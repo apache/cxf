@@ -92,7 +92,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         return bus.getExtension(ClassLoader.class);
     }
     
-    private static DestinationRegistry getDestinationRegistryFromBus(Bus bus) {
+    protected DestinationRegistry getDestinationRegistryFromBus(Bus bus) {
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         try {
             DestinationFactory df = dfm

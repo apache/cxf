@@ -19,9 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.websocket;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -34,14 +32,11 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
     
     @BeforeClass
     public static void startServers() throws Exception {
-        final Map< String, Object > properties = new HashMap< String, Object >();        
-        properties.put("enableWebSocket", "true");
-
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(new BookServerWebSocket(properties)));
+        assertTrue("server did not launch correctly", launchServer(new BookServerWebSocket()));
         createStaticBus();
     }
-        
+    
     @Test
     public void testBookWithWebSocket() throws Exception {
         String address = "ws://localhost:" + PORT + "/web/bookstore";

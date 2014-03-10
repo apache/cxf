@@ -19,10 +19,10 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-rt-transports-http-jetty</artifactId>
+    <artifactId>cxf-rt-transports-websocket</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache CXF Runtime HTTP Jetty Transport</name>
-    <description>Apache CXF Runtime HTTP Jetty Transport</description>
+    <name>Apache CXF Runtime WebSocket Transport</name>
+    <description>Apache CXF Runtime WebSocket Transport</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
@@ -31,7 +31,11 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <cxf.bundle.activator>org.apache.cxf.transport.http_jetty.osgi.HTTPJettyTransportActivator</cxf.bundle.activator>
+<!--
+        <cxf.bundle.activator>org.apache.cxf.transport.websocket.osgi.WebSocketTransportActivator</cxf.bundle.activator>
+                    org.eclipse.jetty.websocket;version="${cxf.jetty.osgi.version}";resolution:=optional,
+        
+-->
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             org.eclipse.jetty*;version="${cxf.jetty.osgi.version}",
@@ -43,7 +47,7 @@
         </cxf.osgi.dynamic.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/transports/http-jetty/configuration"
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/transports/websocket/configuration"
         </cxf.export.service>
     </properties>
     <dependencies>
@@ -74,6 +78,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <optional>true</optional>
@@ -97,6 +106,12 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
             <version>${cxf.jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-websocket</artifactId>
+            <version>${cxf.jetty.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -148,34 +163,6 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-xjc-plugin</artifactId>
-                <version>${cxf.xjc-utils.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-sources</id>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
-                            <xsdOptions>
-                                <xsdOption>
-                                    <xsd>${basedir}/src/main/resources/schemas/configuration/http-jetty.xsd</xsd>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
-                                    <deleteDirs>
-                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
-                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/configuration/security</deleteDir>
-                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/transports/http/configuration</deleteDir>
-                                    </deleteDirs>
-                                </xsdOption>
-                            </xsdOptions>
-                        </configuration>
-                        <goals>
-                            <goal>xsdtojava</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 </project>
