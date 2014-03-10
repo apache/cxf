@@ -78,6 +78,11 @@ public class Attachment implements Transferable {
         this(id, new DataHandler(ds), headers);
     }
     
+    public Attachment(MultivaluedMap<String, String> headers, Object object) {
+        this.headers = headers;
+        this.object = object;
+    }
+    
     public Attachment(InputStream is, MultivaluedMap<String, String> headers) {
         this(headers.getFirst("Content-ID"), 
              new DataHandler(new InputStreamDataSource(is, headers.getFirst("Content-Type"))), 
