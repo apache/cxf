@@ -48,11 +48,11 @@ import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
 public class CXFNonSpringServlet extends AbstractHTTPServlet {
-
     private static final long serialVersionUID = -2437897227486327166L;
+   
+    protected Bus bus;
     private DestinationRegistry destinationRegistry;
     private boolean globalRegistry;
-    private Bus bus;
     private ServletController controller;
     private ClassLoader loader;
     private boolean loadBus = true;
