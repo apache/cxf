@@ -27,6 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 
 public class StaticEndpointClaimsHandler implements ClaimsHandler {
 
@@ -51,10 +53,10 @@ public class StaticEndpointClaimsHandler implements ClaimsHandler {
         return Collections.unmodifiableList(this.supportedClaims);
     }    
     
-    public ClaimCollection retrieveClaimValues(
-            RequestClaimCollection claims, ClaimsParameters parameters) {
+    public ProcessedClaimCollection retrieveClaimValues(
+            ClaimCollection claims, ClaimsParameters parameters) {
         
-        ClaimCollection claimsColl = new ClaimCollection();
+        ProcessedClaimCollection claimsColl = new ProcessedClaimCollection();
         String appliesTo = parameters.getAppliesToAddress();
         if (appliesTo == null) {
             if (LOG.isLoggable(Level.FINER)) {
@@ -70,9 +72,9 @@ public class StaticEndpointClaimsHandler implements ClaimsHandler {
             }
             return claimsColl;
         }
-        for (RequestClaim claim : claims) {
+        for (Claim claim : claims) {
             if (endpointClaims.keySet().contains(claim.getClaimType().toString())) {
-                Claim c = new Claim();
+                ProcessedClaim c = new ProcessedClaim();
                 c.setClaimType(claim.getClaimType());
                 c.setPrincipal(parameters.getPrincipal());
                 c.addValue(endpointClaims.get(claim.getClaimType().toString()));

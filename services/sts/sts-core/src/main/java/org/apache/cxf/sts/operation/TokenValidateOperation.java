@@ -27,10 +27,10 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.event.STSValidateFailureEvent;
 import org.apache.cxf.sts.event.STSValidateSuccessEvent;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -125,7 +125,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
                 processValidToken(providerParameters, validateTarget, tokenResponse);
                 
                 // Check if the requested claims can be handled by the configured claim handlers
-                RequestClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
+                ClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
                 checkClaimsSupport(requestedClaims);
                 requestedClaims = providerParameters.getRequestedSecondaryClaims();
                 checkClaimsSupport(requestedClaims);

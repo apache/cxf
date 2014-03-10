@@ -34,6 +34,8 @@ import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.token.realm.RealmSupport;
 import org.springframework.ldap.core.LdapTemplate;
 
@@ -174,18 +176,18 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         return list;
     }    
     
-    public ClaimCollection retrieveClaimValues(
-            RequestClaimCollection claims, ClaimsParameters parameters) {
+    public ProcessedClaimCollection retrieveClaimValues(
+            ClaimCollection claims, ClaimsParameters parameters) {
         
         boolean found = false;
-        for (RequestClaim claim: claims) {
+        for (Claim claim: claims) {
             if (claim.getClaimType().toString().equals(this.groupURI)) {
                 found = true;
                 break;
             }
         }
         if (!found) {
-            return new ClaimCollection();
+            return new ProcessedClaimCollection();
         }
         
         String user = null;
@@ -207,7 +209,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
             LOG.warning("Principal is null");
         }
         if (user == null) {
-            return new ClaimCollection();
+            return new ProcessedClaimCollection();
         }
         
         if (!LdapUtils.isDN(user)) {
@@ -218,7 +220,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
                 LOG.fine("DN for (" + this.getUserNameAttribute() + "=" + user + ") found: " + user);
             } else {
                 LOG.warning("DN not found for user '" + user + "'");
-                return new ClaimCollection();
+                return new ProcessedClaimCollection();
             }
         }
         
@@ -234,7 +236,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.info("No groups found for user '" + user + "'");
             }
-            return new ClaimCollection();
+            return new ProcessedClaimCollection();
         }
         
         if (LOG.isLoggable(Level.FINE)) {
@@ -300,11 +302,11 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         LOG.info("Filtered groups: " + filteredGroups);
         if (filteredGroups.size() == 0) {
             LOG.info("No matching groups found for user '" + principal + "'");
-            return new ClaimCollection();
+            return new ProcessedClaimCollection();
         }
         
-        ClaimCollection claimsColl = new ClaimCollection();
-        Claim c = new Claim();
+        ProcessedClaimCollection claimsColl = new ProcessedClaimCollection();
+        ProcessedClaim c = new ProcessedClaim();
         c.setClaimType(URI.create(this.groupURI));
         c.setPrincipal(principal);
         c.setValues(new ArrayList<Object>(filteredGroups));

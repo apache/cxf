@@ -19,38 +19,45 @@
 
 package org.apache.cxf.sts.claims;
 
-import java.net.URI;
+import java.security.Principal;
+
+import org.apache.cxf.rt.security.claims.Claim;
 
 /**
- * This represents a Claim that has been processed by the RequestParser.
+ * This represents a Claim that has been processed by a ClaimsHandler instance.
  */
-public class RequestClaim {
+public class ProcessedClaim extends Claim {
 
-    private URI claimType;
-    private boolean optional;
-    private String claimValue;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -336574019841442184L;
+    private String issuer;
+    private String originalIssuer;
+    private transient Principal principal;
 
-    public URI getClaimType() {
-        return claimType;
+    public String getIssuer() {
+        return issuer;
     }
 
-    public void setClaimType(URI claimType) {
-        this.claimType = claimType;
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 
-    public boolean isOptional() {
-        return optional;
+    public String getOriginalIssuer() {
+        return originalIssuer;
     }
 
-    public void setOptional(boolean optional) {
-        this.optional = optional;
+    public void setOriginalIssuer(String originalIssuer) {
+        this.originalIssuer = originalIssuer;
     }
 
-    public String getClaimValue() {
-        return claimValue;
+    public Principal getPrincipal() {
+        return principal;
     }
 
-    public void setClaimValue(String claimValue) {
-        this.claimValue = claimValue;
+    public void setPrincipal(Principal principal) {
+        this.principal = principal;
     }
+
 }

@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.sts.claims.RequestClaim;
+import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.sts.event.AbstractSTSEvent;
 import org.apache.cxf.sts.event.AbstractSTSFailureEvent;
 import org.apache.cxf.sts.event.STSEventListener;
@@ -116,14 +116,14 @@ public class EventMapper implements STSEventListener {
 
         if (params.getRequestedPrimaryClaims() != null) {
             List<String> claims = new ArrayList<String>();
-            for (RequestClaim claim : params.getRequestedPrimaryClaims()) {
+            for (Claim claim : params.getRequestedPrimaryClaims()) {
                 claims.add(claim.getClaimType().toString());
             }
             map.put(KEYS.CLAIMS_PRIMARY.name(), claims.toString());
         }
         if (params.getRequestedSecondaryClaims() != null) {
             List<String> claims = new ArrayList<String>();
-            for (RequestClaim claim : params.getRequestedSecondaryClaims()) {
+            for (Claim claim : params.getRequestedSecondaryClaims()) {
                 claims.add(claim.getClaimType().toString());
             }
             map.put(KEYS.CLAIMS_SECONDARY.name(), claims.toString());

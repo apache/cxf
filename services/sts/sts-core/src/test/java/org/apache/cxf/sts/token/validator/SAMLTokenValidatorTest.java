@@ -34,18 +34,17 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
 import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsManager;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.common.CustomClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -535,10 +534,10 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
         
-        RequestClaimCollection claims = new RequestClaimCollection();
-        RequestClaim claim = new RequestClaim();
+        ClaimCollection claims = new ClaimCollection();
+        Claim claim = new Claim();
         claim.setClaimType(URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"));
-        claim.setClaimValue(role);
+        claim.addValue(role);
         claims.add(claim);
         
         providerParameters.setRequestedPrimaryClaims(claims);

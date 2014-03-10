@@ -32,11 +32,12 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
@@ -47,8 +48,6 @@ import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
 import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.ClaimsMapper;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.common.CustomAttributeProvider;
 import org.apache.cxf.sts.common.CustomClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
@@ -861,8 +860,8 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
         
-        RequestClaimCollection requestedClaims = new RequestClaimCollection();
-        RequestClaim requestClaim = new RequestClaim();
+        ClaimCollection requestedClaims = new ClaimCollection();
+        Claim requestClaim = new Claim();
         requestClaim.setClaimType(ClaimTypes.LASTNAME);
         requestClaim.setOptional(false);
         requestedClaims.add(requestClaim);

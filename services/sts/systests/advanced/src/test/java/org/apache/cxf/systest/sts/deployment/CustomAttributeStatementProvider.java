@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.cxf.sts.claims.Claim;
-import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.ClaimsParameters;
+import org.apache.cxf.sts.claims.ProcessedClaim;
+import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
@@ -42,7 +42,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
 
         // Handle Claims
         ClaimsManager claimsManager = providerParameters.getClaimsManager();
-        ClaimCollection retrievedClaims = new ClaimCollection();
+        ProcessedClaimCollection retrievedClaims = new ProcessedClaimCollection();
         if (claimsManager != null) {
             ClaimsParameters params = new ClaimsParameters();
             params.setAdditionalProperties(providerParameters.getAdditionalProperties());
@@ -66,7 +66,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
             return null;
         }
         
-        Iterator<Claim> claimIterator = retrievedClaims.iterator();
+        Iterator<ProcessedClaim> claimIterator = retrievedClaims.iterator();
         if (!claimIterator.hasNext()) {
             return null;
         }
@@ -76,7 +76,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
 
         AttributeStatementBean attrBean = new AttributeStatementBean();
         while (claimIterator.hasNext()) {
-            Claim claim = claimIterator.next();
+            ProcessedClaim claim = claimIterator.next();
             AttributeBean attributeBean = new AttributeBean();
             
             URI claimType = claim.getClaimType();

@@ -19,17 +19,15 @@
 package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
-import org.apache.cxf.interceptor.security.SAMLSecurityContext;
-import org.apache.cxf.ws.security.wss4j.SAMLUtils;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
+import org.apache.cxf.rt.security.saml.SAMLUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 /**
@@ -67,28 +65,18 @@ public class DefaultSAMLRoleParser implements SAMLRoleParser {
             } else {
                 return new DefaultSecurityContext(principal, subject).getUserRoles();
             }
-        } 
+        }
         
-        List<String> roles = 
-            SAMLUtils.parseRolesInAssertion(assertion, roleAttributeName);
-        SAMLSecurityContext context = createSecurityContext(principal, roles);
+        ClaimCollection claims = SAMLUtils.getClaims(assertion);
+        Set<Principal> roles = 
+            SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
+        
+        SAMLSecurityContext context = 
+            new SAMLSecurityContext(principal, roles, claims);
+        
         return context.getUserRoles();
     }
     
-    private SAMLSecurityContext createSecurityContext(final Principal p, final List<String> roles) {
-        final Set<Principal> userRoles;
-        if (roles != null) {
-            userRoles = new HashSet<Principal>();
-            for (String role : roles) {
-                userRoles.add(new SimplePrincipal(role));
-            }
-        } else {
-            userRoles = null;
-        }
-        
-        return new SAMLSecurityContext(p, userRoles);
-    }
-
     public boolean isUseJaasSubject() {
         return useJaasSubject;
     }

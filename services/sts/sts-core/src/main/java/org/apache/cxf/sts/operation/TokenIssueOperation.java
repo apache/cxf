@@ -33,8 +33,8 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.QNameConstants;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.event.STSIssueFailureEvent;
 import org.apache.cxf.sts.event.STSIssueSuccessEvent;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -113,7 +113,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             providerParameters = createTokenProviderParameters(requestParser, context);
     
             // Check if the requested claims can be handled by the configured claim handlers
-            RequestClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
+            ClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
             checkClaimsSupport(requestedClaims);
             requestedClaims = providerParameters.getRequestedSecondaryClaims();
             checkClaimsSupport(requestedClaims);

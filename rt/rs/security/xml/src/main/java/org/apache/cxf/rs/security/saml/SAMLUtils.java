@@ -20,8 +20,6 @@ package org.apache.cxf.rs.security.saml;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -32,8 +30,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
-import org.apache.cxf.rs.security.saml.assertion.Claim;
-import org.apache.cxf.rs.security.saml.assertion.Claims;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -41,10 +37,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.opensaml.saml2.core.Attribute;
-import org.opensaml.saml2.core.AttributeStatement;
 import org.opensaml.saml2.core.NameID;
-import org.opensaml.xml.XMLObject;
 
 public final class SAMLUtils {
     private static final Logger LOG = 
@@ -67,28 +60,6 @@ public final class SAMLUtils {
         subject.setSpId(nameId.getSPProvidedID());
         subject.setSpQualifier(nameId.getSPNameQualifier());
         return subject;
-    }
-    
-    
-    public static Claims getClaims(SamlAssertionWrapper assertionW) {
-        // Should we just do a simple DOM parsing without even relying on
-        // OpenSaml
-        List<Claim> claims = new ArrayList<Claim>();
-        List<AttributeStatement> statements = assertionW.getSaml2().getAttributeStatements();
-        for (AttributeStatement as : statements) {
-            for (Attribute atr : as.getAttributes()) {
-                Claim claim = new Claim();
-                claim.setName(atr.getName());
-                claim.setNameFormat(atr.getNameFormat());
-                claim.setFriendlyName(atr.getFriendlyName());
-                for (XMLObject o : atr.getAttributeValues()) {
-                    String attrValue = o.getDOM().getTextContent();
-                    claim.getValues().add(attrValue);
-                }
-                claims.add(claim);
-            }
-        }
-        return new Claims(claims);
     }
     
     public static SamlAssertionWrapper createAssertion(Message message) throws Fault {

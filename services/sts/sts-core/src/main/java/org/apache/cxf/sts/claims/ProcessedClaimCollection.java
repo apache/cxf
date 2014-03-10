@@ -19,25 +19,14 @@
 
 package org.apache.cxf.sts.claims;
 
-import java.net.URI;
-
 /**
- * This holds a collection of RequestClaims.
+ * This holds a collection of Claims that have been processed by a ClaimsHandler implementation
  */
-public class RequestClaimCollection extends java.util.ArrayList<RequestClaim> {
-    
+public class ProcessedClaimCollection extends java.util.ArrayList<ProcessedClaim> {
+
     /**
      * 
      */
-    private static final long serialVersionUID = 6013920740410651546L;
-    private URI dialect;
-    
-    public URI getDialect() {
-        return dialect;
-    }
-    
-    public void setDialect(URI dialect) {
-        this.dialect = dialect;
-    }
+    private static final long serialVersionUID = -4630183900697336428L;
 
 }

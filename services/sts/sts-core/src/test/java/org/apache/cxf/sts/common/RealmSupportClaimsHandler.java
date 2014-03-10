@@ -21,12 +21,12 @@ package org.apache.cxf.sts.common;
 import java.net.URI;
 import java.util.List;
 
-import org.apache.cxf.sts.claims.Claim;
-import org.apache.cxf.sts.claims.ClaimCollection;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsParameters;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
+import org.apache.cxf.sts.claims.ProcessedClaim;
+import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.token.realm.RealmSupport;
 import org.junit.Assert;
 
@@ -57,8 +57,8 @@ public class RealmSupportClaimsHandler implements ClaimsHandler, RealmSupport {
         this.supportedClaimTypes = supportedClaimTypes;
     }
     
-    public ClaimCollection retrieveClaimValues(
-            RequestClaimCollection claims, ClaimsParameters parameters) {
+    public ProcessedClaimCollection retrieveClaimValues(
+            ClaimCollection claims, ClaimsParameters parameters) {
         
         if ("A".equals(realm)) {
             Assert.assertEquals("ClaimHandler in realm A. Alice username must be 'alice'",
@@ -76,10 +76,10 @@ public class RealmSupportClaimsHandler implements ClaimsHandler, RealmSupport {
         }
         
         if (claims != null && claims.size() > 0) {
-            ClaimCollection claimCollection = new ClaimCollection();
-            for (RequestClaim requestClaim : claims) {
+            ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
+            for (Claim requestClaim : claims) {
                 if (getSupportedClaimTypes().indexOf(requestClaim.getClaimType()) != -1) {
-                    Claim claim = new Claim();
+                    ProcessedClaim claim = new ProcessedClaim();
                     claim.setClaimType(requestClaim.getClaimType());
                     claim.addValue("Value_" + requestClaim.getClaimType());
                     claimCollection.add(claim);
