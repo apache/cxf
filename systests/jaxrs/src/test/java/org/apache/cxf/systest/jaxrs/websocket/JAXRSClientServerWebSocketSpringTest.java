@@ -32,7 +32,7 @@ public class JAXRSClientServerWebSocketSpringTest extends JAXRSClientServerWebSo
     @BeforeClass
     public static void startServers() throws Exception {
 
-        @SuppressWarnings("unused")
+        @SuppressWarnings({ "unused", "resource" })
         ApplicationContext appctxt = 
             new ClassPathXmlApplicationContext(
                 JAXRSClientServerWebSocketSpringTest.class.getResource(
