@@ -22,6 +22,7 @@ package org.apache.cxf.ws.rm;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
@@ -37,6 +38,7 @@ public class RMDeliveryInterceptor extends AbstractRMInterceptor<Message> {
   
     public RMDeliveryInterceptor() {
         super(Phase.POST_INVOKE);
+        addBefore(OutgoingChainInterceptor.class.getName());
     }
     
     // Interceptor interface 
