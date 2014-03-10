@@ -62,8 +62,18 @@ public class JAXRSSimpleRequestDispatcherTest extends AbstractBusClientServerTes
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         client.accept("application/json");
         Book book = client.get(Book.class);
-        assertEquals("Redirect complete", book.getName());
+        assertEquals("Redirect complete: /dispatch/bookstore/books/redirectComplete", book.getName());
     }
     
+    @Test
+    public void testGetRedirectedBook2() throws Exception {
+        String address = "http://localhost:" + PORT + "/dispatch/redirect/bookstore3/books/redirectStart";
+        WebClient client = WebClient.create(address);
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        client.accept("application/json");
+        Book book = client.get(Book.class);
+        assertEquals("Redirect complete: /dispatch/redirect/bookstore/books/redirectComplete", 
+                     book.getName());
+    }
     
 }
