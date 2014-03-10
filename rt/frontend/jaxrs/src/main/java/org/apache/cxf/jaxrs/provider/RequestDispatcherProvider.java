@@ -85,6 +85,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private String beanName;
     private String dispatcherName;
     private String servletPath;
+    private boolean useCurrentServlet;
     private boolean saveParametersAsAttributes;
     private boolean logRedirects;
     private boolean strictPathCheck;
@@ -172,28 +173,37 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         throws IOException {
         
         ServletContext sc = getServletContext();
+        HttpServletRequest servletRequest = mc.getHttpServletRequest();
+        
         String path = getResourcePath(clazz, o);
-        RequestDispatcher rd = getRequestDispatcher(sc, clazz, path);
+        
+        String theServletPath = servletPath != null ? servletPath 
+            : useCurrentServlet ? servletRequest.getServletPath() : "/";
+                
+        if (theServletPath.endsWith("/") && path != null && path.startsWith("/")) {
+            theServletPath = theServletPath.length() == 1 ? "" 
+                : theServletPath.substring(0, theServletPath.length() - 1);
+        } else if (!theServletPath.endsWith("/") && path != null && !path.startsWith("/")) {
+            path = "/" + path;
+        }
+        
+        
+        RequestDispatcher rd = getRequestDispatcher(sc, clazz, theServletPath + path);
         
         try {
             mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.TRUE);
             
-            String theServletPath = servletPath == null ? "/" : servletPath;
-            if ("/".equals(theServletPath) && path != null && path.startsWith("/")) {
-                theServletPath = "";
-            }
-            HttpServletRequestFilter servletRequest = 
-                new HttpServletRequestFilter(mc.getHttpServletRequest(), path, 
-                                             theServletPath, saveParametersAsAttributes);
+            HttpServletRequestFilter requestFilter = new HttpServletRequestFilter(
+                servletRequest, path, theServletPath, saveParametersAsAttributes);
             String attributeName = getBeanName(o);
             if (REQUEST_SCOPE.equals(scope)) {
-                servletRequest.setAttribute(attributeName, o);
+                requestFilter.setAttribute(attributeName, o);
             } else if (SESSION_SCOPE.equals(scope)) {
-                servletRequest.getSession(true).setAttribute(attributeName, o);
+                requestFilter.getSession(true).setAttribute(attributeName, o);
             } 
-            setRequestParameters(servletRequest);
+            setRequestParameters(requestFilter);
             logRedirection(path, attributeName, o);
-            rd.forward(servletRequest, mc.getHttpServletResponse());
+            rd.forward(requestFilter, mc.getHttpServletResponse());
         } catch (Throwable ex) {
             mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.FALSE);
             ex.printStackTrace();
@@ -379,6 +389,10 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
 
     public void setEnumResources(Map<? extends Enum<?>, String> enumResources) {
         this.enumResources = enumResources;
+    }
+
+    public void setUseCurrentServlet(boolean useCurrentServlet) {
+        this.useCurrentServlet = useCurrentServlet;
     }
 
     protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {

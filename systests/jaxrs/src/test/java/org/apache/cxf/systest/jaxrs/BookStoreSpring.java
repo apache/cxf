@@ -95,7 +95,7 @@ public class BookStoreSpring {
     @Path("/books/redirectComplete")
     public Book getBookRedirectComplete(@Context HttpServletRequest request) {
         Book book = (Book)request.getAttribute(Book.class.getSimpleName().toLowerCase());
-        book.setName("Redirect complete");
+        book.setName("Redirect complete: " + request.getRequestURI());
         return book; 
     }
     
