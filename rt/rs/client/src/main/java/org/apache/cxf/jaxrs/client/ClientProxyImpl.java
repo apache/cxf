@@ -406,7 +406,7 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         
-        Map<String, Object> beanParamValues = new HashMap<String, Object>(beanParams.size());
+        Map<String, BeanPair> beanParamValues = new HashMap<String, BeanPair>(beanParams.size());
         for (Parameter p : beanParams) {
             beanParamValues.putAll(getValuesFromBeanParam(params[p.getIndex()], PathParam.class));
         }
@@ -416,7 +416,8 @@ public class ClientProxyImpl extends AbstractClient implements
             if (p != null) {
                 list.add(convertParamValue(params[p.getIndex()], getParamAnnotations(m, p)));
             } else if (beanParamValues.containsKey(varName)) {
-                list.add(convertParamValue(beanParamValues.get(varName), null));
+                BeanPair pair = beanParamValues.get(varName);
+                list.add(convertParamValue(pair.getValue(), pair.getAnns()));
             }
         }
         
