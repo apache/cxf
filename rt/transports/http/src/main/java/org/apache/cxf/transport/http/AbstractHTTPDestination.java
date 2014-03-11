@@ -72,6 +72,8 @@ import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
 import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.WSDLLibrary;
@@ -268,14 +270,19 @@ public abstract class AbstractHTTPDestination
         final Exchange exchange = inMessage.getExchange();
         DelegatingInputStream in = new DelegatingInputStream(req.getInputStream()) {
             public void cacheInput() {
-                if (!cached && exchange.isOneWay()) {
-                    //For one-ways, we need to cache the values of the HttpServletRequest
+                if (!cached && (exchange.isOneWay() || isWSAddressingReplyToSpecified(exchange))) {
+                    //For one-ways and WS-Addressing invocations with ReplyTo address,
+                    //we need to cache the values of the HttpServletRequest
                     //so they can be queried later for things like paths and schemes 
                     //and such like that.                   
                     //Please note, exchange used to always get the "current" message
                     exchange.getInMessage().put(HTTP_REQUEST, new HttpServletRequestSnapshot(req));
                 }
                 super.cacheInput();
+            }
+            private boolean isWSAddressingReplyToSpecified(Exchange ex) {
+                AddressingProperties map = ContextUtils.retrieveMAPs(ex.getInMessage(), false, false, false);
+                return map != null && !ContextUtils.isGenericAddress(map.getReplyTo());
             }
         };
         
