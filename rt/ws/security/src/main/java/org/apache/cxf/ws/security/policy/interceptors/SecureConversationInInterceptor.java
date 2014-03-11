@@ -122,7 +122,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
             String addNs = null;
             AddressingProperties inProps = (AddressingProperties)message
-                .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
+                .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
             if (inProps != null) {
                 addNs = inProps.getNamespaceURI();
                 if (s == null) {

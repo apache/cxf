@@ -87,7 +87,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 s = SoapActionInInterceptor.getSoapAction(message);
             }
             AddressingProperties inProps = (AddressingProperties)message
-                .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
+                .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
             if (inProps != null && s == null) {
                 //MS/WCF doesn't put a soap action out for this, must check the headers
                 s = inProps.getAction().getValue();

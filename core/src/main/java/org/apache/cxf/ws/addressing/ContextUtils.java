@@ -49,11 +49,9 @@ import org.apache.cxf.transport.MessageObserver;
 import static org.apache.cxf.message.Message.ASYNC_POST_RESPONSE_DISPATCH;
 import static org.apache.cxf.message.Message.REQUESTOR_ROLE;
 
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_INBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND;
 
 
 /**
@@ -141,26 +139,23 @@ public final class ContextUtils {
     /**
      * Get appropriate property name for message addressing properties.
      *
+     * @param isRequestor true if the current messaging role is that of
+     * requestor
      * @param isProviderContext true if the binding provider request context 
      * available to the client application as opposed to the message context 
      * visible to handlers
-     * @param isRequestor true if the current messaging role is that of
-     * requestor
      * @param isOutbound true if the message is outbound
      * @return the property name to use when caching the MAPs in the context
      */
     public static String getMAPProperty(boolean isRequestor, 
                                         boolean isProviderContext,
                                         boolean isOutbound) {
-        return isRequestor
-                ? isProviderContext
-                 ? CLIENT_ADDRESSING_PROPERTIES
-                 : isOutbound
-                   ? CLIENT_ADDRESSING_PROPERTIES_OUTBOUND
-                   : CLIENT_ADDRESSING_PROPERTIES_INBOUND
-               : isOutbound
-                 ? SERVER_ADDRESSING_PROPERTIES_OUTBOUND
-                 : SERVER_ADDRESSING_PROPERTIES_INBOUND;
+        if (isRequestor && isProviderContext) {
+            return CLIENT_ADDRESSING_PROPERTIES;
+        }
+        return isOutbound
+            ? ADDRESSING_PROPERTIES_OUTBOUND
+            : ADDRESSING_PROPERTIES_INBOUND;          
     }
 
     /**
@@ -244,8 +239,8 @@ public final class ContextUtils {
                                                    boolean warnIfMissing) {
         boolean isRequestor = ContextUtils.isRequestor(message);
         String mapProperty =
-            ContextUtils.getMAPProperty(isProviderContext, 
-                                        isRequestor,
+            ContextUtils.getMAPProperty(isRequestor,
+                                        isProviderContext, 
                                         isOutbound);
         LOG.log(Level.FINE,
                 "retrieving MAPs from context property {0}",

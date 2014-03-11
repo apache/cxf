@@ -59,7 +59,7 @@ public class MEXInInterceptor extends AbstractPhaseInterceptor<Message> {
         String action = (String)message.get(SoapBindingConstants.SOAP_ACTION);
         if (action == null) {
             AddressingProperties inProps = (AddressingProperties)message
-                .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
+                .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
             if (inProps != null && inProps.getAction() != null) {
                 action = inProps.getAction().getValue();
             }

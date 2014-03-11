@@ -29,7 +29,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
 public abstract class AbstractMultiplexDestination extends AbstractDestination implements
     MultiplexDestination {
@@ -78,7 +78,7 @@ public abstract class AbstractMultiplexDestination extends AbstractDestination i
     public String getId(Map<String, Object> contextMap) {
         String markedParam = null;
         AddressingProperties maps = (AddressingProperties)contextMap
-            .get(SERVER_ADDRESSING_PROPERTIES_INBOUND);
+            .get(ADDRESSING_PROPERTIES_INBOUND);
         if (null != maps) {
             EndpointReferenceType toEpr = maps.getToEndpointReference();
             if (null != toEpr) {

@@ -40,9 +40,9 @@ public class SCTOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     public void handleMessage(SoapMessage message) throws Fault {
         
         AddressingProperties inProps = (AddressingProperties)message
-            .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
+            .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
         AddressingProperties outProps = (AddressingProperties)message
-            .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND);
+            .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND);
         if (inProps != null) {
             if (outProps == null) {
                 outProps = new AddressingProperties(inProps.getNamespaceURI());
@@ -50,7 +50,7 @@ public class SCTOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
             AttributedURIType action = new AttributedURIType();
             action.setValue(inProps.getAction().getValue().replace("/RST/", "/RSTR/"));
             outProps.setAction(action);
-            message.put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND, outProps);
+            message.put(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND, outProps);
         }
     }
     

@@ -73,7 +73,7 @@ public class RMOutInterceptorTest extends Assert {
         Message message = control.createMock(Message.class);        
         EasyMock.expect(interceptor.isRuntimeFault(message)).andReturn(false).anyTimes();
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();        
-        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND))
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND))
             .andReturn(null).anyTimes();
         control.replay();
         interceptor.handle(message);
@@ -104,7 +104,7 @@ public class RMOutInterceptorTest extends Assert {
         EasyMock.expect(ex.getOutMessage()).andReturn(message).anyTimes();
         EasyMock.expect(ex.put("defer.uncorrelated.message.abort", Boolean.TRUE)).andReturn(null).anyTimes();
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();        
-        EasyMock.expect(message.get(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND))
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND))
             .andReturn(maps).anyTimes();
         RMProperties rmpsOut = new RMProperties();
         EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_OUTBOUND)).

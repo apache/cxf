@@ -66,21 +66,22 @@ public final class JAXWSAConstants {
      * Well-known Property names for AddressingProperties in Handler
      * Context.
      */
-    public static final String CLIENT_ADDRESSING_PROPERTIES_INBOUND = 
+    public static final String ADDRESSING_PROPERTIES_INBOUND = 
         "javax.xml.ws.addressing.context.inbound";
-    public static final String CLIENT_ADDRESSING_PROPERTIES_OUTBOUND = 
+    public static final String ADDRESSING_PROPERTIES_OUTBOUND = 
         "javax.xml.ws.addressing.context.outbound";
-    public static final String SERVER_ADDRESSING_PROPERTIES_INBOUND = 
-        "javax.xml.ws.addressing.context.inbound";
-    public static final String SERVER_ADDRESSING_PROPERTIES_OUTBOUND = 
-        "javax.xml.ws.addressing.context.outbound";
-    
-    /**
-     * Used by AddressingBuilder factory method.
-     */
-    public static final String DEFAULT_ADDRESSING_BUILDER =
-        "org.apache.cxf.ws.addressing.impl.AddressingBuilderImpl";
 
+
+    @Deprecated
+    public static final String CLIENT_ADDRESSING_PROPERTIES_INBOUND = ADDRESSING_PROPERTIES_INBOUND;
+    @Deprecated
+    public static final String CLIENT_ADDRESSING_PROPERTIES_OUTBOUND = ADDRESSING_PROPERTIES_OUTBOUND;
+    @Deprecated
+    public static final String SERVER_ADDRESSING_PROPERTIES_INBOUND = ADDRESSING_PROPERTIES_INBOUND;
+    @Deprecated
+    public static final String SERVER_ADDRESSING_PROPERTIES_OUTBOUND = ADDRESSING_PROPERTIES_OUTBOUND;
+
+    
     /**
      * Prevents instantiation. 
      */

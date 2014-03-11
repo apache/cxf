@@ -32,8 +32,8 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.Names;
 
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_INBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND;
 
 
 /**
@@ -47,8 +47,8 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
     public MAPVerifier() {
         super(Phase.POST_LOGICAL);
         mapProperties = new HashMap<String, Object>();
-        mapProperties.put(MAPTest.INBOUND_KEY, CLIENT_ADDRESSING_PROPERTIES_INBOUND);
-        mapProperties.put(MAPTest.OUTBOUND_KEY, CLIENT_ADDRESSING_PROPERTIES_OUTBOUND);
+        mapProperties.put(MAPTest.INBOUND_KEY, ADDRESSING_PROPERTIES_INBOUND);
+        mapProperties.put(MAPTest.OUTBOUND_KEY, ADDRESSING_PROPERTIES_OUTBOUND);
     }
     
     public void handleMessage(Message message) {

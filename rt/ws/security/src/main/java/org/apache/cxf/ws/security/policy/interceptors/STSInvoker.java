@@ -64,13 +64,13 @@ abstract class STSInvoker implements Invoker {
     
     public Object invoke(Exchange exchange, Object o) {
         AddressingProperties inProps = (AddressingProperties)exchange.getInMessage()
-                .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
+                .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
         if (inProps != null) {
             AddressingProperties props = inProps.createCompatibleResponseProperties();
             AttributedURIType action = new AttributedURIType();
             action.setValue(inProps.getAction().getValue().replace("/RST/", "/RSTR/"));
             props.setAction(action);
-            exchange.getOutMessage().put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND, props);
+            exchange.getOutMessage().put(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND, props);
         }
 
         MessageContentsList lst = (MessageContentsList)o;
