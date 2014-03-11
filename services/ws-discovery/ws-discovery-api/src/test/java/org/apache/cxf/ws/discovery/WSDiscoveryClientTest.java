@@ -23,7 +23,9 @@ import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.net.SocketAddress;
+import java.util.Enumeration;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
@@ -56,6 +58,28 @@ public final class WSDiscoveryClientTest {
     
     @Test
     public void testMultiResponses() throws Exception {
+        // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
+        if (System.getProperties().getProperty("os.name").equals("Linux") 
+            && System.getProperties().getProperty("os.version").indexOf("el") > 0) {
+            System.out.println("Skipping MultiResponse test for REL");
+            return;
+        }
+        
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        int count = 0;
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = interfaces.nextElement();
+            if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+                continue;  
+            }
+            count++;
+        }
+        if (count == 0) {
+            //no non-loopbacks, cannot do broadcasts
+            System.out.println("Skipping MultiResponse test");
+            return;
+        }
+        
         new Thread(new Runnable() {
             public void run() {
                 try {
