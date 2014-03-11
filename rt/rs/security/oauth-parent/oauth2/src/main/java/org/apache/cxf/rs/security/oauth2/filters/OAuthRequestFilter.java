@@ -24,14 +24,20 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
+import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
+import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -42,6 +48,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.services.AbstractAccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
@@ -56,6 +63,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     
     private boolean useUserSubject;
     private boolean audienceIsEndpointAddress;
+    private boolean checkFormData;
     
     public void filter(ContainerRequestContext context) {
         validateRequest(JAXRSUtils.getCurrentMessage());
@@ -198,7 +206,38 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         this.audienceIsEndpointAddress = audienceIsEndpointAddress;
     }
     
-    protected String[] getAuthorizationParts(Message m) {
-        return AuthorizationUtils.getAuthorizationParts(getMessageContext(), supportedSchemes);
+    public void setCheckFormData(boolean checkFormData) {
+        this.checkFormData = checkFormData;
     }
+    
+    protected String[] getAuthorizationParts(Message m) {
+        if (!checkFormData) {
+            return AuthorizationUtils.getAuthorizationParts(getMessageContext(), supportedSchemes);
+        } else {
+            return new String[]{OAuthConstants.BEARER_AUTHORIZATION_SCHEME, getTokenFromFormData(m)};
+        }
+    }
+    
+    protected String getTokenFromFormData(Message message) {
+        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        String type = (String)message.get(Message.CONTENT_TYPE);
+        if (type != null && MediaType.APPLICATION_FORM_URLENCODED.startsWith(type) 
+            && method != null && (method.equals(HttpMethod.POST) || method.equals(HttpMethod.PUT))) {
+            try {
+                FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
+                Form form = FormUtils.readForm(provider, message);
+                MultivaluedMap<String, String> formData = form.asMap();
+                String token = formData.getFirst(OAuthConstants.ACCESS_TOKEN);
+                if (token != null) {
+                    FormUtils.restoreForm(provider, form, message);
+                    return token;
+                }
+            } catch (Exception ex) {
+                // the exception will be thrown below    
+            }       
+        }
+        AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
+        return null;
+    }
+    
 }
