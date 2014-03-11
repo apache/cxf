@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
+import org.apache.cxf.transport.servlet.ServletDestination;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -44,39 +45,38 @@ public class JettyWebSocketManagerTest extends Assert {
     }
     
     @Test
-    public void testServiceUsingDestination() throws Exception {
+    public void testServiceUsingJettyDestination() throws Exception {
         JettyWebSocketManager jwsm = new JettyWebSocketManager();
         
-        JettyWebSocketHandler handler = control.createMock(JettyWebSocketHandler.class);
-        JettyHTTPDestination dest = control.createMock(JettyHTTPDestination.class);
+        JettyHTTPDestination dest = control.createMock(JettyWebSocketDestination.class);
                 
         HttpServletRequest request = control.createMock(HttpServletRequest.class);
         HttpServletResponse response = control.createMock(HttpServletResponse.class);
         
-        dest.invoke(EasyMock.isNull(ServletConfig.class), EasyMock.isNull(ServletContext.class), 
+        dest.invoke(EasyMock.isNull(ServletConfig.class), EasyMock.anyObject(ServletContext.class), 
                     EasyMock.eq(request), EasyMock.eq(response));
         EasyMock.expectLastCall();
         control.replay();
-        jwsm.init(handler, dest);
+        jwsm.init(dest);
         
         jwsm.service(request, response);
         control.verify();
     }
 
     @Test
-    public void testServiceUsingServlet() throws Exception {
+    public void testServiceUsingServletDestination() throws Exception {
         JettyWebSocketManager jwsm = new JettyWebSocketManager();
         
+        ServletDestination dest = control.createMock(JettyWebSocketServletDestination.class);
+                
         HttpServletRequest request = control.createMock(HttpServletRequest.class);
         HttpServletResponse response = control.createMock(HttpServletResponse.class);
         
-        CXFNonSpringJettyWebSocketServlet srvlt = control.createMock(CXFNonSpringJettyWebSocketServlet.class);
-        ServletConfig sc = control.createMock(ServletConfig.class);
-
-        srvlt.serviceInternal(EasyMock.eq(request), EasyMock.eq(response));
+        dest.invoke(EasyMock.isNull(ServletConfig.class), EasyMock.anyObject(ServletContext.class), 
+                    EasyMock.eq(request), EasyMock.eq(response));
         EasyMock.expectLastCall();
         control.replay();
-        jwsm.init(srvlt, sc);
+        jwsm.init(dest);
         
         jwsm.service(request, response);
         control.verify();

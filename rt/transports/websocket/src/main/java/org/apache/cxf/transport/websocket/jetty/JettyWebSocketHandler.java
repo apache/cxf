@@ -27,23 +27,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPHandler;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.websocket.WebSocket;
-import org.eclipse.jetty.websocket.WebSocketFactory;
 
 /**
  * The extended version of JettyHTTPHandler that can support websocket.
  */
-class JettyWebSocketHandler extends JettyHTTPHandler implements WebSocketFactory.Acceptor {
+class JettyWebSocketHandler extends JettyHTTPHandler {
     private JettyWebSocketManager webSocketManager;
 
-    public JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact) {
+    public JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact,
+                                 JettyWebSocketManager webSocketManager) {
         super(jhd, cmExact);
-        webSocketManager = new JettyWebSocketManager();
-        webSocketManager.init(this, jhd);
-    }
-
-    public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
-        return new JettyWebSocket(webSocketManager, request, protocol);
+        this.webSocketManager = webSocketManager;
     }
     
     @Override
@@ -55,9 +49,5 @@ class JettyWebSocketHandler extends JettyHTTPHandler implements WebSocketFactory
         } else {
             super.handle(target, baseRequest, request, response);
         }
-    }
-
-    public boolean checkOrigin(HttpServletRequest request, String protocol) {
-        return true;
     }
 }

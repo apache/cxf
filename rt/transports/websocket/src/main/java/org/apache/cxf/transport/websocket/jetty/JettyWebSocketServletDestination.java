@@ -20,54 +20,40 @@
 package org.apache.cxf.transport.websocket.jetty;
 
 import java.io.IOException;
-import java.net.URL;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
-import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
-import org.apache.cxf.transport.http_jetty.JettyHTTPHandler;
-import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
+import org.apache.cxf.transport.servlet.ServletDestination;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketFactory;
 
 /**
  * 
  */
-public class JettyWebSocketDestination extends JettyHTTPDestination implements WebSocketFactory.Acceptor {
+public class JettyWebSocketServletDestination extends ServletDestination implements WebSocketFactory.Acceptor {
     private JettyWebSocketManager webSocketManager;
 
-    public JettyWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
-                                     JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
-        super(bus, registry, ei, serverEngineFactory);
+    public JettyWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
+                                            String path) throws IOException {
+        super(bus, registry, ei, ei.toString());
         webSocketManager = new JettyWebSocketManager();
         webSocketManager.init(this);
     }
 
     @Override
-    protected String getAddress(EndpointInfo endpointInfo) {
-        String address = endpointInfo.getAddress();
-        if (address.startsWith("ws")) {
-            address = "http" + address.substring(2);
+    public void invoke(ServletConfig config, ServletContext context, HttpServletRequest req,
+                       HttpServletResponse resp) throws IOException {
+        if (webSocketManager.acceptWebSocket(req, resp)) {
+            return;
         }
-        return address;
-    }
 
-
-    @Override
-    protected String getBasePath(String contextPath) throws IOException {
-        if (StringUtils.isEmpty(endpointInfo.getAddress())) {
-            return "";
-        }
-        return new URL(getAddress(endpointInfo)).getPath();
-    }
-    
-    @Override
-    protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
-        return new JettyWebSocketHandler(jhd, cmExact, webSocketManager);
+        super.invoke(config, context, req, resp);
     }
 
     @Override
@@ -90,5 +76,4 @@ public class JettyWebSocketDestination extends JettyHTTPDestination implements W
             super.shutdown();
         }
     }
-
 }

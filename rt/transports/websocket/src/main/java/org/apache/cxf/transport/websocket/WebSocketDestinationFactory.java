@@ -23,12 +23,15 @@ import java.io.IOException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
+import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http.HttpDestinationFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
-import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination;
+import org.apache.cxf.transport.websocket.jetty.JettyWebSocketServletDestination;
 
 @NoJSR250Annotations()
 public class WebSocketDestinationFactory implements HttpDestinationFactory {
@@ -42,8 +45,25 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                 .getExtension(JettyHTTPServerEngineFactory.class);
             return new JettyWebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
         } else {
-            return new ServletDestination(bus, registry, endpointInfo, endpointInfo.getAddress());
+            //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
+            registry = getDestinationRegistry(bus);
+            return new JettyWebSocketServletDestination(bus, registry, endpointInfo, endpointInfo.getAddress());
         }
+    }
+
+    private static DestinationRegistry getDestinationRegistry(Bus bus) {
+        DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
+        try {
+            DestinationFactory df = dfm
+                .getDestinationFactory("http://cxf.apache.org/transports/http/configuration");
+            if (df instanceof HTTPTransportFactory) {
+                HTTPTransportFactory transportFactory = (HTTPTransportFactory)df;
+                return transportFactory.getRegistry();
+            }
+        } catch (Exception e) {
+            // why are we throwing a busexception if the DF isn't found?
+        }
+        return null;
     }
 
 }
