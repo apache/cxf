@@ -41,7 +41,12 @@ public class DefaultSecurityContext implements LoginSecurityContext {
     private Subject subject; 
     
     public DefaultSecurityContext(Subject subject) {
-        this.p = findPrincipal(subject);
+        this.p = findPrincipal(null, subject);
+        this.subject = subject;
+    }
+    
+    public DefaultSecurityContext(String principalName, Subject subject) {
+        this.p = findPrincipal(principalName, subject);
         this.subject = subject;
     }
     
@@ -49,18 +54,31 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         this.p = p;
         this.subject = subject;
         if (p == null) {
-            this.p = findPrincipal(subject);
+            this.p = findPrincipal(null, subject);
         }
     }
     
-    private static Principal findPrincipal(Subject subject) {
-        if (subject != null) {
+    private static Principal findPrincipal(String principalName, Subject subject) {
+        if (subject == null) {
+            return null;
+        }
+        
+        for (Principal principal : subject.getPrincipals()) {
+            if (!(principal instanceof Group) && (principalName == null 
+                || (principalName != null && principalName.equals(principal.getName())))) {
+                return principal;
+            }
+        }
+        
+        // No match for the principalName. Just return first non-Group Principal
+        if (principalName != null) {
             for (Principal principal : subject.getPrincipals()) {
                 if (!(principal instanceof Group)) { 
                     return principal;
                 }
             }
         }
+        
         return null;
     }
     

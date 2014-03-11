@@ -138,7 +138,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
             
             Subject subject = ctx.getSubject();
             
-            message.put(SecurityContext.class, createSecurityContext(subject)); 
+            message.put(SecurityContext.class, createSecurityContext(name, subject)); 
         } catch (LoginException ex) {
             String errorMessage = "Unauthorized : " + ex.getMessage();
             LOG.fine(errorMessage);
@@ -154,12 +154,12 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         return new NamePasswordCallbackHandler(name, password);
     }
     
-    protected SecurityContext createSecurityContext(Subject subject) {
+    protected SecurityContext createSecurityContext(String name, Subject subject) {
         if (getRoleClassifier() != null) {
             return new RolePrefixSecurityContextImpl(subject, getRoleClassifier(),
                                                      getRoleClassifierType());
         } else {
-            return new DefaultSecurityContext(subject);
+            return new DefaultSecurityContext(name, subject);
         }
     }
 
