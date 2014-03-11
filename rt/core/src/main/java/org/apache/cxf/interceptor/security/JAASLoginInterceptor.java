@@ -37,6 +37,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 
 public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -161,7 +162,21 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
             return new RolePrefixSecurityContextImpl(subject, getRoleClassifier(),
                                                      getRoleClassifierType());
         } else {
-            return new DefaultSecurityContext(subject);
+            // Get username - this is a bit unwieldy but necessary to preserve the message signature
+            Message message = PhaseInterceptorChain.getCurrentMessage();
+            AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
+            String name = null;
+            if (policy != null) {
+                name = policy.getUserName();
+            } else {
+                // try the UsernameToken
+                SecurityToken token = message.get(SecurityToken.class);
+                if (token != null && token.getTokenType() == TokenType.UsernameToken) {
+                    UsernameToken ut = (UsernameToken)token;
+                    name = ut.getName();
+                }
+            }
+            return new DefaultSecurityContext(name, subject);
         }
     }
 
