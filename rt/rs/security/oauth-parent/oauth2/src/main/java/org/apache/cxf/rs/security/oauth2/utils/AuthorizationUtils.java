@@ -59,6 +59,12 @@ public final class AuthorizationUtils {
     
     public static String[] getAuthorizationParts(MessageContext mc,
                                                  Set<String> challenges) {
+        return getAuthorizationParts(mc, challenges, null);
+    }
+    
+    public static String[] getAuthorizationParts(MessageContext mc,
+                                                 Set<String> challenges,
+                                                 String realm) {
         List<String> headers = mc.getHttpHeaders().getRequestHeader("Authorization");
         if (headers.size() == 1) {
             String[] parts = headers.get(0).split(" ");
@@ -66,7 +72,7 @@ public final class AuthorizationUtils {
                 return parts;       
             }
         }
-        throwAuthorizationFailure(challenges);
+        throwAuthorizationFailure(challenges, realm);
         return null;
     }
     
