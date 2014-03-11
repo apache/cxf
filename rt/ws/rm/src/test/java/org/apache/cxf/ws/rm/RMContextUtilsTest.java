@@ -143,7 +143,7 @@ public class RMContextUtilsTest extends Assert {
     public void testStoreMAPs() {
         Message msg = control.createMock(Message.class);
         AddressingProperties maps = control.createMock(AddressingProperties.class);
-        EasyMock.expect(msg.put(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND, maps)).andReturn(null);
+        EasyMock.expect(msg.put(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND, maps)).andReturn(null);
         control.replay();
         RMContextUtils.storeMAPs(maps, msg, true, true);
     }

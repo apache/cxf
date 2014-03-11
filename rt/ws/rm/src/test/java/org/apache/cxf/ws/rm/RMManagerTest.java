@@ -234,7 +234,7 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(exchange.getDestination()).andReturn(destination).anyTimes();
         AddressingPropertiesImpl maps = control.createMock(AddressingPropertiesImpl.class);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(null);
-        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND))
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND))
             .andReturn(maps).anyTimes();
         EndpointReferenceType replyTo = RMUtils.createAnonymousReference();
         EasyMock.expect(maps.getReplyTo()).andReturn(replyTo).anyTimes();

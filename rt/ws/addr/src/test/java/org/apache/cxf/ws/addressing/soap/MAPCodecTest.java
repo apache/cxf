@@ -59,10 +59,8 @@ import org.junit.Test;
 
 import static org.apache.cxf.message.Message.MIME_HEADERS;
 import static org.apache.cxf.message.Message.REQUESTOR_ROLE;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_INBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND;
 
 public class MAPCodecTest extends Assert {
 
@@ -397,9 +395,7 @@ public class MAPCodecTest extends Assert {
     }
 
     private String getMAPProperty(boolean requestor, boolean outbound) {
-        return requestor ? outbound
-            ? CLIENT_ADDRESSING_PROPERTIES_OUTBOUND : CLIENT_ADDRESSING_PROPERTIES_INBOUND : outbound
-            ? SERVER_ADDRESSING_PROPERTIES_OUTBOUND : SERVER_ADDRESSING_PROPERTIES_INBOUND;
+        return outbound ? ADDRESSING_PROPERTIES_OUTBOUND : ADDRESSING_PROPERTIES_INBOUND;
     }
 
     private AddressingPropertiesImpl getMAPs(boolean requestor, boolean outbound, String uri) {

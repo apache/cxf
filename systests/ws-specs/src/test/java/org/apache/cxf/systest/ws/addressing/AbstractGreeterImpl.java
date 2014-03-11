@@ -41,7 +41,7 @@ import org.apache.hello_world_soap_http.types.SayHiResponse;
 import org.apache.hello_world_soap_http.types.TestDocLitFaultResponse;
 import org.apache.hello_world_soap_http.types.TestNillableResponse;
 
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
 public abstract class AbstractGreeterImpl implements Greeter {
     VerificationCache verificationCache;
@@ -122,7 +122,7 @@ public abstract class AbstractGreeterImpl implements Greeter {
 
     private void verifyMAPs() {
         if (context.getMessageContext() != null) {
-            String property = SERVER_ADDRESSING_PROPERTIES_INBOUND;
+            String property = ADDRESSING_PROPERTIES_INBOUND;
             AddressingProperties maps = (AddressingProperties)
                 context.getMessageContext().get(property);
             verificationCache.put(MAPTest.verifyMAPs(maps, this));

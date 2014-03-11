@@ -199,7 +199,7 @@ public class ServantTest extends Assert {
 
         maps.setReplyTo(RMUtils.createReference(DECOUPLED_URL));
         
-        message.put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND, maps);
+        message.put(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND, maps);
         
         CreateSequenceType cs = new CreateSequenceType();
         cs.setAcksTo(org.apache.cxf.ws.addressing.VersionTransformer
@@ -260,7 +260,7 @@ public class ServantTest extends Assert {
 
         maps.setReplyTo(RMUtils.createReference(DECOUPLED_URL));
         
-        message.put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND, maps);
+        message.put(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND, maps);
 
         TerminateSequenceType ts = new TerminateSequenceType();
         Identifier sid = new Identifier();

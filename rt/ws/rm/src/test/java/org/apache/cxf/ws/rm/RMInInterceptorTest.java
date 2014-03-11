@@ -315,7 +315,7 @@ public class RMInInterceptorTest extends Assert {
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         AddressingPropertiesImpl maps = control.createMock(AddressingPropertiesImpl.class);
         EasyMock.expect(maps.getNamespaceURI()).andReturn(Names200408.WSA_NAMESPACE_NAME).anyTimes();
-        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
         AttributedURIType actionURI = control.createMock(AttributedURIType.class);
         EasyMock.expect(maps.getAction()).andReturn(actionURI).times(2);
         EasyMock.expect(actionURI.getValue()).andReturn("foo");
@@ -379,7 +379,7 @@ public class RMInInterceptorTest extends Assert {
         interceptor.setManager(manager);
         
         // test 1. a normal sequence fault case without non-anonymous faultTo
-        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(message.get(RMMessageConstants.RM_PROTOCOL_VARIATION))
             .andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
@@ -405,7 +405,7 @@ public class RMInInterceptorTest extends Assert {
         EasyMock.expect(exchange.get(Endpoint.class)).andReturn(ep).anyTimes();
         EasyMock.expect(maps.getFaultTo())
             .andReturn(RMUtils.createReference("http://localhost:9999/decoupled")).anyTimes();
-        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(message.get(RMMessageConstants.RM_PROTOCOL_VARIATION))
             .andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
@@ -427,7 +427,7 @@ public class RMInInterceptorTest extends Assert {
         control.reset();
         EasyMock.expect(maps.getFaultTo())
             .andReturn(RMUtils.createAnonymousReference()).anyTimes();
-        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps).anyTimes();
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps).anyTimes();
         EasyMock.expect(manager.getDestination(message)).andReturn(d);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY)).andReturn(true).anyTimes();
@@ -445,7 +445,7 @@ public class RMInInterceptorTest extends Assert {
         control.reset();
         EasyMock.expect(maps.getFaultTo())
             .andReturn(RMUtils.createAnonymousReference()).anyTimes();
-        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps).anyTimes();
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps).anyTimes();
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(message.get(RMMessageConstants.RM_PROTOCOL_VARIATION))
             .andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
@@ -471,7 +471,7 @@ public class RMInInterceptorTest extends Assert {
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(!serverSide);
         AddressingPropertiesImpl maps = control.createMock(AddressingPropertiesImpl.class);
         EasyMock.expect(maps.getNamespaceURI()).andReturn(Names200408.WSA_NAMESPACE_NAME).anyTimes();
-        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
         
         AttributedURIType actionURI = control.createMock(AttributedURIType.class);
         EasyMock.expect(maps.getAction()).andReturn(actionURI).times(2);

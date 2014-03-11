@@ -73,11 +73,9 @@ import org.junit.Test;
 
 import static org.apache.cxf.binding.soap.Soap11.SOAP_NAMESPACE;
 import static org.apache.cxf.message.Message.REQUESTOR_ROLE;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_INBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND;
 
 public class MAPAggregatorTest extends Assert {
 
@@ -405,7 +403,7 @@ public class MAPAggregatorTest extends Assert {
         maps.setMessageID(id);
         maps.setAction(ContextUtils.getAttributedURI(""));
         setUpMessageProperty(message,
-                             SERVER_ADDRESSING_PROPERTIES_OUTBOUND,
+                             ADDRESSING_PROPERTIES_OUTBOUND,
                              maps);
         setUpMessageProperty(message,
                              "org.apache.cxf.ws.addressing.map.fault.name",
@@ -436,7 +434,7 @@ public class MAPAggregatorTest extends Assert {
                              maps);
         aggregator.mediate(message, false);
         AddressingProperties props = 
-            (AddressingProperties)message.get(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND);
+            (AddressingProperties)message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND);
         assertSame(replyTo, props.getReplyTo());
     }
 
@@ -690,7 +688,7 @@ public class MAPAggregatorTest extends Assert {
             maps.setAction(ContextUtils.getAttributedURI(""));
         }
         setUpMessageProperty(message,
-                             SERVER_ADDRESSING_PROPERTIES_INBOUND,
+                             ADDRESSING_PROPERTIES_INBOUND,
                              maps);
         if (!args.outbound) {
             setUpOneway(message, exchange, args.oneway);
@@ -720,7 +718,7 @@ public class MAPAggregatorTest extends Assert {
                                  REQUESTOR_ROLE,
                                  Boolean.FALSE);
             setUpMessageProperty(message,
-                                 SERVER_ADDRESSING_PROPERTIES_INBOUND,
+                                 ADDRESSING_PROPERTIES_INBOUND,
                                  maps);            
             if (args.fault) {
                 // REVISIT test double rebase does not occur
@@ -932,13 +930,9 @@ public class MAPAggregatorTest extends Assert {
     }
     
     private String getMAPProperty(boolean requestor, boolean outbound) { 
-        return requestor
-               ? outbound
-                 ? CLIENT_ADDRESSING_PROPERTIES_OUTBOUND
-                 : CLIENT_ADDRESSING_PROPERTIES_INBOUND
-               : outbound
-                 ? SERVER_ADDRESSING_PROPERTIES_OUTBOUND
-                 : SERVER_ADDRESSING_PROPERTIES_INBOUND;
+        return outbound
+                 ? ADDRESSING_PROPERTIES_OUTBOUND
+                 : ADDRESSING_PROPERTIES_INBOUND;
     }
 
     private void verifyMessage(Message message,

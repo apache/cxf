@@ -52,7 +52,7 @@ public class GreeterImplA extends AbstractGreeterImpl {
         String id = null;
         if (context.getMessageContext() != null) {
             String property =
-                JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND;
+                JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
             AddressingProperties maps = (AddressingProperties)
                 context.getMessageContext().get(property);
             id = maps != null && maps.getMessageID() != null

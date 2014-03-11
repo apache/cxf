@@ -510,7 +510,7 @@ public class JettyHTTPDestinationTest extends Assert {
         maps.getToEndpointReference();
         EasyMock.expectLastCall().andReturn(refWithId);
         EasyMock.replay(maps);      
-        context.put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND, maps);
+        context.put(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND, maps);
         String result = destination.getId(context);
         assertNotNull(result);
         assertEquals("match our id", result, id);

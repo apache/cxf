@@ -50,8 +50,8 @@ import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.soap.VersionTransformer;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_INBOUND;
-import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND;
 
 
 /**
@@ -195,7 +195,7 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
 
     private boolean isOutgoingPartialResponse(SoapMessage message) {
         AddressingProperties maps = 
-            (AddressingProperties)message.get(SERVER_ADDRESSING_PROPERTIES_OUTBOUND);
+            (AddressingProperties)message.get(ADDRESSING_PROPERTIES_OUTBOUND);
         return ContextUtils.isOutbound(message)
                && !ContextUtils.isRequestor(message)
                && maps != null
@@ -205,7 +205,7 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
     private boolean isIncomingPartialResponse(SoapMessage message) 
         throws SOAPException {
         AddressingProperties maps = 
-            (AddressingProperties)message.get(CLIENT_ADDRESSING_PROPERTIES_INBOUND);
+            (AddressingProperties)message.get(ADDRESSING_PROPERTIES_INBOUND);
         return !ContextUtils.isOutbound(message)
                && ContextUtils.isRequestor(message)
                && maps != null
