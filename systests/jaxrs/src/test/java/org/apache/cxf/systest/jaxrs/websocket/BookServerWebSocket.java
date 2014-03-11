@@ -27,7 +27,9 @@ import org.apache.cxf.systest.jaxrs.BookStorePerRequest;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServerWebSocket extends AbstractBusTestServerBase {
-    public static final String PORT = allocatePort(BookServerWebSocket.class);
+    public static final String PORT = allocatePort(BookServerWebSocket.class, 1);
+    public static final String PORT_SPRING = allocatePort(BookServerWebSocket.class, 2);
+    public static final String PORT_WAR = allocatePort(BookServerWebSocket.class, 3);
      
     org.apache.cxf.endpoint.Server server;
     

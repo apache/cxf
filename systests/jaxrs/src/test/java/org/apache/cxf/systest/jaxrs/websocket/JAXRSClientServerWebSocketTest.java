@@ -28,7 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = BookServerWebSocket.PORT;
+    private static final String PORT = BookServerWebSocket.PORT;
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -39,7 +39,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
     
     @Test
     public void testBookWithWebSocket() throws Exception {
-        String address = "ws://localhost:" + PORT + "/web/bookstore";
+        String address = "ws://localhost:" + getPort() + "/web/bookstore";
 
         WebSocketTestClient wsclient = new WebSocketTestClient(address, 1);
         wsclient.connect();
@@ -101,7 +101,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
     
     @Test
     public void testBookWithWebSocketServletStream() throws Exception {
-        String address = "ws://localhost:" + PORT + "/web/bookstore";
+        String address = "ws://localhost:" + getPort() + "/web/bookstore";
 
         WebSocketTestClient wsclient = new WebSocketTestClient(address, 1);
         wsclient.connect();
@@ -122,7 +122,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
     
     @Test
     public void testWrongMethod() throws Exception {
-        String address = "ws://localhost:" + PORT + "/web/bookstore";
+        String address = "ws://localhost:" + getPort() + "/web/bookstore";
 
         WebSocketTestClient wsclient = new WebSocketTestClient(address, 1);
         wsclient.connect();
@@ -141,7 +141,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
     
     @Test
     public void testPathRestriction() throws Exception {
-        String address = "ws://localhost:" + PORT + "/web/bookstore";
+        String address = "ws://localhost:" + getPort() + "/web/bookstore";
 
         WebSocketTestClient wsclient = new WebSocketTestClient(address, 1);
         wsclient.connect();
@@ -227,4 +227,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         }
     }
     
+    protected String getPort() {
+        return PORT;
+    }
 }

@@ -24,11 +24,12 @@ import org.junit.BeforeClass;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+
 /**
  * JAXRSClientServerWebSocket test with jaxrs:server using the embedded jetty server.
  */
 public class JAXRSClientServerWebSocketSpringTest extends JAXRSClientServerWebSocketTest {
-    public static final String PORT = BookServerWebSocket.PORT;
+    private static final String PORT = BookServerWebSocket.PORT_SPRING;
     @BeforeClass
     public static void startServers() throws Exception {
 
@@ -38,6 +39,10 @@ public class JAXRSClientServerWebSocketSpringTest extends JAXRSClientServerWebSo
                 JAXRSClientServerWebSocketSpringTest.class.getResource(
                     "/jaxrs_websocket/beans-embedded.xml").toString());
         
+    }
+
+    protected String getPort() {
+        return PORT;
     }
 
 }

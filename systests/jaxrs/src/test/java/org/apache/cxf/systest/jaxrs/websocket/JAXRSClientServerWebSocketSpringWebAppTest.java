@@ -34,14 +34,13 @@ import org.junit.BeforeClass;
  * JAXRSClientServerWebSocket test with jaxrs:server using the jetty webapp server.
  */
 public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServerWebSocketTest {
-    public static final String PORT = BookServerWebSocket.PORT;
-
+    private static final String PORT = BookServerWebSocket.PORT_WAR;
     @BeforeClass
     public static void startServers() throws Exception {
         org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server();
 
         SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(Integer.parseInt(PORT));
+        connector.setPort(Integer.parseInt(BookServerWebSocket.PORT_WAR));
         server.setConnectors(new Connector[] {connector});
 
         WebAppContext webappcontext = new WebAppContext();
@@ -62,4 +61,7 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
 
     }
 
+    protected String getPort() {
+        return PORT;
+    }
 }
