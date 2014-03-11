@@ -482,7 +482,7 @@ public class ClientProxyImpl extends AbstractClient implements
                     Method getter = bean.getClass().getMethod("get" + propertyName, new Class[]{});
                     Object value = getter.invoke(bean, new Object[]{});
                     String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
-                    values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
+                    values.put(annotationValue, new BeanPair(value, m.getAnnotations()));
                 } catch (Throwable t) {
                     // ignore
                 }
