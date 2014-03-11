@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.HttpMethod;
@@ -432,8 +434,9 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         } else {
             actualHeaders = allowHeaders;
         }
-        
-        return actualHeaders.containsAll(aHeaders);
+        Set<String> actualHeadersSet = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        actualHeadersSet.addAll(actualHeaders);
+        return actualHeadersSet.containsAll(aHeaders);
     }
 
     private List<String> effectiveExposeHeaders(CrossOriginResourceSharing ann) {

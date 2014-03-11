@@ -418,7 +418,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         // this is the origin we expect to get.
         http.addHeader("Origin", "http://area51.mil:31415");
         http.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "PUT");
-        http.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, "X-custom-1, X-custom-2");
+        http.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, "X-custom-1, x-custom-2");
         HttpResponse response = httpclient.execute(http);
         assertEquals(200, response.getStatusLine().getStatusCode());
         assertOriginResponse(false, new String[]{"http://area51.mil:31415"}, true, response);
@@ -429,7 +429,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         assertEquals(Collections.emptyList(), exposeHeadersValues);
         List<String> allowHeadersValues 
             = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS));
-        assertEquals(Arrays.asList(new String[] {"X-custom-1", "X-custom-2" }), allowHeadersValues);
+        assertEquals(Arrays.asList(new String[] {"X-custom-1", "x-custom-2" }), allowHeadersValues);
         if (httpclient instanceof Closeable) {
             ((Closeable)httpclient).close();
         }
