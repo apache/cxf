@@ -30,24 +30,44 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http.HttpDestinationFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
+import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketServletDestination;
 import org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination;
 import org.apache.cxf.transport.websocket.jetty.JettyWebSocketServletDestination;
 
 @NoJSR250Annotations()
 public class WebSocketDestinationFactory implements HttpDestinationFactory {
-
+    private static final boolean ATMOSPHERE_AVAILABLE = probeClass("org.atmosphere.cpr.ApplicationConfig");
+    
+    private static boolean probeClass(String name) {
+        try {
+            Class.forName(name, true, WebSocketDestinationFactory.class.getClassLoader());
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+    
     public AbstractHTTPDestination createDestination(EndpointInfo endpointInfo, Bus bus,
                                                      DestinationRegistry registry) throws IOException {
-
         if (endpointInfo.getAddress().startsWith("ws")) {
-            //TODO for now jetty specific, 
+            // for the embedded mode, we stick with jetty. 
             JettyHTTPServerEngineFactory serverEngineFactory = bus
                 .getExtension(JettyHTTPServerEngineFactory.class);
             return new JettyWebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
         } else {
             //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
             registry = getDestinationRegistry(bus);
-            return new JettyWebSocketServletDestination(bus, registry, endpointInfo, endpointInfo.getAddress());
+            
+            // choose atmosphere if available, otherwise assume jetty is available
+            if (ATMOSPHERE_AVAILABLE) {
+                // use atmosphere
+                return new AtmosphereWebSocketServletDestination(bus, registry,
+                                                                 endpointInfo, endpointInfo.getAddress());
+            } else {
+                // use jetty-websocket
+                return new JettyWebSocketServletDestination(bus, registry,
+                                                            endpointInfo, endpointInfo.getAddress());
+            }
         }
     }
 
@@ -65,5 +85,6 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
         }
         return null;
     }
+    
 
 }

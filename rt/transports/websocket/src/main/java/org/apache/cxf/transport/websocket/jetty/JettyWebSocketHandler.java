@@ -43,7 +43,6 @@ class JettyWebSocketHandler extends JettyHTTPHandler {
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
-        // only switch to websocket if websocket is enabled for this destination 
         if (webSocketManager.acceptWebSocket(request, response)) {
             baseRequest.setHandled(true);
         } else {

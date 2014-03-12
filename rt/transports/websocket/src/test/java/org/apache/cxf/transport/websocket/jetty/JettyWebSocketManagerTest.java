@@ -24,8 +24,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
-import org.apache.cxf.transport.servlet.ServletDestination;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -48,12 +46,12 @@ public class JettyWebSocketManagerTest extends Assert {
     public void testServiceUsingJettyDestination() throws Exception {
         JettyWebSocketManager jwsm = new JettyWebSocketManager();
         
-        JettyHTTPDestination dest = control.createMock(JettyWebSocketDestination.class);
+        JettyWebSocketDestination dest = control.createMock(JettyWebSocketDestination.class);
                 
         HttpServletRequest request = control.createMock(HttpServletRequest.class);
         HttpServletResponse response = control.createMock(HttpServletResponse.class);
         
-        dest.invoke(EasyMock.isNull(ServletConfig.class), EasyMock.anyObject(ServletContext.class), 
+        dest.invokeInternal(EasyMock.isNull(ServletConfig.class), EasyMock.anyObject(ServletContext.class), 
                     EasyMock.eq(request), EasyMock.eq(response));
         EasyMock.expectLastCall();
         control.replay();
@@ -67,12 +65,12 @@ public class JettyWebSocketManagerTest extends Assert {
     public void testServiceUsingServletDestination() throws Exception {
         JettyWebSocketManager jwsm = new JettyWebSocketManager();
         
-        ServletDestination dest = control.createMock(JettyWebSocketServletDestination.class);
+        JettyWebSocketServletDestination dest = control.createMock(JettyWebSocketServletDestination.class);
                 
         HttpServletRequest request = control.createMock(HttpServletRequest.class);
         HttpServletResponse response = control.createMock(HttpServletResponse.class);
         
-        dest.invoke(EasyMock.isNull(ServletConfig.class), EasyMock.anyObject(ServletContext.class), 
+        dest.invokeInternal(EasyMock.isNull(ServletConfig.class), EasyMock.anyObject(ServletContext.class), 
                     EasyMock.eq(request), EasyMock.eq(response));
         EasyMock.expectLastCall();
         control.replay();

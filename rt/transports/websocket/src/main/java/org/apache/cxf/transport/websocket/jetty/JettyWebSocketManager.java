@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.websocket.WebSocketDestinationService;
 import org.eclipse.jetty.websocket.WebSocketFactory;
 import org.eclipse.jetty.websocket.WebSocketFactory.Acceptor;
 
@@ -74,7 +75,7 @@ public class JettyWebSocketManager {
 
     public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if (destination != null) {
-            destination.invoke(null, servletContext, request, response);
+            ((WebSocketDestinationService)destination).invokeInternal(null, servletContext, request, response);
         }
     }
 }

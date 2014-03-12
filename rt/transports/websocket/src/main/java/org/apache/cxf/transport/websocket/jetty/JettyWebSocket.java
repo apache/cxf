@@ -19,93 +19,42 @@
 
 package org.apache.cxf.transport.websocket.jetty;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.transport.websocket.WebSocketServletHolder;
+import org.apache.cxf.transport.websocket.WebSocketVirtualServletRequest;
+import org.apache.cxf.transport.websocket.WebSocketVirtualServletResponse;
 import org.eclipse.jetty.websocket.WebSocket;
 
 class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessage {
     private static final Logger LOG = LogUtils.getL7dLogger(JettyWebSocket.class);
-    private static final String CRLF = "\r\n";
 
-    private static final String URI_KEY = "$uri";
-    private static final String METHOD_KEY = "$method";
-    private static final String SC_KEY = "$sc";
-    private static final String SM_KEY = "$sm";
-    private static final String FLUSHED_KEY = "$flushed";
-    
     private JettyWebSocketManager manager;
-    private ServletContext servletContext;
     private Connection webSocketConnection;
-    private Map<String, Object> requestProperties;
+    private WebSocketServletHolder webSocketHolder;
     private String protocol;
     
     public JettyWebSocket(JettyWebSocketManager manager, HttpServletRequest request, String protocol) {
         this.manager = manager;
         this.protocol = protocol;
-        this.requestProperties = readProperties(request);
+        this.webSocketHolder = new JettyWebSocketServletHolder(this, request);
     }
     
-    private Map<String, Object> readProperties(HttpServletRequest request) {
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("servletPath", request.getServletPath());
-        properties.put("requestURI", request.getRequestURI());
-        properties.put("requestURL", request.getRequestURL().toString());
-        properties.put("contextPath", request.getContextPath());
-        properties.put("servletPath", request.getServletPath());
-        properties.put("pathInfo", request.getPathInfo());
-        properties.put("pathTranslated", request.getPathTranslated());
-        properties.put("protocol", request.getProtocol());
-        properties.put("scheme", request.getScheme());
-        // some additional ones
-        properties.put("localAddr", request.getLocalAddr());
-        properties.put("localName", request.getLocalName());
-        properties.put("localPort", request.getLocalPort());
-        properties.put("locale", request.getLocale());
-        properties.put("locales", request.getLocales());
-        properties.put("remoteHost", request.getRemoteHost());
-        properties.put("remoteAddr", request.getRemoteAddr());
-        properties.put("serverName", request.getServerName());
-        properties.put("secure", request.isSecure());
-        properties.put("authType", request.getAuthType());
-        properties.put("dispatcherType", request.getDispatcherType());
-        
-        return properties;
-    }
 
     @Override
     public void onClose(int closeCode, String message) {
@@ -129,6 +78,7 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             LOG.log(Level.INFO, "onMessage({0})", data);
         }
         try {
+            //TODO may want use string directly instead of converting it to byte[]
             byte[] bdata = data.getBytes("utf-8");
             HttpServletRequest request = createServletRequest(bdata, 0, bdata.length);
             HttpServletResponse response = createServletResponse();
@@ -156,17 +106,13 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         }
     }
     
-    private <T> T getRequestProperty(String name, Class<T> cls) {
-        return getValue(requestProperties, name, cls);
-    }
-    
     private WebSocketVirtualServletRequest createServletRequest(byte[] data, int offset, int length) 
         throws IOException {
-        return new WebSocketVirtualServletRequest(servletContext, this, new ByteArrayInputStream(data, offset, length));
+        return new WebSocketVirtualServletRequest(webSocketHolder, new ByteArrayInputStream(data, offset, length));
     }
 
     private WebSocketVirtualServletResponse createServletResponse() throws IOException {
-        return new WebSocketVirtualServletResponse(this);
+        return new WebSocketVirtualServletResponse(webSocketHolder);
     }
     
     /**
@@ -180,932 +126,172 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         LOG.log(Level.INFO, "write(byte[], offset, length)");
         webSocketConnection.sendMessage(data, offset, length);
     }
-
-    private static byte[] buildResponse(Map<String, String> headers, byte[] data, int offset, int length) {
-        StringBuilder sb = new StringBuilder();
-        String v = headers.get(SC_KEY);
-        sb.append(v == null ? "200" : v).append(CRLF);
-        v = headers.get("Content-Type");
-        if (v != null) {
-            sb.append("Content-Type: ").append(v).append(CRLF);
-        }
-        sb.append(CRLF);
-        
-        byte[] hb = sb.toString().getBytes();
-        byte[] longdata = new byte[hb.length + length];
-        System.arraycopy(hb, 0, longdata, 0, hb.length);
-        if (data != null && length > 0) {
-            System.arraycopy(data, offset, longdata, hb.length, length);
-        }
-        return longdata;
-    }
-
-    private static byte[] buildResponse(byte[] data, int offset, int length) {
-        byte[] longdata = new byte[length + 2];
-        longdata[0] = 0x0d;
-        longdata[1] = 0x0a;
-        System.arraycopy(data, offset, longdata, 2, length);
-        return longdata;
-    }
-    
-    ServletOutputStream getServletOutputStream(final Map<String, String> headers) {
-        LOG.log(Level.INFO, "getServletOutputStream()");
-        return new ServletOutputStream() {
-
-            @Override
-            public void write(int b) throws IOException {
-                byte[] data = new byte[1];
-                data[0] = (byte)b;
-                write(data, 0, 1);
-            }
-
-            @Override
-            public void write(byte[] data, int offset, int length) throws IOException {
-                if (headers.get(FLUSHED_KEY) == null) {
-                    data = buildResponse(headers, data, offset, length);
-                    headers.put(FLUSHED_KEY, "true");
-                } else {
-                    data = buildResponse(data, offset, length);
-                }
-                webSocketConnection.sendMessage(data, 0, data.length);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (headers.get(FLUSHED_KEY) == null) {
-                    byte[] data = buildResponse(headers, null, 0, 0);
-                    webSocketConnection.sendMessage(data, 0, data.length);
-                    headers.put(FLUSHED_KEY, "true");
-                }                
-                super.close();
-            }
-            
-        };
-    }
-    
-    OutputStream getOutputStream(final Map<String, String> headers) {
-        LOG.log(Level.INFO, "getOutputStream()");
-        return new OutputStream() {
-
-            @Override
-            public void write(int b) throws IOException {
-                byte[] data = new byte[1];
-                data[0] = (byte)b;
-                write(data, 0, 1);
-            }
-            
-            @Override
-            public void write(byte[] data, int offset, int length) throws IOException {
-                if (headers.get(FLUSHED_KEY) == null) {
-                    data = buildResponse(headers, data, offset, length);
-                    headers.put(FLUSHED_KEY, "true");
-                } else {
-                    data = buildResponse(data, offset, length);
-                }
-                webSocketConnection.sendMessage(data, 0, data.length);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (headers.get(FLUSHED_KEY) == null) {
-                    byte[] data = buildResponse(headers, null, 0, 0);
-                    webSocketConnection.sendMessage(data, 0, data.length);
-                    headers.put(FLUSHED_KEY, "true");
-                }                
-                super.close();
-            }
-        };
-        
-    }
     
     String getProtocol() {
         return protocol;
     }
     
-    // 
-    static class WebSocketVirtualServletRequest implements HttpServletRequest {
-        private ServletContext context;
-        private JettyWebSocket websocket;
-        private InputStream in;
-        private Map<String, String> requestHeaders;
-        private Map<String, Object> attributes;
-        
-        public WebSocketVirtualServletRequest(ServletContext context, JettyWebSocket websocket, InputStream in) 
-            throws IOException {
-            this.context = context;
-            this.websocket = websocket;
-            this.in = in;
+    private static class JettyWebSocketServletHolder implements WebSocketServletHolder {
+        private JettyWebSocket webSocket;
+        private Map<String, Object> requestProperties;
 
-            this.requestHeaders = readHeaders(in);
-            String path = requestHeaders.get(URI_KEY);
-            String origin = websocket.getRequestProperty("requestURI", String.class);
-            if (!path.startsWith(origin)) {
-                //REVISIT for now, log it here and reject the request later.  
-                LOG.log(Level.WARNING, "invalid path: {0} not within {1}", new Object[]{path, origin});
-            }
-            this.attributes = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
+        public JettyWebSocketServletHolder(JettyWebSocket webSocket, HttpServletRequest request) {
+            this.webSocket = webSocket;
+            this.requestProperties = readProperties(request);
         }
 
-        @Override
-        public AsyncContext getAsyncContext() {
-            return null;
+        @SuppressWarnings("unchecked")
+        private <T> T getRequestProperty(String name, Class<T> cls) {
+            return (T)requestProperties.get(name);
         }
 
-        @Override
-        public Object getAttribute(String name) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "getAttribute({0})", name);
-            }
-            return attributes.get(name);
-        }
-
-        @Override
-        public Enumeration<String> getAttributeNames() {
-            LOG.log(Level.INFO, "getAttributeNames()");
-            return Collections.enumeration(attributes.keySet());
-        }
-
-        @Override
-        public String getCharacterEncoding() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getCharacterEncoding()");
-            return null;
-        }
-
-        @Override
-        public int getContentLength() {
-            LOG.log(Level.INFO, "getContentLength()");
-            return 0;
-        }
-
-        @Override
-        public String getContentType() {
-            LOG.log(Level.INFO, "getContentType()");
-            return requestHeaders.get("Content-Type");
-        }
-
-        @Override
-        public DispatcherType getDispatcherType() {
-            LOG.log(Level.INFO, "getDispatcherType()");
-            return websocket.getRequestProperty("dispatcherType", DispatcherType.class);
-        }
-
-        @Override
-        public ServletInputStream getInputStream() throws IOException {
-            return new ServletInputStream() {
-                @Override
-                public int read() throws IOException {
-                    return in.read();
-                }
-
-                @Override
-                public int read(byte[] b, int off, int len) throws IOException {
-                    return in.read(b, off, len);
-                }
-            };
-        }
-
-        @Override
-        public String getLocalAddr() {
-            LOG.log(Level.INFO, "getLocalAddr()");
-            return websocket.getRequestProperty("localAddr", String.class);
-        }
-
-        @Override
-        public String getLocalName() {
-            LOG.log(Level.INFO, "getLocalName()");
-            return websocket.getRequestProperty("localName", String.class);
-        }
-
-        @Override
-        public int getLocalPort() {
-            LOG.log(Level.INFO, "getLocalPort()");
-            return websocket.getRequestProperty("localPort", int.class);
-        }
-
-        @Override
-        public Locale getLocale() {
-            LOG.log(Level.INFO, "getLocale()");
-            return websocket.getRequestProperty("locale", Locale.class);
-        }
-
-        @Override
-        public Enumeration<Locale> getLocales() {
-            LOG.log(Level.INFO, "getLocales()");
-            return CastUtils.cast(websocket.getRequestProperty("locales", Enumeration.class));
-        }
-
-        @Override
-        public String getParameter(String name) {
-            // TODO Auto-generated method stub
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "getParameter({0})", name);
-            }
-            return null;
-        }
-
-        @Override
-        public Map<String, String[]> getParameterMap() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getParameterMap()");
-            return null;
-        }
-
-        @Override
-        public Enumeration<String> getParameterNames() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getParameterNames()");
-            return null;
-        }
-
-        @Override
-        public String[] getParameterValues(String name) {
-            // TODO Auto-generated method stub
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "getParameterValues({0})", name);
-            }
-            return null;
-        }
-
-        @Override
-        public String getProtocol() {
-            LOG.log(Level.INFO, "getProtocol");
-            return websocket.getRequestProperty("protocol", String.class);
-        }
-
-        @Override
-        public BufferedReader getReader() throws IOException {
-            LOG.log(Level.INFO, "getReader");
-            return new BufferedReader(new InputStreamReader(in, "utf-8"));
-        }
-
-        @Override
-        public String getRealPath(String path) {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getRealPath");
-            return null;
-        }
-
-        @Override
-        public String getRemoteAddr() {
-            LOG.log(Level.INFO, "getRemoteAddr");
-            return websocket.getRequestProperty("remoteAddr", String.class);
-        }
-
-        @Override
-        public String getRemoteHost() {
-            LOG.log(Level.INFO, "getRemoteHost");
-            return websocket.getRequestProperty("remoteHost", String.class);
-        }
-
-        @Override
-        public int getRemotePort() {
-            LOG.log(Level.INFO, "getRemotePort");
-            return websocket.getRequestProperty("remotePort", int.class);
-        }
-
-        @Override
-        public RequestDispatcher getRequestDispatcher(String path) {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getRequestDispatcher");
-            return null;
-        }
-
-        @Override
-        public String getScheme() {
-            LOG.log(Level.INFO, "getScheme");
-            return websocket.getRequestProperty("scheme", String.class);
-        }
-
-        @Override
-        public String getServerName() {
-            return websocket.getRequestProperty("serverName", String.class);
-        }
-
-        @Override
-        public int getServerPort() {
-            LOG.log(Level.INFO, "getServerPort");
-            return websocket.getRequestProperty("serverPoart", int.class);
-        }
-
-        @Override
-        public ServletContext getServletContext() {
-            LOG.log(Level.INFO, "getServletContext");
-            return context;
-        }
-
-        @Override
-        public boolean isAsyncStarted() {
-            LOG.log(Level.INFO, "isAsyncStarted");
-            return false;
-        }
-
-        @Override
-        public boolean isAsyncSupported() {
-            LOG.log(Level.INFO, "isAsyncSupported");
-            return false;
-        }
-
-        @Override
-        public boolean isSecure() {
-            LOG.log(Level.INFO, "isSecure");
-            return websocket.getRequestProperty("secure", boolean.class);
-        }
-
-        @Override
-        public void removeAttribute(String name) {
-            LOG.log(Level.INFO, "removeAttribute");
-            attributes.remove(name);
-        }
-
-        @Override
-        public void setAttribute(String name, Object o) {
-            LOG.log(Level.INFO, "setAttribute");
-            attributes.put(name,  o);
-        }
-
-        @Override
-        public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
-            LOG.log(Level.INFO, "setCharacterEncoding");
-            // ignore as we stick to utf-8.
-        }
-
-        @Override
-        public AsyncContext startAsync() {
-            LOG.log(Level.INFO, "startAsync");
-            return null;
-        }
-
-        @Override
-        public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "startAsync");
-            return null;
-        }
-
-        @Override
-        public boolean authenticate(HttpServletResponse servletResponse) throws IOException, ServletException {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "authenticate");
-            return false;
+        private Map<String, Object> readProperties(HttpServletRequest request) {
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put("servletPath", request.getServletPath());
+            properties.put("requestURI", request.getRequestURI());
+            properties.put("requestURL", request.getRequestURL());
+            properties.put("contextPath", request.getContextPath());
+            properties.put("servletPath", request.getServletPath());
+            properties.put("servletContext", request.getServletContext());
+            properties.put("pathInfo", request.getPathInfo());
+            properties.put("pathTranslated", request.getPathTranslated());
+            properties.put("protocol", request.getProtocol());
+            properties.put("scheme", request.getScheme());
+            // some additional ones
+            properties.put("localAddr", request.getLocalAddr());
+            properties.put("localName", request.getLocalName());
+            properties.put("localPort", request.getLocalPort());
+            properties.put("locale", request.getLocale());
+            properties.put("locales", request.getLocales());
+            properties.put("remoteHost", request.getRemoteHost());
+            properties.put("remoteAddr", request.getRemoteAddr());
+            properties.put("serverName", request.getServerName());
+            properties.put("serverPort", request.getServerPort());
+            properties.put("secure", request.isSecure());
+            properties.put("authType", request.getAuthType());
+            properties.put("dispatcherType", request.getDispatcherType());
+            
+            return properties;
         }
 
         @Override
         public String getAuthType() {
-            LOG.log(Level.INFO, "getAuthType");
-            return websocket.getRequestProperty("authType", String.class);
+            return getRequestProperty("authType", String.class);
         }
 
         @Override
         public String getContextPath() {
-            LOG.log(Level.INFO, "getContextPath");
-            return websocket.getRequestProperty("contextPath", String.class);
+            return getRequestProperty("contextPath", String.class);
         }
 
         @Override
-        public Cookie[] getCookies() {
-            LOG.log(Level.INFO, "getCookies");
-            return null;
+        public String getLocalAddr() {
+            return getRequestProperty("LocalAddr", String.class);
         }
 
         @Override
-        public long getDateHeader(String name) {
-            LOG.log(Level.INFO, "getDateHeader");
-            return 0;
+        public String getLocalName() {
+            return getRequestProperty("localName", String.class);
         }
 
         @Override
-        public String getHeader(String name) {
-            LOG.log(Level.INFO, "getHeader");
-            return requestHeaders.get(name);
-        }
-
-        @Override
-        public Enumeration<String> getHeaderNames() {
-            LOG.log(Level.INFO, "getHeaderNames");
-            return Collections.enumeration(requestHeaders.keySet());
-        }
-
-        @Override
-        public Enumeration<String> getHeaders(String name) {
-            LOG.log(Level.INFO, "getHeaders");
-            // our protocol assumes no multiple headers
-            return Collections.enumeration(Arrays.asList(requestHeaders.get(name)));
-        }
-
-        @Override
-        public int getIntHeader(String name) {
-            LOG.log(Level.INFO, "getIntHeader");
-            String v = requestHeaders.get(name);
-            return v == null ? -1 : Integer.parseInt(v);
-        }
-
-        @Override
-        public String getMethod() {
-            LOG.log(Level.INFO, "getMethod");
-            return requestHeaders.get(METHOD_KEY);
-        }
-
-        @Override
-        public Part getPart(String name) throws IOException, ServletException {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getPart");
-            return null;
-        }
-
-        @Override
-        public Collection<Part> getParts() throws IOException, ServletException {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getParts");
-            return null;
-        }
-
-        @Override
-        public String getPathInfo() {
-            LOG.log(Level.INFO, "getPathInfo");
-            String uri = requestHeaders.get("$uri");
-            String servletpath = websocket.getRequestProperty("servletPath", String.class);
-            //TODO remove the query string part
-            //REVISIT may cache this value in requstHeaders?
-            return uri.substring(servletpath.length());
-        }
-
-        @Override
-        public String getPathTranslated() {
-            LOG.log(Level.INFO, "getPathTranslated");
-            String path = getPathInfo();
-            String opathtrans = websocket.getRequestProperty("pathTranslated", String.class);
-            String opathinfo = websocket.getRequestProperty("pathInfo", String.class);
-            int pos = opathtrans.indexOf(opathinfo);
-            //REVISIT may cache this value in requstHeaders?
-            return new StringBuilder().append(opathtrans.substring(0, pos)).append(path).toString();
-        }
-
-        @Override
-        public String getQueryString() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getQueryString");
-            return null;
-        }
-
-        @Override
-        public String getRemoteUser() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getRemoteUser");
-            return null;
-        }
-
-        @Override
-        public String getRequestURI() {
-            LOG.log(Level.INFO, "getRequestURI");
-            return requestHeaders.get(URI_KEY);
-        }
-
-        @Override
-        public StringBuffer getRequestURL() {
-            LOG.log(Level.INFO, "getRequestURL");
-            String url = websocket.getRequestProperty("requestURL", String.class);
-            String ouri = websocket.getRequestProperty("requestURI", String.class);
-            StringBuffer sb = new StringBuffer();
-            String uri = getRequestURI();
-            //REVISIT the way to reject the requeist uri that does not match the original request
-            if (!uri.startsWith(ouri)) {
-                sb.append(url).append("invalid").append(uri);
-            } else {
-                sb.append(url).append(uri.substring(ouri.length()));
-            }
-            
-            return sb;
-        }
-
-        @Override
-        public String getRequestedSessionId() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getRequestedSessionId");
-            return null;
-        }
-
-        @Override
-        public String getServletPath() {
-            LOG.log(Level.INFO, "getServletPath");
-            return websocket.getRequestProperty("servletPath", String.class);
-        }
-
-        @Override
-        public HttpSession getSession() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getSession");
-            return null;
-        }
-
-        @Override
-        public HttpSession getSession(boolean create) {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getSession");
-            return null;
-        }
-
-        @Override
-        public Principal getUserPrincipal() {
-            LOG.log(Level.INFO, "getUserPrincipal");
-            return websocket.getRequestProperty("userPrincipal", Principal.class);
-        }
-
-        @Override
-        public boolean isRequestedSessionIdFromCookie() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "isRequestedSessionIdFromCookie");
-            return false;
-        }
-
-        @Override
-        public boolean isRequestedSessionIdFromURL() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "isRequestedSessionIdFromURL");
-            return false;
-        }
-
-        @Override
-        public boolean isRequestedSessionIdFromUrl() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "isRequestedSessionIdFromUrl");
-            return false;
-        }
-
-        @Override
-        public boolean isRequestedSessionIdValid() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "isRequestedSessionIdValid");
-            return false;
-        }
-
-        @Override
-        public boolean isUserInRole(String role) {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "isUserInRole");
-            return false;
-        }
-
-        @Override
-        public void login(String username, String password) throws ServletException {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "login");
-            
-        }
-
-        @Override
-        public void logout() throws ServletException {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "logout");
-            
-        }
-    }
-
-    //TODO need to make the header setting to be written to the body (as symmetric to the request behavior)
-    static class WebSocketVirtualServletResponse implements HttpServletResponse {
-        private JettyWebSocket websocket;
-        private Map<String, String> responseHeaders;
-        private boolean flushed;
-
-        public WebSocketVirtualServletResponse(JettyWebSocket websocket) {
-            this.websocket = websocket;
-            this.responseHeaders = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
-        }
-
-        @Override
-        public void flushBuffer() throws IOException {
-            LOG.log(Level.INFO, "flushBuffer()");
-            if (!flushed) {
-                //REVISIT this mechanism to determine if the headers have been flushed
-                if (responseHeaders.get(FLUSHED_KEY) == null) {
-                    byte[] data = buildResponse(responseHeaders, null, 0, 0);
-                    websocket.write(data, 0, data.length);
-                    responseHeaders.put(FLUSHED_KEY, "true");
-                }
-                flushed = true;
-            }
-        }
-
-        @Override
-        public int getBufferSize() {
-            LOG.log(Level.INFO, "getBufferSize()");
-            return 0;
-        }
-
-        @Override
-        public String getCharacterEncoding() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getCharacterEncoding()");
-            return null;
-        }
-
-        @Override
-        public String getContentType() {
-            LOG.log(Level.INFO, "getContentType()");
-            return responseHeaders.get("Content-Type");
+        public int getLocalPort() {
+            return getRequestProperty("localPort", int.class);
         }
 
         @Override
         public Locale getLocale() {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "getLocale");
-            return null;
+            return getRequestProperty("locale", Locale.class);
         }
 
         @Override
-        public ServletOutputStream getOutputStream() throws IOException {
-            LOG.log(Level.INFO, "getOutputStream()");
-            return websocket.getServletOutputStream(responseHeaders);
+        public Enumeration<Locale> getLocales() {
+            return CastUtils.cast(getRequestProperty("locales", Enumeration.class));
         }
 
         @Override
-        public PrintWriter getWriter() throws IOException {
-            LOG.log(Level.INFO, "getWriter()");
-            return new PrintWriter(websocket.getOutputStream(responseHeaders));
+        public String getProtocol() {
+            return getRequestProperty("protocol", String.class);
         }
 
         @Override
-        public boolean isCommitted() {
-            return false;
+        public String getRemoteAddr() {
+            return getRequestProperty("remoteAddr", String.class);
         }
 
         @Override
-        public void reset() {
+        public String getRemoteHost() {
+            return getRequestProperty("remoteHost", String.class);
         }
 
         @Override
-        public void resetBuffer() {
-            LOG.log(Level.INFO, "resetBuffer()");
+        public int getRemotePort() {
+            return getRequestProperty("remotePort", int.class);
         }
 
         @Override
-        public void setBufferSize(int size) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setBufferSize({0})", size);
-            }
+        public String getRequestURI() {
+            return getRequestProperty("requestURI", String.class);
         }
 
         @Override
-        public void setCharacterEncoding(String charset) {
-            // TODO 
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setCharacterEncoding({0})", charset);
-            }
+        public StringBuffer getRequestURL() {
+            return getRequestProperty("requestURL", StringBuffer.class);
         }
 
         @Override
-        public void setContentLength(int len) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setContentLength({0})", len);
-            }
-            responseHeaders.put("Content-Length", Integer.toString(len));
+        public DispatcherType getDispatcherType() {
+            return getRequestProperty("dispatcherType", DispatcherType.class);
         }
 
         @Override
-        public void setContentType(String type) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setContentType({0})", type);
-            }
-            responseHeaders.put("Content-Type", type);
+        public boolean isSecure() {
+            return getRequestProperty("secure", boolean.class);
         }
 
         @Override
-        public void setLocale(Locale loc) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setLocale({0})", loc);
-            }
+        public String getPathInfo() {
+            return getRequestProperty("pathInfo", String.class);
         }
 
         @Override
-        public void addCookie(Cookie cookie) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "addCookie({0})", cookie);
-            }
+        public String getPathTranslated() {
+            return getRequestProperty("pathTranslated", String.class);
         }
 
         @Override
-        public void addDateHeader(String name, long date) {
-            // TODO
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "addDateHeader({0}, {1})", new Object[]{name, date});
-            }
+        public String getScheme() {
+            return getRequestProperty("scheme", String.class);
         }
 
         @Override
-        public void addHeader(String name, String value) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "addHeader({0}, {1})", new Object[]{name, value});
-            }
-            responseHeaders.put(name, value);
+        public String getServerName() {
+            return getRequestProperty("serverName", String.class);
         }
 
         @Override
-        public void addIntHeader(String name, int value) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "addIntHeader({0}, {1})", new Object[]{name, value});
-            }
-            responseHeaders.put(name, Integer.toString(value));
+        public String getServletPath() {
+            return getRequestProperty("servletPath", String.class);
         }
 
         @Override
-        public boolean containsHeader(String name) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "containsHeader({0})", name);
-            }
-            return responseHeaders.containsKey(name);
+        public int getServerPort() {
+            return getRequestProperty("serverPort", int.class);
         }
 
         @Override
-        public String encodeRedirectURL(String url) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "encodeRedirectURL({0})", url);
-            }
-            return null;
+        public ServletContext getServletContext() {
+            return getRequestProperty("serverContext", ServletContext.class);
         }
 
         @Override
-        public String encodeRedirectUrl(String url) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "encodeRedirectUrl({0})", url);
-            }
-            return null;
+        public Principal getUserPrincipal() {
+            return getRequestProperty("userPrincipal", Principal.class);
         }
 
         @Override
-        public String encodeURL(String url) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "encodeURL({0})", url);
-            }
-            return null;
-        }
-
-        @Override
-        public String encodeUrl(String url) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "encodeUrl({0})", url);
-            }
-            return null;
-        }
-
-        @Override
-        public String getHeader(String name) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "getHeader({0})", name);
-            }
-            return null;
-        }
-
-        @Override
-        public Collection<String> getHeaderNames() {
-            LOG.log(Level.INFO, "getHeaderNames()");
-            return null;
-        }
-
-        @Override
-        public Collection<String> getHeaders(String name) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "getHeaders({0})", name);
-            }
-            return null;
-        }
-
-        @Override
-        public int getStatus() {
-            LOG.log(Level.INFO, "getStatus()");
-            String v = responseHeaders.get(SC_KEY);
-            return v == null ? 200 : Integer.parseInt(v);
-        }
-
-        @Override
-        public void sendError(int sc) throws IOException {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "sendError{0}", sc);
-            }
-            responseHeaders.put(SC_KEY, Integer.toString(sc));
-        }
-
-        @Override
-        public void sendError(int sc, String msg) throws IOException {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "sendError({0}, {1})", new Object[]{sc, msg});
-            }
-            responseHeaders.put(SC_KEY, Integer.toString(sc));
-            responseHeaders.put(SM_KEY, msg);
-        }
-
-        @Override
-        public void sendRedirect(String location) throws IOException {
-            // TODO Auto-generated method stub
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "sendRedirect({0})", location);
-            }
-        }
-
-        @Override
-        public void setDateHeader(String name, long date) {
-            // ignore
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setDateHeader({0}, {1})", new Object[]{name, date});
-            }
-        }
-
-        @Override
-        public void setHeader(String name, String value) {
-            // TODO Auto-generated method stub
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setHeader({0}, {1})", new Object[]{name, value});
-            }
-        }
-
-        @Override
-        public void setIntHeader(String name, int value) {
-            // TODO Auto-generated method stub
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setIntHeader({0}, {1})", new Object[]{name, value});
-            }
-        }
-
-        @Override
-        public void setStatus(int sc) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setStatus({0})", sc);
-            }
-            responseHeaders.put(SC_KEY, Integer.toString(sc));
-        }
-
-        @Override
-        public void setStatus(int sc, String sm) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "setStatus({0}, {1})", new Object[]{sc, sm});
-            }
-            responseHeaders.put(SC_KEY, Integer.toString(sc));
-            responseHeaders.put(SM_KEY, sm);
+        public void write(byte[] data, int offset, int length) throws IOException {
+            webSocket.write(data, offset, length);
         }
     }
-
-    /*
-     * We accept only a restricted syntax as we have the syntax in our control.
-     * Do not allow multiline or line-wrapped headers.
-     * Do not allow charset other than utf-8. (although i would have preferred iso-8859-1 ;-)
-     */
-    private static Map<String, String> readHeaders(InputStream in) throws IOException {
-        Map<String, String> headers = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
-        // read the request line
-        String line = readLine(in);
-        int del = line.indexOf(' ');
-        if (del < 0) {
-            throw new IOException("invalid request: " + line);
-        }
-        headers.put(METHOD_KEY, line.substring(0, del).trim());
-        headers.put(URI_KEY, line.substring(del + 1).trim());
-        
-        // read headers
-        while ((line = readLine(in)) != null) {
-            if (line.length() > 0) {
-                del = line.indexOf(':');
-                if (del < 0) {
-                    headers.put(line.trim(), "");
-                } else {
-                    headers.put(line.substring(0, del).trim(), line.substring(del + 1).trim());
-                }
-            }
-        }
-
-        return headers;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T getValue(Map<String, Object> properties, String name, Class<T> cls) {
-        return (T)properties.get(name);
-    }
-    
-
-    ///// this is copied from AttachmentDeserializer with a minor change. think about putting this method to IOUtils
-    private static String readLine(InputStream in) throws IOException {
-        StringBuilder buffer = new StringBuilder(128);
-
-        int c;
-
-        while ((c = in.read()) != -1) {
-            // a linefeed is a terminator, always.
-            if (c == '\n') {
-                break;
-            } else if (c == '\r') {
-                //just ignore the CR.  The next character SHOULD be an NL.  If not, we're
-                //just going to discard this
-                continue;
-            } else {
-                // just add to the buffer
-                buffer.append((char)c);
-            }
-        }
-
-        // no characters found...this was either an eof or a null line.
-        if (buffer.length() == 0) {
-            return null;
-        }
-
-        return buffer.toString();
-    }
-    ///// END
 }

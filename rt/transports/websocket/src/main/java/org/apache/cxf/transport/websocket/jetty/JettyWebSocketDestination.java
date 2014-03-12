@@ -22,7 +22,10 @@ package org.apache.cxf.transport.websocket.jetty;
 import java.io.IOException;
 import java.net.URL;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.StringUtils;
@@ -31,13 +34,15 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPHandler;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
+import org.apache.cxf.transport.websocket.WebSocketDestinationService;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketFactory;
 
 /**
  * 
  */
-public class JettyWebSocketDestination extends JettyHTTPDestination implements WebSocketFactory.Acceptor {
+public class JettyWebSocketDestination extends JettyHTTPDestination implements 
+    WebSocketDestinationService, WebSocketFactory.Acceptor {
     private JettyWebSocketManager webSocketManager;
 
     public JettyWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
@@ -45,6 +50,12 @@ public class JettyWebSocketDestination extends JettyHTTPDestination implements W
         super(bus, registry, ei, serverEngineFactory);
         webSocketManager = new JettyWebSocketManager();
         webSocketManager.init(this);
+    }
+    
+    @Override
+    public void invokeInternal(ServletConfig config, ServletContext context, HttpServletRequest req,
+                               HttpServletResponse resp) throws IOException {
+        super.invoke(config, context, req, resp);
     }
 
     @Override

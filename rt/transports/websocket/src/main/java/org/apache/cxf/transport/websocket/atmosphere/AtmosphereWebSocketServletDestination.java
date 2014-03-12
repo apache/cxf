@@ -17,12 +17,13 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket.jetty;
+package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,30 +32,49 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
-import org.eclipse.jetty.websocket.WebSocket;
-import org.eclipse.jetty.websocket.WebSocketFactory;
+import org.atmosphere.cpr.ApplicationConfig;
+import org.atmosphere.cpr.AtmosphereFramework;
+import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.util.Utils;
+import org.atmosphere.websocket.WebSocketProtocol;
 
 /**
  * 
  */
-public class JettyWebSocketServletDestination extends ServletDestination implements 
-    WebSocketDestinationService, WebSocketFactory.Acceptor {
-    private JettyWebSocketManager webSocketManager;
+public class AtmosphereWebSocketServletDestination extends ServletDestination implements
+    WebSocketDestinationService {
+    private AtmosphereFramework framework;
 
-    public JettyWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
-                                            String path) throws IOException {
+    public AtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei, 
+                                                 String path) throws IOException {
         super(bus, registry, ei, ei.toString());
-        webSocketManager = new JettyWebSocketManager();
-        webSocketManager.init(this);
+        this.framework = new AtmosphereFramework(false, true);
+
+        framework.setUseNativeImplementation(false);
+        framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
+        //TODO provide a way to switch between the non-stream handler and the stream handler
+        framework.addInitParameter(ApplicationConfig.WEBSOCKET_PROTOCOL, 
+                                   AtmosphereWebSocketHandler.class.getName());
+        framework.init();
+
+        WebSocketProtocol wsp = framework.getWebSocketProtocol();
+        if (wsp instanceof AtmosphereWebSocketHandler) {
+            ((AtmosphereWebSocketHandler)wsp).setDestination(this);
+        }
     }
 
     @Override
     public void invoke(ServletConfig config, ServletContext context, HttpServletRequest req,
                        HttpServletResponse resp) throws IOException {
-        if (webSocketManager.acceptWebSocket(req, resp)) {
+        if (Utils.webSocketEnabled(req)) {
+            try {
+                framework.doCometSupport(AtmosphereRequest.wrap(req), AtmosphereResponse.wrap(resp));
+            } catch (ServletException e) {
+                throw new IOException(e);
+            }
             return;
         }
-
         super.invoke(config, context, req, resp);
     }
 
@@ -64,24 +84,4 @@ public class JettyWebSocketServletDestination extends ServletDestination impleme
         super.invoke(config, context, req, resp);
     }
 
-    @Override
-    public boolean checkOrigin(HttpServletRequest arg0, String arg1) {
-        return true;
-    }
-
-    @Override
-    public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
-        return new JettyWebSocket(webSocketManager, request, protocol);
-    }
-
-    @Override
-    public void shutdown() {
-        try {
-            webSocketManager.destroy();
-        } catch (Exception e) {
-            // ignore
-        } finally {
-            super.shutdown();
-        }
-    }
 }

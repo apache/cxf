@@ -1,0 +1,264 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.apache.cxf.transport.websocket.atmosphere;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.Principal;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.transport.websocket.WebSocketDestinationService;
+import org.apache.cxf.transport.websocket.WebSocketServletHolder;
+import org.apache.cxf.transport.websocket.WebSocketVirtualServletRequest;
+import org.apache.cxf.transport.websocket.WebSocketVirtualServletResponse;
+import org.atmosphere.cpr.AtmosphereConfig;
+import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.websocket.WebSocket;
+import org.atmosphere.websocket.WebSocketProcessor.WebSocketException;
+import org.atmosphere.websocket.WebSocketProtocol;
+
+/**
+ * 
+ */
+public class AtmosphereWebSocketHandler implements WebSocketProtocol {
+    private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketHandler.class);
+
+    protected AtmosphereWebSocketServletDestination destination;
+    
+    
+    public AtmosphereWebSocketServletDestination getDestination() {
+        return destination;
+    }
+
+    public void setDestination(AtmosphereWebSocketServletDestination destination) {
+        this.destination = destination;
+    }
+
+    /** {@inheritDoc}*/
+    @Override
+    public void configure(AtmosphereConfig config) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /** {@inheritDoc}*/
+    @Override
+    public List<AtmosphereRequest> onMessage(WebSocket webSocket, String data) {
+        LOG.info("onMessage(WebSocket, String)");
+        return null;
+    }
+
+    /** {@inheritDoc}*/
+    @Override
+    public List<AtmosphereRequest> onMessage(WebSocket webSocket, byte[] data, int offset, int length) {
+        LOG.info("onMessage(WebSocket, byte[], int, int)");
+        
+        try {
+            WebSocketServletHolder webSocketHolder = new AtmosphereWebSocketServletHolder(webSocket);
+            HttpServletRequest request = createServletRequest(webSocketHolder, data, offset, length);
+            HttpServletResponse response = createServletResponse(webSocketHolder);
+            if (destination != null) {
+                ((WebSocketDestinationService)destination).invokeInternal(null, 
+                    webSocket.resource().getRequest().getServletContext(),
+                    request, response);
+            }
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Failed to invoke service", e);
+        }
+        return null;
+    }
+
+    /** {@inheritDoc}*/
+    @Override
+    public void onOpen(WebSocket webSocket) {
+        LOG.info("onOpen(WebSocket)");
+    }
+
+    /** {@inheritDoc}*/
+    @Override
+    public void onClose(WebSocket webSocket) {
+        LOG.info("onClose(WebSocket)");
+        
+    }
+
+    /** {@inheritDoc}*/
+    @Override
+    public void onError(WebSocket webSocket, WebSocketException t) {
+        LOG.info("onError(WebSocket, WebSocketException)");
+    }
+
+    protected WebSocketVirtualServletRequest createServletRequest(WebSocketServletHolder webSocketHolder, 
+                                                                  byte[] data, int offset, int length) 
+        throws IOException {
+        return new WebSocketVirtualServletRequest(webSocketHolder, 
+                                                  new ByteArrayInputStream(data, offset, length));
+    }
+    
+    protected WebSocketVirtualServletRequest createServletRequest(WebSocketServletHolder webSocketHolder, 
+                                                                  InputStream stream)
+        throws IOException {
+        return new WebSocketVirtualServletRequest(webSocketHolder, stream);
+    }
+
+    protected WebSocketVirtualServletResponse createServletResponse(WebSocketServletHolder webSocketHolder) 
+        throws IOException {
+        return new WebSocketVirtualServletResponse(webSocketHolder);
+    }
+    
+    protected static class AtmosphereWebSocketServletHolder implements WebSocketServletHolder {
+        private WebSocket webSocket;
+        
+        public AtmosphereWebSocketServletHolder(WebSocket webSocket) {
+            this.webSocket = webSocket;
+        }
+        
+        @Override
+        public String getAuthType() {
+            return webSocket.resource().getRequest().getAuthType();
+        }
+
+        @Override
+        public String getContextPath() {
+            return webSocket.resource().getRequest().getContextPath();
+        }
+
+        @Override
+        public String getLocalAddr() {
+            return webSocket.resource().getRequest().getLocalAddr();
+        }
+
+        @Override
+        public String getLocalName() {
+            return webSocket.resource().getRequest().getLocalName();
+        }
+
+        @Override
+        public int getLocalPort() {
+            return webSocket.resource().getRequest().getLocalPort();
+        }
+
+        @Override
+        public Locale getLocale() {
+            return webSocket.resource().getRequest().getLocale();
+        }
+
+        @Override
+        public Enumeration<Locale> getLocales() {
+            return webSocket.resource().getRequest().getLocales();
+        }
+
+        @Override
+        public String getProtocol() {
+            return webSocket.resource().getRequest().getProtocol();
+        }
+
+        @Override
+        public String getRemoteAddr() {
+            return webSocket.resource().getRequest().getRemoteAddr();
+        }
+
+        @Override
+        public String getRemoteHost() {
+            return webSocket.resource().getRequest().getRemoteHost();
+        }
+
+        @Override
+        public int getRemotePort() {
+            return webSocket.resource().getRequest().getRemotePort();
+        }
+
+        @Override
+        public String getRequestURI() {
+            return webSocket.resource().getRequest().getRequestURI();
+        }
+
+        @Override
+        public StringBuffer getRequestURL() {
+            return webSocket.resource().getRequest().getRequestURL();
+        }
+
+        @Override
+        public DispatcherType getDispatcherType() {
+            return webSocket.resource().getRequest().getDispatcherType();
+        }
+
+        @Override
+        public boolean isSecure() {
+            return webSocket.resource().getRequest().isSecure();
+        }
+
+        @Override
+        public String getPathInfo() {
+            return webSocket.resource().getRequest().getServletPath();
+        }
+
+        @Override
+        public String getPathTranslated() {
+            return webSocket.resource().getRequest().getPathTranslated();
+        }
+
+        @Override
+        public String getScheme() {
+            return webSocket.resource().getRequest().getScheme();
+        }
+
+        @Override
+        public String getServerName() {
+            return webSocket.resource().getRequest().getServerName();
+        }
+
+        @Override
+        public String getServletPath() {
+            return webSocket.resource().getRequest().getServletPath();
+        }
+
+        @Override
+        public int getServerPort() {
+            return webSocket.resource().getRequest().getServerPort();
+        }
+
+        @Override
+        public ServletContext getServletContext() {
+            return webSocket.resource().getRequest().getServletContext();
+        }
+        
+        @Override
+        public Principal getUserPrincipal() {
+            return webSocket.resource().getRequest().getUserPrincipal();
+        }
+
+        @Override
+        public void write(byte[] data, int offset, int length) throws IOException {
+            webSocket.write(data, offset, length);
+        }
+    }
+
+}
