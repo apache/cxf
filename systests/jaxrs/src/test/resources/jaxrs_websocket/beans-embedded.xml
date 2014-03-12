@@ -36,7 +36,7 @@
         
     <bean class="org.apache.cxf.systest.jaxrs.websocket.BookStoreWebSocket" id="serviceBean"/>
 
-    <jaxrs:server id="bookservice" address="ws://localhost:${testutil.ports.org.apache.cxf.systest.jaxrs.websocket.BookServerWebSocket.2}/">
+    <jaxrs:server id="bookservice" address="ws://localhost:${testutil.ports.org.apache.cxf.systest.jaxrs.websocket.BookServerWebSocket.2}/websocket">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>

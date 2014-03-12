@@ -21,6 +21,8 @@ package org.apache.cxf.systest.jaxrs.websocket;
 
 import java.net.URISyntaxException;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.systest.jaxrs.Book;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -29,6 +31,7 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * JAXRSClientServerWebSocket test with jaxrs:server using the jetty webapp server.
@@ -59,6 +62,15 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
         server.setHandler(handlers);
         server.start();
 
+    }
+    
+    @Test
+    public void testGetBookHTTP() throws Exception {
+        String address = "http://localhost:" + getPort() + "/http/web/bookstore/books/1";
+        WebClient wc = WebClient.create(address);
+        wc.accept("application/xml");
+        Book book = wc.get(Book.class);
+        assertEquals(1L, book.getId());
     }
 
     protected String getPort() {

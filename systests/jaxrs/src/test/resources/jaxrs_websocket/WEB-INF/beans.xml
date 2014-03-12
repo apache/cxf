@@ -36,10 +36,16 @@
 
     <bean class="org.apache.cxf.systest.jaxrs.websocket.BookStoreWebSocket" id="serviceBean"/>
 
-    <jaxrs:server id="bookservice" address="/" transportId="http://cxf.apache.org/transports/websockt">
+    <jaxrs:server id="bookserviceWS" address="/websocket" transportId="http://cxf.apache.org/transports/websockt">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
+    <jaxrs:server id="bookserviceHTTP" address="/http">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    
 </beans>
 <!-- END SNIPPET: beans -->

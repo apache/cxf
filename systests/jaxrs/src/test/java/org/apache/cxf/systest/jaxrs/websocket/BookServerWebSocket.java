@@ -44,7 +44,7 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
         sf.setResourceClasses(BookStoreWebSocket.class, BookStorePerRequest.class);
         sf.setResourceProvider(BookStoreWebSocket.class,
                                new SingletonResourceProvider(new BookStoreWebSocket(), true));
-        sf.setAddress("ws://localhost:" + PORT + "/");
+        sf.setAddress("ws://localhost:" + PORT + "/websocket");
         server = sf.create();
 
         BusFactory.setDefaultBus(null);
