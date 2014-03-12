@@ -52,6 +52,9 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
         }
         brokerUrl1 = url;
     }
+    public void setBrokerName(String s) {
+        brokerName = s;
+    }
     
     public String getBrokerURL() {
         return brokerUrl1;

@@ -32,7 +32,9 @@ import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
+
 import org.junit.After;
 import org.junit.AfterClass;
 
@@ -48,11 +50,15 @@ public abstract class AbstractVmJMSTest {
     protected static Bus bus;
     protected static ConnectionFactoryFeature cff;
     protected static ConnectionFactory cf;
+    protected static EmbeddedJMSBrokerLauncher broker;
     private List<Object> closeableResources = new ArrayList<Object>();
 
     public static void startBusAndJMS(Class<?> testClass) {
         bus = BusFactory.getDefaultBus();
-        String brokerURI = "vm://" + testClass.getName() + "?broker.persistent=false";
+        String brokerURI = "vm://" + testClass.getName() + "?broker.persistent=false&broker.useJmx=false";
+        broker = new EmbeddedJMSBrokerLauncher(brokerURI);
+        broker.setBrokerName(testClass.getName());
+        broker.run();
         ActiveMQConnectionFactory cf1 = new ActiveMQConnectionFactory(brokerURI);
         cf = new PooledConnectionFactory(cf1);
         cff = new ConnectionFactoryFeature(cf);
@@ -78,8 +84,13 @@ public abstract class AbstractVmJMSTest {
     }
     
     @AfterClass
-    public static void stopBus() {
+    public static void stopBus() throws Exception {
         bus.shutdown(false);
+        bus = null;
+        cf = null;
+        cff = null;
+        broker.stop();
+        broker = null;
     }
     
     public URL getWSDLURL(String s) throws Exception {

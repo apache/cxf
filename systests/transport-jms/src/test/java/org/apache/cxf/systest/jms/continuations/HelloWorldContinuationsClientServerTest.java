@@ -36,6 +36,7 @@ public class HelloWorldContinuationsClientServerTest extends AbstractVmJMSTest {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        startBusAndJMS(HelloWorldContinuationsClientServerTest.class);
         publish(new HelloWorldWithContinuationsJMS());        
     }
     
