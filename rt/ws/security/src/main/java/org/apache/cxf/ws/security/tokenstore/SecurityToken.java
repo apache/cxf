@@ -270,7 +270,9 @@ public class SecurityToken implements Serializable {
      * @param token The token to set.
      */
     public void setToken(Element token) {
-        this.token = token;
+        if (token != null) {
+            this.token = cloneElement(token);
+        }
     }
 
     /**
