@@ -537,12 +537,22 @@ public class SourceGenerator {
     }
     
     private String firstCharToUpperCase(String name) {
-        StringBuilder sb = new StringBuilder();
-        if (name.length() > 0) {
+        if (name.length() > 0 && Character.isLowerCase(name.charAt(0))) {
+            StringBuilder sb = new StringBuilder();
             sb.append(Character.toUpperCase(name.charAt(0)));
             return name.length() > 1 ? sb.append(name.substring(1)).toString() : sb.toString();
         } else {
-            return sb.toString();
+            return name;
+        }
+    }
+    
+    private String firstCharToLowerCase(String name) {
+        if (name.length() > 0 && Character.isUpperCase(name.charAt(0))) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(Character.toLowerCase(name.charAt(0)));
+            return name.length() > 1 ? sb.append(name.substring(1)).toString() : sb.toString();
+        } else {
+            return name;
         }
     }
     
@@ -966,7 +976,7 @@ public class SourceGenerator {
             } else {
                 paramName = name.replaceAll("[:\\.\\-]", "_");
             }
-            sbCode.append(type).append(" ").append(paramName);
+            sbCode.append(type).append(" ").append(firstCharToLowerCase(paramName));
             if (i + 1 < inParamEls.size()) {
                 sbCode.append(", ");
                 if (i + 1 >= 4 && ((i + 1) % 4) == 0) {
