@@ -70,6 +70,7 @@
                         <option value="A"/>
                         <option value="B"/>
                     </param>
+                    <param name="If-Modified-Since" style="header" type="xsd:date"/>
                 </request>
                 <response>
                     <representation mediaType="text/plain">

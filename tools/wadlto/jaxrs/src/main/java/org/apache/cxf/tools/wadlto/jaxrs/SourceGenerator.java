@@ -624,7 +624,7 @@ public class SourceGenerator {
     }
     
     private void addImport(Set<String> imports, String clsName) {
-        if (imports == null || clsName.startsWith("java.lang")) {
+        if (imports == null || clsName.startsWith("java.lang") || !clsName.contains(".")) {
             return;
         }
         if (!imports.contains(clsName)) {
@@ -1136,7 +1136,8 @@ public class SourceGenerator {
                     return schemaTypeMap.get(expandedName);
                 }
                 
-                return XSD_SPECIFIC_TYPE_MAP.get(pair[1]);
+                String xsdType = XSD_SPECIFIC_TYPE_MAP.get(pair[1]);
+                return addImportsAndGetSimpleName(imports, xsdType);
             }
             
             String value = pair[1].replaceAll("[\\-\\_]", "");
