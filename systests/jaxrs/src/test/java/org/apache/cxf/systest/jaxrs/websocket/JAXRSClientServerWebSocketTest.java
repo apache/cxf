@@ -121,14 +121,20 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             String value = resp.getTextEntity();
             assertEquals("CXF in Action", value);
            
-            WebClient wc = WebClient.create("http://localhost:" + getPort() + "/websocket/web/bookstore/books/1");
-            wc.accept("application/xml");
-            Book book = wc.get(Book.class);
-            assertEquals(1L, book.getId());
+            testGetBookHTTPFromWebSocketEndpoint();
             
         } finally {
             wsclient.close();
         }
+    }
+    
+    @Test
+    public void testGetBookHTTPFromWebSocketEndpoint() throws Exception {
+        String address = "http://localhost:" + getPort() + "/websocket/web/bookstore/books/1";
+        WebClient wc = WebClient.create(address);
+        wc.accept("application/xml");
+        Book book = wc.get(Book.class);
+        assertEquals(1L, book.getId());
     }
     
     @Test
