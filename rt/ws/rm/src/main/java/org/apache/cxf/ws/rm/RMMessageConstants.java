@@ -42,8 +42,8 @@ public final class RMMessageConstants {
     /** Retransmission in progress flag (Boolean.TRUE if in progress). */
     public static final String RM_RETRANSMISSION = "org.apache.cxf.ws.rm.retransmitting";
     
-    /** Boolean property TRUE for a chain used only to capture (not send) a message. */
-    public static final String MESSAGE_CAPTURE_CHAIN = "org.apache.cxf.rm.captureOnly";
+    /** Boolean property TRUE for a chain used to capture a message. */
+    public static final String MESSAGE_CAPTURE = "org.apache.cxf.rm.capture";
     
     /** Client callback (must be instance of {@link MessageCallback}). */
     public static final String RM_CLIENT_CALLBACK = "org.apache.cxf.rm.clientCallback";

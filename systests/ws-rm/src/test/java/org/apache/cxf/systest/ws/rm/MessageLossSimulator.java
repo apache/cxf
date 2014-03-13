@@ -82,9 +82,6 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         if (MessageUtils.isPartialResponse(message)) {
             return;
         }
-        if (Boolean.TRUE.equals(message.get(RMMessageConstants.MESSAGE_CAPTURE_CHAIN))) {
-            return;
-        }
         if (Boolean.TRUE.equals(message.get(RMMessageConstants.RM_RETRANSMISSION))) {
             return;
         }
@@ -103,7 +100,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
                 }
             }
         }
-        
+
         InterceptorChain chain = message.getInterceptorChain();
         ListIterator<Interceptor<? extends Message>> it = chain.getIterator();
         while (it.hasNext()) {
