@@ -55,6 +55,9 @@ public abstract class AbstractClientServerTestBase extends Assert {
         assertTrue("server failed", passed);
     }
     
+    /**
+     * Starts the server inProcess
+     */
     public static boolean launchServer(AbstractTestServerBase base) {
         boolean ok = false;
         try { 
@@ -70,20 +73,16 @@ public abstract class AbstractClientServerTestBase extends Assert {
         return ok;
     }
     
+    /**
+     * Starts the server inProcess
+     */
     public static boolean launchServer(Class<?> clz) {
-        boolean ok = false;
-        try { 
-            ServerLauncher sl = new ServerLauncher(clz.getName());
-            ok = sl.launchServer();
-            assertTrue("server failed to launch", ok);
-            launchers.add(0, sl);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            fail("failed to launch server " + clz);
-        }
-        
-        return ok;
+        return launchServer(clz, true);
     }
+
+    /**
+     * Starts the server inProcess or out of process depending on the param
+     */
     public static boolean launchServer(Class<?> clz, boolean inProcess) {
         boolean ok = false;
         try { 
@@ -98,9 +97,17 @@ public abstract class AbstractClientServerTestBase extends Assert {
         
         return ok;
     }
+
+    /**
+     * Starts the server inProcess
+     */
     public static boolean launchServer(Class<?> clz, Map<String, String> props, String[] args) {
-        return launchServer(clz, props, args, false);
+        return launchServer(clz, props, args, true);
     }
+
+    /**
+     * Starts the server inProcess or out of process depending on the param
+     */
     public static boolean launchServer(Class<?> clz, Map<String, String> props, String[] args,
                                 boolean inProcess) {
         boolean ok = false;

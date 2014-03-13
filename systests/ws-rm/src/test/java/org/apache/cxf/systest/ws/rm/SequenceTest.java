@@ -134,7 +134,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         } catch (Throwable t) {
             //ignore
         }
-        Thread.sleep(100);
     }
     
     // --- tests ---
@@ -1433,8 +1432,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         assertEquals("Unexpected maximum sequence count.", 1, manager.getDestinationPolicy().getMaxSequences());
 
         greeter.greetMe("one");
+        
+        //hold onto the greeter to keep the sequence open
+        Closeable oldGreeter = (Closeable)greeter;
+
         // force greeter to be re-initialized so that a new sequence is created
-        ClientProxy.getClient(greeter).getConduit().close();
         initProxy(false, null);
 
         try {
@@ -1442,7 +1444,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             fail("Expected fault.");
         } catch (WebServiceException ex) {
             // sequence creation refused
-        }   
+        }
         
         // the third inbound message has a SequenceFault header
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
@@ -1453,6 +1455,9 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
                                         GREETME_RESPONSE_ACTION,
                                         RM10_GENERIC_FAULT_ACTION};
         mf.verifyActions(expectedActions, false);
+        
+        //now close the old greeter to cleanup the sequence
+        oldGreeter.close();
     }
 
     // --- test utilities ---
@@ -1577,17 +1582,10 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     
     private void stopClient() throws IOException {
         if (null != greeterBus) {
-            
             //ensure we close the decoupled destination of the conduit,
             //so that release the port if the destination reference count hit zero
-            if (greeter != null) {
-                //ClientProxy.getClient(greeter).getConduit().close();
-            }
             if (greeter instanceof Closeable) {
                 ((Closeable)greeter).close();
-            }
-            if (dispatch != null) {
-                //((DispatchImpl<?>)dispatch).getClient().getConduit().close();
             }
             if (dispatch instanceof Closeable) {
                 ((Closeable)dispatch).close();

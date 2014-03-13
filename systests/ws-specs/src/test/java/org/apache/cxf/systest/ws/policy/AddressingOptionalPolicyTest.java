@@ -44,6 +44,7 @@ import org.apache.cxf.testutil.recorders.OutMessageRecorder;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.selector.MinimalAlternativeSelector;
 import org.apache.cxf.ws.rm.RMUtils;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -65,6 +66,9 @@ public class AddressingOptionalPolicyTest extends AbstractBusClientServerTestBas
         }
         public Server(String dir) {
             tmpDir = dir;
+        }
+        public Server(String args[]) {
+            tmpDir = args[0];
         }
         protected void run()  {       
             System.setProperty("temp.location", tmpDir);

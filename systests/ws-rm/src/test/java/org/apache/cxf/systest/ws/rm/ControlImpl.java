@@ -116,10 +116,10 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
                 s = (String)xp.getValue("/ns:greetMeOneWay/ns:requestType",
                                         el,
                                         XPathConstants.STRING);
-                System.out.println("greetMeOneWay arg: " + s);
+                //System.out.println("greetMeOneWay arg: " + s);
                 return null;
             } else {
-                System.out.println("greetMe arg: " + s);
+                //System.out.println("greetMe arg: " + s);
                 String resp =
                     "<greetMeResponse "
                         + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"

@@ -59,6 +59,9 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
         public Server(String dir) {
             tmpDir = dir;
         }
+        public Server(String args[]) {
+            tmpDir = args[0];
+        }
         protected void run()  {
             
             System.setProperty("server.temp.location", tmpDir);
