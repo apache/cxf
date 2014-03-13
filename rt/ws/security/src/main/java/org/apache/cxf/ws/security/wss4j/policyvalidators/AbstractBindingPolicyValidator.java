@@ -56,7 +56,6 @@ import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.EncryptionToken;
-import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.ProtectionToken;
 import org.apache.wss4j.policy.model.SignatureToken;
 import org.apache.wss4j.policy.model.X509Token;
@@ -163,21 +162,6 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
-        // Check the AlgorithmSuite
-        AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
-        if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
-            return false;
-        }
-        assertPolicy(aim, binding.getAlgorithmSuite());
-        String namespace = binding.getAlgorithmSuite().getAlgorithmSuiteType().getNamespace();
-        String name = binding.getAlgorithmSuite().getAlgorithmSuiteType().getName();
-        Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
-        if (algSuiteAis != null) {
-            for (AssertionInfo algSuiteAi : algSuiteAis) {
-                algSuiteAi.setAsserted(true);
-            }
-        }
-        
         // Check the IncludeTimestamp
         if (!validateTimestamp(binding.isIncludeTimestamp(), false, results, signedResults, message)) {
             String error = "Received Timestamp does not match the requirements";
@@ -185,21 +169,6 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             return false;
         }
         assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
-        
-        // Check the Layout
-        Layout layout = binding.getLayout();
-        LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator(results, signedResults);
-        if (!layoutValidator.validatePolicy(layout)) {
-            String error = "Layout does not match the requirements";
-            notAssertPolicy(aim, layout, error);
-            ai.setNotAsserted(error);
-            return false;
-        }
-        assertPolicy(aim, layout);
-        assertPolicy(aim, SPConstants.LAYOUT_LAX);
-        assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
-        assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
-        assertPolicy(aim, SPConstants.LAYOUT_STRICT);
         
         // Check the EntireHeaderAndBodySignatures property
         if (binding.isOnlySignEntireHeadersAndBody()

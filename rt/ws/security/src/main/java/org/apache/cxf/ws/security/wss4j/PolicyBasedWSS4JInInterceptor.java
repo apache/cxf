@@ -61,12 +61,14 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.AlgorithmSuitePolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AsymmetricBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.BindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.ConcreteSupportingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingEncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.LayoutPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityContextTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEncryptedTokenPolicyValidator;
@@ -888,6 +890,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             asymmetricValidator.validatePolicy(
                 aim, msg, soapBody, results, signedResults, encryptedResults
             );
+        
+        // Check AlgorithmSuite + Layout that might not be tied to a binding
+        AlgorithmSuitePolicyValidator algorithmSuiteValidator = new AlgorithmSuitePolicyValidator();
+        check &= 
+            algorithmSuiteValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
+        
+        LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator();
+        check &= layoutValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
         
         return check;
     }

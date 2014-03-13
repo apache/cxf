@@ -24,43 +24,84 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.transform.STRTransform;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 
 /**
- * Validate a WSSecurityEngineResult corresponding to the processing of a Signature, EncryptedKey or
+ * Validate results corresponding to the processing of a Signature, EncryptedKey or
  * EncryptedData structure against an AlgorithmSuite policy.
  */
-public class AlgorithmSuitePolicyValidator {
+public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator {
     
-    private List<WSSecurityEngineResult> results;
+    public boolean validatePolicy(
+        AssertionInfoMap aim,
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
+        if (!ais.isEmpty()) {
+            parsePolicies(aim, ais, message, results);
+        }
 
-    public AlgorithmSuitePolicyValidator(
+        return true;
+    }
+    
+    private void parsePolicies(
+        AssertionInfoMap aim,
+        Collection<AssertionInfo> ais, 
+        Message message,  
         List<WSSecurityEngineResult> results
     ) {
-        this.results = results;
+        for (AssertionInfo ai : ais) {
+            AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
+            ai.setAsserted(true);
+            
+            boolean valid = validatePolicy(ai, algorithmSuite, results);
+            if (valid) {
+                String namespace = algorithmSuite.getAlgorithmSuiteType().getNamespace();
+                String name = algorithmSuite.getAlgorithmSuiteType().getName();
+                Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
+                if (algSuiteAis != null) {
+                    for (AssertionInfo algSuiteAi : algSuiteAis) {
+                        algSuiteAi.setAsserted(true);
+                    }
+                }
+            } else if (!valid && ai.isAsserted()) {
+                ai.setNotAsserted("Error in validating AlgorithmSuite policy");
+            }
+        }
     }
     
     public boolean validatePolicy(
-        AssertionInfo aiBinding, AlgorithmSuite algorithmPolicy
+        AssertionInfo ai, AlgorithmSuite algorithmPolicy, List<WSSecurityEngineResult> results
     ) {
         boolean success = true;
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
             if (WSConstants.SIGN == actInt 
-                && !checkSignatureAlgorithms(result, algorithmPolicy, aiBinding)) {
+                && !checkSignatureAlgorithms(result, algorithmPolicy, ai)) {
                 success = false;
             } else if (WSConstants.ENCR == actInt
-                && !checkEncryptionAlgorithms(result, algorithmPolicy, aiBinding)) {
+                && !checkEncryptionAlgorithms(result, algorithmPolicy, ai)) {
                 success = false;
             }
         }

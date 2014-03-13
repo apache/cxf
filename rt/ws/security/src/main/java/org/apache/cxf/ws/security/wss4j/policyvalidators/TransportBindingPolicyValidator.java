@@ -22,8 +22,6 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.w3c.dom.Element;
 
 import org.apache.cxf.message.Message;
@@ -35,7 +33,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
-import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.TransportBinding;
 
 /**
@@ -89,21 +86,6 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 assertPolicy(aim, binding.getTransportToken());
             }
             
-            // Check the AlgorithmSuite
-            AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
-            if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
-                continue;
-            }
-            assertPolicy(aim, binding.getAlgorithmSuite());
-            String namespace = binding.getAlgorithmSuite().getVersion().getNamespace();
-            String name = binding.getAlgorithmSuite().getAlgorithmSuiteType().getName();
-            Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
-            if (algSuiteAis != null) {
-                for (AssertionInfo algSuiteAi : algSuiteAis) {
-                    algSuiteAi.setAsserted(true);
-                }
-            }
-            
             // Check the IncludeTimestamp
             if (!validateTimestamp(binding.isIncludeTimestamp(), true, results, signedResults, message)) {
                 String error = "Received Timestamp does not match the requirements";
@@ -111,21 +93,6 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 continue;
             }
             assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
-            
-            // Check the Layout
-            Layout layout = binding.getLayout();
-            LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator(results, signedResults);
-            if (!layoutValidator.validatePolicy(layout)) {
-                String error = "Layout does not match the requirements";
-                notAssertPolicy(aim, binding.getLayout(), error);
-                ai.setNotAsserted(error);
-                continue;
-            }
-            assertPolicy(aim, binding.getLayout());
-            assertPolicy(aim, SPConstants.LAYOUT_LAX);
-            assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
-            assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
-            assertPolicy(aim, SPConstants.LAYOUT_STRICT);
         }
 
     }
