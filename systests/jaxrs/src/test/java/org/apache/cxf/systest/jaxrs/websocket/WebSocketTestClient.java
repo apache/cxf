@@ -19,8 +19,10 @@
 
 package org.apache.cxf.systest.jaxrs.websocket;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -47,16 +49,16 @@ import org.apache.cxf.common.logging.LogUtils;
 class WebSocketTestClient {
     private static final Logger LOG = LogUtils.getL7dLogger(WebSocketTestClient.class);
 
-    private List<String> received;
-    private List<byte[]> receivedBytes;
+    private List<Object> received;
+    private List<Object> fragments;
     private CountDownLatch latch;
     private AsyncHttpClient client;
     private WebSocket websocket;
     private String url;
     
     public WebSocketTestClient(String url, int count) {
-        this.received = new ArrayList<String>();
-        this.receivedBytes = new ArrayList<byte[]>();
+        this.received = new ArrayList<Object>();
+        this.fragments = new ArrayList<Object>();
         this.latch = new CountDownLatch(count);
         this.client = new AsyncHttpClient();
         this.url = url;
@@ -82,15 +84,10 @@ class WebSocketTestClient {
     public void reset(int count) {
         latch = new CountDownLatch(count);
         received.clear();
-        receivedBytes.clear();
     }
 
-    public List<String> getReceived() {
+    public List<Object> getReceived() {
         return received;
-    }
-    
-    public List<byte[]> getReceivedBytes() {
-        return receivedBytes;
     }
 
     public void close() {
@@ -113,14 +110,13 @@ class WebSocketTestClient {
         }
 
         public void onMessage(byte[] message) {
-            receivedBytes.add(message);
+            received.add(message);
             LOG.info("[ws] received bytes --> " + makeString(message));
             latch.countDown();
         }
 
         public void onFragment(byte[] fragment, boolean last) {
-            // TODO Auto-generated method stub
-            LOG.info("TODO [ws] received fragment bytes --> " + makeString(fragment) + "; last? " + last);
+            processFragments(fragment, last);
         }
 
         public void onMessage(String message) {
@@ -130,10 +126,39 @@ class WebSocketTestClient {
         }
 
         public void onFragment(String fragment, boolean last) {
-            // TODO Auto-generated method stub
-            LOG.info("TODO [ws] received fragment --> " + fragment + "; last? " + last);
+            processFragments(fragment, last);
         }
         
+        private void processFragments(Object f, boolean last) {
+            synchronized (fragments) {
+                fragments.add(f);
+                if (last) {
+                    if (f instanceof String) {
+                        // string
+                        StringBuilder sb = new StringBuilder();
+                        for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
+                            Object o = it.next();
+                            if (o instanceof String) {
+                                sb.append((String)o);
+                                it.remove();
+                            }
+                        }
+                        received.add(sb.toString());
+                    } else {
+                        // byte[]
+                        ByteArrayOutputStream bao = new ByteArrayOutputStream();
+                        for (Iterator<Object> it = fragments.iterator(); it.hasNext();) {
+                            Object o = it.next();
+                            if (o instanceof byte[]) {
+                                bao.write((byte[])o, 0, ((byte[])o).length);
+                                it.remove();
+                            }
+                        }
+                        received.add(bao.toString());
+                    }
+                }
+            }
+        }
     }
     
     private static String makeString(byte[] data) {
