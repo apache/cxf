@@ -22,6 +22,7 @@ package org.apache.cxf.transport.http_jetty;
 import java.io.IOException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +36,7 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
+import org.apache.cxf.transport.http.HttpUrlUtil;
 import org.apache.cxf.transport.https_jetty.JettySslConnectorFactory;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
@@ -115,6 +117,8 @@ public class JettyHTTPServerEngine
      * has been called.
      */
     private boolean configFinalized;
+    
+    private List<String> registedPaths = new ArrayList<String>();
         
     /**
      * This constructor is called by the JettyHTTPServerEngineFactory.
@@ -177,6 +181,7 @@ public class JettyHTTPServerEngine
      * remove it from the factory's cache. 
      */
     public void shutdown() {
+        registedPaths.clear();
         if (shouldDestroyPort()) {
             if (servantCount == 0) {
                 JettyHTTPServerEngineFactory.destroyForPort(port);
@@ -271,6 +276,22 @@ public class JettyHTTPServerEngine
         maxIdleTime = maxIdle;
     }
     
+    protected void checkRegistedContext(URL url) {
+        String path = url.getPath();
+        for (String registedPath : registedPaths) {
+            if (path.equals(registedPath) 
+                || HttpUrlUtil.checkContextPath(registedPath, path)) {
+                // Throw the address is already used exception
+                throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
+            }
+            if (HttpUrlUtil.checkContextPath(path, registedPath)) {
+                throw new Fault(new Message("ADD_HANDLER_CONTEXT_CONFILICT_MSG", LOG, url, registedPath));
+            }
+        }
+        
+    }
+    
+    
     /**
      * Register a servant.
      * 
@@ -278,6 +299,9 @@ public class JettyHTTPServerEngine
      * @param handler notified on incoming HTTP requests
      */
     public synchronized void addServant(URL url, JettyHTTPHandler handler) {
+        
+        checkRegistedContext(url);
+        
         SecurityHandler securityHandler = null;
         if (server == null) {
             DefaultHandler defaultHandler = null;
@@ -444,8 +468,8 @@ public class JettyHTTPServerEngine
                 LOG.log(Level.WARNING, "ADD_HANDLER_FAILED_MSG", new Object[] {ex.getMessage()});
             }
         }
-        
-            
+         
+        registedPaths.add(url.getPath());
         ++servantCount;
     }
     
@@ -515,6 +539,7 @@ public class JettyHTTPServerEngine
         
         final String contextName = HttpUriMapper.getContextName(url.getPath());
         final String smap = HttpUriMapper.getResourceBase(url.getPath());
+        
         boolean found = false;
         
         if (server != null && server.isRunning()) {
@@ -543,8 +568,9 @@ public class JettyHTTPServerEngine
         if (!found) {
             LOG.log(Level.WARNING, "CAN_NOT_FIND_HANDLER_MSG", new Object[]{url});
         }
-        
+        registedPaths.remove(url.getPath());
         --servantCount;
+        
        
     }
 
@@ -690,6 +716,7 @@ public class JettyHTTPServerEngine
      *
      */
     protected void stop() throws Exception {
+        registedPaths.clear();
         if (server != null) {
             try {
                 connector.stop();

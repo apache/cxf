@@ -88,7 +88,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         //                     "com.ibm.ws.webservices.engine.soap.MessageFactoryImpl");
         //System.setProperty(SAAJFactoryResolver.SOAP_FACTORY_KEY, 
         //    "com.ibm.ws.webservices.engine.xmlsoap.SOAPFactory");
-            
+        createStaticBus();    
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 

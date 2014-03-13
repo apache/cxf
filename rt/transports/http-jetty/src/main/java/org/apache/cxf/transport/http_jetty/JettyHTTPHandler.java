@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.transport.http.HttpUrlUtil;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
@@ -53,14 +54,6 @@ public class JettyHTTPHandler extends AbstractHandler {
         return urlName;
     }
 
-    boolean checkContextPath(String target) {
-        String pathString = urlName;
-        if (!pathString.endsWith("/")) {
-            pathString = pathString + "/";
-        }
-        return target.startsWith(pathString);
-    }
-
     public void handle(String target, Request baseRequest, HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
         if (contextMatchExact) {
@@ -68,7 +61,7 @@ public class JettyHTTPHandler extends AbstractHandler {
                 jettyHTTPDestination.doService(servletContext, request, response);
             }
         } else {
-            if (target.equals(urlName) || checkContextPath(target)) {
+            if (target.equals(urlName) || HttpUrlUtil.checkContextPath(urlName, target)) {
                 jettyHTTPDestination.doService(servletContext, request, response);
             }
         }
