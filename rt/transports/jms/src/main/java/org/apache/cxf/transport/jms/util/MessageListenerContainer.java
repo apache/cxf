@@ -54,6 +54,10 @@ public class MessageListenerContainer implements JMSListenerContainer {
         executor = Executors.newFixedThreadPool(20);
     }
     
+    public Connection getConnection() {
+        return connection;
+    }
+    
     public void setTransacted(boolean transacted) {
         this.transacted = transacted;
     }

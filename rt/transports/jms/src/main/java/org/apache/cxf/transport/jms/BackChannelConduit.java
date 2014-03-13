@@ -27,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Session;
@@ -51,11 +50,13 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSDestination.class);
     private JMSConfiguration jmsConfig;
     private Message inMessage;
+    private Connection connection;
     
-    BackChannelConduit(Message inMessage, JMSConfiguration jmsConfig) {
+    BackChannelConduit(Message inMessage, JMSConfiguration jmsConfig, Connection connection) {
         super(EndpointReferenceUtils.getAnonymousEndpointReference());
         this.inMessage = inMessage;
         this.jmsConfig = jmsConfig;
+        this.connection = connection;
     }
     @Override
     public void close(Message msg) throws IOException {
@@ -111,8 +112,6 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
 
         ResourceCloser closer = new ResourceCloser();
         try {
-            ConnectionFactory cf = jmsConfig.getConnectionFactory();
-            Connection connection = closer.register(cf.createConnection());
             Session session = closer
                 .register(connection.createSession(jmsConfig.isSessionTransacted(), Session.AUTO_ACKNOWLEDGE));
 

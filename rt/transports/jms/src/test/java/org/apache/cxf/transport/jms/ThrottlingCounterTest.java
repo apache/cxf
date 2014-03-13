@@ -18,7 +18,10 @@
  */
 package org.apache.cxf.transport.jms;
 
+import javax.jms.Connection;
+
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -63,6 +66,9 @@ public class ThrottlingCounterTest {
         public void shutdown() {
         }
 
+        public Connection getConnection() {
+            return null;
+        }
     }
 
 }

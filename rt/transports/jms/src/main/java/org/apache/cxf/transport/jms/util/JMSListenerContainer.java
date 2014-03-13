@@ -19,9 +19,13 @@
 
 package org.apache.cxf.transport.jms.util;
 
+import javax.jms.Connection;
+
 public interface JMSListenerContainer {
     boolean isRunning();
     void stop();
     void start();
     void shutdown();
+    
+    Connection getConnection();
 }

@@ -70,7 +70,7 @@ public class JMSDestination extends AbstractMultiplexDestination
      * @return the inbuilt backchannel
      */
     protected Conduit getInbuiltBackChannel(Message inMessage) {
-        return new BackChannelConduit(inMessage, jmsConfig);
+        return new BackChannelConduit(inMessage, jmsConfig, jmsListener.getConnection());
     }
 
     /**
