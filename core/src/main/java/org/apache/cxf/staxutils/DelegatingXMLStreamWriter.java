@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 
 public class DelegatingXMLStreamWriter implements XMLStreamWriter {
-    XMLStreamWriter delegate;
+    protected final XMLStreamWriter delegate;
     
     public DelegatingXMLStreamWriter(XMLStreamWriter del) {
         delegate = del;
