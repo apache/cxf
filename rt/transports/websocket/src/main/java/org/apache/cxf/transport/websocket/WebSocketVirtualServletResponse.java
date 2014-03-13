@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.websocket;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Locale;
@@ -71,7 +70,6 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public String getCharacterEncoding() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "getCharacterEncoding()");
         return null;
     }
@@ -84,7 +82,6 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public Locale getLocale() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "getLocale");
         return null;
     }
@@ -100,6 +97,11 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
                 write(data, 0, 1);
             }
 
+            @Override
+            public void write(byte[] data) throws IOException {
+                write(data, 0, data.length);
+            }
+            
             @Override
             public void write(byte[] data, int offset, int length) throws IOException {
                 if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
@@ -127,36 +129,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
     @Override
     public PrintWriter getWriter() throws IOException {
         LOG.log(Level.INFO, "getWriter()");
-        return new PrintWriter(new OutputStream() {
-
-            @Override
-            public void write(int b) throws IOException {
-                byte[] data = new byte[1];
-                data[0] = (byte)b;
-                write(data, 0, 1);
-            }
-            
-            @Override
-            public void write(byte[] data, int offset, int length) throws IOException {
-                if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
-                    data = WebSocketUtils.buildResponse(responseHeaders, data, offset, length);
-                    responseHeaders.put(WebSocketUtils.FLUSHED_KEY, "true");
-                } else {
-                    data = WebSocketUtils.buildResponse(data, offset, length);
-                }
-                webSocketHolder.write(data, 0, data.length);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
-                    byte[] data = WebSocketUtils.buildResponse(responseHeaders, null, 0, 0);
-                    webSocketHolder.write(data, 0, data.length);
-                    responseHeaders.put(WebSocketUtils.FLUSHED_KEY, "true");
-                }                
-                super.close();
-            }
-        });
+        return new PrintWriter(getOutputStream());
     }
 
     @Override
@@ -330,7 +303,6 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public void sendRedirect(String location) throws IOException {
-        // TODO Auto-generated method stub
         if (LOG.isLoggable(Level.INFO)) {
             LOG.log(Level.INFO, "sendRedirect({0})", location);
         }
@@ -346,7 +318,6 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public void setHeader(String name, String value) {
-        // TODO Auto-generated method stub
         if (LOG.isLoggable(Level.INFO)) {
             LOG.log(Level.INFO, "setHeader({0}, {1})", new Object[]{name, value});
         }
@@ -354,7 +325,6 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public void setIntHeader(String name, int value) {
-        // TODO Auto-generated method stub
         if (LOG.isLoggable(Level.INFO)) {
             LOG.log(Level.INFO, "setIntHeader({0}, {1})", new Object[]{name, value});
         }

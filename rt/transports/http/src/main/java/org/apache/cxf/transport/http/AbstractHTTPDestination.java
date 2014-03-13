@@ -869,14 +869,6 @@ public abstract class AbstractHTTPDestination
         this.multiplexWithAddress = multiplexWithAddress;
     }
 
-    public boolean isEnableWebSocket() {
-        return enableWebSocket;
-    }
-
-    public void setEnableWebSocket(boolean enableWebSocket) {
-        this.enableWebSocket = enableWebSocket;
-    }
-
     public HTTPServerPolicy getServer() {
         calcServerPolicy(null);
         return serverPolicy;

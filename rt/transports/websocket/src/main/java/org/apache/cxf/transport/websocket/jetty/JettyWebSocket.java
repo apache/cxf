@@ -21,6 +21,7 @@ package org.apache.cxf.transport.websocket.jetty;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.transport.websocket.InvalidPathException;
 import org.apache.cxf.transport.websocket.WebSocketServletHolder;
 import org.apache.cxf.transport.websocket.WebSocketVirtualServletRequest;
 import org.apache.cxf.transport.websocket.WebSocketVirtualServletResponse;
@@ -80,13 +82,9 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         try {
             //TODO may want use string directly instead of converting it to byte[]
             byte[] bdata = data.getBytes("utf-8");
-            HttpServletRequest request = createServletRequest(bdata, 0, bdata.length);
-            HttpServletResponse response = createServletResponse();
-            if (manager != null) {
-                manager.service(request, response);    
-            }
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "Failed to invoke service", e);
+            invokeService(bdata, 0, bdata.length);
+        } catch (UnsupportedEncodingException e) {
+            // will not happen
         }            
     }
 
@@ -95,14 +93,36 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         if (LOG.isLoggable(Level.INFO)) {
             LOG.log(Level.INFO, "onMessage({0}, {1}, {2})", new Object[]{data, offset, length});
         }
+        invokeService(data, offset, length);
+    }
+    
+    private void invokeService(byte[] data, int offset, int length) {
+        HttpServletRequest request = null;
+        HttpServletResponse response = null;
         try {
-            HttpServletRequest request = createServletRequest(data, offset, length);
-            HttpServletResponse response = createServletResponse();
+            request = createServletRequest(data, offset, length);
+            response = createServletResponse();
             if (manager != null) {
                 manager.service(request, response);
             }
+        } catch (InvalidPathException ex) { 
+            reportErrorStatus(response, 400);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Failed to invoke service", e);
+            reportErrorStatus(response, 500);
+        }
+    }
+    
+    private void reportErrorStatus(HttpServletResponse response, int status) {
+        if (response != null) {
+            response.setStatus(status);
+            try {
+                response.getWriter().write("\r\n");
+                response.getWriter().close();
+                response.flushBuffer();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
     

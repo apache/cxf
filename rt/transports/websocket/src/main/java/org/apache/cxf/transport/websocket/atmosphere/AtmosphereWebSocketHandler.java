@@ -65,7 +65,7 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     /** {@inheritDoc}*/
     @Override
     public void configure(AtmosphereConfig config) {
-        // TODO Auto-generated method stub
+        LOG.info("configure(AtmosphereConfig)");
 
     }
 

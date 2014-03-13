@@ -71,8 +71,8 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         String path = requestHeaders.get(WebSocketUtils.URI_KEY);
         String origin = websocket.getRequestURI();
         if (!path.startsWith(origin)) {
-            //REVISIT for now, log it here and reject the request later.  
             LOG.log(Level.WARNING, "invalid path: {0} not within {1}", new Object[]{path, origin});
+            throw new InvalidPathException();
         }
         this.attributes = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
     }
@@ -379,14 +379,12 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public Part getPart(String name) throws IOException, ServletException {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "getPart");
         return null;
     }
 
     @Override
     public Collection<Part> getParts() throws IOException, ServletException {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "getParts");
         return null;
     }
@@ -414,14 +412,12 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getQueryString() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "getQueryString");
         return null;
     }
 
     @Override
     public String getRemoteUser() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "getRemoteUser");
         return null;
     }
@@ -438,19 +434,12 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         StringBuffer sb = webSocketHolder.getRequestURL();
         String ouri = webSocketHolder.getRequestURI();
         String uri = getRequestURI();
-        //REVISIT the way to reject the requeist uri that does not match the original request
-        if (!uri.startsWith(ouri)) {
-            sb.append("invalid").append(uri);
-        } else {
-            sb.append(uri.substring(ouri.length()));
-        }
-        
+        sb.append(uri.substring(ouri.length()));
         return sb;
     }
 
     @Override
     public String getRequestedSessionId() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "getRequestedSessionId");
         return null;
     }
@@ -463,14 +452,12 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public HttpSession getSession() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "getSession");
         return null;
     }
 
     @Override
     public HttpSession getSession(boolean create) {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "getSession");
         return null;
     }
@@ -483,50 +470,42 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public boolean isRequestedSessionIdFromCookie() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "isRequestedSessionIdFromCookie");
         return false;
     }
 
     @Override
     public boolean isRequestedSessionIdFromURL() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "isRequestedSessionIdFromURL");
         return false;
     }
 
     @Override
     public boolean isRequestedSessionIdFromUrl() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "isRequestedSessionIdFromUrl");
         return false;
     }
 
     @Override
     public boolean isRequestedSessionIdValid() {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "isRequestedSessionIdValid");
         return false;
     }
 
     @Override
     public boolean isUserInRole(String role) {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "isUserInRole");
         return false;
     }
 
     @Override
     public void login(String username, String password) throws ServletException {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "login");
         
     }
 
     @Override
     public void logout() throws ServletException {
-        // TODO Auto-generated method stub
         LOG.log(Level.INFO, "logout");
-        
     }
 }
