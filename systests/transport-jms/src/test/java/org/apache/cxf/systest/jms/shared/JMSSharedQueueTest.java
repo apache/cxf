@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -38,6 +39,7 @@ import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDStati
 import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,7 +69,7 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
         private HelloWorldPortType port;
         private CorrelationIDFactory corrFactory;
         private String prefix;
-        private Throwable ex;
+        private volatile Throwable ex;
 
         public ClientRunnable(HelloWorldPortType port) {
             this.port = port;
@@ -93,6 +95,7 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
                     callGreetMe();
                 }
             } catch (Throwable e) {
+                //e.printStackTrace();
                 ex = e;
             }
         }
@@ -133,8 +136,10 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
             executor.execute(client);
         }
         executor.shutdown();
+        executor.awaitTermination(10, TimeUnit.SECONDS);
         for (ClientRunnable client : clients) {
             if (client.getException() != null) {
+                client.getException().printStackTrace();
                 throw client.getException();
             }
         }
@@ -268,7 +273,7 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
         URL wsdl = getWSDLURL(WSDL);
         HelloWorldServiceRuntimeCorrelationIDDynamicPrefix service = 
             new HelloWorldServiceRuntimeCorrelationIDDynamicPrefix(wsdl, serviceName);
-        HelloWorldPortType port = markForClose(service.getPort(portName, HelloWorldPortType.class));
+        HelloWorldPortType port = markForClose(service.getPort(portName, HelloWorldPortType.class, cff));
 
         Collection<ClientRunnable> clients = new ArrayList<ClientRunnable>();        
         for (int i = 0; i < 10; ++i) {

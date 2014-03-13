@@ -21,6 +21,8 @@ package org.apache.cxf.systest.jms;
 import java.io.Closeable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -60,17 +62,21 @@ import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
 import org.apache.hello_world_doc_lit.SOAPService7;
+
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JMSClientServerTest.class);
  
     private static EmbeddedJMSBrokerLauncher broker;
-    private String wsdlString;
+    private List<String> wsdlStrings = new ArrayList<String>();
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -80,12 +86,23 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         createStaticBus();
     }
     
+    @Before
+    public void setUp() throws Exception {
+        assertSame(getStaticBus(), BusFactory.getThreadDefaultBus(false));
+    }
+   
+    @After 
+    public void tearDown() throws Exception {
+        wsdlStrings.clear();
+    }
+    
     public URL getWSDLURL(String s) throws Exception {
         URL u = getClass().getResource(s);
         if (u == null) {
             throw new IllegalArgumentException("WSDL classpath resource not found " + s);
         }
-        wsdlString = u.toString().intern();
+        String wsdlString = u.toString().intern();
+        wsdlStrings.add(wsdlString);
         broker.updateWsdl(getBus(), wsdlString);
         return u;
     }
@@ -230,7 +247,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         System.gc();
     }
     
-    @Ignore
     @Test
     public void testBasicConnection() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
@@ -332,51 +348,55 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         ClassPathXmlApplicationContext ctx = 
             new ClassPathXmlApplicationContext(
                 new String[] {"/org/apache/cxf/systest/jms/JMSClients.xml"});
-        String wsdlString2 = "classpath:wsdl/jms_test.wsdl";
-        broker.updateWsdl((Bus)ctx.getBean("cxf"), wsdlString2);
-        HelloWorldPortType greeter = (HelloWorldPortType)ctx.getBean("jmsRPCClient");
-        
         try {
+            String wsdlString2 = "classpath:wsdl/jms_test.wsdl";
+            wsdlStrings.add(wsdlString2);
+            broker.updateWsdl((Bus)ctx.getBean("cxf"), wsdlString2);
+            HelloWorldPortType greeter = (HelloWorldPortType)ctx.getBean("jmsRPCClient");
             
-            for (int idx = 0; idx < 5; idx++) {
-                String greeting = greeter.greetMe("Milestone-" + idx);
-                assertNotNull("no response received from service", greeting);
-                String exResponse = "Hello Milestone-" + idx;
-                assertEquals(exResponse, greeting);
-
-                String reply = greeter.sayHi();
-                assertEquals("Bonjour", reply);
+            try {
                 
-                try {
-                    greeter.testRpcLitFault("BadRecordLitFault");
-                    fail("Should have thrown BadRecoedLitFault");
-                } catch (BadRecordLitFault ex) {
-                    assertNotNull(ex.getFaultInfo());
+                for (int idx = 0; idx < 5; idx++) {
+                    String greeting = greeter.greetMe("Milestone-" + idx);
+                    assertNotNull("no response received from service", greeting);
+                    String exResponse = "Hello Milestone-" + idx;
+                    assertEquals(exResponse, greeting);
+    
+                    String reply = greeter.sayHi();
+                    assertEquals("Bonjour", reply);
+                    
+                    try {
+                        greeter.testRpcLitFault("BadRecordLitFault");
+                        fail("Should have thrown BadRecoedLitFault");
+                    } catch (BadRecordLitFault ex) {
+                        assertNotNull(ex.getFaultInfo());
+                    }
+                    
+                    try {
+                        greeter.testRpcLitFault("NoSuchCodeLitFault");
+                        fail("Should have thrown NoSuchCodeLitFault exception");
+                    } catch (NoSuchCodeLitFault nslf) {
+                        assertNotNull(nslf.getFaultInfo());
+                        assertNotNull(nslf.getFaultInfo().getCode());
+                    } 
                 }
-                
-                try {
-                    greeter.testRpcLitFault("NoSuchCodeLitFault");
-                    fail("Should have thrown NoSuchCodeLitFault exception");
-                } catch (NoSuchCodeLitFault nslf) {
-                    assertNotNull(nslf.getFaultInfo());
-                    assertNotNull(nslf.getFaultInfo().getCode());
-                } 
+            } catch (UndeclaredThrowableException ex) {
+                ctx.close();
+                throw (Exception)ex.getCause();
             }
-        } catch (UndeclaredThrowableException ex) {
+            
+            HelloWorldOneWayPort greeter1 = (HelloWorldOneWayPort)ctx.getBean("jmsQueueOneWayServiceClient");
+            assertNotNull(greeter1);
+            try {
+                greeter1.greetMeOneWay("hello");
+            } catch (Exception ex) {
+                fail("There should not throw the exception" + ex);
+            }
+        } finally {
             ctx.close();
-            throw (Exception)ex.getCause();
+            BusFactory.setDefaultBus(getBus());
+            BusFactory.setThreadDefaultBus(getBus());
         }
-        
-        HelloWorldOneWayPort greeter1 = (HelloWorldOneWayPort)ctx.getBean("jmsQueueOneWayServiceClient");
-        assertNotNull(greeter1);
-        try {
-            greeter1.greetMeOneWay("hello");
-        } catch (Exception ex) {
-            fail("There should not throw the exception" + ex);
-        }
-        ctx.close();
-        BusFactory.setDefaultBus(getBus());
-        BusFactory.setThreadDefaultBus(getBus());
     }
     
     @Test
@@ -403,7 +423,9 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                                       "HelloWorldQueueDecoupledOneWaysService");
         QName portName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldQueueDecoupledOneWaysPort");
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
-        broker.updateWsdl(getBus(), "testutils/jms_test.wsdl");
+        String wsdl2 = "testutils/jms_test.wsdl".intern();
+        wsdlStrings.add(wsdl2);
+        broker.updateWsdl(getBus(), wsdl2);
 
         HelloWorldQueueDecoupledOneWaysService service = 
             new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
@@ -473,6 +495,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
         String wsdlString2 = "testutils/jms_test.wsdl";
+        wsdlStrings.add(wsdlString2);
         broker.updateWsdl(getBus(), wsdlString2);
 
         HelloWorldQueueDecoupledOneWaysService service = 

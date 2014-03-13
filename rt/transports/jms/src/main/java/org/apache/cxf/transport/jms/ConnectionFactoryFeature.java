@@ -25,6 +25,10 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 
@@ -43,11 +47,15 @@ public class ConnectionFactoryFeature extends AbstractFeature {
 
     @Override
     public void initialize(Client client, Bus bus) {
-        Conduit conduit = client.getConduit();
-        if (conduit instanceof JMSConduit) {
-            JMSConduit jmsConduit = (JMSConduit)conduit;
-            jmsConduit.getJmsConfig().setConnectionFactory(connectionFactory);
-        }
+        client.getEndpoint().getOutInterceptors().add(new AbstractPhaseInterceptor<Message>(Phase.PREPARE_SEND) {
+            public void handleMessage(Message message) throws Fault {
+                Conduit conduit = message.getExchange().getConduit(message);
+                if (conduit instanceof JMSConduit) {
+                    JMSConduit jmsConduit = (JMSConduit)conduit;
+                    jmsConduit.getJmsConfig().setConnectionFactory(connectionFactory);
+                }
+            }
+        });
         super.initialize(client, bus);
     }
 
