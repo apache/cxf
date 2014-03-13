@@ -154,7 +154,7 @@ class WebSocketTestClient {
                                 it.remove();
                             }
                         }
-                        received.add(bao.toString());
+                        received.add(bao.toByteArray());
                     }
                 }
             }
