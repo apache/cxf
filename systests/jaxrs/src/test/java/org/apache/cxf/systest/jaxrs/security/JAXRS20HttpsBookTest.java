@@ -44,6 +44,7 @@ public class JAXRS20HttpsBookTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
+        createStaticBus("org/apache/cxf/systest/jaxrs/security/jaxrs-https-server.xml");
         assertTrue("server did not launch correctly",
                    launchServer(BookHttpsServer.class, true));
     }

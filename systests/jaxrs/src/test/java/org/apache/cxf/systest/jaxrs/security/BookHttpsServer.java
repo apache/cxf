@@ -36,10 +36,6 @@ public class BookHttpsServer extends AbstractBusTestServerBase {
     
     protected void run() {
         
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus(SERVER_CONFIG_FILE);
-        BusFactory.setDefaultBus(bus);
-        
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
         //default lifecycle is per-request, change it to singleton
@@ -53,6 +49,11 @@ public class BookHttpsServer extends AbstractBusTestServerBase {
     public static void main(String[] args) {
         try {
             BookHttpsServer s = new BookHttpsServer();
+        
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus bus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(bus);
+
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
