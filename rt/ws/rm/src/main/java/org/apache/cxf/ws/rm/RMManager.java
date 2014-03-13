@@ -105,6 +105,7 @@ public class RMManager {
     public static final String WSRM_ACKNOWLEDGEMENT_INTERVAL_PROPERTY = "org.apache.cxf.ws.rm.acknowledgement-interval";
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMManager.class);
+    private static final String WSRM_RETRANSMIT_CHAIN = RMManager.class.getName() + ".retransmitChain";
 
 
     private Bus bus;
@@ -118,7 +119,6 @@ public class RMManager {
     private DestinationPolicyType destinationPolicy;
     private InstrumentationManager instrumentationManager;
     private ManagedRMManager managedManager;
-    private PhaseInterceptorChain retransmitChain;
     
     // ServerLifeCycleListener
     
@@ -725,10 +725,14 @@ public class RMManager {
      * @param msg
      */
     public void initializeInterceptorChain(Message msg) {
-        if (retransmitChain == null) {
-            LOG.info("Setting retransmit chain from message");
-            PhaseInterceptorChain chain = (PhaseInterceptorChain)msg.getInterceptorChain();
-            retransmitChain = chain.cloneChain();
+        Endpoint ep = msg.getExchange().getEndpoint();
+        synchronized (ep) {
+            if (ep.get(WSRM_RETRANSMIT_CHAIN) == null) {
+                LOG.info("Setting retransmit chain from message");
+                PhaseInterceptorChain chain = (PhaseInterceptorChain)msg.getInterceptorChain();
+                chain = chain.cloneChain();
+                ep.put(WSRM_RETRANSMIT_CHAIN, chain);
+            }
         }
     }
     
@@ -737,10 +741,12 @@ public class RMManager {
      * 
      * @return chain (<code>null</code> if none set)
      */
-    public PhaseInterceptorChain getRetransmitChain() {
-        if (retransmitChain == null) {
+    public PhaseInterceptorChain getRetransmitChain(Message msg) {
+        Endpoint ep = msg.getExchange().getEndpoint();
+        PhaseInterceptorChain pic = (PhaseInterceptorChain)ep.get(WSRM_RETRANSMIT_CHAIN);
+        if (pic == null) {
             return null;
         }
-        return retransmitChain.cloneChain();
+        return pic.cloneChain();
     }
 }

@@ -200,13 +200,13 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
             }
         }
         
-        // capture message if retranmission possible
+        // capture message if retransmission possible
         if (isApplicationMessage && !isPartialResponse) {
             getManager().initializeInterceptorChain(msg);
             captureMessage(msg);
         }
     }
-
+    
     private void captureMessage(Message message) {
         Message capture = new MessageImpl();
         capture.setId(message.getId());

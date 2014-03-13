@@ -727,7 +727,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         try {
             
             // initialize copied interceptor chain for message
-            PhaseInterceptorChain retransmitChain = manager.getRetransmitChain();
+            PhaseInterceptorChain retransmitChain = manager.getRetransmitChain(message);
             ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
             Endpoint endpoint = manager.getReliableEndpoint(message).getEndpoint(protocol);
             PhaseChainCache cache = new PhaseChainCache();
