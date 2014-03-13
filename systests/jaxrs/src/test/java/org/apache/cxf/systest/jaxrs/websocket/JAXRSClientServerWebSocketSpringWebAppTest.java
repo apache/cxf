@@ -72,6 +72,15 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
         Book book = wc.get(Book.class);
         assertEquals(1L, book.getId());
     }
+    
+    @Test
+    public void testGetBookHTTPFromWebSocketEndpoint() throws Exception {
+        String address = "http://localhost:" + getPort() + "/websocket/web/bookstore/books/1";
+        WebClient wc = WebClient.create(address);
+        wc.accept("application/xml");
+        Book book = wc.get(Book.class);
+        assertEquals(1L, book.getId());
+    }
 
     protected String getPort() {
         return PORT;

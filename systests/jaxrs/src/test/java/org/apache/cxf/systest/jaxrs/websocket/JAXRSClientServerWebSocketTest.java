@@ -21,7 +21,9 @@ package org.apache.cxf.systest.jaxrs.websocket;
 
 import java.util.List;
 
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -96,6 +98,34 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
                 assertEquals(0, resp.getStatusCode());
                 assertEquals(r, Integer.parseInt(resp.getTextEntity()));
             }
+        } finally {
+            wsclient.close();
+        }
+    }
+    
+    @Test
+    public void testBookWithWebSocketAndHTTP() throws Exception {
+        String address = "ws://localhost:" + getPort() + "/websocket/web/bookstore";
+
+        WebSocketTestClient wsclient = new WebSocketTestClient(address, 1);
+        wsclient.connect();
+        try {
+            // call the GET service
+            wsclient.sendMessage("GET /websocket/web/bookstore/booknames".getBytes());
+            assertTrue("one book must be returned", wsclient.await(3));
+            List<Object> received = wsclient.getReceived();
+            assertEquals(1, received.size());
+            Response resp = new Response(received.get(0));
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("text/plain", resp.getContentType());
+            String value = resp.getTextEntity();
+            assertEquals("CXF in Action", value);
+           
+            WebClient wc = WebClient.create("http://localhost:" + getPort() + "/websocket/web/bookstore/books/1");
+            wc.accept("application/xml");
+            Book book = wc.get(Book.class);
+            assertEquals(1L, book.getId());
+            
         } finally {
             wsclient.close();
         }
