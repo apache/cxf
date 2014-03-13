@@ -856,11 +856,6 @@
                         </sp:X509Token>
                      </wsp:Policy>
                   </sp:RecipientToken>
-                  <sp:Layout>
-                     <wsp:Policy>
-                        <sp:Lax/>
-                     </wsp:Policy>
-                  </sp:Layout>
                   <sp:IncludeTimestamp/>
                   <sp:OnlySignEntireHeadersAndBody/>
                   <sp:AlgorithmSuite>
@@ -870,6 +865,11 @@
                   </sp:AlgorithmSuite>
                </wsp:Policy>
             </sp:AsymmetricBinding>
+            <sp:Layout>
+               <wsp:Policy>
+                  <sp:Lax/>
+               </wsp:Policy>
+            </sp:Layout>
          </wsp:All>
       </wsp:ExactlyOne>
     </wsp:Policy>

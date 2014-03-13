@@ -36,7 +36,6 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.EncryptionToken;
-import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.ProtectionToken;
 import org.apache.cxf.ws.security.policy.model.SignatureToken;
 import org.apache.cxf.ws.security.policy.model.SymmetricAsymmetricBindingBase;
@@ -171,17 +170,6 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             return false;
         }
         assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
-        
-        // Check the Layout
-        Layout layout = binding.getLayout();
-        LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator(results, signedResults);
-        if (!layoutValidator.validatePolicy(layout)) {
-            String error = "Layout does not match the requirements";
-            notAssertPolicy(aim, layout, error);
-            ai.setNotAsserted(error);
-            return false;
-        }
-        assertPolicy(aim, layout);
         
         // Check the EntireHeaderAndBodySignatures property
         if (binding.isEntireHeadersAndBodySignatures()

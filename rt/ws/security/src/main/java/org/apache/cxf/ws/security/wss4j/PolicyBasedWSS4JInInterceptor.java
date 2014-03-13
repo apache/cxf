@@ -75,6 +75,7 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.ConcreteSupportingToken
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingEncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.LayoutPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityContextTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEncryptedTokenPolicyValidator;
@@ -775,6 +776,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             asymmetricValidator.validatePolicy(
                 aim, msg, soapBody, results, signedResults, encryptedResults
             );
+        
+        // Check Layout that might not be tied to a binding
+        LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator();
+        check &= layoutValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
         
         return check;
     }
