@@ -193,9 +193,27 @@ public class JettyHTTPServerEngineTest extends Assert {
         response = getResponse(urlStr);
         assertEquals("The jetty http handler did not take effect", response, "string1");
 
-        engine.addServant(new URL(urlStr), handler2);
-        response = getResponse(urlStr);
-        assertEquals("The jetty http handler did not take effect", response, "string1string2");
+        try {
+            engine.addServant(new URL(urlStr), handler2);
+            fail("We don't support to publish the two service at the same context path");
+        } catch (Exception ex) {
+            assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test") > 0);
+        }
+        
+        try {
+            engine.addServant(new URL(urlStr + "/test"), handler2);
+            fail("We don't support to publish the two service at the same context path");
+        } catch (Exception ex) {
+            assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test/test") > 0);
+        }
+        
+        try {
+            engine.addServant(new URL("http://localhost:" + PORT1 + "/hello"), handler2);
+            fail("We don't support to publish the two service at the same context path");
+        } catch (Exception ex) {
+            assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello") > 0);
+        }
+        
         engine.addServant(new URL(urlStr2), handler2);
         
         Set<ObjectName>  s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
@@ -281,6 +299,7 @@ public class JettyHTTPServerEngineTest extends Assert {
             fail("Can't get the reponse from the server " + ex);
         }
         engine.stop();
+        JettyHTTPServerEngineFactory.destroyForPort(PORT2);
     }
 
     @Test
@@ -318,7 +337,7 @@ public class JettyHTTPServerEngineTest extends Assert {
 
     @Test
     public void testJettyHTTPHandler() throws Exception {
-        String urlStr1 = "http://localhost:" + PORT3 + "/hello/test";
+        String urlStr1 = "http://localhost:" + PORT3 + "/hello/test1";
         String urlStr2 = "http://localhost:" + PORT3 + "/hello/test2";
         JettyHTTPServerEngine engine =
             factory.createJettyHTTPServerEngine(PORT3, "http");
@@ -328,9 +347,12 @@ public class JettyHTTPServerEngineTest extends Assert {
         JettyHTTPHandler handler1 = new JettyHTTPTestHandler("test", false);
         JettyHTTPHandler handler2 = new JettyHTTPTestHandler("test2", false);
         engine.addServant(new URL(urlStr1), handler1);
+        
+        contextHandler = engine.getContextHandler(new URL(urlStr1));
+        
         engine.addServant(new URL(urlStr2), handler2);
-
-
+        contextHandler = engine.getContextHandler(new URL(urlStr2));
+        
         String response = null;
         try {
             response = getResponse(urlStr1 + "/test");
