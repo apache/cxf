@@ -57,6 +57,18 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             String value = resp.getTextEntity();
             assertEquals("CXF in Action", value);
             
+            // call the same GET service in the text mode
+            wsclient.reset(1);
+            wsclient.sendTextMessage("GET /websocket/web/bookstore/booknames");
+            assertTrue("one book must be returned", wsclient.await(3));
+            received = wsclient.getReceived();
+            assertEquals(1, received.size());
+            resp = new Response(received.get(0));
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("text/plain", resp.getContentType());
+            value = resp.getTextEntity();
+            assertEquals("CXF in Action", value);
+
             // call another GET service
             wsclient.reset(1);
             wsclient.sendMessage("GET /websocket/web/bookstore/books/123".getBytes());
@@ -81,6 +93,18 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             value = resp.getTextEntity();
             assertEquals("123", value);
             
+            // call the same POST service in the text mode 
+            wsclient.reset(1);
+            wsclient.sendTextMessage(
+                "POST /websocket/web/bookstore/booksplain\r\nContent-Type: text/plain\r\n\r\n123");
+            assertTrue("response expected", wsclient.await(3));
+            received = wsclient.getReceived();
+            resp = new Response(received.get(0));
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("text/plain", resp.getContentType());
+            value = resp.getTextEntity();
+            assertEquals("123", value);
+
             // call the GET service returning a continous stream output
             wsclient.reset(6);
             wsclient.sendMessage("GET /websocket/web/bookstore/bookbought".getBytes());
