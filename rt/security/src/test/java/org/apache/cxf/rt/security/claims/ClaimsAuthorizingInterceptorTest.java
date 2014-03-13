@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.authorization;
+package org.apache.cxf.rt.security.claims;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -33,8 +33,6 @@ import org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.rt.security.claims.ClaimCollection;
-import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.rt.security.saml.SAMLUtils;
 import org.apache.cxf.security.SecurityContext;

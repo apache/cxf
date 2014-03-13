@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.authorization;
+package org.apache.cxf.rt.security.claims;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -36,7 +36,6 @@ import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.claims.authorization.Claim;

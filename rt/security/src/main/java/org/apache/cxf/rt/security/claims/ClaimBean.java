@@ -16,11 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.authorization;
+package org.apache.cxf.rt.security.claims;
 
-import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.security.claims.authorization.ClaimMode;
-
 
 public class ClaimBean {
     private SAMLClaim claim;
