@@ -143,7 +143,6 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
     }
     
     @Test
-    @Ignore
     public void testPathRestriction() throws Exception {
         String address = "ws://localhost:" + getPort() + "/websocket/web/bookstore";
 

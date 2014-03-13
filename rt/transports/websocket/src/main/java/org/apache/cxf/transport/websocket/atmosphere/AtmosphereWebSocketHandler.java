@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.transport.websocket.InvalidPathException;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
 import org.apache.cxf.transport.websocket.WebSocketServletHolder;
 import org.apache.cxf.transport.websocket.WebSocketVirtualServletRequest;
@@ -80,20 +81,38 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     @Override
     public List<AtmosphereRequest> onMessage(WebSocket webSocket, byte[] data, int offset, int length) {
         LOG.info("onMessage(WebSocket, byte[], int, int)");
-        
+        HttpServletRequest request = null;
+        HttpServletResponse response = null;
         try {
             WebSocketServletHolder webSocketHolder = new AtmosphereWebSocketServletHolder(webSocket);
-            HttpServletRequest request = createServletRequest(webSocketHolder, data, offset, length);
-            HttpServletResponse response = createServletResponse(webSocketHolder);
+            response = createServletResponse(webSocketHolder);
+            request = createServletRequest(webSocketHolder, data, offset, length);
             if (destination != null) {
                 ((WebSocketDestinationService)destination).invokeInternal(null, 
                     webSocket.resource().getRequest().getServletContext(),
                     request, response);
             }
+        } catch (InvalidPathException ex) { 
+            reportErrorStatus(response, 400);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Failed to invoke service", e);
+            reportErrorStatus(response, 500);
         }
         return null;
+    }
+
+    // may want to move this error reporting code to WebSocketServletHolder
+    private void reportErrorStatus(HttpServletResponse response, int status) {
+        if (response != null) {
+            response.setStatus(status);
+            try {
+                response.getWriter().write("\r\n");
+                response.getWriter().close();
+                response.flushBuffer();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 
     /** {@inheritDoc}*/

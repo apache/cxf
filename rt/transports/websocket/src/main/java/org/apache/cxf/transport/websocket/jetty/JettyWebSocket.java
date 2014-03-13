@@ -100,8 +100,8 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         HttpServletRequest request = null;
         HttpServletResponse response = null;
         try {
-            request = createServletRequest(data, offset, length);
             response = createServletResponse();
+            request = createServletRequest(data, offset, length);
             if (manager != null) {
                 manager.service(request, response);
             }
@@ -113,6 +113,7 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         }
     }
     
+    // may want to move this error reporting code to WebSocketServletHolder
     private void reportErrorStatus(HttpServletResponse response, int status) {
         if (response != null) {
             response.setStatus(status);
