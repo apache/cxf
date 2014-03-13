@@ -25,7 +25,6 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestBase {
@@ -203,6 +202,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             return contentType;
         }
         
+        @SuppressWarnings("unused")
         public Object getEntity() {
             return entity;
         }
