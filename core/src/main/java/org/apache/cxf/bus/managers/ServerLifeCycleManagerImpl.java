@@ -20,7 +20,7 @@
 package org.apache.cxf.bus.managers;
 
 import java.util.Collection;
-
+import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.Bus;
@@ -63,8 +63,9 @@ public class ServerLifeCycleManagerImpl implements ServerLifeCycleManager, BusEx
     }
 
     public void stopServer(Server server) {
-        for (ServerLifeCycleListener listener : listeners) {
-            listener.stopServer(server);
+        ListIterator<ServerLifeCycleListener> li = listeners.listIterator(listeners.size());
+        while (li.hasPrevious()) {
+            li.previous().stopServer(server);
         }
     }
 

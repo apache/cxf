@@ -20,6 +20,7 @@
 package org.apache.cxf.bus.managers;
 
 import java.util.Collection;
+import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.Bus;
@@ -63,8 +64,9 @@ public class ClientLifeCycleManagerImpl implements ClientLifeCycleManager, BusEx
     }
 
     public void clientDestroyed(Client client) {
-        for (ClientLifeCycleListener listener : listeners) {
-            listener.clientDestroyed(client);
+        ListIterator<ClientLifeCycleListener> li = listeners.listIterator(listeners.size());
+        while (li.hasPrevious()) {
+            li.previous().clientDestroyed(client);
         }
     }
 

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.bus.managers;
 
+import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.Resource;
@@ -91,8 +92,9 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     public void preShutdown() {
         if (!preShutdownCalled) { 
             preShutdownCalled = true;
-            for (BusLifeCycleListener listener : listeners) {
-                listener.preShutdown();
+            ListIterator<BusLifeCycleListener> li = listeners.listIterator(listeners.size());
+            while (li.hasPrevious()) {
+                li.previous().preShutdown();
             }
         }
     }
@@ -103,9 +105,11 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
         }
         if (!postShutdownCalled) {
             postShutdownCalled = true;
-            for (BusLifeCycleListener listener : listeners) {
-                listener.postShutdown();
+            ListIterator<BusLifeCycleListener> li = listeners.listIterator(listeners.size());
+            while (li.hasPrevious()) {
+                li.previous().postShutdown();
             }
+
         }
     }
         

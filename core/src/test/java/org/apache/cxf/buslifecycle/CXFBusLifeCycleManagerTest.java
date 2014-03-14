@@ -96,15 +96,15 @@ public class CXFBusLifeCycleManagerTest extends Assert {
         ctrl.verify();
         
         ctrl.reset();
-        listener1.preShutdown();
         listener2.preShutdown();
+        listener1.preShutdown();
         ctrl.replay();
         mgr.preShutdown();
         ctrl.verify();
         
         ctrl.reset();
-        listener1.postShutdown();
         listener2.postShutdown();
+        listener1.postShutdown();
         ctrl.replay();
         mgr.postShutdown();
         ctrl.verify();
