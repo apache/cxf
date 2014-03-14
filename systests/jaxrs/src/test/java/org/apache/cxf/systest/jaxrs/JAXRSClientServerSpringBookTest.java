@@ -159,6 +159,65 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         checkWadlResourcesInfo(address, address, "/book.xsd", 1);
     }
     
+    @Test
+    public void testGetBookISOJson() throws Exception {
+        doTestGetBookISO("ISO-8859-1", "1");
+    }
+    @Test
+    public void testGetBookISO2Json() throws Exception {
+        doTestGetBookISO("ISO-8859-1", "2");
+    }
+    @Test
+    public void testGetBookISO3Json() throws Exception {
+        doTestGetBookISO(null, "1");
+    }
+    @Test
+    public void testGetBookISOXML() throws Exception {
+        doTestGetBookISOXML("ISO-8859-1", "1");
+    }
+    @Test
+    public void testGetBookISOXML2() throws Exception {
+        doTestGetBookISOXML("ISO-8859-1", "2");
+    }
+    @Test
+    public void testGetBookISOXML3() throws Exception {
+        doTestGetBookISOXML(null, "1");
+    }
+    private void doTestGetBookISO(String charset, String pathSegment) throws Exception {
+        String address = "http://localhost:" + PORT + "/the/bookstore/ISO-8859-1/" + pathSegment;    
+        WebClient wc = WebClient.create(address);
+        wc.accept("application/json" + (charset == null ? "" : ";charset=ISO-8859-1"));
+        byte[] iso88591bytes = wc.get(byte[].class);
+        String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
+        
+        String name = helloStringISO88591.substring(
+            helloStringISO88591.indexOf("\"name\":\"") + "\"name\":\"".length(),
+            helloStringISO88591.lastIndexOf("\""));
+        
+        compareNames(name);
+    }
+    private void doTestGetBookISOXML(String charset, String pathSegment) throws Exception {
+        String address = "http://localhost:" + PORT + "/the/bookstore/ISO-8859-1/" + pathSegment;    
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        wc.accept("application/xml" + (charset == null ? "" : ";charset=ISO-8859-1"));
+        byte[] iso88591bytes = wc.get(byte[].class);
+        String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
+        
+        String name = helloStringISO88591.substring(
+            helloStringISO88591.indexOf("<name>") + "<name>".length(),
+            helloStringISO88591.indexOf("</name>"));
+        
+        compareNames(name);
+    }
+    
+    private void compareNames(String name) throws Exception  {
+        String eWithAcute = "\u00E9";
+        String nameUTF16 = "F" + eWithAcute + "lix";
+        String nameExpected = new String(nameUTF16.getBytes("ISO-8859-1"), "ISO-8859-1");
+        assertEquals(nameExpected, name);
+    }
+    
     private void checkSchemas(String address, String schemaSegment, 
                               String includedSchema,
                               String refAttrName) throws Exception {

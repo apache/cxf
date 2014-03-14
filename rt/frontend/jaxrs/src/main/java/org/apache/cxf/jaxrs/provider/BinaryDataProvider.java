@@ -77,7 +77,12 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
             return clazz.cast(new InputStreamReader(is, getEncoding(type)));
         }
         if (byte[].class.isAssignableFrom(clazz)) {
-            return clazz.cast(IOUtils.readBytesFromStream(is));
+            String enc = getCharset(type);
+            if (enc == null) {
+                return clazz.cast(IOUtils.readBytesFromStream(is));
+            } else {
+                return clazz.cast(IOUtils.toString(is, enc).getBytes(enc));
+            }
         }
         if (File.class.isAssignableFrom(clazz)) {
             LOG.warning("Reading data into File objects with the help of pre-packaged" 
@@ -145,6 +150,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     private String getEncoding(MediaType mt) {
         String enc = mt.getParameters().get("charset");
         return enc == null ? "UTF-8" : enc;
+    }
+    private String getCharset(MediaType mt) {
+        return mt.getParameters().get("charset");
     }
     
     protected void copyInputToOutput(InputStream is, OutputStream os,

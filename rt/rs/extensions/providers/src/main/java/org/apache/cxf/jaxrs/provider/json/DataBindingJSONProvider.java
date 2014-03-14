@@ -88,7 +88,7 @@ public class DataBindingJSONProvider<T> extends DataBindingProvider<T> {
     }
     
     @Override
-    protected XMLStreamWriter createWriter(Class<?> type, Type genericType, OutputStream os) 
+    protected XMLStreamWriter createWriter(Class<?> type, Type genericType, String enc, OutputStream os) 
         throws Exception {
         QName qname = null;
         if (!InjectionUtils.isSupportedCollectionOrArray(type)) {
@@ -100,7 +100,7 @@ public class DataBindingJSONProvider<T> extends DataBindingProvider<T> {
             JSONUtils.createConfiguration(namespaceMap, writeXsiType && !ignoreNamespaces,
                                           false, null);
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
-             writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement);
+             writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement, enc);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
         return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
     }

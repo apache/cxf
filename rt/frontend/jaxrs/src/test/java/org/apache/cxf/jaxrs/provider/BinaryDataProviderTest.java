@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
@@ -35,6 +36,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -62,17 +65,23 @@ public class BinaryDataProviderTest extends Assert {
     @Test
     public void testReadFrom() throws Exception {
         MessageBodyReader p = new BinaryDataProvider();
-        byte[] bytes = (byte[])p.readFrom(byte[].class, null, null, 
-                                          null, null, new ByteArrayInputStream("hi".getBytes()));
+        byte[] bytes = (byte[])p.readFrom(byte[].class, byte[].class, new Annotation[]{}, 
+                                          MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+                                          new MetadataMap<String, Object>(), 
+                                          new ByteArrayInputStream("hi".getBytes()));
         assertTrue(Arrays.equals(new String("hi").getBytes(), bytes));
         
-        InputStream is = (InputStream)p.readFrom(InputStream.class, null, null, null, null, 
+        InputStream is = (InputStream)p.readFrom(InputStream.class, InputStream.class, new Annotation[]{}, 
+                                                 MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+                                                 new MetadataMap<String, Object>(), 
             new ByteArrayInputStream("hi".getBytes()));
         bytes = IOUtils.readBytesFromStream(is);
         assertTrue(Arrays.equals(new String("hi").getBytes(), bytes));
         
-        Reader r = (Reader)p.readFrom(Reader.class, null, null, 
-                       MediaType.valueOf("text/xml"), null, new ByteArrayInputStream("hi".getBytes()));
+        Reader r = (Reader)p.readFrom(Reader.class, Reader.class, new Annotation[]{}, 
+                                      MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+                                      new MetadataMap<String, Object>(),
+                                      new ByteArrayInputStream("hi".getBytes()));
         assertEquals(IOUtils.toString(r), "hi");
     }
     

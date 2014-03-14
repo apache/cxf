@@ -45,6 +45,7 @@ import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.jaxrs.provider.json.utils.JSONUtils;
 import org.apache.cxf.jaxrs.provider.json.utils.PrefixCollectingXMLStreamWriter;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
@@ -113,7 +114,9 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
             Document dom = w3cStreamWriter.getDocument();
             // ok, now the namespace map has all the prefixes.
             
-            XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), os);
+            String enc = HttpUtils.getSetEncoding(m, headers, "UTF-8");
+            
+            XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), enc, os);
             xmlStreamWriter.writeStartDocument();
             StaxUtils.copy(dom, xmlStreamWriter);
             // Jettison needs, and StaxUtils.copy doesn't do it.
@@ -126,13 +129,13 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
     }
 
     @Override
-    protected XMLStreamWriter createStreamWriter(QName typeQName, OutputStream os) throws Exception {
+    protected XMLStreamWriter createStreamWriter(QName typeQName, String enc, OutputStream os) throws Exception {
         
         Configuration config = 
             JSONUtils.createConfiguration(namespaceMap, 
                                           writeXsiType && !ignoreNamespaces, false, null);
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, 
-             writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement);
+             writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement, enc);
         return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
     }
 

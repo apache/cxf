@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.provider.json.utils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,8 +57,7 @@ public final class JSONUtils {
 
     private static final String XSI_PREFIX = "xsi";
     private static final String XSI_URI = WSDLConstants.NS_SCHEMA_XSI; 
-    private static final Charset UTF8 = Charset.forName("utf-8");
-
+    
     private JSONUtils() {
     }
     
@@ -72,19 +70,20 @@ public final class JSONUtils {
         XMLInputFactory factory = new BadgerFishXMLInputFactory();
         return factory.createXMLStreamReader(is);
     }
-        
+    //CHECKSTYLE:OFF    
     public static XMLStreamWriter createStreamWriter(OutputStream os, 
                                                      QName qname, 
                                                      boolean writeXsiType,
                                                      Configuration config,
                                                      boolean serializeAsArray,
                                                      List<String> arrayKeys,
-                                                     boolean dropRootElement) throws Exception {
-        
+                                                     boolean dropRootElement,
+                                                     String enc) throws Exception {
+    //CHECKSTYLE:ON    
         MappedNamespaceConvention convention = new MappedNamespaceConvention(config);
         AbstractXMLStreamWriter xsw = new MappedXMLStreamWriter(
                                             convention, 
-                                            new OutputStreamWriter(os, UTF8));
+                                            new OutputStreamWriter(os, enc));
         if (serializeAsArray) {
             if (arrayKeys != null) {
                 for (String key : arrayKeys) {

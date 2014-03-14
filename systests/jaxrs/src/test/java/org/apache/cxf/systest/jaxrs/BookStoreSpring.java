@@ -190,6 +190,24 @@ public class BookStoreSpring {
     }
     
     @GET
+    @Path("/ISO-8859-1/1")
+    @Produces({"application/json;charset=ISO-8859-1", "application/xml;charset=ISO-8859-1" })
+    public Book getBookISO() throws Exception {
+        String eWithAcute = "\u00E9";
+        String helloStringUTF16 = "F" + eWithAcute + "lix";
+        byte[] iso88591bytes = helloStringUTF16.getBytes("ISO-8859-1");
+        String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
+        return new Book(helloStringISO88591, 333L);
+    }
+    
+    @GET
+    @Path("/ISO-8859-1/2")
+    @Produces({"application/json", "application/xml" })
+    public Book getBookISO2() throws Exception {
+        return getBookISO();
+    }
+    
+    @GET
     @Path("/semicolon2{id}")
     @Produces("application/xml")
     public Book getBookWithSemicolnAndMatrixParam(@PathParam("id") String name,

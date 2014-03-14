@@ -39,6 +39,7 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Provider
@@ -100,11 +101,12 @@ public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBody
     }
 
     public void writeTo(T o, Class<?> clazz, Type genericType, Annotation[] annotations, 
-                        MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
+                        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         XMLStreamWriter writer = null;
         try {
-            writer = createWriter(clazz, genericType, os);
+            String enc = HttpUtils.getSetEncoding(m, headers, "UTF-8");
+            writer = createWriter(clazz, genericType, enc, os);
             writeToWriter(writer, o);
         } catch (Exception ex) {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
@@ -119,7 +121,7 @@ public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBody
         writer.flush();
     }
     
-    protected XMLStreamWriter createWriter(Class<?> clazz, Type genericType, OutputStream os) 
+    protected XMLStreamWriter createWriter(Class<?> clazz, Type genericType, String enc, OutputStream os) 
         throws Exception {
         return StaxUtils.createXMLStreamWriter(os);
     }
