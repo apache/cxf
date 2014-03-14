@@ -21,10 +21,12 @@ package org.apache.cxf.io;
 
 import java.security.GeneralSecurityException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
 /**
@@ -32,8 +34,8 @@ import javax.crypto.spec.IvParameterSpec;
  */
 public class CipherPair {
     private String transformation;
-    private Cipher enccipher;
-    private Cipher deccipher;
+    private Key key;
+    private byte[] ivp;
     
     public CipherPair(String transformation) throws GeneralSecurityException {
         this.transformation = transformation;
@@ -45,18 +47,16 @@ public class CipherPair {
         } else {
             a = transformation;
         }
+        Cipher enccipher = null;
         try {
             KeyGenerator keygen = KeyGenerator.getInstance(a);
             keygen.init(new SecureRandom());
-            Key key = keygen.generateKey();
+            key = keygen.generateKey();
             enccipher = Cipher.getInstance(transformation);
-            deccipher = Cipher.getInstance(transformation);
             enccipher.init(Cipher.ENCRYPT_MODE, key);
-            final byte[] ivp = enccipher.getIV();
-            deccipher.init(Cipher.DECRYPT_MODE, key, ivp == null ? null : new IvParameterSpec(ivp));
+            ivp = enccipher.getIV();
         } catch (GeneralSecurityException e) {
             enccipher = null;
-            deccipher = null;
             throw e;
         }
     }
@@ -66,10 +66,22 @@ public class CipherPair {
     }
     
     public Cipher getEncryptor() {
+        Cipher enccipher = null;
+        try {
+            enccipher = Cipher.getInstance(transformation);
+            enccipher.init(Cipher.ENCRYPT_MODE, key);
+        } catch (GeneralSecurityException e) {
+        }
         return enccipher;
     }
     
     public Cipher getDecryptor() {
+        Cipher deccipher = null;
+        try {
+            deccipher = Cipher.getInstance(transformation);
+            deccipher.init(Cipher.DECRYPT_MODE, key, ivp == null ? null : new IvParameterSpec(ivp));
+        } catch (GeneralSecurityException e) {
+        }
         return deccipher;
     }
 }

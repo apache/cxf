@@ -75,6 +75,11 @@ public class CachedWriterTest extends CachedStreamTestBase {
     protected String readFromStreamObject(Object obj) throws IOException {
         return readFromReader((Reader)obj);
     }
+
+    @Override
+    protected String readPartiallyFromStreamObject(Object cache, int len) throws IOException {
+        return readPartiallyFromReader((Reader)cache, len);
+    }
 }
     
    

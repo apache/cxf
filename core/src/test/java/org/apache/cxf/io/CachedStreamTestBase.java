@@ -42,6 +42,7 @@ public abstract class CachedStreamTestBase extends Assert {
     protected abstract File getTmpFile(String result, Object cache) throws IOException;
     protected abstract Object getInputStreamObject(Object cache) throws IOException;
     protected abstract String readFromStreamObject(Object cache) throws IOException;
+    protected abstract String readPartiallyFromStreamObject(Object cache, int len) throws IOException;
     
     @Test
     public void testResetOut() throws IOException {
@@ -127,6 +128,37 @@ public abstract class CachedStreamTestBase extends Assert {
         // the file is deleted when cos is closed while all the associated inputs are closed
         final String dectext = readFromStreamObject(fin);
         assertEquals("text is not decoded correctly", text, dectext);
+        assertFalse("file is not deleted", tmpfile.exists());
+    }
+
+    @Test
+    public void testEncryptAndDecryptPartially() throws IOException {
+        // need a 8-bit cipher so that all bytes are flushed when the stream is flushed.
+        Object cache = createCache(4, "RC4");
+        final String text = "Hello Secret World!";
+        File tmpfile = getTmpFile(text, cache);
+        assertNotNull(tmpfile);
+
+        Object fin = getInputStreamObject(cache);
+        // read partially and keep the stream open
+        String pdectext = readPartiallyFromStreamObject(fin, 4);
+        assertTrue("text is not decoded correctly", text.startsWith(pdectext));
+
+        Object fin2 = getInputStreamObject(cache);
+
+        final String dectext = readFromStreamObject(fin2);
+        assertEquals("text is not decoded correctly", text, dectext);
+
+        // close the partially read stream
+        if (fin instanceof InputStream) {
+            ((InputStream)fin).close();
+        } else if (fin instanceof Reader) {
+            ((Reader)fin).close();
+        }
+
+        // the file is deleted when cos is closed while all the associated inputs are closed
+        assertTrue("file is deleted", tmpfile.exists());
+        close(cache);
         assertFalse("file is not deleted", tmpfile.exists());
     }
 
@@ -219,6 +251,24 @@ public abstract class CachedStreamTestBase extends Assert {
         }
         return new String(buf.toByteArray(), "UTF-8");
     }
+
+    protected static String readPartiallyFromStream(InputStream is, int len) throws IOException {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        byte[] b = new byte[len];
+        int rn = 0;
+        for (;;) {
+            int n = is.read(b, 0, b.length);
+            if (n < 0) {
+                break;
+            }
+            buf.write(b, 0, n);
+            rn += n;
+            if (len <= rn) {
+                break;
+            }
+        }
+        return new String(buf.toByteArray(), "UTF-8");
+    }
  
     protected static String readFromReader(Reader is) throws IOException {
         StringBuffer buf = new StringBuffer();
@@ -233,6 +283,24 @@ public abstract class CachedStreamTestBase extends Assert {
             }
         } finally {
             is.close();
+        }
+        return buf.toString();
+    }
+    
+    protected static String readPartiallyFromReader(Reader is, int len) throws IOException {
+        StringBuffer buf = new StringBuffer();
+        char[] b = new char[len];
+        int rn = 0;
+        for (;;) {
+            int n = is.read(b, 0, b.length);
+            if (n < 0) {
+                break;
+            }
+            buf.append(b, 0, n);
+            rn += n;
+            if (len <= rn) {
+                break;
+            }
         }
         return buf.toString();
     }

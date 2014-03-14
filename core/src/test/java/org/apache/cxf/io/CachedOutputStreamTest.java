@@ -76,6 +76,11 @@ public class CachedOutputStreamTest extends CachedStreamTestBase {
     protected String readFromStreamObject(Object obj) throws IOException {
         return readFromStream((InputStream)obj);
     }
+
+    @Override
+    protected String readPartiallyFromStreamObject(Object cache, int len) throws IOException {
+        return readPartiallyFromStream((InputStream)cache, len);
+    }
 }
     
    
