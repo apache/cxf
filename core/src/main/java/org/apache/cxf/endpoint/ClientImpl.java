@@ -148,6 +148,13 @@ public class ClientImpl
         if (bus == null) {
             return;
         }
+        for (Closeable c : getEndpoint().getCleanupHooks()) {
+            try {
+                c.close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }
         ClientLifeCycleManager mgr = bus.getExtension(ClientLifeCycleManager.class);
         if (null != mgr) {
             mgr.clientDestroyed(this);

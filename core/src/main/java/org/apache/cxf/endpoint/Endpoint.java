@@ -19,6 +19,7 @@
 
 package org.apache.cxf.endpoint;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -55,4 +56,14 @@ public interface Endpoint extends Map<String, Object>, InterceptorProvider {
     void setOutFaultObserver(MessageObserver observer);
 
     List<Feature> getActiveFeatures();
+    
+    /**
+     * Add a hook that will be called when this end point being terminated.
+     * This will be called prior to the Server/ClientLifecycleListener.*Destroyed()
+     * method is called.  This provides an opportunity to cleanup any resources
+     * that are specific to this Endpoint. 
+     * @param c
+     */
+    void addCleanupHook(Closeable c);
+    List<Closeable> getCleanupHooks();
 }

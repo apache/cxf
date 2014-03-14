@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.Closeable;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -600,6 +601,11 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         }
 
         public void setOutFaultObserver(MessageObserver observer) {            
+        }
+        public void addCleanupHook(Closeable c) {
+        }
+        public List<Closeable> getCleanupHooks() {
+            return null;
         }
     }
     

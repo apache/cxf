@@ -19,6 +19,7 @@
 
 package org.apache.cxf.endpoint;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -162,6 +163,13 @@ public class ServerImpl implements Server {
         
         LOG.fine("Server is stopping.");
         
+        for (Closeable c : endpoint.getCleanupHooks()) {
+            try {
+                c.close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }
         if (slcMgr != null) {
             slcMgr.stopServer(this);
         }

@@ -19,9 +19,12 @@
 
 package org.apache.cxf.endpoint;
 
+import java.io.Closeable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
@@ -62,6 +65,7 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
     private MessageObserver inFaultObserver;
     private MessageObserver outFaultObserver;
     private List<Feature> activeFeatures;
+    private List<Closeable> cleanupHooks;
 
     public EndpointImpl(Bus bus, Service s, QName endpointName) throws EndpointException {
         this(bus, s, s.getEndpointInfo(endpointName));
@@ -188,5 +192,18 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
     @Override
     public int hashCode() {
         return endpointInfo.hashCode();
+    }
+    
+    public synchronized void addCleanupHook(Closeable c) {
+        if (cleanupHooks == null) {
+            cleanupHooks = new CopyOnWriteArrayList<Closeable>();
+        }
+        cleanupHooks.add(c);
+    }
+    public List<Closeable> getCleanupHooks() {
+        if (cleanupHooks == null) {
+            return Collections.emptyList();
+        }
+        return cleanupHooks;
     }
 }

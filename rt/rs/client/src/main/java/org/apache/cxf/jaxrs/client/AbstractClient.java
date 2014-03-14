@@ -289,6 +289,13 @@ public abstract class AbstractClient implements Client {
         if (cfg.getBus() == null) {
             return;
         }
+        for (Closeable c : cfg.getEndpoint().getCleanupHooks()) {
+            try {
+                c.close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }
         ClientLifeCycleManager mgr = cfg.getBus().getExtension(ClientLifeCycleManager.class);
         if (null != mgr) {
             mgr.clientDestroyed(new FrontendClientAdapter(getConfiguration()));
