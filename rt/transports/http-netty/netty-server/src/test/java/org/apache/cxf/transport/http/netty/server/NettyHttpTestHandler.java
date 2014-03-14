@@ -24,6 +24,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.cxf.transport.http.HttpUrlUtil;
 
 
 public class NettyHttpTestHandler extends NettyHttpHandler {
@@ -47,7 +48,7 @@ public class NettyHttpTestHandler extends NettyHttpHandler {
             resp.flushBuffer();
 
         } else {
-            if (target.equals(getName()) || checkContextPath(target)) {
+            if (target.equals(getName()) || HttpUrlUtil.checkContextPath(getName(), target)) {
                 resp.getOutputStream().write(response.getBytes());
                 resp.flushBuffer();
             }

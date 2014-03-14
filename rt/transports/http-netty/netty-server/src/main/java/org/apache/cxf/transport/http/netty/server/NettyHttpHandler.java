@@ -24,6 +24,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.cxf.transport.http.HttpUrlUtil;
 
 public class NettyHttpHandler {
     private String urlName;
@@ -51,13 +52,6 @@ public class NettyHttpHandler {
         return urlName;
     }
 
-    boolean checkContextPath(String target) {
-        String pathString = urlName;
-        if (!pathString.endsWith("/")) {
-            pathString = pathString + "/";
-        }
-        return target.startsWith(pathString);
-    }
 
     public void handle(String target, HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
@@ -66,7 +60,7 @@ public class NettyHttpHandler {
                 nettyHttpDestination.doService(servletContext, request, response);
             }
         } else {
-            if (target.equals(urlName) || checkContextPath(target)) {
+            if (target.equals(urlName) || HttpUrlUtil.checkContextPath(getName(), target)) {
                 nettyHttpDestination.doService(servletContext, request, response);
             }
         }

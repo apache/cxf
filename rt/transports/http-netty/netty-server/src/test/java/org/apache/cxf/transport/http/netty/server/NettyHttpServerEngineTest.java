@@ -91,12 +91,29 @@ public class NettyHttpServerEngineTest extends Assert {
         response = getResponse(urlStr);
         assertEquals("The netty http handler did not take effect", response, "string1");
 
-        engine.addServant(new URL(urlStr), handler2);
-        response = getResponse(urlStr);
-        assertEquals("The netty http handler did not take effect", response, "string1string2");
+        try {
+            engine.addServant(new URL(urlStr), handler2);
+            fail("We don't support to publish the two service at the same context path");
+        } catch (Exception ex) {
+            assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test") > 0);
+        }
+
+        try {
+            engine.addServant(new URL(urlStr + "/test"), handler2);
+            fail("We don't support to publish the two service at the same context path");
+        } catch (Exception ex) {
+            assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test/test") > 0);
+        }
+
+        try {
+            engine.addServant(new URL("http://localhost:" + PORT1 + "/hello"), handler2);
+            fail("We don't support to publish the two service at the same context path");
+        } catch (Exception ex) {
+            assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello") > 0);
+        }
+
         engine.addServant(new URL(urlStr2), handler2);
 
-        
         engine.removeServant(new URL(urlStr));
         response = getResponse(urlStr2);
         assertEquals("The netty http handler did not take effect", response, "string2");

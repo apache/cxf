@@ -21,13 +21,20 @@ package org.apache.cxf.transport.http.netty.server;
 
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
+import org.apache.cxf.transport.http.HttpUrlUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -36,7 +43,11 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 
+
 public class NettyHttpServerEngine implements ServerEngine {
+
+    private static final Logger LOG =
+            LogUtils.getL7dLogger(NettyHttpServerEngine.class);
 
     /**
      * This is the network port for which this engine is allocated.
@@ -67,8 +78,11 @@ public class NettyHttpServerEngine implements ServerEngine {
      */
     private TLSServerParameters tlsServerParameters;
     
-    private ThreadingParameters threadingParameters = new ThreadingParameters(); 
-    
+    private ThreadingParameters threadingParameters = new ThreadingParameters();
+
+    private List<String> registedPaths = new CopyOnWriteArrayList<String>();
+
+    // TODO need to setup configuration about them
     private int readIdleTime = 60;
     
     private int writeIdleTime = 30;
@@ -109,7 +123,6 @@ public class NettyHttpServerEngine implements ServerEngine {
     /**
      * This method is used to programmatically set the TLSServerParameters.
      * This method may only be called by the factory.
-     * @throws IOException 
      */
     public void setTlsServerParameters(TLSServerParameters params) {
         tlsServerParameters = params;
@@ -168,9 +181,26 @@ public class NettyHttpServerEngine implements ServerEngine {
         }
     }
 
+    protected void checkRegistedContext(URL url) {
+        String path = url.getPath();
+        for (String registedPath : registedPaths) {
+            if (path.equals(registedPath)
+                    || HttpUrlUtil.checkContextPath(registedPath, path)) {
+                // Throw the address is already used exception
+                throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
+            }
+            if (HttpUrlUtil.checkContextPath(path, registedPath)) {
+                throw new Fault(new Message("ADD_HANDLER_CONTEXT_CONFILICT_MSG", LOG, url, registedPath));
+            }
+        }
+
+    }
+
 
     @Override
     public void addServant(URL url, NettyHttpHandler handler) {
+        checkRegistedContext(url);
+
         if (serverChannel == null) {
             serverChannel = startServer();
         }
@@ -184,6 +214,7 @@ public class NettyHttpServerEngine implements ServerEngine {
             handlerMap.put(contextName, contextHandler);
         }
         contextHandler.addNettyHttpHandler(handler);
+        registedPaths.add(url.getPath());
     }
 
     @Override
@@ -197,6 +228,8 @@ public class NettyHttpServerEngine implements ServerEngine {
                 handlerMap.remove(contextName);
             }
         }
+        registedPaths.remove(url.getPath());
+
     }
 
     @Override
@@ -211,6 +244,10 @@ public class NettyHttpServerEngine implements ServerEngine {
     }
 
     public void shutdown() {
+        // clean up the handler maps
+        handlerMap.clear();
+        registedPaths.clear();
+
         // just unbind the channel
         if (servletPipeline != null) {
             servletPipeline.shutdown();
