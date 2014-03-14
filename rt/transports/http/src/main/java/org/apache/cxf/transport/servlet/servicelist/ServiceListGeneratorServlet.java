@@ -19,7 +19,6 @@
 package org.apache.cxf.transport.servlet.servicelist;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,7 +82,6 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             request.removeAttribute(ServletController.AUTH_SERVICE_LIST);
             request.removeAttribute(ServletController.AUTH_SERVICE_LIST_REALM);
         }
-        PrintWriter writer = response.getWriter();
         AbstractDestination[] destinations = destinationRegistry.getSortedDestinations();
         if (request.getParameter("stylesheet") != null) {
             renderStyleSheet(request, response);
@@ -123,7 +121,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         }
         response.setContentType(serviceListWriter.getContentType());
         Object basePath = request.getAttribute(Message.BASE_PATH);
-        serviceListWriter.writeServiceList(writer,
+        serviceListWriter.writeServiceList(response.getWriter(),
                                            basePath == null ? null : basePath.toString(),
                                            soapEndpoints, restEndpoints);
     }
