@@ -221,6 +221,8 @@ public final class AnnotationUtils {
         }
         for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
             if (isValidParamAnnotations(paramAnnotations)) {
+                LOG.warning("Method " + m.getName() + " in " + m.getDeclaringClass().getName()
+                             + " has no JAX-RS Path or HTTP Method annotations");
                 return m;
             }
         }
