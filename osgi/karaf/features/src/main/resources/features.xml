@@ -117,6 +117,7 @@
         <feature version="${project.version}">cxf-ws-addr</feature>
         <bundle start-level="40" dependency="true">mvn:net.sf.ehcache/ehcache/${cxf.ehcache.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-ws-security/${project.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-security/${project.version}</bundle>
     </feature>
     <feature name="cxf-rt-security" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-core</feature>
