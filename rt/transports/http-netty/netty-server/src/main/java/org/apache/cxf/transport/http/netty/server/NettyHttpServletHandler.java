@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.http.netty.server.interceptor.NettyInterceptor;
 import org.apache.cxf.transport.http.netty.server.servlet.NettyHttpServletRequest;
 import org.apache.cxf.transport.http.netty.server.servlet.NettyServletResponse;
@@ -108,7 +110,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
             handleHttpServletRequest(ctx, request, nettyHttpContextHandler);
         } else {
             throw new RuntimeException(
-                    "No handler found for uri: " + request.getUri());
+                    new Fault(new Message("NO_NETTY_SERVLET_HANDLER_FOUND", LOG , request.getUri())));
         }
     }
 
@@ -159,7 +161,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         
-        LOG.log(Level.SEVERE, "Unexpected exception from downstream.", cause);
+        LOG.log(Level.SEVERE, "UNEXPECTED_EXCEPCTION_IN_NETTY_SERVLET_HANDLER", cause);
 
         interceptOnRequestFailed(ctx, cause);
 

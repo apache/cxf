@@ -24,14 +24,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.http.netty.server.servlet.NettyServletContext;
 
 public class NettyHttpContextHandler {
+    private static final Logger LOG =
+            LogUtils.getL7dLogger(NettyHttpContextHandler.class);
     private final ServletContext servletContext;
     private List<NettyHttpHandler> nettyHttpHandlerList = new CopyOnWriteArrayList<NettyHttpHandler>();
 
@@ -66,6 +71,8 @@ public class NettyHttpContextHandler {
         NettyHttpHandler handler = getNettyHttpHandler(urlName);
         if (handler != null) {
             nettyHttpHandlerList.remove(handler);
+        } else {
+            LOG.log(Level.WARNING, "REMOVE_HANDLER_FAILED_MSG",  urlName);
         }
     }
 

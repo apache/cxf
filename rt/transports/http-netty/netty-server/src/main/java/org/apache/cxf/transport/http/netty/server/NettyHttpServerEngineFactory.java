@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -171,7 +172,7 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
 
     public synchronized NettyHttpServerEngine createNettyHttpServerEngine(String host, int port,
                                                                           String protocol) throws IOException {
-        LOG.fine("Creating Netty HTTP Server Engine for port " + port + ".");
+        LOG.log(Level.FINE, "CREATING_NETTY_SERVER_ENGINE",  port);
         TLSServerParameters tlsServerParameters = null;
         if (protocol.equals("https") && tlsServerParametersMap != null) {
             tlsServerParameters = tlsServerParametersMap.get(port);
@@ -199,7 +200,7 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
     public static synchronized void destroyForPort(int port) {
         NettyHttpServerEngine ref = portMap.remove(port);
         if (ref != null) {
-            LOG.fine("Stopping Jetty HTTP Server Engine on port " + port + ".");
+            LOG.log(Level.FINE, "STOPPING_NETTY_SERVER_ENGINE", port);
             try {
                 ref.shutdown();
             } catch (Exception e) {
