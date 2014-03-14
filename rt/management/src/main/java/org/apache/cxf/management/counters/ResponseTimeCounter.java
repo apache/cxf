@@ -94,7 +94,7 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
         
         totalHandlingTime = 0;    
         maxHandlingTime = 0;
-        minHandlingTime = Integer.MAX_VALUE;   
+        minHandlingTime = 0;   
     }
     
     public ObjectName getObjectName() {
@@ -103,7 +103,7 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
 
     public Number getAvgResponseTime() {        
         if (invocations.get() == 0) {
-            return -1; //return -1 if invocation number is 0;
+            return 0;
         }
         return (int)(totalHandlingTime / invocations.get());
     }

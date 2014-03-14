@@ -151,8 +151,9 @@ public class CounterRepositoryTest extends Assert {
         assertTrue(opCounter.getNumRuntimeFaults().intValue() == 0);
         assertTrue(opCounter.getNumUnCheckedApplicationFaults().intValue() == 0);
         assertTrue(opCounter.getTotalHandlingTime().intValue() == 0);
-        assertTrue(opCounter.getMinResponseTime().longValue() == Integer.MAX_VALUE);
+        assertTrue(opCounter.getMinResponseTime().intValue() == 0);
         assertTrue(opCounter.getMaxResponseTime().intValue() == 0);
+        assertTrue(opCounter.getAvgResponseTime().intValue() == 0);
         
         verifyBus();
         EasyMock.verify(mhtr1);
