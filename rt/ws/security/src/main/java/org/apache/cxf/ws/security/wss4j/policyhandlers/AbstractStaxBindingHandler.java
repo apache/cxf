@@ -1044,4 +1044,19 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             }
         }
     }
+    
+    // Reshuffle so that a IssuedToken/SecureConveration is above a Signature that references it
+    protected void putCustomTokenAfterSignature() {
+        if (properties.getActions() != null) {
+            List<WSSConstants.Action> actionList = properties.getActions();
+            if ((actionList.contains(WSSConstants.SIGNATURE)
+                || actionList.contains(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)
+                || actionList.contains(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN))
+                && actionList.contains(WSSConstants.CUSTOM_TOKEN)) {
+                getProperties().getActions().remove(WSSConstants.CUSTOM_TOKEN);
+                getProperties().getActions().add(WSSConstants.CUSTOM_TOKEN);
+            }
+      
+        }
+    }
 }

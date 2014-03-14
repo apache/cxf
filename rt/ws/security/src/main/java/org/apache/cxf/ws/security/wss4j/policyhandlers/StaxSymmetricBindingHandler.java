@@ -158,7 +158,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
 
             String tokenId = null;
             SecurityToken tok = null;
-            boolean customTokenAdded = false;
             if (encryptionToken instanceof KerberosToken) {
                 tok = getSecurityToken();
                 if (MessageUtils.isRequestor(message)) {
@@ -167,10 +166,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             } else if (encryptionToken instanceof IssuedToken) {
                 tok = getSecurityToken();
                 addIssuedToken((IssuedToken)encryptionToken, tok, false, true);
-                
-                if (getProperties().getActions().contains(WSSConstants.CUSTOM_TOKEN)) {
-                    customTokenAdded = true;
-                }
                 
                 if (tok == null && !isRequestor()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
@@ -185,7 +180,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     WSSSecurityProperties properties = getProperties();
                     WSSConstants.Action actionToPerform = WSSConstants.CUSTOM_TOKEN;
                     properties.addAction(actionToPerform);
-                    customTokenAdded = true;
                 } else if (tok == null && !isRequestor()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
                         findInboundSecurityToken(WSSecurityEventConstants.SecurityContextToken);
@@ -273,12 +267,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             removeSignatureIfSignedSAML();
             enforceEncryptBeforeSigningWithSignedSAML();
             prependSignatureToSC();
-            
-            // Reshuffle so that a IssuedToken is above a Signature that references it
-            if (customTokenAdded) {
-                getProperties().getActions().remove(WSSConstants.CUSTOM_TOKEN);
-                getProperties().getActions().add(WSSConstants.CUSTOM_TOKEN);
-            }
+            putCustomTokenAfterSignature();
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -294,7 +283,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         try {
             SecurityToken sigTok = null;
-            boolean customTokenAdded = false;
             if (sigToken != null) {
                 if (sigToken instanceof KerberosToken) {
                     sigTok = getSecurityToken();
@@ -304,10 +292,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 } else if (sigToken instanceof IssuedToken) {
                     sigTok = getSecurityToken();
                     addIssuedToken((IssuedToken)sigToken, sigTok, false, true);
-                    
-                    if (getProperties().getActions().contains(WSSConstants.CUSTOM_TOKEN)) {
-                        customTokenAdded = true;
-                    }
                     
                     if (sigTok == null && !isRequestor()) {
                         org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
@@ -322,7 +306,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         WSSSecurityProperties properties = getProperties();
                         WSSConstants.Action actionToPerform = WSSConstants.CUSTOM_TOKEN;
                         properties.addAction(actionToPerform);
-                        customTokenAdded = true;
                     } else if (sigTok == null && !isRequestor()) {
                         org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
                             findInboundSecurityToken(WSSecurityEventConstants.SecurityContextToken);
@@ -403,11 +386,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             AbstractTokenWrapper encrAbstractTokenWrapper = getEncryptionToken();
             doEncryption(encrAbstractTokenWrapper, enc, false);
             
-            // Reshuffle so that a IssuedToken is above a Signature that references it
-            if (customTokenAdded) {
-                getProperties().getActions().remove(WSSConstants.CUSTOM_TOKEN);
-                getProperties().getActions().add(WSSConstants.CUSTOM_TOKEN);
-            }
+            putCustomTokenAfterSignature();
         } catch (Exception e) {
             throw new Fault(e);
         }

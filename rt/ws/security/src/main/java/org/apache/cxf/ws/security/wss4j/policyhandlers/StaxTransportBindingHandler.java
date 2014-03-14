@@ -151,6 +151,8 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         assertPolicy(SP11Constants.SIGNED_PARTS);
         assertPolicy(SP12Constants.ENCRYPTED_PARTS);
         assertPolicy(SP11Constants.ENCRYPTED_PARTS);
+        
+        putCustomTokenAfterSignature();
     }
     
     /**

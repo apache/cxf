@@ -46,6 +46,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.DefaultSymmetricBinding;
@@ -75,7 +76,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     
     public SecureConversationInInterceptor() {
         super(Phase.PRE_STREAM);
-        getBefore().add(WSS4JStaxInInterceptor.class.getName());
+        addBefore(WSS4JStaxInInterceptor.class.getName());
+        addBefore(HttpsTokenInInterceptor.class.getName());
     }
     private AbstractBinding getBinding(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = 

@@ -26,12 +26,14 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;
+import org.apache.cxf.systest.ws.common.UTPasswordCallback;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 
 
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
+    static final String PORT2 = allocatePort(Server.class, 2);
 
     public Server() throws Exception {
         
@@ -39,8 +41,9 @@ public class Server extends AbstractBusTestServerBase {
     
     protected Server(String baseUrl) throws Exception {
         
-        
-        //"SecureConversation_UserNameOverTransport_IPingService",
+        doPublish(baseUrl.replace(PORT, PORT2).replace("http", "https")
+                + "SecureConversation_UserNameOverTransport_IPingService", 
+                new SCTLSPingService());
         doPublish(baseUrl + "SecureConversation_MutualCertificate10SignEncrypt_IPingService",
                   new SCMCSEIPingService());
         
@@ -112,8 +115,18 @@ public class Server extends AbstractBusTestServerBase {
             ep.getProperties().put(SecurityConstants.SIGNATURE_PROPERTIES + ".sct", 
                 "alice.properties");
             ep.getProperties().put(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
+        } else if (url.contains("UserNameOverTransport")) {
+            ep.getProperties().put(SecurityConstants.CALLBACK_HANDLER + ".sct", new UTPasswordCallback());
         }
         ep.publish(url);
+    }
+    
+    @WebService(targetNamespace = "http://WSSec/wssc", 
+            serviceName = "PingService", 
+            portName = "SecureConversation_UserNameOverTransport_IPingService", 
+            endpointInterface = "wssec.wssc.IPingService",
+            wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
+    public static class SCTLSPingService extends PingServiceImpl {
     }
     
     @WebService(targetNamespace = "http://WSSec/wssc", 

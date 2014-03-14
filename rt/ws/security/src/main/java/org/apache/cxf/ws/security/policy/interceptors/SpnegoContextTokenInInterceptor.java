@@ -25,7 +25,6 @@ import java.util.Date;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -42,6 +41,7 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -63,7 +63,8 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     
     public SpnegoContextTokenInInterceptor() {
         super(Phase.PRE_STREAM);
-        getBefore().add(WSS4JStaxInInterceptor.class.getName());
+        addBefore(WSS4JStaxInInterceptor.class.getName());
+        addBefore(HttpsTokenInInterceptor.class.getName());
     }
     
     public void handleMessage(SoapMessage message) throws Fault {

@@ -192,40 +192,7 @@
     <http:conduit name="http://localhost/.*">
         <http:client AllowChunking="false"/>
     </http:conduit>
-    <http:conduit name="https://localhost/.*">
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="pkcs12" password="password" resource="certs/alice.jks"/>
-            </sec:keyManagers>
-            <sec:trustManagers>
-                <sec:keyStore type="pkcs12" password="password" resource="certs/bob.jks"/>
-            </sec:trustManagers>
-        </http:tlsClientParameters>
-        <http:client AllowChunking="false"/>
-    </http:conduit>
-    <http:conduit name="https://localhost/.*">
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="pkcs12" password="password" resource="certs/bob.jks"/>
-            </sec:keyManagers>
-            <sec:trustManagers>
-                <sec:keyStore type="pkcs12" password="password" resource="certs/WssIP.jks"/>
-            </sec:trustManagers>
-        </http:tlsClientParameters>
-        <http:client AllowChunking="false"/>
-    </http:conduit>
-    <http:conduit name="https://localhost:8443/.*">
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="pkcs12" password="password" resource="certs/alice.jks"/>
-            </sec:keyManagers>
-            <sec:trustManagers>
-                <sec:keyStore type="pkcs12" password="password" resource="certs/WssIP.jks"/>
-            </sec:trustManagers>
-        </http:tlsClientParameters>
-        <http:client AllowChunking="false"/>
-    </http:conduit>
-    <http:conduit name="https://localhost:.*/DoubleIt.*">
+    <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>

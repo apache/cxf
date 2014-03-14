@@ -50,6 +50,7 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
+import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -204,6 +205,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
     static class HttpsTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
         public HttpsTokenInInterceptor() {
             super(Phase.PRE_STREAM);
+            addBefore(WSS4JStaxInInterceptor.class.getName());
         }
 
         public void handleMessage(Message message) throws Fault {

@@ -42,7 +42,9 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class WSSCTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String PORT2 = allocatePort(Server.class, 2);
     static final String STAX_PORT = allocatePort(StaxServer.class);
+    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
 
     private static final String OUT = "CXF : ping";
     private static wssec.wssc.PingService svc;
@@ -94,6 +96,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
         return Arrays.asList(new TestParam[][] {
+            {new TestParam("SecureConversation_UserNameOverTransport_IPingService", PORT2, false)},
             {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", PORT, false)},
             {new TestParam("AC_IPingService", PORT, false)},
             {new TestParam("ADC_IPingService", PORT, false)},
@@ -117,7 +120,8 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             {new TestParam("_XD_IPingService", PORT, false)},
             {new TestParam("_XD-SEES_IPingService", PORT, false)},
             {new TestParam("_XD-ES_IPingService", PORT, false)},
-                
+            
+            {new TestParam("SecureConversation_UserNameOverTransport_IPingService", PORT2, true)},
             // TODO Endorsing streaming not supported
             // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", PORT, true)},
             {new TestParam("AC_IPingService", PORT, true)},
@@ -144,7 +148,8 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             // {new TestParam("_XD_IPingService", PORT, true)},
             // {new TestParam("_XD-SEES_IPingService", PORT, true)},
             // {new TestParam("_XD-ES_IPingService", PORT, true)},
-
+            
+            {new TestParam("SecureConversation_UserNameOverTransport_IPingService", STAX_PORT2, false)},
             // TODO StAX Policy Validation error caused by incorrect DOM message
             // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", 
             //               STAX_PORT, false)},
@@ -170,7 +175,8 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             {new TestParam("_XD_IPingService", STAX_PORT, false)},
             {new TestParam("_XD-SEES_IPingService", STAX_PORT, false)},
             {new TestParam("_XD-ES_IPingService", STAX_PORT, false)},
-
+            
+            {new TestParam("SecureConversation_UserNameOverTransport_IPingService", STAX_PORT2, true)},
             // TODO Endorsing derived keys not supported.
             // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", 
             //               STAX_PORT, true)},
@@ -198,7 +204,6 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             // {new TestParam("_XD_IPingService", STAX_PORT, true)},
             // {new TestParam("_XD-SEES_IPingService", STAX_PORT, true)},
             // {new TestParam("_XD-ES_IPingService", STAX_PORT, true)},
-                
         });
     }
     
@@ -217,8 +222,14 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
                 wssec.wssc.IPingService.class
             );
 
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                                        "http://localhost:" + test.port + "/" + test.prefix);
+        if (PORT2.equals(test.port) || STAX_PORT2.equals(test.port)) {
+            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                        "https://localhost:" + test.port + "/" + test.prefix);
+        } else {
+            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                    "http://localhost:" + test.port + "/" + test.prefix);
+        }
+        
         if (test.prefix.charAt(0) == '_') {
             //MS would like the _ versions to send a cancel
             ((BindingProvider)port).getRequestContext()
