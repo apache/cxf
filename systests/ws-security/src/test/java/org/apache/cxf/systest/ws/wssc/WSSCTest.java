@@ -38,7 +38,7 @@ import org.junit.Test;
  */
 public class WSSCTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
-
+    static final String PORT2 = allocatePort(Server.class, 2);
        
     private static final String OUT = "CXF : ping";
     private static wssec.wssc.PingService svc;
@@ -67,6 +67,10 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
     
+    @Test
+    public void testSecureConversationUserNameOverTransportIPingService() throws Exception {
+        runTest("SecureConversation_UserNameOverTransport_IPingService");
+    }
     
     @Test
     public void testSecureConversationMutualCertificate10SignEncryptIPingService() throws Exception {
@@ -183,9 +187,6 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
         runTest("_XD-ES_IPingService");
     }
 
-
-
-
     private void runTest(String ... argv) throws Exception {
         for (String portPrefix : argv) {
             final wssec.wssc.IPingService port = 
@@ -197,8 +198,14 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
                     wssec.wssc.IPingService.class
                 );
            
-            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+            if (portPrefix.contains("UserNameOverTransport")) {
+                ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                        "https://localhost:" + PORT2 + "/" + portPrefix);
+            } else {
+                ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                                             "http://localhost:" + PORT + "/" + portPrefix);
+            }
+            
             if (portPrefix.charAt(0) == '_') {
                 //MS would like the _ versions to send a cancel
                 ((BindingProvider)port).getRequestContext()

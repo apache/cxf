@@ -45,6 +45,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.ProtectionToken;
@@ -70,8 +71,10 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
     
     public SecureConversationInInterceptor() {
-        super(Phase.PRE_PROTOCOL);
+        super(Phase.PRE_STREAM);
+        addBefore(HttpsTokenInInterceptor.class.getName());
     }
+    
     private Binding getBinding(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
         if (ais != null && !ais.isEmpty()) {
@@ -109,6 +112,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 return;
             }
             String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
+            if (s == null) {
+                s = SoapActionInInterceptor.getSoapAction(message);
+            }
             String addNs = null;
             AddressingProperties inProps = (AddressingProperties)message
                 .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);

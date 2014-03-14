@@ -221,39 +221,14 @@
    	<http:conduit name="http://localhost/.*">
         <http:client AllowChunking="false"/>
     </http:conduit>
-    <http:conduit name="https://localhost/.*">
+    
+    <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="pkcs12" password="password" resource="org/apache/cxf/systest/ws/wssc/certs/alice.jks"/>
-            </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="pkcs12" password="password" resource="org/apache/cxf/systest/ws/wssc/certs/bob.jks"/>
+                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
-        <http:client AllowChunking="false"/>
-    </http:conduit>
-    <http:conduit name="https://localhost/.*">
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="pkcs12" password="password" resource="org/apache/cxf/systest/ws/wssc/certs/bob.jks"/>
-            </sec:keyManagers>
-            <sec:trustManagers>
-                <sec:keyStore type="pkcs12" password="password" resource="org/apache/cxf/systest/ws/wssc/certs/WssIP.jks"/>
-            </sec:trustManagers>
-        </http:tlsClientParameters>
-        <http:client AllowChunking="false"/>
-    </http:conduit>
-    <http:conduit name="https://localhost:8443/.*">
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="pkcs12" password="password" resource="org/apache/cxf/systest/ws/wssc/certs/alice.jks"/>
-            </sec:keyManagers>
-            <sec:trustManagers>
-                <sec:keyStore type="pkcs12" password="password" resource="org/apache/cxf/systest/ws/wssc/certs/WssIP.jks"/>
-            </sec:trustManagers>
-        </http:tlsClientParameters>
-        <http:client AllowChunking="false"/>
-    </http:conduit>
+    </http:conduit>  
     
     
 </beans>
