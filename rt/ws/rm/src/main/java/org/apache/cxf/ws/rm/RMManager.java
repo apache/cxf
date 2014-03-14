@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -127,12 +128,11 @@ public class RMManager {
     }
 
     public void stopServer(Server server) {
-        shutdownReliableEndpoint(server.getEndpoint());
     }
     
     // ClientLifeCycleListener
     
-    public void clientCreated(Client client) {
+    public void clientCreated(final Client client) {
         if (null == store || null == retransmissionQueue) {
             return;
         }        
@@ -146,7 +146,6 @@ public class RMManager {
     }
     
     public void clientDestroyed(Client client) {
-        shutdownReliableEndpoint(client.getEndpoint());
     }
 
     // Configuration
@@ -625,7 +624,12 @@ public class RMManager {
         //TODO add the redelivery code
     }
 
-    RMEndpoint createReliableEndpoint(Endpoint endpoint) {
+    RMEndpoint createReliableEndpoint(final Endpoint endpoint) {
+        endpoint.addCleanupHook(new Closeable() {
+            public void close() throws IOException {
+                shutdownReliableEndpoint(endpoint);
+            }
+        });
         return new RMEndpoint(this, endpoint);
     }  
     

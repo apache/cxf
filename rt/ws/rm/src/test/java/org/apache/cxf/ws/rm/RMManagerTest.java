@@ -182,22 +182,7 @@ public class RMManagerTest extends Assert {
         manager.startServer(s);
         control.verify();
     }
-    
-    @Test
-    public void testStopServer() throws NoSuchMethodException {
-        Method m = RMManager.class
-            .getDeclaredMethod("shutdownReliableEndpoint", new Class[] {Endpoint.class});
-        manager = control.createMock(RMManager.class, new Method[] {m});
-        Server s = control.createMock(Server.class);
-        Endpoint e = control.createMock(Endpoint.class);
-        EasyMock.expect(s.getEndpoint()).andReturn(e);
-        manager.shutdownReliableEndpoint(e);
-        EasyMock.expectLastCall();
-        control.replay();
-        manager.stopServer(s);
-        control.verify();
-    }
-    
+
     @Test
     public void testClientCreated() throws NoSuchMethodException {
         Method m = RMManager.class.getDeclaredMethod("recoverReliableEndpoint",
@@ -215,21 +200,6 @@ public class RMManagerTest extends Assert {
         //EasyMock.expectLastCall();
         control.replay();
         manager.clientCreated(client);
-        control.verify();
-    }
-    
-    @Test
-    public void testClientDestroyed() throws NoSuchMethodException {
-        Method m = RMManager.class
-            .getDeclaredMethod("shutdownReliableEndpoint", new Class[] {Endpoint.class});
-        manager = control.createMock(RMManager.class, new Method[] {m});
-        Client c = control.createMock(Client.class);
-        Endpoint e = control.createMock(Endpoint.class);
-        EasyMock.expect(c.getEndpoint()).andReturn(e);
-        manager.shutdownReliableEndpoint(e);
-        EasyMock.expectLastCall();
-        control.replay();
-        manager.clientDestroyed(c);
         control.verify();
     }
     

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.io.Closeable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -164,5 +165,13 @@ public class WrappedEndpoint implements Endpoint {
      */
     public List<Feature> getActiveFeatures() {
         return wrappedEndpoint.getActiveFeatures();
+    }
+
+    public void addCleanupHook(Closeable c) {
+        wrappedEndpoint.addCleanupHook(c);
+    }
+
+    public List<Closeable> getCleanupHooks() {
+        return wrappedEndpoint.getCleanupHooks();
     }
 }

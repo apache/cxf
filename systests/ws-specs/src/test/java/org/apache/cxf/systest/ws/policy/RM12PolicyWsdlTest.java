@@ -26,6 +26,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.greeter_control.Reliable12GreeterService;
+import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.systest.ws.util.MessageFlow;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.testutil.recorders.MessageRecorder;
@@ -77,6 +78,7 @@ public class RM12PolicyWsdlTest extends RMPolicyWsdlTestBase {
         Reliable12GreeterService gs = new Reliable12GreeterService();
         Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
+        ConnectionHelper.setKeepAliveConnection(greeter, true);
         LOG.fine("Created greeter client.");
 
         // oneway
