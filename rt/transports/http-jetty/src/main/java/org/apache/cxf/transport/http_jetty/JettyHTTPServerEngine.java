@@ -22,8 +22,8 @@ package org.apache.cxf.transport.http_jetty;
 import java.io.IOException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -118,7 +118,7 @@ public class JettyHTTPServerEngine
      */
     private boolean configFinalized;
     
-    private List<String> registedPaths = new ArrayList<String>();
+    private List<String> registedPaths = new CopyOnWriteArrayList<String>();
         
     /**
      * This constructor is called by the JettyHTTPServerEngineFactory.
