@@ -21,12 +21,10 @@ package org.apache.cxf.io;
 
 import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
 /**
@@ -71,6 +69,7 @@ public class CipherPair {
             enccipher = Cipher.getInstance(transformation);
             enccipher.init(Cipher.ENCRYPT_MODE, key);
         } catch (GeneralSecurityException e) {
+            // ignore
         }
         return enccipher;
     }
@@ -81,6 +80,7 @@ public class CipherPair {
             deccipher = Cipher.getInstance(transformation);
             deccipher.init(Cipher.DECRYPT_MODE, key, ivp == null ? null : new IvParameterSpec(ivp));
         } catch (GeneralSecurityException e) {
+            // ignore
         }
         return deccipher;
     }
