@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.provider.aegis;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -29,9 +30,11 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.resources.AegisTestBean;
 
 import org.junit.After;
@@ -99,7 +102,9 @@ public class AegisElementProviderTest extends Assert {
         AegisTestBean bean = new AegisTestBean();
         bean.setBoolValue(Boolean.TRUE);
         bean.setStrValue("hovercraft");
-        p.writeTo(bean, null, null, null, null, null, os);
+        p.writeTo(bean, null, null, new Annotation[]{}, 
+                  MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+                  new MetadataMap<String, Object>(), os);
         byte[] bytes = os.toByteArray();
         String xml = new String(bytes, "utf-8");
         assertEquals(simpleBeanXml, xml);
@@ -112,7 +117,9 @@ public class AegisElementProviderTest extends Assert {
         AegisTestBean bean = new AegisTestBean();
         bean.setBoolValue(Boolean.TRUE);
         bean.setStrValue("hovercraft");
-        p.writeTo(bean, null, null, null, null, null, os);
+        p.writeTo(bean, null, null, new Annotation[]{}, 
+                  MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+                  new MetadataMap<String, Object>(), os);
         byte[] bytes = os.toByteArray();
         String xml = new String(bytes, "utf-8");
         assertEquals(noNamespaceXml, xml);
@@ -140,15 +147,19 @@ public class AegisElementProviderTest extends Assert {
             = new AegisElementProvider<Map<AegisTestBean, AegisSuperBean>>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        writer.writeTo(testMap, testMap.getClass(), mapType, null, null, null, os);
+        writer.writeTo(testMap, testMap.getClass(), mapType, new Annotation[]{}, 
+                       MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+                       new MetadataMap<String, Object>(), os);
         byte[] bytes = os.toByteArray();
         String xml = new String(bytes, "utf-8");
         MessageBodyReader<Map<AegisTestBean, AegisSuperBean>> reader
             = new AegisElementProvider<Map<AegisTestBean, AegisSuperBean>>();
         byte[] simpleBytes = xml.getBytes("utf-8");
 
-        Map<AegisTestBean, AegisSuperBean> map2 = reader.readFrom(null, mapType, null,
-                                          null, null, new ByteArrayInputStream(simpleBytes));
+        Map<AegisTestBean, AegisSuperBean> map2 = reader.readFrom(null, mapType, new Annotation[]{}, 
+                                                                  MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+                                                                  new MetadataMap<String, String>(),
+                                                                  new ByteArrayInputStream(simpleBytes));
         assertEquals(1, map2.size());
         Map.Entry<AegisTestBean, AegisSuperBean> entry = map2.entrySet().iterator().next();
         AegisTestBean bean1 = entry.getKey();

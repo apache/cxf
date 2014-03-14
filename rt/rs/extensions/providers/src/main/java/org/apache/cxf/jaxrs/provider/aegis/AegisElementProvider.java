@@ -41,6 +41,7 @@ import org.apache.cxf.aegis.AegisReader;
 import org.apache.cxf.aegis.AegisWriter;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Provider
@@ -107,7 +108,8 @@ public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
         AegisType aegisType = context.getTypeMapping().getType(genericType);
         AegisWriter<XMLStreamWriter> aegisWriter = context.createXMLStreamWriter();
         try {
-            XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), os);
+            String enc = HttpUtils.getSetEncoding(m, headers, "UTF-8");
+            XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), enc, os);
             // use type qname as element qname?
             xmlStreamWriter.writeStartDocument();
             aegisWriter.write(obj, aegisType.getSchemaType(), false, xmlStreamWriter, aegisType);
@@ -118,8 +120,9 @@ public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
         }
     }
     
-    protected XMLStreamWriter createStreamWriter(QName typeQName, 
+    protected XMLStreamWriter createStreamWriter(QName typeQName,
+                                                 String enc,
                                                  OutputStream os) throws Exception {
-        return StaxUtils.createXMLStreamWriter(os);
+        return StaxUtils.createXMLStreamWriter(os, enc);
     }
 }
