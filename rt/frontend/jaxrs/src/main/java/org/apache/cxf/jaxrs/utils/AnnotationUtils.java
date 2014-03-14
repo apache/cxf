@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.annotation.Priority;
 import javax.ws.rs.BeanParam;
@@ -43,8 +44,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
-public final class AnnotationUtils {
+import org.apache.cxf.common.logging.LogUtils;
 
+public final class AnnotationUtils {
+    private static final Logger LOG = LogUtils.getL7dLogger(AnnotationUtils.class);
     private static final Set<Class<?>> PARAM_ANNOTATION_CLASSES;
     private static final Set<Class<?>> METHOD_ANNOTATION_CLASSES;
     static {
@@ -166,6 +169,8 @@ public final class AnnotationUtils {
         }
         for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
             if (isValidParamAnnotations(paramAnnotations)) {
+                LOG.warning("Method " + m.getName() + " in " + m.getDeclaringClass().getName()
+                             + " has no JAX-RS Path or HTTP Method annotations");
                 return m;
             }
         }
