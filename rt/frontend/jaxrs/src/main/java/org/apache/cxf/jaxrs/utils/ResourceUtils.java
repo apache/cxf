@@ -722,11 +722,19 @@ public final class ResourceUtils {
         }
         return values;
     }
+    
     public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath) {
         return createApplication(app, ignoreAppPath, false);
     }
+    
     public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath,
                                                            boolean staticSubresourceResolution) {
+        return initializeApplication(new JAXRSServerFactoryBean(), app, 
+                ignoreAppPath, staticSubresourceResolution);
+    }
+    
+    public static JAXRSServerFactoryBean initializeApplication(JAXRSServerFactoryBean bean,
+            Application app, boolean ignoreAppPath, boolean staticSubresourceResolution) {
         
         Set<Object> singletons = app.getSingletons();
         verifySingletons(singletons);
@@ -767,7 +775,6 @@ public final class ResourceUtils {
             }
         }
         
-        JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
         String address = "/";
         if (!ignoreAppPath) {
             ApplicationPath appPath = app.getClass().getAnnotation(ApplicationPath.class);
@@ -793,6 +800,7 @@ public final class ResourceUtils {
         
         return bean;
     }
+
     
     private static boolean isValidProvider(Class<?> c) {
         if (c == null || c == Object.class) {

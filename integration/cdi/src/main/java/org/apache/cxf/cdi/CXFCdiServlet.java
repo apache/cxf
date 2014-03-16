@@ -18,19 +18,12 @@
  */
 package org.apache.cxf.cdi;
 
-import java.util.ArrayList;
-import java.util.ServiceLoader;
-
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 /**
@@ -40,31 +33,15 @@ public class CXFCdiServlet extends CXFNonSpringServlet {
     private static final long serialVersionUID = -2890970731778523861L;
     
     @Override
-    @SuppressWarnings("rawtypes")
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);        
         
         final BeanManager beanManager = CDI.current().getBeanManager();
         final JAXRSCdiResourceExtension extension = beanManager.getExtension(JAXRSCdiResourceExtension.class);
         if (extension != null) {    
-            for (final Application application: extension.getApplications()) {
-                final JAXRSServerFactoryBean bean = ResourceUtils.createApplication(application, false, false);
-                
-                bean.setServiceBeans(new ArrayList< Object >(extension.getServices()));
-                bean.setProviders(extension.getProviders());
-                bean.setBus(getBus());
-                
-                final ServiceLoader< MessageBodyWriter > writers = ServiceLoader.load(MessageBodyWriter.class);
-                for (final MessageBodyWriter< ? > writer: writers) {
-                    bean.setProvider(writer);
-                }
-                
-                final ServiceLoader< MessageBodyReader > readers = ServiceLoader.load(MessageBodyReader.class);
-                for (final MessageBodyReader< ? > reader: readers) {
-                    bean.setProvider(reader);
-                }
-                
-                bean.create();
+            for (final JAXRSServerFactoryBean factory: extension.getFactories()) {
+                factory.setBus(getBus());    
+                factory.init();
             }        
         }
     }
