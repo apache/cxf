@@ -36,7 +36,6 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
-import org.apache.cxf.transport.http.HttpUrlUtil;
 import org.apache.cxf.transport.https_jetty.JettySslConnectorFactory;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
@@ -279,16 +278,17 @@ public class JettyHTTPServerEngine
     protected void checkRegistedContext(URL url) {
         String path = url.getPath();
         for (String registedPath : registedPaths) {
-            if (path.equals(registedPath) 
-                || HttpUrlUtil.checkContextPath(registedPath, path)) {
+            if (path.equals(registedPath)) { 
+                //|| HttpUrlUtil.checkContextPath(registedPath, path)) {
                 // Throw the address is already used exception
                 throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
             }
+            /*
             if (HttpUrlUtil.checkContextPath(path, registedPath)) {
                 throw new Fault(new Message("ADD_HANDLER_CONTEXT_CONFILICT_MSG", LOG, url, registedPath));
             }
+            */
         }
-        
     }
     
     
