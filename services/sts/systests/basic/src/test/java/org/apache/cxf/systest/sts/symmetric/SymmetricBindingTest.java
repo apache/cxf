@@ -32,6 +32,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
+import javax.xml.ws.soap.AddressingFeature;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -50,6 +51,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.wss4j.dom.WSConstants;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -285,9 +287,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See CXF-5567
     @org.junit.Test
-    @org.junit.Ignore
     public void testUsernameTokenSAML1Dispatch() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -302,7 +302,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1Port");
        
         Dispatch<DOMSource> dispatch = 
-            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
+            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD, new AddressingFeature());
         updateAddressPort(dispatch, test.getPort());
         
         // Setup STSClient
@@ -316,6 +316,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         // Make a successful request
         Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
         client.getRequestContext().put("ws-security.sts.client", stsClient);
+        //client.getRequestContext().put("find.dispatch.operation", Boolean.TRUE);
+        
         
         if (test.isStreaming()) {
             client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
