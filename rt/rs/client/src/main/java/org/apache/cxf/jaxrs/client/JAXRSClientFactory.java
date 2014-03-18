@@ -144,6 +144,21 @@ public final class JAXRSClientFactory {
     }
     
     /**
+     * Creates a thread safe proxy and allows to specify time to keep state.
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param providers list of providers
+     * @param timeToKeepState how long to keep this state 
+     * @return typed proxy
+     */
+    public static <T> T create(String baseAddress, Class<T> cls, List<?> providers, long timeToKeepState) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, cls, null);
+        bean.setProviders(providers);
+        bean.setInitialState(new ThreadLocalClientState(baseAddress, timeToKeepState));
+        return bean.create(cls);
+    }
+    
+    /**
      * Creates a proxy
      * @param baseAddress baseAddress
      * @param cls proxy class, if not interface then a CGLIB proxy will be created
@@ -259,6 +274,26 @@ public final class JAXRSClientFactory {
         if (threadSafe) {
             bean.setInitialState(new ThreadLocalClientState(baseAddress));
         }
+        return bean.create(cls);
+    }
+    
+    /**
+     * Creates a thread safe proxy using user resource model and allows to 
+     * specify time to keep state.
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param modelRef model location
+     * @param providers list of providers
+     * @param timeToKeepState how long to keep this state
+     * @return typed proxy
+     */
+    public static <T> T createFromModel(String baseAddress, Class<T> cls, String modelRef, 
+                                        List<?> providers, long timeToKeepState) {
+        JAXRSClientFactoryBean bean = WebClient.getBean(baseAddress, null);
+        bean.setProviders(providers);
+        bean.setModelRef(modelRef);
+        bean.setServiceClass(cls);
+        bean.setInitialState(new ThreadLocalClientState(baseAddress, timeToKeepState));
         return bean.create(cls);
     }
     
