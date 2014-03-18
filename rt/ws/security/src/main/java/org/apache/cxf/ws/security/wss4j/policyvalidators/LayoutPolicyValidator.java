@@ -21,14 +21,18 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.ws.security.WSConstants;
@@ -46,17 +50,44 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
  */
 public class LayoutPolicyValidator {
     
-    private List<WSSecurityEngineResult> results;
-    private List<WSSecurityEngineResult> signedResults;
-
-    public LayoutPolicyValidator(
-        List<WSSecurityEngineResult> results, List<WSSecurityEngineResult> signedResults
+    public boolean validatePolicy(
+        AssertionInfoMap aim,
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
     ) {
-        this.results = results;
-        this.signedResults = signedResults;
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.LAYOUT);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(aim, ais, message, results, signedResults);
+        }
+
+        return true;
     }
-    
-    public boolean validatePolicy(Layout layout) {
+            
+    private void parsePolicies(
+        AssertionInfoMap aim,
+        Collection<AssertionInfo> ais, 
+        Message message,  
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
+        for (AssertionInfo ai : ais) {
+            Layout layout = (Layout)ai.getAssertion();
+            ai.setAsserted(true);
+
+            if (!validatePolicy(layout, results, signedResults)) {
+                String error = "Layout does not match the requirements";
+                ai.setNotAsserted(error);
+            }
+        }
+    }
+
+    public boolean validatePolicy(
+        Layout layout,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
         boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTsFirst;
         boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTsLast;
         boolean strict = layout.getValue() == SPConstants.Layout.Strict;
@@ -78,16 +109,19 @@ public class LayoutPolicyValidator {
             if (lastAction.intValue() != WSConstants.TS) {
                 return false;
             }
-        } else if (strict && (!validateStrictSignaturePlacement() 
-            || !validateStrictSignatureTokenPlacement()
-            || !checkSignatureIsSignedPlacement())) {
+        } else if (strict && (!validateStrictSignaturePlacement(results, signedResults) 
+            || !validateStrictSignatureTokenPlacement(results)
+            || !checkSignatureIsSignedPlacement(signedResults))) {
             return false;
         }
         
         return true;
     }
     
-    private boolean validateStrictSignaturePlacement() {
+    private boolean validateStrictSignaturePlacement(
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
         // Go through each Signature and check any security header token is before the Signature
         for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> sl = 
@@ -125,13 +159,13 @@ public class LayoutPolicyValidator {
         return true;
     }
     
-    private boolean validateStrictSignatureTokenPlacement() {
+    private boolean validateStrictSignatureTokenPlacement(List<WSSecurityEngineResult> results) {
         // Go through each Signature and check that the Signing Token appears before the Signature
         for (int i = 0; i < results.size(); i++) {
             WSSecurityEngineResult result = results.get(i);
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt == WSConstants.SIGN) {
-                int correspondingIndex = findCorrespondingTokenIndex(result);
+                int correspondingIndex = findCorrespondingTokenIndex(result, results);
                 if (correspondingIndex > 0 && correspondingIndex < i) {
                     return false;
                 }
@@ -141,7 +175,7 @@ public class LayoutPolicyValidator {
         return true;
     }
     
-    private boolean checkSignatureIsSignedPlacement() {
+    private boolean checkSignatureIsSignedPlacement(List<WSSecurityEngineResult> signedResults) {
         for (int i = 0; i < signedResults.size(); i++) {
             WSSecurityEngineResult signedResult = signedResults.get(i);
             List<WSDataRef> sl =
@@ -181,7 +215,8 @@ public class LayoutPolicyValidator {
      * to sign the "signatureResult" argument.
      */
     private int findCorrespondingTokenIndex(
-        WSSecurityEngineResult signatureResult
+        WSSecurityEngineResult signatureResult,
+        List<WSSecurityEngineResult> results
     ) {
         // See what was used to sign this result
         X509Certificate cert = 
@@ -228,3 +263,4 @@ public class LayoutPolicyValidator {
         return -1;
     }
 }
+
