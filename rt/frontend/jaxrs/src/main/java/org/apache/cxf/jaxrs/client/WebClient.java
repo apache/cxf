@@ -149,6 +149,19 @@ public class WebClient extends AbstractClient {
     }
     
     /**
+     * Creates a thread safe WebClient
+     * @param baseURI baseURI
+     * @param providers list of providers
+     * @param timeToKeepState time to keep this thread safe state.
+     */
+    public static WebClient create(String baseAddress, List<?> providers, long timeToKeepState) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, null);
+        bean.setProviders(providers);
+        bean.setInitialState(new ThreadLocalClientState(baseAddress, timeToKeepState));
+        return bean.createWebClient();        
+    }
+
+    /**
      * Creates WebClient
      * @param baseAddress baseAddress
      * @param providers list of providers
