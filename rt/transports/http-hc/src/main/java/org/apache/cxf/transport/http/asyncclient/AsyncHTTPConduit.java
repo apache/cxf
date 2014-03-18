@@ -280,6 +280,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
             inbuf = new SharedInputBuffer(bufSize, allocator);
             outbuf = new SharedOutputBuffer(bufSize, allocator);
+            isAsync = outMessage != null && outMessage.getExchange() != null 
+                && !outMessage.getExchange().isSynchronous();
         }
         
         public boolean retransmitable() {
@@ -791,7 +793,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
 
         protected void setupNewConnection(String newURL) throws IOException {
             httpResponse = null;
-            isAsync = false;
+            isAsync = outMessage != null && outMessage.getExchange() != null 
+                && !outMessage.getExchange().isSynchronous();
             exception = null;
             connectionFuture = null;
             session = null;
