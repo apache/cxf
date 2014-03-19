@@ -73,6 +73,17 @@ public class DoMerges {
     
     public static Set<String> records = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     public static Set<String> patchIds = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+    
+    static class ToFrom {
+        final String from;
+        final String to;
+        
+        public ToFrom(String t, String f) {
+            to = t;
+            from = f;
+        }
+    }
+    public static List<ToFrom> pathMaps = new LinkedList<ToFrom>();
 
     static int waitFor(Process p) throws Exception  {
         return waitFor(p, true);
@@ -138,6 +149,13 @@ public class DoMerges {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MERGEINFOFILE));
         writer.write(fromBranch);
         writer.newLine();
+        for (ToFrom ent : pathMaps) {
+            writer.write("A ");
+            writer.write(ent.from);
+            writer.write(" ");
+            writer.write(ent.to);
+            writer.newLine();
+        }
         for (String s : records) {
             writer.write(s);
             writer.newLine();
@@ -162,7 +180,14 @@ public class DoMerges {
             fromBranch = line;
             line = reader.readLine();
             while (line != null) {
-                records.add(line.trim());
+                if (line.startsWith("A ")) {
+                    line = line.substring(2).trim();
+                    String from = line.substring(0, line.indexOf(' '));
+                    String to = line.substring(line.indexOf(' ') + 1);
+                    pathMaps.add(new ToFrom(to, from));
+                } else {
+                    records.add(line.trim());
+                }
                 line = reader.readLine();
             }
             reader.close();
@@ -292,6 +317,53 @@ public class DoMerges {
             records.add("M " + ver);
         }
     }
+    private static void doMappedMerge(String ver) throws Exception {
+        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "format-patch", "--stdout", "-1", ver}));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        
+        File outputFile = File.createTempFile("merge", ".patch");
+        outputFile.deleteOnExit();
+        BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
+        
+        String line = reader.readLine();
+        while (line != null) {
+            if ((line.startsWith("--- ")
+                || line.startsWith("+++ ")) && line.length() > 7) {
+                String file = line.substring(6).trim();
+                for (ToFrom ent : pathMaps) {
+                    if (file.contains(ent.from)) {
+                        String newf = file.replace(ent.from, ent.to);
+                        File fo = new File(newf);                        
+                        if (fo.exists() && fo.isFile()) {
+                            line = line.substring(0, 6) + newf;
+                            break;
+                        }
+                    }
+                }
+                //System.out.println("newl: " + line);
+            }
+            writer.append(line);
+            writer.newLine();
+            line = reader.readLine();
+        }
+        waitFor(p, false);
+        writer.flush();
+        writer.close();
+        
+        p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "am", outputFile.getCanonicalPath()}));
+        
+        if (waitFor(p, false) != 0) {
+            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "status"}));
+            runProcess(p);
+                
+            if (doCommit()) {
+                records.add("M " + ver);
+            }
+        } else {
+            records.add("M " + ver);
+        }
+        outputFile.delete();
+    }
     private static String getPatchId(String id) throws Exception {
        
         String commands[] = new String[] { "git", "show", id};
@@ -407,13 +479,14 @@ public class DoMerges {
                 System.in.read();
             }
             while (c != 'M'
+                   && c != 'A'
                    && c != 'B'
                    && c != 'I'
                    && c != 'R'
                    && c != 'F'
                    && c != 'C'
                    && c != 'P') {
-                System.out.print("[M]erge, [B]lock, or [I]gnore, [R]ecord only, [F]lush, [C]hanges? ");
+                System.out.print("[M]erge, [A]dvancedMerge, [B]lock, or [I]gnore, [R]ecord only, [F]lush, [C]hanges? ");
                 int i = System.in.read();
                 c = Character.toUpperCase((char)i);
             }
@@ -421,6 +494,9 @@ public class DoMerges {
             switch (c) {
             case 'M':
                 doMerge(ver);
+                break;
+            case 'A':
+                doMappedMerge(ver);
                 break;
             case 'P':
                 System.out.println("Patch Id: " + getPatchId(ver));
