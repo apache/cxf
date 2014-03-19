@@ -32,6 +32,9 @@ public class Server extends AbstractBusTestServerBase {
         Object implementor = new SayHiImpl();
         String address = "http://localhost:" + PORT + "/schemaimport/sayHi";
         Endpoint.publish(address, implementor);
+        Object implementor2 = new TestEndpointImpl();
+        String address2 = "http://localhost:" + PORT + "/schemaimport/service";
+        Endpoint.publish(address2, implementor2);
     }
 
     public static void main(String[] args) {

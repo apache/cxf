@@ -56,13 +56,35 @@ public class SchemaImportTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testImportWsdl() throws Exception {
-        String schemaURL = "http://localhost:" + PORT + "/schemaimport/sayHi"  + "?wsdl=sayhi/sayhi/a.wsdl";
-        URL url = new URL(schemaURL);
+        String wsdlURL = "http://localhost:" + PORT + "/schemaimport/sayHi"  + "?wsdl=sayhi/sayhi/a.wsdl";
+        URL url = new URL(wsdlURL);
         InputStream ins = null;
         try {
             ins = url.openStream();
             String output = IOUtils.toString(ins);
             assertTrue(output.indexOf("sayHiArray") > -1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Can not access the import wsdl");
+
+        } finally {
+            if (ins != null) {
+                ins.close();
+            }
+        }
+    }
+    
+    
+    @Test
+    public void testAnotherSchemaImportl() throws Exception {
+        String schemaURL = "http://localhost:" + PORT + "/schemaimport/service"  + "?xsd=schema1.xsd";
+        URL url = new URL(schemaURL);
+        InputStream ins = null;
+        try {
+            ins = url.openStream();
+            String output = IOUtils.toString(ins);
+            assertTrue(output.indexOf("schemaimport/service?xsd=schema2.xsd") > -1);
+            assertTrue(output.indexOf("schemaimport/service?xsd=schema5.xsd") > -1);
         } catch (Exception e) {
             e.printStackTrace();
             fail("Can not access the import wsdl");

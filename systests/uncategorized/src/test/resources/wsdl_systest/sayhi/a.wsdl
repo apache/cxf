@@ -18,7 +18,7 @@
   under the License.
 -->
 <definitions xmlns:tns="http://apache.org/sayHi" xmlns:sayhi1="http://apache.org/sayHi1" xmlns:sayhi2="http://apache.org/sayHi2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://apache.org/sayHi" name="SayHiService">
-    <import namespace="http://apache.org/sayHi" location="sayhi/a.wsdl"/>
+    <import namespace="http://apache.org/sayHi" location="./sayhi/a.wsdl"/>
     <message name="sayHi">
         <part name="parameters" element="sayhi1:sayHi"/>
     </message>
