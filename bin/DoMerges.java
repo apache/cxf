@@ -313,8 +313,6 @@ public class DoMerges {
             if (doCommit()) {
                 records.add("M " + ver);
             }
-        } else {
-            records.add("M " + ver);
         }
     }
     private static void doMappedMerge(String ver) throws Exception {
