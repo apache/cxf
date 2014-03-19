@@ -277,8 +277,11 @@ public class WSDLGetUtils {
         throws UnsupportedEncodingException {
         String key = loc;
         try {
-            if (!(new URI(loc).isAbsolute()) && xsd != null && !UrlUtils.getStem(xsd).equals(xsd)) {
-                key = UrlUtils.getStem(xsd) + "/" + loc;
+            if (!(new URI(loc).isAbsolute()) && xsd != null) {
+                key = new URI(xsd).resolve(loc).toString();
+            }
+            if (!(new URI(loc).isAbsolute()) && xsd == null) {
+                key = new URI(".").resolve(loc).toString();
             }
         } catch (URISyntaxException e) {
            //ignore
@@ -335,7 +338,10 @@ public class WSDLGetUtils {
                 String sl = el.getAttribute("location");
                 try {
                     if (!StringUtils.isEmpty(wsdl) && !(new URI(sl).isAbsolute())) {
-                        sl = UrlUtils.getStem(wsdl) + "/" + sl;
+                        sl = new URI(wsdl).resolve(sl).toString();
+                    }
+                    if (StringUtils.isEmpty(wsdl) && !(new URI(sl).isAbsolute())) {
+                        sl = new URI(".").resolve(sl).toString();
                     }
                 } catch (URISyntaxException e) {
                     //ignore
@@ -467,9 +473,12 @@ public class WSDLGetUtils {
                         new URL(start);
                     } catch (MalformedURLException e) {
                         try {
-                            if (!(new URI(docBase).isAbsolute()) && !(new URI(start).isAbsolute())
-                                && !StringUtils.isEmpty(docBase)) {
-                                start = UrlUtils.getStem(docBase) + "/" + start;
+                            if (!StringUtils.isEmpty(docBase) && !(new URI(start).isAbsolute())) {
+                                start = new URI(docBase).resolve(start).toString();
+                                decodedStart = URLDecoder.decode(start, "utf-8");
+                            } 
+                            if (StringUtils.isEmpty(docBase) && !(new URI(start).isAbsolute())) {
+                                start = new URI(".").resolve(start).toString();
                                 decodedStart = URLDecoder.decode(start, "utf-8");
                             }
                         } catch (Exception e1) {
