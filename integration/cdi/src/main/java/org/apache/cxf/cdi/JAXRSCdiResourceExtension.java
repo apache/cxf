@@ -19,10 +19,7 @@
 package org.apache.cxf.cdi;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.enterprise.event.Observes;
@@ -41,21 +38,22 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
  * Apache CXF portable CDI extension to support initialization of JAX-RS / JAX-WS resources.  
  */
-
-public class JAXRSCdiResourceExtension implements Extension {
+public class JAXRSCdiResourceExtension implements Extension {    
+    private Bean< ? > busBean;
+    private Bus bus;
+    
     private final List< Bean< ? > > applicationBeans = new ArrayList< Bean< ? > >();
     private final List< Bean< ? > > serviceBeans = new ArrayList< Bean< ? > >();
     private final List< Bean< ? > > providerBeans = new ArrayList< Bean< ? > >();
-    private final Map< Bean< ? >, Bean< JAXRSServerFactoryBean > > factoryBeans = 
-        new HashMap< Bean< ? >, Bean< JAXRSServerFactoryBean > >();
-    
-    private final List< JAXRSServerFactoryBean > factories = new ArrayList< JAXRSServerFactoryBean >();
+        
     private final List< Object > services = new ArrayList< Object >();
     private final List< Object > providers = new ArrayList< Object >();
     
@@ -66,6 +64,9 @@ public class JAXRSCdiResourceExtension implements Extension {
             serviceBeans.add(event.getBean());
         } else if (event.getAnnotated().isAnnotationPresent(Provider.class)) {
             providerBeans.add(event.getBean());
+        } else if (CdiBusBean.CXF.equals(event.getBean().getName()) 
+                && Bus.class.isAssignableFrom(event.getBean().getBeanClass())) {
+            busBean = event.getBean();  
         }
     }
     
@@ -90,51 +91,45 @@ public class JAXRSCdiResourceExtension implements Extension {
             );    
         }
         
-        for (final Map.Entry< Bean< ? >, Bean< JAXRSServerFactoryBean > > entry: factoryBeans.entrySet()) {
+        bus = (Bus)beanManager.getReference(
+            busBean, 
+            busBean.getBeanClass(), 
+            beanManager.createCreationalContext(busBean)
+        );
+        
+        for (final Bean< ? > application: applicationBeans) {
             final Application instance = (Application)beanManager.getReference(
-                entry.getKey(), 
-                entry.getKey().getBeanClass(), 
-                beanManager.createCreationalContext(entry.getKey()) 
+                application, 
+                application.getBeanClass(), 
+                beanManager.createCreationalContext(application) 
             );
             
             // Create the JAXRSServerFactoryBean for each application we have discovered
-            factories.add(createFactoryInstance(instance, entry.getValue(), beanManager));
+            final JAXRSServerFactoryBean factory = createFactoryInstance(instance);
+            factory.init();
         }
     }
     
     public void injectFactories(@Observes final AfterBeanDiscovery event, final BeanManager beanManager) {
-        final AnnotatedType< JAXRSServerFactoryBean > factoryAnnotatedType = 
-             beanManager.createAnnotatedType(JAXRSServerFactoryBean.class);
-        
-        final InjectionTarget<JAXRSServerFactoryBean> injectionTarget = 
-             beanManager.createInjectionTarget(factoryAnnotatedType);
-        
-        for (final Bean< ? > applicationBean: applicationBeans) {
-            final Bean< JAXRSServerFactoryBean > factoryBean =
-                new JAXRSCdiServerFactoryBean(applicationBean, injectionTarget);   
-            
-            event.addBean(factoryBean);
-            factoryBeans.put(applicationBean, factoryBean);
-        }
-    }
-    
-    public List< JAXRSServerFactoryBean > getFactories() {
-        return Collections.< JAXRSServerFactoryBean > unmodifiableList(factories);
+        if (busBean == null) {
+            final AnnotatedType< ExtensionManagerBus > busAnnotatedType = 
+                beanManager.createAnnotatedType(ExtensionManagerBus.class);
+               
+            final InjectionTarget<ExtensionManagerBus> busInjectionTarget = 
+                beanManager.createInjectionTarget(busAnnotatedType);
+               
+            busBean = new CdiBusBean(busInjectionTarget);
+            event.addBean(busBean);
+        } 
     }
     
     @SuppressWarnings("rawtypes")
-    private JAXRSServerFactoryBean createFactoryInstance(final Application application, 
-            final Bean< ? > factoryBean, final BeanManager beanManager) {
-        
-        final JAXRSServerFactoryBean instance = (JAXRSServerFactoryBean)beanManager.getReference(
-            factoryBean, 
-            factoryBean.getBeanClass(), 
-            beanManager.createCreationalContext(factoryBean)
-        );
+    private JAXRSServerFactoryBean createFactoryInstance(final Application application) {
                         
-        ResourceUtils.initializeApplication(instance, application, false, false);          
+        JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false);          
         instance.setServiceBeans(new ArrayList< Object >(services));
         instance.setProviders(providers);
+        instance.setBus(bus);
               
         final ServiceLoader< MessageBodyWriter > writers = ServiceLoader.load(MessageBodyWriter.class);
         for (final MessageBodyWriter< ? > writer: writers) {
@@ -147,5 +142,9 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
         
         return instance; 
+    }
+    
+    public Bus getBus() {
+        return bus;
     }
 }

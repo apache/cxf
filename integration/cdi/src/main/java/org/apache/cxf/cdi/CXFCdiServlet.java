@@ -21,9 +21,8 @@ package org.apache.cxf.cdi;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 /**
@@ -31,18 +30,28 @@ import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
  */
 public class CXFCdiServlet extends CXFNonSpringServlet {
     private static final long serialVersionUID = -2890970731778523861L;
+    private boolean busCreated;
     
     @Override
-    public void init(ServletConfig servletConfig) throws ServletException {
-        super.init(servletConfig);        
-        
-        final BeanManager beanManager = CDI.current().getBeanManager();
-        final JAXRSCdiResourceExtension extension = beanManager.getExtension(JAXRSCdiResourceExtension.class);
-        if (extension != null) {    
-            for (final JAXRSServerFactoryBean factory: extension.getFactories()) {
-                factory.setBus(getBus());    
-                factory.init();
-            }        
+    protected void loadBus(ServletConfig servletConfig) {
+        final BeanManager beanManager = CDI.current().getBeanManager();        
+        if (beanManager != null) {
+            final JAXRSCdiResourceExtension extension = beanManager.getExtension(JAXRSCdiResourceExtension.class);
+            if (extension != null) {
+                setBus(extension.getBus());
+            }
+        } else {
+            busCreated = true;
+            setBus(BusFactory.newInstance().createBus());
+        }
+    }
+
+    @Override
+    public void destroyBus() {
+        if (busCreated) {
+            //if we created the Bus, we need to destroy it.  Otherwise, spring will handle it.
+            getBus().shutdown(true);
+            setBus(null);
         }
     }
 }

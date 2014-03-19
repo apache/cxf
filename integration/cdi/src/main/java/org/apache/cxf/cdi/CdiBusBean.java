@@ -33,23 +33,22 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.util.AnnotationLiteral;
 
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 
-public final class JAXRSCdiServerFactoryBean implements Bean< JAXRSServerFactoryBean > {
-    private static final String FACTORY_BEAN = "factoryBean";
+public final class CdiBusBean implements Bean< ExtensionManagerBus > {
+    static final String CXF = "cxf";
     
-    private final Bean< ? > applicationBean;
-    private final InjectionTarget<JAXRSServerFactoryBean> injectionTarget;
+    private final InjectionTarget<ExtensionManagerBus> injectionTarget;
     
-    JAXRSCdiServerFactoryBean(final Bean< ? > applicationBean,
-            final InjectionTarget<JAXRSServerFactoryBean> injectionTarget) {
-        this.applicationBean = applicationBean;
+    CdiBusBean(final InjectionTarget<ExtensionManagerBus> injectionTarget) {
         this.injectionTarget = injectionTarget;
     }
     
     @Override
     public Class< ? > getBeanClass() {
-        return JAXRSServerFactoryBean.class;
+        return Bus.class;
     }
 
     @Override
@@ -59,7 +58,7 @@ public final class JAXRSCdiServerFactoryBean implements Bean< JAXRSServerFactory
 
     @Override
     public String getName() {
-        return FACTORY_BEAN + applicationBean.getName();
+        return CXF;
     }
 
     @SuppressWarnings("serial")
@@ -74,7 +73,7 @@ public final class JAXRSCdiServerFactoryBean implements Bean< JAXRSServerFactory
     @Override
     public Set<Type> getTypes() {
         final Set< Type > types = new HashSet< Type >();
-        types.add(JAXRSServerFactoryBean.class);
+        types.add(Bus.class);
         types.add(Object.class);
         return types;
     }
@@ -100,18 +99,22 @@ public final class JAXRSCdiServerFactoryBean implements Bean< JAXRSServerFactory
     }
 
     @Override
-    public JAXRSServerFactoryBean create(final CreationalContext< JAXRSServerFactoryBean > ctx) {
-        final JAXRSServerFactoryBean instance = injectionTarget.produce(ctx);
+    public ExtensionManagerBus create(final CreationalContext< ExtensionManagerBus > ctx) {
+        final ExtensionManagerBus instance = injectionTarget.produce(ctx);
+        CXFBusFactory.possiblySetDefaultBus(instance);
+        instance.initialize();
+        
         injectionTarget.inject(instance, ctx);
         injectionTarget.postConstruct(instance);
         return instance;
     }
 
     @Override
-    public void destroy(final JAXRSServerFactoryBean instance, 
-            final CreationalContext< JAXRSServerFactoryBean > ctx) {
+    public void destroy(final ExtensionManagerBus instance, 
+            final CreationalContext< ExtensionManagerBus > ctx) {
         injectionTarget.preDestroy(instance);
         injectionTarget.dispose(instance);
+        instance.shutdown();
         ctx.release();
     }
 }
