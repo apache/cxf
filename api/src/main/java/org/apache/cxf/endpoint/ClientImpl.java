@@ -47,6 +47,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.UncheckedException;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.ClientOutFaultObserver;
@@ -81,7 +82,11 @@ public class ClientImpl
     implements Client, Retryable, MessageObserver {
 
     public static final String THREAD_LOCAL_REQUEST_CONTEXT = "thread.local.request.context";
-
+    /**
+     * When a synchronous request/response invoke is done using an asynchronous transport mechanism,
+     * this is the timeout used for waiting for the response.  Default is 60 seconds. 
+     */
+    public static final String SYNC_TIMEOUT = "cxf.synchronous.timeout";
 
     public static final String FINISHED = "exchange.finished";
 
@@ -651,9 +656,7 @@ public class ClientImpl
 
         // Wait for a response if we need to
         if (oi != null && !oi.getOperationInfo().isOneWay()) {
-            synchronized (exchange) {
-                waitResponse(exchange);
-            }
+            waitResponse(exchange);
         }
 
         // leave the input stream open for the caller
@@ -709,24 +712,31 @@ public class ClientImpl
     }
 
     protected void waitResponse(Exchange exchange) throws IOException {
-        int remaining = synchronousTimeout;
-        while (!Boolean.TRUE.equals(exchange.get(FINISHED)) && remaining > 0) {
-            long start = System.currentTimeMillis();
-            try {
-                exchange.wait(remaining);
-            } catch (InterruptedException ex) {
-                // ignore
+        synchronized (exchange) {
+            long remaining = synchronousTimeout;
+            Long o = PropertyUtils.getLong(exchange.getOutMessage(), SYNC_TIMEOUT);
+            if (o != null) {
+                remaining = o;
             }
-            long end = System.currentTimeMillis();
-            remaining -= (int)(end - start);
-        }
-        if (!Boolean.TRUE.equals(exchange.get(FINISHED))) {
-            LogUtils.log(LOG, Level.WARNING, "RESPONSE_TIMEOUT",
-                exchange.get(OperationInfo.class).getName().toString());
-            String msg = new org.apache.cxf.common.i18n.Message("RESPONSE_TIMEOUT", LOG, 
-                                                                exchange.get(OperationInfo.class).getName().toString())
-                .toString();
-            throw new IOException(msg);
+            while (!Boolean.TRUE.equals(exchange.get(FINISHED)) && remaining > 0) {
+                long start = System.currentTimeMillis();
+                try {
+                    exchange.wait(remaining);
+                } catch (InterruptedException ex) {
+                    // ignore
+                }
+                long end = System.currentTimeMillis();
+                remaining -= (int)(end - start);
+            }
+            if (!Boolean.TRUE.equals(exchange.get(FINISHED))) {
+                LogUtils.log(LOG, Level.WARNING, "RESPONSE_TIMEOUT",
+                    exchange.get(OperationInfo.class).getName().toString());
+                String msg = new org.apache.cxf.common.i18n.Message("RESPONSE_TIMEOUT", LOG, 
+                                                                    exchange.get(OperationInfo.class)
+                                                                        .getName().toString())
+                    .toString();
+                throw new IOException(msg);
+            }
         }
     }
 
