@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.cdi;
 
+import java.util.Set;
+
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.servlet.ServletConfig;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
@@ -34,12 +38,21 @@ public class CXFCdiServlet extends CXFNonSpringServlet {
     
     @Override
     protected void loadBus(ServletConfig servletConfig) {
+        Bus bus = null;
         final BeanManager beanManager = CDI.current().getBeanManager();        
         if (beanManager != null) {
-            final JAXRSCdiResourceExtension extension = beanManager.getExtension(JAXRSCdiResourceExtension.class);
-            if (extension != null) {
-                setBus(extension.getBus());
+            final Set< Bean< ? > > candidates = beanManager.getBeans(CdiBusBean.CXF);
+            
+            if (!candidates.isEmpty()) {
+                final Bean< ? > candidate = candidates.iterator().next();
+                
+                bus = (Bus)beanManager.getReference(candidate, Bus.class, 
+                    beanManager.createCreationalContext(candidate));                
             }
+        } 
+        
+        if (bus != null) {
+            setBus(bus);
         } else {
             busCreated = true;
             setBus(BusFactory.newInstance().createBus());
