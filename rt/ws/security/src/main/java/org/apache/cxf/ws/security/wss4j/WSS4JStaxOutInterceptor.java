@@ -34,7 +34,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -130,8 +129,6 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             configureCallbackHandler(mc, secProps);
             configureProperties(mc, outboundTokens, secProps);
             
-            OutboundWSSec outboundWSSec = null;
-            
             if ((secProps.getActions() == null || secProps.getActions().size() == 0)
                 && mc.get(AssertionInfoMap.class) != null) {
                 // If no actions configured (with SecurityPolicy) then return
@@ -145,17 +142,19 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             SecurityEventListener securityEventListener = 
                 configureSecurityEventListener(mc, secProps);
             
-            outboundWSSec = WSSec.getOutboundWSSec(secProps);
+            OutboundWSSec outboundWSSec = WSSec.getOutboundWSSec(secProps);
             
             final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
             outboundSecurityContext.putList(SecurityEvent.class, requestSecurityEvents);
             outboundSecurityContext.addSecurityEventListener(securityEventListener);
             
             // Save Tokens on the security context
-            for (String key : outboundTokens.keySet()) {
-                SecurityTokenProvider<OutboundSecurityToken> provider = outboundTokens.get(key);
-                outboundSecurityContext.registerSecurityTokenProvider(provider.getId(), provider);
-                outboundSecurityContext.put(key, provider.getId());
+            if (!outboundTokens.isEmpty()) {
+                for (String key : outboundTokens.keySet()) {
+                    SecurityTokenProvider<OutboundSecurityToken> provider = outboundTokens.get(key);
+                    outboundSecurityContext.registerSecurityTokenProvider(provider.getId(), provider);
+                    outboundSecurityContext.put(key, provider.getId());
+                }
             }
             
             newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, outboundSecurityContext);
@@ -167,17 +166,14 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         }
 
         mc.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION, Boolean.TRUE);
-        mc.put(StaxOutInterceptor.FORCE_START_DOCUMENT, Boolean.TRUE);
 
-        if (MessageUtils.getContextualBoolean(mc, StaxOutInterceptor.FORCE_START_DOCUMENT, false)) {
-            try {
-                newXMLStreamWriter.writeStartDocument(encoding, "1.0");
-            } catch (XMLStreamException e) {
-                throw new Fault(e);
-            }
-            mc.removeContent(OutputStream.class);
-            mc.put(OUTPUT_STREAM_HOLDER, os);
+        try {
+            newXMLStreamWriter.writeStartDocument(encoding, "1.0");
+        } catch (XMLStreamException e) {
+            throw new Fault(e);
         }
+        mc.removeContent(OutputStream.class);
+        mc.put(OUTPUT_STREAM_HOLDER, os);
 
         // Add a final interceptor to write end elements
         mc.getInterceptorChain().add(ending);

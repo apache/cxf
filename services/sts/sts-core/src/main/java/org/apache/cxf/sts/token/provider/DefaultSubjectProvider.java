@@ -170,7 +170,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 if (receivedKey.getX509Cert() != null) {
                     try {
                         stsProperties.getSignatureCrypto().verifyTrust(
-                            new X509Certificate[]{receivedKey.getX509Cert()}, false);
+                            new X509Certificate[]{receivedKey.getX509Cert()}, false, null);
                     } catch (WSSecurityException e) {
                         LOG.log(Level.FINE, "Error in trust validation of UseKey: ", e);
                         throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);

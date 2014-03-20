@@ -45,11 +45,9 @@
     <jaxws:endpoint id="HelloWorldWS" address="http://localhost:${testutil.ports.Server}/wsse/HelloWorldWS" wsdlLocation="" implementor="org.apache.cxf.systest.ws.security.handler.HelloWorldImpl">
         <jaxws:inInterceptors>
             <ref bean="UsernameTokenSign_Request"/>
-            <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
         </jaxws:inInterceptors>
         <jaxws:outInterceptors>
             <ref bean="UsernameTokenSign_Response"/>
-            <bean class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
         </jaxws:outInterceptors>
         <jaxws:handlers>
             <bean class="org.apache.cxf.systest.ws.security.handler.JAXWSHandler"/>

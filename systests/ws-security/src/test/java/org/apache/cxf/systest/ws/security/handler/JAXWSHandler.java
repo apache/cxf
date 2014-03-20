@@ -49,12 +49,12 @@ public class JAXWSHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public boolean handleMessage(SOAPMessageContext smc) {
-        logToSystemOut(smc);
+        // logToSystemOut(smc);
         return true;
     }
 
     public boolean handleFault(SOAPMessageContext smc) {
-        logToSystemOut(smc);
+        // logToSystemOut(smc);
         return true;
     }
 

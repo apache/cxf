@@ -23,8 +23,10 @@ import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -111,8 +113,11 @@ public class XkmsCryptoProvider extends CryptoBase {
     }
 
     @Override
-    public void verifyTrust(X509Certificate[] certs, boolean enableRevocation)
-        throws WSSecurityException {
+    public void verifyTrust(
+        X509Certificate[] certs, 
+        boolean enableRevocation, 
+        Collection<Pattern> subjectCertConstraints
+    ) throws WSSecurityException {
         if (certs != null) {
             LOG.fine(String.format("Verifying certificate id: %s", certs[0].getSubjectDN()));
         }

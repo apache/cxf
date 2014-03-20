@@ -111,8 +111,6 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             configureCallbackHandler(soapMessage, secProps);
             configureProperties(soapMessage, secProps);
             
-            InboundWSSec inboundWSSec = null;
-            
             if (secProps.getActions() != null && secProps.getActions().size() > 0) {
                 soapMessage.getInterceptorChain().add(new StaxActionInInterceptor(secProps.getActions()));
             }
@@ -133,7 +131,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             List<SecurityEventListener> securityEventListeners = 
                 configureSecurityEventListeners(soapMessage, secProps);
             
-            inboundWSSec = WSSec.getInboundWSSec(secProps);
+            InboundWSSec inboundWSSec = WSSec.getInboundWSSec(secProps);
             
             newXmlStreamReader = 
                 inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListeners);

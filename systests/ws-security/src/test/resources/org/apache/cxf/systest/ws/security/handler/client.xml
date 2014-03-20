@@ -44,11 +44,9 @@
     <cxf:bus>
         <cxf:outInterceptors>
             <ref bean="UsernameTokenSign_Request"/>
-            <bean class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
         </cxf:outInterceptors>
         <cxf:inInterceptors>
             <ref bean="UsernameTokenSign_Response"/>
-            <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
         </cxf:inInterceptors>
     </cxf:bus>
 </beans>
