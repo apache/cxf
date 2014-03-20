@@ -71,7 +71,7 @@ public final class SchemaUtil {
         List<Definition> defList = new ArrayList<Definition>();
         parseImports(def, defList);
         extractSchema(def, schemaCol, schemas);
-        // added
+        // added        
         getSchemaList(def);
         
         Map<Definition, Definition> done = new IdentityHashMap<Definition, Definition>();
@@ -127,9 +127,8 @@ public final class SchemaUtil {
                         if (def.getDocumentBaseURI() != null
                             && def.getDocumentBaseURI().toUpperCase().endsWith(".xsd")
                             && def.getTargetNamespace() == null
-                            && (obj == null 
-                                || !(obj instanceof Schema 
-                                    || !((Schema)obj).getDocumentBaseURI().equals(def.getDocumentBaseURI())))) {
+                            && obj instanceof Schema 
+                            && ((Schema)obj).getDocumentBaseURI().equals(def.getDocumentBaseURI())) {
                             systemId = def.getDocumentBaseURI();
                         }
     
