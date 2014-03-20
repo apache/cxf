@@ -36,7 +36,6 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.workqueue.WorkQueueManager;
 
 
@@ -102,12 +101,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                 chain.pause();
                 chain.resume();
                 if (message.getContent(Exception.class) != null) {
-                    // return the fault over the response fault channel
-                    MessageObserver faultObserver = chain.getFaultObserver();
-                    if (faultObserver != null) {
-                        message.getExchange().setOneWay(false);
-                        faultObserver.onMessage(message);
-                    } 
+                    // CXF-5629 fault has been delivered alread in resume()
                     return;
                 }
             }
