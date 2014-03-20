@@ -240,7 +240,7 @@ public class DoMerges {
         while (line != null) {
             if (line.length() > 0 && line.startsWith("commit ")) {
                 if (!list.isEmpty()) {
-                    addIfNotMergeBlock(map, list);
+                    map.add(list.toArray(new String[list.size()]));
                     list.clear();
                 }
                 while (line != null && line.length() > 0 && line.charAt(0) != ' ') {
@@ -252,36 +252,12 @@ public class DoMerges {
             line = reader.readLine();
         }
         if (!list.isEmpty()) {
-            addIfNotMergeBlock(map, list);
+            map.add(list.toArray(new String[list.size()]));
             list.clear();
         }
         return map;
     }
-    
-    private static void addIfNotMergeBlock(List<String[]> map, List<String> list) {
-        for (String s: list) {
-            if (s.trim().startsWith("Merged revision")
-                && s.contains(" via ")) {
-                return;
-            }
-            if (s.trim().startsWith("Recording revision")
-                && s.contains(" via ")) {
-                return;
-            }
-            if (s.trim().startsWith("Blocking revision")
-                && s.contains(" via ")) {
-                return;
-            }
-            if (s.trim().contains("Recording .gitmergeinfo Changes")) {
-                return;
-            }
-            if (s.contains("[maven-release-plugin] prepare")) {
-                return;
-            }
-        }
-        map.add(list.toArray(new String[list.size()]));
-    }
-    
+        
     public static String[] getLog(String ver, Set<String> jiras) throws Exception {
         Process p;
         BufferedReader reader;
@@ -594,7 +570,8 @@ public class DoMerges {
             if (s.trim().length() > 0 
                 && !onBranch.remove(s.trim())
                 && !s.startsWith("Author: ")
-                && !s.startsWith("Date: ")) {                
+                && !s.startsWith("Date: ")
+                && !s.contains("git-svn-id")) {                
                 ll.add(s);
             } 
         }
