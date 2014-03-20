@@ -197,10 +197,11 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             // writer to grab the content of soap fault.
             // robust is not yet used at client's side, but I think it should
             StringWriter writer = new StringWriter();
-            ((Client)greeter).getInInterceptors().add(new LoggingInInterceptor());
+            Client client = ClientProxy.getClient(greeter);
+            client.getInInterceptors().add(new LoggingInInterceptor());
             ((LoggingInInterceptor)greeterBus.getInInterceptors().get(0)).setPrintWriter(new PrintWriter(writer));
             // it should tell CXF to convert one-way robust out faults into real SoapFaultException
-            ((Client)greeter).getEndpoint().put(Message.ROBUST_ONEWAY, true);
+            client.getEndpoint().put(Message.ROBUST_ONEWAY, true);
             greeter.greetMeOneWay("oneway");
             fail("Oneway operation unexpectedly succeded for phase " + location.getPhase());
         } catch (WebServiceException ex) {
