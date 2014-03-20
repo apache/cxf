@@ -580,16 +580,25 @@ public class DoMerges {
     private static boolean compareLogs(String[] f, String[] logLines) throws IOException {
         ArrayList<String> onBranch = new ArrayList<String>(f.length);
         for (String s : f) {
+            if (s.trim().startsWith("Conflicts:")) {
+                break;
+            }
             if (s.trim().length() > 0 
                 && s.charAt(0) == ' '
                 && !s.contains("git-svn-id")) {
                 onBranch.add(s.trim());
             }
         }
+        List<String> ll = new ArrayList<String>();
         for (String s : logLines) {
-            onBranch.remove(s.trim());
+            if (s.trim().length() > 0 
+                && !onBranch.remove(s.trim())
+                && !s.startsWith("Author: ")
+                && !s.startsWith("Date: ")) {                
+                ll.add(s);
+            } 
         }
-        if (onBranch.isEmpty()) {
+        if (ll.isEmpty()) {
             //everything in the source log is in a log on this branch, let's prompt to record the merge
             System.out.println("Found possible commit already on branch:");
             for (String s : f) {
