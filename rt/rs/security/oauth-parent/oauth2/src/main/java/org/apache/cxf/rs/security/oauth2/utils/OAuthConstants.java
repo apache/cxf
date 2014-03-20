@@ -59,7 +59,7 @@ public final class OAuthConstants {
     // CXF-specific
     public static final String REFRESH_TOKEN_TYPE = "refresh";
         
-    // MAC token parameters
+    // Hawk token parameters
     // Set by Access Token Service
     public static final String HAWK_TOKEN_KEY = "secret";
     public static final String HAWK_TOKEN_ALGORITHM = "algorithm";
@@ -70,6 +70,10 @@ public final class OAuthConstants {
     public static final String HAWK_TOKEN_EXTENSION = "ext";
     public static final String HAWK_TOKEN_NONCE = "nonce";
     public static final String HAWK_TOKEN_SIGNATURE = "mac";
+    
+    // Mac/Hawk HMAC algorithm names
+    public static final String HMAC_ALGO_SHA_1 = "hmac-sha-1";
+    public static final String HMAC_ALGO_SHA_256 = "hmac-sha-256";
     
     // Token Authorization schemes
     public static final String BEARER_AUTHORIZATION_SCHEME = "Bearer";

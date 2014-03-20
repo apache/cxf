@@ -19,8 +19,13 @@
 package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Provider;
+import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
@@ -30,71 +35,90 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 public final class HmacUtils {
-    public static final String ALGO_HMAC_SHA_1 = "hmac-sha-1";
-    public static final String ALGO_HMAC_SHA_256 = "hmac-sha-256";
     
     private HmacUtils() {
         
     }
     
-    public static String computeSignature(String macAlgoOAuthName, String macSecret, String data) {
-        HmacAlgorithm theAlgo = HmacAlgorithm.toHmacAlgorithm(macAlgoOAuthName);
-        return computeHmacString(macSecret, theAlgo.getJavaName(), data);
+    public static String encodeHmacString(String macSecret, String macAlgoJavaName, String data) {
+        return Base64Utility.encode(computeHmac(macSecret, macAlgoJavaName, data));
     }
     
-    /**
-      * Computes HMAC value using the given parameters.
-      * 
-      * @param macSecret
-      * @param macAlgorithm Should be one of HmacSHA1 or HmacSHA256
-      * @param data
-      * @return Base64 encoded string representation of the computed hmac value
-      */
-    public static String computeHmacString(String macSecret, String macAlgoJavaName, String data) {
-        return new String(Base64Utility.encode(computeHmac(macSecret, macAlgoJavaName, data)));
+    public static String encodeHmacString(String macSecret, String macAlgoJavaName, String data, boolean urlSafe) {
+        byte[] bytes = computeHmac(macSecret, macAlgoJavaName, data);
+        return urlSafe ? Base64UrlUtility.encode(bytes) : Base64Utility.encode(bytes);
     }
     
-    /**
-     * Computes HMAC value using the given parameters.
-     * 
-     * @param macKey
-     * @param macAlgorithm
-     * @param data
-     * @return Computed HMAC value.
-     */
-    public static byte[] computeHmac(String key, HmacAlgorithm algo, String data) {
-        return computeHmac(key, algo.getJavaName(), data);
+    public static Mac getMac(String macAlgoJavaName) {
+        return getMac(macAlgoJavaName, (String)null);
     }
     
-    /**
-      * Computes HMAC value using the given parameters.
-      * 
-      * @param macKey
-      * @param macAlgorithm
-      * @param data
-      * @return Computed HMAC value.
-      */
-    public static byte[] computeHmac(String key, String macAlgoJavaName, String data) {
+    public static Mac getMac(String macAlgoJavaName, String provider) {
         try {
-            Mac hmac = Mac.getInstance(macAlgoJavaName);
-            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), macAlgoJavaName);
-            hmac.init(secretKey);
-            return hmac.doFinal(data.getBytes());
+            return provider == null ? Mac.getInstance(macAlgoJavaName) : Mac.getInstance(macAlgoJavaName, provider);
         } catch (NoSuchAlgorithmException e) {
-            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST, e);
-        } catch (InvalidKeyException e) {
-            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST, e);
-        } catch (UnsupportedEncodingException e) {
-            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST, e);
+            throw new OAuthServiceException(e);
+        } catch (NoSuchProviderException e) {
+            throw new OAuthServiceException(e);
         }
     }
     
-    public static String generateSecret(HmacAlgorithm algo) {
+    public static Mac getMac(String macAlgoJavaName, Provider provider) {
         try {
-            KeyGenerator keyGen = KeyGenerator.getInstance(algo.name());
+            return Mac.getInstance(macAlgoJavaName, provider);
+        } catch (NoSuchAlgorithmException e) {
+            throw new OAuthServiceException(e);
+        }
+    }
+    
+    public static byte[] computeHmac(String key, String macAlgoJavaName, String data) {
+        Mac mac = getMac(macAlgoJavaName);
+        return computeHmac(key, mac, data);
+    }
+    
+    public static byte[] computeHmac(byte[] key, String macAlgoJavaName, String data) {
+        Mac mac = getMac(macAlgoJavaName);
+        return computeHmac(key, mac, data);
+    }
+    
+    public static byte[] computeHmac(String key, Mac hmac, String data) {
+        try {
+            return computeHmac(key.getBytes("UTF-8"), hmac, data);
+        } catch (UnsupportedEncodingException e) {
+            throw new OAuthServiceException(e);
+        }
+    }
+    
+    public static byte[] computeHmac(byte[] key, Mac hmac, String data) {
+        SecretKeySpec secretKey = new SecretKeySpec(key, hmac.getAlgorithm());
+        return computeHmac(secretKey, hmac, data);
+    }
+    
+    public static byte[] computeHmac(Key secretKey, Mac hmac, String data) {
+        return computeHmac(secretKey, hmac, null, data);
+    }
+    
+    public static byte[] computeHmac(Key secretKey, Mac hmac, AlgorithmParameterSpec spec, String data) {
+        try {
+            if (spec == null) {
+                hmac.init(secretKey);
+            } else {
+                hmac.init(secretKey, spec);
+            }
+            return hmac.doFinal(data.getBytes());
+        } catch (InvalidKeyException e) {
+            throw new OAuthServiceException(e);
+        } catch (InvalidAlgorithmParameterException e) {
+            throw new OAuthServiceException(e);
+        }
+    }
+    
+    public static String generateKey(String algo) {
+        try {
+            KeyGenerator keyGen = KeyGenerator.getInstance(algo);
             return Base64Utility.encode(keyGen.generateKey().getEncoded());
         } catch (NoSuchAlgorithmException e) {
-            throw new OAuthServiceException(OAuthConstants.SERVER_ERROR, e);
+            throw new OAuthServiceException(e);
         }
     }
     

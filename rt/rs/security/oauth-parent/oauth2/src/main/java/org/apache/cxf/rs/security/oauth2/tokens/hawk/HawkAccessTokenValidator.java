@@ -34,7 +34,6 @@ import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
-import org.apache.cxf.rs.security.oauth2.utils.HmacAlgorithm;
 import org.apache.cxf.rs.security.oauth2.utils.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
@@ -90,7 +89,7 @@ public class HawkAccessTokenValidator implements AccessTokenValidator {
         try {
             HmacAlgorithm hmacAlgo = HmacAlgorithm.toHmacAlgorithm(macAccessToken.getMacAlgorithm());
             byte[] serverMacData = HmacUtils.computeHmac(
-                macAccessToken.getMacKey(), hmacAlgo, normalizedString); 
+                macAccessToken.getMacKey(), hmacAlgo.getJavaName(), normalizedString); 
                                                          
             byte[] clientMacData = Base64Utility.decode(clientMacString);
             boolean validMac = Arrays.equals(serverMacData, clientMacData);

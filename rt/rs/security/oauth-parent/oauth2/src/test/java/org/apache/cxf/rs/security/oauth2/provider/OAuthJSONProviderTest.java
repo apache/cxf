@@ -29,7 +29,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
-import org.apache.cxf.rs.security.oauth2.utils.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 import org.junit.Assert;
@@ -109,7 +108,7 @@ public class OAuthJSONProviderTest extends Assert {
         token.setApprovedScope("read");
         Map<String, String> params = new LinkedHashMap<String, String>();
         params.put(OAuthConstants.HAWK_TOKEN_KEY, "test_mac_secret");
-        params.put(OAuthConstants.HAWK_TOKEN_ALGORITHM, HmacUtils.ALGO_HMAC_SHA_1);
+        params.put(OAuthConstants.HAWK_TOKEN_ALGORITHM, OAuthConstants.HMAC_ALGO_SHA_1);
         params.put("my_parameter", "http://abc");
         
         token.setParameters(params);

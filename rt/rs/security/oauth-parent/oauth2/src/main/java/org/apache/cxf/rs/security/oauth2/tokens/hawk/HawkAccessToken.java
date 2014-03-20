@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
-import org.apache.cxf.rs.security.oauth2.utils.HmacAlgorithm;
 import org.apache.cxf.rs.security.oauth2.utils.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
@@ -77,7 +76,7 @@ public class HawkAccessToken extends ServerAccessToken {
     }
     
     private void setExtraParameters(HmacAlgorithm algo, String macKey) {
-        String theKey = macKey == null ? HmacUtils.generateSecret(algo) : macKey; 
+        String theKey = macKey == null ? HmacUtils.generateKey(algo.getJavaName()) : macKey; 
         super.getParameters().put(OAuthConstants.HAWK_TOKEN_KEY,
                                   theKey);
         super.getParameters().put(OAuthConstants.HAWK_TOKEN_ALGORITHM,

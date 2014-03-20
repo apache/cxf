@@ -28,7 +28,6 @@ import org.apache.cxf.rs.security.oauth2.client.HttpRequestProperties;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
-import org.apache.cxf.rs.security.oauth2.utils.HmacAlgorithm;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.easymock.EasyMock;
 

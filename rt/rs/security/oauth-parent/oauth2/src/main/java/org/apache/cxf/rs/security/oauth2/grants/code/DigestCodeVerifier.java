@@ -18,10 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import java.io.StringWriter;
-
-import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.MessageDigestGenerator;
 
@@ -29,16 +25,10 @@ public class DigestCodeVerifier implements CodeVerifierTransformer {
 
     public String transformCodeVerifier(String codeVerifier) {
         MessageDigestGenerator mdg = new MessageDigestGenerator();
-        byte[] digest = mdg.createDigest(codeVerifier, "SHA-256");
+        byte[] digest = mdg.createDigest(codeVerifier, MessageDigestGenerator.ALGO_SHA_256);
         int length = digest.length > 128 / 8 ? 128 / 8 : digest.length;
         
-        StringWriter stringWriter = new StringWriter();
-        try {
-            Base64UrlUtility.encode(digest, 0, length, stringWriter);
-        } catch (Base64Exception e) {
-            throw new OAuthServiceException("server_error", e);
-        }
-        return stringWriter.toString();
+        return Base64UrlUtility.encodeChunk(digest, 0, length);
     }
 
     

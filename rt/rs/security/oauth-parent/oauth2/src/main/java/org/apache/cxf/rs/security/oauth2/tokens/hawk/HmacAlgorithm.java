@@ -17,12 +17,14 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public enum HmacAlgorithm {
-    HmacSHA1(HmacUtils.ALGO_HMAC_SHA_1),
-    HmacSHA256(HmacUtils.ALGO_HMAC_SHA_256);
+    
+    HmacSHA1(OAuthConstants.HMAC_ALGO_SHA_1),
+    HmacSHA256(OAuthConstants.HMAC_ALGO_SHA_256);
 
     private final String oauthName;
 
@@ -39,10 +41,10 @@ public enum HmacAlgorithm {
     }
 
     public static HmacAlgorithm toHmacAlgorithm(String value) {
-        if (HmacUtils.ALGO_HMAC_SHA_1.equals(value)) {
+        if (OAuthConstants.HMAC_ALGO_SHA_1.equals(value)) {
             return HmacSHA1;
         }
-        if (HmacUtils.ALGO_HMAC_SHA_256.equals(value)) {
+        if (OAuthConstants.HMAC_ALGO_SHA_256.equals(value)) {
             return HmacSHA256;
         }
         return null;

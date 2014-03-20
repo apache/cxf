@@ -69,7 +69,9 @@ public class HawkAuthorizationScheme {
     public String toAuthorizationHeader(String macAlgo, String macSecret) {
         
         String data = getNormalizedRequestString();
-        String signature = HmacUtils.computeSignature(macAlgo, macSecret, data);
+        String signature = HmacUtils.encodeHmacString(macSecret, 
+                                                      HmacAlgorithm.toHmacAlgorithm(macAlgo).getJavaName(), 
+                                                      data);
         
         StringBuilder sb = new StringBuilder();
         sb.append(OAuthConstants.HAWK_AUTHORIZATION_SCHEME).append(" ");
