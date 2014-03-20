@@ -19,11 +19,8 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import java.io.StringWriter;
-
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
@@ -96,13 +93,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         byte[] digest = mdg.createDigest(tempClientSecret, "SHA-256");
         int length = digest.length > 128 / 8 ? 128 / 8 : digest.length;
         
-        StringWriter stringWriter = new StringWriter();
-        try {
-            Base64UrlUtility.encode(digest, 0, length, stringWriter);
-        } catch (Base64Exception e) {
-            throw new OAuthServiceException("server_error", e);
-        }
-        String expectedHash = stringWriter.toString();
+        String expectedHash = Base64UrlUtility.encodeChunk(digest, 0, length);
         return tempClientSecretHash.equals(expectedHash);
         
     }

@@ -29,7 +29,11 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
  * random values
  */
 public class MessageDigestGenerator {
-    private String algorithm = "MD5";
+    public static final String ALGO_SHA_1 = "SHA-1";
+    public static final String ALGO_SHA_256 = "SHA-256";
+    public static final String ALGO_MD5 = "MD5";
+    
+    private String algorithm = ALGO_MD5;
         
     public String generate(byte[] input) throws OAuthServiceException {
         if (input == null) {
