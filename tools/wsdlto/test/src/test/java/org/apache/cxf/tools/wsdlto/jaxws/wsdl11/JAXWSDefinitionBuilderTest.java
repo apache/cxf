@@ -76,7 +76,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         if (obj instanceof JAXBExtensibilityElement) {
             obj = ((JAXBExtensibilityElement)obj).getValue();
         }
-        assertTrue(obj.getClass().getName() + " is an HTTPAddress",
+        assertTrue(obj.getClass().getName() + " is not an HTTPAddress",
                    obj instanceof HTTPAddress);
 
         Binding binding = port.getBinding();
