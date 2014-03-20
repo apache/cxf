@@ -112,13 +112,13 @@ public class ToolException extends RuntimeException {
 
         // Print suppressed exceptions, if any
         for (Throwable se : suppressed) {
-            printThrowable(se, ps, pfx + "/t", "Suppressed: ");
+            printThrowable(se, ps, pfx + "\t", "Suppressed: ");
         }
 
         // Print cause, if any
         Throwable ourCause = getCause();
         if (ourCause != null && (!hasSuppressed || ourCause != suppressed.get(0))) {
-            printThrowable(ourCause, ps, pfx + "/t", "Caused by: ");
+            printThrowable(ourCause, ps, pfx + "\t", "Caused by: ");
         }
     }    
     private void printThrowable(Throwable t, PrintStream ps, String pfx, String cap) {
@@ -143,7 +143,7 @@ public class ToolException extends RuntimeException {
             this.getClass().getMethod("addSuppressed", Throwable.class).invoke(this, t);
         } catch (Throwable t2) {
             //java < 1.7
-            suppressed.add(t2);
+            suppressed.add(t);
             if (getCause() == null) {
                 initCause(t);
             }
