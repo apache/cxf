@@ -124,6 +124,14 @@ public final class SchemaUtil {
                             }
                         }
                         String systemId = def.getDocumentBaseURI() + "#types" + schemaCount;
+                        if (def.getDocumentBaseURI() != null
+                            && def.getDocumentBaseURI().toUpperCase().endsWith(".xsd")
+                            && def.getTargetNamespace() == null
+                            && (obj == null 
+                                || !(obj instanceof Schema 
+                                    || !((Schema)obj).getDocumentBaseURI().equals(def.getDocumentBaseURI())))) {
+                            systemId = def.getDocumentBaseURI();
+                        }
     
                         schemaCol.setBaseUri(def.getDocumentBaseURI());
                         CatalogXmlSchemaURIResolver schemaResolver =
