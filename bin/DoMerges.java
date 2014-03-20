@@ -304,6 +304,7 @@ public class DoMerges {
         p.waitFor();
         return lines.toArray(new String[lines.size()]);
     }
+        
     private static void doMerge(String ver) throws Exception {
         Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry-pick", ver}));
         if (runProcess(p, false) != 0) {
@@ -311,6 +312,12 @@ public class DoMerges {
             runProcess(p);
                 
             if (doCommit()) {
+                records.add("M " + ver);
+            }
+        } else {
+            String oldPatchId = getPatchId(ver);
+            String newPatchId = getPatchId("HEAD");
+            if (!oldPatchId.equals(newPatchId)) {
                 records.add("M " + ver);
             }
         }
@@ -399,7 +406,7 @@ public class DoMerges {
         return line;
     }
     
-    public static void main (String a[]) throws Exception {
+    public static void main(String a[]) throws Exception {
         File file = new File(".git-commit-message.txt");
         if (file.exists()) {
             //make sure we delete this to not cause confusion
@@ -411,6 +418,7 @@ public class DoMerges {
         doUpdate();
         
         List<String> args = new LinkedList<String>(Arrays.asList(a));
+        List<String> check = new LinkedList<String>();
         while (!args.isEmpty()) {
             String get = args.remove(0);
             
@@ -420,11 +428,22 @@ public class DoMerges {
                 username = getUserName();
             } else if ("-user".equals(get)) {
                 username = args.get(0);
+            } else {
+                check.add(get);
             }
         }
 
         
         List<String> verList = getAvailableUpdates();
+        if (!check.isEmpty()) {
+            List<String> newList = new LinkedList<String>();
+            for (String s : check) {
+                if (verList.contains(s)) {
+                    newList.add(s);
+                }
+            }
+            verList = newList;
+        }
         if (verList.isEmpty()) {
             System.out.println("Nothing needs to be merged");
             System.exit(0);
