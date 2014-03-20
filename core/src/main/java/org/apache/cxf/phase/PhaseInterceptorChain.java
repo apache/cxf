@@ -365,6 +365,9 @@ public class PhaseInterceptorChain implements InterceptorChain {
                         }
                         
                         if (faultObserver != null && !isOneWay) {
+                            // CXF-5629. when exchange is one way and robust, it becomes req-resp in order to
+                            // send the fault
+                            message.getExchange().setOneWay(false);
                             faultObserver.onMessage(message);
                         }
                     }

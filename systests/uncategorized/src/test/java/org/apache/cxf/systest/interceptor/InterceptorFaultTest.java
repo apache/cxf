@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.interceptor;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +46,8 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.greeter_control.types.FaultLocation;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseComparator;
 import org.apache.cxf.phase.PhaseManager;
@@ -173,6 +177,36 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     @Test
     public void testRobustWithoutAddressing() throws Exception {
         testWithoutAddressing(true);
+    }
+
+    @Test
+    public void testRobustFailWithoutAddressingInUserLogicalPhase() throws Exception {
+
+        setupGreeter("org/apache/cxf/systest/interceptor/no-addr.xml", false);
+
+        control.setRobustInOnlyMode(true);
+
+        // behaviour is identicial for all phases
+        FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
+            .createFaultLocation();
+        location.setPhase("user-logical");
+
+        control.setFaultLocation(location);
+
+        try {
+            // writer to grab the content of soap fault.
+            // robust is not yet used at client's side, but I think it should
+            StringWriter writer = new StringWriter();
+            ((Client)greeter).getInInterceptors().add(new LoggingInInterceptor());
+            ((LoggingInInterceptor)greeterBus.getInInterceptors().get(0)).setPrintWriter(new PrintWriter(writer));
+            // it should tell CXF to convert one-way robust out faults into real SoapFaultException
+            ((Client)greeter).getEndpoint().put(Message.ROBUST_ONEWAY, true);
+            greeter.greetMeOneWay("oneway");
+            fail("Oneway operation unexpectedly succeded for phase " + location.getPhase());
+        } catch (WebServiceException ex) {
+            // actually it should be instance of javax.xml.ws.soap.SOAPFaultException
+            assertEquals(FAULT_MESSAGE, ex.getMessage());
+        }
     }
 
     private void testWithoutAddressing(boolean robust) throws Exception {
