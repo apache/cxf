@@ -249,11 +249,17 @@ public class HandlerChainInvoker {
         }
 
         boolean continueProcessing = true;
+        MessageContext oldCtx = null;
         try {
-            WebServiceContextImpl.setMessageContext(ctx);
+            oldCtx = WebServiceContextImpl.setMessageContext(ctx);
             continueProcessing = invokeHandleMessage(handlerChain, ctx);
         } finally {
-            WebServiceContextImpl.clear();
+            // restore the WebServiceContextImpl's ThreadLocal variable to the previous value
+            if (oldCtx == null) {
+                WebServiceContextImpl.clear();
+            } else {
+                WebServiceContextImpl.setMessageContext(oldCtx);
+            }
         }
 
         return continueProcessing;
@@ -300,11 +306,17 @@ public class HandlerChainInvoker {
         }
 
         boolean continueProcessing = true;
+        MessageContext oldCtx = null;
         try {
-            WebServiceContextImpl.setMessageContext(ctx);
+            oldCtx = WebServiceContextImpl.setMessageContext(ctx);
             continueProcessing = invokeHandleFault(handlerChain, ctx);
         } finally {
-            WebServiceContextImpl.clear();
+            // restore the WebServiceContextImpl's ThreadLocal variable to the previous value
+            if (oldCtx == null) {
+                WebServiceContextImpl.clear();
+            } else {
+                WebServiceContextImpl.setMessageContext(oldCtx);
+            }
         }
 
         return continueProcessing;
