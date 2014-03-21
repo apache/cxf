@@ -56,10 +56,10 @@ class WebSocketTestClient {
     private WebSocket websocket;
     private String url;
     
-    public WebSocketTestClient(String url, int count) {
+    public WebSocketTestClient(String url) {
         this.received = new ArrayList<Object>();
         this.fragments = new ArrayList<Object>();
-        this.latch = new CountDownLatch(count);
+        this.latch = new CountDownLatch(1);
         this.client = new AsyncHttpClient();
         this.url = url;
     }
@@ -90,6 +90,15 @@ class WebSocketTestClient {
         return received;
     }
 
+    public List<Response> getReceivedResponses() {
+        Object[] objs = received.toArray();
+        List<Response> responses = new ArrayList<Response>(objs.length);
+        for (Object o : objs) {
+            responses.add(new Response(o));
+        }
+        return responses;
+    }
+    
     public void close() {
         websocket.close();
         client.close();
@@ -195,5 +204,95 @@ class WebSocketTestClient {
             buf.append((char)b).append(' ');
         }
         buf.append(' ');
+    }
+    
+    //TODO this is a temporary way to verify the response; we should come up with something better.
+    public static class Response {
+        private Object data;
+        private int pos; 
+        private int statusCode;
+        private String contentType;
+        private Object entity;
+        
+        public Response(Object data) {
+            this.data = data;
+            String line = readLine();
+            if (line != null) {
+                statusCode = Integer.parseInt(line);
+                while ((line = readLine()) != null) {
+                    if (line.length() > 0) {
+                        int del = line.indexOf(':');
+                        String h = line.substring(0, del).trim();
+                        String v = line.substring(del + 1).trim();
+                        if ("Content-Type".equalsIgnoreCase(h)) {
+                            contentType = v;
+                        }
+                    }
+                }
+            }
+            if (data instanceof String) {
+                entity = ((String)data).substring(pos);
+            } else if (data instanceof byte[]) {
+                entity = new byte[((byte[])data).length - pos];
+                System.arraycopy((byte[])data, pos, (byte[])entity, 0, ((byte[])entity).length);
+            }
+        }
+                
+            
+        
+        public int getStatusCode() {
+            return statusCode;
+        }
+        
+        public String getContentType() {
+            return contentType;
+        }
+        
+        @SuppressWarnings("unused")
+        public Object getEntity() {
+            return entity;
+        }
+        
+        public String getTextEntity() {
+            return gettext(entity);
+        }
+
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            sb.append("Status: ").append(statusCode).append("\r\n");
+            sb.append("Type: ").append(contentType).append("\r\n");
+            sb.append("Entity: ").append(gettext(entity)).append("\r\n");
+            return sb.toString();
+        }
+        
+        private String readLine() {
+            StringBuilder sb = new StringBuilder();
+            while (pos < length(data)) {
+                int c = getchar(data, pos++);
+                if (c == '\n') {
+                    break;
+                } else if (c == '\r') {
+                    continue;
+                } else {
+                    sb.append((char)c);
+                }
+            }
+            if (sb.length() == 0) {
+                return null;
+            }
+            return sb.toString();
+        }
+
+        private int length(Object o) {
+            return o instanceof char[] ? ((String)o).length() : (o instanceof byte[] ? ((byte[])o).length : 0);
+        }
+
+        private int getchar(Object o, int p) {
+            return 0xff & (o instanceof String ? ((String)o).charAt(p) : (o instanceof byte[] ? ((byte[])o)[p] : -1));
+        }
+
+        private String gettext(Object o) {
+            return o instanceof String ? (String)o : (o instanceof byte[] ? new String((byte[])o) : null);
+        }
     }
 }
