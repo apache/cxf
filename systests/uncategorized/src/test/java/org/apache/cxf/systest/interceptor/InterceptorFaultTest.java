@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -56,6 +57,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.MAPAggregator;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -203,9 +205,8 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             ((Client)greeter).getEndpoint().put(Message.ROBUST_ONEWAY, true);
             greeter.greetMeOneWay("oneway");
             fail("Oneway operation unexpectedly succeded for phase " + location.getPhase());
-        } catch (WebServiceException ex) {
-            // actually it should be instance of javax.xml.ws.soap.SOAPFaultException
-            assertEquals(FAULT_MESSAGE, ex.getMessage());
+        } catch (SOAPFaultException ex) {
+            //expected
         }
     }
 
