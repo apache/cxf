@@ -20,9 +20,7 @@
 package demo.wssec.server;
 
 import java.net.URL;
-import java.util.Properties;
 
-import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
@@ -31,18 +29,15 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
-import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 /**
  * A StAX-based server
  */
 public class StaxServer {
 
-     protected StaxServer() throws Exception {
+    protected StaxServer() throws Exception {
         System.out.println("Starting StaxServer");
 
         Object implementor = new GreeterImpl();

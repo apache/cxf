@@ -22,9 +22,6 @@ package demo.wssec.client;
 import java.io.Closeable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
-import java.util.Properties;
-
-import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -32,15 +29,10 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
-import org.apache.cxf.ws.security.wss4j.StaxCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
-import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.xml.security.stax.ext.SecurePart;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 import demo.wssec.server.UTPasswordCallback;
 

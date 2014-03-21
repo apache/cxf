@@ -28,7 +28,6 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.hello_world_soap_http.Greeter;
-import org.springframework.core.io.ClassPathResource;
 
 public final class Client {
 
