@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.ws.Provider;
+import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.MessageContext.Scope;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -57,7 +58,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
         
         Map<String, Object> handlerScopedStuff = removeHandlerProperties(ctx);
         
-        WebServiceContextImpl.setMessageContext(ctx);
+        final MessageContext oldCtx = WebServiceContextImpl.setMessageContext(ctx);
         List<Object> res = null;
         try {
             if ((params == null || params.isEmpty()) && m.getDeclaringClass().equals(Provider.class)) {
@@ -81,8 +82,12 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             }
             throw f;
         } finally {
-            //clear the WebServiceContextImpl's ThreadLocal variable
-            WebServiceContextImpl.clear();
+            //restore the WebServiceContextImpl's ThreadLocal variable to the previous value
+            if (oldCtx == null) {
+                WebServiceContextImpl.clear();
+            } else {
+                WebServiceContextImpl.setMessageContext(oldCtx);
+            }
             
             addHandlerProperties(ctx, handlerScopedStuff);
         }
