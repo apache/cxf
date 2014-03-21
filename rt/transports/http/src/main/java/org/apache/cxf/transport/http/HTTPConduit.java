@@ -1512,7 +1512,7 @@ public abstract class HTTPConduit
         }
         
         /**
-         * This predicate returns true iff the exchange indicates 
+         * This predicate returns true if the exchange indicates 
          * a oneway MEP.
          * 
          * @param exchange The exchange in question
@@ -1521,13 +1521,16 @@ public abstract class HTTPConduit
             return exchange != null && exchange.isOneWay();
         }
         
-        private boolean doProcessResponse(Message message) {
+        private boolean doProcessResponse(Message message, int responseCode) {
             // 1. Not oneWay
             if (!isOneway(message.getExchange())) {
                 return true;
             }
-            // 2. Context property
-            return MessageUtils.getContextualBoolean(message, Message.PROCESS_ONEWAY_RESPONSE, false);
+            // 2. Robust OneWays could have a fault
+            if (responseCode == 500 && MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false)) {
+                return true;
+            }
+            return false;
         }
 
         protected void handleResponseInternal() throws IOException {
@@ -1561,10 +1564,11 @@ public abstract class HTTPConduit
             updateResponseHeaders(inMessage);
             inMessage.put(Message.RESPONSE_CODE, responseCode);
 
-            if (isOneway(exchange)
+            if (!doProcessResponse(outMessage, responseCode)
                 || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
                 in = getPartialResponse();
-                if ((in == null) || !doProcessResponse(outMessage)) {
+                if (in == null 
+                    || !MessageUtils.getContextualBoolean(outMessage, Message.PROCESS_ONEWAY_RESPONSE, false)) {
                     // oneway operation or decoupled MEP without 
                     // partial response
                     closeInputStream();
@@ -1580,12 +1584,9 @@ public abstract class HTTPConduit
                             cc.handleResponse(null, null);
                         }
                     }
-                    if (in != null) {
-                        in.close();
-                    }
                     exchange.setInMessage(inMessage);
                     return;
-                }
+                } 
             } else {
                 //not going to be resending or anything, clear out the stuff in the out message
                 //to free memory
