@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.SequenceInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -146,65 +147,85 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
-            CachedOutputStream bos = new CachedOutputStream();
-            if (threshold > 0) {
-                bos.setThreshold(threshold);
-            }
-            try {
-                // use the appropriate input stream and restore it later
-                InputStream bis = is instanceof DelegatingInputStream 
-                    ? ((DelegatingInputStream)is).getInputStream() : is;
-                
-                IOUtils.copyAndCloseInput(bis, bos);
-                bos.flush();
-                bis = bos.getInputStream();
-                
-                // restore the delegating input stream or the input stream
-                if (is instanceof DelegatingInputStream) {
-                    ((DelegatingInputStream)is).setInputStream(bis);
-                } else {
-                    message.setContent(InputStream.class, bis);
-                }
-
-                if (bos.getTempFile() != null) {
-                    //large thing on disk...
-                    buffer.getMessage().append("\nMessage (saved to tmp file):\n");
-                    buffer.getMessage().append("Filename: " + bos.getTempFile().getAbsolutePath() + "\n");
-                }
-                if (bos.size() > limit) {
-                    buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
-                }
-                writePayload(buffer.getPayload(), bos, encoding, ct); 
-                    
-                bos.close();
-            } catch (Exception e) {
-                throw new Fault(e);
-            }
+            logInputStream(message, is, buffer, encoding, ct);
         } else {
             Reader reader = message.getContent(Reader.class);
             if (reader != null) {
-                try {
-                    CachedWriter writer = new CachedWriter();
-                    IOUtils.copyAndCloseInput(reader, writer);
-                    message.setContent(Reader.class, writer.getReader());
-                    
-                    if (writer.getTempFile() != null) {
-                        //large thing on disk...
-                        buffer.getMessage().append("\nMessage (saved to tmp file):\n");
-                        buffer.getMessage().append("Filename: " + writer.getTempFile().getAbsolutePath() + "\n");
-                    }
-                    if (writer.size() > limit) {
-                        buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
-                    }
-                    writer.writeCacheTo(buffer.getPayload(), limit);
-                } catch (Exception e) {
-                    throw new Fault(e);
-                }
+                logReader(message, reader, buffer);
             }
         }
         log(logger, formatLoggingMessage(buffer));
     }
 
+    protected void logReader(Message message, Reader reader, LoggingMessage buffer) {
+        try {
+            CachedWriter writer = new CachedWriter();
+            IOUtils.copyAndCloseInput(reader, writer);
+            message.setContent(Reader.class, writer.getReader());
+            
+            if (writer.getTempFile() != null) {
+                //large thing on disk...
+                buffer.getMessage().append("\nMessage (saved to tmp file):\n");
+                buffer.getMessage().append("Filename: " + writer.getTempFile().getAbsolutePath() + "\n");
+            }
+            if (writer.size() > limit) {
+                buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+            }
+            writer.writeCacheTo(buffer.getPayload(), limit);
+        } catch (Exception e) {
+            throw new Fault(e);
+        }
+    }
+    protected void logInputStream(Message message, InputStream is, LoggingMessage buffer,
+                                  String encoding, String ct) {
+        CachedOutputStream bos = new CachedOutputStream();
+        if (threshold > 0) {
+            bos.setThreshold(threshold);
+        }
+        try {
+            // use the appropriate input stream and restore it later
+            InputStream bis = is instanceof DelegatingInputStream 
+                ? ((DelegatingInputStream)is).getInputStream() : is;
+            
+
+            //only copy up to the limit since that's all we need to log
+            //we can stream the rest
+            byte bytes[] = new byte[2048];
+            int i = bis.read(bytes);
+            int count = 0;
+            while (count <= limit && i != -1) {
+                bos.write(bytes, 0, i);
+                count += i;
+                i = bis.read(bytes);
+            }
+            if (i > 0) {
+                bos.write(bytes, 0, i);
+            }
+            bos.flush();
+            bis = new SequenceInputStream(bos.getInputStream(), bis);
+            
+            // restore the delegating input stream or the input stream
+            if (is instanceof DelegatingInputStream) {
+                ((DelegatingInputStream)is).setInputStream(bis);
+            } else {
+                message.setContent(InputStream.class, bis);
+            }
+
+            if (bos.getTempFile() != null) {
+                //large thing on disk...
+                buffer.getMessage().append("\nMessage (saved to tmp file):\n");
+                buffer.getMessage().append("Filename: " + bos.getTempFile().getAbsolutePath() + "\n");
+            }
+            if (bos.size() > limit) {
+                buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+            }
+            writePayload(buffer.getPayload(), bos, encoding, ct); 
+                
+            bos.close();
+        } catch (Exception e) {
+            throw new Fault(e);
+        }
+    }
 
     protected String formatLoggingMessage(LoggingMessage loggingMessage) {
 
