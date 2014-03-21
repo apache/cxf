@@ -133,8 +133,16 @@ public class WebServiceContextImpl implements WebServiceContext {
         }
     }
 
-    public static void setMessageContext(MessageContext ctx) {
+    /**
+     * Sets reference to the specified MessageContext and returns the previous reference, if any.
+     * 
+     * @param ctx       The MessageContext to set
+     * @return          The former MessageContext reference, if any.
+     */
+    public static MessageContext setMessageContext(MessageContext ctx) {
+        MessageContext oldCtx = context.get();
         context.set(ctx);
+        return oldCtx;
     }
 
     public static void clear() {
