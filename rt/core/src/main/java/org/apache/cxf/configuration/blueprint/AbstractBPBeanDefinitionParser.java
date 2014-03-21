@@ -18,15 +18,21 @@
  */
 package org.apache.cxf.configuration.blueprint;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -42,7 +48,6 @@ import org.apache.aries.blueprint.mutable.MutableValueMetadata;
 import org.apache.cxf.bus.blueprint.BlueprintBus;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -60,8 +65,6 @@ public abstract class AbstractBPBeanDefinitionParser {
 
     private static final String XMLNS_BLUEPRINT = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
     private static final String COMPONENT_ID = "component-id";
-
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractBPBeanDefinitionParser.class);
 
     private JAXBContext jaxbContext;
     private Set<Class<?>> jaxbClasses;
@@ -321,46 +324,78 @@ public abstract class AbstractBPBeanDefinitionParser {
 
         mapElementToJaxbProperty(ctx, bean, data, propertyName, c);
     }
+    
+    public static class JAXBBeanFactory {
+        final JAXBContext ctx;
+        final Class<?> cls;
+        public JAXBBeanFactory(JAXBContext c, Class<?> c2) {
+            ctx = c;
+            cls = c2;
+        }
+        
+        
+        public Object createJAXBBean(String v) {
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(v));
+            try {
+                return ctx.createUnmarshaller().unmarshal(reader, cls);
+            } catch (JAXBException e) {
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    reader.close();
+                } catch (XMLStreamException e) {
+                    //ignore
+                }
+            }
+        }
+    }
 
     protected void mapElementToJaxbProperty(ParserContext ctx,
-                                            MutableBeanMetadata bean, Element data, 
+                                            MutableBeanMetadata bean, 
+                                            Element data, 
                                             String propertyName, 
-                                            Class<?> c) {
+                                            Class<?> c) {   
         try {
-            Unmarshaller unmarshaller = getContext(c).createUnmarshaller();
-            MutablePassThroughMetadata value = ctx.createMetadata(MutablePassThroughMetadata.class);
-            value.setObject(unmarshaller.unmarshal(data, c).getValue());
-            bean.addProperty(propertyName, value);
+            XMLStreamWriter xmlWriter = null;
+            try {
+                StringWriter writer = new StringWriter();
+                xmlWriter = StaxUtils.createXMLStreamWriter(writer);
+                StaxUtils.copy(data, xmlWriter);
+                xmlWriter.flush();
+    
+                
+                MutableBeanMetadata factory = ctx.createMetadata(MutableBeanMetadata.class);
+                factory.setClassName(c.getName());
+                factory.setFactoryComponent(createPassThrough(ctx, new JAXBBeanFactory(getContext(c), c)));
+                factory.setFactoryMethod("createJAXBBean");
+                factory.addArgument(createValue(ctx, writer.toString()), String.class.getName(), 0);
+                bean.addProperty(propertyName, factory);
+
+            } catch (Exception ex) {                
+                Unmarshaller u = getContext(c).createUnmarshaller();
+                Object obj;
+                if (c != null) {
+                    obj = u.unmarshal(data, c);
+                } else {
+                    obj = u.unmarshal(data);
+                }
+                if (obj instanceof JAXBElement<?>) {
+                    JAXBElement<?> el = (JAXBElement<?>)obj;
+                    obj = el.getValue();
+                }
+                if (obj != null) {
+                    MutablePassThroughMetadata value = ctx.createMetadata(MutablePassThroughMetadata.class);
+                    value.setObject(obj);
+                    bean.addProperty(propertyName, value);
+                }
+            } finally {
+                StaxUtils.close(xmlWriter);
+            }
         } catch (JAXBException e) {
-            LOG.warning("Unable to parse property " + propertyName + " due to " + e);
+            throw new RuntimeException("Could not parse configuration.", e);
         }
     }
     
-    protected void mapElementToHolder(ParserContext ctx, MutableBeanMetadata bean, Element parent, QName name,
-                                    String propertyName, Class<?> cls) {
-        Element data = DOMUtils.getFirstChildWithName(parent, name);
-        if (data == null) {
-            return;
-        }
-        MutableBeanMetadata ef = ctx.createMetadata(MutableBeanMetadata.class);
-
-        ef.setRuntimeClass(cls);
-
-        try {
-            // Print the DOM node
-
-            String xmlString = StaxUtils.toString(data);
-            ef.addProperty("parsedElement", createValue(ctx, xmlString));
-            ef.setInitMethod("init");
-
-            ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
-            bean.addProperty(propertyName, ef);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Could not process configuration.", e);
-        }
-
-    }
 
     protected synchronized JAXBContext getContext(Class<?> cls) {
         if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
