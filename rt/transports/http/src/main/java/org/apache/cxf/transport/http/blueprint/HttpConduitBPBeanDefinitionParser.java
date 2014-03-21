@@ -19,7 +19,6 @@
 
 package org.apache.cxf.transport.http.blueprint;
 
-import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -30,21 +29,22 @@ import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.configuration.jsse.TLSClientParametersConfig;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.CipherSuites;
 import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.configuration.security.KeyManagersType;
+import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TLSClientParametersType;
 import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
-    private static final String HTTP_NS =
-        "http://cxf.apache.org/transports/http/configuration";
     private static final String SECURITY_NS =
         "http://cxf.apache.org/configuration/security";
 
@@ -52,14 +52,6 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
         MutableBeanMetadata bean = context.createMetadata(MutableBeanMetadata.class);
         
         bean.setRuntimeClass(HTTPConduit.class);
-
-        mapElementToHolder(context, bean, element,
-                new QName(HTTP_NS, "client"), "client", HTTPClientPolicyHolder.class);
-        mapElementToHolder(context, bean, element,
-                new QName(HTTP_NS, "proxyAuthorization"), "proxyAuthorization", 
-                ProxyAuthorizationPolicyHolder.class);
-        mapElementToHolder(context, bean, element,
-                new QName(HTTP_NS, "authorization"), "authorization", AuthorizationPolicyHolder.class);
         
         parseAttributes(element, context, bean);
         parseChildElements(element, context, bean);
@@ -84,6 +76,15 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
             mapBeanOrClassElement(ctx, bean, el, MessageTrustDecider.class);
         } else if ("authSupplier".equals(name)) {
             mapBeanOrClassElement(ctx, bean, el, HttpAuthSupplier.class);
+        } else if ("client".equals(name)) {
+            mapElementToJaxbProperty(ctx, bean, el, name, 
+                                     HTTPClientPolicy.class);
+        } else if ("proxyAuthorization".equals(name)) {
+            mapElementToJaxbProperty(ctx, bean, el, name, 
+                                     ProxyAuthorizationPolicy.class);
+        } else if ("authorization".equals(name)) {
+            mapElementToJaxbProperty(ctx, bean, el, name, 
+                                     AuthorizationPolicy.class);
         }
     }
 
