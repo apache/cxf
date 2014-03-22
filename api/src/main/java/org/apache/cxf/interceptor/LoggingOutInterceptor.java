@@ -80,6 +80,9 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                     if (threshold > 0) {
                         newOut.setThreshold(threshold);
                     }
+                    if (limit > 0) {
+                        newOut.setCacheLimit(limit);
+                    }
                     message.setContent(OutputStream.class, newOut);
                     newOut.registerCallback(new LoggingCallback(logger, message, os));
                 } else {
@@ -215,13 +218,13 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             
             if (cos.getTempFile() == null) {
                 //buffer.append("Outbound Message:\n");
-                if (cos.size() > limit) {
+                if (cos.size() >= limit) {
                     buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
                 }
             } else {
                 buffer.getMessage().append("Outbound Message (saved to tmp file):\n");
                 buffer.getMessage().append("Filename: " + cos.getTempFile().getAbsolutePath() + "\n");
-                if (cos.size() > limit) {
+                if (cos.size() >= limit) {
                     buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
                 }
             }
