@@ -29,6 +29,8 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 public class RMProperties {
+    private SourceSequence sourceSequence;
+    private long messageNumber;
     private SequenceType sequence;
     private Collection<SequenceAcknowledgement> acks;
     private Collection<AckRequestedType> acksRequested;
@@ -50,6 +52,14 @@ public class RMProperties {
     
     public SequenceType getSequence() {
         return sequence;
+    }
+    
+    public long getMessageNumber() {
+        return messageNumber;
+    }
+    
+    public SourceSequence getSourceSequence() {
+        return sourceSequence;
     }
     
     public boolean isLastMessage() {
@@ -75,9 +85,11 @@ public class RMProperties {
     }
     
     public void setSequence(SourceSequence seq) {
+        sourceSequence = seq;
+        messageNumber = seq.getCurrentMessageNr();
         SequenceType s = new SequenceType();
         s.setIdentifier(seq.getIdentifier());
-        s.setMessageNumber(seq.getCurrentMessageNr());
+        s.setMessageNumber(messageNumber);
         setSequence(s);
         lastMessage = seq.isLastMessage();
     }

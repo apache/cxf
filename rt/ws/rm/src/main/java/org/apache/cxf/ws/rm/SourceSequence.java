@@ -117,6 +117,26 @@ public class SourceSequence extends AbstractSequence {
     }
 
     /**
+     * Returns true if any messages other than the number supplied are waiting for acknowledgment.
+     * 
+     * @param num message number to check
+     * @return true if all messages have been acknowledged.
+     */
+    public boolean needAcknowledge(long num) {
+        if (currentMessageNumber != num) {
+            return true;
+        }
+        if (acknowledgement.getAcknowledgementRange().size() == 0) {
+            return false;
+        }
+        if (acknowledgement.getAcknowledgementRange().size() == 1) {
+            AcknowledgementRange r = acknowledgement.getAcknowledgementRange().get(0);
+            return r.getLower().longValue() != 1 || r.getUpper().longValue() < (num - 1);
+        }
+        return true;
+    }
+
+    /**
      * Returns true if a last message had been sent for this sequence and if all
      * messages for this sequence have been acknowledged.
      * 

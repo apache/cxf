@@ -86,7 +86,6 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         
         Identifier inSeqId = null;
-
         if (isApplicationMessage) {
             RMProperties rmpsIn = RMContextUtils.retrieveRMProperties(msg, false);
             if (null != rmpsIn && null != rmpsIn.getSequence()) {
@@ -96,7 +95,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         
         // add Acknowledgements (to application messages or explicitly 
         // created Acknowledgement messages only)
-        if (isApplicationMessage || constants.getSequenceAckAction().equals(action)) {
+        boolean isAck = constants.getSequenceAckAction().equals(action);
+        if (isApplicationMessage || isAck) {
             AttributedURIType to = maps.getTo();
             assert null != to;
             addAcknowledgements(destination, rmpsOut, inSeqId, to);
@@ -105,7 +105,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
                 msg.remove(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE);
             }
         } 
-        if (constants.getSequenceAckAction().equals(action)
+        if (isAck || constants.getSequenceAckAction().equals(action)
             || (constants.getTerminateSequenceAction().equals(action)
                 && RM10Constants.NAMESPACE_URI.equals(rmNamespace))) {
             maps.setReplyTo(RMUtils.createNoneReference());
