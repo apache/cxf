@@ -299,7 +299,7 @@ public class DoMerges {
         }
     }
     private static void doMappedMerge(String ver) throws Exception {
-        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "format-patch", "--stdout", "-1", ver}));
+        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "format-patch", "--stdout", "-1", "-k", ver}));
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         
         File outputFile = File.createTempFile("merge", ".patch");
@@ -331,7 +331,7 @@ public class DoMerges {
         writer.flush();
         writer.close();
         
-        p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "am", outputFile.getCanonicalPath()}));
+        p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "am", "-k", outputFile.getCanonicalPath()}));
         
         if (waitFor(p, false) != 0) {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "status"}));
