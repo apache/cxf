@@ -31,6 +31,8 @@ import java.io.OutputStream;
 public class CacheAndWriteOutputStream extends CachedOutputStream {
 
     OutputStream flowThroughStream;
+    long count;
+    long limit = Long.MAX_VALUE;
     
     public CacheAndWriteOutputStream(OutputStream stream) {
         super();
@@ -38,6 +40,10 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
             throw new IllegalArgumentException("Stream may not be null");
         }
         flowThroughStream = stream;
+    }
+    
+    public void setCacheLimit(long l) {
+        limit = l;
     }
 
     public void closeFlowthroughStream() throws IOException {
@@ -63,18 +69,27 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
     @Override
     public void write(int b) throws IOException {
         flowThroughStream.write(b);
-        super.write(b);
+        if (count <= limit) {
+            super.write(b);
+        }
+        count++;
     }
     
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         flowThroughStream.write(b, off, len);
-        super.write(b, off, len);
+        if (count <= limit) {
+            super.write(b, off, len);
+        }
+        count += len;
     }
     
     @Override
     public void write(byte[] b) throws IOException {
         flowThroughStream.write(b);
-        super.write(b);
+        if (count <= limit) {
+            super.write(b);
+        }
+        count += b.length;
     }
 }
