@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
 import javax.servlet.ServletConfig;
 
 import org.apache.cxf.Bus;
@@ -36,9 +37,15 @@ public class CXFCdiServlet extends CXFNonSpringServlet {
     private static final long serialVersionUID = -2890970731778523861L;
     private boolean busCreated;
     
+    @Override @Inject
+    public void setBus(final Bus bus) {
+        super.setBus(bus);
+    }
+    
     @Override
     protected void loadBus(ServletConfig servletConfig) {
         Bus bus = null;
+        
         final BeanManager beanManager = CDI.current().getBeanManager();        
         if (beanManager != null) {
             final Set< Bean< ? > > candidates = beanManager.getBeans(CdiBusBean.CXF);
