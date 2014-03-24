@@ -30,9 +30,9 @@ import org.xmlsoap.schemas.soap.envelope.Fault;
 @HandlerChain(file = "./handlers.xml", name = "TestHandlerChain")
 public class SOAPFaultImpl implements SoapFaultPortType {
     public void soapFault(Fault fault) {
-        System.out.println("Received soap fault message");
-        System.out.println("FaultString: " + fault.getFaultstring());
-        System.out.println("FaulCode: " + fault.getFaultcode());
+        //System.out.println("Received soap fault message");
+        //System.out.println("FaultString: " + fault.getFaultstring());
+        //System.out.println("FaulCode: " + fault.getFaultcode());
     }
 
 }
