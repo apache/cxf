@@ -22,6 +22,7 @@ package org.apache.cxf.transport.websocket.atmosphere;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.List;
@@ -74,7 +75,14 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     @Override
     public List<AtmosphereRequest> onMessage(WebSocket webSocket, String data) {
         LOG.info("onMessage(WebSocket, String)");
-        return null;
+        //TODO may want to use string directly instead of converting it to byte[]
+        byte[] bdata = null;
+        try {
+            bdata = data.getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            // will not happen
+        }
+        return onMessage(webSocket, bdata, 0, bdata.length);
     }
 
     /** {@inheritDoc}*/
