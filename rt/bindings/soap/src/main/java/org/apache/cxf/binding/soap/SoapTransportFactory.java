@@ -36,8 +36,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
-import org.apache.cxf.binding.soap.tcp.SoapTcpDestination;
-import org.apache.cxf.binding.soap.tcp.TCPConduit;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
@@ -77,7 +75,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             "http://www.w3.org/2003/05/soap/bindings/HTTP/");
     public static final Set<String> DEFAULT_PREFIXES 
         = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-            "soap.udp", "soap.tcp"
+            "soap.udp"
         )));
     
     public SoapTransportFactory() {
@@ -110,9 +108,6 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
 
     public Destination getDestination(EndpointInfo ei, Bus bus) throws IOException {
         String address = ei.getAddress();
-        if (!StringUtils.isEmpty(address) && address.startsWith("soap.tcp")) {
-            return new SoapTcpDestination(ei.getTarget(), ei);
-        }
         BindingInfo bi = ei.getBinding();
         String transId = ei.getTransportId();
         if (bi instanceof SoapBindingInfo) {
@@ -202,10 +197,6 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
 
     public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target, Bus bus) throws IOException {
         String address = target == null ? ei.getAddress() : target.getAddress().getValue();
-        if (!StringUtils.isEmpty(address) && address.startsWith("soap.tcp://")) {
-            //TODO - examine policies and stuff to look for the sun tcp policies
-            return new TCPConduit(ei);
-        }
         BindingInfo bi = ei.getBinding();
         String transId = ei.getTransportId();
         if (bi instanceof SoapBindingInfo) {
