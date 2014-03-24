@@ -76,6 +76,5 @@ public class SAAJOutInterceptorTest extends TestBase {
         soapMessage.setContent(XMLStreamWriter.class, writer);
         soi.handleMessage(soapMessage);
         
-        m.writeTo(System.out);
     }
 }
