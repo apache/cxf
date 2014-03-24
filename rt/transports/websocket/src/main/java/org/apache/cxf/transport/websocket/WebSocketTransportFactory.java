@@ -46,7 +46,7 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
 
     public static final List<String> DEFAULT_NAMESPACES 
         = Arrays.asList(
-            "http://cxf.apache.org/transports/websockt",
+            "http://cxf.apache.org/transports/websocket",
             "http://cxf.apache.org/transports/websocket/configuration"
         );
 

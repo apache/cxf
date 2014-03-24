@@ -36,7 +36,7 @@
 
     <bean class="org.apache.cxf.systest.jaxrs.websocket.BookStoreWebSocket" id="serviceBean"/>
 
-    <jaxrs:server id="bookserviceWS" address="/websocket" transportId="http://cxf.apache.org/transports/websockt">
+    <jaxrs:server id="bookserviceWS" address="/websocket" transportId="http://cxf.apache.org/transports/websocket">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
