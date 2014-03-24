@@ -275,11 +275,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         assertNotSame(c3.getEndpoint(), c2.getEndpoint());
 
         c3.getInInterceptors();
-        
-        System.out.println(c2.getRequestContext());
-        System.out.println(((BindingProvider)greeter2).getRequestContext());
-        
-        
+
         ((BindingProvider)greeter).getRequestContext().put("test", "manny");
         ((BindingProvider)greeter2).getRequestContext().put("test", "moe");
         ((BindingProvider)greeter3).getRequestContext().put("test", "jack");
