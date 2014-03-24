@@ -57,7 +57,7 @@ public final class AddressFactory {
         try {
             address = (Address) Class.forName(sb.toString()).newInstance();
             addresses.put(name, address);
-            LOG.log(Level.INFO, "FOUND_ADDRESSER", sb);
+            LOG.log(Level.FINE, "FOUND_ADDRESSER", sb);
             return address;
         } catch (Exception e) {
             Message msg = new Message("FOUND_NO_ADDRESSER", LOG, sb);
