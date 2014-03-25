@@ -57,6 +57,10 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
     public void handleMessage(Message message) {
         Exchange ex = message.getExchange();
         BindingOperationInfo binding = ex.get(BindingOperationInfo.class);
+        //if we get this far, we're going to be outputting some valid content, but we COULD
+        //also be "echoing" some of the content from the input.   Thus, we need to 
+        //mark it as requiring the input to be cached.   
+        message.put("cxf.io.cacheinput", Boolean.TRUE);
         if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay()) {
             closeInput(message);
             return;
