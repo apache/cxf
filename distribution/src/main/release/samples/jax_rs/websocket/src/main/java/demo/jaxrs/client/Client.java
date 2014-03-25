@@ -62,7 +62,9 @@ public final class Client {
         client.reset(1);
         System.out.println("Sent PUT request to update customer info");
         String inputData = getStringFromInputStream(Client.class.getResourceAsStream("/update_customer.xml"));
-        client.sendTextMessage("PUT /customerservice/customers\r\nContent-Type: text/xml; charset=ISO-8859-1\r\n\r\n" + inputData);
+        client.sendTextMessage("PUT /customerservice/customers\r\nContent-Type: text/xml;"
+                               + " charset=ISO-8859-1\r\n\r\n"
+                               + inputData);
         client.await(5);
         responses = client.getReceivedResponses();
         System.out.println(responses.get(0));
@@ -71,7 +73,8 @@ public final class Client {
         client.reset(1);
         System.out.println("Sent POST request to add customer");
         inputData = getStringFromInputStream(Client.class.getResourceAsStream("/add_customer.xml"));
-        client.sendTextMessage("POST /customerservice/customers\r\nContent-Type: text/xml; charset=ISO-8859-1\r\nAccept: text/xml\r\n\r\n" + inputData);
+        client.sendTextMessage("POST /customerservice/customers\r\nContent-Type: text/xml; "
+                               + "charset=ISO-8859-1\r\nAccept: text/xml\r\n\r\n" + inputData);
         client.await(5);
         responses = client.getReceivedResponses();
         System.out.println(responses.get(0));

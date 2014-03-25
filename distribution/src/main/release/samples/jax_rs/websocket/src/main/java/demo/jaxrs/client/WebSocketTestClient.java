@@ -284,11 +284,13 @@ class WebSocketTestClient {
         }
 
         private int length(Object o) {
-            return o instanceof char[] ? ((String)o).length() : (o instanceof byte[] ? ((byte[])o).length : 0);
+            return o instanceof char[] ? ((String)o).length()
+                : (o instanceof byte[] ? ((byte[])o).length : 0);
         }
 
         private int getchar(Object o, int p) {
-            return 0xff & (o instanceof String ? ((String)o).charAt(p) : (o instanceof byte[] ? ((byte[])o)[p] : -1));
+            return 0xff & (o instanceof String ? ((String)o).charAt(p)
+                           : (o instanceof byte[] ? ((byte[])o)[p] : -1));
         }
 
         private String gettext(Object o) {
