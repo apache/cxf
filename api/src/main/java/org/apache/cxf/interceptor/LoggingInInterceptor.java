@@ -190,17 +190,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
 
             //only copy up to the limit since that's all we need to log
             //we can stream the rest
-            byte bytes[] = new byte[2048];
-            int i = bis.read(bytes);
-            int count = 0;
-            while (count <= limit && i != -1) {
-                bos.write(bytes, 0, i);
-                count += i;
-                i = bis.read(bytes);
-            }
-            if (i > 0) {
-                bos.write(bytes, 0, i);
-            }
+            IOUtils.copyAtLeast(bis, bos, limit);
             bos.flush();
             bis = new SequenceInputStream(bos.getInputStream(), bis);
             
