@@ -23,6 +23,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
+import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStorePerRequest;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
@@ -42,6 +44,7 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStoreWebSocket.class, BookStorePerRequest.class);
+        sf.setProvider(new StreamingResponseProvider<Book>());
         sf.setResourceProvider(BookStoreWebSocket.class,
                                new SingletonResourceProvider(new BookStoreWebSocket(), true));
         sf.setAddress("ws://localhost:" + PORT + "/websocket");

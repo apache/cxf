@@ -128,6 +128,39 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
     }
     
     @Test
+    public void testGetBookStream() throws Exception {
+        String address = "ws://localhost:" + getPort() + "/websocket/web/bookstore";
+
+        WebSocketTestClient wsclient = new WebSocketTestClient(address);
+        wsclient.connect();
+        try {
+            wsclient.reset(5);
+            wsclient.sendMessage(
+                "GET /websocket/web/bookstore/bookstream\r\nAccept: application/json\r\n\r\n".getBytes());
+            assertTrue("response expected", wsclient.await(5));
+            List<WebSocketTestClient.Response> received = wsclient.getReceivedResponses();
+            assertEquals(5, received.size());
+            WebSocketTestClient.Response resp = received.get(0);
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("application/json", resp.getContentType());
+            String value = resp.getTextEntity();
+            assertEquals(value, getBookJson(1));
+            for (int i = 2; i <= 5; i++) {
+                // subsequent data should not carry the headers nor the status.
+                resp = received.get(i - 1);
+                assertEquals(0, resp.getStatusCode());
+                assertEquals(resp.getTextEntity(), getBookJson(i));
+            }
+        } finally {
+            wsclient.close();
+        }
+    }
+    
+    private String getBookJson(int index) {
+        return "{\"Book\":{\"id\":" + index + ",\"name\":\"WebSocket" + index + "\"}}";
+    }
+    
+    @Test
     public void testBookWithWebSocketAndHTTP() throws Exception {
         String address = "ws://localhost:" + getPort() + "/websocket/web/bookstore";
 

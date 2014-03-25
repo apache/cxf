@@ -36,6 +36,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.cxf.jaxrs.ext.StreamingResponse;
 import org.apache.cxf.systest.jaxrs.Book;
 
 @Path("/web/bookstore")
@@ -89,6 +90,29 @@ public class BookStoreWebSocket {
                             for (int r = 2, i = 1; i <= 5; r *= 2, i++) {
                                 Thread.sleep(500);
                                 out.write(Integer.toString(r).getBytes());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        };
+    }
+    
+    @GET
+    @Path("/bookstream")
+    @Produces("application/json")
+    public StreamingResponse<Book> getBookStream() {
+        return new StreamingResponse<Book>() {
+            public void writeTo(final StreamingResponse.Writer<Book> out) throws IOException {
+                out.write(new Book("WebSocket1", 1));
+                executor.execute(new Runnable() {
+                    public void run() {
+                        try {
+                            for (int i = 2; i <= 5; i++) {
+                                Thread.sleep(500);
+                                out.write(new Book("WebSocket" + i, i));
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

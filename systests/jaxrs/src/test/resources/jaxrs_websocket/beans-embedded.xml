@@ -40,6 +40,9 @@
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.jaxrs.provider.StreamingResponseProvider"/>
+        </jaxrs:providers>
     </jaxrs:server>
 </beans>
 <!-- END SNIPPET: beans -->
