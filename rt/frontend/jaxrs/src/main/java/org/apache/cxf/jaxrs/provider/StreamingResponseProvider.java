@@ -57,8 +57,8 @@ public class StreamingResponseProvider<T> implements
             throw new InternalServerErrorException();
         }
         //TODO: review the possibility of caching the providers
-        StreamingProviderWriterImpl thewriter = 
-            new StreamingProviderWriterImpl(writer, actualCls, anns, mt, headers, os);
+        StreamingResponseWriter thewriter = 
+            new StreamingResponseWriter(writer, actualCls, anns, mt, headers, os);
         p.writeTo(thewriter);
     }
 
@@ -67,7 +67,7 @@ public class StreamingResponseProvider<T> implements
         return -1;
     }
     
-    private class StreamingProviderWriterImpl implements StreamingResponse.Writer<T> {
+    private class StreamingResponseWriter implements StreamingResponse.Writer<T> {
         private MessageBodyWriter<T> writer;
         private Class<?> cls;
         private MediaType mt;
@@ -75,12 +75,12 @@ public class StreamingResponseProvider<T> implements
         private MultivaluedMap<String, Object> headers; 
         private OutputStream os;
                 
-        public StreamingProviderWriterImpl(MessageBodyWriter<T> writer, 
-                                           Class<?> cls,
-                                           Annotation[] anns,
-                                           MediaType mt,
-                                           MultivaluedMap<String, Object> headers, 
-                                           OutputStream os) {
+        public StreamingResponseWriter(MessageBodyWriter<T> writer, 
+                                       Class<?> cls,
+                                       Annotation[] anns,
+                                       MediaType mt,
+                                       MultivaluedMap<String, Object> headers, 
+                                       OutputStream os) {
             this.writer = writer;
             this.cls = cls;
             this.anns = anns;
