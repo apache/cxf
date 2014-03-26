@@ -25,6 +25,7 @@ import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +39,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
@@ -51,8 +51,11 @@ import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.saml2.core.AuthnRequest;
@@ -181,17 +184,23 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         final String name = subject.getName();
         
         if (name != null) {
-            final SecurityContext sc = new SecurityContext() {
+            String roleAttributeName = 
+                (String)m.getContextualProperty(SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+            if (roleAttributeName == null || roleAttributeName.length() == 0) {
+                roleAttributeName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
+            }
+            ClaimCollection claims = 
+                org.apache.cxf.rt.security.saml.SAMLUtils.getClaims(assertionWrapper);
+            Set<Principal> roles = 
+                org.apache.cxf.rt.security.saml.SAMLUtils.parseRolesFromClaims(
+                    claims, roleAttributeName, null);
 
-                public Principal getUserPrincipal() {
-                    return new SimplePrincipal(name);
-                }
-
-                public boolean isUserInRole(String role) {
-                    return false;
-                }
-            };
-            m.put(SecurityContext.class, sc);
+            SAMLSecurityContext context = 
+                new SAMLSecurityContext(new SimplePrincipal(name), roles, claims);
+            context.setIssuer(org.apache.cxf.rt.security.saml.SAMLUtils.getIssuer(assertionWrapper));
+            context.setAssertionElement(
+                org.apache.cxf.rt.security.saml.SAMLUtils.getAssertionElement(assertionWrapper));
+            m.put(SecurityContext.class, context);
         }
     }
     
