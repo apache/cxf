@@ -49,16 +49,19 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.xml.sax.InputSource;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.XMLFilter;
+import org.xml.sax.XMLReader;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -170,6 +173,15 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             if (t == null && supportJaxbOnly) {
                 return super.unmarshalFromInputStream(unmarshaller, is, mt);
             }
+            
+            if (unmarshaller.getClass().getName().contains("eclipse")) {
+                //eclipse MOXy doesn't work properly with the XMLFilter/Reader thing
+                //so we need to bounce through a DOM
+                Source reader = new StaxSource(StaxUtils.createXMLStreamReader(is));
+                DOMResult dom = new DOMResult();
+                t.newTransformer().transform(reader, dom);
+                return unmarshaller.unmarshal(dom.getNode());
+            }
             XMLFilter filter = null;
             try {
                 filter = factory.newXMLFilter(t);
@@ -178,12 +190,15 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                 filter = factory.newXMLFilter(ti.getTemplates());
                 trySettingProperties(filter, ti);
             }
-            SAXSource source = new SAXSource(filter, new InputSource(is));
+            XMLReader reader = new StaxSource(StaxUtils.createXMLStreamReader(is));
+            filter.setParent(reader);
+            SAXSource source = new SAXSource();
+            source.setXMLReader(filter);
             if (systemId != null) {
                 source.setSystemId(systemId);
             }
             return unmarshaller.unmarshal(source);
-        } catch (TransformerConfigurationException ex) {
+        } catch (TransformerException ex) {
             LOG.warning("Transformation exception : " + ex.getMessage());
             throw ExceptionUtils.toInternalServerErrorException(ex, null); 
         }
