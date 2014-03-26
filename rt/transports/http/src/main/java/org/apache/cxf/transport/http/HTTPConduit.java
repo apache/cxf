@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -51,6 +53,7 @@ import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
@@ -167,7 +170,7 @@ public abstract class HTTPConduit
     private static final String AUTO_REDIRECT_SAME_HOST_ONLY = "http.redirect.same.host.only";
     private static final String AUTO_REDIRECT_ALLOW_REL_URI = "http.redirect.relative.uri";
     private static final String AUTO_REDIRECT_ALLOWED_URI = "http.redirect.allowed.uri";
-    
+    private static final String AUTO_REDIRECT_MAX_SAME_URI_COUNT = "http.redirect.max.same.uri.count";
     
     private static final String HTTP_POST_METHOD = "POST";
     private static final String HTTP_PUT_METHOD = "PUT";
@@ -1811,21 +1814,38 @@ public abstract class HTTPConduit
                                            String lastURL, 
                                            String newURL,
                                            Message message) throws IOException {
-        @SuppressWarnings("unchecked")
-        Set<String> visitedURLs = (Set<String>) message.get(KEY_VISITED_URLS);
+        Map<String, Integer> visitedURLs = CastUtils.cast((Map<?, ?>)message.get(KEY_VISITED_URLS));
         if (visitedURLs == null) {
-            visitedURLs = new HashSet<String>();
+            visitedURLs = new HashMap<String, Integer>();
             message.put(KEY_VISITED_URLS, visitedURLs);
         } 
-        visitedURLs.add(lastURL);
-        if (newURL != null && visitedURLs.contains(newURL)) {
+        Integer visitCount = visitedURLs.get(lastURL);
+        if (visitCount == null) {
+            visitCount = 1;
+        } else {
+            visitCount++;
+        }
+        visitedURLs.put(lastURL, visitCount);
+        
+        Integer newURLCount = visitedURLs.get(newURL);
+        if (newURL != null && newURLCount != null) {
             // See if we are being redirected in a loop as best we can,
             // using string equality on URL.
-            // We are in a redirect loop; -- bail
-            String msg = "Redirect loop detected on Conduit '" 
-                + conduitName + "' on '" + newURL + "'";
-            LOG.log(Level.INFO, msg);
-            throw new IOException(msg);
+            boolean invalidLoopDetected = newURL.equals(lastURL); 
+            if (!invalidLoopDetected) {
+                // this URI was used sometime earlier
+                Integer maxSameURICount = PropertyUtils.getInteger(message, AUTO_REDIRECT_MAX_SAME_URI_COUNT);
+                if (maxSameURICount == null || newURLCount > maxSameURICount) {
+                    invalidLoopDetected = true;
+                }
+            }
+            if (invalidLoopDetected) {
+                // We are in a redirect loop; -- bail
+                String msg = "Redirect loop detected on Conduit '" 
+                    + conduitName + "' on '" + newURL + "'";
+                LOG.log(Level.INFO, msg);
+                throw new IOException(msg);
+            }
         }
     }   
     private static void detectAuthorizationLoop(String conduitName, Message message, 
