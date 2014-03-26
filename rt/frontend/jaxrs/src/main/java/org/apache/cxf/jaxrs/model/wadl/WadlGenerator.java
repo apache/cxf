@@ -1051,10 +1051,14 @@ public class WadlGenerator implements RequestHandler {
                 ElementQNameResolver theResolver = createElementQNameResolver(context);
                 String tns = doc.getDocumentElement().getAttribute("targetNamespace");
                 
-                String tnsDecl = 
-                    doc.getDocumentElement().getAttribute("xmlns:tns");
-                String tnsPrefix = tnsDecl != null && tnsDecl.equals(tns) ? "tns:" : "";
-                
+                String tnsPrefix = doc.getDocumentElement().lookupPrefix(tns);
+                if (tnsPrefix == null) {
+                    String tnsDecl = doc.getDocumentElement().getAttribute("xmlns:tns");
+                    tnsPrefix = tnsDecl != null && tnsDecl.equals(tns) ? "tns:" : "";
+                } else {
+                    tnsPrefix += ":";
+                }
+
                 if (supportJaxbXmlType) {
                     for (Class<?> cls : resourceTypes.getAllTypes().keySet()) {
                         if (isXmlRoot(cls)) {

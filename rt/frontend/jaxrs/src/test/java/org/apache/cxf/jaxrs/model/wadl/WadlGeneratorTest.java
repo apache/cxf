@@ -400,14 +400,24 @@ public class WadlGeneratorTest extends Assert {
         return false;
     }
     
+    private boolean checkTypeName(Element el, String typeName, String name) {
+        String pfx = "";
+        String tn = typeName;
+        if (tn.contains(":")) {
+            pfx = tn.substring(0, tn.indexOf(':'));
+            tn = tn.substring(tn.indexOf(':') + 1);
+        }
+        pfx = el.lookupNamespaceURI(pfx);
+        
+        return tn.equals(name) && pfx.length() > 5;
+    }
+    
     private boolean checkElement(List<Element> els, String name, String localTypeName) {
         for (Element e : els) {
             if (name.equals(e.getAttribute("name"))) {
                 String type = e.getAttribute("type");
                 if (!StringUtils.isEmpty(type)) {
-                    String expectedType1 = "tns:" + localTypeName;
-                    String expectedType2 = "os:" + localTypeName;
-                    if (type.equals(expectedType1) || type.equals(expectedType2)) {
+                    if (checkTypeName(e, type, localTypeName)) {
                         return true;
                     }
                 } else if ("books".equals(name) || "thebook2s".equals(name)) {
@@ -422,9 +432,7 @@ public class WadlGeneratorTest extends Assert {
                         (Element)seqElement.getElementsByTagNameNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
                                                           "element").item(0);
                     String ref = xsElement.getAttribute("ref");
-                    String expectedRef = thebooks2 ? "tns:thebook2" : "tns:thebook";
-                    String expectedRef2 = thebooks2 ? "os:thebook2" : "os:thebook";
-                    if (ref.equals(expectedRef) || ref.equals(expectedRef2)) {
+                    if (checkTypeName(e, ref, thebooks2 ? "thebook2" : "thebook")) {
                         return true;
                     }
                 }
