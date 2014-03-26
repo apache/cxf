@@ -324,7 +324,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
         } catch (WSSecurityException e) {
             LOG.log(Level.WARNING, "", e);
-            SoapFault fault = createSoapFault(version, e);
+            SoapFault fault = createSoapFault(msg, version, e);
             throw fault;
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, version.getSender());
@@ -833,12 +833,18 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * as the fault code from the WSSecurityException.
      */
     private SoapFault 
-    createSoapFault(SoapVersion version, WSSecurityException e) {
+    createSoapFault(org.apache.cxf.message.Message message, SoapVersion version, WSSecurityException e) {
         SoapFault fault;
-        String errorMessage = WSS4JUtils.getSafeExceptionMessage(e);
-        if (errorMessage == null) {
+        String errorMessage = null;
+        if (MessageUtils.isRequestor(message)) {
             errorMessage = e.getMessage();
+        } else {
+            errorMessage = WSS4JUtils.getSafeExceptionMessage(e);
+            if (errorMessage == null) {
+                errorMessage = e.getMessage();
+            }
         }
+        
         javax.xml.namespace.QName faultCode = e.getFaultCode();
         if (version.getVersion() == 1.1 && faultCode != null) {
             fault = new SoapFault(errorMessage, e, faultCode);
