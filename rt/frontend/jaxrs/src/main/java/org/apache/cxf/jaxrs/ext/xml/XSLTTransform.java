@@ -25,8 +25,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Can be used to assign qualified XML names to arbitrary classes
- * for the purpose of matching them with external schema definitions 
+ * Can be used to enable server-side XSLT transformations 
  * 
  */
 @Target({ElementType.METHOD, ElementType.PARAMETER })
@@ -37,7 +36,7 @@ public @interface XSLTTransform {
      */
     String value();
     /**
-     * Media types 
+     * Supported media types 
      **/
     String[] mediaTypes() default {"*/*" };
 }
