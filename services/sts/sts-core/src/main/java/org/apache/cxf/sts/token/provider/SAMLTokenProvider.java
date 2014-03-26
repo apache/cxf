@@ -397,7 +397,8 @@ public class SAMLTokenProvider implements TokenProvider {
             LOG.fine("Signing SAML Token");
             boolean useKeyValue = signatureProperties.isUseKeyValue();
             assertion.signAssertion(
-                alias, password, signatureCrypto, useKeyValue, c14nAlgorithm, signatureAlgorithm
+                alias, password, signatureCrypto, useKeyValue, c14nAlgorithm, signatureAlgorithm,
+                signatureProperties.getDigestAlgorithm()
             );
         }
         

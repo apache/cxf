@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -33,6 +32,7 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.common.TestUtils;
 import org.apache.cxf.sts.request.BinarySecret;
 import org.apache.cxf.sts.request.Entropy;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -491,6 +491,72 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         token = providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(WSConstants.C14N_EXCL_WITH_COMMENTS));
+    }
+    
+    /**
+     * Create a default Saml2 Bearer Assertion using a different Signature algorithm
+     */
+    @org.junit.Test
+    public void testDefaultSaml2BearerDifferentSignatureAlgorithm() throws Exception {
+        if (!TestUtils.checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
+        
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
+        KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
+        
+        String signatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+        keyRequirements.setSignatureAlgorithm(signatureAlgorithm);
+        
+        // This will fail as the requested signature algorithm is rejected
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertFalse(tokenString.contains(signatureAlgorithm));
+        assertTrue(tokenString.contains(WSConstants.RSA_SHA1));
+        
+        STSPropertiesMBean stsProperties = providerParameters.getStsProperties();
+        SignatureProperties sigProperties = new SignatureProperties();
+        List<String> acceptedSignatureAlgorithms = new ArrayList<String>();
+        acceptedSignatureAlgorithms.add(signatureAlgorithm);
+        acceptedSignatureAlgorithms.add(WSConstants.RSA_SHA1);
+        sigProperties.setAcceptedSignatureAlgorithms(acceptedSignatureAlgorithms);
+        stsProperties.setSignatureProperties(sigProperties);
+        
+        // This will succeed as the requested signature algorithm is accepted
+        providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        token = providerResponse.getToken();
+        tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(signatureAlgorithm));
+    }
+    
+    /**
+     * Create a default Saml2 Bearer Assertion using a different Signature Digest algorithm
+     */
+    @org.junit.Test
+    public void testDefaultSaml2BearerDifferentSignatureDigestAlgorithm() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
+        SignatureProperties signatureProperties = 
+                providerParameters.getStsProperties().getSignatureProperties();
+        signatureProperties.setDigestAlgorithm(WSConstants.SHA256);
+        
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(WSConstants.SHA256));
     }
     
     /**
