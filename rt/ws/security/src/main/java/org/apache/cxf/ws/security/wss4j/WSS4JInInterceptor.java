@@ -798,7 +798,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         String errorMessage = null;
         boolean returnSecurityError = 
             MessageUtils.getContextualBoolean(message, SecurityConstants.RETURN_SECURITY_ERROR, false);
-        if (returnSecurityError) {
+        if (returnSecurityError || MessageUtils.isRequestor(message)) {
             errorMessage = e.getMessage();
         } else {
             errorMessage = e.getSafeExceptionMessage();
