@@ -187,7 +187,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                     response = unmarshaller.unmarshal(reader, theType);
                 }
             } else {
-                response = doUnmarshal(unmarshaller, type, is, mt);
+                response = doUnmarshal(unmarshaller, type, is, anns, mt);
             }
             if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
                 response = ((JAXBElement<?>)response).getValue();    
@@ -221,12 +221,13 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         return null;
     }
 
-    protected Object doUnmarshal(Unmarshaller unmarshaller, Class<?> type, InputStream is, MediaType mt) 
+    protected Object doUnmarshal(Unmarshaller unmarshaller, Class<?> type, InputStream is, 
+                                 Annotation[] anns, MediaType mt) 
         throws JAXBException {
         XMLStreamReader reader = getStreamReader(is, type, mt);
         if (reader != null) {
             try {
-                return unmarshalFromReader(unmarshaller, reader, mt);
+                return unmarshalFromReader(unmarshaller, reader, anns, mt);
             } catch (JAXBException e) {
                 throw e;
             } finally {
@@ -237,7 +238,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 }
             }
         }
-        return unmarshalFromInputStream(unmarshaller, is, mt);
+        return unmarshalFromInputStream(unmarshaller, is, anns, mt);
     }
     
     protected XMLStreamReader getStreamReader(InputStream is, Class<?> type, MediaType mt) {
@@ -269,7 +270,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         
     }
     
-    protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
+    protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, 
+                                              Annotation[] anns, MediaType mt) 
         throws JAXBException {
         // Try to create the read before unmarshalling the stream
         XMLStreamReader xmlReader = null;
@@ -295,7 +297,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         }
     }
     
-    protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, MediaType mt) 
+    protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, 
+                                         Annotation[] anns, MediaType mt) 
         throws JAXBException {
         return unmarshaller.unmarshal(reader);
     }
@@ -376,25 +379,26 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             XmlJavaTypeAdapter adapter = 
                 org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(firstObj.getClass(), anns);
             marshalCollectionMember(JAXBUtils.useAdapter(firstObj, adapter, true), 
-                                    actualClass, genericType, enc, os, m, 
+                                    actualClass, genericType, enc, os, anns, m, 
                                     qname.getNamespaceURI());
             while (it.hasNext()) {
                 marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true), actualClass, 
-                                        genericType, enc, os, m, 
+                                        genericType, enc, os, anns, m, 
                                         qname.getNamespaceURI());
             }
         }
         os.write(endTag.getBytes());
     }
-    
+    //CHECKSTYLE:OFF
     protected void marshalCollectionMember(Object obj, 
                                            Class<?> cls, 
                                            Type genericType, 
                                            String enc, 
-                                           OutputStream os, 
+                                           OutputStream os,
+                                           Annotation[] anns,
                                            MediaType mt, 
                                            String ns) throws Exception {
-        
+    //CHECKSTYLE:ON    
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement<?>)obj).getValue();    
         } else {
@@ -416,7 +420,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             map.putAll(nsPrefixes);
             setNamespaceMapper(ms, map);
         }
-        marshal(obj, cls, genericType, enc, os, mt, ms);
+        marshal(obj, cls, genericType, enc, os, anns, mt, ms);
     }
     
     protected void marshal(Object obj, Class<?> cls, Type genericType, 
@@ -439,7 +443,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         addAttachmentMarshaller(ms);
         addProcessingInstructions(ms, anns);
         addSchemaLocation(ms, anns);
-        marshal(obj, cls, genericType, enc, os, mt, ms);
+        marshal(obj, cls, genericType, enc, os, anns, mt, ms);
     }
     
     private void addProcessingInstructions(Marshaller ms, Annotation[] anns) throws Exception {
@@ -516,11 +520,12 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             return null;
         }
     }
-    
+    //CHECKSTYLE:OFF
     protected void marshal(Object obj, Class<?> cls, Type genericType, 
-                           String enc, OutputStream os, MediaType mt, Marshaller ms)
+                           String enc, OutputStream os, 
+                           Annotation[] anns, MediaType mt, Marshaller ms)
         throws Exception {
-        
+    //CHECKSTYLE:ON    
         for (Map.Entry<String, Object> entry : mProperties.entrySet()) {
             ms.setProperty(entry.getKey(), entry.getValue());
         }
@@ -546,12 +551,12 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 }
                 mc.put(XMLStreamWriter.class.getName(), writer);    
             }
-            marshalToWriter(ms, obj, writer, mt);
+            marshalToWriter(ms, obj, writer, anns, mt);
             if (mc != null) { 
                 writer.writeEndDocument();
             }
         } else {
-            marshalToOutputStream(ms, obj, os, mt);
+            marshalToOutputStream(ms, obj, os, anns, mt);
         }
     }
     
@@ -582,7 +587,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         return createTransformWriterIfNeeded(writer, os, true);
     }
     
-    protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, MediaType mt) 
+    protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, 
+                                         Annotation[] anns, MediaType mt) 
         throws Exception {
         if (os == null) {
             Writer writer = getStreamHandlerFromCurrentMessage(Writer.class);
@@ -597,7 +603,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         }
     }
     
-    protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer, MediaType mt) 
+    protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer, 
+                                   Annotation[] anns, MediaType mt) 
         throws Exception {
         ms.marshal(obj, writer);
     }

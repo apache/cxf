@@ -23,9 +23,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.Unmarshaller;
@@ -34,6 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
+import org.apache.cxf.jaxrs.ext.xml.XSLTTransform;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.SuperBook;
@@ -101,6 +104,25 @@ public class XSLTJaxbProviderTest extends Assert {
         b.setName("TheBook");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(b, Book.class, Book.class, b.getClass().getAnnotations(),
+                         MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        Unmarshaller um = provider.getClassContext(Book.class).createUnmarshaller();
+        Book b2 = (Book)um.unmarshal(new StringReader(bos.toString()));
+        b.setName("TheBook2");
+        assertEquals("Transformation is bad", b, b2);
+    }
+    
+    @Test
+    public void testWriteWithAnnotation() throws Exception {
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        provider.setMessageContext(new MessageContextImpl(createMessage()));
+        Book b = new Book();
+        b.setId(123L);
+        b.setName("TheBook");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        
+        Annotation[] anns = Root.class.getMethod("getBook").getAnnotations();
+        assertTrue(provider.isWriteable(Book.class, Book.class, anns, MediaType.TEXT_XML_TYPE));
+        provider.writeTo(b, Book.class, Book.class, anns,
                          MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         Unmarshaller um = provider.getClassContext(Book.class).createUnmarshaller();
         Book b2 = (Book)um.unmarshal(new StringReader(bos.toString()));
@@ -255,5 +277,13 @@ public class XSLTJaxbProviderTest extends Assert {
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;
+    }
+    
+    public static class Root {
+        @GET
+        @XSLTTransform(TEMPLATE_LOCATION)
+        public Book getBook() {
+            return new Book();
+        }
     }
 }
