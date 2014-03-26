@@ -1482,7 +1482,10 @@ public final class StaxUtils {
             } else if (source instanceof StaxSource) {
                 return ((StaxSource)source).getXMLStreamReader();
             } else if (source instanceof SAXSource) {
-                return createXMLStreamReader(((SAXSource)source).getInputSource());
+                SAXSource ss = (SAXSource)source;
+                if (ss.getXMLReader() == null) {
+                    return createXMLStreamReader(((SAXSource)source).getInputSource());
+                }
             }
             
             XMLInputFactory factory = getXMLInputFactory();
