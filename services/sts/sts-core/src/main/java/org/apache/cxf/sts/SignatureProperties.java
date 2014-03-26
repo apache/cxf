@@ -36,6 +36,7 @@ public class SignatureProperties {
     private long keySize = 256;
     private long minimumKeySize = 128;
     private long maximumKeySize = 512;
+    private String digestAlgorithm = WSConstants.SHA1;
     
     public SignatureProperties() {
         // Default signature algorithms
@@ -173,6 +174,22 @@ public class SignatureProperties {
      */
     public void setAcceptedC14nAlgorithms(List<String> acceptedC14nAlgorithms) {
         this.acceptedC14nAlgorithms = acceptedC14nAlgorithms;
+    }
+
+    /**
+     * Get the Digest algorithm to use for Signature
+     * @return the Digest algorithm to use for Signature
+     */
+    public String getDigestAlgorithm() {
+        return digestAlgorithm;
+    }
+
+    /**
+     * Set the Digest algorithm to use for Signature
+     * @param digestAlgorithm the Digest algorithm to use for Signature
+     */
+    public void setDigestAlgorithm(String digestAlgorithm) {
+        this.digestAlgorithm = digestAlgorithm;
     }
     
 }
