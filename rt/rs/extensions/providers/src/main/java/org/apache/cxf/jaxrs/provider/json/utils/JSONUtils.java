@@ -176,6 +176,15 @@ public final class JSONUtils {
             this.namespaceMap = nsMap;
         }
         
+
+        public String getNamespaceURI(String arg0) {
+            String uri = super.getNamespaceURI(arg0);
+            if (uri == null) {
+                uri = getNamespaceContext().getNamespaceURI(arg0);
+            }
+            return uri;
+        }
+        
         @Override
         public String getAttributePrefix(int n) {
             QName name = getAttributeName(n);
