@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -92,12 +90,6 @@ public class CachedOutputStream extends OutputStream {
     private List<CachedOutputStreamCallback> callbacks;
     
     private List<Object> streamList = new ArrayList<Object>();
-
-    public CachedOutputStream(PipedInputStream stream) throws IOException {
-        currentStream = new PipedOutputStream(stream);
-        inmem = true;
-        readBusProperties();
-    }
 
     public CachedOutputStream() {
         this(defaultThreshold);
@@ -260,9 +252,6 @@ public class CachedOutputStream extends OutputStream {
                     if (copyOldContent && byteOut.size() > 0) {
                         byteOut.writeTo(out);
                     }
-                } else if (currentStream instanceof PipedOutputStream) {
-                    PipedOutputStream pipeOut = (PipedOutputStream) currentStream;
-                    IOUtils.copyAndCloseInput(new PipedInputStream(pipeOut), out);
                 } else {
                     throw new IOException("Unknown format of currentStream");
                 }
@@ -520,8 +509,6 @@ public class CachedOutputStream extends OutputStream {
                 return ((LoadingByteArrayOutputStream) currentStream).createInputStream();
             } else if (currentStream instanceof ByteArrayOutputStream) {
                 return new ByteArrayInputStream(((ByteArrayOutputStream) currentStream).toByteArray());
-            } else if (currentStream instanceof PipedOutputStream) {
-                return new PipedInputStream((PipedOutputStream) currentStream);
             } else {
                 return null;
             }
