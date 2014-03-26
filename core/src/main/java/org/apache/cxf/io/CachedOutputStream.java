@@ -605,7 +605,7 @@ public class CachedOutputStream extends OutputStream {
                 "-1");
             i = Integer.parseInt(s);
             if (i <= 0) {
-                i = 64 * 1024;
+                i = 128 * 1024;
             }
         }
         defaultThreshold = i;

@@ -60,7 +60,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         BINARY_CONTENT_MEDIA_TYPES.add("image/gif");
     }
     
-    protected int limit = 100 * 1024;
+    protected int limit = 48 * 1024;
     protected long threshold = -1;
     protected PrintWriter writer;
     protected boolean prettyLogging;

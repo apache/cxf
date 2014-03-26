@@ -70,8 +70,8 @@ public abstract class CachedStreamTestBase extends Assert {
     @Test
     public void testDeleteTmpFile2() throws IOException {
         Object cache = createCache();
-        //ensure output data size larger then 64k which will generate tmp file
-        String result = initTestData(65);
+        //ensure output data size larger then 128k which will generate tmp file
+        String result = initTestData(130);
         File tempFile = getTmpFile(result, cache);
         assertNotNull(tempFile);
         //assert tmp file is generated
