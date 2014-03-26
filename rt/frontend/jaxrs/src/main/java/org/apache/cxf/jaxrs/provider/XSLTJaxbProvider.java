@@ -59,7 +59,6 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
 
