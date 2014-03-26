@@ -1037,8 +1037,6 @@ public class JAXBElementProviderTest extends Assert {
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         String expected = "<?xml version='1.0' encoding='UTF-8'?>"
             + "<ns2:t xmlns:ns2=\"http://tagsvo2\"><group>B</group><name>A</name></ns2:t>";
-        System.out.println(expected);
-        System.out.println(bos.toString());
         assertEquals(expected, bos.toString());
         
     }
