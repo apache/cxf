@@ -461,6 +461,12 @@ public class JAXBElementProviderTest extends Assert {
         throws Exception {
         JAXBElementProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>> provider 
             = new JAXBElementProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>>();
+
+        Map<String, String> prefixes = new HashMap<String, String>();
+        prefixes.put("http://superbooks", "ns1");
+        prefixes.put("http://books", "ns2");
+        provider.setNamespacePrefixes(prefixes);
+
         provider.setCollectionWrapperName("{http://superbooks}SuperBooks");
         provider.setJaxbElementClassMap(Collections.singletonMap(
                 org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
@@ -947,6 +953,11 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutAppendElementsDiffNs() throws Exception {
         JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        
+        Map<String, String> prefixes = new HashMap<String, String>();
+        prefixes.put("http://tags", "ns2");
+        provider.setNamespacePrefixes(prefixes);
+
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
@@ -992,6 +1003,11 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutAppendElementsSameNs() throws Exception {
         JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        
+        Map<String, String> prefixes = new HashMap<String, String>();
+        prefixes.put("http://tags", "ns2");
+        provider.setNamespacePrefixes(prefixes);
+
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tags}t");
         provider.setOutAppendElements(map);
@@ -1009,6 +1025,9 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalNsToLocalNs() throws Exception {
         JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        Map<String, String> prefixes = new HashMap<String, String>();
+        prefixes.put("http://tags", "ns2");
+        provider.setNamespacePrefixes(prefixes);
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutTransformElements(map);
@@ -1018,6 +1037,8 @@ public class JAXBElementProviderTest extends Assert {
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         String expected = "<?xml version='1.0' encoding='UTF-8'?>"
             + "<ns2:t xmlns:ns2=\"http://tagsvo2\"><group>B</group><name>A</name></ns2:t>";
+        System.out.println(expected);
+        System.out.println(bos.toString());
         assertEquals(expected, bos.toString());
         
     }
@@ -1057,6 +1078,11 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalNsToLocalWildcard2() throws Exception {
         JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
+        
+        Map<String, String> prefixes = new HashMap<String, String>();
+        prefixes.put("http://tags", "ns2");
+        provider.setNamespacePrefixes(prefixes);
+
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}*", "{http://tags2}*");
         provider.setOutTransformElements(map);
