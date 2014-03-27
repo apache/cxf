@@ -116,7 +116,7 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
         W3CEndpointReference epr = port.lookupEndpoint(new QName("http://service/1", "Number"));
         String eprString = epr.toString();
         assertTrue(eprString.contains("Metadata"));
-        assertTrue(eprString.contains("wsdli:wsdlLocation=\"http://service/1 wsdlLoc\""));
+        assertTrue(eprString.contains("wsdlLocation=\"http://service/1 wsdlLoc\""));
     }
     
     @Test
@@ -131,7 +131,8 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
         W3CEndpointReference epr = port.lookupEndpoint(new QName("http://service/2", "Number"));
         String eprString = epr.toString();
         assertTrue(eprString.contains("Metadata"));
-        assertTrue(eprString.contains("wsdli:wsdlLocation=\"wsdlLoc\""));
+        System.out.println(eprString);
+        assertTrue(eprString.contains("wsdlLocation=\"wsdlLoc\""));
     }
 
     @Test
