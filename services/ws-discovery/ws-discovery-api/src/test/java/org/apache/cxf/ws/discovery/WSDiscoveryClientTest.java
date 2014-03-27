@@ -95,8 +95,9 @@ public final class WSDiscoveryClientTest {
                     s.receive(p);
                     SocketAddress sa = p.getSocketAddress();
                     String incoming = new String(p.getData(), 0, p.getLength(), "UTF-8");
-                    int idx = incoming.indexOf("MessageID>");
-                    incoming = incoming.substring(idx + 10);
+                    int idx = incoming.indexOf("MessageID");
+                    idx = incoming.indexOf('>', idx);
+                    incoming = incoming.substring(idx + 1);
                     idx = incoming.indexOf("</");
                     incoming = incoming.substring(0, idx);
                     for (int x = 1; x < 4; x++) {
