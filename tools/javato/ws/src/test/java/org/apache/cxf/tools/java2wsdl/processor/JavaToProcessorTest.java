@@ -480,7 +480,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     @Test
     public void testMimeTypeInBean() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/send_image2.wsdl");
-        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.ImageSender2");
+        env.put(ToolConstants.CFG_CLASSNAME, org.apache.cxf.tools.fortest.ImageSender2.class.getName());
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         try {
             processor.setEnvironment(env);

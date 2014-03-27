@@ -68,6 +68,13 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
 
     @Test
     public void testDocLitWrappedWithWrapperClass() throws Exception {
+        if (isMOXy()) {
+            //This test is testing to see if the lack of namespace declarations on the wrapper classes
+            //can still map into the targetnamespace of the service.   MOXy always looks for the
+            //namespace on the annotation or in package-info and thus cannot support this.  This
+            //is fairly bad practice anyway.
+            return;
+        }
         builder.setServiceClass(org.apache.cxf.tools.fortest.withannotation.doc.StockWrapped.class);
         ServiceInfo service = builder.createService();
         generator.setServiceModel(service);
