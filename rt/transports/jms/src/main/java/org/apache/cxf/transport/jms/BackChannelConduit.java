@@ -34,6 +34,7 @@ import javax.jms.TextMessage;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.AbstractConduit;
@@ -124,8 +125,21 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
             // setup the reply message
             final javax.jms.Message request = (javax.jms.Message)inMessage
                 .get(JMSConstants.JMS_REQUEST_MESSAGE);
-            final String msgType = JMSMessageUtils.isMtomEnabled(outMessage)
-                ? JMSConstants.BINARY_MESSAGE_TYPE : JMSMessageUtils.getMessageType(request);
+            final String msgType;
+            if (JMSMessageUtils.isMtomEnabled(outMessage) 
+                && !jmsConfig.getMessageType().equals(JMSConstants.TEXT_MESSAGE_TYPE)) {
+                //get chance to set messageType from JMSConfiguration with MTOM enabled
+                msgType = jmsConfig.getMessageType();
+            } else {
+                msgType = JMSMessageUtils.getMessageType(request);
+            }
+            if (JMSConstants.TEXT_MESSAGE_TYPE.equals(msgType) 
+                && JMSMessageUtils.isMtomEnabled(outMessage)) {
+                org.apache.cxf.common.i18n.Message msg = 
+                    new org.apache.cxf.common.i18n.Message("INVALID_MESSAGE_TYPE", LOG);
+                throw new ConfigurationException(msg);
+            }
+            
             if (isTimedOut(request)) {
                 return;
             }
