@@ -23,11 +23,14 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <bean id="loggerListener" class="org.apache.cxf.sts.event.LoggerListener"/>
+    <bean id="mapEventLogger" class="org.apache.cxf.sts.event.map.MapEventLogger"/>
+    <bean id="eventMapper" class="org.apache.cxf.sts.event.map.EventMapper">
+        <constructor-arg ref="mapEventLogger" />
+    </bean>
     <bean id="transportSTSProviderBean" class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
         <property name="services" ref="transportService"/>
         <property name="stsProperties" ref="transportSTSProperties"/>
-        <property name="eventListener" ref="loggerListener"/>
+        <property name="eventListener" ref="eventMapper"/>
     </bean>
     <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
         <property name="endpoints" ref="transportEndpoints"/>
