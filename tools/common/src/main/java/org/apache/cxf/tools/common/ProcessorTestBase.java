@@ -40,6 +40,8 @@ import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -93,6 +95,16 @@ public class ProcessorTestBase extends Assert {
     @After
     public void tearDown() {
         env = null;
+    }
+    
+
+    protected boolean isMOXy() {
+        try {
+            JAXBContext c = JAXBContext.newInstance(String.class);
+            return c.getClass().getName().contains(".eclipse");
+        } catch (JAXBException e) {
+            return false;
+        }
     }
 
     protected String getClassPath() throws URISyntaxException, IOException {

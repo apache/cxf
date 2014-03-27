@@ -22,11 +22,19 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Compiler;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolTestBase;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -337,10 +345,17 @@ public class JavaToWSTest extends ToolTestBase {
         JavaToWS.main(args);
 
         File file = new File(output.getPath() + "/xml-list.wsdl");
-        String str = FileUtils.getStringFromFile(file);
-        assertTrue("Java2wsdl did not generate xsd:list element",
-                   str.indexOf("xs:list") > -1);
+        
+        Document doc = StaxUtils.read(file);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        XPathUtils util = new XPathUtils(map);
+        Element node = (Element)util.getValueNode("//xsd:list", doc);
+        assertNotNull(node);
 
+        assertTrue(node.getAttribute("itemType").contains("string"));
     }
 
     @Test
@@ -365,11 +380,18 @@ public class JavaToWSTest extends ToolTestBase {
        
         JavaToWS.main(args);
         File file = new File(output.getPath() + "/xmladapter.wsdl");
-        String str = FileUtils.getStringFromFile(file);
-        String expected = "<xs:element  minOccurs=\"0\"  name=\"arg0\"  type=\"xs:string\"/>";
-        assertTrue("@XmlJavaTypeAdapter in SEI dose not take effect",
-                   str.indexOf(expected) > -1);
-            
+        
+        Document doc = StaxUtils.read(file);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        XPathUtils util = new XPathUtils(map);
+        Element node = (Element)util.getValueNode("//xsd:element[@name='arg0']", doc);
+        assertNotNull(node);
+
+        assertEquals("0", node.getAttribute("minOccurs"));
+        assertTrue(node.getAttribute("type").contains("string"));
     }
 
 
