@@ -19,48 +19,11 @@
 
 package org.apache.cxf.binding.corba.wsdl;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 
-/**
- * Anonymous IDL type. Has no repository ID.
- *  Used for intermediate types for multidimensional arrays 
- * and sequences of sequences.
- *             
- * 
- * <p>Java class for corbaType complex type.
- * 
- * <p>The following schema fragment specifies the expected i
- * content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="corbaType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="name" use="required" i
- *       type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="type" use="required" i
- *      type="{http://www.w3.org/2001/XMLSchema}QName" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
- * </pre>
- * 
- * 
- */
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "corbaTypeImpl")
-public class CorbaTypeImpl 
-      extends CorbaType {
-
-
-    @XmlAttribute(required = true)
-    protected QName name;
+public class CorbaTypeImpl {
+    protected QName qname;
     
     /**
      * Gets the value of the qname property.
@@ -71,7 +34,7 @@ public class CorbaTypeImpl
      *     
      */
     public QName getQName() {
-        return name;
+        return qname;
     }
 
     /**
@@ -83,11 +46,11 @@ public class CorbaTypeImpl
      *     
      */
     public void setQName(QName value) {
-        this.name = value;
+        this.qname = value;
     }
 
     public boolean isSetQName() {
-        return this.name != null;
+        return this.qname != null;
     }
     
 }

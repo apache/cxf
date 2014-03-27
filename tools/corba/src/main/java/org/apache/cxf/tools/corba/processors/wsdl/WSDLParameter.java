@@ -32,7 +32,7 @@ import javax.wsdl.Part;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.ArgType;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.ModeType;
 import org.apache.cxf.binding.corba.wsdl.ParamType;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -436,9 +436,9 @@ public final class WSDLParameter {
     private static QName getIdlType(WSDLToCorbaBinding wsdlToCorbaBinding, XmlSchemaType schemaType,
                                     QName typeName, boolean nill) throws Exception {
         QName idltype = null;
-        CorbaTypeImpl corbaTypeImpl = null;
+        CorbaType corbaTypeImpl = null;
         if (schemaType == null) {
-            corbaTypeImpl = (CorbaTypeImpl)WSDLToCorbaHelper.CORBAPRIMITIVEMAP.get(typeName);
+            corbaTypeImpl = (CorbaType)WSDLToCorbaHelper.CORBAPRIMITIVEMAP.get(typeName);
             if (nill) {
                 QName qname = corbaTypeImpl.getQName();
                 idltype = wsdlToCorbaBinding.getHelper().createQNameCorbaNamespace(qname.getLocalPart()
@@ -487,7 +487,7 @@ public final class WSDLParameter {
                                            XmlSchemaAnnotation annotation, QName typeName, boolean nill)
         throws Exception {
         QName idltype = null;
-        CorbaTypeImpl corbaTypeImpl = null;
+        CorbaType corbaTypeImpl = null;
 
         corbaTypeImpl = wsdlToCorbaBinding.getHelper().convertSchemaToCorbaType(schemaType, typeName, null,
                                                                                 annotation, false);

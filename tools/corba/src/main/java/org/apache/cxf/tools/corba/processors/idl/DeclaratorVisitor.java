@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.Alias;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Fixed;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -45,7 +45,7 @@ public class DeclaratorVisitor extends VisitorBase {
                              XmlSchema schemaRef,
                              WSDLASTVisitor wsdlASTVisitor,
                              XmlSchemaType schemaTypeRef,
-                             CorbaTypeImpl corbaTypeRef,
+                             CorbaType corbaTypeRef,
                              Scope fQName) {
         super(scope, defn, schemaRef, wsdlASTVisitor);
         setSchemaType(schemaTypeRef);
@@ -95,10 +95,10 @@ public class DeclaratorVisitor extends VisitorBase {
     }
 
     private void visitNewTypes(Scope newScope) {
-        CorbaTypeImpl nextCorbaType = null;
+        CorbaType nextCorbaType = null;
         XmlSchemaType nextSchemaType = null;
 
-        CorbaTypeImpl oldCorbaType = getCorbaType();
+        CorbaType oldCorbaType = getCorbaType();
 
         QName newQname = new QName(getCorbaType().getQName().getNamespaceURI(), newScope.toString());
 

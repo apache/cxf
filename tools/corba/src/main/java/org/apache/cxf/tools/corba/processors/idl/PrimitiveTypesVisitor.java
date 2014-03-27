@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
 import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.tools.corba.common.XmlSchemaPrimitiveMap;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
@@ -55,7 +55,7 @@ public class PrimitiveTypesVisitor implements Visitor {
     }
 
     private XmlSchemaType schemaType;
-    private CorbaTypeImpl corbaType;
+    private CorbaType corbaType;
     private Scope scope;
     private XmlSchemaCollection schemas;
     
@@ -106,7 +106,7 @@ public class PrimitiveTypesVisitor implements Visitor {
  
         
         XmlSchemaType stype = null; 
-        CorbaTypeImpl ctype = null;
+        CorbaType ctype = null;
         QName corbaTypeQName = PrimitiveTypesVisitor.getPrimitiveType(node);
         if (corbaTypeQName != null) {
             QName schemaTypeQName = xmlSchemaPrimitiveMap.get(corbaTypeQName);
@@ -114,7 +114,7 @@ public class PrimitiveTypesVisitor implements Visitor {
                 //XmlSchemaCollection schemas = new XmlSchemaCollection();
                 stype = schemas.getTypeByQName(schemaTypeQName);
                 if (stype != null) {
-                    ctype = new CorbaTypeImpl();
+                    ctype = new CorbaType();
                     ctype.setQName(corbaTypeQName);
                     ctype.setType(stype.getQName());
                     ctype.setName(stype.getQName().getLocalPart());
@@ -131,7 +131,7 @@ public class PrimitiveTypesVisitor implements Visitor {
         return schemaType;
     }
     
-    public CorbaTypeImpl getCorbaType() {
+    public CorbaType getCorbaType() {
         return corbaType;
     }
     

@@ -28,7 +28,7 @@ import org.apache.cxf.binding.corba.wsdl.Alias;
 import org.apache.cxf.binding.corba.wsdl.Anonstring;
 import org.apache.cxf.binding.corba.wsdl.Anonwstring;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaMaxLengthFacet;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
@@ -130,7 +130,7 @@ public class StringVisitor extends VisitorBase {
 
         setSchemaType(simpleType);
 
-        CorbaTypeImpl anon = null;
+        CorbaType anon = null;
         if (stringNode.getType() == IDLTokenTypes.LITERAL_string) {
             // corba:anonstring
             Anonstring anonstring = new Anonstring();
@@ -175,7 +175,7 @@ public class StringVisitor extends VisitorBase {
 
         Scope anonstringScopedName = new Scope(getScope(), "_Anon1_" + stringScopedName.tail());
         String anonstringName = anonstringScopedName.toString();
-        CorbaTypeImpl anon = null;
+        CorbaType anon = null;
         if (stringNode.getType() == IDLTokenTypes.LITERAL_string) {
             // corba:anonstring
             Anonstring anonstring = new Anonstring();
@@ -219,7 +219,7 @@ public class StringVisitor extends VisitorBase {
 
 
         // corba type
-        CorbaTypeImpl corbaString = new CorbaTypeImpl();
+        CorbaType corbaString = new CorbaType();
         if (stringNode.getType() == IDLTokenTypes.LITERAL_string) {
             corbaString.setQName(CorbaConstants.NT_CORBA_STRING);
             corbaString.setName(CorbaConstants.NT_CORBA_STRING.getLocalPart());

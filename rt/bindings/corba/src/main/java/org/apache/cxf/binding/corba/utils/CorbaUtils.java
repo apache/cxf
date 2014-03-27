@@ -41,7 +41,6 @@ import org.apache.cxf.binding.corba.wsdl.Array;
 import org.apache.cxf.binding.corba.wsdl.CaseType;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.CorbaType;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
 import org.apache.cxf.binding.corba.wsdl.Enum;
 import org.apache.cxf.binding.corba.wsdl.Enumerator;
 import org.apache.cxf.binding.corba.wsdl.Exception;
@@ -418,7 +417,7 @@ public final class CorbaUtils {
         return PRIMITIVE_TYPECODES.values().contains(tc.kind());
     }
 
-    public static CorbaTypeImpl getCorbaType(QName idlType, CorbaTypeMap typeMap) {
+    public static CorbaType getCorbaType(QName idlType, CorbaTypeMap typeMap) {
         if (!isPrimitiveIdlType(idlType) && (typeMap != null)) {
             return typeMap.getType(idlType.getLocalPart());
         }
@@ -432,10 +431,10 @@ public final class CorbaUtils {
             TypeMappingType tmType = tmTypes.get(0);
             map = new CorbaTypeMap(tmType.getTargetNamespace());
 
-            List<CorbaTypeImpl> types = tmType.getStructOrExceptionOrUnion();
+            List<CorbaType> types = tmType.getStructOrExceptionOrUnion();
             LOG.fine("Found " + types.size() + " types defined in the typemap");
-            for (Iterator<CorbaTypeImpl> it = types.iterator(); it.hasNext();) {
-                CorbaTypeImpl corbaType = it.next();
+            for (Iterator<CorbaType> it = types.iterator(); it.hasNext();) {
+                CorbaType corbaType = it.next();
                 String name = corbaType.getName();
                 // There can be some instances where a prefix is added to the name by the tool
                 // (e.g. Object Reference Names).  Since the name is read as a string, this

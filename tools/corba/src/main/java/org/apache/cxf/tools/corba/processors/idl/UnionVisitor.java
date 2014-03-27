@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
 import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.CaseType;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Union;
 import org.apache.cxf.binding.corba.wsdl.Unionbranch;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
@@ -93,7 +93,7 @@ public class UnionVisitor extends VisitorBase {
         // it should be visited by a SwitchTypeSpecVisitor
         TypesVisitor visitor = new TypesVisitor(getScope(), definition, schema, wsdlVisitor, null);
         visitor.visit(discriminatorNode);
-        CorbaTypeImpl ctype = visitor.getCorbaType();
+        CorbaType ctype = visitor.getCorbaType();
         Scope fullyQualifiedName = visitor.getFullyQualifiedName();
 
         XmlSchemaChoice choice = new XmlSchemaChoice();
@@ -181,7 +181,7 @@ public class UnionVisitor extends VisitorBase {
                                                     null);
             visitor.visit(typeNode);
             XmlSchemaType stype = visitor.getSchemaType();
-            CorbaTypeImpl ctype = visitor.getCorbaType();
+            CorbaType ctype = visitor.getCorbaType();
             Scope fullyQualifiedName = visitor.getFullyQualifiedName();
 
 
@@ -271,7 +271,7 @@ public class UnionVisitor extends VisitorBase {
             List<DeferredAction> list = deferredActions.getActions(unionScope);
             if ((list != null) && !list.isEmpty()) {
                 XmlSchemaType stype = getSchemaType();
-                CorbaTypeImpl ctype = getCorbaType();
+                CorbaType ctype = getCorbaType();
                 Iterator<DeferredAction> iterator = list.iterator();
                 while (iterator.hasNext()) {
                     SchemaDeferredAction action = (SchemaDeferredAction)iterator.next();

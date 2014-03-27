@@ -19,15 +19,15 @@
 
 package org.apache.cxf.tools.corba.processors.idl;
 
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
 public class VisitorTypeHolder {
 
-    CorbaTypeImpl ctype;
+    CorbaType ctype;
     XmlSchemaType stype;
 
-    public CorbaTypeImpl getCorbaType() {
+    public CorbaType getCorbaType() {
         return ctype;
     }
 
@@ -35,7 +35,7 @@ public class VisitorTypeHolder {
         return stype;
     }
 
-    public void setCorbaType(CorbaTypeImpl type) {
+    public void setCorbaType(CorbaType type) {
         ctype = type;
     }
 

@@ -32,7 +32,7 @@ import org.apache.cxf.binding.corba.runtime.CorbaObjectReader;
 import org.apache.cxf.binding.corba.utils.CorbaAnyHelper;
 import org.apache.cxf.binding.corba.utils.CorbaUtils;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.W3CConstants;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.omg.CORBA.Any;
@@ -135,7 +135,7 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
         if (CorbaAnyHelper.isPrimitiveIdlType(idlType)) {
             result = CorbaAnyHelper.convertPrimitiveIdlToSchemaType(obj.getIdlType());
         } else {
-            CorbaTypeImpl impl = obj.getType();
+            CorbaType impl = obj.getType();
             result = impl.getType();
         }
 

@@ -32,7 +32,7 @@ import org.apache.cxf.binding.corba.wsdl.Anonarray;
 import org.apache.cxf.binding.corba.wsdl.Anonsequence;
 import org.apache.cxf.binding.corba.wsdl.Array;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.tools.corba.common.XmlSchemaPrimitiveMap;
@@ -95,7 +95,7 @@ public class ScopedNameVisitor extends VisitorBase {
         //                 | <scoped_name> "::" <identifier>
 
         XmlSchemaType stype = null;
-        CorbaTypeImpl ctype = null;        
+        CorbaType ctype = null;        
         if (PrimitiveTypesVisitor.accept(node)) {
             // primitive type            
             PrimitiveTypesVisitor primitiveVisitor =
@@ -147,13 +147,13 @@ public class ScopedNameVisitor extends VisitorBase {
         
     }
 
-    private static CorbaTypeImpl getCorbaSchemaType(XmlSchema xmlSchema,
+    private static CorbaType getCorbaSchemaType(XmlSchema xmlSchema,
                                                     TypeMappingType typeMap,
                                                     XmlSchemaType stype,
                                                     Scope scopedName) {       
-        CorbaTypeImpl ctype = null;
+        CorbaType ctype = null;
         if (stype.getQName().equals(Constants.XSD_STRING)) {
-            ctype = new CorbaTypeImpl();
+            ctype = new CorbaType();
             ctype.setName(CorbaConstants.NT_CORBA_STRING.getLocalPart());
             ctype.setQName(CorbaConstants.NT_CORBA_STRING);
             ctype.setType(Constants.XSD_STRING);
@@ -518,11 +518,11 @@ public class ScopedNameVisitor extends VisitorBase {
     
     
     
-    public static CorbaTypeImpl findCorbaTypeForSchemaType(TypeMappingType typeMap, 
+    public static CorbaType findCorbaTypeForSchemaType(TypeMappingType typeMap, 
                                                            QName schemaTypeName,
                                                            Scope scopedName) {
-        CorbaTypeImpl result = null;
-        for (CorbaTypeImpl type : typeMap.getStructOrExceptionOrUnion()) {         
+        CorbaType result = null;
+        for (CorbaType type : typeMap.getStructOrExceptionOrUnion()) {         
             if ((type instanceof Sequence)
                 || (type instanceof Array)
                 || (type.getType() == null)
@@ -550,9 +550,9 @@ public class ScopedNameVisitor extends VisitorBase {
         return result;
     }  
 
-    public static CorbaTypeImpl findCorbaType(TypeMappingType typeMap, QName typeName) {
-        CorbaTypeImpl result = null;
-        for (CorbaTypeImpl type : typeMap.getStructOrExceptionOrUnion()) {
+    public static CorbaType findCorbaType(TypeMappingType typeMap, QName typeName) {
+        CorbaType result = null;
+        for (CorbaType type : typeMap.getStructOrExceptionOrUnion()) {
             if (type.getQName().equals(typeName)) {
                 result = type;
                 break;
@@ -596,7 +596,7 @@ public class ScopedNameVisitor extends VisitorBase {
         XmlSchemaCollection schemas = wsdlVisitor.getSchemas();
 
         QName qname = new QName(typeMap.getTargetNamespace(), name);
-        CorbaTypeImpl corbaType = findCorbaType(typeMap, qname);
+        CorbaType corbaType = findCorbaType(typeMap, qname);
         if (corbaType != null) {
             if (corbaType instanceof Alias) {
                 result = true;
@@ -617,7 +617,7 @@ public class ScopedNameVisitor extends VisitorBase {
         return result;
     }
 
-    protected static void populateAliasSchemaType(CorbaTypeImpl corbaType,
+    protected static void populateAliasSchemaType(CorbaType corbaType,
                                                   WSDLASTVisitor wsdlVisitor,
                                                   VisitorTypeHolder holder) {
         XmlSchemaCollection schemas = wsdlVisitor.getSchemas();
@@ -625,7 +625,7 @@ public class ScopedNameVisitor extends VisitorBase {
         holder.setCorbaType(corbaType);
         Alias alias = (Alias) corbaType;
         //loop through alias base types, till you get a non-alias corba type
-        CorbaTypeImpl type = findCorbaType(typeMap, alias.getBasetype());
+        CorbaType type = findCorbaType(typeMap, alias.getBasetype());
         while ((type != null) && (type instanceof Alias)) {
             alias = (Alias) type;
             type = findCorbaType(typeMap, alias.getBasetype());

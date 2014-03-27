@@ -20,7 +20,7 @@
 <definitions xmlns:tns="http://www.apache.org/bus/demos/bank" xmlns:bank="http://www.apache.org/bus/demos/bank" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://www.apache.org/corba/typemap/BasePortType.idl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.apache.org/bus/demos/bank/corba/typemap/" xmlns:xsd1="http://soapinterop.org/xsd" xmlns="http://schemas.xmlsoap.org/wsdl/" name="BaseService" targetNamespace="http://www.apache.org/bus/demos/bank">
     <corba:typeMapping targetNamespace="http://www.apache.org/bus/demos/bank/corba/typemap/">
         <corba:sequence xmlns:tns="http://www.apache.org/bus/demos/bank" elemtype="corba:string" bound="0" repositoryID="IDL:AccountNames:1.0" type="tns:AccountNames" name="AccountNames"/>
-        <corba:object xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns="" xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" binding="" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="wsa:EndpointReferenceType" name="CORBA.Object"/>
+        <corba:object xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns="" xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="wsa:EndpointReferenceType" name="CORBA.Object"/>
     </corba:typeMapping>
     <types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.apache.org/bus/demos/bank">

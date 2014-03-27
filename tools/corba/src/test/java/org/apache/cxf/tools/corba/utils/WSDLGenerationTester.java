@@ -23,21 +23,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
-import javax.wsdl.Port;
-import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.cxf.binding.corba.wsdl.BindingType;
-import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
-import org.apache.cxf.wsdl.JAXBExtensionHelper;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
@@ -159,16 +153,16 @@ public class WSDLGenerationTester {
     }
 
     public File writeDefinition(File targetDir, File defnFile) throws Exception {
+        WSDLManager wm = BusFactory.getThreadDefaultBus().getExtension(WSDLManager.class);
         File bkFile = new File(targetDir, "bk_" + defnFile.getName());
         FileWriter writer = new FileWriter(bkFile);
         WSDLFactory factory
             = WSDLFactory.newInstance("org.apache.cxf.tools.corba.utils.TestWSDLCorbaFactoryImpl");
         WSDLReader reader = factory.newWSDLReader();
         reader.setFeature("javax.wsdl.importDocuments", false);
-        ExtensionRegistry extReg = new ExtensionRegistry();
-        addExtensions(extReg);
-        reader.setExtensionRegistry(extReg);
+        reader.setExtensionRegistry(wm.getExtensionRegistry());
         Definition wsdlDefn = reader.readWSDL(defnFile.toString());
+        
         WSDLWriter wsdlWriter = factory.newWSDLWriter();
         wsdlWriter.writeWSDL(wsdlDefn, writer);
         writer.close();
@@ -189,22 +183,4 @@ public class WSDLGenerationTester {
         reader = null;
         return bkFile;
     }
-
-    private void addExtensions(ExtensionRegistry extReg) throws Exception {
-        JAXBExtensionHelper.addExtensions(extReg, Binding.class, BindingType.class);
-        JAXBExtensionHelper.addExtensions(extReg, BindingOperation.class,
-                                          org.apache.cxf.binding.corba.wsdl.OperationType.class);
-        JAXBExtensionHelper.addExtensions(extReg, Definition.class, TypeMappingType.class);
-        JAXBExtensionHelper.addExtensions(extReg, Port.class,
-                                          org.apache.cxf.binding.corba.wsdl.AddressType.class);
-
-        extReg.mapExtensionTypes(Binding.class, CorbaConstants.NE_CORBA_BINDING, BindingType.class);
-        extReg.mapExtensionTypes(BindingOperation.class, CorbaConstants.NE_CORBA_OPERATION,
-                                 org.apache.cxf.binding.corba.wsdl.OperationType.class);
-        extReg.mapExtensionTypes(Definition.class, CorbaConstants.NE_CORBA_TYPEMAPPING,
-                                 TypeMappingType.class);
-        extReg.mapExtensionTypes(Port.class, CorbaConstants.NE_CORBA_ADDRESS,
-                                 org.apache.cxf.binding.corba.wsdl.AddressType.class);
-    }
-
 }

@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.BindingType;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Object;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
@@ -292,9 +292,9 @@ public class ObjectReferenceVisitor extends VisitorBase {
         // Get the list of all corba types already defined and look for the provided
         // QName.  If we have defined this type, we don't need to add it to the typemap
         // again.
-        List<CorbaTypeImpl> allTypes = typeMap.getStructOrExceptionOrUnion();
-        for (Iterator<CorbaTypeImpl> iter = allTypes.iterator(); iter.hasNext();) {
-            CorbaTypeImpl impl = iter.next();
+        List<CorbaType> allTypes = typeMap.getStructOrExceptionOrUnion();
+        for (Iterator<CorbaType> iter = allTypes.iterator(); iter.hasNext();) {
+            CorbaType impl = iter.next();
             if (impl.getQName().equals(objectReferenceName))  {
                 return true;
             }

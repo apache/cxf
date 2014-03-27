@@ -22,7 +22,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.CorbaTypeMap;
 import org.apache.cxf.binding.corba.wsdl.Anonsequence;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.omg.CORBA.ORB;
@@ -46,7 +46,7 @@ public class CorbaSequenceListener extends AbstractCorbaTypeListener {
         orb = orbRef;
         typeMap = map;
         serviceInfo = sInfo;
-        CorbaTypeImpl seqType = handler.getType();
+        CorbaType seqType = handler.getType();
         QName elementName;
         if (seqType instanceof Anonsequence) {
             Anonsequence anonSeqType = (Anonsequence) seqType;

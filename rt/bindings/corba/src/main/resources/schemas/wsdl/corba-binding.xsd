@@ -20,26 +20,28 @@
 -->
 
 <xs:schema targetNamespace="http://cxf.apache.org/bindings/corba" 
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
     xmlns:corba="http://cxf.apache.org/bindings/corba" 
     xmlns:xs="http://www.w3.org/2001/XMLSchema" 
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     jaxb:version="2.0"
     elementFormDefault="qualified" 
     attributeFormDefault="unqualified"> 
-    
-    <xs:import namespace="http://schemas.xmlsoap.org/wsdl/"
-        schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd"/>
-  
+      
+        <xs:complexType name="baseCorbaType">
+                <xs:annotation>
+        			<xs:appinfo>
+            			<jaxb:class ref="org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl"/>                                
+        			</xs:appinfo>      
+                </xs:annotation>
+	    </xs:complexType>  
         <xs:complexType name="corbaType">
                 <xs:annotation>
                         <xs:documentation>Anonymous IDL type. Has no repository ID.
             Used for intermediate types for multidimensional arrays and sequences of sequences.
             </xs:documentation>            
-        <xs:appinfo>
-            <jaxb:class implClass="org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl"/>                                
-        </xs:appinfo>      
                 </xs:annotation>
+                <xs:complexContent>
+                        <xs:extension base="corba:baseCorbaType">
                 <xs:attribute name="name" type="xs:string" use="required">
                   <xs:annotation>
                     <xs:documentation>Specifies a name for the mapped type. Typically this name is derived from the XML Schema type being mapped.</xs:documentation>
@@ -51,6 +53,8 @@
                   </xs:annotation>
                 </xs:attribute>
                 <xs:attribute name="qualified" type="xs:boolean" />
+                </xs:extension>
+                </xs:complexContent>
         </xs:complexType>
         <xs:complexType name="namedType">
                 <xs:annotation>
@@ -258,7 +262,7 @@
                 </xs:annotation>
                 <xs:complexContent>
                         <xs:extension base="corba:corbaType">
-                                <xs:attribute name="bound" type="corba:ulong"/>
+                                <xs:attribute name="bound" type="corba:ulong" use="required"/>
                         </xs:extension>
                 </xs:complexContent>
         </xs:complexType>
@@ -268,7 +272,7 @@
                 </xs:annotation>
                 <xs:complexContent>
                         <xs:extension base="corba:corbaType">
-                                <xs:attribute name="bound" type="corba:ulong"/>
+                                <xs:attribute name="bound" type="corba:ulong" use="required"/>
                         </xs:extension>
                 </xs:complexContent>
         </xs:complexType>
@@ -301,41 +305,33 @@
                 <xs:annotation>
                         <xs:documentation>CXF CORBA WSDL binding type map.</xs:documentation>
                 </xs:annotation>
-                <xs:complexContent>
-                        <xs:extension base="wsdl:tExtensibilityElement">
-                                <xs:sequence>
-                                        <xs:choice maxOccurs="unbounded">
-                                                <xs:element name="struct" type="corba:struct"/>
-                                                <xs:element name="exception" type="corba:exception"/>
-                                                <xs:element name="union" type="corba:union"/>
-                                                <xs:element name="alias" type="corba:alias"/>
-                                                <xs:element name="sequence" type="corba:sequence"/>
-                                                <xs:element name="array" type="corba:array"/>
-                                                <xs:element name="enum" type="corba:enum"/>
-                                                <xs:element name="fixed" type="corba:fixed"/>
-                                                <xs:element name="anonsequence" type="corba:anonsequence"/>
-                                                <xs:element name="anonarray" type="corba:anonarray"/>
-                                                <xs:element name="anonstring" type="corba:anonstring"/>
-                                                <xs:element name="anonwstring" type="corba:anonwstring"/>
-                                                <xs:element name="anonfixed" type="corba:anonfixed"/>
-                                                <xs:element name="const" type="corba:const"/>
-                                                <xs:element name="object" type="corba:object"/>
-                                        </xs:choice>
-                                </xs:sequence>
-                                <xs:attribute name="targetNamespace" type="xs:anyURI" use="required"/>
-                        </xs:extension>
-                </xs:complexContent>
+                <xs:sequence>
+                        <xs:choice maxOccurs="unbounded">
+                                <xs:element name="struct" type="corba:struct"/>
+                                <xs:element name="exception" type="corba:exception"/>
+                                <xs:element name="union" type="corba:union"/>
+                                <xs:element name="alias" type="corba:alias"/>
+                                <xs:element name="sequence" type="corba:sequence"/>
+                                <xs:element name="array" type="corba:array"/>
+                                <xs:element name="enum" type="corba:enum"/>
+                                <xs:element name="fixed" type="corba:fixed"/>
+                                <xs:element name="anonsequence" type="corba:anonsequence"/>
+                                <xs:element name="anonarray" type="corba:anonarray"/>
+                                <xs:element name="anonstring" type="corba:anonstring"/>
+                                <xs:element name="anonwstring" type="corba:anonwstring"/>
+                                <xs:element name="anonfixed" type="corba:anonfixed"/>
+                                <xs:element name="const" type="corba:const"/>
+                                <xs:element name="object" type="corba:object"/>
+                        </xs:choice>
+                </xs:sequence>
+                <xs:attribute name="targetNamespace" type="xs:anyURI" use="required"/>
         </xs:complexType>
         <!-- Begin CORBA Binding Definitions -->
         <xs:complexType name="addressType">
                 <xs:annotation>
                         <xs:documentation>CXF CORBA Address Type</xs:documentation>
                 </xs:annotation>
-                <xs:complexContent>
-                        <xs:extension base="wsdl:tExtensibilityElement">
-                                <xs:attribute name="location" type="xs:string" use="required"/>
-                        </xs:extension>
-                </xs:complexContent>
+                <xs:attribute name="location" type="xs:string" use="required"/>
         </xs:complexType>
         <xs:element name="address" type="corba:addressType"/>
         <xs:complexType name="policyType">
@@ -344,38 +340,34 @@
                 Artix IIOP tunnel policy specification.
             </xs:documentation>
                 </xs:annotation>
-                <xs:complexContent>
-                        <xs:extension base="wsdl:tExtensibilityElement">
-                                <xs:attribute name="poaname" type="xs:string" use="optional">
-                                        <xs:annotation>
-                                                <xs:documentation>
-                                                        Attribute used to set a poaname, otherwise it will
-                                                        default to the service name that this port runs under.
+                <xs:attribute name="poaname" type="xs:string" use="optional">
+                        <xs:annotation>
+                                <xs:documentation>
+                                        Attribute used to set a poaname, otherwise it will
+                                        default to the service name that this port runs under.
 
-                                                        poaname is used for setting certain policies, such
-                                                        as direct persistence and well-known port numbers in
-                                                        the orb config file.
-                                                </xs:documentation>
-                                        </xs:annotation>
-                                </xs:attribute>
-                                <xs:attribute name="serviceid" type="xs:string" use="optional">
-                                        <xs:annotation>
-                                                <xs:documentation>
-                                                        Attribute used to set a serviceid
-                                                        see CORBA documentation for more details.
-                                                </xs:documentation>
-                                        </xs:annotation>
-                                </xs:attribute>
-                                <xs:attribute name="persistent" type="xs:boolean" use="optional" default="false">
-                                        <xs:annotation>
-                                                <xs:documentation>
-                                                        Attribute select whether to use a persistent poa.
-                                                        see CORBA documentation for more details.
-                                                </xs:documentation>
-                                        </xs:annotation>
-                                </xs:attribute>
-                        </xs:extension>
-                </xs:complexContent>
+                                        poaname is used for setting certain policies, such
+                                        as direct persistence and well-known port numbers in
+                                        the orb config file.
+                                </xs:documentation>
+                        </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="serviceid" type="xs:string" use="optional">
+                        <xs:annotation>
+                                <xs:documentation>
+                                        Attribute used to set a serviceid
+                                        see CORBA documentation for more details.
+                                </xs:documentation>
+                        </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="persistent" type="xs:boolean" use="optional" default="false">
+                        <xs:annotation>
+                                <xs:documentation>
+                                        Attribute select whether to use a persistent poa.
+                                        see CORBA documentation for more details.
+                                </xs:documentation>
+                        </xs:annotation>
+                </xs:attribute>
         </xs:complexType>
         <xs:element name="policy" type="corba:policyType"/>
 
@@ -386,12 +378,8 @@
                 <xs:annotation>
                         <xs:documentation>CXF CORBA Binding Type</xs:documentation>
                 </xs:annotation>
-                <xs:complexContent>
-                        <xs:extension base="wsdl:tExtensibilityElement">
-                                <xs:attribute name="repositoryID" type="xs:string" use="required"/>
+                <xs:attribute name="repositoryID" type="xs:string" use="required"/>
                 <xs:attribute name="bases" type="corba:basesType" use="optional"/>
-                        </xs:extension>
-                </xs:complexContent>
         </xs:complexType>
         <xs:element name="binding" type="corba:bindingType">
                 <xs:annotation>
@@ -402,16 +390,12 @@
                 <xs:annotation>
                         <xs:documentation>CORBA Operation Type</xs:documentation>
                 </xs:annotation>
-                <xs:complexContent>
-                        <xs:extension base="wsdl:tExtensibilityElement">
-                                <xs:sequence>
-                                        <xs:element name="param" type="corba:paramType" minOccurs="0" maxOccurs="unbounded"/>
-                                        <xs:element name="return" type="corba:argType" minOccurs="0"/>
-                                        <xs:element name="raises" type="corba:raisesType" minOccurs="0" maxOccurs="unbounded"/>
-                                </xs:sequence>
-                                <xs:attribute name="name" type="xs:string" use="required"/>
-                        </xs:extension>
-                </xs:complexContent>
+                <xs:sequence>
+                        <xs:element name="param" type="corba:paramType" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element name="return" type="corba:argType" minOccurs="0"/>
+                        <xs:element name="raises" type="corba:raisesType" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string" use="required"/>
         </xs:complexType>
         <xs:element name="operation" type="corba:operationType">
                 <xs:annotation>

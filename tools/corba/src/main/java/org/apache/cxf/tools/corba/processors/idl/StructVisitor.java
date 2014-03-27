@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
 
 import antlr.collections.AST;
 
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.binding.corba.wsdl.Struct;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
@@ -114,7 +114,7 @@ public class StructVisitor extends VisitorBase {
             AST memberNode = TypesUtils.getCorbaTypeNameNode(memberTypeNode);
 
             XmlSchemaType schemaType = null;
-            CorbaTypeImpl corbaType = null;
+            CorbaType corbaType = null;
             Scope fqName = null;
             try {
                 TypesVisitor visitor = new TypesVisitor(structScope,
@@ -141,7 +141,7 @@ public class StructVisitor extends VisitorBase {
                    && !ScopedNameVisitor.accept(structScope, definition, schema, memberNode, wsdlVisitor, true)) {
 
                 XmlSchemaType memberSchemaType = schemaType;
-                CorbaTypeImpl memberCorbaType = corbaType;
+                CorbaType memberCorbaType = corbaType;
                 // needed for anonymous arrays in structs
                 if (ArrayVisitor.accept(memberNode)) {
                     Scope anonScope = new Scope(structScope,
@@ -195,7 +195,7 @@ public class StructVisitor extends VisitorBase {
     }
 
     private MemberType createMemberType(AST memberNode,
-                                        CorbaTypeImpl corbaType,
+                                        CorbaType corbaType,
                                         Scope fqName) {
         // corba:member
         String memberName = memberNode.toString();
@@ -227,7 +227,7 @@ public class StructVisitor extends VisitorBase {
             List<DeferredAction> list = deferredActions.getActions(structScope);
             if ((list != null) && !list.isEmpty()) {
                 XmlSchemaType stype = getSchemaType();
-                CorbaTypeImpl ctype = getCorbaType();
+                CorbaType ctype = getCorbaType();
                 Iterator<DeferredAction> iterator = list.iterator();
                 while (iterator.hasNext()) {
                     SchemaDeferredAction action = (SchemaDeferredAction)iterator.next();

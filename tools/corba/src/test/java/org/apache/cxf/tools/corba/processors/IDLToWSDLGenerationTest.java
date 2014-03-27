@@ -61,6 +61,7 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
         addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "object"), "binding");
         addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "enum"), "type");
         addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "union"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "union"), "discriminator");
         addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "unionbranch"), "idltype");
         addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonstring"), "type");
         addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonwstring"), "type");
@@ -75,6 +76,11 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
         addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "alias"), "basetype");
         addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonsequence"), "type");
         addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonsequence"), "elemtype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonarray"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonarray"), "elemtype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "param"), "idltype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "return"), "idltype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "raises"), "exception");
 
     }
 
@@ -96,11 +102,11 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
         processor.setOutputWriter(out);        
         processor.process();
 
-        InputStream origStream = getClass().getResourceAsStream(expectedWsdlFilename);  
+        URL orig = getClass().getResource(expectedWsdlFilename);  
         InputStream actualStream = new ByteArrayInputStream(out.toString().getBytes());
 
         System.out.println(out.toString());
-        assertWsdlEquals(origStream, actualStream, DEFAULT_IGNORE_ATTR, DEFAULT_IGNORE_TAG);
+        assertWsdlEquals(orig.openStream(), actualStream, DEFAULT_IGNORE_ATTR, DEFAULT_IGNORE_TAG);
     }
     
     @Test

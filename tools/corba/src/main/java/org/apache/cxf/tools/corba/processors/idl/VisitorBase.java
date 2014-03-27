@@ -23,7 +23,7 @@ import javax.wsdl.Definition;
 
 import antlr.collections.AST;
 
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
@@ -42,7 +42,7 @@ public abstract class VisitorBase implements Visitor {
     protected Definition definition;
     
     private XmlSchemaType schemaType;
-    private CorbaTypeImpl corbaType;
+    private CorbaType corbaType;
     private Scope fullyQualifiedName;
 
     private Scope scope;
@@ -79,11 +79,11 @@ public abstract class VisitorBase implements Visitor {
         return schemaType;
     }
     
-    protected void setCorbaType(CorbaTypeImpl type) {
+    protected void setCorbaType(CorbaType type) {
         corbaType = type;
     }
     
-    public CorbaTypeImpl getCorbaType() {
+    public CorbaType getCorbaType() {
         return corbaType;        
     }
     

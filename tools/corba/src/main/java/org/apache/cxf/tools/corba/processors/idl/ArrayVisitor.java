@@ -27,7 +27,7 @@ import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.Anonarray;
 import org.apache.cxf.binding.corba.wsdl.Array;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
@@ -95,7 +95,7 @@ public class ArrayVisitor extends VisitorBase {
         // process first array
         Long size = new Long(firstSizeNode.toString());
         XmlSchemaType stype = null;
-        CorbaTypeImpl ctype = null;
+        CorbaType ctype = null;
         if (identifierNode != null) {
             Scope scopedName = getScope();
             if (result.getSchemaType() != null) {
@@ -144,7 +144,7 @@ public class ArrayVisitor extends VisitorBase {
         setCorbaType(ctype);
     }
 
-    private Types doAnonarray(AST node, XmlSchemaType stype, CorbaTypeImpl ctype) {
+    private Types doAnonarray(AST node, XmlSchemaType stype, CorbaType ctype) {
         Types result = new Types();
 
         if (node != null) {
@@ -218,7 +218,7 @@ public class ArrayVisitor extends VisitorBase {
     }
 
     private Array generateCorbaArray(Scope scopedName, Long size,
-                                     CorbaTypeImpl type, XmlSchemaType stype, Scope fQName) {
+                                     CorbaType type, XmlSchemaType stype, Scope fQName) {
         Array array = new Array();
         array.setQName(new QName(typeMap.getTargetNamespace(), scopedName.toString()));
         array.setBound(size);
@@ -237,7 +237,7 @@ public class ArrayVisitor extends VisitorBase {
     }
 
     private Anonarray generateCorbaAnonarray(String name, Long size,
-                                             CorbaTypeImpl type, XmlSchemaType stype, Scope fQName) {
+                                             CorbaType type, XmlSchemaType stype, Scope fQName) {
         Anonarray anonarray = new Anonarray();
         anonarray.setQName(new QName(typeMap.getTargetNamespace(), name));
         anonarray.setBound(size);
@@ -256,7 +256,7 @@ public class ArrayVisitor extends VisitorBase {
 
     class Types {
         private XmlSchemaType schemaType;
-        private CorbaTypeImpl corbaType;
+        private CorbaType corbaType;
         private Scope fullyQualifiedName;
 
         public Types() {
@@ -264,7 +264,7 @@ public class ArrayVisitor extends VisitorBase {
             corbaType = null;
         }
 
-        public Types(XmlSchemaType stype, CorbaTypeImpl ctype,
+        public Types(XmlSchemaType stype, CorbaType ctype,
                      Scope fqName) {
             schemaType = stype;
             corbaType = ctype;
@@ -275,7 +275,7 @@ public class ArrayVisitor extends VisitorBase {
             schemaType = stype;
         }
 
-        public void setCorbaType(CorbaTypeImpl ctype) {
+        public void setCorbaType(CorbaType ctype) {
             corbaType = ctype;
         }
 
@@ -283,7 +283,7 @@ public class ArrayVisitor extends VisitorBase {
             return schemaType;
         }
 
-        public CorbaTypeImpl getCorbaType() {
+        public CorbaType getCorbaType() {
             return corbaType;
         }
 

@@ -31,7 +31,7 @@ import org.apache.cxf.binding.corba.wsdl.Alias;
 import org.apache.cxf.binding.corba.wsdl.Anonarray;
 import org.apache.cxf.binding.corba.wsdl.Anonsequence;
 import org.apache.cxf.binding.corba.wsdl.Array;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Exception;
 import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
@@ -79,7 +79,7 @@ public final class CorbaHandlerUtils {
             handler = new CorbaAnyHandler(name, idlType, tc, null);
             ((CorbaAnyHandler)handler).setTypeMap(typeMap);
         } else {
-            CorbaTypeImpl type = CorbaUtils.getCorbaType(idlType, typeMap);
+            CorbaType type = CorbaUtils.getCorbaType(idlType, typeMap);
             switch (tc.kind().value()) {
             case TCKind._tk_array:
                 handler = new CorbaArrayHandler(name, idlType, tc, type);
@@ -176,7 +176,7 @@ public final class CorbaHandlerUtils {
                                               Map<QName, CorbaObjectHandler> seenTypes) {
         QName arrayElementType = null;
         long arrayBound = 0;
-        CorbaTypeImpl baseType = obj.getType();
+        CorbaType baseType = obj.getType();
         QName elementName;
         if (baseType instanceof Array) {
             Array arrayType = (Array)baseType;
@@ -231,7 +231,7 @@ public final class CorbaHandlerUtils {
                                                  Map<QName, CorbaObjectHandler> seenTypes) {
         QName seqElementType = null;
         long seqBound = 0;
-        CorbaTypeImpl baseType = obj.getType();
+        CorbaType baseType = obj.getType();
         QName elementName;
         if (baseType instanceof Sequence) {
             Sequence seqType = (Sequence)baseType;
@@ -415,7 +415,7 @@ public final class CorbaHandlerUtils {
             handler = new CorbaPrimitiveHandler(name, idlType, tc, null);
             result = new CorbaPrimitiveListener(handler);
         } else {
-            CorbaTypeImpl type = CorbaUtils.getCorbaType(idlType, typeMap);
+            CorbaType type = CorbaUtils.getCorbaType(idlType, typeMap);
             switch (tc.kind().value()) {
             case TCKind._tk_any:
                 handler = new CorbaAnyHandler(name, idlType, tc, type);
@@ -533,7 +533,7 @@ public final class CorbaHandlerUtils {
     }
 
     public static boolean isPrimitiveIDLTypeSequence(CorbaObjectHandler handler) {
-        CorbaTypeImpl seqType = handler.getType();
+        CorbaType seqType = handler.getType();
         QName seqElementType;
         if (seqType instanceof Anonsequence) {
             Anonsequence anonSeqType = (Anonsequence) seqType;
@@ -554,7 +554,7 @@ public final class CorbaHandlerUtils {
         return result;
     }
 
-    public static boolean isOctets(CorbaTypeImpl baseType) {
+    public static boolean isOctets(CorbaType baseType) {
         return baseType.getType().equals(W3CConstants.NT_SCHEMA_BASE64)
             || baseType.getType().equals(W3CConstants.NT_SCHEMA_HBIN);
     }

@@ -21,7 +21,7 @@ package org.apache.cxf.binding.corba.types;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.CorbaStreamable;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TCKind;
@@ -34,7 +34,7 @@ public class CorbaObjectHandler {
     protected QName name;
     protected QName idlType;
     protected TypeCode typeCode;
-    protected CorbaTypeImpl type;
+    protected CorbaType type;
     protected boolean isAnon;
     protected boolean isRecursive;
 
@@ -45,7 +45,7 @@ public class CorbaObjectHandler {
         name = objName;
         idlType = objIdlType;
         typeCode = objTC;
-        type = (CorbaTypeImpl)objType;
+        type = (CorbaType)objType;
     }
     
     public QName getName() {
@@ -68,7 +68,7 @@ public class CorbaObjectHandler {
         return typeCode.kind();
     }
     
-    public CorbaTypeImpl getType() {
+    public CorbaType getType() {
         return type;
     }
 

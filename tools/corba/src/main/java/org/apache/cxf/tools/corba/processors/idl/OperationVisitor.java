@@ -33,6 +33,7 @@ import javax.wsdl.Output;
 import javax.wsdl.Part;
 import javax.wsdl.PortType;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.xml.namespace.QName;
 
@@ -233,7 +234,7 @@ public class OperationVisitor extends VisitorBase {
             throw new RuntimeException(ex);
         }
         corbaOperation.setName(corbaOpName);
-        bindingOperation.addExtensibilityElement(corbaOperation);
+        bindingOperation.addExtensibilityElement((ExtensibilityElement)corbaOperation);
         bindingOperation.setOperation(op);
         bindingOperation.setName(op.getName());
         binding.addBindingOperation(bindingOperation);

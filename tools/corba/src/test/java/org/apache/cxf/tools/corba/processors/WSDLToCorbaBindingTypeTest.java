@@ -42,7 +42,7 @@ import org.apache.cxf.binding.corba.wsdl.Anonfixed;
 import org.apache.cxf.binding.corba.wsdl.Anonsequence;
 import org.apache.cxf.binding.corba.wsdl.Anonstring;
 import org.apache.cxf.binding.corba.wsdl.Array;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Struct;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.binding.corba.wsdl.Union;
@@ -386,9 +386,9 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
             idlgen.setOutputFile("typeInherit.idl");
             idlgen.generateIDL(model);
 
-            List<CorbaTypeImpl> types = mapType.getStructOrExceptionOrUnion();
+            List<CorbaType> types = mapType.getStructOrExceptionOrUnion();
             for (int i = 0; i < types.size(); i++) {
-                CorbaTypeImpl type = types.get(i);
+                CorbaType type = types.get(i);
                 if ("Type5SequenceStruct".equals(type.getName())) {
                     assertTrue("Name is incorrect for Type5SequenceStruct Type", type instanceof Struct);
                     assertEquals("Type is incorrect for AnonSequence Type", "Type5", 
@@ -435,9 +435,9 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
             idlgen.setOutputFile("atype.idl");
             idlgen.generateIDL(model);
 
-            List<CorbaTypeImpl> types = mapType.getStructOrExceptionOrUnion();
+            List<CorbaType> types = mapType.getStructOrExceptionOrUnion();
             for (int i = 0; i < types.size(); i++) {
-                CorbaTypeImpl type = types.get(i);
+                CorbaType type = types.get(i);
                 if (type instanceof Anonstring) {
                     Anonstring str = (Anonstring)type;
                     assertEquals("Name is incorrect for Array Type", "X._1_S", 
@@ -513,8 +513,8 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
             assertEquals(2, typemap.getElementsByTagName("corba:struct").getLength());            
 
             TypeMappingType mapType = (TypeMappingType)model.getExtensibilityElements().get(0);
-            Map<String, CorbaTypeImpl> tmap = new HashMap<String, CorbaTypeImpl>();
-            for (CorbaTypeImpl type : mapType.getStructOrExceptionOrUnion()) {
+            Map<String, CorbaType> tmap = new HashMap<String, CorbaType>();
+            for (CorbaType type : mapType.getStructOrExceptionOrUnion()) {
                 tmap.put(type.getName(), type);
             }
 
@@ -576,7 +576,7 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
             assertEquals(5, mapType.getStructOrExceptionOrUnion().size());
             int strcnt = 0;
             int unioncnt = 0;
-            for (CorbaTypeImpl corbaType : mapType.getStructOrExceptionOrUnion()) {
+            for (CorbaType corbaType : mapType.getStructOrExceptionOrUnion()) {
                 if (corbaType instanceof Struct) {
                     strcnt++;
                 }

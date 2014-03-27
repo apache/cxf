@@ -24,7 +24,7 @@ import java.util.HashMap;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 
 public class CorbaPrimitiveMap extends PrimitiveMapBase {
     
@@ -75,11 +75,11 @@ public class CorbaPrimitiveMap extends PrimitiveMapBase {
     }
     
     public Object get(QName key) {
-        CorbaTypeImpl corbaTypeImpl = null;
+        CorbaType corbaTypeImpl = null;
 
         QName type = corbaPrimitiveMap.get(key.getLocalPart());
         if (type != null) {
-            corbaTypeImpl = new CorbaTypeImpl();
+            corbaTypeImpl = new CorbaType();
             corbaTypeImpl.setQName(type);
             corbaTypeImpl.setType(key);
             corbaTypeImpl.setName(key.getLocalPart());

@@ -21,6 +21,7 @@ package org.apache.cxf.tools.corba.processors.idl;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.wsdl.Binding;
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
@@ -33,6 +34,7 @@ import javax.wsdl.Output;
 import javax.wsdl.Part;
 import javax.wsdl.PortType;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.xml.namespace.QName;
 
@@ -388,7 +390,7 @@ public class AttributeVisitor extends VisitorBase {
         bindingOutput.setName(op.getOutput().getName());
 
         BindingOperation bindingOperation = definition.createBindingOperation();
-        bindingOperation.addExtensibilityElement(corbaOp);
+        bindingOperation.addExtensibilityElement((ExtensibilityElement)corbaOp);
         bindingOperation.setOperation(op);
         bindingOperation.setName(op.getName());
 

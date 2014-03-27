@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaType;
@@ -34,7 +34,7 @@ import org.apache.ws.commons.schema.constants.Constants;
 public class FixedPtConstVisitor implements Visitor {
         
     private XmlSchemaType schemaType;
-    private CorbaTypeImpl corbaType;
+    private CorbaType corbaType;
     private Scope scope;
     private XmlSchemaCollection schemas;
     
@@ -59,7 +59,7 @@ public class FixedPtConstVisitor implements Visitor {
         //      <fixed_pt_const_type> ::= "fixed"
                 
         XmlSchemaType stype = null; 
-        CorbaTypeImpl ctype = null;
+        CorbaType ctype = null;
         
         QName corbaTypeQName =  CorbaConstants.NE_CORBA_FIXED; 
         
@@ -68,7 +68,7 @@ public class FixedPtConstVisitor implements Visitor {
             if (schemaTypeQName != null) {        
                 stype = schemas.getTypeByQName(schemaTypeQName);
                 if (stype != null) {
-                    ctype = new CorbaTypeImpl();
+                    ctype = new CorbaType();
                     ctype.setQName(corbaTypeQName);
                     ctype.setType(stype.getQName());
                     ctype.setName(stype.getQName().getLocalPart());
@@ -84,7 +84,7 @@ public class FixedPtConstVisitor implements Visitor {
         return schemaType;
     }
     
-    public CorbaTypeImpl getCorbaType() {
+    public CorbaType getCorbaType() {
         return corbaType;
     }
     

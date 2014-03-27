@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.Anonsequence;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -83,7 +83,7 @@ public class SequenceVisitor extends VisitorBase {
         visitor.visit(simpleTypeSpecNode);
 
         XmlSchemaType stype = visitor.getSchemaType();
-        CorbaTypeImpl ctype = visitor.getCorbaType();
+        CorbaType ctype = visitor.getCorbaType();
         Scope fullyQualifiedName = visitor.getFullyQualifiedName();
 
 
@@ -119,7 +119,7 @@ public class SequenceVisitor extends VisitorBase {
             schemaType = generateSchemaType(null, scopedName, bound, fullyQualifiedName);
         }
 
-        CorbaTypeImpl corbaType = null;
+        CorbaType corbaType = null;
         if (identifierNode == null) {
             corbaType = generateCorbaAnonsequence(ctype,
                                                   schemaType,
@@ -168,7 +168,7 @@ public class SequenceVisitor extends VisitorBase {
         return ct;
     }
 
-    private CorbaTypeImpl generateCorbaSequence(CorbaTypeImpl ctype,
+    private CorbaType generateCorbaSequence(CorbaType ctype,
                                                 XmlSchemaType schemaType,
                                                 Scope scopedName,
                                                 long bound,
@@ -195,7 +195,7 @@ public class SequenceVisitor extends VisitorBase {
         return corbaSeq;
     }
 
-    private Anonsequence generateCorbaAnonsequence(CorbaTypeImpl ctype,
+    private Anonsequence generateCorbaAnonsequence(CorbaType ctype,
                                                    XmlSchemaType schemaType,
                                                    Scope scopedName,
                                                    long bound,

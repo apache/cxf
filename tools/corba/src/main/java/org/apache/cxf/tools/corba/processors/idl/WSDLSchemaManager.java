@@ -26,27 +26,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Import;
-import javax.wsdl.Port;
 import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensionRegistry;
+import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
 import javax.wsdl.factory.WSDLFactory;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.binding.corba.wsdl.AddressType;
-import org.apache.cxf.binding.corba.wsdl.BindingType;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.OperationType;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
-import org.apache.cxf.wsdl.JAXBExtensionHelper;
 import org.apache.cxf.wsdl.WSDLConstants;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaExternal;
@@ -84,15 +79,16 @@ public class WSDLSchemaManager {
     }
 
     public Definition createWSDLDefinition(String tns) throws WSDLException, JAXBException {
-        WSDLFactory wsdlFactory = WSDLFactory.newInstance();
+        WSDLManager wm = BusFactory.getThreadDefaultBus().getExtension(WSDLManager.class);
+        WSDLFactory wsdlFactory = wm.getWSDLFactory();
         Definition wsdlDefinition = wsdlFactory.newDefinition();
+        wsdlDefinition.setExtensionRegistry(wm.getExtensionRegistry());
         wsdlDefinition.setTargetNamespace(tns);
         wsdlDefinition.addNamespace("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         wsdlDefinition.addNamespace(WSDLConstants.NP_SCHEMA_XSD, WSDLConstants.NS_SCHEMA_XSD);
         wsdlDefinition.addNamespace(WSDLConstants.SOAP11_PREFIX, WSDLConstants.NS_SOAP11);
         wsdlDefinition.addNamespace("tns", tns);
         wsdlDefinition.addNamespace(CorbaConstants.NP_WSDL_CORBA, CorbaConstants.NU_WSDL_CORBA);
-        addCorbaExtensions(wsdlDefinition.getExtensionRegistry());
         defns.put(tns, wsdlDefinition);
         return wsdlDefinition;
     }
@@ -231,25 +227,6 @@ public class WSDLSchemaManager {
         }
     }
 
-    private void addCorbaExtensions(ExtensionRegistry extReg) throws JAXBException {
-        try {
-            JAXBExtensionHelper.addExtensions(extReg, Binding.class, BindingType.class);
-            JAXBExtensionHelper.addExtensions(extReg, BindingOperation.class, OperationType.class);
-            JAXBExtensionHelper.addExtensions(extReg, Definition.class, TypeMappingType.class);
-            JAXBExtensionHelper.addExtensions(extReg, Port.class, AddressType.class);
-
-            extReg.mapExtensionTypes(Binding.class, CorbaConstants.NE_CORBA_BINDING, BindingType.class);
-            extReg.mapExtensionTypes(BindingOperation.class, CorbaConstants.NE_CORBA_OPERATION,
-                                     org.apache.cxf.binding.corba.wsdl.OperationType.class);
-            extReg.mapExtensionTypes(Definition.class, CorbaConstants.NE_CORBA_TYPEMAPPING,
-                                     TypeMappingType.class);
-            extReg.mapExtensionTypes(Port.class, CorbaConstants.NE_CORBA_ADDRESS,
-                                     org.apache.cxf.binding.corba.wsdl.AddressType.class);
-        } catch (javax.xml.bind.JAXBException ex) {
-            throw new JAXBException(ex.getMessage());
-        }
-    }
-
     public void deferAttachSchemaToWSDL(Definition definition, XmlSchema schema, boolean isSchemaGenerated)
         throws Exception {
         DeferredSchemaAttachment attachment = new DeferredSchemaAttachment();
@@ -321,7 +298,7 @@ public class WSDLSchemaManager {
         } else {
             typeMap.setTargetNamespace(corbatypemaptns);
         }
-        definition.addExtensibilityElement(typeMap);
+        definition.addExtensibilityElement((ExtensibilityElement)typeMap);
         return typeMap;
     }
 

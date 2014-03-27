@@ -26,7 +26,7 @@ import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.Alias;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.constants.Constants;
@@ -61,7 +61,7 @@ public class TypedefVisitor extends VisitorBase {
         typesVisitor.visit(typeDeclaratorNode);
 
         XmlSchemaType schemaType = typesVisitor.getSchemaType();
-        CorbaTypeImpl corbaType = typesVisitor.getCorbaType();
+        CorbaType corbaType = typesVisitor.getCorbaType();
         Scope fullyQualifiedName = typesVisitor.getFullyQualifiedName();
         Scope typedefScope = new Scope(getScope(), identifierNode);
         
@@ -150,7 +150,7 @@ public class TypedefVisitor extends VisitorBase {
     
     private void generateAlias(AST identifierNode,
                                XmlSchemaType schemaType,
-                               CorbaTypeImpl corbaType,
+                               CorbaType corbaType,
                                Scope fqName) {
     
         Scope scopedName = new Scope(getScope(), identifierNode);
@@ -174,7 +174,7 @@ public class TypedefVisitor extends VisitorBase {
     private void generateStringAlias(AST typeDeclaratorNode,
                                      AST identifierNode,
                                      XmlSchemaType schemaType,
-                                     CorbaTypeImpl corbaType,
+                                     CorbaType corbaType,
                                      Scope fqName) {
         
         Scope typedefScope = new Scope(getScope(), identifierNode);

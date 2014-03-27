@@ -21,7 +21,7 @@ package org.apache.cxf.tools.corba.processors.idl;
 
 import antlr.collections.AST;
 
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
 public interface Visitor {
@@ -29,7 +29,7 @@ public interface Visitor {
     void visit(AST node);
     
     XmlSchemaType getSchemaType();
-    CorbaTypeImpl getCorbaType();
+    CorbaType getCorbaType();
 
     Scope getScope();  
     Scope getFullyQualifiedName();  

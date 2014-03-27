@@ -40,6 +40,7 @@ import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.Types;
+import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
 import javax.xml.namespace.QName;
@@ -48,7 +49,7 @@ import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.AddressType;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -521,17 +522,17 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 addr = "IOR:";
             }
             address.setLocation(addr);
-            port.addExtensibilityElement(address);
+            port.addExtensibilityElement((ExtensibilityElement)address);
             service.addPort(port);
             port.setBinding(bindings[i]);
         }
     }
 
     public void cleanUpTypeMap(TypeMappingType typeMap) {
-        List<CorbaTypeImpl> types = typeMap.getStructOrExceptionOrUnion();
+        List<CorbaType> types = typeMap.getStructOrExceptionOrUnion();
         if (types != null) {
             for (int i = 0; i < types.size(); i++) {
-                CorbaTypeImpl type = types.get(i);
+                CorbaType type = types.get(i);
                 if (type.getQName() != null) {
                     type.setName(type.getQName().getLocalPart());
                     type.setQName(null);
@@ -541,7 +542,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     }
     
     public void addTypeMapSchemaImports(Definition def, WSDLASTVisitor visitor) {
-        List<CorbaTypeImpl> types = visitor.getTypeMap().getStructOrExceptionOrUnion();
+        List<CorbaType> types = visitor.getTypeMap().getStructOrExceptionOrUnion();
         ModuleToNSMapper mapper = visitor.getModuleToNSMapper();
         WSDLSchemaManager manager = visitor.getManager();
         Collection<String> namespaces = CastUtils.cast(def.getNamespaces().values());
@@ -549,7 +550,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         
         if (types != null) {
             for (int i = 0; i < types.size(); i++) {
-                CorbaTypeImpl type = types.get(i);
+                CorbaType type = types.get(i);
                 QName schemaType = type.getType();
                 if (schemaType != null) {
                     String typeNamespace = schemaType.getNamespaceURI();

@@ -23,7 +23,7 @@ import javax.wsdl.Definition;
 
 import antlr.collections.AST;
 
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.ModeType;
 import org.apache.cxf.binding.corba.wsdl.OperationType;
 import org.apache.cxf.binding.corba.wsdl.ParamType;
@@ -77,7 +77,7 @@ public class ParamDclVisitor extends VisitorBase {
                                                                 wsdlVisitor);
         visitor.visit(typeNode);
         XmlSchemaType schemaType = visitor.getSchemaType();
-        CorbaTypeImpl corbaType = visitor.getCorbaType();
+        CorbaType corbaType = visitor.getCorbaType();
         Scope fullyQualifiedName = visitor.getFullyQualifiedName();
 
         switch (node.getType()) {
@@ -135,7 +135,7 @@ public class ParamDclVisitor extends VisitorBase {
         return element;
     }
 
-    private void addCorbaParam(CorbaTypeImpl corbaType, ModeType mode,
+    private void addCorbaParam(CorbaType corbaType, ModeType mode,
                                String partName, Scope fullyQualifiedName) {
         ParamType param = new ParamType();
         param.setName(partName);

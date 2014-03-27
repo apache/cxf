@@ -27,15 +27,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
-import javax.wsdl.Port;
-import javax.wsdl.extensions.ExtensionRegistry;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.Alias;
@@ -49,7 +45,7 @@ import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.binding.corba.wsdl.CaseType;
 import org.apache.cxf.binding.corba.wsdl.Const;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Enum;
 import org.apache.cxf.binding.corba.wsdl.Enumerator;
 import org.apache.cxf.binding.corba.wsdl.Fixed;
@@ -91,7 +87,6 @@ import org.apache.cxf.tools.corba.common.idltypes.IdlUnion;
 import org.apache.cxf.tools.corba.common.idltypes.IdlUnionBranch;
 import org.apache.cxf.tools.corba.utils.FileOutputStreamFactory;
 import org.apache.cxf.tools.corba.utils.OutputStreamFactory;
-import org.apache.cxf.wsdl.JAXBExtensionHelper;
 
 public class WSDLToIDLAction {
         
@@ -106,7 +101,6 @@ public class WSDLToIDLAction {
     private Definition def;
     private IdlRoot root = IdlRoot.create();
     private IdlInterface intf;
-    private ExtensionRegistry extReg;
     private WSDLToTypeProcessor typeProcessor = new WSDLToTypeProcessor(); 
     private boolean generateAllBindings;    
 
@@ -120,8 +114,6 @@ public class WSDLToIDLAction {
         } else {
             def = definition;
         }
-        extReg = def.getExtensionRegistry();
-
         if (printWriter == null) {
             printWriter = createPrintWriter(outputFile);
         }
@@ -162,32 +154,6 @@ public class WSDLToIDLAction {
         printWriter.close();
         
     }
-
-    
-    public void addExtensions(ExtensionRegistry extRegistry) throws JAXBException {
-        extReg = extRegistry;
-        try {
-                      
-            JAXBExtensionHelper.addExtensions(extReg, Binding.class, BindingType.class);
-            JAXBExtensionHelper.addExtensions(extReg, BindingOperation.class,
-                                              org.apache.cxf.binding.corba.wsdl.OperationType.class);
-            JAXBExtensionHelper.addExtensions(extReg, Definition.class, TypeMappingType.class);
-            JAXBExtensionHelper.addExtensions(extReg, Port.class,
-                                              org.apache.cxf.binding.corba.wsdl.AddressType.class);
-
-            extReg.mapExtensionTypes(Binding.class, CorbaConstants.NE_CORBA_BINDING, BindingType.class);
-            extReg.mapExtensionTypes(BindingOperation.class, CorbaConstants.NE_CORBA_OPERATION,
-                                     org.apache.cxf.binding.corba.wsdl.OperationType.class);
-            extReg.mapExtensionTypes(Definition.class, CorbaConstants.NE_CORBA_TYPEMAPPING,
-                                     TypeMappingType.class);
-            extReg.mapExtensionTypes(Port.class, CorbaConstants.NE_CORBA_ADDRESS,
-                                     org.apache.cxf.binding.corba.wsdl.AddressType.class);
-
-        } catch (javax.xml.bind.JAXBException ex) {
-            LOG.log(Level.SEVERE, "Failing to serialize/deserialize extensions", ex);
-            throw new JAXBException(ex.getMessage());
-        }
-    }    
 
     private void generateIDL(Definition definition, Binding binding) {
         List<?> ext = binding.getExtensibilityElements();
@@ -326,7 +292,7 @@ public class WSDLToIDLAction {
         try {
             TypeMappingType typeMappingType = getTypeMappingType();
             if (typeMappingType != null) {
-                for (CorbaTypeImpl corbaTypeImpl 
+                for (CorbaType corbaTypeImpl 
                     : typeMappingType.getStructOrExceptionOrUnion()) {                                
                     findCorbaIdlType(corbaTypeImpl);
                 }
@@ -336,13 +302,13 @@ public class WSDLToIDLAction {
         }
     }
 
-    private CorbaTypeImpl getCorbaType(QName qname) throws Exception {    
-        CorbaTypeImpl corbaTypeImpl = null;
+    private CorbaType getCorbaType(QName qname) throws Exception {    
+        CorbaType corbaTypeImpl = null;
 
         try {
             TypeMappingType typeMappingType = getTypeMappingType();
             if (typeMappingType != null) {
-                for (CorbaTypeImpl corbaType : typeMappingType.getStructOrExceptionOrUnion()) {
+                for (CorbaType corbaType : typeMappingType.getStructOrExceptionOrUnion()) {
                     if (corbaType.getName().equals(qname.getLocalPart())) {                    
                         return corbaType;
                     }
@@ -368,13 +334,13 @@ public class WSDLToIDLAction {
         return findIdlType(local, qname, null);                
     }
 
-    private IdlType findCorbaIdlType(CorbaTypeImpl corbaTypeImpl) throws Exception {        
+    private IdlType findCorbaIdlType(CorbaType corbaTypeImpl) throws Exception {        
         String local = corbaTypeImpl.getName();        
         return findIdlType(local, corbaTypeImpl.getType(), corbaTypeImpl);                
     }
     
     private IdlType findIdlType(String local, QName ntype, 
-                                  CorbaTypeImpl corbatypeImpl) throws Exception {
+                                  CorbaType corbatypeImpl) throws Exception {
         IdlType idlType = null;
         
         if (ntype.getNamespaceURI().equals(CorbaConstants.NU_WSDL_CORBA)) {
@@ -432,12 +398,12 @@ public class WSDLToIDLAction {
         return (IdlType)result;
     }
        
-    protected IdlType createType(QName idlType, String name[], CorbaTypeImpl corbaType) throws Exception {
+    protected IdlType createType(QName idlType, String name[], CorbaType corbaType) throws Exception {
         if (idlType.getLocalPart().equals("CORBA.Object")) {
             return IdlInterface.create(null, "Object");
         }        
 
-        CorbaTypeImpl  corbaTypeImpl = corbaType;
+        CorbaType  corbaTypeImpl = corbaType;
         if (corbaTypeImpl == null) {
             corbaTypeImpl = getCorbaType(idlType);
         }
@@ -479,7 +445,7 @@ public class WSDLToIDLAction {
                 // Check to see if CORBAType exists. If so, create type for it
                 // otherwise
                 // create module for this scope               
-                CorbaTypeImpl possibleCorbaType = getCorbaType(qname);
+                CorbaType possibleCorbaType = getCorbaType(qname);
 
                 if (possibleCorbaType != null) {
                     idlDef = findType(qname);                    
@@ -534,7 +500,7 @@ public class WSDLToIDLAction {
         return result; 
     }
 
-    private IdlType checkAnon(CorbaTypeImpl corbaTypeImpl, IdlScopeBase scope, 
+    private IdlType checkAnon(CorbaType corbaTypeImpl, IdlScopeBase scope, 
                               String local) throws Exception {
         IdlType result = null;
         

@@ -25,7 +25,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.NamedType;
 import org.omg.CORBA.TypeCode;
 
@@ -33,20 +33,20 @@ import org.omg.CORBA.TypeCode;
 public class CorbaTypeMap {
 
     private String targetNamespace;
-    private Map<String, CorbaTypeImpl> typeMap;
+    private Map<String, CorbaType> typeMap;
     private Map<QName, TypeCode> typeCodeMap;
 
     public CorbaTypeMap(String namespace) {
         targetNamespace = namespace;
-        typeMap = new HashMap<String, CorbaTypeImpl>();
+        typeMap = new HashMap<String, CorbaType>();
         typeCodeMap = new HashMap<QName, TypeCode>();
     }
 
-    public void addType(String name, CorbaTypeImpl type) {
+    public void addType(String name, CorbaType type) {
         typeMap.put(name, type);
     }
 
-    public CorbaTypeImpl getType(String name) {
+    public CorbaType getType(String name) {
         assert name != null;
 
         return typeMap.get(name);
@@ -79,9 +79,9 @@ public class CorbaTypeMap {
             return null;
         }
 
-        Set<Map.Entry<String, CorbaTypeImpl>> mapSet = typeMap.entrySet();
-        for (Iterator<Map.Entry<String, CorbaTypeImpl>> i = mapSet.iterator(); i.hasNext();) {
-            Map.Entry<String, CorbaTypeImpl> entry = i.next();
+        Set<Map.Entry<String, CorbaType>> mapSet = typeMap.entrySet();
+        for (Iterator<Map.Entry<String, CorbaType>> i = mapSet.iterator(); i.hasNext();) {
+            Map.Entry<String, CorbaType> entry = i.next();
             if (entry.getValue() instanceof NamedType) {
                 NamedType n = (NamedType)entry.getValue();
                 if (n.getRepositoryID().equals(repId)) {

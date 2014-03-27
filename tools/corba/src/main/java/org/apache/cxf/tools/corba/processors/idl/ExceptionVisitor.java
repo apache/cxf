@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
 
 import antlr.collections.AST;
 
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -108,7 +108,7 @@ public class ExceptionVisitor extends VisitorBase {
                                                     null);
             visitor.visit(memberTypeNode);
             XmlSchemaType stype = visitor.getSchemaType();
-            CorbaTypeImpl ctype = visitor.getCorbaType();
+            CorbaType ctype = visitor.getCorbaType();
             Scope fullyQualifiedName = visitor.getFullyQualifiedName();
 
             // needed for anonymous arrays in exceptions
@@ -188,7 +188,7 @@ public class ExceptionVisitor extends VisitorBase {
         return member;
     }
 
-    private MemberType createMemberType(AST memberNode, CorbaTypeImpl ctype,
+    private MemberType createMemberType(AST memberNode, CorbaType ctype,
                                         Scope fqName) {
         // corba:member
         MemberType memberType = new MemberType();

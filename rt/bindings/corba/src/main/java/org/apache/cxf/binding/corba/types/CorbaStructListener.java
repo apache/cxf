@@ -26,7 +26,7 @@ import org.apache.cxf.binding.corba.CorbaTypeMap;
 import org.apache.cxf.binding.corba.utils.CorbaUtils;
 import org.apache.cxf.binding.corba.wsdl.Abstractanonsequence;
 import org.apache.cxf.binding.corba.wsdl.Abstractsequence;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.binding.corba.wsdl.Struct;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -98,7 +98,7 @@ public class CorbaStructListener extends AbstractCorbaTypeListener {
                 currentTypeListener.getCorbaObject().setAnonymousType(true);
                 currentTypeListener.processStartElement(name);
             } else {
-                CorbaTypeImpl type = CorbaUtils.getCorbaType(member.getIdltype(), typeMap);
+                CorbaType type = CorbaUtils.getCorbaType(member.getIdltype(), typeMap);
                 boolean wrapped = true;
                 if (type instanceof Abstractsequence) {
                     wrapped = ((Abstractsequence)type).isWrapped();

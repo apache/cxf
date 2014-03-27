@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
 import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.Const;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaType;
@@ -103,9 +103,9 @@ public final class TypesUtils {
     }
     
     public static String getConstValueByName(AST node, TypeMappingType typeMap) {
-        List<CorbaTypeImpl> types = typeMap.getStructOrExceptionOrUnion();
-        for (Iterator<CorbaTypeImpl> it = types.iterator(); it.hasNext();) {
-            CorbaTypeImpl corbaType = it.next();
+        List<CorbaType> types = typeMap.getStructOrExceptionOrUnion();
+        for (Iterator<CorbaType> it = types.iterator(); it.hasNext();) {
+            CorbaType corbaType = it.next();
             if (corbaType instanceof Const) {
                 Const corbaConst = (Const) corbaType;
                 String name = corbaConst.getQName().getLocalPart();

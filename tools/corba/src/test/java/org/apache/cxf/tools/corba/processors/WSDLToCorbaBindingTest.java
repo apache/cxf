@@ -45,7 +45,7 @@ import org.apache.cxf.binding.corba.wsdl.Anonsequence;
 import org.apache.cxf.binding.corba.wsdl.Array;
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Fixed;
 import org.apache.cxf.binding.corba.wsdl.OperationType;
 import org.apache.cxf.binding.corba.wsdl.ParamType;
@@ -144,8 +144,8 @@ public class WSDLToCorbaBindingTest extends Assert {
                                 "YCORBABinding", "tns");
         Binding binding = model.getBinding(bName);
         TypeMappingType mapType = (TypeMappingType)model.getExtensibilityElements().get(0);
-        Map<String, CorbaTypeImpl> tmap = new HashMap<String, CorbaTypeImpl>();
-        for (CorbaTypeImpl type : mapType.getStructOrExceptionOrUnion()) {
+        Map<String, CorbaType> tmap = new HashMap<String, CorbaType>();
+        for (CorbaType type : mapType.getStructOrExceptionOrUnion()) {
             tmap.put(type.getName(), type);
         }
         
@@ -168,7 +168,7 @@ public class WSDLToCorbaBindingTest extends Assert {
     }
      
     private void checkSequenceType(BindingOperation bindingOperation,
-                                   Map<String, CorbaTypeImpl> mapType) {
+                                   Map<String, CorbaType> mapType) {
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
             if (extElement.getElementType().getLocalPart().equals("operation")) {
                 OperationType corbaOpType = (OperationType)extElement;
@@ -185,7 +185,7 @@ public class WSDLToCorbaBindingTest extends Assert {
     }
     
     private void checkFixedTypeOne(BindingOperation bindingOperation,
-                                   Map<String, CorbaTypeImpl>  mapType) {
+                                   Map<String, CorbaType>  mapType) {
 
         assertEquals(bindingOperation.getBindingInput().getName(), "op_k");
         assertEquals(bindingOperation.getBindingOutput().getName(), "op_kResponse");
@@ -208,7 +208,7 @@ public class WSDLToCorbaBindingTest extends Assert {
     }
     
     private void checkFixedTypeTwo(BindingOperation bindingOperation,
-                                   Map<String, CorbaTypeImpl>  mapType) {
+                                   Map<String, CorbaType>  mapType) {
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
             if (extElement.getElementType().getLocalPart().equals("operation")) {
                 OperationType corbaOpType = (OperationType)extElement;
@@ -227,7 +227,7 @@ public class WSDLToCorbaBindingTest extends Assert {
     }
     
     private void checkFixedTypeThree(BindingOperation bindingOperation,
-                                     Map<String, CorbaTypeImpl>  mapType) {
+                                     Map<String, CorbaType>  mapType) {
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
             if (extElement.getElementType().getLocalPart().equals("operation")) {
                 OperationType corbaOpType = (OperationType)extElement;
@@ -246,7 +246,7 @@ public class WSDLToCorbaBindingTest extends Assert {
     }
     
     private void checkFixedTypeFour(BindingOperation bindingOperation,
-                                    Map<String, CorbaTypeImpl>  mapType) {
+                                    Map<String, CorbaType>  mapType) {
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
             if (extElement.getElementType().getLocalPart().equals("operation")) {
                 OperationType corbaOpType = (OperationType)extElement;

@@ -41,7 +41,7 @@ import org.apache.cxf.binding.corba.wsdl.Array;
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.binding.corba.wsdl.CaseType;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Fixed;
 import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
@@ -70,11 +70,11 @@ public final class WSDLTypes {
     private WSDLTypes() {
     }
 
-    public static CorbaTypeImpl processObject(Definition definition, XmlSchemaComplexType complex,
+    public static CorbaType processObject(Definition definition, XmlSchemaComplexType complex,
                                               XmlSchemaAnnotation annotation, QName typeName,
                                               QName defaultName, String idlNamespace)
         throws Exception {
-        CorbaTypeImpl corbaTypeImpl = null;
+        CorbaType corbaTypeImpl = null;
 
         if (annotation != null) {
             for (XmlSchemaAnnotationItem item : annotation.getItems()) {
@@ -142,7 +142,7 @@ public final class WSDLTypes {
     }
 
 
-    public static CorbaTypeImpl processStringType(CorbaTypeImpl corbaTypeImpl, QName name,
+    public static CorbaType processStringType(CorbaType corbaTypeImpl, QName name,
                                                   String maxLength, String length) throws Exception {
         boolean boundedString = true;
         int bound = 0;
@@ -173,9 +173,9 @@ public final class WSDLTypes {
         return corbaTypeImpl;
     }
 
-    public static CorbaTypeImpl mapToArray(QName name, QName schematypeName, QName arrayType,
+    public static CorbaType mapToArray(QName name, QName schematypeName, QName arrayType,
                                            QName elName, int bound, boolean anonymous) {
-        CorbaTypeImpl corbatype = null;
+        CorbaType corbatype = null;
 
         //schematypeName = checkPrefix(schematypeName);
 
@@ -206,9 +206,9 @@ public final class WSDLTypes {
         return corbatype;
     }
 
-    public static CorbaTypeImpl mapToSequence(QName name, QName schematypeName, QName arrayType,
+    public static CorbaType mapToSequence(QName name, QName schematypeName, QName arrayType,
                                               QName elName, int bound, boolean anonymous) {
-        CorbaTypeImpl corbaTypeImpl = null;
+        CorbaType corbaTypeImpl = null;
 
         //schematypeName = checkPrefix(schematypeName);
         if (!anonymous) {
@@ -302,8 +302,8 @@ public final class WSDLTypes {
     }
 
 
-    public static CorbaTypeImpl processDecimalType(XmlSchemaSimpleTypeRestriction restrictionType,
-                                                   QName name, CorbaTypeImpl corbaTypeImpl,
+    public static CorbaType processDecimalType(XmlSchemaSimpleTypeRestriction restrictionType,
+                                                   QName name, CorbaType corbaTypeImpl,
                                                    boolean anonymous) throws Exception {
 
         String tdigits = null;
@@ -395,7 +395,7 @@ public final class WSDLTypes {
     }
 
 
-    public static CorbaTypeImpl processBase64Type(CorbaTypeImpl corbaTypeImpl, QName name,
+    public static CorbaType processBase64Type(CorbaType corbaTypeImpl, QName name,
                                                   String maxLength, String length)
         throws Exception {
         int bound = 0;
@@ -442,7 +442,7 @@ public final class WSDLTypes {
         return anonymous;
     }
 
-    public static CorbaTypeImpl getFixedCorbaType(QName name, QName stype, int digits, int scale) {
+    public static CorbaType getFixedCorbaType(QName name, QName stype, int digits, int scale) {
         Fixed fixed = new Fixed();
         fixed.setName(name.getLocalPart());
         fixed.setQName(name);
@@ -455,7 +455,7 @@ public final class WSDLTypes {
         return fixed;
     }
 
-    public static CorbaTypeImpl getAnonFixedCorbaType(QName name, QName stype, int digits, int scale) {
+    public static CorbaType getAnonFixedCorbaType(QName name, QName stype, int digits, int scale) {
         Anonfixed fixed = new Anonfixed();
         fixed.setName(name.getLocalPart());
         fixed.setQName(name);
@@ -465,7 +465,7 @@ public final class WSDLTypes {
         return fixed;
     }
 
-    public static CorbaTypeImpl getOctetCorbaType(QName name, QName stype, int bound) {
+    public static CorbaType getOctetCorbaType(QName name, QName stype, int bound) {
         Sequence seq = new Sequence();
         seq.setName(name.getLocalPart());
         seq.setQName(name);

@@ -44,19 +44,18 @@ import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
 import org.apache.cxf.binding.corba.wsdl.AddressType;
 import org.apache.cxf.binding.corba.wsdl.ArgType;
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
-import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.binding.corba.wsdl.OperationType;
 import org.apache.cxf.binding.corba.wsdl.ParamType;
@@ -67,7 +66,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolException;
-import org.apache.cxf.wsdl.JAXBExtensionHelper;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotation;
 import org.apache.ws.commons.schema.XmlSchemaAnnotationItem;
@@ -225,7 +223,6 @@ public class WSDLToCorbaBinding {
 
         if (extReg == null) {
             extReg = def.getExtensionRegistry();
-            addExtensions(extReg);
         }
 
         bindingNames = new ArrayList<String>();
@@ -287,7 +284,7 @@ public class WSDLToCorbaBinding {
                                         + binding.getPortType().getQName().getLocalPart().replace('.', '/')
                                         + WSDLToCorbaHelper.IDL_VERSION);
 
-            binding.addExtensibilityElement(bindingType);
+            binding.addExtensibilityElement((ExtensibilityElement)bindingType);
         } catch (WSDLException ex) {
             ex.printStackTrace();
         }
@@ -309,7 +306,6 @@ public class WSDLToCorbaBinding {
                                                 Binding binding) throws Exception {
         if (extReg == null) {
             extReg = def.getExtensionRegistry();
-            addExtensions(extReg);
         }
 
         String interfaceName = portType.getQName().getLocalPart();
@@ -362,7 +358,7 @@ public class WSDLToCorbaBinding {
                 addr = "file:./" + interfaceName + ".ref";
             }
             addressType.setLocation(addr);
-            servicePort.addExtensibilityElement(addressType);
+            servicePort.addExtensibilityElement((ExtensibilityElement)addressType);
         } catch (WSDLException ex) {
             throw new Exception("Failed to create CORBA address for service", ex);
         }
@@ -409,28 +405,6 @@ public class WSDLToCorbaBinding {
         }
     }
 
-    public void addExtensions(ExtensionRegistry extRegistry) throws JAXBException {
-        try {
-            JAXBExtensionHelper.addExtensions(extReg, Binding.class, BindingType.class);
-            JAXBExtensionHelper.addExtensions(extReg, BindingOperation.class,
-                                              org.apache.cxf.binding.corba.wsdl.OperationType.class);
-            JAXBExtensionHelper.addExtensions(extReg, Definition.class, TypeMappingType.class);
-            JAXBExtensionHelper.addExtensions(extReg, Port.class,
-                                              org.apache.cxf.binding.corba.wsdl.AddressType.class);
-
-            extReg.mapExtensionTypes(Binding.class, CorbaConstants.NE_CORBA_BINDING, BindingType.class);
-            extReg.mapExtensionTypes(BindingOperation.class, CorbaConstants.NE_CORBA_OPERATION,
-                                     org.apache.cxf.binding.corba.wsdl.OperationType.class);
-            extReg.mapExtensionTypes(Definition.class, CorbaConstants.NE_CORBA_TYPEMAPPING,
-                                     TypeMappingType.class);
-            extReg.mapExtensionTypes(Port.class, CorbaConstants.NE_CORBA_ADDRESS,
-                                     org.apache.cxf.binding.corba.wsdl.AddressType.class);
-        } catch (javax.xml.bind.JAXBException ex) {
-            LOG.log(Level.SEVERE, "Failing to serialize/deserialize extensions", ex);
-            throw new JAXBException(ex.getMessage());
-        }
-    }
-
     private void addCorbaOperationExtElement(BindingOperation bo, Operation op)
         throws Exception {
 
@@ -459,14 +433,14 @@ public class WSDLToCorbaBinding {
         Collection<Fault> faults = CastUtils.cast(op.getFaults().values());
         for (Fault fault : faults) {
             RaisesType raisestype = new RaisesType();
-            CorbaTypeImpl extype = convertFaultToCorbaType(xmlSchemaType, fault);
+            CorbaType extype = convertFaultToCorbaType(xmlSchemaType, fault);
             if (extype != null) {
                 raisestype.setException(helper.createQNameCorbaNamespace(extype.getName()));
                 operationType.getRaises().add(raisestype);
             }
         }
 
-        bo.addExtensibilityElement(operationType);
+        bo.addExtensibilityElement((ExtensibilityElement)operationType);
     }
 
 
@@ -485,7 +459,7 @@ public class WSDLToCorbaBinding {
             typeMappingType = (TypeMappingType)extReg.createExtension(Definition.class,
                                                                       CorbaConstants.NE_CORBA_TYPEMAPPING);
             typeMappingType.setTargetNamespace(getIdlNamespace());
-            definition.addExtensibilityElement(typeMappingType);
+            definition.addExtensibilityElement((ExtensibilityElement)typeMappingType);
         }
         helper.setTypeMap(typeMappingType);
         addCorbaTypes(definition);
@@ -513,7 +487,7 @@ public class WSDLToCorbaBinding {
 
     private void addCorbaTypes(XmlSchema xmlSchemaTypes) throws Exception {
         Map<QName, XmlSchemaType> objs = xmlSchemaTypes.getSchemaTypes();
-        CorbaTypeImpl corbaTypeImpl = null;
+        CorbaType corbaTypeImpl = null;
         for (XmlSchemaType type : objs.values()) {
             boolean anonymous = WSDLTypes.isAnonymous(type.getName());
             corbaTypeImpl = helper.convertSchemaToCorbaType(type, type.getQName(), null,
@@ -527,7 +501,7 @@ public class WSDLToCorbaBinding {
     }
 
 
-    private void addCorbaElements(CorbaTypeImpl corbaTypeImpl,
+    private void addCorbaElements(CorbaType corbaTypeImpl,
                                   XmlSchema xmlSchemaTypes) throws Exception {
         Map<QName, XmlSchemaElement> elements = xmlSchemaTypes.getElements();
         for (XmlSchemaElement el : elements.values()) {
@@ -597,7 +571,7 @@ public class WSDLToCorbaBinding {
         }
     }
 
-    private CorbaTypeImpl convertFaultToCorbaType(XmlSchema xmlSchema, Fault fault) throws Exception {
+    private CorbaType convertFaultToCorbaType(XmlSchema xmlSchema, Fault fault) throws Exception {
         org.apache.cxf.binding.corba.wsdl.Exception corbaex = null;
         XmlSchemaType schemaType = null;
         Iterator<Part> parts = CastUtils.cast(fault.getMessage().getParts().values().iterator());
@@ -628,7 +602,7 @@ public class WSDLToCorbaBinding {
                 QName faultMsgName = helper.createQNameCorbaNamespace(faultName);
                 corbaex.setName(faultName);
                 corbaex.setQName(faultMsgName);
-                CorbaTypeImpl corbaTypeImpl =
+                CorbaType corbaTypeImpl =
                     helper.convertSchemaToCorbaType(schemaType, name, null, null, false);
                 if (corbaTypeImpl != null) {
                     MemberType member = new MemberType();
@@ -664,9 +638,9 @@ public class WSDLToCorbaBinding {
                 + corbaex.getName().replace('.', '/')
                 + WSDLToCorbaHelper.IDL_VERSION;
             corbaex.setRepositoryID(repoId);
-            CorbaTypeImpl corbaTypeImpl = corbaex;
+            CorbaType corbaTypeImpl = corbaex;
             if (!helper.isDuplicate(corbaTypeImpl)) {
-                CorbaTypeImpl dup = helper.isDuplicateException(corbaTypeImpl);
+                CorbaType dup = helper.isDuplicateException(corbaTypeImpl);
                 if (dup != null) {
                     typeMappingType.getStructOrExceptionOrUnion().remove(dup);
                     typeMappingType.getStructOrExceptionOrUnion().add(corbaTypeImpl);
@@ -872,10 +846,10 @@ public class WSDLToCorbaBinding {
     }
 
     public void cleanUpTypeMap(TypeMappingType typeMap) {
-        List<CorbaTypeImpl> types = typeMap.getStructOrExceptionOrUnion();
+        List<CorbaType> types = typeMap.getStructOrExceptionOrUnion();
         if (types != null) {
             for (int i = 0; i < types.size(); i++) {
-                CorbaTypeImpl type = types.get(i);
+                CorbaType type = types.get(i);
                 if (type.getQName() != null) {
                     type.setName(type.getQName().getLocalPart());
                     type.setQName(null);

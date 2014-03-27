@@ -31,6 +31,7 @@ import javax.wsdl.Fault;
 import javax.wsdl.Operation;
 import javax.wsdl.PortType;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.xml.namespace.QName;
 
@@ -254,7 +255,7 @@ public class PortTypeVisitor extends VisitorBase {
                                         + pragmaPrefix
                                         + scopedPortTypeName.replace('.', '/')
                                         + CorbaConstants.IDL_VERSION);
-            binding.addExtensibilityElement(bindingType);
+            binding.addExtensibilityElement((ExtensibilityElement)bindingType);
         } catch (WSDLException ex) {
             throw new RuntimeException(ex);
         }
