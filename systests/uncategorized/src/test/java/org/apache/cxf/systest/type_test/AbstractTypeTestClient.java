@@ -1119,37 +1119,6 @@ public abstract class AbstractTypeTestClient
     }
 
     @Test
-    public void testID() throws Exception {
-        if (!shouldRunTest("ID")) {
-            return;
-        }
-        // n.b. to be valid, elements with an ID in the response message
-        // must have a unique ID, so this test does not return x as the
-        // return value (like the other tests).
-        String valueSets[][] = {{"root.id-testartix.2", "L.-type_test"}, {"_iona.com", "zoo-5_wolf"},
-                                {"x-_liberty", "_-.-_"}};
-
-        for (int i = 0; i < valueSets.length; i++) {
-            String x = valueSets[i][0];
-            String yOrig = valueSets[i][1];
-            Holder<String> y = new Holder<String>(yOrig);
-            Holder<String> z = new Holder<String>();
-
-            if (testDocLiteral) {
-                /* String ret = */docClient.testID(x, y, z);
-            } else if (testXMLBinding) {
-                /* String ret = */xmlClient.testID(x, y, z);
-            } else {
-                /* String ret = */rpcClient.testID(x, y, z);
-            }
-            if (!perfTestOnly) {
-                assertEquals("testID(): Incorrect value for inout param", x, y.value);
-                assertEquals("testID(): Incorrect value for out param", yOrig, z.value);
-            }
-        }
-    }
-
-    @Test
     public void testDecimal() throws Exception {
         if (!shouldRunTest("Decimal")) {
             return;

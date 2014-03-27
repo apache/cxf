@@ -61,6 +61,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -76,6 +77,7 @@ import org.apache.cxf.jaxrs.resources.jaxb.Book2;
 import org.apache.cxf.jaxrs.resources.jaxb.Book2NoRootElement;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -635,6 +637,10 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testWriteToSingleQualifiedTagBadgerFish() throws Exception {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://tags", "ns2");
+        p.setNamespaceMap(namespaceMap);
+
         p.setConvention("badgerfish");
         TagVO2 tag = createTag2("a", "b");
         
@@ -895,9 +901,10 @@ public class JSONProviderTest extends Assert {
     
     private void doTestMixedContent(String data, boolean ignore, String fileName) throws Exception {
         InputStream is = getClass().getResourceAsStream(fileName);
-        JAXBContext context = JAXBContext.newInstance(new Class[]{Books.class, Book.class});
+        JAXBContext context = JAXBContext.newInstance(Books.class);
         Unmarshaller um = context.createUnmarshaller();
         JAXBElement<?> jaxbEl = um.unmarshal(new StreamSource(is), Books.class);
+        
         JSONProvider<JAXBElement<?>> p = new JSONProvider<JAXBElement<?>>();
         p.setIgnoreMixedContent(ignore);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -1368,6 +1375,11 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutAppendElementsSameNs() throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
+
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://tags", "ns2");
+        provider.setNamespaceMap(namespaceMap);
+
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tags}t");
         provider.setOutAppendElements(map);
@@ -1382,6 +1394,11 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutAppendElementsDiffNs() throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
+
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://tags", "ns2");
+        provider.setNamespaceMap(namespaceMap);
+
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
@@ -1396,6 +1413,9 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalNsToLocalNs() throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://tags", "ns2");
+        provider.setNamespaceMap(namespaceMap);
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutTransformElements(map);
@@ -1475,7 +1495,6 @@ public class JSONProviderTest extends Assert {
         provider.writeTo(b, Base1.class, Base1.class,
                         new Annotation[0], MediaType.APPLICATION_JSON_TYPE,
                         new MetadataMap<String, Object>(), bos);
-        
         readBase(bos.toString());
     }
 

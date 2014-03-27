@@ -331,7 +331,8 @@ public class RequestParser {
         byte[] x509 = null;
         if (useKey.getAny() instanceof JAXBElement<?>) {
             JAXBElement<?> useKeyJaxb = (JAXBElement<?>)useKey.getAny();
-            if (KeyInfoType.class == useKeyJaxb.getDeclaredType()) {
+            Object obj = useKeyJaxb.getValue();
+            if (KeyInfoType.class == useKeyJaxb.getDeclaredType() || obj instanceof KeyInfoType) {
                 KeyInfoType keyInfoType = KeyInfoType.class.cast(useKeyJaxb.getValue());
                 LOG.fine("Found KeyInfo UseKey type");
                 for (Object keyInfoContent : keyInfoType.getContent()) {
@@ -348,7 +349,8 @@ public class RequestParser {
                         }
                     }
                 }
-            } else if (SecurityTokenReferenceType.class == useKeyJaxb.getDeclaredType()) {
+            } else if (SecurityTokenReferenceType.class == useKeyJaxb.getDeclaredType()
+                || obj instanceof SecurityTokenReferenceType) {
                 SecurityTokenReferenceType strType = 
                     SecurityTokenReferenceType.class.cast(useKeyJaxb.getValue());
                 Element token = fetchTokenElementFromReference(strType, wsContext);

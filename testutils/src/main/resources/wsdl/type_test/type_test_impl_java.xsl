@@ -269,15 +269,6 @@ public class TypeTestImpl {
         return x;
     }
 
-    public java.lang.String testID(
-            java.lang.String x,
-            Holder<java.lang.String> y,
-            Holder<java.lang.String> z) {    
-        z.value = y.value;
-        y.value = x;
-        return x + y.value;
-    }
-
     public IDTypeAttribute testIDTypeAttribute(
             IDTypeAttribute x,
             Holder<IDTypeAttribute> y,
