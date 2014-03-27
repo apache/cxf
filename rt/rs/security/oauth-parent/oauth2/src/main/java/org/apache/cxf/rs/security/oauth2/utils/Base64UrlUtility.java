@@ -60,7 +60,7 @@ public final class Base64UrlUtility {
         return Base64Utility.decode(encoded);
     }
 
-    public static String encode(String str) throws Base64Exception {
+    public static String encode(String str) {
         try {
             return encode(str.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException ex) {
