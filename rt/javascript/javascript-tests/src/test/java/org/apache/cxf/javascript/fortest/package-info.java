@@ -17,12 +17,5 @@
  * under the License.
  */
 
-@javax.xml.bind.annotation.XmlSchema(xmlns = { 
-                                     @javax.xml.bind.annotation.XmlNs(
-                                       namespaceURI = "uri:org.apache.cxf.javascript.testns3", 
-                                       prefix = "Plan3") 
-                                     }
-                                    ,
-                                     elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED
-                                     )
+@javax.xml.bind.annotation.XmlSchema(namespace = "uri:org.apache.cxf.javascript.testns")
 package org.apache.cxf.javascript.fortest; 
