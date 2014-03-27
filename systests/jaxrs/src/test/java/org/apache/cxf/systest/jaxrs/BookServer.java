@@ -125,7 +125,8 @@ public class BookServer extends AbstractBusTestServerBase {
     private static class BusMapperExceptionMapper implements ExceptionMapper<BusMapperException> {
 
         public Response toResponse(BusMapperException exception) {
-            return Response.serverError().header("BusMapper", "the-mapper").build();
+            return Response.serverError().type("text/plain;charset=utf-8").header("BusMapper", "the-mapper")
+                .entity("BusMapperException").build();
         }
         
     }
