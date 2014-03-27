@@ -19,8 +19,8 @@
 
 package org.apache.cxf.systest.jaxws;
 import javax.jws.WebService;
-@WebService(wsdlLocation = "partialwsdl/AddNumbersImplPartial2Service.wsdl")
 
+@WebService
 public class AddNumbersImplPartial2 {
     public int addTwoNumbers(int number1, int number2) {
         return number1 + number2;

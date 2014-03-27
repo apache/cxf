@@ -51,7 +51,8 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         protected void run() {
             try {
                 JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
-                factory.setWsdlLocation("classpath:wsdl/swa-mime-jms.wsdl");
+                factory.setBus(getBus());
+                factory.setWsdlLocation("classpath:/swa-mime_jms.wsdl");
                 factory.setTransportId(SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
                 factory.setServiceName(new QName("http://cxf.apache.org/swa", "SwAService"));
                 factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceJMSPort"));
@@ -80,10 +81,10 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     @Test
     public void testSwa() throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setWsdlLocation("classpath:wsdl/swa-mime-jms.wsdl");
+        factory.setWsdlLocation("classpath:/swa-mime_jms.wsdl");
         factory.setTransportId(SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
         factory.setServiceName(new QName("http://cxf.apache.org/swa", "SwAService"));
-        factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceHttpPort"));
+        factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceJMSPort"));
         factory.setAddress(ADDRESS + broker.getEncodedBrokerURL());
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
         SwAService port = factory.create(SwAService.class);
