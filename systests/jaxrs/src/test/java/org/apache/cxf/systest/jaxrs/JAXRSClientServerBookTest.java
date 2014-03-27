@@ -272,9 +272,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testUseMapperOnBus() {
         String address = "http://localhost:" + PORT + "/bookstore/mapperonbus";
         WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         Response r = wc.post(null);
         assertEquals(500, r.getStatus());
+        MediaType mt = r.getMediaType();
+        assertEquals("text/plain;charset=utf-8", mt.toString().toLowerCase());
         assertEquals("the-mapper", r.getHeaderString("BusMapper"));
+        assertEquals("BusMapperException", r.readEntity(String.class));
     }
     
     @Test

@@ -593,9 +593,6 @@ public abstract class AbstractHTTPDestination
 
         int responseCode = getReponseCodeFromMessage(outMessage);
         response.setStatus(responseCode);
-        if (HttpURLConnection.HTTP_INTERNAL_ERROR == responseCode) {
-            new Headers(outMessage).removeContentType();
-        }
         new Headers(outMessage).copyToResponse(response);
 
         outMessage.put(RESPONSE_HEADERS_COPIED, "true");
