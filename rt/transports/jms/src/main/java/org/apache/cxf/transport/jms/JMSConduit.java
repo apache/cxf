@@ -25,6 +25,7 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +49,7 @@ import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
+import org.apache.cxf.transport.jms.util.MessageListenerContainer;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
@@ -102,11 +104,23 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
     private synchronized void getJMSListener(Destination replyTo) {
         if (jmsListener == null) {
-            jmsListener = JMSFactory
-                .createListenerContainer(jmsConfig, connection, this, replyTo, conduitId);
+            jmsListener = createListenerContainer(replyTo);
             addBusListener();
         }
     }
+    
+    private JMSListenerContainer createListenerContainer(Destination destination) {
+        MessageListenerContainer container = new MessageListenerContainer(connection, destination,
+                                                                          this);
+        String messageSelector = JMSFactory.getMessageSelector(jmsConfig, conduitId);
+        container.setMessageSelector(messageSelector);
+        Executor executor = JMSFactory.createExecutor(bus, "jms-conduit");
+        container.setExecutor(executor);
+        container.start();
+        return container;
+    }
+
+    
     /**
      * Send the JMS message and if the MEP is not oneway receive the response.
      * 
@@ -129,7 +143,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         
         JMSMessageHeadersType headers = getOrCreateJmsHeaders(outMessage);
         String userCID = headers.getJMSCorrelationID();
-        assertIsNotAsyncSyncAndUserCID(exchange, userCID);
+        assertIsNotAsyncAndUserCID(exchange, userCID);
 
         ResourceCloser closer = new ResourceCloser();
         try {
@@ -171,7 +185,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
             synchronized (exchange) {
                 sender.sendMessage(closer, session, targetDest, message);
-                LOG.log(Level.INFO, "client sending request message " 
+                LOG.log(Level.FINE, "client sending request message " 
                     + message.getJMSMessageID() + " to " + targetDest);
                 headers.setJMSMessageID(message.getJMSMessageID());
                 if (correlationId == null) {
@@ -200,7 +214,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         }
     }
 
-    private void assertIsNotAsyncSyncAndUserCID(Exchange exchange, String userCID) {
+    private void assertIsNotAsyncAndUserCID(Exchange exchange, String userCID) {
         if (!exchange.isSynchronous() && userCID != null) {
             throw new IllegalArgumentException("User CID can not be used for asynchronous exchanges");
         }
@@ -305,7 +319,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     public void onMessage(javax.jms.Message jmsMessage) {
         try {
             String correlationId = jmsMessage.getJMSCorrelationID();
-            LOG.log(Level.INFO, "Received reply message with correlation id " + correlationId);
+            LOG.log(Level.FINE, "Received reply message with correlation id " + correlationId);
 
             // Try to correlate the incoming message with some timeout as it may have been
             // added to the map after the message was sent
@@ -313,7 +327,9 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             Exchange exchange = null;
             while (exchange == null && count < 100) {
                 exchange = correlationMap.remove(correlationId);
-                Thread.sleep(100);
+                if (exchange == null) {
+                    Thread.sleep(1);
+                }
                 count++;
             }
             if (exchange == null) {

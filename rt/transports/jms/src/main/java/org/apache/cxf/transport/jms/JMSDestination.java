@@ -20,11 +20,15 @@
 package org.apache.cxf.transport.jms;
 
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jms.Connection;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
+import javax.jms.Session;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -43,14 +47,17 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSUtil;
+import org.apache.cxf.transport.jms.util.MessageListenerContainer;
+import org.apache.cxf.transport.jms.util.ResourceCloser;
 
-public class JMSDestination extends AbstractMultiplexDestination 
-    implements MessageListener {
+public class JMSDestination extends AbstractMultiplexDestination implements MessageListener {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JMSDestination.class);
 
     private JMSConfiguration jmsConfig;
     private Bus bus;
+    
+    @SuppressWarnings("unused")
     private EndpointInfo ei;
     private JMSListenerContainer jmsListener;
     private ThrottlingCounter suspendedContinuations;
@@ -80,11 +87,32 @@ public class JMSDestination extends AbstractMultiplexDestination
         getLogger().log(Level.FINE, "JMSDestination activate().... ");
         jmsConfig.ensureProperlyConfigured();
 
-        jmsListener = JMSFactory.createTargetDestinationListener(ei, jmsConfig, this);
-        int restartLimit = jmsConfig.getMaxSuspendedContinuations() * jmsConfig.getReconnectPercentOfMax() / 100;
-        this.suspendedContinuations = new ThrottlingCounter(this.jmsListener, 
-                                                            restartLimit,
+        jmsListener = createTargetDestinationListener();
+        int restartLimit = jmsConfig.getMaxSuspendedContinuations() * jmsConfig.getReconnectPercentOfMax()
+                           / 100;
+        this.suspendedContinuations = new ThrottlingCounter(this.jmsListener, restartLimit,
                                                             jmsConfig.getMaxSuspendedContinuations());
+    }
+    
+    
+    private JMSListenerContainer createTargetDestinationListener() {
+        Session session = null;
+        try {
+            Connection connection = JMSFactory.createConnection(jmsConfig);
+            connection.start();
+            session = connection.createSession(jmsConfig.isSessionTransacted(), Session.AUTO_ACKNOWLEDGE);
+            Destination destination = jmsConfig.getTargetDestination(session);
+            MessageListenerContainer container = new MessageListenerContainer(connection, destination, this);
+            container.setMessageSelector(jmsConfig.getMessageSelector());
+            Executor executor = JMSFactory.createExecutor(bus, "jms-destination");
+            container.setExecutor(executor);
+            container.start();
+            return container;
+        } catch (JMSException e) {
+            throw JMSUtil.convertJmsException(e);
+        } finally {
+            ResourceCloser.close(session);
+        }
     }
 
     public void deactivate() {
@@ -113,32 +141,31 @@ public class JMSDestination extends AbstractMultiplexDestination
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-            getLogger().log(Level.INFO, "JMS destination received message " + message + " on " 
-                + jmsConfig.getTargetDestination());
-            Message inMessage = JMSMessageUtils.asCXFMessage(message, JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+            getLogger().log(Level.FINE,
+                            "JMS destination received message " + message + " on "
+                                + jmsConfig.getTargetDestination());
+            Message inMessage = JMSMessageUtils
+                .asCXFMessage(message, JMSConstants.JMS_SERVER_REQUEST_HEADERS);
             SecurityContext securityContext = JMSMessageUtils.buildSecurityContext(message, jmsConfig);
             inMessage.put(SecurityContext.class, securityContext);
             inMessage.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, new JMSMessageHeadersType());
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
             ((MessageImpl)inMessage).setDestination(this);
             if (jmsConfig.getMaxSuspendedContinuations() != 0) {
-                JMSContinuationProvider cp = new JMSContinuationProvider(bus, 
-                                                                         inMessage, 
-                                                                         incomingObserver, 
+                JMSContinuationProvider cp = new JMSContinuationProvider(bus, inMessage, incomingObserver,
                                                                          suspendedContinuations);
                 inMessage.put(ContinuationProvider.class.getName(), cp);
             }
-            
+
             origBus = BusFactory.getAndSetThreadDefaultBus(bus);
 
             // FIXME
-            //JCATransactionalMessageListenerContainer.setMessageEndpoint(inMessage);
+            // JCATransactionalMessageListenerContainer.setMessageEndpoint(inMessage);
 
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
-            
-            if (inMessage.getExchange() != null 
-                && inMessage.getExchange().getInMessage() != null) {
+
+            if (inMessage.getExchange() != null && inMessage.getExchange().getInMessage() != null) {
                 inMessage = inMessage.getExchange().getInMessage();
             }
 
@@ -153,7 +180,7 @@ public class JMSDestination extends AbstractMultiplexDestination
                     }
                 }
             }
-            
+
         } catch (SuspendedInvocationException ex) {
             getLogger().log(Level.FINE, "Request message has been suspended");
         } catch (UnsupportedEncodingException ex) {
@@ -164,7 +191,7 @@ public class JMSDestination extends AbstractMultiplexDestination
             if (origBus != bus) {
                 BusFactory.setThreadDefaultBus(origBus);
             }
-            if (origLoader != null) { 
+            if (origLoader != null) {
                 origLoader.reset();
             }
         }

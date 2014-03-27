@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.jms.Connection;
@@ -41,7 +41,7 @@ public class MessageListenerContainer implements JMSListenerContainer {
     private boolean running;
     private MessageConsumer consumer;
     private Session session;
-    private ExecutorService executor;
+    private Executor executor;
     private String durableSubscriptionName;
     private boolean pubSubNoLocal;
 
@@ -51,7 +51,6 @@ public class MessageListenerContainer implements JMSListenerContainer {
         this.connection = connection;
         this.replyTo = replyTo;
         this.listenerHandler = listenerHandler;
-        executor = Executors.newFixedThreadPool(20);
     }
     
     public Connection getConnection() {
@@ -70,14 +69,14 @@ public class MessageListenerContainer implements JMSListenerContainer {
         this.messageSelector = messageSelector;
     }
     
-    private ExecutorService getExecutor() {
+    private Executor getExecutor() {
         if (executor == null) {
             executor = Executors.newFixedThreadPool(10);
         }
         return executor;
     }
 
-    public void setExecutor(ExecutorService executor) {
+    public void setExecutor(Executor executor) {
         this.executor = executor;
     }
 

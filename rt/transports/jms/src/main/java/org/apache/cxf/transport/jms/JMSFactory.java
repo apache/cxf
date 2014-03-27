@@ -18,21 +18,18 @@
  */
 package org.apache.cxf.transport.jms;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.MessageListener;
-import javax.jms.Session;
 import javax.naming.NamingException;
 
-import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.jms.util.JMSListenerContainer;
+import org.apache.cxf.Bus;
 import org.apache.cxf.transport.jms.util.JMSSender;
-import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.JndiHelper;
-import org.apache.cxf.transport.jms.util.MessageListenerContainer;
-import org.apache.cxf.transport.jms.util.ResourceCloser;
+import org.apache.cxf.workqueue.WorkQueueManager;
 
 /**
  * Factory to create jms helper objects from configuration and context information
@@ -90,43 +87,11 @@ public final class JMSFactory {
         return sender;
     }
 
-    private static String getMessageSelector(JMSConfiguration jmsConfig, String conduitId) {
+    static String getMessageSelector(JMSConfiguration jmsConfig, String conduitId) {
         String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
         String conduitIdSt = jmsConfig.isUseConduitIdSelector() && conduitId != null ? conduitId : "";
         String correlationIdPrefix = staticSelectorPrefix + conduitIdSt;
         return correlationIdPrefix.isEmpty() ? null : "JMSCorrelationID LIKE '" + correlationIdPrefix + "%'";
-    }
-    
-    public static JMSListenerContainer createTargetDestinationListener(EndpointInfo ei, 
-                                                                       JMSConfiguration jmsConfig,
-                                                                       MessageListener listenerHandler) {
-        Session session = null;
-        try {
-            Connection connection = createConnection(jmsConfig);
-            connection.start();
-            session = connection.createSession(jmsConfig.isSessionTransacted(), Session.AUTO_ACKNOWLEDGE);
-            Destination destination = jmsConfig.getTargetDestination(session);
-            MessageListenerContainer container = new MessageListenerContainer(connection, destination, listenerHandler);
-            container.setMessageSelector(jmsConfig.getMessageSelector());
-            container.start();
-            return container;
-        } catch (JMSException e) {
-            throw JMSUtil.convertJmsException(e);
-        } finally {
-            ResourceCloser.close(session);
-        }
-    }
-
-    public static JMSListenerContainer createListenerContainer(JMSConfiguration jmsConfig,
-                                                               Connection connection,
-                                                               MessageListener listenerHandler, 
-                                                               Destination destination,
-                                                               String conduitId) {
-        MessageListenerContainer container = new MessageListenerContainer(connection, destination, listenerHandler);
-        String messageSelector = getMessageSelector(jmsConfig, conduitId);
-        container.setMessageSelector(messageSelector);
-        container.start();
-        return container;
     }
 
     public static Connection createConnection(JMSConfiguration jmsConfig) throws JMSException {
@@ -138,4 +103,17 @@ public final class JMSFactory {
         return connection;
     }
     
+    public static Executor createExecutor(Bus bus, String name) {
+        WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
+        Executor workQueue;
+        if (manager != null) {
+            workQueue = manager.getNamedWorkQueue(name);
+            if (workQueue == null) {
+                workQueue = manager.getAutomaticWorkQueue();
+            }
+        } else {
+            workQueue = Executors.newFixedThreadPool(20);
+        }
+        return workQueue;
+    }
 }
