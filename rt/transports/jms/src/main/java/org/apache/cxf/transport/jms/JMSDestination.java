@@ -48,6 +48,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
@@ -294,14 +295,23 @@ public class JMSDestination extends AbstractMultiplexDestination
             final javax.jms.Message request = (javax.jms.Message)inMessage
                 .get(JMSConstants.JMS_REQUEST_MESSAGE);
             final String msgType;
-            if (isMtomEnabled(outMessage)) {
-                msgType = JMSConstants.BINARY_MESSAGE_TYPE;
+            if (isMtomEnabled(outMessage) 
+                && !jmsConfig.getMessageType().equals(JMSConstants.TEXT_MESSAGE_TYPE)) {
+                //get chance to set messageType from JMSConfiguration with MTOM enabled
+                msgType = jmsConfig.getMessageType();
             } else if (request instanceof TextMessage) {
                 msgType = JMSConstants.TEXT_MESSAGE_TYPE;
             } else if (request instanceof BytesMessage) {
                 msgType = JMSConstants.BYTE_MESSAGE_TYPE;
             } else {
                 msgType = JMSConstants.BINARY_MESSAGE_TYPE;
+            }
+            
+            
+            if (JMSConstants.TEXT_MESSAGE_TYPE.equals(msgType) && isMtomEnabled(outMessage)) {
+                org.apache.cxf.common.i18n.Message msg = 
+                    new org.apache.cxf.common.i18n.Message("INVALID_MESSAGE_TYPE", LOG);
+                throw new ConfigurationException(msg);
             }
 
             Destination replyTo = getReplyToDestination(jmsTemplate, inMessage);
