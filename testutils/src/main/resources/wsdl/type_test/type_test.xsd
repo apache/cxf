@@ -91,7 +91,7 @@
     <itst:builtIn name="NMTOKENS"                     javaType="java.util.List&#x3c;java.lang.String&#x3e;" javaHolder="java.util.List&#x3c;java.lang.String&#x3e;"/>
     <itst:builtIn name="Name"                         javaType="java.lang.String"             javaHolder="java.lang.String"/>
     <itst:builtIn name="NCName"                       javaType="java.lang.String"             javaHolder="java.lang.String"/>
-    <itst:builtIn name="ID"                           javaType="java.lang.String"             javaHolder="java.lang.String"/>
+    <!-- itst:builtIn name="ID"                           javaType="java.lang.String"             javaHolder="java.lang.String"/-->
     <itst:builtIn name="base64Binary"  javaType="byte[]" javaHolder="byte[]"/>
     <itst:builtIn name="hexBinary"     javaType="byte[]" javaHolder="byte[]"/>
 
