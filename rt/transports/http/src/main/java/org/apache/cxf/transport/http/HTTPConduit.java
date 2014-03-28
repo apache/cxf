@@ -1455,6 +1455,7 @@ public abstract class HTTPConduit
                 } catch (URISyntaxException e) {
                     throw new IOException(e);
                 }
+                cookies.writeToMessageHeaders(outMessage);
                 retransmit(newURL);
                 return true;
             }

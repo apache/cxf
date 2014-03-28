@@ -117,9 +117,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/bookstore/redirect?sameuri=true";
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setAutoRedirect(true);
+        WebClient.getConfig(wc).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
         Response r = wc.get();
         Book book = r.readEntity(Book.class);
         assertEquals(123L, book.getId());
+        String requestUri = r.getStringHeaders().getFirst("RequestURI");
+        assertEquals("http://localhost:" + PORT + "/bookstore/redirect?redirect=true", requestUri);
+        String theCookie = r.getStringHeaders().getFirst("TheCookie");
+        assertEquals("b", theCookie);
     }
     
     @Test
