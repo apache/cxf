@@ -2053,7 +2053,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             
             InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
             
-            assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                         stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -2087,8 +2088,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             int result = httpclient.executeMethod(put);
             assertEquals(200, result);
             InputStream expected = getClass().getResourceAsStream("resources/expected_update_book.txt");
-            assertEquals(getStringFromInputStream(expected), 
-                         getStringFromInputStream(put.getResponseBodyAsStream()));
+            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                         stripXmlInstructionIfNeeded(getStringFromInputStream(put.getResponseBodyAsStream())));
         } finally {
             // Release current connection to the connection pool once you are
             // done
@@ -2135,8 +2136,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             int result = httpclient.executeMethod(put);
             assertEquals(200, result);
             InputStream expected = getClass().getResourceAsStream("resources/expected_update_book.txt");
-            assertEquals(getStringFromInputStream(expected), 
-                         getStringFromInputStream(put.getResponseBodyAsStream()));
+            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                         stripXmlInstructionIfNeeded(getStringFromInputStream(put.getResponseBodyAsStream())));
         } finally {
             // Release current connection to the connection pool once you are
             // done
@@ -2463,7 +2464,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             assertEquals(expectedStatus, result);
             String content = getStringFromInputStream(get.getResponseBodyAsStream());
             assertEquals("Expected value is wrong", 
-                         expectedValue, content);
+                         stripXmlInstructionIfNeeded(expectedValue), stripXmlInstructionIfNeeded(content));
             if (expectedStatus == 200) {
                 assertEquals("123", get.getResponseHeader("BookId").getValue());
                 assertNotNull(get.getResponseHeader("Date"));
@@ -2478,6 +2479,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         } finally {
             get.releaseConnection();
         }
+    }
+    
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
     }
     
     private void getAndCompareStrings(String address, 
