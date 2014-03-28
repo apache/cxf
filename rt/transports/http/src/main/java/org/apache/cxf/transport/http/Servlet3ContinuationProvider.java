@@ -76,6 +76,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         volatile boolean isNew = true;
         volatile boolean isResumed;
         volatile boolean isPending;
+        volatile boolean isComplete;
         volatile Object obj;
         private ContinuationCallback callback;
         public Servlet3Continuation() {
@@ -91,10 +92,11 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             AsyncContext old = context;
             try {
                 context = req.startAsync();
+                context.addListener(this);
+                isComplete = false;
             } catch (IllegalStateException ex) { 
                 context = old;
             }
-            context.addListener(this);
         }
         
         public boolean suspend(long timeout) {
@@ -105,6 +107,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
                 isPending = true;
             }
             isNew = false;
+            isResumed = false;
             
             context.setTimeout(timeout);
             inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
@@ -112,7 +115,9 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             return true;
         }
         public void redispatch() {
-            context.dispatch();
+            if (!isComplete) {
+                context.dispatch();
+            }
         }
         public void resume() {
             isResumed = true;
@@ -121,7 +126,16 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
 
         public void reset() {
-            context.complete();
+            isComplete = true;
+            try {
+                context.complete();
+            } catch (IllegalStateException ex) { 
+                // ignore
+            }
+            isPending = false;
+            isResumed = false;
+            isNew = false;
+            
             obj = null;
             if (callback != null) {
                 final Exception ex = inMessage.getExchange().get(Exception.class);
@@ -156,8 +170,6 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         public void onComplete(AsyncEvent event) throws IOException {
             inMessage.getExchange().getInMessage()
                 .remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
-            isPending = false;
-            //REVISIT: isResumed = false;
             if (callback != null) {
                 callback.onComplete();
             }
@@ -170,9 +182,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         public void onStartAsync(AsyncEvent event) throws IOException {
         }
         public void onTimeout(AsyncEvent event) throws IOException {
-            isPending = false;
-            //REVISIT: isResumed = true;
-            redispatch();
+            resume();
         }
         
         private Throwable isCausedByIO(final Exception ex) {
