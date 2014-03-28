@@ -215,6 +215,24 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
             } else {
                 writer.writeStartElement(prefix, localName, namespaceURI);
             }
+            if (!mapping.isEmpty() && atts != null) {
+                int attCount = atts.getLength();
+                for (int i = 0; i < attCount; i++) {
+                    if (!StringUtils.isEmpty(atts.getURI(i))
+                        && atts.getQName(i).startsWith("xmlns")) {
+                        String pfx = atts.getQName(i);
+                        int idx = pfx.indexOf(':');
+                        if (idx == -1) {
+                            mapping.remove("");
+                            writer.writeDefaultNamespace(atts.getValue(i));
+                        } else {
+                            pfx = pfx.substring(idx + 1);
+                            mapping.remove(pfx);
+                            writer.writeNamespace(pfx, atts.getValue(i));
+                        }
+                    }
+                }
+            }
             for (Map.Entry<String, String> e : mapping.entrySet()) {
                 if ("".equals(e.getKey())) {
                     writer.writeDefaultNamespace(e.getValue());
@@ -235,16 +253,18 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
                                               atts.getValue(i));
                     } else {
                         String pfx = atts.getQName(i);
-                        if (pfx.indexOf(':') != -1) {
-                            pfx = pfx.substring(0, pfx.indexOf(':'));
-                            writer.writeAttribute(pfx,
-                                                  atts.getURI(i),
+                        if (!pfx.startsWith("xmlns")) {
+                            if (pfx.indexOf(':') != -1) {
+                                pfx = pfx.substring(0, pfx.indexOf(':'));
+                                writer.writeAttribute(pfx,
+                                                      atts.getURI(i),
+                                                      atts.getLocalName(i),
+                                                      atts.getValue(i));
+                            } else {
+                                writer.writeAttribute(atts.getURI(i),
                                                   atts.getLocalName(i),
                                                   atts.getValue(i));
-                        } else {
-                            writer.writeAttribute(atts.getURI(i),
-                                              atts.getLocalName(i),
-                                              atts.getValue(i));
+                            }
                         }
                     }
                 }
