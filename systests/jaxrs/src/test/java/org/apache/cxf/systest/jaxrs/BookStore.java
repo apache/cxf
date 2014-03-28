@@ -43,6 +43,7 @@ import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -65,6 +66,7 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -169,14 +171,18 @@ public class BookStore {
     @GET
     @Path("/redirect")
     public Response getBookRedirect(@QueryParam("redirect") Boolean done,
-                                    @QueryParam("sameuri") Boolean sameuri) {
+                                    @QueryParam("sameuri") Boolean sameuri,
+                                    @CookieParam("a") String cookie) {
         if (done == null) {
             String uri = sameuri.equals(Boolean.TRUE) 
                 ? ui.getAbsolutePathBuilder().queryParam("redirect", "true").build().toString()
                 : "http://otherhost/redirect";
-            return Response.status(303).header("Location", uri).build();
+            return Response.status(303).cookie(NewCookie.valueOf("a=b")).header("Location", uri).build();
         } else {
-            return Response.ok(new Book("CXF", 123L), "application/xml").build();
+            return Response.ok(new Book("CXF", 123L), "application/xml")
+                .header("RequestURI", this.ui.getRequestUri().toString())
+                .header("TheCookie", cookie)
+                .build();
         }
     }
     
