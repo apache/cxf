@@ -125,7 +125,20 @@ public final class JAXBContextCache {
         = new CacheMap<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>>();
 
     private static final Map<Package, CachedClass> OBJECT_FACTORY_CACHE
-        = new CacheMap<Package, CachedClass>(); 
+        = new CacheMap<Package, CachedClass>();
+    
+    private static final boolean HAS_MOXY;
+    
+    static {
+        boolean b = false;
+        try {
+            JAXBContext ctx = JAXBContext.newInstance(String.class);
+            b = ctx.getClass().getName().contains(".eclipse");
+        } catch (Throwable t) {
+            //ignore
+        }
+        HAS_MOXY = b;
+    }
     
     private JAXBContextCache() {
         //utility class
@@ -180,6 +193,9 @@ public final class JAXBContextCache {
 
         Map<String, Object> map = new HashMap<String, Object>();
         if (defaultNs != null) {
+            if (HAS_MOXY) {
+                map.put("eclipselink.default-target-namespace", defaultNs);
+            }
             map.put("com.sun.xml.bind.defaultNamespaceRemap", defaultNs);
         }
         if (props != null) {

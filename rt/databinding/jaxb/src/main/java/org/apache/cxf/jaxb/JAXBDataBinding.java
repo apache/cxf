@@ -395,6 +395,8 @@ public class JAXBDataBinding extends AbstractDataBinding
                         continue;
                     }
                 }
+                //StaxUtils.print(r.getNode());
+                //System.out.println();
                 addSchemaDocument(serviceInfo,
                                   col,
                                  (Document)r.getNode(),
