@@ -4,7 +4,7 @@
     <ns2:QueryKeyBinding>
         <KeyInfo>
             <X509Data>
-                <X509Certificate>XXX</X509Certificate>
+                <X509Certificate>XXXX</X509Certificate>
             </X509Data>
         </KeyInfo>
     </ns2:QueryKeyBinding>
