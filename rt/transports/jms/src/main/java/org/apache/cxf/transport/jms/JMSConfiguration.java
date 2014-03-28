@@ -391,11 +391,10 @@ public class JMSConfiguration {
     }
     
     public Destination getReplyToDestination(Session session, String userDestination) throws JMSException {
-        String replyTo = userDestination;
-        if (replyTo == null) {
+        if (userDestination == null) {
             return getReplyDestination(session);
         }
-        return destinationResolver.resolveDestinationName(session, replyTo, replyPubSubDomain);
+        return destinationResolver.resolveDestinationName(session, userDestination, replyPubSubDomain);
     }
     
     public Destination getReplyDestination(Session session) throws JMSException {

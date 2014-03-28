@@ -139,79 +139,100 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
         jmsConfig.ensureProperlyConfigured();        
         assertIsNotTextMessageAndMtom(outMessage);
-        //assertIsNotSyncAndTopicReply(exchange);
-        
-        JMSMessageHeadersType headers = getOrCreateJmsHeaders(outMessage);
-        String userCID = headers.getJMSCorrelationID();
-        assertIsNotAsyncAndUserCID(exchange, userCID);
 
         ResourceCloser closer = new ResourceCloser();
         try {
             if (connection == null) {
                 connection = JMSFactory.createConnection(jmsConfig);
+                connection.start();
             }
             Session session = closer.register(connection.createSession(jmsConfig.isSessionTransacted(), 
                                                                        Session.AUTO_ACKNOWLEDGE));
-            Destination targetDest = jmsConfig.getTargetDestination(session);
             
-            Destination replyToDestination = null;
-            if (!exchange.isOneWay()) {
-                if (!exchange.isSynchronous() && staticReplyDestination == null) {
-                    staticReplyDestination = jmsConfig.getReplyDestination(session);
-                    getJMSListener(staticReplyDestination);
-                }
-                replyToDestination = jmsConfig.getReplyToDestination(session, headers.getJMSReplyTo());
-            }
-            connection.start();
-
-            String messageType = jmsConfig.getMessageType();
-            String correlationId = createCorrelationId(exchange, userCID);
-            if (correlationId != null) {
-                correlationMap.put(correlationId, exchange);
-            }
-            
-            javax.jms.Message message = JMSMessageUtils.asJMSMessage(jmsConfig, 
-                                                                     outMessage,
-                                                                     request, 
-                                                                     messageType,
-                                                                     session,  
-                                                                     correlationId, 
-                                                                     JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
-            if (replyToDestination != null) {
-                message.setJMSReplyTo(replyToDestination);
-            }
-
-            JMSSender sender = JMSFactory.createJmsSender(jmsConfig, headers);
-
-            synchronized (exchange) {
-                sender.sendMessage(closer, session, targetDest, message);
-                LOG.log(Level.FINE, "client sending request message " 
-                    + message.getJMSMessageID() + " to " + targetDest);
-                headers.setJMSMessageID(message.getJMSMessageID());
-                if (correlationId == null) {
-                    // Warning: We might loose the reply if it already arrived at this point 
-                    correlationId = message.getJMSMessageID();
-                    correlationMap.put(correlationId, exchange);
-                }
-            }
-            
-            /**
-             * If the message is not oneWay we will expect to receive a reply on the listener.
-             */
-            if (!exchange.isOneWay() && (exchange.isSynchronous())) {
-                Destination replyDestination = staticReplyDestination != null 
-                    ? staticReplyDestination : replyToDestination;
-                javax.jms.Message replyMessage = JMSUtil.receive(session, replyDestination, correlationId,
-                                                                 jmsConfig.getReceiveTimeout(),
-                                                                 jmsConfig.isPubSubNoLocal());
-                correlationMap.remove(correlationId);
-                doReplyMessage(exchange, replyMessage);
+            if (exchange.isOneWay()) {
+                sendMessage(request, outMessage, null, null, closer, session);
+            } else {
+                sendAndReceiveMessage(exchange, request, outMessage, closer, session);
             }
         } catch (JMSException e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
             closer.close();
         }
+    }
+
+    private void sendAndReceiveMessage(final Exchange exchange, final Object request, final Message outMessage,
+                                ResourceCloser closer,
+                                Session session) throws JMSException {
+        if (staticReplyDestination == null) {
+            staticReplyDestination = jmsConfig.getReplyDestination(session);
+            getJMSListener(staticReplyDestination);
+        }
+        JMSMessageHeadersType headers = getOrCreateJmsHeaders(outMessage);
+        String userCID = headers.getJMSCorrelationID();
+        assertIsNotAsyncAndUserCID(exchange, userCID);
+        String correlationId = createCorrelationId(exchange, userCID);
+        if (correlationId != null) {
+            correlationMap.put(correlationId, exchange);
+        }
+        
+        Destination replyToDestination = jmsConfig.getReplyToDestination(session, headers.getJMSReplyTo());
+        String jmsMessageID = sendMessage(request, outMessage, replyToDestination, correlationId, closer, session);
+        
+        boolean perMessageCorrelationId = correlationId == null || userCID != null;
+        if (correlationId == null) {
+            correlationId = jmsMessageID;
+            correlationMap.put(correlationId, exchange);
+        }
+
+        if (exchange.isSynchronous()) {
+            if (perMessageCorrelationId) {
+                // TODO Not sure if replyToDestination is correct here
+                javax.jms.Message replyMessage = JMSUtil.receive(session, replyToDestination, correlationId,
+                                                                 jmsConfig.getReceiveTimeout(),
+                                                                 jmsConfig.isPubSubNoLocal());
+                correlationMap.remove(correlationId);
+                processReplyMessage(exchange, replyMessage);
+            } else {
+                synchronized (exchange) {
+                    try {
+                        exchange.wait(jmsConfig.getReceiveTimeout());
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException("Interrupted while correlating", e);
+                    }
+                    if (exchange.get(CORRELATED) != Boolean.TRUE) {
+                        throw new RuntimeException("Timeout receiving message with correlationId "
+                                                   + correlationId);
+                    }
+                }
+            }
+        }
+    }
+
+    private String sendMessage(final Object request, final Message outMessage,
+                               Destination replyToDestination, String correlationId,
+                               ResourceCloser closer, Session session) throws JMSException {
+        JMSMessageHeadersType headers = getOrCreateJmsHeaders(outMessage);
+        javax.jms.Message message = JMSMessageUtils.asJMSMessage(jmsConfig, 
+                                                                 outMessage,
+                                                                 request, 
+                                                                 jmsConfig.getMessageType(),
+                                                                 session,  
+                                                                 correlationId, 
+                                                                 JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+        if (replyToDestination != null) {
+            message.setJMSReplyTo(replyToDestination);
+        }
+
+        JMSSender sender = JMSFactory.createJmsSender(jmsConfig, headers);
+        
+        Destination targetDest = jmsConfig.getTargetDestination(session);
+        sender.sendMessage(closer, session, targetDest, message);
+        String jmsMessageID = message.getJMSMessageID();
+        LOG.log(Level.FINE, "client sending request message " 
+            + jmsMessageID + " to " + targetDest);
+        headers.setJMSMessageID(jmsMessageID);
+        return jmsMessageID;
     }
 
     private void assertIsNotAsyncAndUserCID(Exchange exchange, String userCID) {
@@ -230,35 +251,21 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             throw new ConfigurationException(msg);
         }
     }
-    
-    @SuppressWarnings("unused")
-    private void assertIsNotSyncAndTopicReply(Exchange exchange) {
-        if (exchange.isSynchronous() && jmsConfig.isReplyPubSubDomain()) {
-            throw new IllegalArgumentException("Synchronous calls can not be combined with a response on a Topic");
-        }
-    }
 
     private String createCorrelationId(final Exchange exchange, String userCID) {
-        String correlationId = null;
-        if (!exchange.isOneWay()) {
-            if (userCID != null) {
-                correlationId = userCID;
-            } else if (!jmsConfig.isSetConduitSelectorPrefix()
-                       && !jmsConfig.isReplyPubSubDomain()
-                       && (exchange.isSynchronous() || exchange.isOneWay())
-                       && (!jmsConfig.isSetUseConduitIdSelector() 
-                           || !jmsConfig.isUseConduitIdSelector())) {
-                // in this case the correlation id will be set to
-                // the message id later
-                correlationId = null;
-            } else { 
-                String prefix = (jmsConfig.isUseConduitIdSelector()) 
-                    ? jmsConfig.getConduitSelectorPrefix() + conduitId 
-                    : jmsConfig.getConduitSelectorPrefix();
-                correlationId = JMSUtil.createCorrelationId(prefix, messageCount.incrementAndGet());
-            }
+        if (userCID != null) {
+            return userCID;
+        } else if (!jmsConfig.isSetConduitSelectorPrefix() && !jmsConfig.isReplyPubSubDomain()
+                   && exchange.isSynchronous()
+                   && (!jmsConfig.isSetUseConduitIdSelector() || !jmsConfig.isUseConduitIdSelector())) {
+            // in this case the correlation id will be set to
+            // the message id later
+            return null;
+        } else {
+            String prefix = (jmsConfig.isUseConduitIdSelector()) ? jmsConfig.getConduitSelectorPrefix()
+                                                                   + conduitId : jmsConfig.getConduitSelectorPrefix();
+            return JMSUtil.createCorrelationId(prefix, messageCount.incrementAndGet());
         }
-        return correlationId;
     }
 
     private JMSMessageHeadersType getOrCreateJmsHeaders(final Message outMessage) {
@@ -336,7 +343,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 LOG.log(Level.WARNING, "Could not correlate message with correlationId " + correlationId);
                 return;
             }
-            doReplyMessage(exchange, jmsMessage);
+            processReplyMessage(exchange, jmsMessage);
         } catch (JMSException e) {
             throw JMSUtil.convertJmsException(e);
         } catch (InterruptedException e) {
@@ -349,7 +356,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
      * Process the reply message
      * @throws JMSException 
      */
-    public void doReplyMessage(Exchange exchange, javax.jms.Message jmsMessage) throws JMSException {
+    protected void processReplyMessage(Exchange exchange, javax.jms.Message jmsMessage) throws JMSException {
         
         LOG.log(Level.FINE, "client received reply: ", jmsMessage);
         try {
@@ -376,7 +383,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         }
     }
 
-    public synchronized void shutdownListeners() {
+    private synchronized void shutdownListeners() {
         if (listener != null) {
             listener.unreg();
             listener = null;
