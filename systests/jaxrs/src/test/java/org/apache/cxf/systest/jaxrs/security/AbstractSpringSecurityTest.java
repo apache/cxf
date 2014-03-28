@@ -60,12 +60,19 @@ public abstract class AbstractSpringSecurityTest extends AbstractBusClientServer
                 String resource = "/org/apache/cxf/systest/jaxrs/resources/expected_get_book123.txt";
                 InputStream expected = getClass().getResourceAsStream(resource);
                 assertEquals("Expected value is wrong", 
-                             getStringFromInputStream(expected), content);
+                             stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                             stripXmlInstructionIfNeeded(content));
             }
         } finally {
             get.releaseConnection();
         }
         
     }
-   
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
+    }   
 }

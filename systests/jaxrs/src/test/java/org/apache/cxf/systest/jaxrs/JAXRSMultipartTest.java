@@ -855,7 +855,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             assertEquals(status, result);
             if (status == 200) {
                 InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
-                assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+                assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                             stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
             }
         } finally {
             // Release current connection to the connection pool once you are done
@@ -879,7 +880,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             assertEquals(status, result);
             if (status == 200) {
                 InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
-                assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+                assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                             stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
             }
         } finally {
             // Release current connection to the connection pool once you are done
@@ -907,5 +909,12 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         return provider.readFrom(Book.class, Book.class, new Annotation[]{}, 
                                  MediaType.APPLICATION_JSON_TYPE, null, is);
         
+    }
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
     }
 }

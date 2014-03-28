@@ -343,7 +343,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         
         InputStream in = getHttpInputStream("http://localhost:" + PORT + "/test/services/rest/bookstore/0");
         InputStream expected = getClass().getResourceAsStream("resources/expected_get_book123.txt");
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in)));
                 
     }
     
@@ -353,7 +354,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         InputStream in = getHttpInputStream("http://localhost:" + PORT + "/test/services/rest/bookstore/123");
         
         InputStream expected = getClass().getResourceAsStream("resources/expected_get_book123.txt");
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in)));
                 
     }
     
@@ -757,7 +759,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             
             InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
             
-            assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
+                         stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -1126,5 +1129,11 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         }
 
     }
-    
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
+    }
 }

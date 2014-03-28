@@ -59,7 +59,8 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
         InputStream expected = getClass()
             .getResourceAsStream("resources/expected_get_book123.txt");
 
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in))); 
     }
     
     @Test
@@ -100,11 +101,18 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
         assertEquals(200, responseCode);
         
         InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt"); 
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(httpUrlConnection
-            .getInputStream()));  
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(httpUrlConnection
+            .getInputStream())));  
         httpUrlConnection.disconnect();        
     } 
-    
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
+    }
     private String getStringFromInputStream(InputStream in) throws Exception {        
         CachedOutputStream bos = new CachedOutputStream();
         IOUtils.copy(in, bos);

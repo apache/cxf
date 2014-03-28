@@ -80,7 +80,15 @@ public class JAXRSClientServerResourceCreatedSpringBookTest extends AbstractBusC
         InputStream expected = getClass()
             .getResourceAsStream("resources/expected_get_book123.txt");
 
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in))); 
+    }
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
     }
     
     @Test

@@ -219,7 +219,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
             assertEquals(expectedStatus, result);
             String content = getStringFromInputStream(get.getResponseBodyAsStream());
             assertEquals("Expected value is wrong", 
-                         expectedValue, content);
+                         stripXmlInstructionIfNeeded(expectedValue), stripXmlInstructionIfNeeded(content));
             if (expectedContentType != null) {
                 Header ct = get.getResponseHeader("Content-Type");
                 assertEquals("Wrong type of response", expectedContentType, ct.getValue());
@@ -229,6 +229,13 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         }
     }
     
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
+    }
     
     private String getStringFromInputStream(InputStream in) throws Exception {        
         CachedOutputStream bos = new CachedOutputStream();
