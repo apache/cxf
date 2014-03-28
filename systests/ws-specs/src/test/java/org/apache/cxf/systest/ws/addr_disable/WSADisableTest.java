@@ -68,11 +68,10 @@ public class WSADisableTest extends AbstractWSATestBase {
 
         assertEquals(3, port.addNumbers(1, 2));
 
-        String base = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/";
-        String expectedOut = base + "addNumbersRequest</Action>";
+        String expectedOut = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/addNumbersRequest";
         String expectedIn = "http://www.w3.org/2005/08/addressing";
         
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
+        assertLogContains(output.toString(), "//wsa:Action", expectedOut);
         assertTrue(input.toString().indexOf(expectedIn) == -1);
     }
 

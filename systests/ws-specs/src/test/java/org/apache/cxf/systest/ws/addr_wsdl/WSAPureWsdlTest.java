@@ -80,13 +80,10 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         assertEquals(3, port.addNumbers(1, 2));
 
         String base = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/";
-        String expectedOut = base + "addNumbersRequest</Action>";
-        String expectedIn = base + "addNumbersResponse</Action>";
 
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
-        assertTrue(input.toString().indexOf(expectedIn) != -1);
-        
-        
+        assertLogContains(output.toString(), "//wsa:Action", base + "addNumbersRequest");
+        assertLogContains(input.toString(), "//wsa:Action", base + "addNumbersResponse");
+
         resp = port.addNumbers3Async(1, 2);
         assertEquals(3, resp.get().getReturn());
 
@@ -108,8 +105,6 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
     @Test
     public void testProviderEndpoint() throws Exception {
         String base = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/";
-        String expectedOut = base + "addNumbersRequest</Action>";
-        String expectedIn = base + "addNumbersResponse</Action>";
 
         ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
@@ -120,8 +115,8 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         assertEquals(3, port.addNumbers(1, 2));
 
 
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
-        assertTrue(input.toString().indexOf(expectedIn) != -1);
+        assertLogContains(output.toString(), "//wsa:Action", base + "addNumbersRequest");
+        assertLogContains(input.toString(), "//wsa:Action", base + "addNumbersResponse");
 
         output.reset();
         input.reset();
@@ -130,8 +125,8 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
             "http://localhost:" + PORT + "/jaxws/add-providernows");
         assertEquals(3, port.addNumbers(1, 2));
 
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
-        assertTrue(input.toString().indexOf(expectedIn) != -1);
+        assertLogContains(output.toString(), "//wsa:Action", base + "addNumbersRequest");
+        assertLogContains(input.toString(), "//wsa:Action", base + "addNumbersResponse");
     }
 
     @Test
@@ -139,9 +134,6 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         String req = "<addNumbers xmlns=\"http://apache.org/cxf/systest/ws/addr_feature/\">"
             + "<number1>1</number1><number2>2</number2></addNumbers>";
         String base = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/";
-        String expectedOut = base + "addNumbersRequest";
-        String expectedIn = base + "addNumbersResponse</Action>";
-
         
         ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
@@ -159,8 +151,9 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
 
         disp.invoke(new StreamSource(new StringReader(req)));
         
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
-        assertTrue(input.toString().indexOf(expectedIn) != -1);
+        
+        assertLogContains(output.toString(), "//wsa:Action", base + "addNumbersRequest");
+        assertLogContains(input.toString(), "//wsa:Action", base + "addNumbersResponse");
         
 
         output.reset();
@@ -179,10 +172,8 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         
         disp.invoke(new StreamSource(new StringReader(req)));
         
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
-        assertTrue(input.toString().indexOf(expectedIn) != -1);
-
-        
+        assertLogContains(output.toString(), "//wsa:Action", base + "addNumbersRequest");
+        assertLogContains(input.toString(), "//wsa:Action", base + "addNumbersResponse");
     }
     
     @Test

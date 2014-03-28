@@ -151,8 +151,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         } catch (SOAPFaultException ex) {
             //expected
         }
-        String expectedOut = "cxf</Action>";
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
+        assertLogContains(output.toString(), "//wsa:Action", "cxf");
         assertTrue(output.toString().indexOf("SOAPAction=[\"cxf\"]") != -1);
     }
 
