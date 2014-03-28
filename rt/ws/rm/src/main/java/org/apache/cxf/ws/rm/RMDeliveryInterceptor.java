@@ -26,6 +26,8 @@ import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.ContextUtils;
 
 /**
  * Interceptor used for InOrder delivery of messages to the destination. This works with
@@ -44,6 +46,11 @@ public class RMDeliveryInterceptor extends AbstractRMInterceptor<Message> {
     // Interceptor interface 
     
     public void handle(Message message) throws SequenceFault, RMException {
+        final AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
+        //if wsrmp:RMAssertion and addressing is optional
+        if (maps == null && isRMPolicyEnabled(message)) {
+            return;
+        }
         LOG.entering(getClass().getName(), "handleMessage");
         Destination dest = getManager().getDestination(message);
         final boolean robust =
