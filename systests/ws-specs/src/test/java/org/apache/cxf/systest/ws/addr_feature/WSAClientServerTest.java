@@ -69,11 +69,8 @@ public class WSAClientServerTest extends AbstractWSATestBase {
 
         assertEquals(3, port.addNumbers(1, 2));
         
-        String expectedOut = "<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>";
-        String expectedIn = "<RelatesTo xmlns=\"http://www.w3.org/2005/08/addressing\">";
-
-        assertTrue(output.toString().indexOf(expectedOut) == -1);
-        assertTrue(input.toString().indexOf(expectedIn) == -1);
+        assertLogNotContains(output.toString(), "//wsa:Address");
+        assertLogNotContains(input.toString(), "//wsa:RelatesTo");
     }
 
     @Test
@@ -88,12 +85,10 @@ public class WSAClientServerTest extends AbstractWSATestBase {
         AddNumbersPortType port = (AddNumbersPortType) factory.create();
         ((BindingProvider)port).getRequestContext().put("ws-addressing.write.optional.replyto", Boolean.TRUE);
         assertEquals(3, port.addNumbers(1, 2));
-
-        String expectedOut = "<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>";
-        String expectedIn = "<RelatesTo xmlns=\"http://www.w3.org/2005/08/addressing\">";
-
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
-        assertTrue(input.toString().indexOf(expectedIn) != -1);
+        
+        assertLogContains(output.toString(), "//wsa:Address", "http://www.w3.org/2005/08/addressing/anonymous");
+        assertLogContains(input.toString(), "//wsa:RelatesTo", 
+                          getLogValue(output.toString(), "//wsa:MessageID"));
     }
 
     @Test
@@ -106,11 +101,9 @@ public class WSAClientServerTest extends AbstractWSATestBase {
 
         assertEquals(3, port.addNumbers(1, 2));
 
-        String expectedOut = "<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>";
-        String expectedIn = "<RelatesTo xmlns=\"http://www.w3.org/2005/08/addressing\">";
-
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
-        assertTrue(input.toString().indexOf(expectedIn) != -1);
+        assertLogContains(output.toString(), "//wsa:Address", "http://www.w3.org/2005/08/addressing/anonymous");
+        assertLogContains(input.toString(), "//wsa:RelatesTo", 
+                          getLogValue(output.toString(), "//wsa:MessageID"));
     }
     
     //CXF-3456

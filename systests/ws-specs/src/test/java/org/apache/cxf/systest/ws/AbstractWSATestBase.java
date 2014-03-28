@@ -21,9 +21,18 @@ package org.apache.cxf.systest.ws;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
+
+import org.w3c.dom.Document;
+
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
@@ -44,5 +53,30 @@ public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
         this.bus.getOutInterceptors().add(out);
 
         return bos;
+    }
+    
+    
+    protected String getLogValue(String log, String xpath) throws XMLStreamException {
+        String s = log.substring(log.indexOf("Payload: ") + 9);
+        Document doc = StaxUtils.read(new StringReader(s));
+        
+        Map<String, String> ns = new HashMap<String, String>();
+        ns.put("wsa", "http://www.w3.org/2005/08/addressing");
+        ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
+        XPathUtils xpathu = new XPathUtils(ns);
+        return xpathu.getValueString(xpath, doc.getDocumentElement());
+    }
+    protected void assertLogNotContains(String log, String xpath) throws XMLStreamException {
+        String s = log.substring(log.indexOf("Payload: ") + 9);
+        Document doc = StaxUtils.read(new StringReader(s));
+        
+        Map<String, String> ns = new HashMap<String, String>();
+        ns.put("wsa", "http://www.w3.org/2005/08/addressing");
+        ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
+        XPathUtils xpathu = new XPathUtils(ns);
+        assertNull(xpathu.getValueNode(xpath, doc.getDocumentElement()));
+    }
+    protected void assertLogContains(String log, String xpath, String value) throws XMLStreamException {
+        assertEquals(value, getLogValue(log, xpath));
     }
 }
