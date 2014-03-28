@@ -204,10 +204,17 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
             .getResourceAsStream("resources/expected_get_book123badgerfish.txt");
 
         assertEquals("BadgerFish output not correct", 
-                     getStringFromInputStream(expected).trim(),
-                     getStringFromInputStream(in).trim());
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(expected).trim()),
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in).trim()));
     }
     
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
+    }
     @Test
     public void testGetBookNotFound() throws Exception {
         
@@ -224,8 +231,8 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
             .getResourceAsStream("resources/expected_get_book_notfound_mapped.txt");
 
         assertEquals("Exception is not mapped correctly", 
-                     getStringFromInputStream(expected).trim(),
-                     getStringFromInputStream(in).trim());
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(expected).trim()),
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in).trim()));
     }
     
     @Test

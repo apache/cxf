@@ -87,8 +87,8 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
             .getResourceAsStream("resources/expected_get_book_notfound_mapped.txt");
 
         assertEquals("Exception is not mapped correctly", 
-                     getStringFromInputStream(expected).trim(),
-                     getStringFromInputStream(in).trim());
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(expected).trim()),
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in).trim()));
     }
     
     @Test
@@ -142,7 +142,8 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
 
         InputStream expected = getClass()
             .getResourceAsStream("resources/expected_get_book123.txt");
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in)));
     }
     
     @Test
@@ -167,7 +168,6 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
         InputStream expected = getClass()
             .getResourceAsStream("resources/expected_get_book123json.txt");
 
-        //System.out.println("---" + getStringFromInputStream(in));
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
     }
 
@@ -191,4 +191,11 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
         return str;
     }
 
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
+    }
 }
