@@ -118,7 +118,16 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
             ai.setAsserted(true);
         }
     }
-    
     protected abstract void handle(Message message) throws SequenceFault, RMException;
+    protected boolean isRMPolicyEnabled(Message msg) {
+        AssertionInfoMap assertionMap = msg.get(AssertionInfoMap.class);
+        if (assertionMap == null) {
+            return false;
+        }
+        if (!RMPolicyUtilities.collectRMAssertions(assertionMap).isEmpty()) {
+            return true;
+        }
+        return false;
+    }
 
 }
