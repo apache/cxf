@@ -89,7 +89,7 @@ public class RequestResponseTest extends AbstractJMSTester {
         header.setJMSCorrelationID(correlationId);
         header.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
         header.setJMSPriority(1);
-        header.setTimeToLive(1000);
+        header.setTimeToLive(5000);
         header.setJMSReplyTo(replyTo != null ? replyTo : null);
         outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, header);
         outMessage.put(Message.ENCODING, "US-ASCII");
