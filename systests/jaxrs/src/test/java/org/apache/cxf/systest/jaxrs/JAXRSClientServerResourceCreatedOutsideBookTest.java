@@ -103,7 +103,7 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
         InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt"); 
         assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
                      stripXmlInstructionIfNeeded(getStringFromInputStream(httpUrlConnection
-            .getInputStream())));  
+                                                                          .getInputStream())));  
         httpUrlConnection.disconnect();        
     } 
     private String stripXmlInstructionIfNeeded(String str) {
