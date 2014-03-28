@@ -88,12 +88,12 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         LOG.fine("isServerSide: " + isServer);
 
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-        
         // message addressing properties may be null, e.g. in case of a runtime fault 
         // on the server side
         final AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
         if (null == maps) {
-            if (isServer) {
+            //if wsrmp:RMAssertion and addressing is optional
+            if (isServer && !isRMPolicyEnabled(message)) {
                 org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                     "WSA_REQUIRED_EXC", LOG);
                 LOG.log(Level.INFO, msg.toString());

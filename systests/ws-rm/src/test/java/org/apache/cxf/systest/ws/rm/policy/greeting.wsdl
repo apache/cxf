@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="GreetingService" targetNamespace="http://ws.samples.apache.org/" xmlns:ns1="http://schemas.xmlsoap.org/wsdl/soap/http"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ws.samples.apache.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <wsdl:types>
+        <xs:schema elementFormDefault="unqualified" targetNamespace="http://ws.samples.apache.org/" version="1.0"
+            xmlns:tns="http://ws.samples.apache.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="hello" type="tns:hello" />
+            <xs:element name="helloResponse" type="tns:helloResponse" />
+            <xs:element name="goodbye" type="tns:goodbye" />
+            <xs:element name="goodbyeResponse" type="tns:goodbyeResponse" />
+            <xs:complexType name="hello">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="helloResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="return" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="goodbye">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="goodbyeResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="return" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="hello">
+        <wsdl:part element="tns:hello" name="parameters" />
+    </wsdl:message>
+    <wsdl:message name="helloResponse">
+        <wsdl:part element="tns:helloResponse" name="parameters" />
+    </wsdl:message>
+    <wsdl:message name="goodbye">
+        <wsdl:part element="tns:goodbye" name="parameters" />
+    </wsdl:message>
+    <wsdl:message name="goodbyeResponse">
+        <wsdl:part element="tns:goodbyeResponse" name="parameters" />
+    </wsdl:message>
+    <wsdl:portType name="GreetingService">
+        <wsdl:operation name="hello">
+            <wsdl:input message="tns:hello" name="hello" />
+            <wsdl:output message="tns:helloResponse" name="helloResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="goodbye">
+            <wsdl:input message="tns:goodbye" name="goodbye" />
+            <wsdl:output message="tns:goodbyeResponse" name="goodbyeResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="GreetingServiceSoapBinding" type="tns:GreetingService">
+        <wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy">
+            <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata" wsp:Optional="true" />
+            <wsrmp:RMAssertion xmlns:wsrmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
+                wsp:Optional="true" />
+        </wsp:Policy>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="hello">
+            <soap:operation soapAction="" style="document" />
+            <wsdl:input name="hello">
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output name="helloResponse">
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="goodbye">
+            <soap:operation soapAction="" style="document" />
+            <wsdl:input name="goodbye">
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output name="goodbyeResponse">
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="GreetingService">
+        <wsdl:port binding="tns:GreetingServiceSoapBinding" name="GreetingServicePort">
+            <soap:address location="http://localhost:8080/sample/greeting" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
