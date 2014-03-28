@@ -381,6 +381,8 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                         continue;
                     }
                 }
+                //StaxUtils.print(r.getNode());
+                //System.out.println();
                 addSchemaDocument(serviceInfo,
                                   col,
                                  (Document)r.getNode(),
