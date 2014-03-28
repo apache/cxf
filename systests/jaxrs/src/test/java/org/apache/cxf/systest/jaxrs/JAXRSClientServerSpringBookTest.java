@@ -578,7 +578,8 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         InputStream in = connect.getInputStream();           
 
         InputStream expected = getClass().getResourceAsStream(resource);
-        assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in)));
     }
     
     private void getBookAegis(String endpointAddress, String type) throws Exception {
@@ -831,7 +832,8 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             
             if (expectedStatus != 400) {
                 InputStream expected = getClass().getResourceAsStream(expectedResource);
-                assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+                assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                             stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
             } else {
                 assertTrue(post.getResponseBodyAsString()
                                .contains("Cannot find the declaration of element"));
@@ -840,6 +842,14 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
         }
+    }
+    
+    private String stripXmlInstructionIfNeeded(String str) {
+        if (str != null && str.startsWith("<?xml")) {
+            int index = str.indexOf("?>");
+            str = str.substring(index + 2);
+        }
+        return str;
     }
     
     private String getStringFromInputStream(InputStream in) throws Exception {        
