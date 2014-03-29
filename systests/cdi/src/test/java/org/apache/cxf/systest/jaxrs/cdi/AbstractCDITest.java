@@ -37,6 +37,13 @@ import org.junit.Test;
 
 public abstract class AbstractCDITest extends AbstractBusClientServerTestBase {
     @Test
+    public void testInjectedVersionIsProperlyReturned() {
+        Response r = createWebClient("/rest/api/bookstore/version", MediaType.TEXT_PLAIN).get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        assertEquals("1.0", r.readEntity(String.class));
+    }
+    
+    @Test
     public void testResponseHasBeenReceivedWhenAddingNewBook() {
         Response r = createWebClient("/rest/api/bookstore/books").post(
             new Form()
@@ -68,12 +75,27 @@ public abstract class AbstractCDITest extends AbstractBusClientServerTestBase {
         assertEquals(id, book.getId());
     }
     
+    @Test
+    public void testAddOneBookWithValidation() {
+        final String id = UUID.randomUUID().toString();
+        
+        Response r = createWebClient("/rest/custom/bookstore/books").post(
+            new Form()
+                .param("id", id));
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
+    }
+    
+    
     protected WebClient createWebClient(final String url) {
+        return createWebClient(url, MediaType.APPLICATION_JSON);
+    }
+    
+    protected WebClient createWebClient(final String url, final String mediaType) {
         final List< ? > providers = Arrays.asList(new JacksonJsonProvider());
         
         final WebClient wc = WebClient
             .create("http://localhost:" + getPort() + url, providers)
-            .accept(MediaType.APPLICATION_JSON);
+            .accept(mediaType);
         
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         return wc;

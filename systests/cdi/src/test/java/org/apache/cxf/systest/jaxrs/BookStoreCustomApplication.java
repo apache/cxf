@@ -18,13 +18,28 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.enterprise.inject.Produces;
+import java.util.Set;
+
+import javax.inject.Inject;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-@ApplicationPath("/api")
-public class BookStoreApplication extends Application {
-    @Produces public String version() {
-        return "1.0";
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.google.common.collect.Sets;
+
+import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
+import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
+
+@ApplicationPath("/custom")
+public class BookStoreCustomApplication extends Application {
+    @Inject private BookStore bookStore;
+    
+    @Override
+    public Set< Object > getSingletons() {
+        return Sets.< Object >newHashSet(
+            bookStore, 
+            new JacksonJsonProvider(),
+            new ValidationExceptionMapper(),
+            new JAXRSBeanValidationFeature());
     }
 }
