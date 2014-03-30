@@ -200,12 +200,16 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     
     protected XSLTTransform getXsltTransformAnn(Annotation[] anns, MediaType mt) {
         XSLTTransform ann = AnnotationUtils.getAnnotation(anns, XSLTTransform.class);
-        if (ann != null) {
-            for (String s : ann.mediaTypes()) {
-                if (mt.isCompatible(JAXRSUtils.toMediaType(s))) {
-                    return ann;
+        if (ann != null && ann.type() != XSLTTransform.TransformType.CLIENT) {
+            if (ann.mediaTypes().length > 0) {
+                for (String s : ann.mediaTypes()) {
+                    if (mt.isCompatible(JAXRSUtils.toMediaType(s))) {
+                        return ann;
+                    }
                 }
+                return null;
             }
+            return ann;
         }
         return null;
     }

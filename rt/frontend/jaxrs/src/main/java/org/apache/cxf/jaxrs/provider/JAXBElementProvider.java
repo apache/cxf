@@ -64,6 +64,7 @@ import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
+import org.apache.cxf.jaxrs.ext.xml.XSLTTransform;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -441,37 +442,60 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             setNamespaceMapper(ms, nsPrefixes);
         }
         addAttachmentMarshaller(ms);
-        addProcessingInstructions(ms, anns);
-        addSchemaLocation(ms, anns);
+        processXmlAnnotations(ms, mt, anns);
         marshal(obj, cls, genericType, enc, os, anns, mt, ms);
     }
     
-    private void addProcessingInstructions(Marshaller ms, Annotation[] anns) throws Exception {
-        XMLInstruction pi = AnnotationUtils.getAnnotation(anns, XMLInstruction.class);
-        if (pi != null) {
-            String value = pi.value();
-            int ind = value.indexOf("href='");
-            if (ind > 0) {
-                String relRef = value.substring(ind + 6);
-                relRef = relRef.substring(0, relRef.length() - 3).trim();
-                if (relRef.endsWith("'")) {
-                    relRef = relRef.substring(0, relRef.length() - 1);
-                }
-                String absRef = resolveXMLResourceURI(relRef);
-                value = value.substring(0, ind + 6) + absRef + "'?>";
+    private void processXmlAnnotations(Marshaller ms, MediaType mt, Annotation[] anns) throws Exception {
+        if (anns == null) {
+            return;
+        }
+        for (Annotation ann : anns) {
+            if (ann.annotationType() == XMLInstruction.class) {
+                addProcessingInstructions(ms, (XMLInstruction)ann);
+            } else if (ann.annotationType() == XSISchemaLocation.class) {
+                addSchemaLocation(ms, (XSISchemaLocation)ann);
+            } else if (ann.annotationType() == XSLTTransform.class) {
+                addXslProcessingInstruction(ms, mt, (XSLTTransform)ann);
             }
-            setXmlPiProperty(ms, value);
         }
     }
     
-    private void addSchemaLocation(Marshaller ms, Annotation[] anns) throws Exception {
-        XSISchemaLocation sl = AnnotationUtils.getAnnotation(anns, XSISchemaLocation.class);
-        if (sl != null) {
-            String value = sl.resolve() ? resolveXMLResourceURI(sl.value()) : sl.value();
-            String propName = !sl.noNamespace() 
-                ? Marshaller.JAXB_SCHEMA_LOCATION : Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
-            ms.setProperty(propName, value);
+    private void addProcessingInstructions(Marshaller ms, XMLInstruction pi) throws Exception {
+        String value = pi.value();
+        int ind = value.indexOf("href='");
+        if (ind > 0) {
+            String relRef = value.substring(ind + 6);
+            relRef = relRef.substring(0, relRef.length() - 3).trim();
+            if (relRef.endsWith("'")) {
+                relRef = relRef.substring(0, relRef.length() - 1);
+            }
+            String absRef = resolveXMLResourceURI(relRef);
+            value = value.substring(0, ind + 6) + absRef + "'?>";
         }
+        setXmlPiProperty(ms, value);
+    }
+    
+    private void addXslProcessingInstruction(Marshaller ms, MediaType mt, XSLTTransform ann) 
+        throws Exception {
+        if (ann.type() == XSLTTransform.TransformType.CLIENT 
+            || ann.type() == XSLTTransform.TransformType.BOTH && ann.mediaTypes().length > 0) {
+            for (String s : ann.mediaTypes()) {
+                if (mt.isCompatible(JAXRSUtils.toMediaType(s))) {
+                    return;
+                }
+            }
+            String absRef = resolveXMLResourceURI(ann.value());
+            String xslPi = "<?xml-stylesheet type=\"text/xsl\" href=\"" + absRef + "\"?>";
+            setXmlPiProperty(ms, xslPi);
+        }
+    }
+    
+    private void addSchemaLocation(Marshaller ms, XSISchemaLocation sl) throws Exception {
+        String value = sl.resolve() ? resolveXMLResourceURI(sl.value()) : sl.value();
+        String propName = !sl.noNamespace() 
+            ? Marshaller.JAXB_SCHEMA_LOCATION : Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
+        ms.setProperty(propName, value);
     }
     
     protected String resolveXMLResourceURI(String path) {

@@ -31,6 +31,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface XSLTTransform {
+    public enum TransformType {
+        CLIENT, SERVER, BOTH
+    }
     /**
      * Template location
      */
@@ -38,5 +41,6 @@ public @interface XSLTTransform {
     /**
      * Supported media types 
      **/
-    String[] mediaTypes() default {"*/*" };
+    String[] mediaTypes() default { };
+    TransformType type() default TransformType.SERVER;
 }
