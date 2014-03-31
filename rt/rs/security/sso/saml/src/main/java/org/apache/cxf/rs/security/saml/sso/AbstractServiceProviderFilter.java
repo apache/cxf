@@ -33,12 +33,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PreDestroy;
+import javax.ws.rs.BindingPriority;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
@@ -60,6 +63,8 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.opensaml.saml2.core.AuthnRequest;
 
+@PreMatching
+@BindingPriority(BindingPriority.AUTHENTICATION + 1)
 public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler 
     implements RequestHandler {
     
