@@ -31,6 +31,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PreDestroy;
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Cookie;
@@ -61,6 +63,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.saml2.core.AuthnRequest;
 
 @PreMatching
+@Priority(Priorities.AUTHENTICATION + 1)
 public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler 
     implements ContainerRequestFilter {
     
