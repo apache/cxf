@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
@@ -93,7 +93,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String pfx, String uri, String name, String value) throws XMLStreamException {
-        if ("xmlns".equals(pfx)) {
+        if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(uri)) {
             if (StringUtils.isEmpty(name)) {
                 writeDefaultNamespace(value);
             } else {
