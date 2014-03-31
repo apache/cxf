@@ -76,7 +76,13 @@ public class JMSConfiguration {
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private boolean replyPubSubDomain;
-    private Boolean useConduitIdSelector;
+    
+    /**
+     *  Default to use conduitIdSelector as it allows to receive using a listener
+     *  which improves performance.
+     *  Set to false to use message id as correlation id for compatibility with IBM MQ.
+     */
+    private boolean useConduitIdSelector = true;
     private String conduitSelectorPrefix;
     private boolean jmsProviderTibcoEms;
 
@@ -318,14 +324,7 @@ public class JMSConfiguration {
     }
 
     public boolean isUseConduitIdSelector() {
-        if (useConduitIdSelector == null) {
-            return true;
-        }
         return useConduitIdSelector;
-    }
-
-    public boolean isSetUseConduitIdSelector() {
-        return useConduitIdSelector != null;
     }
 
     public boolean isReconnectOnException() {

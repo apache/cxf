@@ -37,10 +37,11 @@ public class JMSEndpointTest extends Assert {
 
     @Test
     public void testQueueParameters() throws Exception {
-        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?foo=bar&foo2=bar2");
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?foo=bar&foo2=bar2&useConduitIdSelector=false");
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
         assertEquals(endpoint.getJmsVariant(), JMSEndpoint.QUEUE);
+        assertEquals(false, endpoint.isUseConduitIdSelector());
         assertEquals(endpoint.getParameters().size(), 2);
         assertEquals(endpoint.getParameter("foo"), "bar");
         assertEquals(endpoint.getParameter("foo2"), "bar2");

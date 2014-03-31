@@ -44,15 +44,19 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 public final class JMSTestUtil {
 
     private static TestCasesType testcases;
-    private static String jndiUrl;
 
     private JMSTestUtil() {
     }
     
-    public static void setJndiUrl(String jndiUrl) {
-        JMSTestUtil.jndiUrl = jndiUrl;
+    public static String getFullAddress(String partAddress, String jndiUrl) {
+        String separator = partAddress.contains("?") ? "&" : "?";
+        String address = partAddress + separator
+            + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "&jndiConnectionFactoryName=ConnectionFactory" 
+            + "&jndiURL=" + jndiUrl;
+        return address;
     }
-
+    
     public static List<TestCaseType> getTestCases() {
         try {
             if (testcases == null) {
@@ -85,19 +89,6 @@ public final class JMSTestUtil {
         JAXBElement<?> e = (JAXBElement<?>)unmarshaller.unmarshal(new JMSTestUtil().getClass()
             .getResource("/org/apache/cxf/jms/testsuite/util/testcases.xml"));
         testcases = (TestCasesType)e.getValue();
-        for (TestCaseType tct : testcases.getTestCase()) {
-            if (tct.isSetAddress()) {
-                String add = tct.getAddress();
-                int idx = add.indexOf("jndiURL=");
-                if (idx != -1) {
-                    int idx2 = add.indexOf("&", idx);
-                    add = add.substring(0, idx)
-                        + "jndiURL=" + jndiUrl
-                        + (idx2 == -1 ? "" : add.substring(idx2));
-                    tct.setAddress(add);
-                }
-            }
-        }
     }
 
     /**

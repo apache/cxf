@@ -103,23 +103,23 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     }
 
     private synchronized void getJMSListener(Destination replyTo) {
-        if (jmsListener == null) {
-            jmsListener = createListenerContainer(replyTo);
-            addBusListener();
+        if (jmsListener != null) {
+            return;
         }
-    }
-    
-    private JMSListenerContainer createListenerContainer(Destination destination) {
-        MessageListenerContainer container = new MessageListenerContainer(connection, destination,
-                                                                          this);
         String messageSelector = JMSFactory.getMessageSelector(jmsConfig, conduitId);
+        if (messageSelector == null && !jmsConfig.isPubSubDomain()) {
+            // Do not open listener without selector on a queue as we then can not share the queue.
+            // An option for this might be a good idea for people who do not plan to share queues.
+            return;
+        }
+        MessageListenerContainer container = new MessageListenerContainer(connection, replyTo, this);
         container.setMessageSelector(messageSelector);
         Executor executor = JMSFactory.createExecutor(bus, "jms-conduit");
         container.setExecutor(executor);
         container.start();
-        return container;
+        jmsListener = container;
+        addBusListener();
     }
-
     
     /**
      * Send the JMS message and if the MEP is not oneway receive the response.
@@ -176,25 +176,30 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             correlationMap.put(correlationId, exchange);
         }
         
-        Destination replyToDestination = jmsConfig.getReplyToDestination(session, headers.getJMSReplyTo());
-        String jmsMessageID = sendMessage(request, outMessage, replyToDestination, correlationId, closer, session);
-        
-        boolean perMessageCorrelationId = correlationId == null || userCID != null;
-        if (correlationId == null) {
-            correlationId = jmsMessageID;
-            correlationMap.put(correlationId, exchange);
-        }
+        // Synchronize on exchange early to make sure we do not miss the notify 
+        synchronized (exchange) {
+            Destination replyToDestination = jmsConfig
+                .getReplyToDestination(session, headers.getJMSReplyTo());
+            String jmsMessageID = sendMessage(request, outMessage, replyToDestination, correlationId, closer,
+                                              session);
 
-        if (exchange.isSynchronous()) {
-            if (perMessageCorrelationId) {
-                // TODO Not sure if replyToDestination is correct here
-                javax.jms.Message replyMessage = JMSUtil.receive(session, replyToDestination, correlationId,
-                                                                 jmsConfig.getReceiveTimeout(),
-                                                                 jmsConfig.isPubSubNoLocal());
-                correlationMap.remove(correlationId);
-                processReplyMessage(exchange, replyMessage);
-            } else {
-                synchronized (exchange) {
+            boolean useSyncReceive = ((correlationId == null || userCID != null) && !jmsConfig.isPubSubDomain())
+                || !replyToDestination.equals(staticReplyDestination);
+            if (correlationId == null) {
+                correlationId = jmsMessageID;
+                correlationMap.put(correlationId, exchange);
+            }
+
+            if (exchange.isSynchronous()) {
+                if (useSyncReceive) {
+                    // TODO Not sure if replyToDestination is correct here
+                    javax.jms.Message replyMessage = JMSUtil.receive(session, replyToDestination,
+                                                                     correlationId,
+                                                                     jmsConfig.getReceiveTimeout(),
+                                                                     jmsConfig.isPubSubNoLocal());
+                    correlationMap.remove(correlationId);
+                    processReplyMessage(exchange, replyMessage);
+                } else {
                     try {
                         exchange.wait(jmsConfig.getReceiveTimeout());
                     } catch (InterruptedException e) {
@@ -204,6 +209,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                         throw new RuntimeException("Timeout receiving message with correlationId "
                                                    + correlationId);
                     }
+
                 }
             }
         }
@@ -257,7 +263,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             return userCID;
         } else if (!jmsConfig.isSetConduitSelectorPrefix() && !jmsConfig.isReplyPubSubDomain()
                    && exchange.isSynchronous()
-                   && (!jmsConfig.isSetUseConduitIdSelector() || !jmsConfig.isUseConduitIdSelector())) {
+                   && (!jmsConfig.isUseConduitIdSelector())) {
             // in this case the correlation id will be set to
             // the message id later
             return null;

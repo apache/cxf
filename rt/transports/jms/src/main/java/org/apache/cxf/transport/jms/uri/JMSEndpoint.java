@@ -401,6 +401,11 @@ public class JMSEndpoint {
     public boolean isUseConduitIdSelector() {
         return useConduitIdSelector;
     }
+    
+    public void setUseConduitIdSelector(String useConduitIdSelectorSt) {
+        this.useConduitIdSelector = Boolean.valueOf(useConduitIdSelectorSt);
+    }
+    
     public void setUseConduitIdSelector(boolean useConduitIdSelector) {
         this.useConduitIdSelector = useConduitIdSelector;
     }

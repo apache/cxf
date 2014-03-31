@@ -17,7 +17,7 @@
         -->
 <testCases xmlns="http://cxf.apache.org/jms/testcase/">
     <testCase id="test0001" mep="inonly">
-        <address>jms:jndi:dynamicQueues/testqueue0001?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0001</address>
         <requestMessage>
             <messageType>byte</messageType>
             <deliveryMode>2</deliveryMode>
@@ -37,7 +37,7 @@
         </requestMessage>
     </testCase>
     <testCase id="test0002" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0001?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0001</address>
         <requestMessage>
             <messageType>byte</messageType>
             <deliveryMode>2</deliveryMode>
@@ -72,7 +72,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0101" mep="inonly">
-        <address>jms:jndi:dynamicQueues/testqueue0101?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0101</address>
         <requestMessage>
             <messageType>byte</messageType>
             <deliveryMode>2</deliveryMode>
@@ -92,7 +92,7 @@
         </requestMessage>
     </testCase>
     <testCase id="test0102" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0101?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0101</address>
         <requestMessage>
             <messageType>byte</messageType>
             <deliveryMode>2</deliveryMode>
@@ -128,7 +128,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0003" mep="inonly">
-        <address>jms:jndi:dynamicQueues/testqueue0003?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0003</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -148,7 +148,7 @@
         </requestMessage>
     </testCase>
     <testCase id="test0004" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0003?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0003</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -184,7 +184,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0005" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0005?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500&amp;targetService=EchoPort&amp;deliveryMode=NON_PERSISTENT&amp;timeToLive=3600000&amp;priority=5&amp;replyToName=dynamicQueues/replyqueue0005</address>
+        <address>jms:jndi:dynamicQueues/testqueue0005?targetService=EchoPort&amp;deliveryMode=NON_PERSISTENT&amp;timeToLive=3600000&amp;priority=5&amp;replyToName=dynamicQueues/replyqueue0005</address>
         <requestMessage>
             <deliveryMode>1</deliveryMode>
             <priority>5</priority>
@@ -197,7 +197,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0006" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0006?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0006</address>
         <requestMessage>
             <deliveryMode>1</deliveryMode>
             <priority>6</priority>
@@ -210,7 +210,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0008" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0008?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0008?useConduitIdSelector=false</address>
         <requestMessage>
             <deliveryMode>1</deliveryMode>
             <priority>8</priority>
@@ -223,7 +223,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0009" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0009?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500&amp;targetService=EchoPort&amp;deliveryMode=PERSISTENT&amp;timeToLive=3600000&amp;priority=1&amp;replyToName=dynamicQueues/replyqueue00091</address>
+        <address>jms:jndi:dynamicQueues/testqueue0009?targetService=EchoPort&amp;deliveryMode=PERSISTENT&amp;timeToLive=3600000&amp;priority=1&amp;replyToName=dynamicQueues/replyqueue00091</address>
         <requestMessage>
             <deliveryMode>1</deliveryMode>
             <priority>3</priority>
@@ -236,7 +236,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0010" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0010?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500&amp;deliveryMode=PERSISTENT&amp;timeToLive=3600000&amp;priority=1&amp;replyToName=dynamicQueues/replyqueue00101</address>
+        <address>jms:jndi:dynamicQueues/testqueue0010?deliveryMode=PERSISTENT&amp;timeToLive=3600000&amp;priority=1&amp;replyToName=dynamicQueues/replyqueue00101</address>
         <requestMessage>
             <deliveryMode>2</deliveryMode>
             <priority>1</priority>
@@ -249,7 +249,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0011" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0011?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500&amp;deliveryMode=PERSISTENT&amp;timeToLive=3600000&amp;priority=1&amp;replyToName=dynamicQueues/replyqueue00111&amp;deliveryMode=NON_PERSISTENT&amp;timeToLive=7200000&amp;priority=2&amp;replyToName=dynamicQueues/replyqueue00112</address>
+        <address>jms:jndi:dynamicQueues/testqueue0011?deliveryMode=PERSISTENT&amp;timeToLive=3600000&amp;priority=1&amp;replyToName=dynamicQueues/replyqueue00111&amp;deliveryMode=NON_PERSISTENT&amp;timeToLive=7200000&amp;priority=2&amp;replyToName=dynamicQueues/replyqueue00112</address>
         <requestMessage>
             <deliveryMode>1</deliveryMode>
             <priority>2</priority>
@@ -262,7 +262,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0012" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0012?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0012</address>
         <requestMessage>
             <deliveryMode>2</deliveryMode>
             <priority>4</priority>
@@ -274,7 +274,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0013" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0013?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0013</address>
         <requestMessage>
             <deliveryMode>2</deliveryMode>
             <priority>5</priority>
@@ -286,7 +286,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test0014" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue0014?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue0014</address>
         <requestMessage>
             <deliveryMode>2</deliveryMode>
             <priority>5</priority>
@@ -298,7 +298,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1001" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1001?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1001</address>
         <requestMessage>
             <messageType>byte</messageType>
             <deliveryMode>2</deliveryMode>
@@ -335,7 +335,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1002" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1002?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1002</address>
         <requestMessage>
             <messageType>stream</messageType>
             <deliveryMode>2</deliveryMode>
@@ -371,7 +371,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1003" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1003?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1003</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -408,7 +408,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1004" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1004?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1004</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -445,7 +445,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1006" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1006?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1006</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -482,7 +482,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1007" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1007?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1007</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -518,7 +518,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1008" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1008?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1008</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -555,7 +555,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1009" mep="inout">
-        <address>jms:XXXX:dynamicQueues/testqueue1009?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:XXXX:dynamicQueues/testqueue1009</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -592,7 +592,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1101" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1101?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1101</address>
         <requestMessage>
             <messageType>byte</messageType>
             <deliveryMode>2</deliveryMode>
@@ -629,7 +629,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1102" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1102?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1102</address>
         <requestMessage>
             <messageType>stream</messageType>
             <deliveryMode>2</deliveryMode>
@@ -666,7 +666,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1103" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1103?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1103</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -703,7 +703,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1104" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1104?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1104</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -739,7 +739,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1105" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1105?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1105</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -775,7 +775,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1106" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1106?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1106</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -812,7 +812,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1107" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1107?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1107</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -848,7 +848,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1108" mep="inout">
-        <address>jms:jndi:dynamicQueues/testqueue1108?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:jndi:dynamicQueues/testqueue1108</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>
@@ -885,7 +885,7 @@
         </responseMessage>
     </testCase>
     <testCase id="test1109" mep="inout">
-        <address>jms:XXXX:dynamicQueues/testqueue1109?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+        <address>jms:XXXX:dynamicQueues/testqueue1109</address>
         <requestMessage>
             <messageType>text</messageType>
             <deliveryMode>2</deliveryMode>

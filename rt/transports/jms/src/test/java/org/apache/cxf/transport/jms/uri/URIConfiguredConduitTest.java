@@ -64,6 +64,7 @@ public class URIConfiguredConduitTest {
                        "jms:jndi:dynamicQueues/"
                            + SERVICE_QUEUE
                            + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                           + "&useConduitIdSelector=false"
                            + "&replyToName=dynamicQueues/testreply" 
                            + "&messageType=text"
                            + "&jndiConnectionFactoryName=ConnectionFactory"
@@ -73,6 +74,7 @@ public class URIConfiguredConduitTest {
     @Test
     public void testSendReceiveCFFromContext() throws Exception {
         sendAndReceive(SyncType.sync, "jms:queue:" + SERVICE_QUEUE + "?replyToName=testreply"
+                                      + "&useConduitIdSelector=false"
                                       + "&messageType=text" 
                                       + "&receiveTimeout=10000"
                                       + "&jndiConnectionFactoryName=ConnectionFactory");
