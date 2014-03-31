@@ -93,7 +93,15 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String pfx, String uri, String name, String value) throws XMLStreamException {
-        addEvent(factory.createAttribute(pfx, uri, name, value));
+        if ("xmlns".equals(pfx)) {
+            if (StringUtils.isEmpty(name)) {
+                writeDefaultNamespace(value);
+            } else {
+                writeNamespace(name, value);
+            }
+        } else {
+            addEvent(factory.createAttribute(pfx, uri, name, value));
+        }
     }
 
     public void writeCData(String arg0) throws XMLStreamException {
