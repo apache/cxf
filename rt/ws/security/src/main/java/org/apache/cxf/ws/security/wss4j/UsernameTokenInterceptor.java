@@ -83,33 +83,6 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         while (child != null) {
             if (SPConstants.USERNAME_TOKEN.equals(child.getLocalName())
                 && WSConstants.WSSE_NS.equals(child.getNamespaceURI())) {
-<<<<<<< HEAD
-                try  {
-                    final WSUsernameTokenPrincipal princ = getPrincipal(child, message);
-                    if (princ != null) {
-                        List<WSSecurityEngineResult>v = new ArrayList<WSSecurityEngineResult>();
-                        int action = WSConstants.UT;
-                        if (princ.getPassword() == null) {
-                            action = WSConstants.UT_NOPASSWORD;
-                        }
-                        v.add(0, new WSSecurityEngineResult(action, princ, null, null, null));
-                        List<WSHandlerResult> results = CastUtils.cast((List<?>)message
-                                                                  .get(WSHandlerConstants.RECV_RESULTS));
-                        if (results == null) {
-                            results = new ArrayList<WSHandlerResult>();
-                            message.put(WSHandlerConstants.RECV_RESULTS, results);
-                        }
-                        WSHandlerResult rResult = new WSHandlerResult(null, v);
-                        results.add(0, rResult);
-
-                        assertTokens(message, princ, false);
-                        message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, princ);                   
-                        
-                        SecurityContext sc = message.get(SecurityContext.class);
-                        if (sc == null || sc.getUserPrincipal() == null) {
-                            Subject subject = createSubject(princ.getName(), princ.getPassword(),
-                                princ.isPasswordDigest(), princ.getNonce(), princ.getCreatedTime());
-=======
                 try {
                     Principal principal = null;
                     Subject subject = null;
@@ -128,22 +101,18 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                         if (subject != null && principal != null) {
                             message.put(SecurityContext.class, 
                                     createSecurityContext(principal, subject));
-                        } else if (principal instanceof UsernameTokenPrincipal) {
-                            UsernameTokenPrincipal utPrincipal = (UsernameTokenPrincipal)principal;
-                            String nonce = null;
-                            if (utPrincipal.getNonce() != null) {
-                                nonce = Base64.encode(utPrincipal.getNonce());
-                            }
+                        } else if (principal instanceof WSUsernameTokenPrincipal) {
+                            WSUsernameTokenPrincipal utPrincipal = (WSUsernameTokenPrincipal)principal;
                             subject = createSubject(utPrincipal.getName(), utPrincipal.getPassword(),
-                                    utPrincipal.isPasswordDigest(), nonce, utPrincipal.getCreatedTime());
->>>>>>> 7063472... [CXF-5660] - UsernameTokenInterceptor cannot use subject from WSSecurityEngineResult
+                                    utPrincipal.isPasswordDigest(), utPrincipal.getNonce(), 
+                                    utPrincipal.getCreatedTime());
                             message.put(SecurityContext.class, 
                                     createSecurityContext(utPrincipal, subject));
                         }
                     }
                     
-                    if (principal instanceof UsernameTokenPrincipal) {
-                        storeResults((UsernameTokenPrincipal)principal, message);
+                    if (principal instanceof WSUsernameTokenPrincipal) {
+                        storeResults((WSUsernameTokenPrincipal)principal, message);
                     }
                 } catch (WSSecurityException ex) {
                     throw new Fault(ex);
@@ -153,12 +122,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         }
     }
     
-    @Deprecated
-    protected UsernameTokenPrincipal getPrincipal(Element tokenElement, final SoapMessage message) {
-        return null;
-    }
-    
-    private void storeResults(UsernameTokenPrincipal principal, SoapMessage message) {
+    private void storeResults(WSUsernameTokenPrincipal principal, SoapMessage message) {
         List<WSSecurityEngineResult> v = new ArrayList<WSSecurityEngineResult>();
         int action = WSConstants.UT;
         if (principal.getPassword() == null) {
@@ -178,16 +142,14 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, principal);   
     }
 
-<<<<<<< HEAD
+    @Deprecated
     protected WSUsernameTokenPrincipal getPrincipal(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
-=======
+        return null;
+    }
+
     protected WSSecurityEngineResult validateToken(Element tokenElement, final SoapMessage message)
-        throws WSSecurityException, Base64DecodingException {
->>>>>>> 7063472... [CXF-5660] - UsernameTokenInterceptor cannot use subject from WSSecurityEngineResult
-        
-        boolean bspCompliant = isWsiBSPCompliant(message);
-        boolean allowNoPassword = isAllowNoPassword(message.get(AssertionInfoMap.class));
+        throws WSSecurityException {
         UsernameTokenProcessor p = new UsernameTokenProcessor();
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         RequestData data = new RequestData() {
@@ -196,67 +158,37 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             }
             public Validator getValidator(QName qName) throws WSSecurityException {
                 Object validator = 
-                        message.getContextualProperty(SecurityConstants.USERNAME_TOKEN_VALIDATOR);
+                    message.getContextualProperty(SecurityConstants.USERNAME_TOKEN_VALIDATOR);
                 if (validator == null) {
                     return super.getValidator(qName);
                 }
-<<<<<<< HEAD
-            };
-            
-            // Configure replay caching
-            ReplayCache nonceCache = 
-                WSS4JUtils.getReplayCache(
-                    message, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
-                );
-            data.setNonceReplayCache(nonceCache);
-            
-            WSSConfig config = WSSConfig.getNewInstance();
-            config.setWsiBSPCompliant(bspCompliant);
-            config.setAllowUsernameTokenNoPassword(allowNoPassword);
-            data.setWssConfig(config);
-            List<WSSecurityEngineResult> results = 
-                p.handleToken(tokenElement, data, wsDocInfo);
-            return (WSUsernameTokenPrincipal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        } else {
-            WSUsernameTokenPrincipal principal = parseTokenAndCreatePrincipal(tokenElement, bspCompliant);
-            WSS4JTokenConverter.convertToken(message, principal);
-            return principal;
-=======
                 return (Validator)validator;
             }
         };
-
+        
         // Configure replay caching
         ReplayCache nonceCache = 
             WSS4JUtils.getReplayCache(
                 message, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
             );
         data.setNonceReplayCache(nonceCache);
-
+        
         WSSConfig config = WSSConfig.getNewInstance();
+        boolean bspCompliant = isWsiBSPCompliant(message);
+        boolean allowNoPassword = isAllowNoPassword(message.get(AssertionInfoMap.class));
+        config.setWsiBSPCompliant(bspCompliant);
         config.setAllowUsernameTokenNoPassword(allowNoPassword);
         data.setWssConfig(config);
-        if (!bspCompliant) {
-            data.setDisableBSPEnforcement(true);
->>>>>>> 7063472... [CXF-5660] - UsernameTokenInterceptor cannot use subject from WSSecurityEngineResult
-        }
-        List<WSSecurityEngineResult> results = p.handleToken(tokenElement, data, wsDocInfo);
+        List<WSSecurityEngineResult> results = 
+            p.handleToken(tokenElement, data, wsDocInfo);
+        
         return results.get(0);
     }
-<<<<<<< HEAD
     
     protected WSUsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement, boolean bspCompliant) 
         throws WSSecurityException {
         org.apache.ws.security.message.token.UsernameToken ut = 
             new org.apache.ws.security.message.token.UsernameToken(tokenElement, false, bspCompliant);
-=======
-
-    protected UsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement, boolean bspCompliant) 
-        throws WSSecurityException, Base64DecodingException {
-        BSPEnforcer bspEnforcer = new BSPEnforcer(!bspCompliant);
-        org.apache.wss4j.dom.message.token.UsernameToken ut = 
-            new org.apache.wss4j.dom.message.token.UsernameToken(tokenElement, false, bspEnforcer);
->>>>>>> 7063472... [CXF-5660] - UsernameTokenInterceptor cannot use subject from WSSecurityEngineResult
         
         WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
         principal.setNonce(ut.getNonce());
