@@ -155,7 +155,7 @@ public final class JAXRSUtils {
     public static final String MEDIA_TYPE_QS_PARAM = "qs";
     private static final String MEDIA_TYPE_DISTANCE_PARAM = "d";
     private static final String DEFAULT_CONTENT_TYPE = "default.content.type";
-    
+    private static final String KEEP_SUBRESOURCE_CANDIDATES = "keep.subresource.candidates";
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PATH_SEGMENT_SEP = "/";
@@ -390,6 +390,8 @@ public final class JAXRSUtils {
         int methodMatched = 0;
         int consumeMatched = 0;
         
+        boolean resourceMethodsAdded = false;
+        List<OperationResourceInfo> finalPathSubresources = null;
         for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> rEntry : matchedResources.entrySet()) {
             ClassResourceInfo resource = rEntry.getKey();
             MultivaluedMap<String, String> values = rEntry.getValue();
@@ -410,28 +412,35 @@ public final class JAXRSUtils {
                 URITemplate uriTemplate = ori.getURITemplate();
                 MultivaluedMap<String, String> map = new MetadataMap<String, String>(values);
                 if (uriTemplate != null && uriTemplate.match(path, map)) {
+                    String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
+                    boolean finalPath = StringUtils.isEmpty(finalGroup) || PATH_SEGMENT_SEP.equals(finalGroup);
+                    
                     if (ori.isSubResourceLocator()) {
                         candidateList.put(ori, map);
+                        if (finalPath) {
+                            if (finalPathSubresources == null) {
+                                finalPathSubresources = new LinkedList<OperationResourceInfo>();
+                            }
+                            finalPathSubresources.add(ori);
+                        }
                         added = true;
-                    } else {
-                        String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
-                        if (StringUtils.isEmpty(finalGroup) || PATH_SEGMENT_SEP.equals(finalGroup)) {
-                            pathMatched++;
-                            if (matchHttpMethod(ori.getHttpMethod(), httpMethod)) {
-                                methodMatched++;
-                                //CHECKSTYLE:OFF
-                                if (getMethod || matchConsumeTypes(requestType, ori)) {
-                                    consumeMatched++;
-                                    for (MediaType acceptType : acceptContentTypes) {
-                                        if (matchProduceTypes(acceptType, ori)) {
-                                            candidateList.put(ori, map);
-                                            added = true;
-                                            break;
-                                        }
+                    } else if (finalPath) {
+                        pathMatched++;
+                        if (matchHttpMethod(ori.getHttpMethod(), httpMethod)) {
+                            methodMatched++;
+                            //CHECKSTYLE:OFF
+                            if (getMethod || matchConsumeTypes(requestType, ori)) {
+                                consumeMatched++;
+                                for (MediaType acceptType : acceptContentTypes) {
+                                    if (matchProduceTypes(acceptType, ori)) {
+                                        candidateList.put(ori, map);
+                                        added = true;
+                                        resourceMethodsAdded = true;
+                                        break;
                                     }
                                 }
-                                //CHECKSTYLE:ON
                             }
+                            //CHECKSTYLE:ON
                         }
                     }
                 } 
@@ -446,7 +455,12 @@ public final class JAXRSUtils {
                 }
             }
         }
-        
+        if (finalPathSubresources != null && resourceMethodsAdded
+            && !MessageUtils.getContextualBoolean(message, KEEP_SUBRESOURCE_CANDIDATES, false)) {
+            for (OperationResourceInfo key : finalPathSubresources) {
+                candidateList.remove(key);
+            }
+        }        
         if (!candidateList.isEmpty()) {
             Map.Entry<OperationResourceInfo, MultivaluedMap<String, String>> firstEntry = 
                 candidateList.entrySet().iterator().next();

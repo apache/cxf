@@ -571,10 +571,19 @@ public class SelectMethodCandidatesTest extends Assert {
     
     @Test
     public void testFindTargetSubResource4() throws Exception {
-        doTestFindTargetSubResource("/1/2/3/d/resource2/1/2", "subresource2");
+        doTestFindTargetSubResource("/1/2/3/d/resource2/1/2", "subresource2", true);
+    }
+    @Test
+    public void testFindTargetSubResource5() throws Exception {
+        doTestFindTargetSubResource("/1/2/3/d/resource2/1/2", "resourceMethod2");
     }
     
     public void doTestFindTargetSubResource(String path, String method) throws Exception {
+        doTestFindTargetSubResource(path, method, false);
+    }
+    
+    public void doTestFindTargetSubResource(String path, String method, boolean setKeepSubProp) 
+        throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResource.class);
         sf.create();
@@ -583,11 +592,13 @@ public class SelectMethodCandidatesTest extends Assert {
         String acceptContentTypes = "text/xml,*/*";
         
         MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(), 
+        OperationResourceInfo ori = findTargetResourceClass(resources, 
+                                                            createMessage(), 
                                                             path,
                                                             "GET",
                                                             values, contentTypes, 
-                                                            sortMediaTypes(acceptContentTypes));
+                                                            sortMediaTypes(acceptContentTypes),
+                                                            setKeepSubProp);
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", method,
                      ori.getMethodToInvoke().getName());
@@ -741,11 +752,16 @@ public class SelectMethodCandidatesTest extends Assert {
         assertEquals("readFoo", ori.getMethodToInvoke().getName());
         
     }
-    
     private Message createMessage() {
+        return createMessage(false);
+    }
+    private Message createMessage(boolean setKeepSubProp) {
         ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        if (setKeepSubProp) {
+            m.put("keep.subresource.candidates", true);
+        }
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
@@ -764,21 +780,38 @@ public class SelectMethodCandidatesTest extends Assert {
         e.put(Endpoint.class, endpoint);
         return m;
     }
-    
     private OperationResourceInfo findTargetResourceClass(List<ClassResourceInfo> resources,
-                                                                 Message message,
-                                                                 String path, 
-                                                                 String httpMethod,
-                                                                 MultivaluedMap<String, String> values,
-                                                                 String requestContentType, 
-                                                                 List<MediaType> acceptContentTypes) {
+                                                          Message message,
+                                                          String path, 
+                                                          String httpMethod,
+                                                          MultivaluedMap<String, String> values,
+                                                          String requestContentType, 
+                                                          List<MediaType> acceptContentTypes) {
+        return findTargetResourceClass(resources, message, path, httpMethod, values, requestContentType,
+                                       acceptContentTypes, false); 
+        
+    }
+    //CHECKSTYLE:OFF
+    private OperationResourceInfo findTargetResourceClass(List<ClassResourceInfo> resources,
+                                                          Message message,
+                                                          String path, 
+                                                          String httpMethod,
+                                                          MultivaluedMap<String, String> values,
+                                                          String requestContentType, 
+                                                          List<MediaType> acceptContentTypes,
+                                                          boolean setKeepSubProp) {
+    //CHECKSTYLE:ON
         message = message == null ? new MessageImpl() : message; 
         Map<ClassResourceInfo, MultivaluedMap<String, String>> mResources 
             = JAXRSUtils.selectResourceClass(resources, path, message);
          
         if (mResources != null) {
-            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, createMessage(), httpMethod, 
-                                                    values, requestContentType, acceptContentTypes);
+            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, 
+                                                                    createMessage(setKeepSubProp), 
+                                                                    httpMethod, 
+                                                                    values, 
+                                                                    requestContentType, 
+                                                                    acceptContentTypes);
             if (ori != null) {
                 return ori;
             }
