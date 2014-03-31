@@ -31,6 +31,7 @@
     <jaxrs:server id="bookservice" address="/bookstore">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
+            <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring2"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="jaxbProvider"/>

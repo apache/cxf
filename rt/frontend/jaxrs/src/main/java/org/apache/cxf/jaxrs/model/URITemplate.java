@@ -199,9 +199,10 @@ public final class URITemplate {
         // sub-resources.
         
         String finalGroup = i > groupCount ? SLASH : m.group(groupCount);
-        if (finalGroup == null) {
+        if (finalGroup == null || finalGroup.startsWith(SLASH_QUOTE)) {
             finalGroup = SLASH;
         }
+        
         templateVariableToValue.putSingle(FINAL_MATCH_GROUP, finalGroup);
 
         return true;

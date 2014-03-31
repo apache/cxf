@@ -152,11 +152,11 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetGeneratedWadlWithExternalSchemas() throws Exception {
         String address = "http://localhost:" + PORT + "/the/bookstore";    
-        checkWadlResourcesInfo(address, address, "/book.xsd", 1);
+        checkWadlResourcesInfo(address, address, "/book.xsd", 2);
     
         checkSchemas(address, "/book.xsd", "/bookid.xsd", "import");
         checkSchemas(address, "/bookid.xsd", null, null);
-        checkWadlResourcesInfo(address, address, "/book.xsd", 1);
+        checkWadlResourcesInfo(address, address, "/book.xsd", 2);
     }
     
     @Test
@@ -544,9 +544,40 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     
     @Test
     public void testGetDefaultBook() throws Exception {
-        String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore"; 
-        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/json");
+        Book book = wc.get(Book.class);
+        assertEquals(123L, book.getId()); 
+    }
+    @Test
+    public void testGetDefaultBook2() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore/2/"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/json");
+        Book book = wc.get(Book.class);
+        assertEquals(123L, book.getId());
+        assertEquals("Default", book.getName());
+    }
+    @Test
+    public void testGetDefaultBookMatrixParam() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore/2/"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.matrix("a", "b");
+        wc.accept("application/json");
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Book book = wc.get(Book.class);
+        assertEquals(123L, book.getId());
+        assertEquals("Defaultb", book.getName());
+    }
+    @Test
+    public void testGetBookById() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore/2/123"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/json");
+        Book book = wc.get(Book.class);
+        assertEquals(123L, book.getId());
+        assertEquals("Id", book.getName());
     }
 
     @Test
