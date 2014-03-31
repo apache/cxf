@@ -23,18 +23,19 @@ import java.awt.Image;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
-
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.systest.mtom_feature.Hello;
 import org.apache.cxf.systest.mtom_feature.HelloService;
 import org.apache.cxf.systest.mtom_feature.ImageHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -90,7 +91,7 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
 
         port.detail(photo, image);
 
-        String expected = "<xop:Include xmlns:xop=";
+        String expected = "<xop:Include ";
         assertTrue(output.toString().indexOf(expected) != -1);
         assertTrue(input.toString().indexOf(expected) != -1);
 

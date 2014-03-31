@@ -21,12 +21,18 @@ package org.apache.cxf.systest.exception;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
-import org.apache.cxf.helpers.IOUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -48,17 +54,20 @@ public class GenericExceptionTest extends AbstractBusClientServerTestBase {
         URL wsdlURL = new URL(address + "?wsdl");
         //check wsdl element
         InputStream ins = wsdlURL.openStream();
-        String wsdlContent = IOUtils.toString(ins).replaceAll("  ", " ");
-
-        int objIndex = wsdlContent
-            .indexOf("type=\"tns:objectWithGenerics\"/>");
-        int aIndex = wsdlContent.indexOf("name=\"a\" type=\"xs:anyType\"/>");
-        int bIndex = wsdlContent.indexOf("name=\"b\" type=\"xs:anyType\"/>");
-
-        assertTrue(objIndex > -1);
-        assertTrue(aIndex > -1);
-        assertTrue(bIndex > -1);
         
+        Document doc = StaxUtils.read(ins);
+        
+        Map<String, String> ns = new HashMap<String, String>();
+        ns.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        ns.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        ns.put("tns", "http://cxf.apache.org/test/HelloService");
+        XPathUtils xpu = new XPathUtils(ns);
+        
+
+        Node nd = xpu.getValueNode("//xsd:complexType[@name='objectWithGenerics']", doc);
+        assertNotNull(nd);
+        assertNotNull(xpu.getValueNode("//xsd:element[@name='a']", nd));
+        assertNotNull(xpu.getValueNode("//xsd:element[@name='b']", nd));
         
         Service service = Service.create(wsdlURL, serviceName);
         service.addPort(new QName("http://cxf.apache.org/test/HelloService", "HelloPort"),
