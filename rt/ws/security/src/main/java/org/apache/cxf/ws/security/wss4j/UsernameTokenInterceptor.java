@@ -80,44 +80,47 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         if (h == null) {
             return;
         }
+        boolean utWithCallbacks = 
+            MessageUtils.getContextualBoolean(message, SecurityConstants.VALIDATE_TOKEN, true);
+        
         Element el = (Element)h.getObject();
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
             if (SPConstants.USERNAME_TOKEN.equals(child.getLocalName())
                 && WSConstants.WSSE_NS.equals(child.getNamespaceURI())) {
-                try  {
-                    final UsernameTokenPrincipal princ = getPrincipal(child, message);
-                    if (princ != null) {
-                        List<WSSecurityEngineResult>v = new ArrayList<WSSecurityEngineResult>();
-                        int action = WSConstants.UT;
-                        if (princ.getPassword() == null) {
-                            action = WSConstants.UT_NOPASSWORD;
-                        }
-                        v.add(0, new WSSecurityEngineResult(action, princ, null, null, null));
-                        List<WSHandlerResult> results = CastUtils.cast((List<?>)message
-                                                                  .get(WSHandlerConstants.RECV_RESULTS));
-                        if (results == null) {
-                            results = new ArrayList<WSHandlerResult>();
-                            message.put(WSHandlerConstants.RECV_RESULTS, results);
-                        }
-                        WSHandlerResult rResult = new WSHandlerResult(null, v);
-                        results.add(0, rResult);
-
-                        assertTokens(message, princ, false);
-                        message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, princ);                   
-                        
-                        SecurityContext sc = message.get(SecurityContext.class);
-                        if (sc == null || sc.getUserPrincipal() == null) {
-                            String nonce = null;
-                            if (princ.getNonce() != null) {
-                                nonce = Base64.encode(princ.getNonce());
-                            }
-                            Subject subject = createSubject(princ.getName(), princ.getPassword(),
-                                princ.isPasswordDigest(), nonce, princ.getCreatedTime());
+                try {
+                    Principal principal = null;
+                    Subject subject = null;
+                    if (utWithCallbacks) {
+                        final WSSecurityEngineResult result = validateToken(child, message);
+                        principal = (Principal)result.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                        subject = (Subject)result.get(WSSecurityEngineResult.TAG_SUBJECT);
+                    } else {
+                        boolean bspCompliant = isWsiBSPCompliant(message);
+                        principal = parseTokenAndCreatePrincipal(child, bspCompliant);
+                        WSS4JTokenConverter.convertToken(message, principal);
+                    }
+                    
+                    SecurityContext sc = message.get(SecurityContext.class);
+                    if (sc == null || sc.getUserPrincipal() == null) {
+                        if (subject != null && principal != null) {
                             message.put(SecurityContext.class, 
-                                        createSecurityContext(princ, subject));
+                                    createSecurityContext(principal, subject));
+                        } else if (principal instanceof UsernameTokenPrincipal) {
+                            UsernameTokenPrincipal utPrincipal = (UsernameTokenPrincipal)principal;
+                            String nonce = null;
+                            if (utPrincipal.getNonce() != null) {
+                                nonce = Base64.encode(utPrincipal.getNonce());
+                            }
+                            subject = createSubject(utPrincipal.getName(), utPrincipal.getPassword(),
+                                    utPrincipal.isPasswordDigest(), nonce, utPrincipal.getCreatedTime());
+                            message.put(SecurityContext.class, 
+                                    createSecurityContext(utPrincipal, subject));
                         }
-
+                    }
+                    
+                    if (principal instanceof UsernameTokenPrincipal) {
+                        storeResults((UsernameTokenPrincipal)principal, message);
                     }
                 } catch (WSSecurityException ex) {
                     throw new Fault(ex);
@@ -128,54 +131,70 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             child = DOMUtils.getNextElement(child);
         }
     }
+    
+    @Deprecated
+    protected UsernameTokenPrincipal getPrincipal(Element tokenElement, final SoapMessage message) {
+        return null;
+    }
+    
+    private void storeResults(UsernameTokenPrincipal principal, SoapMessage message) {
+        List<WSSecurityEngineResult> v = new ArrayList<WSSecurityEngineResult>();
+        int action = WSConstants.UT;
+        if (principal.getPassword() == null) {
+            action = WSConstants.UT_NOPASSWORD;
+        }
+        v.add(0, new WSSecurityEngineResult(action, principal, null, null, null));
+        List<WSHandlerResult> results = CastUtils.cast((List<?>)message
+                                                  .get(WSHandlerConstants.RECV_RESULTS));
+        if (results == null) {
+            results = new ArrayList<WSHandlerResult>();
+            message.put(WSHandlerConstants.RECV_RESULTS, results);
+        }
+        WSHandlerResult rResult = new WSHandlerResult(null, v);
+        results.add(0, rResult);
 
-    protected UsernameTokenPrincipal getPrincipal(Element tokenElement, final SoapMessage message)
+        assertTokens(message, principal, false);
+        message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, principal);   
+    }
+
+    protected WSSecurityEngineResult validateToken(Element tokenElement, final SoapMessage message)
         throws WSSecurityException, Base64DecodingException {
         
         boolean bspCompliant = isWsiBSPCompliant(message);
-        boolean utWithCallbacks = 
-            MessageUtils.getContextualBoolean(message, SecurityConstants.VALIDATE_TOKEN, true);
         boolean allowNoPassword = isAllowNoPassword(message.get(AssertionInfoMap.class));
-        if (utWithCallbacks) {
-            UsernameTokenProcessor p = new UsernameTokenProcessor();
-            WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
-            RequestData data = new RequestData() {
-                public CallbackHandler getCallbackHandler() {
-                    return getCallback(message);
-                }
-                public Validator getValidator(QName qName) throws WSSecurityException {
-                    Object validator = 
-                        message.getContextualProperty(SecurityConstants.USERNAME_TOKEN_VALIDATOR);
-                    if (validator == null) {
-                        return super.getValidator(qName);
-                    }
-                    return (Validator)validator;
-                }
-            };
-            
-            // Configure replay caching
-            ReplayCache nonceCache = 
-                WSS4JUtils.getReplayCache(
-                    message, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
-                );
-            data.setNonceReplayCache(nonceCache);
-            
-            WSSConfig config = WSSConfig.getNewInstance();
-            config.setAllowUsernameTokenNoPassword(allowNoPassword);
-            data.setWssConfig(config);
-            if (!bspCompliant) {
-                data.setDisableBSPEnforcement(true);
+        UsernameTokenProcessor p = new UsernameTokenProcessor();
+        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
+        RequestData data = new RequestData() {
+            public CallbackHandler getCallbackHandler() {
+                return getCallback(message);
             }
-            List<WSSecurityEngineResult> results = 
-                p.handleToken(tokenElement, data, wsDocInfo);
-            return (UsernameTokenPrincipal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        } else {
-            UsernameTokenPrincipal principal = parseTokenAndCreatePrincipal(tokenElement, bspCompliant);
-            WSS4JTokenConverter.convertToken(message, principal);
-            return principal;
+            public Validator getValidator(QName qName) throws WSSecurityException {
+                Object validator = 
+                        message.getContextualProperty(SecurityConstants.USERNAME_TOKEN_VALIDATOR);
+                if (validator == null) {
+                    return super.getValidator(qName);
+                }
+                return (Validator)validator;
+            }
+        };
+
+        // Configure replay caching
+        ReplayCache nonceCache = 
+            WSS4JUtils.getReplayCache(
+                message, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
+            );
+        data.setNonceReplayCache(nonceCache);
+
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setAllowUsernameTokenNoPassword(allowNoPassword);
+        data.setWssConfig(config);
+        if (!bspCompliant) {
+            data.setDisableBSPEnforcement(true);
         }
+        List<WSSecurityEngineResult> results = p.handleToken(tokenElement, data, wsDocInfo);
+        return results.get(0);
     }
-    
+
     protected UsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement, boolean bspCompliant) 
         throws WSSecurityException, Base64DecodingException {
         BSPEnforcer bspEnforcer = new BSPEnforcer(!bspCompliant);
