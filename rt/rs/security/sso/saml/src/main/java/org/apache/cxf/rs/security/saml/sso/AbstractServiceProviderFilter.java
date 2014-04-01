@@ -48,6 +48,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
@@ -290,11 +291,13 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     protected abstract void signAuthnRequest(AuthnRequest authnRequest) throws Exception;
     
     private String getAbsoluteAssertionServiceAddress(Message m) {
-        if (assertionConsumerServiceAddress == null) {    
-            //TODO: Review the possibility of using this filter
-            //for validating SAMLResponse too
-            reportError("MISSING_ASSERTION_SERVICE_URL");
-            throw ExceptionUtils.toInternalServerErrorException(null, null);
+        if (assertionConsumerServiceAddress == null) {
+            if (Boolean.TRUE.equals(JAXRSUtils.getCurrentMessage().get(SSOConstants.RACS_IS_COLLOCATED))) {
+                assertionConsumerServiceAddress = new UriInfoImpl(m).getAbsolutePath().toString();    
+            } else {
+                reportError("MISSING_ASSERTION_SERVICE_URL");
+                throw ExceptionUtils.toInternalServerErrorException(null, null);
+            }
         }
         if (!assertionConsumerServiceAddress.startsWith("http")) {
             String httpBasePath = (String)m.get("http.base.path");

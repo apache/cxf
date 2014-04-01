@@ -61,7 +61,12 @@ public class RequestAssertionConsumerFilter extends AbstractRequestAssertionCons
                                  MultivaluedMap<String, String> params, 
                                  boolean postBinding) {
         String encodedSamlResponse = params.getFirst(SSOConstants.SAML_RESPONSE);
-        String relayState = params.getFirst(SSOConstants.RELAY_STATE); 
+        String relayState = params.getFirst(SSOConstants.RELAY_STATE);
+        if (relayState == null && encodedSamlResponse == null) { 
+            // initial redirect to IDP has not happened yet, let the SAML authentication filter do it
+            JAXRSUtils.getCurrentMessage().put(SSOConstants.RACS_IS_COLLOCATED, Boolean.TRUE);
+            return;
+        }
         RequestState requestState = processRelayState(relayState);
         String targetUri = requestState.getTargetAddress();
         if (targetUri != null 
