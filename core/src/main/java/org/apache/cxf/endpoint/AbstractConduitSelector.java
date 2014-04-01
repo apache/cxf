@@ -104,26 +104,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
                     ConduitInitiator conduitInitiator =
                         conduitInitiatorMgr.getConduitInitiator(transportID);
                     if (conduitInitiator != null) {
-                        String add = (String)message.get(Message.ENDPOINT_ADDRESS);
-                        String basePath = (String)message.get(Message.BASE_PATH);
-                        if (StringUtils.isEmpty(add)
-                            || add.equals(ei.getAddress())) {
-                            c = conduitInitiator.getConduit(ei, exchange.getBus());
-                            replaceEndpointAddressPropertyIfNeeded(message, add, c);
-                        } else {
-                            EndpointReferenceType epr = new EndpointReferenceType();
-                            AttributedURIType ad = new AttributedURIType();
-                            ad.setValue(StringUtils.isEmpty(basePath) ? add : basePath);
-                            epr.setAddress(ad);
-                            c = conduitInitiator.getConduit(ei, epr, exchange.getBus());
-                        }
-                        MessageObserver observer = 
-                            exchange.get(MessageObserver.class);
-                        if (observer != null) {
-                            c.setMessageObserver(observer);
-                        } else {
-                            getLogger().warning("MessageObserver not found");
-                        }
+                        c = createConduit(message, exchange, conduitInitiator);
                     } else {
                         getLogger().warning("ConduitInitiator not found: "
                                             + ei.getAddress());
@@ -136,7 +117,6 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             } catch (IOException ex) {
                 throw new Fault(ex);
             }
-            conduits.add(c);
         } 
         if (c != null && c.getTarget() != null && c.getTarget().getAddress() != null) {
             replaceEndpointAddressPropertyIfNeeded(message, c.getTarget().getAddress().getValue(), c);
@@ -144,6 +124,42 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         //the search for the conduit could cause extra properties to be reset/loaded. 
         message.resetContextCache();
         message.put(Conduit.class, c);
+        return c;
+    }
+    
+    protected Conduit createConduit(Message message, Exchange exchange, ConduitInitiator conduitInitiator) 
+        throws IOException {
+        Conduit c = null;
+        synchronized (endpoint) {
+            if (!conduits.isEmpty()) {
+                c = findCompatibleConduit(message);
+                if (c != null) {
+                    return c;
+                }
+            }
+            EndpointInfo ei = endpoint.getEndpointInfo();
+            String add = (String)message.get(Message.ENDPOINT_ADDRESS);
+            String basePath = (String)message.get(Message.BASE_PATH);
+            if (StringUtils.isEmpty(add)
+                || add.equals(ei.getAddress())) {
+                c = conduitInitiator.getConduit(ei, exchange.getBus());
+                replaceEndpointAddressPropertyIfNeeded(message, add, c);
+            } else {
+                EndpointReferenceType epr = new EndpointReferenceType();
+                AttributedURIType ad = new AttributedURIType();
+                ad.setValue(StringUtils.isEmpty(basePath) ? add : basePath);
+                epr.setAddress(ad);
+                c = conduitInitiator.getConduit(ei, epr, exchange.getBus());
+            }
+            MessageObserver observer = 
+                exchange.get(MessageObserver.class);
+            if (observer != null) {
+                c.setMessageObserver(observer);
+            } else {
+                getLogger().warning("MessageObserver not found");
+            }
+            conduits.add(c);
+        }
         return c;
     }
 
