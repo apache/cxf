@@ -335,7 +335,7 @@ public class JMSConfiguration {
         this.reconnectOnException = reconnectOnException;
     }
 
-    public ConnectionFactory getConnectionFactory() {
+    public synchronized ConnectionFactory getConnectionFactory() {
         if (connectionFactory == null) {
             connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
         }
@@ -396,7 +396,7 @@ public class JMSConfiguration {
         return destinationResolver.resolveDestinationName(session, userDestination, replyPubSubDomain);
     }
     
-    public Destination getReplyDestination(Session session) throws JMSException {
+    public synchronized Destination getReplyDestination(Session session) throws JMSException {
         if (replyDestinationDest == null) {
             replyDestinationDest = replyDestination == null 
                 ? session.createTemporaryQueue()
