@@ -23,7 +23,9 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 
@@ -42,17 +44,31 @@ public class LogoutService {
     private String mainApplicationAddress;
     
     @GET
+    @Produces("text/html")
     public LogoutResponse logout(@CookieParam(SSOConstants.SECURITY_CONTEXT_TOKEN) Cookie context,
                        @Context SecurityContext sc) {
+        doLogout(context, sc);
+        // Use View Handler to tell the user that the logout has been successful,
+        // optionally listing the user login name and/or linking to the main application address, 
+        // the user may click on it, will be redirected to IDP and the process will start again
+        return new LogoutResponse(sc.getUserPrincipal().getName(), mainApplicationAddress);
+    }
+    
+    @POST
+    @Produces("text/html")
+    public LogoutResponse postLogout(@CookieParam(SSOConstants.SECURITY_CONTEXT_TOKEN) Cookie context,
+                                     @Context SecurityContext sc) {
+        return logout(context, sc);
+    }
+    
+    
+    
+    private void doLogout(Cookie context, SecurityContext sc) {
         if (context == null || sc.getUserPrincipal() == null || sc.getUserPrincipal().getName() == null) {
             reportError("MISSING_RESPONSE_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
         }
         stateProvider.removeResponseState(context.getValue());
-        // Use View Handler to tell the user that the logout has been successful,
-        // optionally linking to the main application address - the user may click on it
-        // and will be redirected to IDP and the process will start again
-        return new LogoutResponse(sc.getUserPrincipal().getName(), mainApplicationAddress);
     }
     
     protected void reportError(String code) {
