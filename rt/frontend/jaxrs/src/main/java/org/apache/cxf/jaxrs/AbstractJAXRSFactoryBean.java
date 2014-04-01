@@ -18,12 +18,14 @@
  */
 package org.apache.cxf.jaxrs;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -66,7 +68,8 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXRSFactoryBean.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXRSFactoryBean.class);
-    
+    private static final String RESOURCE_TYPES = "jaxrs.resource.types"; 
+   
     protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
     protected List<Object> entityProviders = new LinkedList<Object>();
@@ -241,6 +244,9 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
                                      cri.getServiceClass(), null);
         }
         ep.put(JAXRSServiceFactoryBean.class.getName(), serviceFactory);
+        Map<Class<?>, Type> allClasses = 
+            ResourceUtils.getAllRequestResponseTypes(list, false).getAllTypes();
+        ep.put(RESOURCE_TYPES, allClasses.keySet());
         return ep;
     }
     
