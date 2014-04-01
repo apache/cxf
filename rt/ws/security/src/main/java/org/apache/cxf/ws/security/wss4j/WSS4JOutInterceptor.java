@@ -81,15 +81,31 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     public boolean isAllowMTOM() {
         return mtomEnabled;
     }
+    
     /**
-     * Enable or disable mtom with WS-Security.   By default MTOM is disabled as
-     * attachments would not get encrypted or be part of the signature.
+     * Enable or disable mtom with WS-Security. MTOM is disabled if we are signing or
+     * encrypting the message Body, as otherwise attachments would not get encrypted
+     * or be part of the signature.
      * @param mtomEnabled
      */
     public void setAllowMTOM(boolean allowMTOM) {
         this.mtomEnabled = allowMTOM;
     }
     
+    protected void handleSecureMTOM(SoapMessage mc, List<HandlerAction> actions) {
+        if (mtomEnabled) {
+            return;
+        }
+        
+        //must turn off mtom when using WS-Sec so binary is inlined so it can
+        //be properly signed/encrypted/etc...
+        String mtomKey = org.apache.cxf.message.Message.MTOM_ENABLED;
+        if (mc.get(mtomKey) == Boolean.TRUE) {
+            LOG.warning("MTOM will be disabled as the WSS4JOutInterceptor.mtomEnabled property"
+                    + " is set to false");
+        }
+        mc.put(mtomKey, Boolean.FALSE);
+    }
 
     @Override
     public Object getProperty(Object msgContext, String key) {
@@ -106,17 +122,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     }
 
     public void handleMessage(SoapMessage mc) throws Fault {
-        //must turn off mtom when using WS-Sec so binary is inlined so it can
-        //be properly signed/encrypted/etc...
-        if (!mtomEnabled) {
-            String mtomKey = org.apache.cxf.message.Message.MTOM_ENABLED;
-            if (mc.get(mtomKey) == Boolean.TRUE) {
-                LOG.warning("MTOM will be disabled as the WSS4JOutInterceptor.mtomEnabled property"
-                            + " is set to false");
-            }
-            mc.put(mtomKey, Boolean.FALSE);
-        }
-        
         if (mc.getContent(SOAPMessage.class) == null) {
             saajOut.handleMessage(mc);
         }
@@ -190,6 +195,8 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 if (actions.isEmpty()) {
                     return;
                 }
+                
+                handleSecureMTOM(mc, actions);
     
                 /*
                  * For every action we need a username, so get this now. The
@@ -238,7 +245,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                  * into FORM_STRING. This string is converted into a document.
                  * During the FORM_STRING serialization CXF performs multi-ref of
                  * complex data types (if requested), generates and inserts
-                 * references for attachements and so on. The resulting Document
+                 * references for attachments and so on. The resulting Document
                  * MUST be the complete and final SOAP request as CXF would send it
                  * over the wire. Therefore this must shall be the last (or only)
                  * handler in a chain. Now we can perform our security operations on

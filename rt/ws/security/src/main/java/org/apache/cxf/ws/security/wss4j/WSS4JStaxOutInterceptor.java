@@ -23,11 +23,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -59,6 +61,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     
     public static final String OUTPUT_STREAM_HOLDER = 
         WSS4JStaxOutInterceptor.class.getName() + ".outputstream";
+    private static final Logger LOG = LogUtils.getL7dLogger(WSS4JStaxOutInterceptor.class);
     private WSS4JStaxOutInterceptorInternal ending;
     
     private boolean mtomEnabled;
@@ -92,27 +95,36 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     }
     
     /**
-     * Enable or disable mtom with WS-Security.   By default MTOM is disabled as
-     * attachments would not get encrypted or be part of the signature.
+     * Enable or disable mtom with WS-Security. MTOM is disabled if we are signing or
+     * encrypting the message Body, as otherwise attachments would not get encrypted
+     * or be part of the signature.
      * @param mtomEnabled
      */
     public void setAllowMTOM(boolean allowMTOM) {
         this.mtomEnabled = allowMTOM;
     }
-    
 
     @Override
     public Object getProperty(Object msgContext, String key) {
         return super.getProperty(msgContext, key);
     }
-
-    public void handleMessage(SoapMessage mc) throws Fault {
-        //must turn off mtom when using WS-Sec so binary is inlined so it can
-        //be properly signed/encrypted/etc...
-        if (!mtomEnabled) {
-            mc.put(org.apache.cxf.message.Message.MTOM_ENABLED, false);
+    
+    protected void handleSecureMTOM(SoapMessage mc, WSSSecurityProperties secProps) {
+        if (mtomEnabled) {
+            return;
         }
         
+        //must turn off mtom when using WS-Sec so binary is inlined so it can
+        //be properly signed/encrypted/etc...
+        String mtomKey = org.apache.cxf.message.Message.MTOM_ENABLED;
+        if (mc.get(mtomKey) == Boolean.TRUE) {
+            LOG.warning("MTOM will be disabled as the WSS4JOutInterceptor.mtomEnabled property"
+                    + " is set to false");
+        }
+        mc.put(mtomKey, Boolean.FALSE);
+    }
+
+    public void handleMessage(SoapMessage mc) throws Fault {
         OutputStream os = mc.getContent(OutputStream.class);
         String encoding = getEncoding(mc);
 
@@ -134,6 +146,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 // If no actions configured (with SecurityPolicy) then return
                 return;
             }
+            handleSecureMTOM(mc, secProps);
             
             if (secProps.getAttachmentCallbackHandler() == null) {
                 secProps.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));

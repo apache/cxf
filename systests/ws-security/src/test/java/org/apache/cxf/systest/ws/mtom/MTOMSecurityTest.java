@@ -61,8 +61,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
 
+    // The attachment is inlined + the SOAP Body signed
     @org.junit.Test
-    public void testSignedMTOM() throws Exception {
+    public void testSignedMTOMInline() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = MTOMSecurityTest.class.getResource("client.xml");
@@ -73,7 +74,34 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         
         URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItSignedMTOMPort");
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedMTOMInlinePort");
+        DoubleItMtomPortType port = 
+                service.getPort(portQName, DoubleItMtomPortType.class);
+        updateAddressPort(port, PORT);
+        
+        DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
+        DoubleIt4 doubleIt = new DoubleIt4();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt4(25, new DataHandler(source));
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // Here we are not-inlining, but the attachments are signed (as is the SOAP Body)
+    @org.junit.Test
+    public void testSignedMTOMSwA() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = MTOMSecurityTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedMTOMSwAPort");
         DoubleItMtomPortType port = 
                 service.getPort(portQName, DoubleItMtomPortType.class);
         updateAddressPort(port, PORT);

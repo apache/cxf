@@ -36,8 +36,11 @@
     </wsdl:binding>
     
     <wsdl:service name="DoubleItService">
-        <wsdl:port name="DoubleItSignedMTOMPort" binding="tns:DoubleItNoSecurityBinding">
-            <soap:address location="http://localhost:9001/DoubleItSignedMTOM"/>
+        <wsdl:port name="DoubleItSignedMTOMInlinePort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItSignedMTOMInline"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItSignedMTOMSwAPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItSignedMTOMSwA"/>
         </wsdl:port>
     </wsdl:service>
     
