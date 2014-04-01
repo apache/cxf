@@ -182,7 +182,6 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     }
     
     protected void setSecurityContext(Message m, SamlAssertionWrapper assertionWrapper) {
-        // don't worry about roles/claims for now, just set a basic SecurityContext
         Subject subject = SAMLUtils.getSubject(m, assertionWrapper);
         final String name = subject.getName();
         
