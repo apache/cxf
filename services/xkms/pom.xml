@@ -39,5 +39,6 @@
         <module>xkms-features</module>
         <module>xkms-osgi</module>
         <module>xkms-war</module>
+        <module>xkms-itests</module>
     </modules>
 </project>

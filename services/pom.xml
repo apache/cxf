@@ -31,6 +31,7 @@
         <version>3.0.0-SNAPSHOT</version>
     </parent>
     <modules>
+        <module>sts</module>
         <module>wsn</module>
         <module>ws-discovery</module>
         <module>xkms</module>
