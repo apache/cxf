@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import javax.ws.rs.core.MediaType;
 
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
@@ -78,7 +77,7 @@ public class AbstractAuthFilter {
         ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.OAUTH_CONSUMER_SECRET);
     }
     
-    private boolean ignoreUnknownParameters;
+    private boolean supportUnknownParameters;
     private boolean useUserSubject;
     private OAuthDataProvider dataProvider;
     private OAuthValidator validator = new DefaultOAuthValidator();
@@ -276,12 +275,8 @@ public class AbstractAuthFilter {
         this.validator = validator;
     }
 
-    public boolean isIgnoreUnknownParameters() {
-        return ignoreUnknownParameters;
-    }
-
-    public void setIgnoreUnknownParameters(boolean ignoreUnknownParameters) {
-        this.ignoreUnknownParameters = ignoreUnknownParameters;
+    public void setSupportUnknownParameters(boolean supportUnknownParameters) {
+        this.supportUnknownParameters = supportUnknownParameters;
     }
 
     private class CustomHttpServletWrapper extends HttpServletRequestWrapper {
@@ -292,19 +287,13 @@ public class AbstractAuthFilter {
         public Map<String, String[]> getParameterMap() {
             Map<String, String[]> params = super.getParameterMap();
             
-            if (ALLOWED_OAUTH_PARAMETERS.containsAll(params.keySet())) {
+            if (supportUnknownParameters || ALLOWED_OAUTH_PARAMETERS.containsAll(params.keySet())) {
                 return params;
             }
             
-            String contentType = super.getRequest().getContentType();
-            boolean formPayload = contentType != null && MediaType.APPLICATION_FORM_URLENCODED_TYPE.
-                isCompatible(MediaType.valueOf(contentType));
-            
-                        
             Map<String, String[]> newParams = new HashMap<String, String[]>();
             for (Map.Entry<String, String[]> entry : params.entrySet()) {
-                if (ALLOWED_OAUTH_PARAMETERS.contains(entry.getKey())
-                    || formPayload && AbstractAuthFilter.this.isIgnoreUnknownParameters()) {    
+                if (ALLOWED_OAUTH_PARAMETERS.contains(entry.getKey())) {    
                     newParams.put(entry.getKey(), entry.getValue());
                 }
             }
