@@ -36,6 +36,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean.Decision;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
@@ -80,7 +81,11 @@ public class SamlCallbackHandler2 implements CallbackHandler {
                 callback.setSubject(subjectBean);
                 
                 ConditionsBean conditions = new ConditionsBean();
-                conditions.setAudienceURI("https://localhost:" + PORT + "/oauth2-auth/token");
+                AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+                String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+                audienceRestriction.setAudienceURIs(Collections.singletonList(audienceURI));
+                conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
+                
                 callback.setConditions(conditions);
                 
                 AuthDecisionStatementBean authDecBean = new AuthDecisionStatementBean();

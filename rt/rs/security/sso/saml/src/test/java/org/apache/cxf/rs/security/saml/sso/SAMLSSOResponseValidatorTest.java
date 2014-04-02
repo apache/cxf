@@ -19,17 +19,19 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.util.Collections;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
@@ -220,7 +222,10 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         ConditionsBean conditions = new ConditionsBean();
         conditions.setNotBefore(new DateTime());
         conditions.setNotAfter(new DateTime().plusMinutes(5));
-        conditions.setAudienceURI("http://service.apache.org");
+        
+        AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+        audienceRestriction.setAudienceURIs(Collections.singletonList("http://service.apache.org"));
+        conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
         callbackHandler.setConditions(conditions);
         
         SAMLCallback samlCallback = new SAMLCallback();
