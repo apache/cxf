@@ -26,14 +26,9 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.Lifetime;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-<<<<<<< HEAD
+import org.apache.ws.security.saml.ext.bean.AudienceRestrictionBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
-=======
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
->>>>>>> e50e87d... [CXF-5664] - CXF STS does not support wst:Participants
 import org.joda.time.DateTime;
 
 /**
