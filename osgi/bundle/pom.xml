@@ -127,7 +127,6 @@ cxf.schema.version = ${os}
         </resources>
     </build>
     <modules>
-        <module>all</module>
         <module>compatible</module>
     </modules>
 </project>
