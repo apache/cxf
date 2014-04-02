@@ -1653,4 +1653,9 @@ public final class JAXRSUtils {
             return response;
         }
     }
+    
+    public static Message getCurrentMessage() {
+        return PhaseInterceptorChain.getCurrentMessage();
+    }
+    
 }
