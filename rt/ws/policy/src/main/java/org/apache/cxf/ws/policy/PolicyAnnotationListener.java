@@ -176,7 +176,11 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             if (!list.isEmpty()) {
                 List<Policy> stuff = CastUtils.cast((List<?>)inf.getProperty(EXTRA_POLICIES));
                 if (stuff != null) {
-                    stuff.addAll(list);
+                    for (Policy p2 : list) {
+                        if (!stuff.contains(p2)) {
+                            stuff.add(p2);
+                        }
+                    }
                 } else {
                     inf.setProperty(EXTRA_POLICIES, list);
                 }
@@ -340,7 +344,11 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             if (!list.isEmpty()) {
                 List<Policy> stuff = CastUtils.cast((List<?>)ii.getProperty(EXTRA_POLICIES));
                 if (stuff != null) {
-                    stuff.addAll(list);
+                    for (Policy p2 : list) {
+                        if (!stuff.contains(p2)) {
+                            stuff.add(p2);
+                        }
+                    }
                 } else {
                     ii.setProperty(EXTRA_POLICIES, list);
                 }
