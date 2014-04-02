@@ -27,6 +27,7 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -63,6 +64,7 @@ import org.apache.cxf.ws.security.sts.provider.model.ClaimsType;
 import org.apache.cxf.ws.security.sts.provider.model.EntropyType;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
 import org.apache.cxf.ws.security.sts.provider.model.OnBehalfOfType;
+import org.apache.cxf.ws.security.sts.provider.model.ParticipantsType;
 import org.apache.cxf.ws.security.sts.provider.model.RenewTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.RenewingType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
@@ -311,6 +313,12 @@ public class RequestParser {
             }
             tokenRequirements.setRenewing(renewing);
             LOG.fine("Found Renewing token");
+        } else if (QNameConstants.PARTICIPANTS.equals(jaxbElement.getName())) {
+            ParticipantsType participantsType = (ParticipantsType)jaxbElement.getValue();
+            
+            Participants participants = parseParticipants(participantsType);
+            tokenRequirements.setParticipants(participants);
+            LOG.fine("Found Participants");
         } else {
             return false;
         }
@@ -414,6 +422,26 @@ public class RequestParser {
             }
         }
         return null;
+    }
+    
+    private static Participants parseParticipants(ParticipantsType participantsType) {
+        Participants participants = new Participants();
+        
+        if (participantsType.getPrimary() != null) {
+            participants.setPrimaryParticipant(participantsType.getPrimary().getAny());
+        }
+        
+        if (participantsType.getParticipant() != null 
+            && !participantsType.getParticipant().isEmpty()) {
+            List<Object> secondaryParticipants = 
+                new ArrayList<Object>(participantsType.getParticipant().size());
+            for (Object object : participantsType.getParticipant()) {
+                secondaryParticipants.add(object);
+            }
+            participants.setParticipants(secondaryParticipants);
+        }
+        
+        return participants;
     }
     
     private static <T> T extractType(Object param, Class<T> clazz) {
