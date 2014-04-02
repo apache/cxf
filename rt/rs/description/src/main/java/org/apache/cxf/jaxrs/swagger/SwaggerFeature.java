@@ -22,11 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.feature.Feature;
-import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -83,21 +80,6 @@ public class SwaggerFeature extends AbstractFeature {
             setBasePath(address + "/api-docs");
         }
     }
-    
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        EndpointImpl endpointImpl = (EndpointImpl)provider;
-        List<Feature> features = endpointImpl.getActiveFeatures();
-        if (features == null) {
-            features = new ArrayList<Feature>();
-            features.add(this);
-            endpointImpl.initializeActiveFeatures(features);
-        } else {
-            features.add(this);
-        }
-    }
-
-    
     public String getResourcePackage() {
         return resourcePackage;
     }
