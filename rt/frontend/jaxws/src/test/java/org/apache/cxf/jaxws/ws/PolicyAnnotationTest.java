@@ -107,6 +107,10 @@ public class PolicyAnnotationTest extends Assert {
                   "echoIntBindingOpOutputPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestImplServiceServicePolicy");
             
+            assertEquals(1,
+                         xpu.getValueList("/wsdl:definitions/wsdl:binding/wsdl:operation/"
+                                              + "wsp:PolicyReference[@URI='#echoIntBindingOpPolicy']", wsdl)
+                             .getLength());
             
             EndpointPolicy policy = bus.getExtension(PolicyEngine.class)
                 .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null, null);
@@ -172,6 +176,10 @@ public class PolicyAnnotationTest extends Assert {
                   "echoIntBindingOpOutputPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestInterfaceServiceServicePolicy");
             
+            assertEquals(1,
+                         xpu.getValueList("/wsdl:definitions/wsdl:binding/wsdl:operation/"
+                                              + "wsp:PolicyReference[@URI='#echoIntBindingOpPolicy']", wsdl)
+                             .getLength());
             
         } finally {
             bus.shutdown(true);
