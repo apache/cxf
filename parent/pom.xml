@@ -94,6 +94,7 @@
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.logback.classic.version>1.0.13</cxf.logback.classic.version>
         <cxf.log4j.version>1.2.17</cxf.log4j.version>
+        <cxf.lucene.version>4.0.0-BETA</cxf.lucene.version>
         <cxf.mina.version>2.0.7</cxf.mina.version>
         <cxf.javax.annotation-api.version>1.2</cxf.javax.annotation-api.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
@@ -128,6 +129,7 @@
         <cxf.netty3.version>3.8.0.Final</cxf.netty3.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
+        <cxf.oauth.version>20100527</cxf.oauth.version>
         <cxf.opensaml.version>2.6.1</cxf.opensaml.version>
         <cxf.opensaml.osgi.version>2.6.1_1</cxf.opensaml.osgi.version>
         <cxf.opensaml.xmltooling.version>1.4.0_1</cxf.opensaml.xmltooling.version>
