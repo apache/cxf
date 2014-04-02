@@ -50,7 +50,7 @@
         <dependency>
             <groupId>net.oauth.core</groupId>
             <artifactId>oauth-provider</artifactId>
-            <version>${oauth.version}</version>
+            <version>${cxf.oauth.version}</version>
         </dependency>
         
         <dependency>
