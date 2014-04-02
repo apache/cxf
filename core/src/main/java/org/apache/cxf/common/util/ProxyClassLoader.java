@@ -32,10 +32,13 @@ public class ProxyClassLoader extends ClassLoader {
     private final Set<ClassLoader> loaders = new HashSet<ClassLoader>();
     private boolean checkSystem;
 
-    public ProxyClassLoader() {
+    public ProxyClassLoader(ClassLoader parent) {
+        super(parent);
         classes = null;
     }
-    public ProxyClassLoader(Class<?>[] cls) {
+
+    public ProxyClassLoader(ClassLoader parent, Class<?>[] cls) {
+        super(parent);
         classes = cls;
     }
 
