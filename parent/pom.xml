@@ -535,6 +535,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${cxf.log4j.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>${cxf.javax.ws.rs.version}</version>
