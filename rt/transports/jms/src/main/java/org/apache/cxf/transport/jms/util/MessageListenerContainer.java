@@ -20,6 +20,8 @@ package org.apache.cxf.transport.jms.util;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
@@ -29,11 +31,20 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
+import javax.jms.XASession;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
+
+import org.apache.cxf.common.logging.LogUtils;
 
 public class MessageListenerContainer implements JMSListenerContainer {
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(MessageListenerContainer.class);
+
     private Connection connection;
-    private Destination replyTo;
+    private Destination destination;
     private MessageListener listenerHandler;
     private boolean transacted;
     private int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
@@ -44,19 +55,19 @@ public class MessageListenerContainer implements JMSListenerContainer {
     private Executor executor;
     private String durableSubscriptionName;
     private boolean pubSubNoLocal;
+    private TransactionManager transactionManager;
 
-    public MessageListenerContainer(Connection connection, 
-                                    Destination replyTo,
+    public MessageListenerContainer(Connection connection, Destination destination,
                                     MessageListener listenerHandler) {
         this.connection = connection;
-        this.replyTo = replyTo;
+        this.destination = destination;
         this.listenerHandler = listenerHandler;
     }
-    
+
     public Connection getConnection() {
         return connection;
     }
-    
+
     public void setTransacted(boolean transacted) {
         this.transacted = transacted;
     }
@@ -68,7 +79,7 @@ public class MessageListenerContainer implements JMSListenerContainer {
     public void setMessageSelector(String messageSelector) {
         this.messageSelector = messageSelector;
     }
-    
+
     private Executor getExecutor() {
         if (executor == null) {
             executor = Executors.newFixedThreadPool(10);
@@ -92,18 +103,27 @@ public class MessageListenerContainer implements JMSListenerContainer {
     public boolean isRunning() {
         return running;
     }
-    
+
+    public void setTransactionManager(TransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
     @Override
     public void start() {
         try {
             session = connection.createSession(transacted, acknowledgeMode);
             if (durableSubscriptionName != null) {
-                consumer = session.createDurableSubscriber((Topic)replyTo, durableSubscriptionName,
+                consumer = session.createDurableSubscriber((Topic)destination, durableSubscriptionName,
                                                            messageSelector, pubSubNoLocal);
             } else {
-                consumer = session.createConsumer(replyTo, messageSelector);
+                consumer = session.createConsumer(destination, messageSelector);
             }
-            consumer.setMessageListener(listenerHandler);
+            
+            MessageListener intListener = (transactionManager != null)
+                ? new TransactionalMessageListener(transactionManager, session, listenerHandler)
+                : new DispachingListener(getExecutor(), listenerHandler);
+            consumer.setMessageListener(intListener);
+            
             running = true;
         } catch (JMSException e) {
             throw JMSUtil.convertJmsException(e);
@@ -125,21 +145,80 @@ public class MessageListenerContainer implements JMSListenerContainer {
         ResourceCloser.close(connection);
     }
 
-    class DispachingListener implements MessageListener {
+    protected TransactionManager getTransactionManager() {
+        if (this.transactionManager == null) {
+            try {
+                InitialContext ctx = new InitialContext();
+                this.transactionManager = (TransactionManager)ctx
+                    .lookup("javax.transaction.TransactionManager");
+            } catch (NamingException e) {
+                // Ignore
+            }
+        }
+        return this.transactionManager;
+    }
+
+    static class DispachingListener implements MessageListener {
+        private Executor executor;
+        private MessageListener listenerHandler;
+
+        public DispachingListener(Executor executor, MessageListener listenerHandler) {
+            this.executor = executor;
+            this.listenerHandler = listenerHandler;
+
+        }
 
         @Override
         public void onMessage(final Message message) {
-            getExecutor().execute(new Runnable() {
-                
+            executor.execute(new Runnable() {
+
                 @Override
                 public void run() {
-                    try {
-                        listenerHandler.onMessage(message);
-                    } catch (Exception e) {
-                        // Ignore
-                    }
+                    listenerHandler.onMessage(message);
                 }
+
             });
+        }
+
+    }
+    
+    static class TransactionalMessageListener implements MessageListener {
+        private TransactionManager tm;
+        private MessageListener listenerHandler;
+        private Session session;
+        
+        public TransactionalMessageListener(TransactionManager tm, Session session, MessageListener listenerHandler) {
+            this.tm = tm;
+            this.session = session;
+            this.listenerHandler = listenerHandler;
+        }
+
+        @Override
+        public void onMessage(Message message) {
+            if (tm == null || !(session instanceof XASession)) {
+                listenerHandler.onMessage(message);
+                return;
+            }
+            try {
+                XASession xaSession = (XASession)session; // TODO check cast
+                tm.begin();
+                Transaction tr = tm.getTransaction();
+                XAResource res = xaSession.getXAResource();
+                tr.enlistResource(res);
+                listenerHandler.onMessage(message);
+                tm.commit();
+            } catch (Throwable e) {
+                safeRollback(e);
+            }
+        }
+        
+        private void safeRollback(Throwable t) {
+            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back");
+            try {
+                tm.rollback();
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Rollback of JTA transaction failed", e);
+            }
         }
         
     }

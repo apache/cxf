@@ -21,6 +21,7 @@ package org.apache.cxf.transport.jms;
 
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,6 +63,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private JMSListenerContainer jmsListener;
     private ThrottlingCounter suspendedContinuations;
     private ClassLoader loader;
+    private Connection connection;
 
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
         super(b, getTargetReference(info, b), info);
@@ -77,7 +79,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
      * @return the inbuilt backchannel
      */
     protected Conduit getInbuiltBackChannel(Message inMessage) {
-        return new BackChannelConduit(inMessage, jmsConfig, jmsListener.getConnection());
+        return new BackChannelConduit(inMessage, jmsConfig, connection);
     }
 
     /**
@@ -98,13 +100,15 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private JMSListenerContainer createTargetDestinationListener() {
         Session session = null;
         try {
-            Connection connection = JMSFactory.createConnection(jmsConfig);
+            connection = JMSFactory.createConnection(jmsConfig);
             connection.start();
             session = connection.createSession(jmsConfig.isSessionTransacted(), Session.AUTO_ACKNOWLEDGE);
             Destination destination = jmsConfig.getTargetDestination(session);
             MessageListenerContainer container = new MessageListenerContainer(connection, destination, this);
             container.setMessageSelector(jmsConfig.getMessageSelector());
-            Executor executor = JMSFactory.createExecutor(bus, "jms-destination");
+            
+            Executor executor = Executors.newFixedThreadPool(20); 
+                //JMSFactory.createExecutor(bus, "jms-destination");
             container.setExecutor(executor);
             container.start();
             return container;
