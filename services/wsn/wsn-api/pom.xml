@@ -54,7 +54,6 @@
                     <execution>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <sourceRoot>${basedir}/target/jaxws</sourceRoot>
                             <defaultOptions>
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
