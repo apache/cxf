@@ -60,6 +60,8 @@ public final class QNameConstants {
         WS_TRUST_FACTORY.createClaims(null).getName();
     public static final QName RENEWING = 
         WS_TRUST_FACTORY.createRenewing(null).getName();
+    public static final QName PARTICIPANTS = 
+        WS_TRUST_FACTORY.createParticipants(null).getName();
     
     //
     // Key Requirement QNames

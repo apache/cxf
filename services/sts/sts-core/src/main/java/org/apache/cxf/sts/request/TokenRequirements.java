@@ -39,6 +39,7 @@ public class TokenRequirements {
     private ClaimCollection primaryClaims;
     private ClaimCollection secondaryClaims;
     private Renewing renewing;
+    private Participants participants;
     
     public Renewing getRenewing() {
         return renewing;
@@ -134,6 +135,14 @@ public class TokenRequirements {
 
     public void setSecondaryClaims(ClaimCollection secondaryClaims) {
         this.secondaryClaims = secondaryClaims;
+    }
+
+    public Participants getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(Participants participants) {
+        this.participants = participants;
     }
 
 }

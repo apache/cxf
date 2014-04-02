@@ -19,12 +19,14 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.Lifetime;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.joda.time.DateTime;
@@ -200,7 +202,11 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         } else {
             conditions.setTokenPeriodMinutes(5);
         }
-        conditions.setAudienceURI(appliesToAddress);
+        if (appliesToAddress != null) {
+            AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+            audienceRestriction.setAudienceURIs(Collections.singletonList(appliesToAddress));
+            conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
+        }
         
         return conditions;
     }
