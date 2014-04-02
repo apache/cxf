@@ -61,14 +61,14 @@ public final class JSONUtils {
     private JSONUtils() {
     }
     
-    public static XMLStreamWriter createBadgerFishWriter(OutputStream os) throws XMLStreamException {
+    public static XMLStreamWriter createBadgerFishWriter(OutputStream os, String enc) throws XMLStreamException {
         XMLOutputFactory factory = new BadgerFishXMLOutputFactory();
-        return factory.createXMLStreamWriter(os);
+        return factory.createXMLStreamWriter(os, enc);
     }
     
-    public static XMLStreamReader createBadgerFishReader(InputStream is) throws XMLStreamException {
+    public static XMLStreamReader createBadgerFishReader(InputStream is, String enc) throws XMLStreamException {
         XMLInputFactory factory = new BadgerFishXMLInputFactory();
-        return factory.createXMLStreamReader(is);
+        return factory.createXMLStreamReader(is, enc);
     }
     //CHECKSTYLE:OFF    
     public static XMLStreamWriter createStreamWriter(OutputStream os, 
@@ -135,13 +135,14 @@ public final class JSONUtils {
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
         ConcurrentHashMap<String, String> namespaceMap) throws Exception {
-        return createStreamReader(is, readXsiType, namespaceMap, null, null);
+        return createStreamReader(is, readXsiType, namespaceMap, null, null, "UTF-8");
     }
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
         ConcurrentHashMap<String, String> namespaceMap,
         List<String> primitiveArrayKeys,
-        DocumentDepthProperties depthProps) throws Exception {
+        DocumentDepthProperties depthProps,
+        String enc) throws Exception {
         if (readXsiType) {
             namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
@@ -154,7 +155,7 @@ public final class JSONUtils {
         XMLInputFactory factory = depthProps != null 
             ? new JettisonMappedReaderFactory(conf, depthProps) 
             : new MappedXMLInputFactory(conf);
-        return new JettisonReader(namespaceMap, factory.createXMLStreamReader(is));
+        return new JettisonReader(namespaceMap, factory.createXMLStreamReader(is, enc));
     }
     
     private static class JettisonMappedReaderFactory extends MappedXMLInputFactory {

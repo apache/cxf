@@ -214,11 +214,12 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         
         XMLStreamReader reader = null;
+        String enc = HttpUtils.getEncoding(mt, "UTF-8");
         try {
             InputStream realStream = getInputStream(type, genericType, is);
             if (Document.class.isAssignableFrom(type)) {
                 W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-                reader = createReader(type, realStream, false);
+                reader = createReader(type, realStream, false, enc);
                 copyReaderToWriter(reader, writer);
                 return type.cast(writer.getDocument());
             }
@@ -227,7 +228,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             Class<?> theType = getActualType(theGenericType, genericType, anns);
             
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType, isCollection);
-            XMLStreamReader xsr = createReader(type, realStream, isCollection);
+            XMLStreamReader xsr = createReader(type, realStream, isCollection, enc);
             
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type) 
@@ -272,23 +273,24 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         return null;
     }
 
-    protected XMLStreamReader createReader(Class<?> type, InputStream is, boolean isCollection) 
+    protected XMLStreamReader createReader(Class<?> type, InputStream is, boolean isCollection, String enc) 
         throws Exception {
-        XMLStreamReader reader = createReader(type, is);
+        XMLStreamReader reader = createReader(type, is, enc);
         return isCollection ? new JAXBCollectionWrapperReader(reader) : reader;
     }
     
-    protected XMLStreamReader createReader(Class<?> type, InputStream is) 
+    protected XMLStreamReader createReader(Class<?> type, InputStream is, String enc) 
         throws Exception {
         XMLStreamReader reader = null;
         if (BADGER_FISH_CONVENTION.equals(convention)) {
-            reader = JSONUtils.createBadgerFishReader(is);
+            reader = JSONUtils.createBadgerFishReader(is, enc);
         } else {
             reader = JSONUtils.createStreamReader(is, 
                                                   readXsiType, 
                                                   namespaceMap, 
                                                   primitiveArrayKeys,
-                                                  getDepthProperties());
+                                                  getDepthProperties(), 
+                                                  enc);
         }
         reader = createTransformReaderIfNeeded(reader, is);
         
@@ -508,7 +510,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         
         if (BADGER_FISH_CONVENTION.equals(convention)) {
-            return JSONUtils.createBadgerFishWriter(os);
+            return JSONUtils.createBadgerFishWriter(os, enc);
         }
         boolean dropElementsInXmlStreamProp = getBooleanJsonProperty(DROP_ELEMENT_IN_XML_PROPERTY, 
                                                                      dropElementsInXmlStream);
