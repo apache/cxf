@@ -69,7 +69,6 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXRSFactoryBean.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXRSFactoryBean.class);
-    private static final String RESOURCE_TYPES = "jaxrs.resource.types";
     
     protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
@@ -245,10 +244,6 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
                                      cri.getServiceClass(), null);
         }
         ep.put(JAXRSServiceFactoryBean.class.getName(), serviceFactory);
-        
-        Map<Class<?>, Type> allClasses = 
-            ResourceUtils.getAllRequestResponseTypes(list, false).getAllTypes();
-        ep.put(RESOURCE_TYPES, allClasses.keySet());
         return ep;
     }
     
