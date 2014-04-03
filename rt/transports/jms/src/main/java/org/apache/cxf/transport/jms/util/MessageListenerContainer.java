@@ -34,9 +34,7 @@ import javax.jms.Topic;
 import javax.jms.XASession;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-import javax.transaction.xa.XAResource;
 
 import org.apache.cxf.common.logging.LogUtils;
 
@@ -182,29 +180,29 @@ public class MessageListenerContainer implements JMSListenerContainer {
 
     }
     
+    @SuppressWarnings("PMD")
     static class TransactionalMessageListener implements MessageListener {
         private TransactionManager tm;
         private MessageListener listenerHandler;
-        private Session session;
+        private XASession session;
         
         public TransactionalMessageListener(TransactionManager tm, Session session, MessageListener listenerHandler) {
+            if (tm == null) {
+                throw new IllegalArgumentException("Must supply a transaction manager");
+            }
+            if (session == null || !(session instanceof XASession)) {
+                throw new IllegalArgumentException("Must supply an XASession");
+            }
             this.tm = tm;
-            this.session = session;
+            this.session = (XASession)session;
             this.listenerHandler = listenerHandler;
         }
 
         @Override
         public void onMessage(Message message) {
-            if (tm == null || !(session instanceof XASession)) {
-                listenerHandler.onMessage(message);
-                return;
-            }
             try {
-                XASession xaSession = (XASession)session; // TODO check cast
                 tm.begin();
-                Transaction tr = tm.getTransaction();
-                XAResource res = xaSession.getXAResource();
-                tr.enlistResource(res);
+                tm.getTransaction().enlistResource(session.getXAResource());
                 listenerHandler.onMessage(message);
                 tm.commit();
             } catch (Throwable e) {

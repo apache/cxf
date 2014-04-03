@@ -29,6 +29,8 @@ import javax.naming.NamingException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JndiHelper;
+import org.apache.cxf.workqueue.AutomaticWorkQueue;
+import org.apache.cxf.workqueue.WorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 
 /**
@@ -103,17 +105,28 @@ public final class JMSFactory {
         return connection;
     }
     
+    /**
+     * Get workqueue from workqueue manager. Return an executor that will never reject messages and
+     * instead block when all threads are used.
+     * 
+     * @param bus
+     * @param name
+     * @return
+     */
     public static Executor createExecutor(Bus bus, String name) {
         WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
-        Executor workQueue;
         if (manager != null) {
-            workQueue = manager.getNamedWorkQueue(name);
-            if (workQueue == null) {
-                workQueue = manager.getAutomaticWorkQueue();
-            }
+            AutomaticWorkQueue workQueue1 = manager.getNamedWorkQueue(name);
+            final WorkQueue workQueue = (workQueue1 == null) ? manager.getAutomaticWorkQueue() : workQueue1;
+            return new Executor() {
+                
+                @Override
+                public void execute(Runnable command) {
+                    workQueue.execute(command, 0);
+                }
+            };
         } else {
-            workQueue = Executors.newFixedThreadPool(20);
+            return Executors.newFixedThreadPool(20);
         }
-        return workQueue;
     }
 }

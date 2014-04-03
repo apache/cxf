@@ -21,7 +21,6 @@ package org.apache.cxf.transport.jms;
 
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,9 +105,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             Destination destination = jmsConfig.getTargetDestination(session);
             MessageListenerContainer container = new MessageListenerContainer(connection, destination, this);
             container.setMessageSelector(jmsConfig.getMessageSelector());
-            
-            Executor executor = Executors.newFixedThreadPool(20); 
-                //JMSFactory.createExecutor(bus, "jms-destination");
+            Executor executor = JMSFactory.createExecutor(bus, "jms-destination");
             container.setExecutor(executor);
             container.start();
             return container;
