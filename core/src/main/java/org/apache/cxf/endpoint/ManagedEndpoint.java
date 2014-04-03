@@ -37,9 +37,10 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
     public static final String ENDPOINT_NAME = "managed.endpoint.name";
     public static final String SERVICE_NAME = "managed.service.name";
 
-    private Bus bus;
-    private Endpoint endpoint;
-    private Server server;
+    protected final Bus bus;
+    protected final Endpoint endpoint;
+    protected final Server server;
+    
     private enum State { CREATED, STARTED, STOPPED };
     private State state = State.CREATED;
     
