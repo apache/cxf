@@ -87,7 +87,7 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>javadoc/target/apidocs</directory>
+            <directory>javadoc/target/core-api</directory>
             <outputDirectory>apache-cxf-${cxf.version}/docs/api</outputDirectory>
             <includes>
                 <include>**/*</include>
