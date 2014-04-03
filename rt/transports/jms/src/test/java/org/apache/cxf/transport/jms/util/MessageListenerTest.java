@@ -21,7 +21,6 @@ package org.apache.cxf.transport.jms.util;
 import java.util.Enumeration;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -32,90 +31,122 @@ import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.jms.XAConnectionFactory;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
+import org.apache.activemq.RedeliveryPolicy;
 import org.apache.aries.transaction.internal.AriesTransactionManagerImpl;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class MessageListenerTest {
 
+    private static final String FAIL = "fail";
+    private static final String FAILFIRST = "failfirst";
     private static final String OK = "ok";
 
     @Test
-    @Ignore
     public void testWithJTA() throws JMSException, XAException, InterruptedException {
-        Connection connection = createConnection();
+        Connection connection = createXAConnection("brokerJTA");
         Queue dest = createQueue(connection, "test");
-        
+
         MessageListener listenerHandler = new TestMessageListener();
         MessageListenerContainer container = new MessageListenerContainer(connection, dest, listenerHandler);
         container.setTransacted(false);
+        container.setAcknowledgeMode(Session.SESSION_TRANSACTED);
         TransactionManager transactionManager = new AriesTransactionManagerImpl();
         container.setTransactionManager(transactionManager);
         container.start();
-        assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0);
-        synchronized (listenerHandler) {
-            sendMessage(connection, dest, OK);
-            listenerHandler.wait();
-        }
-        Thread.sleep(500);
-        assertNumMessagesInQueue("This message should be committed", connection, dest, 0);
-        synchronized (listenerHandler) {
-            sendMessage(connection, dest, "Fail");
-            listenerHandler.wait();
-        }
-        Thread.sleep(500);
-        assertNumMessagesInQueue("First try should do rollback", connection, dest, 1);
-        Thread.sleep(500);
-        assertNumMessagesInQueue("Second try should work", connection, dest, 0);
-        
+
+        testTransactionalBehaviour(connection, dest);
+
         container.stop();
         connection.close();
     }
-    
+
     @Test
     public void testNoTransaction() throws JMSException, XAException, InterruptedException {
-        ConnectionFactory cf = new ActiveMQConnectionFactory("vm://broker1?broker.persistent=false");
-        Connection connection = cf.createConnection();
-        connection.start();
+        Connection connection = createConnection("brokerNoTransaction");
         Queue dest = createQueue(connection, "test");
-       
+
         MessageListener listenerHandler = new TestMessageListener();
         MessageListenerContainer container = new MessageListenerContainer(connection, dest, listenerHandler);
         container.setTransacted(false);
         container.setAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
         container.start();
-        assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0);
-        synchronized (listenerHandler) {
-            sendMessage(connection, dest, OK);
-            listenerHandler.wait();
-        }
-        Thread.sleep(500);
-        assertNumMessagesInQueue("This message should be committed", connection, dest, 0);
-        synchronized (listenerHandler) {
-            sendMessage(connection, dest, "Fail");
-            listenerHandler.wait();
-        }
-        Thread.sleep(500);
-        assertNumMessagesInQueue("Even when an exception occurs the message should be committed", connection, dest, 0);
+
+        assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0);
+
+        sendMessage(connection, dest, OK);
+        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000);
+
+        sendMessage(connection, dest, FAIL);
+        assertNumMessagesInQueue("Even when an exception occurs the message should be committed", connection,
+                                 dest, 0, 1000);
+
         container.stop();
         connection.close();
     }
 
-    private Connection createConnection() throws JMSException {
-        XAConnectionFactory cf = new ActiveMQXAConnectionFactory("vm://broker2?broker.persistent=false");
+    @Test
+    public void testLocalTransaction() throws JMSException, XAException, InterruptedException {
+        Connection connection = createConnection("brokerLocalTransaction");
+        Queue dest = createQueue(connection, "test");
+        MessageListener listenerHandler = new TestMessageListener();
+        MessageListenerContainer container = new MessageListenerContainer(connection, dest, listenerHandler);
+        container.setTransacted(true);
+        container.setAcknowledgeMode(Session.SESSION_TRANSACTED);
+        container.start();
+
+        testTransactionalBehaviour(connection, dest);
+        container.stop();
+        connection.close();
+    }
+
+    private void testTransactionalBehaviour(Connection connection, Queue dest) throws JMSException,
+        InterruptedException {
+        assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0);
+
+        sendMessage(connection, dest, OK);
+        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000);
+
+        sendMessage(connection, dest, FAILFIRST);
+        assertNumMessagesInQueue("Should be rolled back on first try", connection, dest, 1, 800);
+        assertNumMessagesInQueue("Should succeed on second try", connection, dest, 0, 2000);
+
+        sendMessage(connection, dest, "Fail");
+        assertNumMessagesInQueue("Should be rolled back", connection, dest, 1, 1000);
+    }
+
+    private Connection createConnection(String name) throws JMSException {
+        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://" + name
+                                                                     + "?broker.persistent=false");
+        cf.setRedeliveryPolicy(redeliveryPolicy());
+        Connection connection = cf.createConnection();
+        connection.start();
+        return connection;
+    }
+
+    private Connection createXAConnection(String name) throws JMSException {
+        ActiveMQXAConnectionFactory cf = new ActiveMQXAConnectionFactory("vm://" + name
+                                                                         + "?broker.persistent=false");
+        cf.setRedeliveryPolicy(redeliveryPolicy());
         Connection connection = cf.createXAConnection();
         connection.start();
         return connection;
     }
 
-    protected void drainQueue(Connection connection, Queue dest) throws JMSException {
+    private RedeliveryPolicy redeliveryPolicy() {
+        RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
+        redeliveryPolicy.setRedeliveryDelay(1000);
+        redeliveryPolicy.setMaximumRedeliveries(3);
+        redeliveryPolicy.setUseExponentialBackOff(false);
+        return redeliveryPolicy;
+    }
+
+    protected void drainQueue(Connection connection, Queue dest) throws JMSException, InterruptedException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         MessageConsumer consumer = session.createConsumer(dest);
         while (consumer.receiveNoWait() != null) {
@@ -123,13 +154,23 @@ public class MessageListenerTest {
         }
         consumer.close();
         session.close();
-        assertNumMessagesInQueue("", connection, dest, 0);
+        assertNumMessagesInQueue("", connection, dest, 0, 0);
     }
 
-    private void assertNumMessagesInQueue(String message, 
-                                          Connection connection, 
-                                          Queue queue, 
-                                          int expectedNum) throws JMSException {
+    private void assertNumMessagesInQueue(String message, Connection connection, Queue queue,
+                                          int expectedNum, int timeout) throws JMSException,
+        InterruptedException {
+        long startTime = System.currentTimeMillis();
+        int actualNum;
+        do {
+            actualNum = getNumMessages(connection, queue);
+            System.out.println("Messages in queue: " + actualNum + ", expecting: " + expectedNum);
+            Thread.sleep(100);
+        } while ((System.currentTimeMillis() - startTime < timeout) && expectedNum != actualNum);
+        Assert.assertEquals(message + " -> number of messages", expectedNum, actualNum);
+    }
+
+    private int getNumMessages(Connection connection, Queue queue) throws JMSException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         QueueBrowser browser = session.createBrowser(queue);
         @SuppressWarnings("unchecked")
@@ -141,16 +182,18 @@ public class MessageListenerTest {
         }
         browser.close();
         session.close();
-        Assert.assertEquals(message + " -> number of messages", expectedNum, actualNum);
+        return actualNum;
     }
 
-    private void sendMessage(Connection connection, Destination dest, String content) throws JMSException {
+    private void sendMessage(Connection connection, Destination dest, String content) throws JMSException,
+        InterruptedException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         MessageProducer prod = session.createProducer(dest);
         Message message = session.createTextMessage(content);
         prod.send(message);
         prod.close();
         session.close();
+        Thread.sleep(500); // Give receiver some time to process
     }
 
     private Queue createQueue(Connection connection, String name) throws JMSException {
@@ -162,29 +205,28 @@ public class MessageListenerTest {
             session.close();
         }
     }
-    
+
     private static final class TestMessageListener implements MessageListener {
         @Override
         public void onMessage(Message message) {
-            TextMessage textMessage = (TextMessage) message;
+            TextMessage textMessage = (TextMessage)message;
             try {
                 String text = textMessage.getText();
-                if (MessageListenerTest.OK.equals(text)) {
+                if (OK.equals(text)) {
                     System.out.println("Simulating Processing successful");
-                } else {
+                } else if (FAIL.equals(text)) {
+                    throw new RuntimeException("Simulating something went wrong. Expecting rollback");
+                } else if (FAILFIRST.equals(text)) {
                     if (message.getJMSRedelivered()) {
                         System.out.println("Simulating processing worked on second try");
                     } else {
                         throw new RuntimeException("Simulating something went wrong. Expecting rollback");
                     }
+                } else {
+                    throw new IllegalArgumentException("Invalid message type");
                 }
             } catch (JMSException e) {
                 // Ignore
-            } finally {
-                synchronized (this) {
-                    this.notifyAll();
-                }
-
             }
         }
     }

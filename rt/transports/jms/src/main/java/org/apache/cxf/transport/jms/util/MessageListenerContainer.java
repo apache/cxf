@@ -78,7 +78,7 @@ public class MessageListenerContainer implements JMSListenerContainer {
         this.messageSelector = messageSelector;
     }
 
-    private Executor getExecutor() {
+    protected Executor getExecutor() {
         if (executor == null) {
             executor = Executors.newFixedThreadPool(10);
         }
@@ -118,8 +118,9 @@ public class MessageListenerContainer implements JMSListenerContainer {
             }
             
             MessageListener intListener = (transactionManager != null)
-                ? new TransactionalMessageListener(transactionManager, session, listenerHandler)
-                : new DispachingListener(getExecutor(), listenerHandler);
+                ? new XATransactionalMessageListener(transactionManager, session, listenerHandler)
+                : new LocalTransactionalMessageListener(session, listenerHandler); 
+            // new DispachingListener(getExecutor(), listenerHandler);
             consumer.setMessageListener(intListener);
             
             running = true;
@@ -163,7 +164,6 @@ public class MessageListenerContainer implements JMSListenerContainer {
         public DispachingListener(Executor executor, MessageListener listenerHandler) {
             this.executor = executor;
             this.listenerHandler = listenerHandler;
-
         }
 
         @Override
@@ -180,13 +180,43 @@ public class MessageListenerContainer implements JMSListenerContainer {
 
     }
     
+    static class LocalTransactionalMessageListener implements MessageListener {
+        private MessageListener listenerHandler;
+        private Session session;
+        
+        public LocalTransactionalMessageListener(Session session, MessageListener listenerHandler) {
+            this.session = session;
+            this.listenerHandler = listenerHandler;
+        }
+
+        @Override
+        public void onMessage(Message message) {
+            try {
+                listenerHandler.onMessage(message);
+                session.commit();
+            } catch (Throwable e) {
+                safeRollback(e);
+            }
+        }
+        
+        private void safeRollback(Throwable t) {
+            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back" , t);
+            try {
+                session.rollback();
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Rollback of Local transaction failed", e);
+            }
+        }
+        
+    }
+    
     @SuppressWarnings("PMD")
-    static class TransactionalMessageListener implements MessageListener {
+    static class XATransactionalMessageListener implements MessageListener {
         private TransactionManager tm;
         private MessageListener listenerHandler;
         private XASession session;
         
-        public TransactionalMessageListener(TransactionManager tm, Session session, MessageListener listenerHandler) {
+        public XATransactionalMessageListener(TransactionManager tm, Session session, MessageListener listenerHandler) {
             if (tm == null) {
                 throw new IllegalArgumentException("Must supply a transaction manager");
             }
@@ -211,7 +241,7 @@ public class MessageListenerContainer implements JMSListenerContainer {
         }
         
         private void safeRollback(Throwable t) {
-            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back");
+            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back" , t);
             try {
                 tm.rollback();
             } catch (Exception e) {
