@@ -39,28 +39,18 @@ import org.apache.cxf.transport.MultipleEndpointObserver;
 
 public class ServerImpl implements Server {
     private static final Logger LOG = LogUtils.getL7dLogger(ServerImpl.class);    
+
+    protected final Endpoint endpoint;
+    protected final Bus bus;
+    protected final BindingFactory bindingFactory;
+
     private Destination destination;
-    private Endpoint endpoint;
     private ServerRegistry serverRegistry;
-    private Bus bus;
     private ServerLifeCycleManager slcMgr;
     private InstrumentationManager iMgr;
-    private BindingFactory bindingFactory;
-    private MessageObserver messageObserver;
     private ManagedEndpoint mep;
     private boolean stopped = true;
 
-    public ServerImpl(Bus bus, 
-                      Endpoint endpoint, 
-                      DestinationFactory destinationFactory, 
-                      MessageObserver observer) throws BusException, IOException {
-        this.endpoint = endpoint;
-        this.bus = bus;
-        this.messageObserver = observer;
-        
-        initDestination(destinationFactory);
-    }
-    
     public ServerImpl(Bus bus, 
                       Endpoint endpoint, 
                       DestinationFactory destinationFactory, 
@@ -94,7 +84,7 @@ public class ServerImpl implements Server {
         LOG.info("Setting the server's publish address to be " + ei.getAddress());
         serverRegistry = bus.getExtension(ServerRegistry.class);
         
-        mep = new ManagedEndpoint(bus, endpoint, this);
+        mep = createManagedEndpoint();
         
         slcMgr = bus.getExtension(ServerLifeCycleManager.class);
         if (slcMgr != null) {
@@ -109,6 +99,10 @@ public class ServerImpl implements Server {
                 LOG.log(Level.WARNING, "Registering ManagedEndpoint failed.", jmex);
             }
         }
+    }
+    
+    protected ManagedEndpoint createManagedEndpoint() {
+        return new ManagedEndpoint(bus, endpoint, this);
     }
 
     public Destination getDestination() {
@@ -125,11 +119,7 @@ public class ServerImpl implements Server {
         }
         LOG.fine("Server is starting.");
         
-        if (messageObserver != null) {
-            destination.setMessageObserver(messageObserver);
-        } else {
-            bindingFactory.addListener(destination, endpoint);
-        }
+        bindingFactory.addListener(destination, endpoint);
         
         // register the active server to run
         if (null != serverRegistry) {
@@ -200,14 +190,6 @@ public class ServerImpl implements Server {
 
     public Endpoint getEndpoint() {
         return endpoint;
-    }
-
-    public MessageObserver getMessageObserver() {
-        return messageObserver;
-    }
-
-    public void setMessageObserver(MessageObserver messageObserver) {
-        this.messageObserver = messageObserver;
     }
     
 }
