@@ -34,7 +34,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
-import org.apache.cxf.transport.http.HttpUrlUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -184,13 +183,9 @@ public class NettyHttpServerEngine implements ServerEngine {
     protected void checkRegistedContext(URL url) {
         String path = url.getPath();
         for (String registedPath : registedPaths) {
-            if (path.equals(registedPath)
-                    || HttpUrlUtil.checkContextPath(registedPath, path)) {
+            if (path.equals(registedPath)) {
                 // Throw the address is already used exception
                 throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
-            }
-            if (HttpUrlUtil.checkContextPath(path, registedPath)) {
-                throw new Fault(new Message("ADD_HANDLER_CONTEXT_CONFILICT_MSG", LOG, url, registedPath));
             }
         }
 
