@@ -837,6 +837,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     public void setValidateOutput(boolean validateOutput) {
         this.validateOutputIfPossible = validateOutput;
     }
+    public void setValidateInput(boolean validateInput) {
+        this.validateInputIfPossible = validateInput;
+    }
 
     public void setDepthProperties(DocumentDepthProperties depthProperties) {
         this.depthProperties = depthProperties;
