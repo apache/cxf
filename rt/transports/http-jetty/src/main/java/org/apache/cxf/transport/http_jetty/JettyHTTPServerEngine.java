@@ -281,6 +281,14 @@ public class JettyHTTPServerEngine
             if (path.equals(registedPath)) {
                 throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
             }
+            // There are some context path conflicts which could cause the JettyHTTPServerEngine 
+            // doesn't route the message to the right JettyHTTPHandler
+            if (path.equals(HttpUriMapper.getContextName(registedPath))) {
+                throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
+            }
+            if (registedPath.equals(HttpUriMapper.getContextName(path))) {
+                throw new Fault(new Message("ADD_HANDLER_CONTEXT_CONFILICT_MSG", LOG, url, registedPath));
+            }
         }
     }
     
