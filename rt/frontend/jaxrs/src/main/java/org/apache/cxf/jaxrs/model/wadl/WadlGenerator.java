@@ -221,6 +221,17 @@ public class WadlGenerator implements RequestHandler {
 
         boolean isJson = type == MediaType.APPLICATION_JSON_TYPE;
 
+        StringBuilder sbMain = generateWADL(getBaseURI(m, ui), getResourcesList(m, resource), isJson, m, ui);
+
+        m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, !isJson && ignoreMessageWriters);
+        return Response.ok().type(type).entity(createResponseEntity(sbMain.toString(), isJson)).build();
+    }
+
+    public StringBuilder generateWADL(String baseURI, 
+                                       List<ClassResourceInfo> cris, 
+                                       boolean isJson,
+                                       Message m,
+                                       UriInfo ui) {
         StringBuilder sbMain = new StringBuilder();
         sbMain.append("<application");
         if (!isJson) {
@@ -231,12 +242,10 @@ public class WadlGenerator implements RequestHandler {
         sbGrammars.append("<grammars>");
 
         StringBuilder sbResources = new StringBuilder();
-        sbResources.append("<resources base=\"").append(getBaseURI(m, ui)).append("\">");
+        sbResources.append("<resources base=\"").append(baseURI).append("\">");
 
-        List<ClassResourceInfo> cris = getResourcesList(m, resource);
-
-        MessageBodyWriter<?> jaxbWriter = useJaxbContextForQnames 
-            ? ProviderFactory.getInstance(m).getRegisteredJaxbWriter() : null;
+        MessageBodyWriter<?> jaxbWriter = (m != null && useJaxbContextForQnames)
+             ? ProviderFactory.getInstance(m).getRegisteredJaxbWriter() : null;
         ResourceTypes resourceTypes = ResourceUtils.getAllRequestResponseTypes(cris, 
                                                                                useJaxbContextForQnames,
                                                                                jaxbWriter);
@@ -274,9 +283,7 @@ public class WadlGenerator implements RequestHandler {
         sbMain.append(sbGrammars.toString());
         sbMain.append(sbResources.toString());
         sbMain.append("</application>");
-
-        m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, !isJson && ignoreMessageWriters);
-        return Response.ok().type(type).entity(createResponseEntity(sbMain.toString(), isJson)).build();
+        return sbMain;
     }
 
     private Object createResponseEntity(String entity, boolean isJson) {
