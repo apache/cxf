@@ -199,21 +199,6 @@ public class JettyHTTPServerEngineTest extends Assert {
         } catch (Exception ex) {
             assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test") > 0);
         }
-        /*
-        try {
-            engine.addServant(new URL(urlStr + "/test"), handler2);
-            fail("We don't support to publish the two service at the same context path");
-        } catch (Exception ex) {
-            assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test/test") > 0);
-        }
-        
-        try {
-            engine.addServant(new URL("http://localhost:" + PORT1 + "/hello"), handler2);
-            fail("We don't support to publish the two service at the same context path");
-        } catch (Exception ex) {
-            assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello") > 0);
-        }
-        */
         
         engine.addServant(new URL(urlStr2), handler2);
         
