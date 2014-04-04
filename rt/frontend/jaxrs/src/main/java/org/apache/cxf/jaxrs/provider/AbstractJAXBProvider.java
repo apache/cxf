@@ -136,7 +136,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     
     private Class<?>[] extraClass;
     
-    private boolean validateOutput;
+    private boolean validateInputIfPossible = true;
+    private boolean validateOutputIfPossible;
     private boolean validateBeforeWrite;
     private ValidationEventHandler eventHandler;
     private Unmarshaller.Listener unmarshallerListener;
@@ -213,9 +214,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         }
         if (cris != null) {
             List<String> schemaLocs = new LinkedList<String>();
+            SchemaValidation sv = null;
             for (ClassResourceInfo cri : cris) {
-                SchemaValidation sv = cri.getServiceClass().getAnnotation(SchemaValidation.class);
-                if (sv != null && sv.schemas() != null) {
+                sv = cri.getServiceClass().getAnnotation(SchemaValidation.class);
+                if (sv != null && sv.schemas() != null && sv.type() != SchemaValidation.SchemaValidationType.NONE) {
                     for (String s : sv.schemas()) {
                         String theSchema = s;
                         if (!theSchema.startsWith("classpath:")) {
@@ -227,6 +229,15 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             }
             if (!schemaLocs.isEmpty()) {
                 this.setSchemaLocations(schemaLocs);
+                if (cris.size() == 0 && schema != null) {
+                    SchemaValidation.SchemaValidationType type = sv.type();
+                    if (type == SchemaValidation.SchemaValidationType.OUT) {
+                        validateInputIfPossible = false;
+                        validateOutputIfPossible = true;
+                    } else if (type == SchemaValidation.SchemaValidationType.BOTH) {
+                        validateOutputIfPossible = true;
+                    }
+                }
             }
         }
     }
@@ -593,9 +604,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         JAXBContext context = isCollection ? getCollectionContext(cls) 
                                            : getJAXBContext(cls, genericType);
         Unmarshaller unmarshaller = context.createUnmarshaller();
-        Schema theSchema = getSchema(cls);
-        if (theSchema != null) {
-            unmarshaller.setSchema(theSchema);
+        if (validateInputIfPossible) {
+            Schema theSchema = getSchema(cls);
+            if (theSchema != null) {
+                unmarshaller.setSchema(theSchema);
+            }
         }
         if (eventHandler != null) {
             unmarshaller.setEventHandler(eventHandler);
@@ -631,7 +644,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     
     protected void validateObjectIfNeeded(Marshaller marshaller, Class<?> cls, Object obj) 
         throws JAXBException {
-        if (validateOutput) {
+        if (validateOutputIfPossible) {
             Schema theSchema = getSchema(cls);
             if (theSchema != null) {
                 marshaller.setEventHandler(eventHandler);
@@ -822,7 +835,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
 
     public void setValidateOutput(boolean validateOutput) {
-        this.validateOutput = validateOutput;
+        this.validateOutputIfPossible = validateOutput;
     }
 
     public void setDepthProperties(DocumentDepthProperties depthProperties) {
