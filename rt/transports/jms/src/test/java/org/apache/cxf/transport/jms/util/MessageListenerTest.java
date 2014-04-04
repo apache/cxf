@@ -37,6 +37,7 @@ import javax.transaction.xa.XAException;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;
+import org.apache.activemq.pool.XaPooledConnectionFactory;
 import org.apache.aries.transaction.internal.AriesTransactionManagerImpl;
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,14 +50,16 @@ public class MessageListenerTest {
 
     @Test
     public void testWithJTA() throws JMSException, XAException, InterruptedException {
-        Connection connection = createXAConnection("brokerJTA");
+        TransactionManager transactionManager = new AriesTransactionManagerImpl();
+        Connection connection = createXAConnection("brokerJTA", transactionManager);
         Queue dest = createQueue(connection, "test");
 
         MessageListener listenerHandler = new TestMessageListener();
-        MessageListenerContainer container = new MessageListenerContainer(connection, dest, listenerHandler);
+        PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, dest,
+                                                                                        listenerHandler);
         container.setTransacted(false);
         container.setAcknowledgeMode(Session.SESSION_TRANSACTED);
-        TransactionManager transactionManager = new AriesTransactionManagerImpl();
+
         container.setTransactionManager(transactionManager);
         container.start();
 
@@ -72,7 +75,8 @@ public class MessageListenerTest {
         Queue dest = createQueue(connection, "test");
 
         MessageListener listenerHandler = new TestMessageListener();
-        MessageListenerContainer container = new MessageListenerContainer(connection, dest, listenerHandler);
+        PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, dest,
+                                                                                        listenerHandler);
         container.setTransacted(false);
         container.setAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
         container.start();
@@ -107,17 +111,18 @@ public class MessageListenerTest {
 
     private void testTransactionalBehaviour(Connection connection, Queue dest) throws JMSException,
         InterruptedException {
+        Queue dlq = createQueue(connection, "ActiveMQ.DLQ");
         assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0);
+        assertNumMessagesInQueue("At the start the DLQ should be empty", connection, dlq, 0, 0);
 
         sendMessage(connection, dest, OK);
         assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000);
 
         sendMessage(connection, dest, FAILFIRST);
-        assertNumMessagesInQueue("Should be rolled back on first try", connection, dest, 1, 800);
         assertNumMessagesInQueue("Should succeed on second try", connection, dest, 0, 2000);
 
-        sendMessage(connection, dest, "Fail");
-        assertNumMessagesInQueue("Should be rolled back", connection, dest, 1, 1000);
+        sendMessage(connection, dest, FAIL);
+        assertNumMessagesInQueue("Should be rolled back", connection, dlq, 1, 1000);
     }
 
     private Connection createConnection(String name) throws JMSException {
@@ -129,11 +134,14 @@ public class MessageListenerTest {
         return connection;
     }
 
-    private Connection createXAConnection(String name) throws JMSException {
+    private Connection createXAConnection(String name, TransactionManager tm) throws JMSException {
         ActiveMQXAConnectionFactory cf = new ActiveMQXAConnectionFactory("vm://" + name
                                                                          + "?broker.persistent=false");
         cf.setRedeliveryPolicy(redeliveryPolicy());
-        Connection connection = cf.createXAConnection();
+        XaPooledConnectionFactory cfp = new XaPooledConnectionFactory(cf);
+        cfp.setTransactionManager(tm);
+        cfp.setConnectionFactory(cf);
+        Connection connection = cfp.createConnection();
         connection.start();
         return connection;
     }
@@ -141,8 +149,7 @@ public class MessageListenerTest {
     private RedeliveryPolicy redeliveryPolicy() {
         RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
         redeliveryPolicy.setRedeliveryDelay(1000);
-        redeliveryPolicy.setMaximumRedeliveries(3);
-        redeliveryPolicy.setUseExponentialBackOff(false);
+        redeliveryPolicy.setMaximumRedeliveries(1);
         return redeliveryPolicy;
     }
 
@@ -164,7 +171,8 @@ public class MessageListenerTest {
         int actualNum;
         do {
             actualNum = getNumMessages(connection, queue);
-            System.out.println("Messages in queue: " + actualNum + ", expecting: " + expectedNum);
+            System.out.println("Messages in queue " + queue.getQueueName() + ": " + actualNum
+                               + ", expecting: " + expectedNum);
             Thread.sleep(100);
         } while ((System.currentTimeMillis() - startTime < timeout) && expectedNum != actualNum);
         Assert.assertEquals(message + " -> number of messages", expectedNum, actualNum);
