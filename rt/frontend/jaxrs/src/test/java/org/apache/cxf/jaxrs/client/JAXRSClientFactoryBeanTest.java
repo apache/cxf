@@ -58,7 +58,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
     
     @Test
     public void testCreateClientCustomLoader() throws Exception {
-        ProxyClassLoader loader = new ProxyClassLoader();
+        ProxyClassLoader loader = new ProxyClassLoader(BookStore.class.getClassLoader());
         loader.addLoader(BookStore.class.getClassLoader());
         
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();

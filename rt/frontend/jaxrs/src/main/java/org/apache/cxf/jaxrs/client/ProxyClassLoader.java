@@ -21,4 +21,7 @@ package org.apache.cxf.jaxrs.client;
 @Deprecated
 public class ProxyClassLoader extends org.apache.cxf.common.util.ProxyClassLoader {
 
+    public ProxyClassLoader() {
+        super(null);
+    }
 }
