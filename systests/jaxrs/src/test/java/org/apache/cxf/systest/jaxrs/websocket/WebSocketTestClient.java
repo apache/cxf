@@ -248,7 +248,6 @@ class WebSocketTestClient {
             return contentType;
         }
         
-        @SuppressWarnings("unused")
         public Object getEntity() {
             return entity;
         }

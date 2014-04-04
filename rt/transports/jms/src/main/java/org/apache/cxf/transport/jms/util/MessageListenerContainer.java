@@ -212,7 +212,6 @@ public class MessageListenerContainer implements JMSListenerContainer {
         
     }
     
-    @SuppressWarnings("PMD")
     static class XATransactionalMessageListener implements MessageListener {
         private TransactionManager tm;
         private MessageListener listenerHandler;
@@ -222,7 +221,7 @@ public class MessageListenerContainer implements JMSListenerContainer {
             if (tm == null) {
                 throw new IllegalArgumentException("Must supply a transaction manager");
             }
-            if (session == null || !(session instanceof XASession)) {
+            if (!(session instanceof XASession)) {
                 throw new IllegalArgumentException("Must supply an XASession");
             }
             this.tm = tm;
