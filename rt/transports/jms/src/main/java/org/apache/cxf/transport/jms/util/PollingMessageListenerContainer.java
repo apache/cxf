@@ -19,27 +19,24 @@
 package org.apache.cxf.transport.jms.util;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.jms.Topic;
-import javax.jms.XASession;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 
-public class MessageListenerContainer implements JMSListenerContainer {
-    private static final Logger LOG = LogUtils.getL7dLogger(MessageListenerContainer.class);
+public class PollingMessageListenerContainer implements JMSListenerContainer {
+    private static final Logger LOG = LogUtils.getL7dLogger(PollingMessageListenerContainer.class);
 
     private Connection connection;
     private Destination destination;
@@ -48,15 +45,19 @@ public class MessageListenerContainer implements JMSListenerContainer {
     private int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
     private String messageSelector;
     private boolean running;
-    private MessageConsumer consumer;
-    private Session session;
     private Executor executor;
+    @SuppressWarnings("unused")
     private String durableSubscriptionName;
+    @SuppressWarnings("unused")
     private boolean pubSubNoLocal;
     private TransactionManager transactionManager;
 
-    public MessageListenerContainer(Connection connection, Destination destination,
-                                    MessageListener listenerHandler) {
+    private ExecutorService pollers;
+
+    private int numListenerThreads = 1;
+
+    public PollingMessageListenerContainer(Connection connection, Destination destination,
+                                           MessageListener listenerHandler) {
         this.connection = connection;
         this.destination = destination;
         this.listenerHandler = listenerHandler;
@@ -106,152 +107,86 @@ public class MessageListenerContainer implements JMSListenerContainer {
         this.transactionManager = transactionManager;
     }
 
+    class Poller implements Runnable {
+
+        @Override
+        public void run() {
+            ResourceCloser closer = new ResourceCloser();
+            while (running) {
+                try {
+                    if (transactionManager != null) {
+                        transactionManager.begin();
+                    }
+                    Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
+                    MessageConsumer consumer = closer.register(session.createConsumer(destination,
+                                                                                      messageSelector));
+                    Message message = consumer.receive(1000);
+                    try {
+                        if (message != null) {
+                            listenerHandler.onMessage(message);
+                        }
+                        if (transactionManager != null) {
+                            transactionManager.commit();
+                        } else {
+                            session.commit();
+                        }
+                    } catch (Exception e) {
+                        safeRollBack(session, e);
+                    }
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Unexpected exception", e);
+                } finally {
+                    closer.close();
+                }
+            }
+
+        }
+
+    }
+
+    private void safeRollBack(Session session, Exception e) {
+        LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
+        try {
+            if (transactionManager != null) {
+                transactionManager.rollback();
+            } else {
+                session.rollback();
+            }
+        } catch (Exception e1) {
+            LOG.log(Level.WARNING, "Rollback of Local transaction failed", e1);
+        }
+    }
+
     @Override
     public void start() {
-        try {
-            session = connection.createSession(transacted, acknowledgeMode);
-            if (durableSubscriptionName != null) {
-                consumer = session.createDurableSubscriber((Topic)destination, durableSubscriptionName,
-                                                           messageSelector, pubSubNoLocal);
-            } else {
-                consumer = session.createConsumer(destination, messageSelector);
-            }
-            
-            MessageListener intListener = (transactionManager != null)
-                ? new XATransactionalMessageListener(transactionManager, session, listenerHandler)
-                : new LocalTransactionalMessageListener(session, listenerHandler); 
-            // new DispachingListener(getExecutor(), listenerHandler);
-            consumer.setMessageListener(intListener);
-            
-            running = true;
-        } catch (JMSException e) {
-            throw JMSUtil.convertJmsException(e);
+        if (running) {
+            return;
+        }
+        running = true;
+        pollers = Executors.newFixedThreadPool(numListenerThreads);
+        for (int c = 0; c < numListenerThreads; c++) {
+            pollers.execute(new Poller());
         }
     }
 
     @Override
     public void stop() {
+        if (!running) {
+            return;
+        }
         running = false;
-        ResourceCloser.close(consumer);
-        ResourceCloser.close(session);
-        consumer = null;
-        session = null;
+        pollers.shutdown();
+        try {
+            pollers.awaitTermination(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+        pollers = null;
     }
 
     @Override
     public void shutdown() {
         stop();
         ResourceCloser.close(connection);
-    }
-
-    protected TransactionManager getTransactionManager() {
-        if (this.transactionManager == null) {
-            try {
-                InitialContext ctx = new InitialContext();
-                this.transactionManager = (TransactionManager)ctx
-                    .lookup("javax.transaction.TransactionManager");
-            } catch (NamingException e) {
-                // Ignore
-            }
-        }
-        return this.transactionManager;
-    }
-
-    static class DispachingListener implements MessageListener {
-        private Executor executor;
-        private MessageListener listenerHandler;
-
-        public DispachingListener(Executor executor, MessageListener listenerHandler) {
-            this.executor = executor;
-            this.listenerHandler = listenerHandler;
-        }
-
-        @Override
-        public void onMessage(final Message message) {
-            executor.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    listenerHandler.onMessage(message);
-                }
-
-            });
-        }
-
-    }
-    
-    static class LocalTransactionalMessageListener implements MessageListener {
-        private MessageListener listenerHandler;
-        private Session session;
-        
-        public LocalTransactionalMessageListener(Session session, MessageListener listenerHandler) {
-            this.session = session;
-            this.listenerHandler = listenerHandler;
-        }
-
-        @Override
-        public void onMessage(Message message) {
-            try {
-                listenerHandler.onMessage(message);
-                session.commit();
-            } catch (Throwable e) {
-                safeRollback(e);
-            }
-        }
-        
-        private void safeRollback(Throwable t) {
-            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back" , t);
-            try {
-                session.rollback();
-            } catch (Exception e) {
-                LOG.log(Level.WARNING, "Rollback of Local transaction failed", e);
-            }
-        }
-        
-    }
-    
-    static class XATransactionalMessageListener implements MessageListener {
-        private TransactionManager tm;
-        private MessageListener listenerHandler;
-        private XASession session;
-        
-        public XATransactionalMessageListener(TransactionManager tm, Session session, MessageListener listenerHandler) {
-            if (tm == null) {
-                throw new IllegalArgumentException("Must supply a transaction manager");
-            }
-            if (session == null || !(session instanceof XASession)) {
-                throw new IllegalArgumentException("Must supply an XASession");
-            }
-            this.tm = tm;
-            this.session = (XASession)session;
-            this.listenerHandler = listenerHandler;
-        }
-
-        @Override
-        public void onMessage(Message message) {
-            try {
-                tm.begin();
-                tm.getTransaction().enlistResource(session.getXAResource());
-                listenerHandler.onMessage(message);
-                tm.commit();
-            } catch (Throwable e) {
-                safeRollback(e);
-                if (e instanceof RuntimeException) {
-                    throw (RuntimeException)e;
-                } else {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        
-        private void safeRollback(Throwable t) {
-            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back" , t);
-            try {
-                tm.rollback();
-            } catch (Exception e) {
-                LOG.log(Level.WARNING, "Rollback of JTA transaction failed", e);
-            }
-        }
-        
     }
 }
