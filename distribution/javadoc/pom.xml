@@ -19,7 +19,7 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-javadoc</artifactId>
+    <artifactId>cxf-distribution-javadoc</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF JavaDoc</name>
     <description>Apache CXF JavaDoc</description>
@@ -378,6 +378,12 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <target>
+                                <mkdir dir="${project.build.directory}/coresources"/>
+                                <copy todir="${project.build.directory}/coresources">
+                                    <fileset dir="../../core">
+                                        <include name="**/src/main/java/**/*.java"/>
+                                    </fileset>
+                                </copy>
                                 <mkdir dir="${project.build.directory}/sources"/>
                                 <copy todir="${project.build.directory}/sources">
                                     <fileset dir="../../core">
@@ -446,6 +452,23 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <configuration>
+                            <sourcepath>${project.build.directory}/sources</sourcepath>
+                            <notimestamp>true</notimestamp>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>core-api</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <sourcepath>${project.build.directory}/coresources</sourcepath>
+                            <outputDirectory>${project.build.directory}/core-api</outputDirectory>
+                            <finalName>core-api</finalName>
+                            <attach>false</attach>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
@@ -454,7 +477,6 @@
                     <header>Apache CXF API</header>
                     <footer>Apache CXF API</footer>
                     <doctitle>Apache CXF ${project.version} API</doctitle>
-                    <sourcepath>${project.build.directory}/sources</sourcepath>
                     <notimestamp>true</notimestamp>
                 </configuration>
             </plugin>

@@ -210,7 +210,6 @@ public class MessageListenerContainer implements JMSListenerContainer {
         
     }
     
-    @SuppressWarnings("PMD")
     static class XATransactionalMessageListener implements MessageListener {
         private TransactionManager tm;
         private MessageListener listenerHandler;
@@ -237,6 +236,11 @@ public class MessageListenerContainer implements JMSListenerContainer {
                 tm.commit();
             } catch (Throwable e) {
                 safeRollback(e);
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException)e;
+                } else {
+                    throw new RuntimeException(e);
+                }
             }
         }
         
