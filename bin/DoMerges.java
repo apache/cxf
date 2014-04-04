@@ -546,14 +546,41 @@ public class DoMerges {
         if (gitLogs == null) {
             return false;
         }
+        List<List<String>> matchingLogs = new LinkedList<List<String>>();
         for (String[] f : gitLogs) {
-            if (compareLogs(f, logLines)) {
+            List<String> ll = compareLogs(f, logLines);
+            if (!ll.isEmpty()) {
+                matchingLogs.add(ll);
+            }
+        }
+        
+        if (!matchingLogs.isEmpty()) {
+            //everything in the source log is in a log on this branch, let's prompt to record the merge
+            System.out.println("Found possible commit(s) already on branch:");
+            for (List<String> f : matchingLogs) {
+                for (String s : f) {
+                    System.out.println("    " + s);
+                }
+                System.out.println("------------------------");
+            }
+            
+            while (System.in.available() > 0) {
+                System.in.read();
+            }
+            char c = 0;
+            while (c != 'Y'
+                   && c != 'N') {
+                System.out.print("Record as merged [Y/N]? ");
+                int i = System.in.read();
+                c = Character.toUpperCase((char)i);
+            }
+            if (c == 'Y') {
                 return true;
             }
         }
         return false;
-    }
-    private static boolean compareLogs(String[] f, String[] logLines) throws IOException {
+    }        
+    private static List<String> compareLogs(String[] f, String[] logLines) throws IOException {
         ArrayList<String> onBranch = new ArrayList<String>(f.length);
         for (String s : f) {
             if (s.trim().startsWith("Conflicts:")) {
@@ -575,29 +602,9 @@ public class DoMerges {
                 ll.add(s);
             } 
         }
-        if (ll.isEmpty()) {
-            //everything in the source log is in a log on this branch, let's prompt to record the merge
-            System.out.println("Found possible commit already on branch:");
-            for (String s : f) {
-                System.out.println(s);
-            }
-            
-            while (System.in.available() > 0) {
-                System.in.read();
-            }
-            char c = 0;
-            while (c != 'Y'
-                   && c != 'N') {
-                System.out.print("Record as merged [Y/N]? ");
-                int i = System.in.read();
-                c = Character.toUpperCase((char)i);
-            }
-            if (c == 'Y') {
-                return true;
-            }
-        }
-        return false;
+        return ll;
     }
+        
 
     private static String[] getCommandLine(String[] args) {
         List<String> argLine = new ArrayList<String>();
