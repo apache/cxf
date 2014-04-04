@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -67,6 +68,7 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.helpers.DefaultHandler;
 
+import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -207,6 +209,24 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                         classContexts.put(cls, context);
                     }
                 }
+            }
+        }
+        if (cris != null) {
+            List<String> schemaLocs = new LinkedList<String>();
+            for (ClassResourceInfo cri : cris) {
+                SchemaValidation sv = cri.getServiceClass().getAnnotation(SchemaValidation.class);
+                if (sv != null && sv.schemas() != null) {
+                    for (String s : sv.schemas()) {
+                        String theSchema = s;
+                        if (!theSchema.startsWith("classpath:")) {
+                            theSchema = "classpath:" + theSchema;
+                        }
+                        schemaLocs.add(theSchema);
+                    }
+                }
+            }
+            if (!schemaLocs.isEmpty()) {
+                this.setSchemaLocations(schemaLocs);
             }
         }
     }
@@ -426,11 +446,6 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
 
     protected boolean canBeReadAsJaxbElement(Class<?> type) {
         return unmarshalAsJaxbElement && type != Response.class;
-    }
-    
-    @Deprecated
-    public void setSchemas(List<String> locations) {
-        setSchemaLocations(locations);
     }
     
     public void setSchemaLocations(List<String> locations) {

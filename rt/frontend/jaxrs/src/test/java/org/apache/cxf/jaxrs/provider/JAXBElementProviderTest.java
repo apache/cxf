@@ -67,6 +67,7 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.ContentHandler;
 
+import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
@@ -1285,6 +1286,16 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @Test
+    public void testSetSchemasFromAnnotation() {
+        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(JAXBResource.class, JAXBResource.class, true, true);
+        provider.init(Collections.singletonList(cri));
+        Schema s = provider.getSchema();
+        assertNotNull("schema can not be read from classpath", s);
+    }
+    
+    @Test
     public void testSetSchemasFromDisk() throws Exception {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
         List<String> locations = new ArrayList<String>();
@@ -1567,6 +1578,7 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @Path("/")
+    @SchemaValidation(schemas = "/test.xsd")
     public static class JAXBResource {
         
         @GET

@@ -35,10 +35,16 @@ public @interface SchemaValidation {
     public enum SchemaValidationType {
         IN, OUT, BOTH, NONE
     }
-    
-    @Deprecated
-    boolean enabled() default true;
-    
+    /**
+     * Schema Validation Type
+     * @return validation type
+     */
     SchemaValidationType type() default SchemaValidationType.BOTH;
+    
+    /**
+     * Optional list of schema locations
+     * @return schema locations
+     */
+    String[] schemas() default { };
 }
 
