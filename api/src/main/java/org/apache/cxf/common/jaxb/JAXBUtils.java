@@ -1069,7 +1069,7 @@ public final class JAXBUtils {
         mv.visitLineNumber(30, l0);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
-                           "com/sun/xml/internal/bind/marshaller/NamespacePrefixMapper", "<init>", "()V");
+                           "com/sun/xml/internal/bind/marshaller/NamespacePrefixMapper", "<init>", "()V", false);
         Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(31, l1);
@@ -1103,7 +1103,7 @@ public final class JAXBUtils {
                           "nspref", "Ljava/util/Map;");
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", 
-                           "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+                           "get", "(Ljava/lang/Object;)Ljava/lang/Object;", true);
         mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
         mv.visitVarInsn(Opcodes.ASTORE, 4);
         l1 = helper.createLabel();
