@@ -337,7 +337,7 @@ public final class CorbaAnyHelper {
                           "obj", "Lorg/omg/CORBA/portable/Streamable;");
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable", 
-                           "_read", "(Lorg/omg/CORBA/portable/InputStream;)V");
+                           "_read", "(Lorg/omg/CORBA/portable/InputStream;)V", false);
         Label l3 = helper.createLabel();
         mv.visitJumpInsn(Opcodes.GOTO, l3);
         mv.visitLabel(l1);
@@ -347,7 +347,7 @@ public final class CorbaAnyHelper {
         mv.visitVarInsn(Opcodes.ALOAD, 2);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl", 
                            "read_value", 
-                           "(Lorg/omg/CORBA/portable/InputStream;Lorg/omg/CORBA/TypeCode;)V");
+                           "(Lorg/omg/CORBA/portable/InputStream;Lorg/omg/CORBA/TypeCode;)V", false);
         mv.visitLabel(l3);
         mv.visitLineNumber(59, l3);
         mv.visitInsn(Opcodes.RETURN);
@@ -381,7 +381,7 @@ public final class CorbaAnyHelper {
                           "obj", "Lorg/omg/CORBA/portable/Streamable;");
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable",
-                           "_write", "(Lorg/omg/CORBA/portable/OutputStream;)V");
+                           "_write", "(Lorg/omg/CORBA/portable/OutputStream;)V", false);
         Label l3 = helper.createLabel();
         mv.visitJumpInsn(Opcodes.GOTO, l3);
         mv.visitLabel(l1);
@@ -389,7 +389,7 @@ public final class CorbaAnyHelper {
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl",
-                           "write_value", "(Lorg/omg/CORBA/portable/OutputStream;)V");
+                           "write_value", "(Lorg/omg/CORBA/portable/OutputStream;)V", false);
         mv.visitLabel(l3);
         mv.visitLineNumber(66, l3);
         mv.visitInsn(Opcodes.RETURN);
@@ -427,7 +427,7 @@ public final class CorbaAnyHelper {
         mv.visitLineNumber(50, l1);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl",
-                           "extract_Streamable", "()Lorg/omg/CORBA/portable/Streamable;");
+                           "extract_Streamable", "()Lorg/omg/CORBA/portable/Streamable;", false);
         mv.visitInsn(Opcodes.ARETURN);
         Label l3 = helper.createLabel();
         mv.visitLabel(l3);
@@ -450,7 +450,7 @@ public final class CorbaAnyHelper {
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, 
                            "com/sun/corba/se/impl/corba/AnyImpl", 
                            "insert_Streamable", 
-                           "(Lorg/omg/CORBA/portable/Streamable;)V");
+                           "(Lorg/omg/CORBA/portable/Streamable;)V", false);
         Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(44, l1);
@@ -483,7 +483,7 @@ public final class CorbaAnyHelper {
         mv.visitTypeInsn(Opcodes.CHECKCAST, "com/sun/corba/se/spi/orb/ORB");
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
                            "com/sun/corba/se/impl/corba/AnyImpl",
-                           "<init>", "(Lcom/sun/corba/se/spi/orb/ORB;)V");
+                           "<init>", "(Lcom/sun/corba/se/spi/orb/ORB;)V", false);
         Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(37, l1);
@@ -512,7 +512,7 @@ public final class CorbaAnyHelper {
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
                            "com/sun/corba/se/impl/corba/AnyImpl",
                            "<init>",
-                           "(Lcom/sun/corba/se/spi/orb/ORB;Lorg/omg/CORBA/Any;)V");
+                           "(Lcom/sun/corba/se/spi/orb/ORB;Lorg/omg/CORBA/Any;)V", false);
         l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(40, l1);

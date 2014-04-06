@@ -212,7 +212,7 @@ public final class WrapperClassGenerator extends ASMHelper {
         Label lbegin = createLabel();
         mv.visitLabel(lbegin);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
         mv.visitInsn(Opcodes.RETURN);
         Label lend = createLabel();
         mv.visitLabel(lend);

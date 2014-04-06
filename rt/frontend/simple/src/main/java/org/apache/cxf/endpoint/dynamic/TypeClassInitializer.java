@@ -214,7 +214,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitVarInsn(Opcodes.ALOAD, 1);
                 mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Exception",
-                                   "<init>", "(Ljava/lang/String;)V");
+                                   "<init>", "(Ljava/lang/String;)V", false);
                 mv.visitLabel(createLabel());
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitVarInsn(Opcodes.ALOAD, 2);

@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.ReflectionInvokationHandler.Optional;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.UnwrapParam;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
 
@@ -90,6 +91,7 @@ public class ASMHelper {
         if (cwClass == null) {
             //try the "real" asm first, then the others
             tryClass("org.objectweb.asm.ClassWriter"); 
+            tryClass("org.apache.xbean.asm5.ClassWriter"); 
             tryClass("org.apache.xbean.asm4.ClassWriter"); 
             tryClass("org.apache.xbean.asm.ClassWriter"); 
             tryClass("org.springframework.asm.ClassWriter");
@@ -464,7 +466,7 @@ public class ASMHelper {
                                 int i);
         void visitTypeInsn(int checkcast, String string);
         void visitMethodInsn(int invokevirtual, String periodToSlashes,
-                             String name, String methodSignature);
+                             String name, String methodSignature, @Optional boolean itf);
         void visitIntInsn(int sipush, int x);
         void visitIincInsn(int i, int j);
         void visitFieldInsn(int getfield, String periodToSlashes,

@@ -492,7 +492,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             mv.visitInsn(Opcodes.DUP);
             mv.visitLdcInsn("http://schemas.xmlsoap.org/wsdl/");
             mv.visitLdcInsn("required");
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "javax/xml/namespace/QName", "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "javax/xml/namespace/QName", "<init>", "(Ljava/lang/String;Ljava/lang/String;)V", false);
             mv.visitFieldInsn(Opcodes.PUTSTATIC, className + "Extensibility", "WSDL_REQUIRED", "Ljavax/xml/namespace/QName;");
             mv.visitInsn(Opcodes.RETURN);
             mv.visitMaxs(4, 0);
@@ -508,7 +508,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         mv.visitLabel(l0);
         mv.visitLineNumber(33, l0);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, className, "<init>", "()V");
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, className, "<init>", "()V", false);
         Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(31, l1);
@@ -520,7 +520,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         mv.visitLdcInsn(qname.getLocalPart());
         
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "javax/xml/namespace/QName",
-                           "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
+                           "<init>", "(Ljava/lang/String;Ljava/lang/String;)V", false);
         mv.visitFieldInsn(Opcodes.PUTFIELD, className + "Extensibility",
                           "qn", "Ljavax/xml/namespace/QName;");
         Label l2 = helper.createLabel();
@@ -576,9 +576,9 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             mv.visitLabel(l0);
             mv.visitLineNumber(66, l0);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className + "Extensibility", "getOtherAttributes", "()Ljava/util/Map;");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className + "Extensibility", "getOtherAttributes", "()Ljava/util/Map;", false);
             mv.visitFieldInsn(Opcodes.GETSTATIC, className + "Extensibility", "WSDL_REQUIRED", "Ljavax/xml/namespace/QName;");
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "get", "(Ljava/lang/Object;)Ljava/lang/Object;", true);
             mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
             mv.visitVarInsn(Opcodes.ASTORE, 1);
             l1 = helper.createLabel();
@@ -593,7 +593,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             mv.visitLabel(l2);
             mv.visitFrame(Opcodes.F_APPEND,1, new Object[] {"java/lang/String"}, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 1);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Ljava/lang/String;)Ljava/lang/Boolean;");
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Ljava/lang/String;)Ljava/lang/Boolean;", false);
             mv.visitLabel(l3);
             mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {"java/lang/Boolean"});
             mv.visitInsn(Opcodes.ARETURN);
@@ -618,9 +618,9 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             mv.visitLabel(l2);
             mv.visitLineNumber(77, l2);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className + "Extensibility", "getOtherAttributes", "()Ljava/util/Map;");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className + "Extensibility", "getOtherAttributes", "()Ljava/util/Map;", false);
             mv.visitFieldInsn(Opcodes.GETSTATIC, className + "Extensibility", "WSDL_REQUIRED", "Ljavax/xml/namespace/QName;");
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "remove", "(Ljava/lang/Object;)Ljava/lang/Object;");
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "remove", "(Ljava/lang/Object;)Ljava/lang/Object;", true);
             mv.visitInsn(Opcodes.POP);
             l3 = helper.createLabel();
             mv.visitLabel(l3);
@@ -631,11 +631,11 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             mv.visitLineNumber(79, l1);
             mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className + "Extensibility", "getOtherAttributes", "()Ljava/util/Map;");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, className + "Extensibility", "getOtherAttributes", "()Ljava/util/Map;", false);
             mv.visitFieldInsn(Opcodes.GETSTATIC, className + "Extensibility", "WSDL_REQUIRED", "Ljavax/xml/namespace/QName;");
             mv.visitVarInsn(Opcodes.ALOAD, 1);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "toString", "()Ljava/lang/String;");
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "toString", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true);
             mv.visitInsn(Opcodes.POP);
             mv.visitLabel(l4);
             mv.visitLineNumber(81, l4);
