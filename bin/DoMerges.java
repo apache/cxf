@@ -592,10 +592,11 @@ public class DoMerges {
                 onBranch.add(s.trim());
             }
         }
+        
         List<String> ll = new ArrayList<String>();
         for (String s : logLines) {
             if (s.trim().length() > 0 
-                && !onBranch.remove(s.trim())
+                && onBranch.remove(s.trim())
                 && !s.startsWith("Author: ")
                 && !s.startsWith("Date: ")
                 && !s.contains("git-svn-id")) {                
