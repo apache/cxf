@@ -1084,7 +1084,7 @@ public final class JAXBUtils {
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitVarInsn(Opcodes.ALOAD, 1);
             mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
-                               superName, "<init>", "(Ljava/util/Map;)V");
+                               superName, "<init>", "(Ljava/util/Map;)V", false);
             Label l1 = helper.createLabel();
             mv.visitLabel(l1);
             mv.visitInsn(Opcodes.RETURN);
@@ -1139,7 +1139,7 @@ public final class JAXBUtils {
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitMethodInsn(Opcodes.INVOKESPECIAL, 
                                superName,
-                               "getPreDeclaredNamespaceUris", "()[Ljava/lang/String;");
+                               "getPreDeclaredNamespaceUris", "()[Ljava/lang/String;", false);
             mv.visitVarInsn(Opcodes.ASTORE, 1);
             l1 = helper.createLabel();
             mv.visitLabel(l1);
@@ -1160,8 +1160,8 @@ public final class JAXBUtils {
             mv.visitInsn(Opcodes.DUP);
             mv.visitVarInsn(Opcodes.ALOAD, 1);
             mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Arrays", "asList", 
-                               "([Ljava/lang/Object;)Ljava/util/List;");
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/ArrayList", "<init>", "(Ljava/util/Collection;)V");
+                               "([Ljava/lang/Object;)Ljava/util/List;", false);
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/ArrayList", "<init>", "(Ljava/util/Collection;)V", false);
             mv.visitVarInsn(Opcodes.ASTORE, 2);
             Label l4 = helper.createLabel();
             mv.visitLabel(l4);
@@ -1181,7 +1181,7 @@ public final class JAXBUtils {
             mv.visitFieldInsn(Opcodes.GETFIELD, slashedName, "nsctxt", "[Ljava/lang/String;");
             mv.visitVarInsn(Opcodes.ILOAD, 3);
             mv.visitInsn(Opcodes.AALOAD);
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", "remove", "(Ljava/lang/Object;)Z");
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", "remove", "(Ljava/lang/Object;)Z", true);
             mv.visitInsn(Opcodes.POP);
             Label l8 = helper.createLabel();
             mv.visitLabel(l8);
@@ -1201,10 +1201,10 @@ public final class JAXBUtils {
             mv.visitLineNumber(1044, l9);
             mv.visitVarInsn(Opcodes.ALOAD, 2);
             mv.visitVarInsn(Opcodes.ALOAD, 2);
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", "size", "()I");
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", "size", "()I", true);
             mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/String");
             mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", 
-                               "toArray", "([Ljava/lang/Object;)[Ljava/lang/Object;");
+                               "toArray", "([Ljava/lang/Object;)[Ljava/lang/Object;", true);
             mv.visitTypeInsn(Opcodes.CHECKCAST, "[Ljava/lang/String;");
             mv.visitInsn(Opcodes.ARETURN);
             Label l10 = helper.createLabel();
@@ -1281,7 +1281,7 @@ public final class JAXBUtils {
         mv.visitLabel(l0);
         mv.visitLineNumber(32, l0);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, superName, "<init>", "()V");
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, superName, "<init>", "()V", false);
         Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(29, l1);
@@ -1318,7 +1318,7 @@ public final class JAXBUtils {
         mv.visitFieldInsn(Opcodes.GETFIELD, postFixedName, "nspref", "Ljava/util/Map;");
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", 
-                           "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+                           "get", "(Ljava/lang/Object;)Ljava/lang/Object;", true);
         mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
         mv.visitVarInsn(Opcodes.ASTORE, 4);
         l1 = helper.createLabel();
