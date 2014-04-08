@@ -337,7 +337,12 @@ public abstract class AbstractBPBeanDefinitionParser {
         public Object createJAXBBean(String v) {
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(v));
             try {
-                return ctx.createUnmarshaller().unmarshal(reader, cls);
+                Object o = ctx.createUnmarshaller().unmarshal(reader, cls);
+                if (o instanceof JAXBElement<?>) {
+                    JAXBElement<?> el = (JAXBElement<?>)o;
+                    o = el.getValue();
+                }
+                return o;
             } catch (JAXBException e) {
                 throw new RuntimeException(e);
             } finally {
