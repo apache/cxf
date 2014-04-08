@@ -37,6 +37,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -76,7 +77,11 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected abstract Logger getLogger();
     
     Logger getMessageLogger(Message message) {
-        EndpointInfo endpoint = message.getExchange().getEndpoint().getEndpointInfo();
+        Endpoint ep = message.getExchange().getEndpoint();
+        if (ep == null || ep.getEndpointInfo() == null) {
+            return getLogger();
+        }
+        EndpointInfo endpoint = ep.getEndpointInfo();
         if (endpoint.getService() == null) {
             return getLogger();
         }

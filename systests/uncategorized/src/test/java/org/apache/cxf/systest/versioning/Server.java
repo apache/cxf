@@ -21,6 +21,8 @@ package org.apache.cxf.systest.versioning;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.MultipleEndpointObserver;
@@ -31,6 +33,8 @@ public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
     
     protected void run() {
+        setBus(BusFactory.getDefaultBus());
+        getBus().getInInterceptors().add(new LoggingInInterceptor());
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
         Object implementor1 = new GreeterImplMixedStyle(" version1");
