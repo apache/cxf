@@ -27,6 +27,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,7 +78,11 @@ public class HTTPTransportFactory
         URI_PREFIXES.add("https://");
     }
 
-    protected final DestinationRegistry registry;
+    protected DestinationRegistry registry;
+    
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Lock r = lock.readLock();
+    private final Lock w = lock.writeLock();
     
     public HTTPTransportFactory() {
         this(new DestinationRegistryImpl());
@@ -89,6 +96,22 @@ public class HTTPTransportFactory
     }
     public DestinationRegistry getRegistry() {
         return registry;
+    }
+    
+    public void setRegistry(DestinationRegistry newRegistry) {
+        w.lock();
+        try {
+            if (registry.getDestinations().isEmpty()) {
+                this.registry = newRegistry;
+            } else {
+                String m = new org.apache.cxf.common.i18n.Message("CANNOT_CHANGE_REGISTRY_ALREADY_IN_USE",
+                                                                  LOG).toString();
+                LOG.log(Level.SEVERE, m);
+                throw new RuntimeException(m);
+            }
+        } finally {
+            w.unlock();
+        }
     }
     
     /**
@@ -231,31 +254,36 @@ public class HTTPTransportFactory
         if (endpointInfo == null) {
             throw new IllegalArgumentException("EndpointInfo cannot be null");
         }
-        synchronized (registry) {
-            AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
-            if (d == null) {
-                HttpDestinationFactory jettyFactory = bus.getExtension(HttpDestinationFactory.class);
-                String addr = endpointInfo.getAddress();
-                if (jettyFactory == null && addr != null && addr.startsWith("http")) {
-                    String m = 
-                        new org.apache.cxf.common.i18n.Message("NO_HTTP_DESTINATION_FACTORY_FOUND"
-                                                               , LOG).toString();
-                    LOG.log(Level.SEVERE, m);
-                    throw new IOException(m);
+        r.lock();
+        try {
+            synchronized (registry) {
+                AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
+                if (d == null) {
+                    HttpDestinationFactory jettyFactory = bus.getExtension(HttpDestinationFactory.class);
+                    String addr = endpointInfo.getAddress();
+                    if (jettyFactory == null && addr != null && addr.startsWith("http")) {
+                        String m = 
+                            new org.apache.cxf.common.i18n.Message("NO_HTTP_DESTINATION_FACTORY_FOUND"
+                                                                   , LOG).toString();
+                        LOG.log(Level.SEVERE, m);
+                        throw new IOException(m);
+                    }
+                    HttpDestinationFactory factory = null;
+                    if (jettyFactory != null && (addr == null || addr.startsWith("http"))) {
+                        factory = jettyFactory;
+                    } else {
+                        factory = new ServletDestinationFactory();
+                    }
+                    
+                    d = factory.createDestination(endpointInfo, bus, registry);
+                    registry.addDestination(d);
+                    configure(bus, d);
+                    d.finalizeConfig();
                 }
-                HttpDestinationFactory factory = null;
-                if (jettyFactory != null && (addr == null || addr.startsWith("http"))) {
-                    factory = jettyFactory;
-                } else {
-                    factory = new ServletDestinationFactory();
-                }
-                
-                d = factory.createDestination(endpointInfo, bus, registry);
-                registry.addDestination(d);
-                configure(bus, d);
-                d.finalizeConfig();
+                return d;
             }
-            return d;
+        } finally {
+            r.unlock();
         }
     }
 
