@@ -34,18 +34,22 @@ public class ThrottlingCounter implements Counter {
     private AtomicInteger counter;
     private final int lowWatermark;
     private final int highWatermark;
-    private final JMSListenerContainer listenerContainer;
+    private JMSListenerContainer listenerContainer;
     
-    public ThrottlingCounter(JMSListenerContainer listenerContainer, int lowWatermark, int highWatermark) {
+    public ThrottlingCounter(int lowWatermark, int highWatermark) {
         this.counter = new AtomicInteger();
         this.lowWatermark =  lowWatermark;
         this.highWatermark = highWatermark;
-        this.listenerContainer = listenerContainer;
     }
     
+    public void setListenerContainer(JMSListenerContainer listenerContainer) {
+        this.listenerContainer = listenerContainer;
+    }
+
     public final int incrementAndGet() {
         int curCounter = counter.incrementAndGet();
-        if (highWatermark >= 0 && curCounter >= highWatermark && listenerContainer.isRunning()) {
+        if (listenerContainer != null && highWatermark >= 0 
+            && curCounter >= highWatermark && listenerContainer.isRunning()) {
             listenerContainer.stop();
         }
         return curCounter;
@@ -53,7 +57,7 @@ public class ThrottlingCounter implements Counter {
     
     public final int decrementAndGet() {
         int curCounter = counter.decrementAndGet();
-        if (curCounter <= lowWatermark && !listenerContainer.isRunning()) {
+        if (listenerContainer != null && curCounter <= lowWatermark && !listenerContainer.isRunning()) {
             listenerContainer.start();
         }
         return curCounter;

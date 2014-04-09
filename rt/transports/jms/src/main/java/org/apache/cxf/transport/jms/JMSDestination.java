@@ -73,6 +73,10 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         this.jmsConfig = jmsConfig;
         info.setProperty(OneWayProcessorInterceptor.USE_ORIGINAL_THREAD, Boolean.TRUE);
         loader = bus.getExtension(ClassLoader.class);
+        int restartLimit = jmsConfig.getMaxSuspendedContinuations() * jmsConfig.getReconnectPercentOfMax() / 100;
+
+        this.suspendedContinuations = new ThrottlingCounter(restartLimit,
+                                                            jmsConfig.getMaxSuspendedContinuations());
     }
 
     /**
@@ -90,9 +94,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         getLogger().log(Level.FINE, "JMSDestination activate().... ");
         jmsConfig.ensureProperlyConfigured();
         jmsListener = createTargetDestinationListener();
-        int restartLimit = jmsConfig.getMaxSuspendedContinuations() * jmsConfig.getReconnectPercentOfMax() / 100;
-        this.suspendedContinuations = new ThrottlingCounter(this.jmsListener, restartLimit,
-                                             jmsConfig.getMaxSuspendedContinuations());
     }
     
     
@@ -115,6 +116,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             Executor executor = JMSFactory.createExecutor(bus, "jms-destination");
             container.setExecutor(executor);
             container.start();
+            suspendedContinuations.setListenerContainer(container);
             return container;
         } catch (JMSException e) {
             throw JMSUtil.convertJmsException(e);
@@ -153,7 +155,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         if (jmsListener != null) {
             jmsListener.shutdown();
         }
-        this.suspendedContinuations = null;
+        suspendedContinuations.setListenerContainer(null);
         connection = null;
     }
 

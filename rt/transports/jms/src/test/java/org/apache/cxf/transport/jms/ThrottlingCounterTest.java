@@ -33,7 +33,8 @@ public class ThrottlingCounterTest {
     public void testThrottleWithJmsStartAndStop() {
         JMSListenerContainer listenerContainer = new DummyJMSListener();
 
-        ThrottlingCounter counter = new ThrottlingCounter(listenerContainer, 0, 1);
+        ThrottlingCounter counter = new ThrottlingCounter(0, 1);
+        counter.setListenerContainer(listenerContainer);
         assertTrue(listenerContainer.isRunning());
         
         counter.incrementAndGet();
