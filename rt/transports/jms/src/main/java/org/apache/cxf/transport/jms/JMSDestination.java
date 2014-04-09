@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
@@ -63,6 +64,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private ThrottlingCounter suspendedContinuations;
     private ClassLoader loader;
     private Connection connection;
+    private boolean shutdown;
 
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
         super(b, getTargetReference(info, b), info);
@@ -87,12 +89,10 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     public void activate() {
         getLogger().log(Level.FINE, "JMSDestination activate().... ");
         jmsConfig.ensureProperlyConfigured();
-
         jmsListener = createTargetDestinationListener();
-        int restartLimit = jmsConfig.getMaxSuspendedContinuations() * jmsConfig.getReconnectPercentOfMax()
-                           / 100;
+        int restartLimit = jmsConfig.getMaxSuspendedContinuations() * jmsConfig.getReconnectPercentOfMax() / 100;
         this.suspendedContinuations = new ThrottlingCounter(this.jmsListener, restartLimit,
-                                                            jmsConfig.getMaxSuspendedContinuations());
+                                             jmsConfig.getMaxSuspendedContinuations());
     }
     
     
@@ -100,6 +100,13 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         Session session = null;
         try {
             connection = JMSFactory.createConnection(jmsConfig);
+            connection.setExceptionListener(new ExceptionListener() {
+                
+                @Override
+                public void onException(JMSException exception) {
+                    restartConnection(exception);
+                }
+            });
             connection.start();
             session = connection.createSession(jmsConfig.isSessionTransacted(), Session.AUTO_ACKNOWLEDGE);
             Destination destination = jmsConfig.getTargetDestination(session);
@@ -116,13 +123,42 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         }
     }
 
+    protected void restartConnection(JMSException e) {
+        LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", e);
+        int tries = 0;
+        do {
+            tries++;
+            try {
+                deactivate();
+                activate();
+                LOG.log(Level.INFO, "Reestablished JMS connection");
+            } catch (Exception e1) {
+                jmsListener = null;
+                String message = "Exception on reconnect. Trying again, attempt num " + tries;
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.WARNING, message, e);
+                } else {
+                    LOG.log(Level.WARNING, message);
+                }
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e2) {
+                    // Ignore
+                }
+            }
+        } while (jmsListener == null && !shutdown);
+    }
+
     public void deactivate() {
         if (jmsListener != null) {
             jmsListener.shutdown();
         }
+        this.suspendedContinuations = null;
+        connection = null;
     }
 
     public void shutdown() {
+        this.shutdown = true;
         getLogger().log(Level.FINE, "JMSDestination shutdown()");
         this.deactivate();
     }

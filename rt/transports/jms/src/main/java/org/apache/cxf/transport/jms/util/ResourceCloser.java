@@ -23,12 +23,10 @@ import java.util.AbstractSequentialList;
 import java.util.LinkedList;
 
 import javax.jms.Connection;
-import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.naming.Context;
-import javax.naming.NamingException;
 
 public class ResourceCloser implements Closeable {
     private AbstractSequentialList<Object> resources;
@@ -73,9 +71,7 @@ public class ResourceCloser implements Closeable {
             } else {
                 throw new IllegalArgumentException("Can not handle resource " + resource.getClass());
             }
-        } catch (JMSException e) {
-            // Ignore
-        } catch (NamingException e) {
+        } catch (Exception e) {
             // Ignore
         }
     }

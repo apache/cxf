@@ -157,7 +157,20 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 sendAndReceiveMessage(exchange, request, outMessage, closer, session);
             }
         } catch (JMSException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            // Close connection so it will be refreshed on next try
+            ResourceCloser.close(connection);
+            this.connection = null;
+            this.staticReplyDestination = null;
+            if (this.jmsListener != null) {
+                this.jmsListener.shutdown();
+            }
+            this.jmsListener = null;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+                // Ignore
+            }
+            throw JMSUtil.convertJmsException(e);
         } finally {
             closer.close();
         }

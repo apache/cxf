@@ -38,6 +38,13 @@ import javax.transaction.TransactionManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 
+/**
+ * Listen for messages on a queue or topic asynchronously by registering a
+ * MessageListener.
+ * 
+ * Warning: This class does not refresh connections when the server goes away
+ * This has to be handled outside.
+ */
 public class MessageListenerContainer implements JMSListenerContainer {
     private static final Logger LOG = LogUtils.getL7dLogger(MessageListenerContainer.class);
 
