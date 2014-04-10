@@ -647,7 +647,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
             Destination replyToDestination = jmsConfig.getReplyToDestination(session, null);
             JMSSender sender = JMSFactory.createJmsSender(jmsConfig, null);
             Message jmsMessage = JMSTestUtil.buildJMSMessageFromTestCase(testcase, session, replyToDestination);
-            sender.sendMessage(closer, session, targetDest, jmsMessage);
+            sender.sendMessage(session, targetDest, jmsMessage);
             Message replyMessage = JMSUtil.receive(session, replyToDestination, 
                                                    jmsMessage.getJMSMessageID(), 10000, true);
             checkReplyMessage(replyMessage, testcase);

@@ -75,7 +75,7 @@ public class MessageListenerTest {
         Queue dest = createQueue(connection, "test");
 
         MessageListener listenerHandler = new TestMessageListener();
-        PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, dest,
+        AbstractMessageListenerContainer container = new MessageListenerContainer(connection, dest,
                                                                                         listenerHandler);
         container.setTransacted(false);
         container.setAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
@@ -99,7 +99,7 @@ public class MessageListenerTest {
         Connection connection = createConnection("brokerLocalTransaction");
         Queue dest = createQueue(connection, "test");
         MessageListener listenerHandler = new TestMessageListener();
-        MessageListenerContainer container = new MessageListenerContainer(connection, dest, listenerHandler);
+        AbstractMessageListenerContainer container = new MessageListenerContainer(connection, dest, listenerHandler);
         container.setTransacted(true);
         container.setAcknowledgeMode(Session.SESSION_TRANSACTED);
         container.start();

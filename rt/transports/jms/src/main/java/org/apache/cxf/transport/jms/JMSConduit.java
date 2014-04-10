@@ -148,7 +148,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         ResourceCloser closer = new ResourceCloser();
         try {
             Connection c = getConnection();
-            Session session = closer.register(c.createSession(jmsConfig.isSessionTransacted(), 
+            Session session = closer.register(c.createSession(false, 
                                                               Session.AUTO_ACKNOWLEDGE));
             
             if (exchange.isOneWay()) {
@@ -203,7 +203,6 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 .getReplyToDestination(session, headers.getJMSReplyTo());
             String jmsMessageID = sendMessage(request, outMessage, replyToDestination, correlationId, closer,
                                               session);
-
             boolean useSyncReceive = ((correlationId == null || userCID != null) && !jmsConfig.isPubSubDomain())
                 || !replyToDestination.equals(staticReplyDestination);
             if (correlationId == null) {
@@ -254,7 +253,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         JMSSender sender = JMSFactory.createJmsSender(jmsConfig, headers);
         
         Destination targetDest = jmsConfig.getTargetDestination(session);
-        sender.sendMessage(closer, session, targetDest, message);
+        sender.sendMessage(session, targetDest, message);
         String jmsMessageID = message.getJMSMessageID();
         LOG.log(Level.FINE, "client sending request message " 
             + jmsMessageID + " to " + targetDest);

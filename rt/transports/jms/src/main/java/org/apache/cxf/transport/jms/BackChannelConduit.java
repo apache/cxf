@@ -114,7 +114,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
         ResourceCloser closer = new ResourceCloser();
         try {
             Session session = closer
-                .register(connection.createSession(jmsConfig.isSessionTransacted(), Session.AUTO_ACKNOWLEDGE));
+                .register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
 
             final JMSMessageHeadersType messageProperties = (JMSMessageHeadersType)outMessage
                 .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
@@ -160,7 +160,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
                                       correlationId, JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
             JMSSender sender = JMSFactory.createJmsSender(jmsConfig, messageProperties);
             LOG.log(Level.FINE, "server sending reply: ", reply);
-            sender.sendMessage(closer, session, replyTo, reply);
+            sender.sendMessage(session, replyTo, reply);
         } catch (JMSException ex) {
             throw JMSUtil.convertJmsException(ex);
         } finally {

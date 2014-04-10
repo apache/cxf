@@ -22,15 +22,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jws.WebService;
 
-
-import org.apache.cxf.systest.jms.GreeterImplDocBase;
+import org.apache.hello_world_doc_lit.Greeter;
+import org.apache.hello_world_doc_lit.PingMeFault;
 
 @WebService(endpointInterface = "org.apache.hello_world_doc_lit.Greeter")
-public class GreeterImplWithTransaction extends GreeterImplDocBase {
+public class GreeterImplWithTransaction implements Greeter {
     private AtomicBoolean flag = new AtomicBoolean(true);
        
     public String greetMe(String requestType) {
-        //System.out.println("Reached here :" + requestType);
+        System.out.println("Reached here :" + requestType);
         if ("Bad guy".equals(requestType)) {
             if (flag.getAndSet(false)) {
                 //System.out.println("Throw exception here :" + requestType);
@@ -41,6 +41,25 @@ public class GreeterImplWithTransaction extends GreeterImplDocBase {
             }
         }
         return "Hello " + requestType;
+    }
+
+    @Override
+    public void greetMeOneWay(String name) {
+        if ("Bad guy".equals(name)) {
+            throw new RuntimeException("Got a bad guy call for greetMe");
+        }
+    }
+
+    @Override
+    public void pingMe() throws PingMeFault {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public String sayHi() {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }

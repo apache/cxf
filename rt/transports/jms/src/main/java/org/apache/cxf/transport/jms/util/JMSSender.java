@@ -45,13 +45,19 @@ public class JMSSender {
         this.timeToLive = timeToLive;
     }
 
-    public void sendMessage(ResourceCloser closer, Session session, Destination targetDest,
+    public void sendMessage(Session session, Destination targetDest,
                             javax.jms.Message message) throws JMSException {
-        MessageProducer producer = closer.register(session.createProducer(targetDest));
-        if (explicitQosEnabled) {
-            producer.send(message, deliveryMode, priority, timeToLive);
-        } else {
-            producer.send(message);
+        MessageProducer producer = null;
+        try {
+            producer = session.createProducer(targetDest);
+            if (explicitQosEnabled) {
+                producer.send(message, deliveryMode, priority, timeToLive);
+            } else {
+                producer.send(message);
+            }
+        } finally {
+            ResourceCloser.close(producer);
         }
+        
     }
 }

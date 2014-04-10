@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -31,26 +30,11 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.transaction.TransactionManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 
-public class PollingMessageListenerContainer implements JMSListenerContainer {
+public class PollingMessageListenerContainer extends AbstractMessageListenerContainer {
     private static final Logger LOG = LogUtils.getL7dLogger(PollingMessageListenerContainer.class);
-
-    private Connection connection;
-    private Destination destination;
-    private MessageListener listenerHandler;
-    private boolean transacted;
-    private int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
-    private String messageSelector;
-    private boolean running;
-    private Executor executor;
-    @SuppressWarnings("unused")
-    private String durableSubscriptionName;
-    @SuppressWarnings("unused")
-    private boolean pubSubNoLocal;
-    private TransactionManager transactionManager;
 
     private ExecutorService pollers;
 
@@ -61,50 +45,6 @@ public class PollingMessageListenerContainer implements JMSListenerContainer {
         this.connection = connection;
         this.destination = destination;
         this.listenerHandler = listenerHandler;
-    }
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public void setTransacted(boolean transacted) {
-        this.transacted = transacted;
-    }
-
-    public void setAcknowledgeMode(int acknowledgeMode) {
-        this.acknowledgeMode = acknowledgeMode;
-    }
-
-    public void setMessageSelector(String messageSelector) {
-        this.messageSelector = messageSelector;
-    }
-
-    protected Executor getExecutor() {
-        if (executor == null) {
-            executor = Executors.newFixedThreadPool(10);
-        }
-        return executor;
-    }
-
-    public void setExecutor(Executor executor) {
-        this.executor = executor;
-    }
-
-    public void setDurableSubscriptionName(String durableSubscriptionName) {
-        this.durableSubscriptionName = durableSubscriptionName;
-    }
-
-    public void setPubSubNoLocal(boolean pubSubNoLocal) {
-        this.pubSubNoLocal = pubSubNoLocal;
-    }
-
-    @Override
-    public boolean isRunning() {
-        return running;
-    }
-
-    public void setTransactionManager(TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
     }
 
     class Poller implements Runnable {

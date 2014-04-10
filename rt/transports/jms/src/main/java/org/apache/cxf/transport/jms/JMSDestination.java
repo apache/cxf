@@ -46,9 +46,11 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
+import org.apache.cxf.transport.jms.util.AbstractMessageListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.MessageListenerContainer;
+import org.apache.cxf.transport.jms.util.PollingMessageListenerContainer;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 
 public class JMSDestination extends AbstractMultiplexDestination implements MessageListener {
@@ -93,7 +95,18 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     public void activate() {
         getLogger().log(Level.FINE, "JMSDestination activate().... ");
         jmsConfig.ensureProperlyConfigured();
-        jmsListener = createTargetDestinationListener();
+        try {
+            this.jmsListener = createTargetDestinationListener();
+        } catch (Exception e) {
+            // If first connect fails we will try to establish the connection in the background 
+            new Thread(new Runnable() {
+                
+                @Override
+                public void run() {
+                    restartConnection();
+                }
+            }).start();
+        }
     }
     
     
@@ -102,21 +115,25 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         try {
             connection = JMSFactory.createConnection(jmsConfig);
             connection.setExceptionListener(new ExceptionListener() {
-                
-                @Override
                 public void onException(JMSException exception) {
-                    restartConnection(exception);
+                    LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", exception);
+                    restartConnection();
                 }
             });
-            connection.start();
-            session = connection.createSession(jmsConfig.isSessionTransacted(), Session.AUTO_ACKNOWLEDGE);
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = jmsConfig.getTargetDestination(session);
-            MessageListenerContainer container = new MessageListenerContainer(connection, destination, this);
+            AbstractMessageListenerContainer container = jmsConfig.getTransactionManager() != null
+                ? new PollingMessageListenerContainer(connection, destination, this)
+                : new MessageListenerContainer(connection, destination, this);
+            container.setTransactionManager(jmsConfig.getTransactionManager());
             container.setMessageSelector(jmsConfig.getMessageSelector());
+            container.setTransacted(jmsConfig.isSessionTransacted());
+
             Executor executor = JMSFactory.createExecutor(bus, "jms-destination");
             container.setExecutor(executor);
             container.start();
             suspendedContinuations.setListenerContainer(container);
+            connection.start();
             return container;
         } catch (JMSException e) {
             throw JMSUtil.convertJmsException(e);
@@ -125,20 +142,19 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         }
     }
 
-    protected void restartConnection(JMSException e) {
-        LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", e);
+    protected void restartConnection() {
         int tries = 0;
         do {
             tries++;
             try {
                 deactivate();
-                activate();
-                LOG.log(Level.INFO, "Reestablished JMS connection");
+                this.jmsListener = createTargetDestinationListener();
+                LOG.log(Level.INFO, "Established JMS connection");
             } catch (Exception e1) {
                 jmsListener = null;
                 String message = "Exception on reconnect. Trying again, attempt num " + tries;
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.log(Level.WARNING, message, e);
+                    LOG.log(Level.WARNING, message, e1);
                 } else {
                     LOG.log(Level.WARNING, message);
                 }
@@ -155,6 +171,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         if (jmsListener != null) {
             jmsListener.shutdown();
         }
+        ResourceCloser.close(connection);
         suspendedContinuations.setListenerContainer(null);
         connection = null;
     }
@@ -197,9 +214,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             }
 
             origBus = BusFactory.getAndSetThreadDefaultBus(bus);
-
-            // FIXME
-            // JCATransactionalMessageListenerContainer.setMessageEndpoint(inMessage);
 
             // handle the incoming message
             incomingObserver.onMessage(inMessage);

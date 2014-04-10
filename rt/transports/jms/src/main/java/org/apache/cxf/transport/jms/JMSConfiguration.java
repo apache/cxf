@@ -25,6 +25,7 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.transaction.TransactionManager;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.transport.jms.util.DestinationResolver;
@@ -85,6 +86,8 @@ public class JMSConfiguration {
     private boolean useConduitIdSelector = true;
     private String conduitSelectorPrefix;
     private boolean jmsProviderTibcoEms;
+    
+    private TransactionManager transactionManager;
 
     // For jms spec. Do not configure manually
     private String targetService;
@@ -413,4 +416,12 @@ public class JMSConfiguration {
         return destinationResolver.resolveDestinationName(session, replyToName, replyPubSubDomain);
     }
 
+    public TransactionManager getTransactionManager() {
+        return transactionManager;
+    }
+
+    public void setTransactionManager(TransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+    
 }

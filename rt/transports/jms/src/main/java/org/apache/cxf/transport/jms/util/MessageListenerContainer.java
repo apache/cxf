@@ -19,24 +19,17 @@
 package org.apache.cxf.transport.jms.util;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.XASession;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
-
-import org.apache.cxf.common.logging.LogUtils;
 
 /**
  * Listen for messages on a queue or topic asynchronously by registering a
@@ -45,74 +38,14 @@ import org.apache.cxf.common.logging.LogUtils;
  * Warning: This class does not refresh connections when the server goes away
  * This has to be handled outside.
  */
-public class MessageListenerContainer implements JMSListenerContainer {
-    private static final Logger LOG = LogUtils.getL7dLogger(MessageListenerContainer.class);
-
-    private Connection connection;
-    private Destination destination;
-    private MessageListener listenerHandler;
-    private boolean transacted;
-    private int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
-    private String messageSelector;
-    private boolean running;
-    private MessageConsumer consumer;
-    private Session session;
-    private Executor executor;
-    private String durableSubscriptionName;
-    private boolean pubSubNoLocal;
-    private TransactionManager transactionManager;
-
+public class MessageListenerContainer extends AbstractMessageListenerContainer {
     public MessageListenerContainer(Connection connection, Destination destination,
                                     MessageListener listenerHandler) {
         this.connection = connection;
         this.destination = destination;
         this.listenerHandler = listenerHandler;
     }
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public void setTransacted(boolean transacted) {
-        this.transacted = transacted;
-    }
-
-    public void setAcknowledgeMode(int acknowledgeMode) {
-        this.acknowledgeMode = acknowledgeMode;
-    }
-
-    public void setMessageSelector(String messageSelector) {
-        this.messageSelector = messageSelector;
-    }
-
-    protected Executor getExecutor() {
-        if (executor == null) {
-            executor = Executors.newFixedThreadPool(10);
-        }
-        return executor;
-    }
-
-    public void setExecutor(Executor executor) {
-        this.executor = executor;
-    }
-
-    public void setDurableSubscriptionName(String durableSubscriptionName) {
-        this.durableSubscriptionName = durableSubscriptionName;
-    }
-
-    public void setPubSubNoLocal(boolean pubSubNoLocal) {
-        this.pubSubNoLocal = pubSubNoLocal;
-    }
-
-    @Override
-    public boolean isRunning() {
-        return running;
-    }
-
-    public void setTransactionManager(TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
-    }
-
+    
     @Override
     public void start() {
         try {
@@ -124,9 +57,7 @@ public class MessageListenerContainer implements JMSListenerContainer {
                 consumer = session.createConsumer(destination, messageSelector);
             }
             
-            MessageListener intListener = (transactionManager != null)
-                ? new XATransactionalMessageListener(transactionManager, session, listenerHandler)
-                : new LocalTransactionalMessageListener(session, listenerHandler); 
+            MessageListener intListener = new LocalTransactionalMessageListener(session, listenerHandler); 
             // new DispachingListener(getExecutor(), listenerHandler);
             consumer.setMessageListener(intListener);
             
@@ -144,24 +75,11 @@ public class MessageListenerContainer implements JMSListenerContainer {
         consumer = null;
         session = null;
     }
-
+    
     @Override
     public void shutdown() {
         stop();
         ResourceCloser.close(connection);
-    }
-
-    protected TransactionManager getTransactionManager() {
-        if (this.transactionManager == null) {
-            try {
-                InitialContext ctx = new InitialContext();
-                this.transactionManager = (TransactionManager)ctx
-                    .lookup("javax.transaction.TransactionManager");
-            } catch (NamingException e) {
-                // Ignore
-            }
-        }
-        return this.transactionManager;
     }
 
     static class DispachingListener implements MessageListener {

@@ -18,145 +18,56 @@
  */
 package org.apache.cxf.systest.jms.tx;
 
-import java.lang.reflect.UndeclaredThrowableException;
-import java.net.URL;
+import java.util.Collections;
 
-import javax.jms.ConnectionFactory;
-import javax.xml.namespace.QName;
-
-import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.transport.jms.JMSConfigFeature;
-import org.apache.cxf.transport.jms.JMSConfiguration;
+import org.apache.cxf.systest.jms.AbstractVmJMSTest;
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.hello_world_doc_lit.Greeter;
-import org.apache.hello_world_doc_lit.PingMeFault;
-import org.apache.hello_world_doc_lit.SOAPService2;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-/**
- * Test transactions based on spring transactions.
- * These will not be supported anymore in cxf >= 3
- */
 @Ignore
-public class JMSTransactionClientServerTest extends AbstractBusClientServerTestBase {
-    private static final String BROKER_URI = "vm://JMSTransactionClientServerTest?broker.persistent=false";
-    private static EmbeddedJMSBrokerLauncher broker;
-
-    public static class Server extends AbstractBusTestServerBase {
-        ClassPathXmlApplicationContext context;
-        EndpointImpl endpoint;
-        protected void run()  {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus bus = bf.createBus("org/apache/cxf/systest/jms/tx/jms_server_config.xml");
-            BusFactory.setDefaultBus(bus);
-            endpoint = new EndpointImpl(bus, new GreeterImplWithTransaction());
-            endpoint.setAddress("jms:queue:greeter.queue.noaop?sessionTransacted=true");
-            endpoint.publish();
-        }
-        public void tearDown() {
-            endpoint.stop();
-            context.close();
-        }
-    }
+public class JMSTransactionClientServerTest extends AbstractVmJMSTest {
+    private static final String SERVICE_ADDRESS = 
+        "jms:queue:greeter.queue.tx?receivetTimeOut=5000&sessionTransacted=true";
+    private static EndpointImpl endpoint;
 
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher(BROKER_URI);
-        System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
-        launchServer(broker);
-        launchServer(new Server());
-        createStaticBus();
+        startBusAndJMS(JMSTransactionClientServerTest.class);
+
+        endpoint = new EndpointImpl(bus, new GreeterImplWithTransaction());
+        endpoint.setAddress(SERVICE_ADDRESS);
+        endpoint.setFeatures(Collections.singletonList(cff));
+        endpoint.publish();
     }
+
     @AfterClass
     public static void clearProperty() {
-        System.clearProperty("EmbeddedBrokerURL");
+        endpoint.stop();
     }
-    public URL getWSDLURL(String s) throws Exception {
-        return getClass().getResource(s);
-    }
-    public QName getServiceName(QName q) {
-        return q;
-    }
-    public QName getPortName(QName q) {
-        return q;
-    }
-    
-    @Ignore
+
     @Test
-    public void testDocBasicConnection() throws Exception {
-        QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit", 
-                                 "SOAPService2"));
-        QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort2"));
-        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
-        assertNotNull(wsdl);
-        String wsdlString = wsdl.toString();
-        SOAPService2 service = new SOAPService2(wsdl, serviceName);
-        broker.updateWsdl(getBus(), wsdlString);
-        assertNotNull(service);
-
-        Greeter greeter = service.getPort(portName, Greeter.class);
-        doService(greeter, true);
-    }
-    
-    @Ignore
-    @Test
-    public void testNonAopTransaction() throws Exception {
-        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setServiceClass(Greeter.class);
-        factory.setAddress("jms://");
-
-        JMSConfiguration jmsConfig = new JMSConfiguration();
-        ConnectionFactory connectionFactory
-            = new PooledConnectionFactory(broker.getBrokerURL());
-        jmsConfig.setConnectionFactory(connectionFactory);
-        jmsConfig.setTargetDestination("greeter.queue.noaop");
-        jmsConfig.setPubSubDomain(false);
-
-        JMSConfigFeature jmsConfigFeature = new JMSConfigFeature();
-        jmsConfigFeature.setJmsConfig(jmsConfig);
-        factory.getFeatures().add(jmsConfigFeature);
-
-        Greeter greeter = (Greeter)factory.create();
-        doService(greeter, false);
-    }    
-    public void doService(Greeter greeter, boolean doEx) throws Exception {
-
-        String response1 = new String("Hello ");
+    public void testTransaction() throws Exception {
+        Greeter greeter = createGreeterProxy();
+        // Should be processed normally
+        greeter.greetMeOneWay("Good guy");
         
-        try {
-                          
-            String greeting = greeter.greetMe("Good guy");
-            assertNotNull("No response received from service", greeting);
-            String exResponse = response1 + "Good guy";
-            assertEquals("Get unexcpeted result", exResponse, greeting);
-
-            greeting = greeter.greetMe("Bad guy");
-            assertNotNull("No response received from service", greeting);
-            exResponse = response1 + "[Bad guy]";
-            assertEquals("Get unexcpeted result", exResponse, greeting);
-            
-            if (doEx) {
-                try {
-                    greeter.pingMe();
-                    fail("Should have thrown FaultException");
-                } catch (PingMeFault ex) {
-                    assertNotNull(ex.getFaultInfo());
-                }
-            }
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
-        }
+        // Should cause rollback, redelivery and in the end the message should go to the dead letter queue
+        greeter.greetMe("Bad guy");
     }
 
+    private Greeter createGreeterProxy() throws Exception {
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setBus(bus);
+        factory.getFeatures().add(cff);
+        factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
+        factory.setServiceClass(Greeter.class);
+        factory.setAddress(SERVICE_ADDRESS);
+        return (Greeter)markForClose(factory.create());
+    }
 }
