@@ -144,7 +144,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
         }
         if (!foundValidScope) {
             String message = "Invalid request URI: " + request.getRequestURL().toString();
-            LOG.warning(message);
+            LOG.fine(message);
         }
         return foundValidScope;
     }
