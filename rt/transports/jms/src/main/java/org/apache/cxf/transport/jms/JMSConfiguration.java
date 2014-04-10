@@ -38,7 +38,7 @@ public class JMSConfiguration {
      */
     public static final int DEFAULT_VALUE = -1;
 
-    private ConnectionFactory connectionFactory;
+    private volatile ConnectionFactory connectionFactory;
     private Properties jndiEnvironment;
     private String connectionFactoryName;
     private String userName;
@@ -68,7 +68,7 @@ public class JMSConfiguration {
      * Destination name to listen on for reply messages
      */
     private String replyDestination;
-    private Destination replyDestinationDest;
+    private volatile Destination replyDestinationDest;
     
     /**
      * Destination name to send out as replyTo address in the message 
@@ -338,11 +338,18 @@ public class JMSConfiguration {
         this.reconnectOnException = reconnectOnException;
     }
 
-    public synchronized ConnectionFactory getConnectionFactory() {
-        if (connectionFactory == null) {
-            connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
+    public ConnectionFactory getConnectionFactory() {
+        ConnectionFactory factory = connectionFactory;
+        if (factory == null) {
+            synchronized (this) {
+                factory = connectionFactory;
+                if (factory == null) {
+                    factory = JMSFactory.getConnectionFactoryFromJndi(this);
+                    connectionFactory = factory;
+                }
+            }
         }
-        return connectionFactory;
+        return factory;
     }
     
     public String getDurableSubscriptionClientId() {
@@ -399,13 +406,20 @@ public class JMSConfiguration {
         return destinationResolver.resolveDestinationName(session, userDestination, replyPubSubDomain);
     }
     
-    public synchronized Destination getReplyDestination(Session session) throws JMSException {
-        if (replyDestinationDest == null) {
-            replyDestinationDest = replyDestination == null 
-                ? session.createTemporaryQueue()
-                : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
+    public Destination getReplyDestination(Session session) throws JMSException {
+        Destination result = replyDestinationDest;
+        if (result == null) {
+            synchronized (this) {
+                result = replyDestinationDest;
+                if (result == null) {
+                    result = replyDestination == null 
+                        ? session.createTemporaryQueue()
+                        : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
+                    replyDestinationDest = result;
+                }
+            }
         }
-        return replyDestinationDest;
+        return result;
     }
 
     public Destination getTargetDestination(Session session) throws JMSException {

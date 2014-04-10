@@ -31,6 +31,8 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.pool.PooledConnectionFactory;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 public class PooledConnectionTempQueueTest {
@@ -76,7 +78,8 @@ public class PooledConnectionTempQueueTest {
         
         MessageConsumer consumer = session.createConsumer(tempQueue);
         Message replyMsg = consumer.receive();
-        System.out.println(replyMsg.getJMSCorrelationID());
+        Assert.assertNotNull(replyMsg);
+        //System.out.println(replyMsg.getJMSCorrelationID());
         
         consumer.close();
 
@@ -92,12 +95,12 @@ public class PooledConnectionTempQueueTest {
         MessageConsumer consumer = session.createConsumer(session.createQueue(queueName));
         final javax.jms.Message inMessage = consumer.receive();
 
-        String requestMessageId = inMessage.getJMSMessageID();
-        System.out.println("Received message " + requestMessageId);
+        //String requestMessageId = inMessage.getJMSMessageID();
+        //System.out.println("Received message " + requestMessageId);
         final TextMessage replyMessage = session.createTextMessage("Result");
         replyMessage.setJMSCorrelationID(inMessage.getJMSMessageID());
         final MessageProducer producer = session.createProducer(inMessage.getJMSReplyTo());
-        System.out.println("Sending reply to " + inMessage.getJMSReplyTo());
+        //System.out.println("Sending reply to " + inMessage.getJMSReplyTo());
         producer.send(replyMessage);
         
         producer.close();

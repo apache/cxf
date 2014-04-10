@@ -171,8 +171,9 @@ public class MessageListenerTest {
         int actualNum;
         do {
             actualNum = getNumMessages(connection, queue);
-            System.out.println("Messages in queue " + queue.getQueueName() + ": " + actualNum
-                               + ", expecting: " + expectedNum);
+            
+            //System.out.println("Messages in queue " + queue.getQueueName() + ": " + actualNum
+            //                   + ", expecting: " + expectedNum);
             Thread.sleep(100);
         } while ((System.currentTimeMillis() - startTime < timeout) && expectedNum != actualNum);
         Assert.assertEquals(message + " -> number of messages", expectedNum, actualNum);
@@ -221,12 +222,12 @@ public class MessageListenerTest {
             try {
                 String text = textMessage.getText();
                 if (OK.equals(text)) {
-                    System.out.println("Simulating Processing successful");
+                    //System.out.println("Simulating Processing successful");
                 } else if (FAIL.equals(text)) {
                     throw new RuntimeException("Simulating something went wrong. Expecting rollback");
                 } else if (FAILFIRST.equals(text)) {
                     if (message.getJMSRedelivered()) {
-                        System.out.println("Simulating processing worked on second try");
+                        //System.out.println("Simulating processing worked on second try");
                     } else {
                         throw new RuntimeException("Simulating something went wrong. Expecting rollback");
                     }

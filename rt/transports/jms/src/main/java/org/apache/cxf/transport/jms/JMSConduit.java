@@ -73,8 +73,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private final AtomicLong messageCount = new AtomicLong(0);
     private JMSBusLifeCycleListener listener;
     private Bus bus;
-    private Connection connection;
-    private Destination staticReplyDestination;
+    private volatile Connection connection;
+    private volatile Destination staticReplyDestination;
 
     public JMSConduit(EndpointReferenceType target,
                       JMSConfiguration jmsConfig,
@@ -100,30 +100,19 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         MessageStreamUtil.closeStreams(msg);
         super.close(msg);
     }
-    private synchronized Connection getConnection() throws JMSException {
-        if (connection == null) {
-            connection = JMSFactory.createConnection(jmsConfig);
-            connection.start();
+    private Connection getConnection() throws JMSException {
+        Connection result = connection;
+        if (result == null) {
+            synchronized (this) {
+                result = connection;
+                if (result == null) {
+                    result = JMSFactory.createConnection(jmsConfig);
+                    result.start();
+                    connection = result;
+                }                
+            }
         }
-        return connection;
-    }
-    private synchronized void getJMSListener(Destination replyTo) throws JMSException {
-        if (jmsListener != null) {
-            return;
-        }
-        String messageSelector = JMSFactory.getMessageSelector(jmsConfig, conduitId);
-        if (messageSelector == null && !jmsConfig.isPubSubDomain()) {
-            // Do not open listener without selector on a queue as we then can not share the queue.
-            // An option for this might be a good idea for people who do not plan to share queues.
-            return;
-        }
-        MessageListenerContainer container = new MessageListenerContainer(getConnection(), replyTo, this);
-        container.setMessageSelector(messageSelector);
-        Executor executor = JMSFactory.createExecutor(bus, "jms-conduit");
-        container.setExecutor(executor);
-        container.start();
-        jmsListener = container;
-        addBusListener();
+        return result;
     }
     
     /**
@@ -176,10 +165,29 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         }
     }
     
-    private synchronized void setupReplyDestination(Session session) throws JMSException {
+    private void setupReplyDestination(Session session) throws JMSException {
         if (staticReplyDestination == null) {
-            staticReplyDestination = jmsConfig.getReplyDestination(session);
-            getJMSListener(staticReplyDestination);
+            synchronized (this) {
+                if (staticReplyDestination == null) {
+                    staticReplyDestination = jmsConfig.getReplyDestination(session);
+                    
+                    String messageSelector = JMSFactory.getMessageSelector(jmsConfig, conduitId);
+                    if (messageSelector == null && !jmsConfig.isPubSubDomain()) {
+                        // Do not open listener without selector on a queue as we then can not share the queue.
+                        // An option for this might be a good idea for people who do not plan to share queues.
+                        return;
+                    }
+                    MessageListenerContainer container = new MessageListenerContainer(getConnection(), 
+                                                                                      staticReplyDestination, 
+                                                                                      this);
+                    container.setMessageSelector(messageSelector);
+                    Executor executor = JMSFactory.createExecutor(bus, "jms-conduit");
+                    container.setExecutor(executor);
+                    container.start();
+                    jmsListener = container;
+                    addBusListener();
+                }
+            }
         }
     }
 
@@ -418,6 +426,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             jmsListener.stop();
             jmsListener.shutdown();
             jmsListener = null;
+            staticReplyDestination = null;
         }
     }
     public synchronized void close() {

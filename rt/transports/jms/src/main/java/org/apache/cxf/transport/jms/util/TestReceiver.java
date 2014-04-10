@@ -92,11 +92,11 @@ public class TestReceiver {
                 .createQueue(receiveQueueName)));
             final javax.jms.Message inMessage = consumer.receive(10000);
             if (inMessage == null) {
-                System.out.println("TestReceiver timed out");
+                //System.out.println("TestReceiver timed out");
                 throw new RuntimeException("No message received on destination " + receiveQueueName);
             }
             requestMessageId = inMessage.getJMSMessageID();
-            System.out.println("Received message " + requestMessageId);
+            //System.out.println("Received message " + requestMessageId);
             final TextMessage replyMessage = session.createTextMessage("Result");
             String correlationId = (forceMessageIdAsCorrelationId || inMessage.getJMSCorrelationID() == null) 
                 ? inMessage.getJMSMessageID() : inMessage.getJMSCorrelationID();
@@ -106,7 +106,7 @@ public class TestReceiver {
             if (replyDest != null) {
                 final MessageProducer producer = closer
                     .register(session.createProducer(replyDest));
-                System.out.println("Sending reply with correlation id " + correlationId + " to " + replyDest);
+                //System.out.println("Sending reply with correlation id " + correlationId + " to " + replyDest);
                 producer.send(replyMessage);
             }
         } catch (Throwable e) {
