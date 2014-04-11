@@ -135,14 +135,17 @@ public class OASISCatalogManager {
     }
 
     public final void loadCatalogs(ClassLoader classLoader, String name) throws IOException {
-        if (classLoader == null || catalog == null) {
+        if (classLoader == null) {
             return;
         }
 
         Enumeration<URL> catalogs = classLoader.getResources(name);
         while (catalogs.hasMoreElements()) {
             URL catalogURL = catalogs.nextElement();
-            if (!loadedCatalogs.contains(catalogURL.toString())) {
+            if (catalog == null) {
+                LOG.log(Level.WARNING, "Catalog found at {0} but no org.apache.xml.resolver.CatalogManager was found."
+                        + "  Check the classpatch for an xmlresolver jar.", catalogURL.toString());
+            } else if (!loadedCatalogs.contains(catalogURL.toString())) {
                 ((Catalog)catalog).parseCatalog(catalogURL);
                 loadedCatalogs.add(catalogURL.toString());
             }
@@ -150,7 +153,7 @@ public class OASISCatalogManager {
     }
 
     public final void loadCatalog(URL catalogURL) throws IOException {
-        if (!loadedCatalogs.contains(catalogURL.toString()) && catalog != null) {
+        if (!loadedCatalogs.contains(catalogURL.toString())) {
             if ("file".equals(catalogURL.getProtocol())) {
                 try {
                     File file = new File(catalogURL.toURI());
@@ -162,9 +165,14 @@ public class OASISCatalogManager {
                 }
             }
 
-            ((Catalog)catalog).parseCatalog(catalogURL);
+            if (catalog == null) {
+                LOG.log(Level.WARNING, "Catalog found at {0} but no org.apache.xml.resolver.CatalogManager was found."
+                        + "  Check the classpatch for an xmlresolver jar.", catalogURL.toString());
+            } else {
+                ((Catalog)catalog).parseCatalog(catalogURL);
 
-            loadedCatalogs.add(catalogURL.toString());
+                loadedCatalogs.add(catalogURL.toString());
+            }
         }
     }
     
