@@ -19,12 +19,20 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.text.ParseException;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.Lifetime;
+import org.apache.cxf.sts.request.Participants;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.ws.security.saml.ext.bean.AudienceRestrictionBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
@@ -132,10 +140,23 @@ public class DefaultConditionsProvider implements ConditionsProvider {
      * Get a ConditionsBean object.
      */
     public ConditionsBean getConditions(TokenProviderParameters providerParameters) {
-        return getConditions(
+        ConditionsBean conditions = getConditions(
             providerParameters.getAppliesToAddress(),
             providerParameters.getTokenRequirements().getLifetime()
         );
+
+        if (conditions != null) {
+            List<AudienceRestrictionBean> audienceRestrictions =
+                createAudienceRestrictions(providerParameters);
+            if (audienceRestrictions != null && !audienceRestrictions.isEmpty()) {
+                if (conditions.getAudienceRestrictions() != null) {
+                    audienceRestrictions.addAll(conditions.getAudienceRestrictions());
+                }
+                conditions.setAudienceRestrictions(audienceRestrictions);
+            }
+        }
+
+        return conditions;
     }
     
     /**
@@ -209,6 +230,71 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         }
         
         return conditions;
+    }
+ 
+     /**
+     * Create a list of AudienceRestrictions to be added to the Conditions Element of the
+     * issued Assertion. The default behaviour is to add a single Audience URI per 
+     * AudienceRestriction Element. The Audience URIs are from the wst:Participants, if 
+     * they exist. The AppliesTo address is also added in another method.
+     */
+    protected List<AudienceRestrictionBean> createAudienceRestrictions(
+        TokenProviderParameters providerParameters
+    ) {
+        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<AudienceRestrictionBean>();
+        
+        Participants participants = providerParameters.getTokenRequirements().getParticipants();
+        if (participants != null) {
+            if (participants.getPrimaryParticipant() instanceof Element) {
+                String address = 
+                    extractAddressFromParticipantsEPR((Element)participants.getPrimaryParticipant());
+                if (address != null) {
+                    AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+                    audienceRestriction.setAudienceURIs(Collections.singletonList(address));
+                    audienceRestrictions.add(audienceRestriction);
+                }
+            }
+            
+            if (participants.getParticipants() != null) {
+                for (Object participant : participants.getParticipants()) {
+                    if (participant instanceof Element) {
+                        String address = 
+                            extractAddressFromParticipantsEPR((Element)participant);
+                        if (address != null) {
+                            AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+                            audienceRestriction.setAudienceURIs(Collections.singletonList(address));
+                            audienceRestrictions.add(audienceRestriction);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return audienceRestrictions;
+    }
+    
+    /**
+     * Extract an address from a Particpants EPR DOM element
+     */
+    protected static String extractAddressFromParticipantsEPR(Element participants) {
+        if (participants != null) {
+            Element endpointRef = 
+                DOMUtils.getFirstChildWithName(
+                    participants, STSConstants.WSA_NS_05, "EndpointReference"
+                );
+            if (endpointRef != null) {
+                LOG.fine("Found EndpointReference element");
+                Element address = 
+                    DOMUtils.getFirstChildWithName(
+                        endpointRef, STSConstants.WSA_NS_05, "Address");
+                if (address != null) {
+                    LOG.fine("Found address element");
+                    return address.getTextContent();
+                }
+            }
+        }
+        LOG.fine("Participants element does not exist or could not be parsed");
+        return null;
     }
 
 }
