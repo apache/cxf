@@ -78,13 +78,11 @@
         <dependency>
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
-            <version>${cxf.rhino.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>${cxf.jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
