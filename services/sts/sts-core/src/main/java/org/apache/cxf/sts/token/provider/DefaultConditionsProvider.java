@@ -19,12 +19,19 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.Lifetime;
+import org.apache.cxf.sts.request.Participants;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
@@ -132,17 +139,9 @@ public class DefaultConditionsProvider implements ConditionsProvider {
      * Get a ConditionsBean object.
      */
     public ConditionsBean getConditions(TokenProviderParameters providerParameters) {
-        return getConditions(
-            providerParameters.getAppliesToAddress(),
-            providerParameters.getTokenRequirements().getLifetime()
-        );
-    }
-    
-    /**
-     * Get a ConditionsBean object.
-     */
-    private ConditionsBean getConditions(String appliesToAddress, Lifetime tokenLifetime) {
         ConditionsBean conditions = new ConditionsBean();
+        
+        Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
         if (lifetime > 0) {
             if (acceptClientLifetime && tokenLifetime != null
                 && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
@@ -202,13 +201,84 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         } else {
             conditions.setTokenPeriodMinutes(5);
         }
-        if (appliesToAddress != null) {
-            AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
-            audienceRestriction.setAudienceURIs(Collections.singletonList(appliesToAddress));
-            conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
+        
+        List<AudienceRestrictionBean> audienceRestrictions = createAudienceRestrictions(providerParameters);
+        if (audienceRestrictions != null && !audienceRestrictions.isEmpty()) {
+            conditions.setAudienceRestrictions(audienceRestrictions);
         }
         
         return conditions;
+    }
+    
+    /**
+     * Create a list of AudienceRestrictions to be added to the Conditions Element of the
+     * issued Assertion. The default behaviour is to add a single Audience URI per 
+     * AudienceRestriction Element. The Audience URIs are from an AppliesTo address, and
+     * the wst:Participants (if either exist).
+     */
+    protected List<AudienceRestrictionBean> createAudienceRestrictions(
+        TokenProviderParameters providerParameters
+    ) {
+        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<AudienceRestrictionBean>();
+        String appliesToAddress = providerParameters.getAppliesToAddress();
+        if (appliesToAddress != null) {
+            AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+            audienceRestriction.setAudienceURIs(Collections.singletonList(appliesToAddress));
+            audienceRestrictions.add(audienceRestriction);
+        }
+        
+        Participants participants = providerParameters.getTokenRequirements().getParticipants();
+        if (participants != null) {
+            if (participants.getPrimaryParticipant() instanceof Element) {
+                String address = 
+                    extractAddressFromParticipantsEPR((Element)participants.getPrimaryParticipant());
+                if (address != null) {
+                    AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+                    audienceRestriction.setAudienceURIs(Collections.singletonList(address));
+                    audienceRestrictions.add(audienceRestriction);
+                }
+            }
+            
+            if (participants.getParticipants() != null) {
+                for (Object participant : participants.getParticipants()) {
+                    if (participant instanceof Element) {
+                        String address = 
+                            extractAddressFromParticipantsEPR((Element)participant);
+                        if (address != null) {
+                            AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+                            audienceRestriction.setAudienceURIs(Collections.singletonList(address));
+                            audienceRestrictions.add(audienceRestriction);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return audienceRestrictions;
+    }
+    
+    /**
+     * Extract an address from a Particpants EPR DOM element
+     */
+    protected static String extractAddressFromParticipantsEPR(Element participants) {
+        if (participants != null) {
+            Element endpointRef = 
+                DOMUtils.getFirstChildWithName(
+                    participants, STSConstants.WSA_NS_05, "EndpointReference"
+                );
+            if (endpointRef != null) {
+                LOG.fine("Found EndpointReference element");
+                Element address = 
+                    DOMUtils.getFirstChildWithName(
+                        endpointRef, STSConstants.WSA_NS_05, "Address");
+                if (address != null) {
+                    LOG.fine("Found address element");
+                    return address.getTextContent();
+                }
+            }
+        }
+        LOG.fine("Participants element does not exist or could not be parsed");
+        return null;
     }
 
 }
