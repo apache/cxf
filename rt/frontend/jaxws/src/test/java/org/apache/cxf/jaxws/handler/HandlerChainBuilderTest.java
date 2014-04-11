@@ -30,10 +30,13 @@ import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.jaxws.javaee.FullyQualifiedClassType;
-import org.apache.cxf.jaxws.javaee.ParamValueType;
-import org.apache.cxf.jaxws.javaee.PortComponentHandlerType;
+import org.apache.cxf.jaxws.handler.types.CString;
+import org.apache.cxf.jaxws.handler.types.FullyQualifiedClassType;
+import org.apache.cxf.jaxws.handler.types.ParamValueType;
+import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
+import org.apache.cxf.jaxws.handler.types.XsdStringType;
 import org.easymock.EasyMock;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,19 +89,19 @@ public class HandlerChainBuilderTest extends Assert {
         List<ParamValueType> params = h.getInitParam();
 
         ParamValueType p = new ParamValueType();
-        org.apache.cxf.jaxws.javaee.CString pName = new org.apache.cxf.jaxws.javaee.CString();
+        CString pName = new CString();
         pName.setValue("foo");
         p.setParamName(pName);
-        org.apache.cxf.jaxws.javaee.XsdStringType pValue = new org.apache.cxf.jaxws.javaee.XsdStringType();
+        XsdStringType pValue = new XsdStringType();
         pValue.setValue("1");
         p.setParamValue(pValue);
         params.add(p);
 
         p = new ParamValueType();
-        pName = new org.apache.cxf.jaxws.javaee.CString();
+        pName = new CString();
         pName.setValue("bar");
         p.setParamName(pName);
-        pValue = new org.apache.cxf.jaxws.javaee.XsdStringType();
+        pValue = new XsdStringType();
         pValue.setValue("2");
         p.setParamValue(pValue);
         params.add(p);
@@ -127,7 +130,7 @@ public class HandlerChainBuilderTest extends Assert {
         List<ParamValueType> params = h.getInitParam();
 
         ParamValueType p = new ParamValueType();
-        org.apache.cxf.jaxws.javaee.CString pName = new org.apache.cxf.jaxws.javaee.CString();
+        CString pName = new CString();
         pName.setValue("foo");
         p.setParamName(pName);
         params.add(p);
@@ -166,7 +169,7 @@ public class HandlerChainBuilderTest extends Assert {
         List<PortComponentHandlerType> handlers = new ArrayList<PortComponentHandlerType>();
 
         PortComponentHandlerType h = new PortComponentHandlerType();
-        org.apache.cxf.jaxws.javaee.CString name = new org.apache.cxf.jaxws.javaee.CString();
+        CString name = new CString();
         name.setValue("lh1");
         h.setHandlerName(name);
         FullyQualifiedClassType type = new FullyQualifiedClassType();
@@ -175,7 +178,7 @@ public class HandlerChainBuilderTest extends Assert {
         handlers.add(h);
 
         h = new PortComponentHandlerType();
-        name = new org.apache.cxf.jaxws.javaee.CString();
+        name = new CString();
         name.setValue("ph1");
         h.setHandlerName(name);
         type = new FullyQualifiedClassType();
@@ -184,7 +187,7 @@ public class HandlerChainBuilderTest extends Assert {
         handlers.add(h);
 
         h = new PortComponentHandlerType();
-        name = new org.apache.cxf.jaxws.javaee.CString();
+        name = new CString();
         name.setValue("ph2");
         h.setHandlerName(name);
         type = new FullyQualifiedClassType();
@@ -193,7 +196,7 @@ public class HandlerChainBuilderTest extends Assert {
         handlers.add(h);
 
         h = new PortComponentHandlerType();
-        name = new org.apache.cxf.jaxws.javaee.CString();
+        name = new CString();
         name.setValue("lh2");
         h.setHandlerName(name);
         type = new FullyQualifiedClassType();

@@ -46,7 +46,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxws.javaee.PortComponentHandlerType;
+import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @SuppressWarnings("rawtypes")

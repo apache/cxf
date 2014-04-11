@@ -188,18 +188,6 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${basedir}/src/main/generated</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>add-spi</id>
                         <phase>generate-resources</phase>
                         <goals>

@@ -37,8 +37,8 @@ import javax.xml.ws.handler.LogicalHandler;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxws.javaee.ParamValueType;
-import org.apache.cxf.jaxws.javaee.PortComponentHandlerType;
+import org.apache.cxf.jaxws.handler.types.ParamValueType;
+import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
