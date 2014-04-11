@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
@@ -187,6 +188,9 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
 
         message.put(USE_ASYNC, Boolean.TRUE);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Asynchronous connection to " + uri.toString() + " has been set up");
+        }
         message.put("http.scheme", uri.getScheme());
         String httpRequestMethod = 
             (String)message.get(Message.HTTP_REQUEST_METHOD);
