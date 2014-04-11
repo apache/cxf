@@ -141,7 +141,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
     /**
      * Get a ConditionsBean object.
      */
-    public ConditionsBean getConditions(String appliesToAddress, Lifetime tokenLifetime) {
+    private ConditionsBean getConditions(String appliesToAddress, Lifetime tokenLifetime) {
         ConditionsBean conditions = new ConditionsBean();
         if (lifetime > 0) {
             if (acceptClientLifetime && tokenLifetime != null

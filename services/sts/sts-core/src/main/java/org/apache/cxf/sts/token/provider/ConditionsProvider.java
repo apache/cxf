@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import org.apache.cxf.sts.request.Lifetime;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 
 /**
@@ -31,11 +30,6 @@ public interface ConditionsProvider {
      * Get a ConditionsBean object.
      */
     ConditionsBean getConditions(TokenProviderParameters providerParameters);
-    
-    /**
-     * Get a ConditionsBean object.
-     */
-    ConditionsBean getConditions(String appliesToAddress, Lifetime tokenLifetime);
     
     /**
      * Get the lifetime to use (in seconds)
