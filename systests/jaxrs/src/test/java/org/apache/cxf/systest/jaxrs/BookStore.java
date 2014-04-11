@@ -1181,7 +1181,8 @@ public class BookStore {
         }
         
         book.setId(bookId + 1);
-        return Response.ok(book).build();
+        URI uri = ui.getRequestUriBuilder().path(Long.toString(book.getId())).build();
+        return Response.ok(book).location(uri).build();
     }
     
     @POST

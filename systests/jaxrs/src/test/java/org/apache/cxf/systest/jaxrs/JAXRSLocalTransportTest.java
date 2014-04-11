@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -156,6 +157,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         
         Response response = localProxy.addBook(new Book("New", 124L));
         assertEquals(200, response.getStatus());
+        assertTrue(response.getMetadata().getFirst("Location") instanceof URI);
     }
     
     @Test

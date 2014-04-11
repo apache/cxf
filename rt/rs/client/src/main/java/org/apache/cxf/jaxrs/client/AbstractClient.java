@@ -379,12 +379,12 @@ public abstract class AbstractClient implements Client {
             return currentResponseBuilder;
         }
                 
-        Map<String, List<String>> protocolHeaders = 
+        Map<String, List<Object>> protocolHeaders = 
             CastUtils.cast((Map<?, ?>)responseMessage.get(Message.PROTOCOL_HEADERS));
         
         boolean splitHeaders = 
             MessageUtils.isTrue(outMessage.getContextualProperty(HEADER_SPLIT_PROPERTY));
-        for (Map.Entry<String, List<String>> entry : protocolHeaders.entrySet()) {
+        for (Map.Entry<String, List<Object>> entry : protocolHeaders.entrySet()) {
             if (null == entry.getKey()) {
                 continue;
             }
@@ -393,8 +393,9 @@ public abstract class AbstractClient implements Client {
                     currentResponseBuilder.header(entry.getKey(), entry.getValue().get(0));
                     continue;                    
                 }
-                for (String val : entry.getValue()) {
-                    if (splitHeaders) {
+                for (Object valObject : entry.getValue()) {
+                    if (splitHeaders && valObject instanceof String) {
+                        String val = (String)valObject;
                         String[] values;
                         if (val == null || val.length() == 0) {
                             values = new String[]{""};
@@ -414,7 +415,7 @@ public abstract class AbstractClient implements Client {
                             }
                         }
                     } else {
-                        currentResponseBuilder.header(entry.getKey(), val);
+                        currentResponseBuilder.header(entry.getKey(), valObject);
                     }
                 }
             }
