@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.ws.security.tokenstore;
 
-import java.util.Date;
-
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -59,29 +57,6 @@ public class EHCacheTokenStoreTest extends org.junit.Assert {
         assertEquals(token, store.getToken(newKey));
         store.remove(newKey);
         assertNull(store.getToken(newKey));
-    }
-    
-    // tests TokenStore apis for storing in the cache with various expiration times
-    @org.junit.Test
-    public void testTokenAddExpiration() throws Exception {
-        SecurityToken expiredToken = new SecurityToken("expiredToken");
-        Date currentDate = new Date();
-        long currentTime = currentDate.getTime();
-        Date expiry = new Date();
-        expiry.setTime(currentTime - 5000L);
-        expiredToken.setExpires(expiry);
-        store.add(expiredToken);
-        assertTrue(store.getTokenIdentifiers().isEmpty());
-        
-        SecurityToken farFutureToken = new SecurityToken("farFuture");
-        expiry = new Date();
-        expiry.setTime(Long.MAX_VALUE);
-        farFutureToken.setExpires(expiry);
-        store.add(farFutureToken);
-        
-        assertTrue(store.getTokenIdentifiers().size() == 1);
-        store.remove(farFutureToken.getId());
-        assertTrue(store.getTokenIdentifiers().isEmpty());
     }
     
     // tests TokenStore apis for removing from the cache.

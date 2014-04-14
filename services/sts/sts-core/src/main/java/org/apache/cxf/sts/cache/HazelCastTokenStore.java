@@ -112,11 +112,6 @@ public class HazelCastTokenStore implements TokenStore {
         return CastUtils.cast((Collection<?>)getCacheMap().keySet());
     }
 
-    public Collection<SecurityToken> getExpiredTokens() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public SecurityToken getToken(String identifier) {
         return (SecurityToken)getCacheMap().get(identifier);
     }

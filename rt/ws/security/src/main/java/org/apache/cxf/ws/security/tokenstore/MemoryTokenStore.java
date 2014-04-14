@@ -19,10 +19,8 @@
 
 package org.apache.cxf.ws.security.tokenstore;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,6 +34,7 @@ public class MemoryTokenStore implements TokenStore {
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     
     private Map<String, CacheEntry> tokens = new ConcurrentHashMap<String, CacheEntry>();
+    private long ttl = DEFAULT_TTL;
     
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
@@ -55,6 +54,14 @@ public class MemoryTokenStore implements TokenStore {
         }
     }
     
+    /**
+     * Set a new (default) TTL value in seconds
+     * @param newTtl a new (default) TTL value in seconds
+     */
+    public void setTTL(long newTtl) {
+        ttl = newTtl;
+    }
+    
     public void remove(String identifier) {
         if (!StringUtils.isEmpty(identifier) && tokens.containsKey(identifier)) {
             tokens.remove(identifier);
@@ -64,20 +71,6 @@ public class MemoryTokenStore implements TokenStore {
     public Collection<String> getTokenIdentifiers() {
         processTokenExpiry();
         return tokens.keySet();
-    }
-    
-    public Collection<SecurityToken> getExpiredTokens() {
-        List<SecurityToken> expiredTokens = new ArrayList<SecurityToken>();
-        Date current = new Date();
-        synchronized (tokens) {
-            for (String id : tokens.keySet()) {
-                CacheEntry cacheEntry = tokens.get(id);
-                if (cacheEntry.getExpiry().before(current)) {
-                    expiredTokens.add(cacheEntry.getSecurityToken());
-                }
-            }
-        }
-        return expiredTokens;
     }
     
     public SecurityToken getToken(String id) {
@@ -103,25 +96,10 @@ public class MemoryTokenStore implements TokenStore {
     }
     
     private CacheEntry createCacheEntry(SecurityToken token) {
-        CacheEntry cacheEntry = null;
-        if (token.getExpires() == null) {
-            Date expires = new Date();
-            long currentTime = expires.getTime();
-            expires.setTime(currentTime + (DEFAULT_TTL * 1000L));
-            cacheEntry = new CacheEntry(token, expires);
-        } else {
-            Date expires = token.getExpires();
-            Date current = new Date();
-            long expiryTime = expires.getTime() - current.getTime();
-            if (expiryTime < 0) {
-                return null;
-            }
-            if (expiryTime > (MAX_TTL * 1000L)) {
-                expires.setTime(current.getTime() + (DEFAULT_TTL * 1000L));
-            }
-            cacheEntry = new CacheEntry(token, expires);
-        }
-        return cacheEntry;
+        Date expires = new Date();
+        long currentTime = expires.getTime();
+        expires.setTime(currentTime + (ttl * 1000L));
+        return new CacheEntry(token, expires);
     }
     
     private static class CacheEntry {

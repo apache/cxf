@@ -381,7 +381,10 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     st = WSS4JUtils.getTokenStore(message).getToken(id);
                 }
             }
-            return st;
+            if (st != null && !st.isExpired()) {
+                return st;
+            }
+            return null;
         }
     }
     

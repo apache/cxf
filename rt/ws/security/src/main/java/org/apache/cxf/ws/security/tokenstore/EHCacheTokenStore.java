@@ -21,11 +21,7 @@ package org.apache.cxf.ws.security.tokenstore;
 
 import java.io.Closeable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -83,33 +79,19 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         ttl = newTtl;
     }
     
-    /**
-     * Get the (default) TTL value in seconds
-     * @return the (default) TTL value in seconds
-     */
-    public long getTTL() {
-        return ttl;
-    }
-    
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
-            int parsedTTL = getTTL(token);
-            if (parsedTTL > 0) {
-                Element element = new Element(token.getId(), token, parsedTTL, parsedTTL);
-                element.resetAccessStatistics();
-                cache.put(element);
-            }
+            Element element = new Element(token.getId(), token, getTTL(), getTTL());
+            element.resetAccessStatistics();
+            cache.put(element);
         }
     }
     
     public void add(String identifier, SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(identifier)) {
-            int parsedTTL = getTTL(token);
-            if (parsedTTL > 0) {
-                Element element = new Element(identifier, token, parsedTTL, parsedTTL);
-                element.resetAccessStatistics();
-                cache.put(element);
-            }
+            Element element = new Element(identifier, token, getTTL(), getTTL());
+            element.resetAccessStatistics();
+            cache.put(element);
         }
     }
     
@@ -124,19 +106,6 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         return cache.getKeysWithExpiryCheck();
     }
     
-    public Collection<SecurityToken> getExpiredTokens() {
-        List<SecurityToken> expiredTokens = new ArrayList<SecurityToken>();
-        @SuppressWarnings("unchecked")
-        Iterator<String> ids = cache.getKeys().iterator();
-        while (ids.hasNext()) {
-            Element element = cache.get(ids.next());
-            if (cache.isExpired(element)) {
-                expiredTokens.add((SecurityToken)element.getObjectValue());
-            }
-        }
-        return expiredTokens;
-    }
-    
     public SecurityToken getToken(String identifier) {
         Element element = cache.get(identifier);
         if (element != null && !cache.isExpired(element)) {
@@ -145,32 +114,11 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         return null;
     }
     
-    private int getTTL(SecurityToken token) {
-        int parsedTTL = 0;
-        if (token.getExpires() != null) {
-            Date expires = token.getExpires();
-            Date current = new Date();
-            long expiryTime = (expires.getTime() - current.getTime()) / 1000L;
-            if (expiryTime < 0) {
-                return 0;
-            }
-            
-            parsedTTL = (int)expiryTime;
-            if (expiryTime != (long)parsedTTL || parsedTTL > MAX_TTL) {
-                // Default to configured value
-                parsedTTL = (int)ttl;
-                if (ttl != (long)parsedTTL) {
-                    // Fall back to 60 minutes if the default TTL is set incorrectly
-                    parsedTTL = 3600;
-                }
-            }
-        } else {
-            // Default to configured value
-            parsedTTL = (int)ttl;
-            if (ttl != (long)parsedTTL) {
-                // Fall back to 60 minutes if the default TTL is set incorrectly
-                parsedTTL = 3600;
-            }
+    private int getTTL() {
+        int parsedTTL = (int)ttl;
+        if (ttl != (long)parsedTTL) {
+             // Fall back to 60 minutes if the default TTL is set incorrectly
+            parsedTTL = 3600;
         }
         return parsedTTL;
     }

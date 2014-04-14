@@ -413,7 +413,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                     
                     String id = pc.getIdentifier();
                     SecurityToken tok = store.getToken(id);
-                    if (tok != null) {
+                    if (tok != null && !tok.isExpired()) {
                         pc.setKey(tok.getSecret());
                         pc.setKey(tok.getKey());
                         pc.setCustomToken(tok.getToken());

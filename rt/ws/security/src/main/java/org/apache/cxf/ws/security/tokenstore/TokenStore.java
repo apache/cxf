@@ -53,12 +53,6 @@ public interface TokenStore {
     Collection<String> getTokenIdentifiers();
     
     /**
-     * Return the list of expired tokens.
-     * @return An array of expired <code>Tokens</code>
-     */
-    Collection<SecurityToken> getExpiredTokens();
-    
-    /**
      * Returns the <code>Token</code> of the given identifier
      * @param identifier
      * @return The requested <code>Token</code> identified by the given identifier

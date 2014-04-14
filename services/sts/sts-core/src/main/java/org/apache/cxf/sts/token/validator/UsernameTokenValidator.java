@@ -183,7 +183,7 @@ public class UsernameTokenValidator implements TokenValidator {
             SecurityToken secToken = null;
             if (tokenParameters.getTokenStore() != null) {
                 secToken = tokenParameters.getTokenStore().getToken(Integer.toString(hash));
-                if (secToken != null && secToken.getTokenHash() != hash) {
+                if (secToken != null && (secToken.getTokenHash() != hash || secToken.isExpired())) {
                     secToken = null;
                 }
             }

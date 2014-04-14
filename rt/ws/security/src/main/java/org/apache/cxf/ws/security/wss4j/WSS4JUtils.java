@@ -176,7 +176,7 @@ public final class WSS4JUtils {
             return null;
         }
         SecurityToken existingToken = getTokenStore(message).getToken(securityToken.getId());
-        if (existingToken == null) {
+        if (existingToken == null || existingToken.isExpired()) {
             Date created = new Date();
             Date expires = new Date();
             expires.setTime(created.getTime() + 300000);

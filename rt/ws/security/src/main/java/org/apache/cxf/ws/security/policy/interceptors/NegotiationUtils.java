@@ -251,7 +251,7 @@ final class NegotiationUtils {
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
                     
                     SecurityToken token = getTokenStore(message).getToken(tok.getIdentifier());
-                    if (token == null) {
+                    if (token == null || token.isExpired()) {
                         byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                         if (secret != null) {
                             token = new SecurityToken(tok.getIdentifier());

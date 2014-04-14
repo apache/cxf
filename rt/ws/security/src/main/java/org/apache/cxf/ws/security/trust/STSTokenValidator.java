@@ -91,7 +91,7 @@ public class STSTokenValidator implements Validator {
             TokenStore tokenStore = getTokenStore(message);
             if (tokenStore != null && hash != 0) {
                 SecurityToken transformedToken = getTransformedToken(tokenStore, hash);
-                if (transformedToken != null) {
+                if (transformedToken != null && !transformedToken.isExpired()) {
                     SamlAssertionWrapper assertion = new SamlAssertionWrapper(transformedToken.getToken());
                     credential.setTransformedToken(assertion);
                     return credential;
