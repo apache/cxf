@@ -149,7 +149,8 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         } catch (DoSomethingFault e) {
             fail("Should not have happened");
         } catch (WebServiceException e) {
-            e.printStackTrace();
+            String expected = "Value '1' is not facet-valid";
+            assertTrue(e.getMessage().indexOf(expected) != -1);
         }
     }
 
