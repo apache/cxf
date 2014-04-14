@@ -542,29 +542,26 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         }
         
         nextId = 0;
-        minfo = unwrapped.getInput();
-        if (minfo != null) {
-            for (MessagePartInfo part : minfo.getMessageParts()) {
-                if (part.getIndex() >= nextId) {
-                    nextId = part.getIndex() + 1;
-                }
-            }
-        }
-        minfo = unwrapped.getOutput();
-        if (minfo != null) {
-            for (MessagePartInfo part : minfo.getMessageParts()) {
-                if (part.getIndex() >= nextId) {
-                    nextId = part.getIndex() + 1;
-                }
-            }
-        }
-        
         if (isInput) {
             minfo = unwrapped.getInput();
             type = MessageInfo.Type.INPUT;
+            if (minfo != null) {
+                for (MessagePartInfo part : minfo.getMessageParts()) {
+                    if (part.getIndex() >= nextId) {
+                        nextId = part.getIndex() + 1;
+                    }
+                }
+            }
         } else {
             minfo = unwrapped.getOutput();
             type = MessageInfo.Type.OUTPUT;
+            if (minfo != null) {
+                for (MessagePartInfo part : minfo.getMessageParts()) {
+                    if (part.getIndex() >= nextId) {
+                        nextId = part.getIndex() + 1;
+                    }
+                }
+            }
         }
 
         if (minfo == null) {
