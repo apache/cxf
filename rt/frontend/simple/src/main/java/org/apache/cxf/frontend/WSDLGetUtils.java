@@ -318,8 +318,9 @@ public class WSDLGetUtils {
                                                               "include");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
-                if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                sl = mapUri(base, smp, sl, xsd);
+                if (sl != null) {
+                    el.setAttribute("schemaLocation", sl);
                 }
             }
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
@@ -327,8 +328,9 @@ public class WSDLGetUtils {
                                                               "redefine");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
-                if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
-                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                sl = mapUri(base, smp, sl, xsd);
+                if (sl != null) {
+                    el.setAttribute("schemaLocation", sl);
                 }
             }
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
