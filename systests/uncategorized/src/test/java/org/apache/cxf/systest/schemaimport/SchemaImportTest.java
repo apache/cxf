@@ -95,5 +95,27 @@ public class SchemaImportTest extends AbstractBusClientServerTestBase {
             }
         }
     }
+    
+    
+    @Test
+    public void testSchemaInclude() throws Exception {
+        String schemaURL = "http://localhost:" + PORT + "/schemainclude/service?xsd=d1/d1/test.xsd";
+        URL url = new URL(schemaURL);
+        InputStream ins = null;
+        try {
+            ins = url.openStream();
+            String output = IOUtils.toString(ins);
+            assertTrue(output.indexOf("msg:RequestType") > -1);
+            assertTrue(output.indexOf("msg:SomeFeatureType") > -1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Can not access the include schema");
+
+        } finally {
+            if (ins != null) {
+                ins.close();
+            }
+        }
+    }
 
 }
