@@ -68,6 +68,9 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 
 /**
  * An implementation of the IssueOperation interface.
@@ -400,8 +403,6 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         }
         
         // Now try steaming results
-        /*
-         * TODO Uncomment this after we release a beta/RC
         try {
             org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
                 findInboundSecurityToken(WSSecurityEventConstants.SamlToken, messageContext);
@@ -413,7 +414,6 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             LOG.log(Level.FINE, e.getMessage(), e);
             return null;
         }
-        */
         
         return null;
     }
