@@ -261,20 +261,15 @@ public class DefaultConditionsProvider implements ConditionsProvider {
      * Extract an address from a Particpants EPR DOM element
      */
     protected static String extractAddressFromParticipantsEPR(Element participants) {
-        if (participants != null) {
-            Element endpointRef = 
+        if (participants != null && STSConstants.WSA_NS_05.equals(participants.getNamespaceURI())
+                && "EndpointReference".equals(participants.getLocalName())) {
+            LOG.fine("Found EndpointReference element");
+            Element address = 
                 DOMUtils.getFirstChildWithName(
-                    participants, STSConstants.WSA_NS_05, "EndpointReference"
-                );
-            if (endpointRef != null) {
-                LOG.fine("Found EndpointReference element");
-                Element address = 
-                    DOMUtils.getFirstChildWithName(
-                        endpointRef, STSConstants.WSA_NS_05, "Address");
-                if (address != null) {
-                    LOG.fine("Found address element");
-                    return address.getTextContent();
-                }
+                        participants, STSConstants.WSA_NS_05, "Address");
+            if (address != null) {
+                LOG.fine("Found address element");
+                return address.getTextContent();
             }
         }
         LOG.fine("Participants element does not exist or could not be parsed");

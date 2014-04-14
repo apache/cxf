@@ -63,6 +63,7 @@ import org.apache.cxf.ws.security.sts.provider.model.ClaimsType;
 import org.apache.cxf.ws.security.sts.provider.model.EntropyType;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
 import org.apache.cxf.ws.security.sts.provider.model.OnBehalfOfType;
+import org.apache.cxf.ws.security.sts.provider.model.ParticipantType;
 import org.apache.cxf.ws.security.sts.provider.model.ParticipantsType;
 import org.apache.cxf.ws.security.sts.provider.model.RenewTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.RenewingType;
@@ -435,8 +436,8 @@ public class RequestParser {
             && !participantsType.getParticipant().isEmpty()) {
             List<Object> secondaryParticipants = 
                 new ArrayList<Object>(participantsType.getParticipant().size());
-            for (Object object : participantsType.getParticipant()) {
-                secondaryParticipants.add(object);
+            for (ParticipantType secondaryParticipant : participantsType.getParticipant()) {
+                secondaryParticipants.add(secondaryParticipant.getAny());
             }
             participants.setParticipants(secondaryParticipants);
         }
