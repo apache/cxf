@@ -44,6 +44,22 @@
                     </sequence>
                 </complexType>
             </element>
+            
+            <element name="SomeFault">
+                <complexType>
+                    <sequence>
+                        <element name="errorCode" minOccurs="1" maxOccurs="1" nillable="false">
+                        	<simpleType>
+                				<restriction base="string">
+                	     			<pattern value="[\d]{4}" />
+                				</restriction>
+            				</simpleType>
+                        </element>
+                    </sequence>
+                </complexType>
+            </element>
+
+            
             <element name="SomeRequestWithHeader">
                 <complexType>
                     <sequence>
@@ -143,6 +159,9 @@
     <wsdl:message name="doSomethingResponse">
         <wsdl:part element="x1:SomeResponse" name="in"/>
     </wsdl:message>
+    <wsdl:message name="doSomethingFault">
+        <wsdl:part element="x1:SomeFault" name="fault"/>
+    </wsdl:message>
     <wsdl:message name="doSomethingRequestWithHeader">
         <wsdl:part element="x1:SomeRequestWithHeader" name="in"/>
         <wsdl:part element="x1:SomeHeader" name="inHeader"/>
@@ -178,6 +197,7 @@
         <wsdl:operation name="doSomething">
             <wsdl:input message="tns:doSomethingRequest" name="doSomethingRequest"/>
             <wsdl:output message="tns:doSomethingResponse" name="doSomethingResponse"/>
+            <wsdl:fault message="tns:doSomethingFault" name="doSomethingFault"/>
         </wsdl:operation>
         <wsdl:operation name="setComplexStruct">
             <wsdl:input message="tns:setComplexStructRequest" name="setComplexStructRequest"/>
@@ -210,6 +230,9 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
+            <wsdl:fault name="doSomethingFault">
+                <soap:fault name="doSomethingFault"  use="literal"/>
+            </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="doSomethingWithHeader">
             <soap:operation style="document"/>

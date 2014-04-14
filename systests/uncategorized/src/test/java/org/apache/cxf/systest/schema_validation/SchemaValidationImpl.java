@@ -24,9 +24,11 @@ import java.util.List;
 
 import javax.jws.WebService;
 
+import org.apache.schema_validation.DoSomethingFault;
 import org.apache.schema_validation.SchemaValidation;
 import org.apache.schema_validation.types.ComplexStruct;
 import org.apache.schema_validation.types.OccuringStruct;
+import org.apache.schema_validation.types.SomeFault;
 import org.apache.schema_validation.types.SomeHeader;
 import org.apache.schema_validation.types.SomeRequest;
 import org.apache.schema_validation.types.SomeRequestWithHeader;
@@ -36,8 +38,8 @@ import org.apache.schema_validation.types.SomeResponseWithHeader;
 @WebService(serviceName = "SchemaValidationService", 
             portName = "SoapPort",
             endpointInterface = "org.apache.schema_validation.SchemaValidation",
-            targetNamespace = "http://apache.org/schema_validation")
-@org.apache.cxf.annotations.SchemaValidation            
+            targetNamespace = "http://apache.org/schema_validation",
+            wsdlLocation = "classpath:/wsdl/schema_validation.wsdl")
 public class SchemaValidationImpl implements SchemaValidation {
 
     public boolean setComplexStruct(ComplexStruct in) {
@@ -70,10 +72,18 @@ public class SchemaValidationImpl implements SchemaValidation {
     }
 
     @Override
-    public SomeResponse doSomething(SomeRequest in) {
+    public SomeResponse doSomething(SomeRequest in) throws DoSomethingFault {
         SomeResponse response = new SomeResponse();
         if (in.getId().equals("1234567890")) {
             response.setTransactionId("aaaaaaaaaaxxx"); // invalid transaction id
+        } else if (in.getId().equals("9999999999")) {
+            SomeFault someFault = new SomeFault();
+            someFault.setErrorCode("1234");
+            throw new DoSomethingFault("Fault", someFault);
+        } else if (in.getId().equals("8888888888")) {
+            SomeFault someFault = new SomeFault();
+            someFault.setErrorCode("1");
+            throw new DoSomethingFault("Fault", someFault);
         } else {
             response.setTransactionId("aaaaaaaaaa");
         }
