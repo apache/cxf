@@ -20,12 +20,9 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,15 +30,14 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
+import org.apache.cxf.sts.cache.CacheUtils;
 import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
 import org.apache.cxf.sts.request.KeyRequirements;
-import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -130,40 +126,19 @@ public class SAMLTokenProvider implements TokenProvider {
             byte[] signatureValue = assertion.getSignatureValue();
             if (tokenParameters.getTokenStore() != null && signatureValue != null
                 && signatureValue.length > 0) {
-                Date expires = new Date();
-                long currentTime = expires.getTime();
-                expires.setTime(currentTime + (conditionsProvider.getLifetime() * 1000L));
-                
-                SecurityToken securityToken = new SecurityToken(assertion.getId(), null, expires);
-                securityToken.setToken(token);
-                securityToken.setPrincipal(tokenParameters.getPrincipal());
-
-                Properties props = new Properties();
-                securityToken.setProperties(props);
-                if (tokenParameters.getRealm() != null) {
-                    props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
-                }
-
-                // Handle Renewing logic
-                Renewing renewing = tokenParameters.getTokenRequirements().getRenewing();
-                if (renewing != null) {
-                    props.put(
-                        STSConstants.TOKEN_RENEWING_ALLOW, 
-                        String.valueOf(renewing.isAllowRenewing())
-                    );
-                    props.put(
-                        STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, 
-                        String.valueOf(renewing.isAllowRenewingAfterExpiry())
-                    );
+                DateTime validTill = null;
+                if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+                    validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
                 } else {
-                    props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW, "true");
-                    props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
+                    validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
                 }
-                    
-                int hash = Arrays.hashCode(signatureValue);
-                securityToken.setTokenHash(hash);
-                String identifier = Integer.toString(hash);
-                tokenParameters.getTokenStore().add(identifier, securityToken);
+                
+                SecurityToken securityToken = 
+                    CacheUtils.createSecurityTokenForStorage(token, assertion.getId(), 
+                        validTill.toDate(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
+                        tokenParameters.getTokenRequirements().getRenewing());
+                CacheUtils.storeTokenInCache(
+                    securityToken, tokenParameters.getTokenStore(), signatureValue);
             }
             
             TokenProviderResponse response = new TokenProviderResponse();

@@ -42,9 +42,9 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
+import org.apache.cxf.sts.cache.CacheUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
-import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.sts.token.provider.ConditionsProvider;
 import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
@@ -590,38 +590,12 @@ public class SAMLTokenRenewer implements TokenRenewer {
                 validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
             }
 
-            SecurityToken securityToken = new SecurityToken(assertion.getId(), null, validTill.toDate());
-            securityToken.setToken(assertion.getElement());
-            securityToken.setPrincipal(principal);
-            
-            Properties props = new Properties();
-            String tokenRealm = tokenParameters.getRealm();
-            if (tokenRealm != null) {
-                props.setProperty(STSConstants.TOKEN_REALM, tokenRealm);
-            }
-            
-            // Handle Renewing logic
-            Renewing renewing = tokenParameters.getTokenRequirements().getRenewing();
-            if (renewing != null) {
-                props.put(
-                    STSConstants.TOKEN_RENEWING_ALLOW, 
-                    String.valueOf(renewing.isAllowRenewing())
-                );
-                props.put(
-                    STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, 
-                    String.valueOf(renewing.isAllowRenewingAfterExpiry())
-                );
-            } else {
-                props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW, "true");
-                props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
-            }
-            
-            securityToken.setProperties(props);
-
-            int hash = Arrays.hashCode(signatureValue);
-            securityToken.setTokenHash(hash);
-            String identifier = Integer.toString(hash);
-            tokenStore.add(identifier, securityToken);
+            SecurityToken securityToken = 
+                CacheUtils.createSecurityTokenForStorage(assertion.getElement(), assertion.getId(), 
+                    validTill.toDate(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
+                    tokenParameters.getTokenRequirements().getRenewing());
+            CacheUtils.storeTokenInCache(
+                securityToken, tokenParameters.getTokenStore(), signatureValue);
         }
     }
 
