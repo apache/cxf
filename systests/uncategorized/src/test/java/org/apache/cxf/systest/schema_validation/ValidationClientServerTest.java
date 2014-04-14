@@ -33,14 +33,18 @@ import javax.xml.ws.Service.Mode;
 import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.schema_validation.DoSomethingFault;
 import org.apache.schema_validation.SchemaValidation;
 import org.apache.schema_validation.SchemaValidationService;
 import org.apache.schema_validation.types.ComplexStruct;
 import org.apache.schema_validation.types.OccuringStruct;
 import org.apache.schema_validation.types.SomeRequest;
 import org.apache.schema_validation.types.SomeResponse;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -61,8 +65,18 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
     // client and server with schema validation enabled/disabled...
     // Only tests client side validation enabled/server side disabled.
     @Test
-    public void testSchemaValidation() throws Exception {
-        SchemaValidation validation = createService(Boolean.TRUE);
+    public void testSchemaValidationServer() throws Exception {
+        SchemaValidation validation = createService(Boolean.FALSE, "SoapPortValidate");
+        runSchemaValidationTest(validation);
+        ((java.io.Closeable)validation).close();
+    }
+    @Test
+    public void testSchemaValidationClient() throws Exception {
+        SchemaValidation validation = createService(Boolean.TRUE, "SoapPort"); 
+        runSchemaValidationTest(validation);
+        ((java.io.Closeable)validation).close();
+    }
+    private void runSchemaValidationTest(SchemaValidation validation) {
         ComplexStruct complexStruct = new ComplexStruct();
         complexStruct.setElem1("one");
         // Don't initialize a member of the structure.  
@@ -94,8 +108,6 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
             assertTrue(e.getMessage().indexOf(expected) != -1);
         }
         
-        validation = createService(Boolean.FALSE);
-
         try {
             // The server will attempt to return an invalid ComplexStruct
             // When validation is disabled on the server side, we'll get the
@@ -109,8 +121,6 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
                        e.getMessage().indexOf(expected) != -1);
         }
 
-        validation = createService(Boolean.TRUE);
-        
         try {
             // The server will attempt to return an invalid OccuringStruct
             // When validation is disabled on the server side, we'll get the
@@ -121,6 +131,25 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         } catch (WebServiceException e) {
             String expected = "'{\"http://apache.org/schema_validation/types\":varFloat}' is expected.";
             assertTrue(e.getMessage().indexOf(expected) != -1);
+        }
+        
+        
+        SomeRequest req = new SomeRequest();
+        req.setId("9999999999");
+        try {
+            validation.doSomething(req);
+            fail("Should have faulted");
+        } catch (DoSomethingFault e) {
+            assertEquals("1234", e.getFaultInfo().getErrorCode());
+        }
+        req.setId("8888888888");
+        try {
+            validation.doSomething(req);
+            fail("Should have faulted");
+        } catch (DoSomethingFault e) {
+            fail("Should not have happened");
+        } catch (WebServiceException e) {
+            e.printStackTrace();
         }
     }
 
@@ -221,6 +250,8 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
             assertTrue(e.getMessage().contains("Unmarshalling Error"));
             assertTrue(e.getMessage().contains("is not facet-valid with respect to pattern"));
         }
+        
+        ((java.io.Closeable)service).close();
     }
     
     private void assertIgnoredRequestValidation(Object validationConfig) throws Exception {
@@ -229,6 +260,7 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         // this is an invalid request but validation is turned off.
         SomeResponse response = execute(service, "1234567890aaaa");
         assertEquals(response.getTransactionId(), "aaaaaaaaaa");
+        ((java.io.Closeable)service).close();
     }
     
     private void assertIgnoredResponseValidation(Object validationConfig) throws Exception {
@@ -237,6 +269,7 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         // the request will result in invalid response but validation is turned off
         SomeResponse response = execute(service, "1234567890");
         assertEquals(response.getTransactionId(), "aaaaaaaaaaxxx");
+        ((java.io.Closeable)service).close();
     }
     
     private void assertFailedRequestValidation(Object validationConfig) throws Exception {
@@ -252,9 +285,13 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
             assertTrue(e.getMessage().contains("Marshalling Error"));
             assertTrue(e.getMessage().contains("is not facet-valid with respect to pattern"));
         }
+        ((java.io.Closeable)service).close();
     }
     
     private SchemaValidation createService(Object validationConfig) throws Exception {
+        return createService(validationConfig, "SoapPort");
+    }
+    private SchemaValidation createService(Object validationConfig, String postfix) throws Exception {
         URL wsdl = getClass().getResource("/wsdl/schema_validation.wsdl");
         assertNotNull(wsdl);
 
@@ -262,10 +299,11 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         assertNotNull(service);
 
         SchemaValidation validation = service.getPort(portName, SchemaValidation.class);
-        updateAddressPort(validation, PORT);
+        setAddress(validation, "http://localhost:" + PORT + "/SoapContext/" + postfix);
+        
         ((BindingProvider)validation).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, validationConfig);
         ((BindingProvider)validation).getResponseContext().put(Message.SCHEMA_VALIDATION_ENABLED, validationConfig);
-        
+        new LoggingFeature().initialize((Client)validation, getBus());
         return validation;
     }
 }

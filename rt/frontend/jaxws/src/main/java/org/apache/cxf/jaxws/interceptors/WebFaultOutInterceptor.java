@@ -29,9 +29,11 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.validation.Schema;
 import javax.xml.ws.WebFault;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -39,6 +41,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.message.FaultMode;
@@ -49,6 +52,7 @@ import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 public class WebFaultOutInterceptor extends FaultOutInterceptor {
 
@@ -136,7 +140,13 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
             try {
                 DataWriter<XMLStreamWriter> writer 
                     = service.getDataBinding().createWriter(XMLStreamWriter.class);
-    
+                
+                if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)) {
+                    Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
+                                                                     message.getExchange().getBus());
+                    writer.setSchema(schema);
+                }
+
                 OperationInfo op = message.getExchange().get(BindingOperationInfo.class).getOperationInfo();
                 QName faultName = getFaultName(fault, cause.getClass(), op);
                 MessagePartInfo part = getFaultMessagePart(faultName, op);
@@ -151,9 +161,14 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
     
                 f.setMessage(ex.getMessage());
             } catch (Exception nex) {
-                //if exception occurs while writing a fault, we'll just let things continue
-                //and let the rest of the chain try handling it as is.
-                LOG.log(Level.WARNING, "EXCEPTION_WHILE_WRITING_FAULT", nex);
+                if (nex instanceof Fault) {
+                    message.setContent(Exception.class, nex);
+                    super.handleMessage(message);
+                } else {
+                    //if exception occurs while writing a fault, we'll just let things continue
+                    //and let the rest of the chain try handling it as is.
+                    LOG.log(Level.WARNING, "EXCEPTION_WHILE_WRITING_FAULT", nex);
+                }
             }
         } else {
             FaultMode mode = message.get(FaultMode.class);
