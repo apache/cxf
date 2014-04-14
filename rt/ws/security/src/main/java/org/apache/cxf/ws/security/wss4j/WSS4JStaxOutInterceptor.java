@@ -38,7 +38,6 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSSPolicyException;
@@ -130,22 +129,17 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
         XMLStreamWriter newXMLStreamWriter;
         try {
-            @SuppressWarnings("unchecked")
-            final List<SecurityEvent> requestSecurityEvents = 
-                (List<SecurityEvent>) mc.getExchange().get(SecurityEvent.class.getName() + ".in");
-            
             WSSSecurityProperties secProps = createSecurityProperties();
             translateProperties(mc, secProps);
+            configureCallbackHandler(mc, secProps);
             Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens = 
                 new HashMap<String, SecurityTokenProvider<OutboundSecurityToken>>();
-            configureCallbackHandler(mc, secProps);
             configureProperties(mc, outboundTokens, secProps);
-            
-            if ((secProps.getActions() == null || secProps.getActions().size() == 0)
-                && mc.get(AssertionInfoMap.class) != null) {
-                // If no actions configured (with SecurityPolicy) then return
+            if (secProps.getActions() == null || secProps.getActions().size() == 0) {
+                // If no actions configured then return
                 return;
             }
+
             handleSecureMTOM(mc, secProps);
             
             if (secProps.getAttachmentCallbackHandler() == null) {
@@ -156,6 +150,10 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 configureSecurityEventListener(mc, secProps);
             
             OutboundWSSec outboundWSSec = WSSec.getOutboundWSSec(secProps);
+            
+            @SuppressWarnings("unchecked")
+            final List<SecurityEvent> requestSecurityEvents = 
+                (List<SecurityEvent>) mc.getExchange().get(SecurityEvent.class.getName() + ".in");
             
             final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
             outboundSecurityContext.putList(SecurityEvent.class, requestSecurityEvents);
