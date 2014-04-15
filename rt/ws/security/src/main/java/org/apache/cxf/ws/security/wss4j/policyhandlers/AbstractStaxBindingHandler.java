@@ -93,6 +93,7 @@ import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
@@ -116,7 +117,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     protected Map<AbstractToken, SecurePart> endSuppTokMap;
     protected Map<AbstractToken, SecurePart> sgndEndEncSuppTokMap;
     protected Map<AbstractToken, SecurePart> sgndEndSuppTokMap;
-    protected Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens;
+    protected final OutboundSecurityContext outboundSecurityContext;
     
     private final WSSSecurityProperties properties;
     private AbstractBinding binding;
@@ -125,12 +126,12 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         WSSSecurityProperties properties, 
         SoapMessage msg,
         AbstractBinding binding,
-        Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
+        OutboundSecurityContext outboundSecurityContext
     ) {
         super(msg);
         this.properties = properties;
         this.binding = binding;
-        this.outboundTokens = outboundTokens;
+        this.outboundSecurityContext = outboundSecurityContext;
     }
 
     protected SecurePart addUsernameToken(UsernameToken usernameToken) {
@@ -240,15 +241,18 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                     return wss4jToken.getId();
                 }
             };
-        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS, 
-                           kerberosSecurityTokenProvider);
+        outboundSecurityContext.registerSecurityTokenProvider(
+                kerberosSecurityTokenProvider.getId(), kerberosSecurityTokenProvider);
+        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS, 
+                kerberosSecurityTokenProvider.getId());
+        
         if (encrypting) {
-            outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
-                               kerberosSecurityTokenProvider);
+            outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
+                    kerberosSecurityTokenProvider.getId());
         }
         if (endorsing) {
-            outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
-                               kerberosSecurityTokenProvider);
+            outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
+                    kerberosSecurityTokenProvider.getId());
         }
         
         // Action
@@ -452,12 +456,15 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 
             };
         encryptedKeySecurityToken.setSha1Identifier(tok.getSHA1());
-        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
-                           encryptedKeySecurityTokenProvider);
-        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
-                           encryptedKeySecurityTokenProvider);
-        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_CUSTOM_TOKEN, 
-                           encryptedKeySecurityTokenProvider);
+        
+        outboundSecurityContext.registerSecurityTokenProvider(
+                encryptedKeySecurityTokenProvider.getId(), encryptedKeySecurityTokenProvider);
+        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
+                encryptedKeySecurityTokenProvider.getId());
+        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
+                encryptedKeySecurityTokenProvider.getId());
+        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_CUSTOM_TOKEN, 
+                encryptedKeySecurityTokenProvider.getId());
     }
     
     protected void configureTimestamp(AssertionInfoMap aim) {

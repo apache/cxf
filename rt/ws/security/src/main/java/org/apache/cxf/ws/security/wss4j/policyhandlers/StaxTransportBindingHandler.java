@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,10 +60,9 @@ import org.apache.wss4j.policy.model.XPath;
 import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
-import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
-import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
  * 
@@ -78,9 +76,9 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         WSSSecurityProperties properties, 
         SoapMessage msg,
         TransportBinding tbinding,
-        Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
+        OutboundSecurityContext outboundSecurityContext
     ) {
-        super(properties, msg, tbinding, outboundTokens);
+        super(properties, msg, tbinding, outboundSecurityContext);
         this.tbinding = tbinding;
     }
     

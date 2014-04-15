@@ -19,7 +19,6 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,12 +48,11 @@ import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.impl.OutboundSecurityContextImpl;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
-import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     
@@ -132,9 +130,9 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             WSSSecurityProperties secProps = createSecurityProperties();
             translateProperties(mc, secProps);
             configureCallbackHandler(mc, secProps);
-            Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens = 
-                new HashMap<String, SecurityTokenProvider<OutboundSecurityToken>>();
-            configureProperties(mc, outboundTokens, secProps);
+            
+            final OutboundSecurityContext outboundSecurityContext = new OutboundSecurityContextImpl();
+            configureProperties(mc, outboundSecurityContext, secProps);
             if (secProps.getActions() == null || secProps.getActions().size() == 0) {
                 // If no actions configured then return
                 return;
@@ -155,18 +153,8 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             final List<SecurityEvent> requestSecurityEvents = 
                 (List<SecurityEvent>) mc.getExchange().get(SecurityEvent.class.getName() + ".in");
             
-            final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
             outboundSecurityContext.putList(SecurityEvent.class, requestSecurityEvents);
             outboundSecurityContext.addSecurityEventListener(securityEventListener);
-            
-            // Save Tokens on the security context
-            if (!outboundTokens.isEmpty()) {
-                for (String key : outboundTokens.keySet()) {
-                    SecurityTokenProvider<OutboundSecurityToken> provider = outboundTokens.get(key);
-                    outboundSecurityContext.registerSecurityTokenProvider(provider.getId(), provider);
-                    outboundSecurityContext.put(key, provider.getId());
-                }
-            }
             
             newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, outboundSecurityContext);
             mc.setContent(XMLStreamWriter.class, newXMLStreamWriter);
@@ -216,7 +204,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     }
     
     protected void configureProperties(
-        SoapMessage msg, Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens,
+        SoapMessage msg, OutboundSecurityContext outboundSecurityContext,
         WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Map<String, Object> config = getProperties();

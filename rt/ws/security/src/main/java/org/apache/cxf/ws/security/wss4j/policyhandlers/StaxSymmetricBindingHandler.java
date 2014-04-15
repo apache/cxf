@@ -23,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -63,13 +62,12 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
-import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
  * 
@@ -83,9 +81,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         WSSSecurityProperties properties, 
         SoapMessage msg,
         SymmetricBinding sbinding,
-        Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
+        OutboundSecurityContext outboundSecurityContext
     ) {
-        super(properties, msg, sbinding, outboundTokens);
+        super(properties, msg, sbinding, outboundSecurityContext);
         this.message = msg;
         this.sbinding = sbinding;
     }

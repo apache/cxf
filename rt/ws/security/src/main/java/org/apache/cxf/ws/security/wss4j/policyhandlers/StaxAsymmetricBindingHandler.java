@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,10 +53,9 @@ import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
-import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
-import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
  * 
@@ -73,9 +71,9 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         WSSSecurityProperties properties, 
         SoapMessage msg,
         AsymmetricBinding abinding,
-        Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
+        OutboundSecurityContext outboundSecurityContext
     ) {
-        super(properties, msg, abinding, outboundTokens);
+        super(properties, msg, abinding, outboundSecurityContext);
         this.message = msg;
         this.abinding = abinding;
     }
@@ -129,7 +127,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     
                     if (sigTok != null) {
                         storeSecurityToken(initiatorToken, sigTok);
-                        outboundTokens.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
+                        outboundSecurityContext.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
                     }
                     
                     // Set up CallbackHandler which wraps the configured Handler
@@ -256,7 +254,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     
                     if (sigTok != null) {
                         storeSecurityToken(initiatorToken, sigTok);
-                        outboundTokens.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
+                        outboundSecurityContext.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
                     }
                     
                     // Set up CallbackHandler which wraps the configured Handler
