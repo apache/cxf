@@ -119,7 +119,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 secProps.setAttachmentCallbackHandler(new AttachmentCallbackHandler(soapMessage));
             }
             
-            TokenStoreCallbackHandler callbackHandler = 
+            final TokenStoreCallbackHandler callbackHandler = 
                 new TokenStoreCallbackHandler(
                     secProps.getCallbackHandler(), WSS4JUtils.getTokenStore(soapMessage)
                 );
@@ -128,10 +128,10 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             setTokenValidators(secProps, soapMessage);
             secProps.setMsgContext(soapMessage);
             
-            List<SecurityEventListener> securityEventListeners = 
+            final List<SecurityEventListener> securityEventListeners = 
                 configureSecurityEventListeners(soapMessage, secProps);
             
-            InboundWSSec inboundWSSec = 
+            final InboundWSSec inboundWSSec = 
                 WSSec.getInboundWSSec(secProps, MessageUtils.isRequestor(soapMessage));
             
             newXmlStreamReader = 
@@ -160,7 +160,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
-        SecurityEventListener securityEventListener = new SecurityEventListener() {
+        final SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                 incomingSecurityEventList.add(securityEvent);

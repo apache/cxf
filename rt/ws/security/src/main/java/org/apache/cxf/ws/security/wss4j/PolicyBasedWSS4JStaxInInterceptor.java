@@ -345,7 +345,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     protected List<SecurityEventListener> configureSecurityEventListeners(
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
-        List<SecurityEventListener> securityEventListeners = new ArrayList<SecurityEventListener>(2);
+        final List<SecurityEventListener> securityEventListeners = new ArrayList<SecurityEventListener>(2);
         securityEventListeners.addAll(super.configureSecurityEventListeners(msg, securityProperties));
         
         Endpoint endoint = msg.getExchange().get(Endpoint.class);

@@ -195,7 +195,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         final SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
         final List<SecurityEvent> outgoingSecurityEventList = new LinkedList<SecurityEvent>();
-        SecurityEventListener securityEventListener = new SecurityEventListener() {
+        final SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SamlToken
