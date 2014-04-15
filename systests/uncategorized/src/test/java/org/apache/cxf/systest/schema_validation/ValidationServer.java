@@ -20,18 +20,27 @@
 package org.apache.cxf.systest.schema_validation;
 
 
+import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.jws.WebService;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceProvider;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.annotations.SchemaValidation;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class ValidationServer extends AbstractBusTestServerBase {
@@ -67,22 +76,81 @@ public class ValidationServer extends AbstractBusTestServerBase {
         
     }
 
+    private static String getResponse(String v) {
+        if ("9999999999".equals(v)) {
+            return "<soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                + "<faultcode>soap:Server</faultcode>"
+                + "<faultstring>Fault</faultstring>"
+                + "<detail>"
+                + "<SomeFault xmlns=\"http://apache.org/schema_validation/types\">"
+                + "    <errorCode>1234</errorCode></SomeFault>"
+                + "</detail>"
+                + "</soap:Fault>";
+        } else if ("8888888888".equals(v)) {
+            return "<soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                + "<faultcode>soap:Server</faultcode>"
+                + "<faultstring>Fault</faultstring>"
+                + "<detail>"
+                + "<SomeFault xmlns=\"http://apache.org/schema_validation/types\">"
+                + "    <errorCode>1</errorCode></SomeFault>"
+                + "</detail>"
+                + "</soap:Fault>";
+        }
+        return "";
+    }
 
-    @WebServiceProvider
+    @WebServiceProvider(wsdlLocation = "classpath:/wsdl/schema_validation.wsdl",
+        serviceName = "SchemaValidationService", 
+        portName = "SoapPort",
+        targetNamespace = "http://apache.org/schema_validation")
     @ServiceMode(Service.Mode.PAYLOAD)
     @SchemaValidation
+    @Logging
     static class PayloadProvider implements Provider<Source> {
         @Override
         public Source invoke(Source request) {
+            try {
+                Document doc = StaxUtils.read(request);
+                String name = doc.getDocumentElement().getLocalName();
+                if ("SomeRequest".equals(name)) {
+                    String v = DOMUtils.getFirstElement(doc.getDocumentElement()).getTextContent();
+                    return new StreamSource(new StringReader(getResponse(v)));
+                }
+            } catch (XMLStreamException e) {
+                e.printStackTrace();
+            }
             return null;
         }
     }
-    @WebServiceProvider
+    
+    @WebServiceProvider(wsdlLocation = "classpath:/wsdl/schema_validation.wsdl",
+        serviceName = "SchemaValidationService", 
+        portName = "SoapPort",
+        targetNamespace = "http://apache.org/schema_validation")
     @ServiceMode(Service.Mode.MESSAGE)
     @SchemaValidation
     static class MessageProvider implements Provider<Source> {
         @Override
         public Source invoke(Source request) {
+            try {
+                Document doc = StaxUtils.read(request);
+                Element el = DOMUtils.getFirstElement(doc.getDocumentElement());
+                while (!"Body".equals(el.getLocalName())) {
+                    el = DOMUtils.getNextElement(el);
+                }
+                el = DOMUtils.getFirstElement(el);
+                String name = el.getLocalName();
+                
+                if ("SomeRequest".equals(name)) {
+                    String v = DOMUtils.getFirstElement(el).getTextContent();
+                    return new StreamSource(
+                        new StringReader("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                            + "<soap:Body>" + getResponse(v) + "</soap:Body></soap:Envelope>"));
+                }
+            } catch (XMLStreamException ex) {
+                ex.printStackTrace();
+            }
+            
             return null;
         }
     }
