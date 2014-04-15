@@ -195,21 +195,22 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         final SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
         final List<SecurityEvent> outgoingSecurityEventList = new LinkedList<SecurityEvent>();
+        msg.getExchange().put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
+        msg.put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
+        
         final SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SamlToken
-                    && securityEvent instanceof TokenSecurityEvent) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SamlToken) {
                     // Store SAML keys in case we need them on the inbound side
                     TokenSecurityEvent<?> tokenSecurityEvent = (TokenSecurityEvent<?>)securityEvent;
                     WSS4JUtils.parseAndStoreStreamingSecurityToken(tokenSecurityEvent.getSecurityToken(), msg);
-                } else {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignatureValue) {
+                    // Required for Signature Confirmation
                     outgoingSecurityEventList.add(securityEvent);
                 }
             }
         };
-        msg.getExchange().put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
-        msg.put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
 
         return securityEventListener;
     }

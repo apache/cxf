@@ -55,10 +55,13 @@ import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     
@@ -160,14 +163,21 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
+        msg.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
+        msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
+        
         final SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                incomingSecurityEventList.add(securityEvent);
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Timestamp
+                    || securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignatureValue
+                    || securityEvent instanceof TokenSecurityEvent
+                    || securityEvent instanceof AbstractSecuredElementSecurityEvent) {
+                    // Store events required for the security context setup, or the crypto coverage checker
+                    incomingSecurityEventList.add(securityEvent);
+                }
             }
         };
-        msg.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
-        msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         
         return Collections.singletonList(securityEventListener);
     }
