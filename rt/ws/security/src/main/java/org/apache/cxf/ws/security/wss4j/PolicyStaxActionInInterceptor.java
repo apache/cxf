@@ -72,7 +72,7 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
         // First check for a SOAP Fault with no security header if we are the client
         // In this case don't blanket assert security policies
         if (MessageUtils.isRequestor(soapMessage)
-            && isEventInResults(WSSecurityEventConstants.NoSecurity, incomingSecurityEventList)) {
+            && incomingSecurityEventList.contains(WSSecurityEventConstants.NoSecurity)) {
             OperationSecurityEvent securityEvent = 
                 (OperationSecurityEvent)findEvent(
                     WSSecurityEventConstants.Operation, incomingSecurityEventList
@@ -87,15 +87,6 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
         assertAllSecurityAssertions(aim);
         assertAllAlgorithmSuites(SP11Constants.SP_NS, aim);
         assertAllAlgorithmSuites(SP12Constants.SP_NS, aim);
-    }
-    
-    private boolean isEventInResults(Event event, List<SecurityEvent> incomingSecurityEventList) {
-        for (SecurityEvent incomingEvent : incomingSecurityEventList) {
-            if (event == incomingEvent.getSecurityEventType()) {
-                return true;
-            }
-        }
-        return false;
     }
     
     private SecurityEvent findEvent(Event event, List<SecurityEvent> incomingSecurityEventList) {
@@ -126,7 +117,7 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
     private void assertAllAlgorithmSuites(String spNamespace, AssertionInfoMap aim) {
         Collection<AssertionInfo> sp11Ais = 
             aim.get(new QName(spNamespace, SPConstants.ALGORITHM_SUITE));
-        if (sp11Ais != null) {
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
             for (AssertionInfo ai : sp11Ais) {
                 ai.setAsserted(true);
                 AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
@@ -137,7 +128,7 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
                 }
                 Collection<AssertionInfo> algAis = 
                     aim.get(new QName(namespace, algorithmSuiteType.getName()));
-                if (algAis != null) {
+                if (algAis != null && !algAis.isEmpty()) {
                     for (AssertionInfo algAi : algAis) {
                         algAi.setAsserted(true);
                     }
