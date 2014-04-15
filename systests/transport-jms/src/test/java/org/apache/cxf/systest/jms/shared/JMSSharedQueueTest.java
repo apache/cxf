@@ -39,7 +39,6 @@ import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDStati
 import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -40,8 +40,6 @@ import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.DOMUtils;
 
-
-
 @WebServiceProvider(serviceName = "HelloWorldService", 
             portName = "HelloWorldPort",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",

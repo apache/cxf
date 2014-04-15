@@ -18,48 +18,53 @@
  */
 package org.apache.cxf.systest.jms.tx;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.jws.WebService;
+import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
 
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
+import org.junit.Assert;
 
+/**
+ * Service that throws an exception when called by BAD_GUY
+ */
 @WebService(endpointInterface = "org.apache.hello_world_doc_lit.Greeter")
 public class GreeterImplWithTransaction implements Greeter {
-    private AtomicBoolean flag = new AtomicBoolean(true);
-       
-    public String greetMe(String requestType) {
-        System.out.println("Reached here :" + requestType);
-        if ("Bad guy".equals(requestType)) {
-            if (flag.getAndSet(false)) {
-                //System.out.println("Throw exception here :" + requestType);
-                throw new RuntimeException("Got a bad guy call for greetMe");
-            } else {
-                requestType = "[Bad guy]";
-                flag.set(true);
-            }
+    public static final String BAD_GUY = "Bad guy";
+    public static final String GOOD_GUY = "Good guy";
+    
+    public String greetMe(String name) {
+        if (BAD_GUY.equals(name)) {
+            throw new RuntimeException("Got a bad guy call for greetMe");
         }
-        return "Hello " + requestType;
+        return "Hello " + name;
     }
 
     @Override
     public void greetMeOneWay(String name) {
-        if ("Bad guy".equals(name)) {
+        ConfiguredBeanLocator locator = BusFactory.getDefaultBus().getExtension(ConfiguredBeanLocator.class);
+        TransactionManager tm = locator.getBeansOfType(TransactionManager.class).iterator().next();
+        try {
+            Assert.assertNotNull("We should run inside a transaction", tm.getTransaction());
+        } catch (SystemException e) {
+            throw new RuntimeException(e.getMessage(), e); 
+        } 
+        if (BAD_GUY.equals(name)) {
             throw new RuntimeException("Got a bad guy call for greetMe");
         }
     }
 
     @Override
     public void pingMe() throws PingMeFault {
-        // TODO Auto-generated method stub
-        
+        throw new IllegalArgumentException("Not implemented");
     }
 
     @Override
     public String sayHi() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new IllegalArgumentException("Not implemented");
     }
     
 }

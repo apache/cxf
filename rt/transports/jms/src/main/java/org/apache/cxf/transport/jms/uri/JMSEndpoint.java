@@ -86,6 +86,7 @@ public class JMSEndpoint {
     private boolean sessionTransacted;
     private String conduitIdSelectorPrefix;
     private boolean useConduitIdSelector = true;
+    private String jndiTransactionManagerName;
 
     /**
      * @param uri
@@ -409,6 +410,14 @@ public class JMSEndpoint {
     public void setUseConduitIdSelector(boolean useConduitIdSelector) {
         this.useConduitIdSelector = useConduitIdSelector;
     }
+    
+    public String getJndiTransactionManagerName() {
+        return jndiTransactionManagerName;
+    }
+
+    public void setJndiTransactionManagerName(String jndiTransactionManagerName) {
+        this.jndiTransactionManagerName = jndiTransactionManagerName;
+    }
 
     public enum DeliveryModeType { PERSISTENT, NON_PERSISTENT };
     
@@ -435,4 +444,5 @@ public class JMSEndpoint {
             throw new IllegalArgumentException(v);
         }
     }
+    
 }

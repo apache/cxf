@@ -58,6 +58,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         transactionManager.begin();
                     }
                     Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
+
                     MessageConsumer consumer = closer.register(session.createConsumer(destination,
                                                                                       messageSelector));
                     Message message = consumer.receive(1000);

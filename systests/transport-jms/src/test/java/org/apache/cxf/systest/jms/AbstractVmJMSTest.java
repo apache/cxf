@@ -19,7 +19,7 @@
 package org.apache.cxf.systest.jms;
 
 import java.io.Closeable;
-import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +28,14 @@ import javax.jms.ConnectionFactory;
 import javax.xml.ws.Endpoint;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.RedeliveryPolicy;
+import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
-
 import org.junit.After;
 import org.junit.AfterClass;
 
@@ -50,18 +51,45 @@ public abstract class AbstractVmJMSTest {
     protected static Bus bus;
     protected static ConnectionFactoryFeature cff;
     protected static ConnectionFactory cf;
-    protected static EmbeddedJMSBrokerLauncher broker;
+    protected static BrokerService broker;
     private List<Object> closeableResources = new ArrayList<Object>();
 
     public static void startBusAndJMS(Class<?> testClass) {
-        bus = BusFactory.getDefaultBus();
         String brokerURI = "vm://" + testClass.getName() + "?broker.persistent=false&broker.useJmx=false";
-        broker = new EmbeddedJMSBrokerLauncher(brokerURI);
-        broker.setBrokerName(testClass.getName());
-        broker.run();
+        startBusAndJMS(brokerURI);
+        startBroker(brokerURI);
+    }
+    
+    public static void startBusAndJMS(String brokerURI) {
+        bus = BusFactory.getDefaultBus();
         ActiveMQConnectionFactory cf1 = new ActiveMQConnectionFactory(brokerURI);
+        RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
+        redeliveryPolicy.setMaximumRedeliveries(1);
+        redeliveryPolicy.setInitialRedeliveryDelay(1000);
+        cf1.setRedeliveryPolicy(redeliveryPolicy());
         cf = new PooledConnectionFactory(cf1);
         cff = new ConnectionFactoryFeature(cf);
+    }
+    
+    protected static RedeliveryPolicy redeliveryPolicy() {
+        RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
+        redeliveryPolicy.setMaximumRedeliveries(1);
+        redeliveryPolicy.setInitialRedeliveryDelay(1000);
+        return redeliveryPolicy;
+    }
+
+    public static void startBroker(String brokerURI) {
+        broker = new BrokerService();
+        broker.setPersistent(false);
+        try {
+            broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
+            broker.setTmpDataDirectory(new File("./target"));
+            broker.setUseJmx(false);
+            broker.addConnector(brokerURI);
+            broker.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
     
     public <T> T markForClose(T resource) {
@@ -75,7 +103,7 @@ public abstract class AbstractVmJMSTest {
             if (proxy instanceof Closeable) {
                 try {
                     ((Closeable)proxy).close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     // Ignore
                 }
             }
@@ -89,8 +117,10 @@ public abstract class AbstractVmJMSTest {
         bus = null;
         cf = null;
         cff = null;
-        broker.stop();
-        broker = null;
+        if (broker != null) {
+            broker.stop();
+            broker = null;
+        }
     }
     
     public URL getWSDLURL(String s) throws Exception {

@@ -86,12 +86,14 @@ public class JMSConfiguration {
     private boolean useConduitIdSelector = true;
     private String conduitSelectorPrefix;
     private boolean jmsProviderTibcoEms;
-    
+
     private TransactionManager transactionManager;
 
     // For jms spec. Do not configure manually
     private String targetService;
     private String requestURI;
+
+
 
     public void ensureProperlyConfigured() {
         ConnectionFactory cf = getConnectionFactory();
@@ -302,6 +304,10 @@ public class JMSConfiguration {
         this.sessionTransacted = sessionTransacted;
     }
 
+    /**
+     * For compatibility with old spring based code
+     * @param transactionManager
+     */
     @Deprecated
     public void setTransactionManager(Object transactionManager) {
     }
@@ -431,11 +437,11 @@ public class JMSConfiguration {
     }
 
     public TransactionManager getTransactionManager() {
-        return transactionManager;
+        return this.transactionManager;
     }
 
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
-    
+
 }

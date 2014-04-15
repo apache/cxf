@@ -186,4 +186,9 @@ public class JMSEndpointTest extends Assert {
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
     }
     
+    @Test
+    public void testTransactionManager() {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?jndiTransactionManagerName=test");
+        assertEquals("test", endpoint.getJndiTransactionManagerName());
+    }
 }

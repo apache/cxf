@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import java.util.Enumeration;
-
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -28,7 +26,6 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
-import javax.jms.QueueBrowser;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.transaction.TransactionManager;
@@ -38,7 +35,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.pool.XaPooledConnectionFactory;
-import org.apache.aries.transaction.internal.AriesTransactionManagerImpl;
+import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,9 +47,9 @@ public class MessageListenerTest {
 
     @Test
     public void testWithJTA() throws JMSException, XAException, InterruptedException {
-        TransactionManager transactionManager = new AriesTransactionManagerImpl();
+        TransactionManager transactionManager = new GeronimoTransactionManager();
         Connection connection = createXAConnection("brokerJTA", transactionManager);
-        Queue dest = createQueue(connection, "test");
+        Queue dest = JMSUtil.createQueue(connection, "test");
 
         MessageListener listenerHandler = new TestMessageListener();
         PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, dest,
@@ -72,7 +69,7 @@ public class MessageListenerTest {
     @Test
     public void testNoTransaction() throws JMSException, XAException, InterruptedException {
         Connection connection = createConnection("brokerNoTransaction");
-        Queue dest = createQueue(connection, "test");
+        Queue dest = JMSUtil.createQueue(connection, "test");
 
         MessageListener listenerHandler = new TestMessageListener();
         AbstractMessageListenerContainer container = new MessageListenerContainer(connection, dest,
@@ -97,7 +94,7 @@ public class MessageListenerTest {
     @Test
     public void testLocalTransaction() throws JMSException, XAException, InterruptedException {
         Connection connection = createConnection("brokerLocalTransaction");
-        Queue dest = createQueue(connection, "test");
+        Queue dest = JMSUtil.createQueue(connection, "test");
         MessageListener listenerHandler = new TestMessageListener();
         AbstractMessageListenerContainer container = new MessageListenerContainer(connection, dest, listenerHandler);
         container.setTransacted(true);
@@ -111,7 +108,7 @@ public class MessageListenerTest {
 
     private void testTransactionalBehaviour(Connection connection, Queue dest) throws JMSException,
         InterruptedException {
-        Queue dlq = createQueue(connection, "ActiveMQ.DLQ");
+        Queue dlq = JMSUtil.createQueue(connection, "ActiveMQ.DLQ");
         assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0);
         assertNumMessagesInQueue("At the start the DLQ should be empty", connection, dlq, 0, 0);
 
@@ -170,28 +167,13 @@ public class MessageListenerTest {
         long startTime = System.currentTimeMillis();
         int actualNum;
         do {
-            actualNum = getNumMessages(connection, queue);
+            actualNum = JMSUtil.getNumMessages(connection, queue);
             
             //System.out.println("Messages in queue " + queue.getQueueName() + ": " + actualNum
             //                   + ", expecting: " + expectedNum);
             Thread.sleep(100);
         } while ((System.currentTimeMillis() - startTime < timeout) && expectedNum != actualNum);
         Assert.assertEquals(message + " -> number of messages", expectedNum, actualNum);
-    }
-
-    private int getNumMessages(Connection connection, Queue queue) throws JMSException {
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        QueueBrowser browser = session.createBrowser(queue);
-        @SuppressWarnings("unchecked")
-        Enumeration<Message> messages = browser.getEnumeration();
-        int actualNum = 0;
-        while (messages.hasMoreElements()) {
-            actualNum++;
-            messages.nextElement();
-        }
-        browser.close();
-        session.close();
-        return actualNum;
     }
 
     private void sendMessage(Connection connection, Destination dest, String content) throws JMSException,
@@ -203,16 +185,6 @@ public class MessageListenerTest {
         prod.close();
         session.close();
         Thread.sleep(500); // Give receiver some time to process
-    }
-
-    private Queue createQueue(Connection connection, String name) throws JMSException {
-        Session session = null;
-        try {
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            return session.createQueue(name);
-        } finally {
-            session.close();
-        }
     }
 
     private static final class TestMessageListener implements MessageListener {

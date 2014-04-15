@@ -45,6 +45,7 @@ public class ResourceCloser implements Closeable {
         for (Object resource : resources) {
             close(resource);
         }
+        resources.clear();
     }
     
     public void close(Object ...resources2) {

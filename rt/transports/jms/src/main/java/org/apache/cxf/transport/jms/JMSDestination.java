@@ -39,6 +39,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -218,22 +219,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
 
-            if (inMessage.getExchange() != null && inMessage.getExchange().getInMessage() != null) {
-                inMessage = inMessage.getExchange().getInMessage();
+            if (inMessage.getExchange() != null) {
+                processExceptions(inMessage.getExchange());
             }
-
-            // need to propagate any exceptions back so transactions can occur
-            if (inMessage.getContent(Exception.class) != null) {
-                Exception ex = inMessage.getContent(Exception.class);
-                if (!(ex instanceof org.apache.cxf.interceptor.Fault)) {
-                    if (ex.getCause() instanceof RuntimeException) {
-                        throw (RuntimeException)ex.getCause();
-                    } else {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-
         } catch (SuspendedInvocationException ex) {
             getLogger().log(Level.FINE, "Request message has been suspended");
         } catch (UnsupportedEncodingException ex) {
@@ -246,6 +234,30 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             }
             if (origLoader != null) {
                 origLoader.reset();
+            }
+        }
+    }
+
+    /**
+     * Rethrow exceptions for one way exchanges so the jms transaction can be rolled back.
+     * Do not roll back for request/reply as client might expect a response
+     */
+    private void processExceptions(Exchange exchange) {
+        if (!exchange.isOneWay()) {
+
+            return;
+        }
+        Message inMessage = exchange.getInMessage();
+        if (inMessage == null) {
+            return;
+        }
+        Exception ex = inMessage.getContent(Exception.class);
+
+        if (ex != null) {
+            if (ex.getCause() instanceof RuntimeException) {
+                throw (RuntimeException)ex.getCause();
+            } else {
+                throw new RuntimeException(ex);
             }
         }
     }

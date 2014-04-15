@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.transport.jms;
 
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -27,6 +28,9 @@ import java.util.logging.Logger;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.transaction.TransactionManager;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
@@ -84,6 +88,10 @@ public final class JMSConfigFactory {
         jmsConfig.setConduitSelectorPrefix(endpoint.getConduitIdSelectorPrefix());
         jmsConfig.setUserName(endpoint.getUsername());
         jmsConfig.setPassword(endpoint.getPassword());
+
+        TransactionManager tm = getTransactionManager(bus, endpoint);
+        jmsConfig.setTransactionManager(tm);
+        
         if (endpoint.getJndiURL() != null) {
             // Configure Connection Factory using jndi
             jmsConfig.setJndiEnvironment(JMSConfigFactory.getInitialContextEnv(endpoint));
@@ -126,6 +134,28 @@ public final class JMSConfigFactory {
         return jmsConfig;
     }
 
+    private static TransactionManager getTransactionManager(Bus bus, JMSEndpoint endpoint) {
+        String tmName = endpoint.getJndiTransactionManagerName();
+        TransactionManager tm = null;
+        ConfiguredBeanLocator locator = bus.getExtension(ConfiguredBeanLocator.class);
+        if (tmName != null) {
+            if (locator != null) {
+                tm = locator.getBeanOfType(tmName, TransactionManager.class);
+            }
+            if (tm == null) {
+                tm = getTransactionManagerFromJndi(tmName);
+            }
+            
+        }
+        if (tm == null && locator != null) {
+            Collection<? extends TransactionManager> tms = locator.getBeansOfType(TransactionManager.class);
+            if (tms.size() == 1) {
+                tm = tms.iterator().next();
+            }
+        }
+        return tm;
+    }
+
     private static void setReplyDestination(JMSConfiguration jmsConfig, JMSEndpoint endpoint) {
         if (endpoint.getReplyToName() != null)  {
             jmsConfig.setReplyDestination(endpoint.getReplyToName());
@@ -157,4 +187,18 @@ public final class JMSConfigFactory {
         }
         return env;
     }
+    
+    private static TransactionManager getTransactionManagerFromJndi(String transactionManagerJndiName) {
+        if (transactionManagerJndiName == null) {
+            return null;
+        }
+        try {
+            InitialContext ictx = new InitialContext();
+            return (TransactionManager)ictx.lookup(transactionManagerJndiName);
+        } catch (NamingException e) {
+            throw new IllegalArgumentException("Transaction Manager " + transactionManagerJndiName 
+                                               + " not found in jndi");
+        }
+    }
+
 }

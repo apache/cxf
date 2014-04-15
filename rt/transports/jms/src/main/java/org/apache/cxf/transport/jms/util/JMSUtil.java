@@ -18,12 +18,17 @@
  */
 package org.apache.cxf.transport.jms.util;
 
+import java.util.Enumeration;
+
 import javax.jms.BytesMessage;
+import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.QueueBrowser;
 import javax.jms.Session;
 
 import org.apache.cxf.transport.jms.JMSConstants;
@@ -95,5 +100,28 @@ public final class JMSUtil {
         return message;
     }
     
-
+    public static Queue createQueue(Connection connection, String name) throws JMSException {
+        Session session = null;
+        try {
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            return session.createQueue(name);
+        } finally {
+            session.close();
+        }
+    }
+    
+    public static int getNumMessages(Connection connection, Queue queue) throws JMSException {
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        QueueBrowser browser = session.createBrowser(queue);
+        @SuppressWarnings("unchecked")
+        Enumeration<Message> messages = browser.getEnumeration();
+        int actualNum = 0;
+        while (messages.hasMoreElements()) {
+            actualNum++;
+            messages.nextElement();
+        }
+        browser.close();
+        session.close();
+        return actualNum;
+    }
 }

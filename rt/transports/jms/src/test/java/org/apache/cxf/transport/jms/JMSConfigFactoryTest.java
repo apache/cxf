@@ -19,10 +19,19 @@
 
 package org.apache.cxf.transport.jms;
 
+import javax.naming.NamingException;
+import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAException;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.jms.uri.JMSEndpoint;
+import org.apache.cxf.transport.jms.uri.MyBeanLocator;
+import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.junit.Assert;
 import org.junit.Test;
-
 
 public class JMSConfigFactoryTest extends AbstractJMSTester {
 
@@ -30,7 +39,44 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
     public void testUsernameAndPassword() throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldService", "HelloWorldPort");
         JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, target);
-        Assert.assertEquals("User name does not match." , "testUser", config.getUserName());
-        Assert.assertEquals("Password does not match." , "testPassword", config.getPassword());
+        Assert.assertEquals("User name does not match.", "testUser", config.getUserName());
+        Assert.assertEquals("Password does not match.", "testPassword", config.getPassword());
+    }
+
+    @Test
+    public void testTransactionManagerFromBus() throws XAException, NamingException {
+        Bus bus = BusFactory.newInstance().createBus();
+        ConfiguredBeanLocator cbl = bus.getExtension(ConfiguredBeanLocator.class);
+        MyBeanLocator mybl = new MyBeanLocator(cbl);
+        bus.setExtension(mybl, ConfiguredBeanLocator.class);
+
+        TransactionManager tmExpected = new GeronimoTransactionManager();
+        mybl.register("tm", tmExpected);
+        tmByName(bus, tmExpected);
+        tmByClass(bus, tmExpected);
+    }
+
+    private void tmByName(Bus bus, TransactionManager tmExpected) {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?jndiTransactionManagerName=tm");
+        Assert.assertEquals("tm", endpoint.getJndiTransactionManagerName());
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpoint(bus, endpoint);
+        TransactionManager tm = jmsConfig.getTransactionManager();
+        Assert.assertEquals(tmExpected, tm);
+    }
+    
+    private void tmByClass(Bus bus, TransactionManager tmExpected) {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar");
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpoint(bus, endpoint);
+        TransactionManager tm = jmsConfig.getTransactionManager();
+        Assert.assertEquals(tmExpected, tm);
+    }
+
+
+    @Test
+    public void testTransactionManagerFromJndi() throws XAException, NamingException {
+        JMSEndpoint endpoint = 
+            new JMSEndpoint("jms:queue:Foo.Bar?jndiTransactionManagerName=java:/comp/TransactionManager");
+        Assert.assertEquals("java:/comp/TransactionManager", endpoint.getJndiTransactionManagerName());
+        // TODO Check JNDI lookup
     }
 }
