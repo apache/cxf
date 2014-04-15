@@ -20,6 +20,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -85,8 +86,6 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
         }
         
         assertAllSecurityAssertions(aim);
-        assertAllAlgorithmSuites(SP11Constants.SP_NS, aim);
-        assertAllAlgorithmSuites(SP12Constants.SP_NS, aim);
     }
     
     private SecurityEvent findEvent(Event event, List<SecurityEvent> incomingSecurityEventList) {
@@ -99,33 +98,35 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
     }
     
     private void assertAllSecurityAssertions(AssertionInfoMap aim) {
-        for (QName key : aim.keySet()) {
-            if (SP11Constants.SP_NS.equals(key.getNamespaceURI())
-                || SP12Constants.SP_NS.equals(key.getNamespaceURI())
-                || SP13Constants.SP_NS.equals(key.getNamespaceURI())) {
-                Collection<AssertionInfo> ais = aim.get(key);
+        for (Map.Entry<QName, Collection<AssertionInfo>> entry : aim.entrySet()) {
+            String namespace = entry.getKey().getNamespaceURI();
+            if (SP11Constants.SP_NS.equals(namespace) || SP12Constants.SP_NS.equals(namespace)
+                || SP13Constants.SP_NS.equals(namespace)) {
+                Collection<AssertionInfo> ais = entry.getValue();
                 if (ais != null && !ais.isEmpty()) {
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
+                    if (SPConstants.ALGORITHM_SUITE.equals(entry.getKey().getLocalPart())) {
+                        assertAlgorithmSuites(ais, aim);
+                    } else {
+                        for (AssertionInfo ai : ais) {
+                            ai.setAsserted(true);
+                        }
                     }
                 }
             }
         }
-        
     }
     
-    private void assertAllAlgorithmSuites(String spNamespace, AssertionInfoMap aim) {
-        Collection<AssertionInfo> sp11Ais = 
-            aim.get(new QName(spNamespace, SPConstants.ALGORITHM_SUITE));
-        if (sp11Ais != null && !sp11Ais.isEmpty()) {
-            for (AssertionInfo ai : sp11Ais) {
-                ai.setAsserted(true);
-                AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
-                AlgorithmSuiteType algorithmSuiteType = algorithmSuite.getAlgorithmSuiteType();
-                String namespace = algorithmSuiteType.getNamespace();
-                if (namespace == null) {
-                    namespace = spNamespace;
-                }
+    // Handle these separately for custom AlgorithmSuites
+    private void assertAlgorithmSuites(
+        Collection<AssertionInfo> ais, AssertionInfoMap aim
+    ) {
+        for (AssertionInfo ai : ais) {
+            ai.setAsserted(true);
+            AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
+       
+            AlgorithmSuiteType algorithmSuiteType = algorithmSuite.getAlgorithmSuiteType();
+            String namespace = algorithmSuiteType.getNamespace();
+            if (namespace != null && !namespace.equals(algorithmSuite.getName().getNamespaceURI())) {
                 Collection<AssertionInfo> algAis = 
                     aim.get(new QName(namespace, algorithmSuiteType.getName()));
                 if (algAis != null && !algAis.isEmpty()) {
