@@ -52,7 +52,7 @@ import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
+import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 public class WebFaultOutInterceptor extends FaultOutInterceptor {
 

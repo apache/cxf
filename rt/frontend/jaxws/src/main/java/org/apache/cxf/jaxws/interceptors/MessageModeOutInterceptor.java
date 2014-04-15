@@ -71,7 +71,7 @@ import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
+import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message> {
     MessageModeOutInterceptorInternal internal;
