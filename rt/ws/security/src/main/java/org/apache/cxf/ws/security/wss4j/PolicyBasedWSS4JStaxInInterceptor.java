@@ -47,7 +47,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
@@ -112,16 +111,13 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
         
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
-            message.put("RefId-" + signCrypto.hashCode(), signCrypto);
+            securityProperties.setDecryptionCrypto(signCrypto);
         }
         
         if (encrCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
-            message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
+            securityProperties.setSignatureVerificationCrypto(encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
-            message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
+            securityProperties.setSignatureVerificationCrypto(signCrypto);
         }
     }
     
@@ -171,16 +167,13 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
 
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
-            message.put("RefId-" + signCrypto.hashCode(), signCrypto);
+            securityProperties.setDecryptionCrypto(signCrypto);
         }
 
         if (encrCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
-            message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
+            securityProperties.setSignatureVerificationCrypto(encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
-            message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
+            securityProperties.setSignatureVerificationCrypto(signCrypto);
         }
     }
 
@@ -228,8 +221,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 crypto = signCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + crypto.hashCode());
-                message.put("RefId-" + crypto.hashCode(), crypto);
+                securityProperties.setSignatureCrypto(crypto);
             }
             
             crypto = signCrypto;
@@ -237,8 +229,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 crypto = encrCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + crypto.hashCode());
-                message.put("RefId-" + crypto.hashCode(), crypto);
+                securityProperties.setDecryptionCrypto(crypto);
             }
         } else {
             Crypto crypto = signCrypto;
@@ -246,8 +237,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 crypto = encrCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + crypto.hashCode());
-                message.put("RefId-" + crypto.hashCode(), crypto);
+                securityProperties.setSignatureVerificationCrypto(crypto);
             }
             
             crypto = encrCrypto;
@@ -255,8 +245,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 crypto = signCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + crypto.hashCode());
-                message.put("RefId-" + crypto.hashCode(), crypto);
+                securityProperties.setDecryptionCrypto(crypto);
             }
         }
     }

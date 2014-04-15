@@ -207,23 +207,22 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         SoapMessage msg, OutboundSecurityContext outboundSecurityContext,
         WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        Map<String, Object> config = getProperties();
+        String user = (String)msg.getContextualProperty(SecurityConstants.USERNAME);
+        if (user != null) {
+            securityProperties.setTokenUser(user);
+        }
+        String sigUser = (String)msg.getContextualProperty(SecurityConstants.SIGNATURE_USERNAME);
+        if (sigUser != null) {
+            securityProperties.setSignatureUser(sigUser);
+        }
+        String encUser = (String)msg.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
+        if (encUser != null) {
+            securityProperties.setEncryptionUser(encUser);
+        }
         
         // Crypto loading only applies for Map
-        if (config != null) {
-            String user = (String)msg.getContextualProperty(SecurityConstants.USERNAME);
-            if (user != null) {
-                securityProperties.setTokenUser(user);
-            }
-            String sigUser = (String)msg.getContextualProperty(SecurityConstants.SIGNATURE_USERNAME);
-            if (sigUser != null) {
-                securityProperties.setSignatureUser(sigUser);
-            }
-            String encUser = (String)msg.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
-            if (encUser != null) {
-                securityProperties.setEncryptionUser(encUser);
-            }
-            
+        Map<String, Object> config = getProperties();
+        if (config != null && !config.isEmpty()) {
             Crypto sigCrypto = 
                 loadCrypto(
                     msg,
@@ -256,13 +255,27 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 }
             }
             ConfigurationConverter.parseCrypto(config, securityProperties);
+        } else {
+            Crypto sigCrypto = securityProperties.getSignatureCrypto();
+            if (sigCrypto != null && sigUser == null 
+                && sigCrypto.getDefaultX509Identifier() != null) {
+                // Fall back to default identifier
+                securityProperties.setSignatureUser(sigCrypto.getDefaultX509Identifier());
+            }
             
-            if (securityProperties.getSignatureUser() == null && user != null) {
-                securityProperties.setSignatureUser(user);
+            Crypto encrCrypto = securityProperties.getEncryptionCrypto();
+            if (encrCrypto != null && encUser == null 
+                && encrCrypto.getDefaultX509Identifier() != null) {
+                // Fall back to default identifier
+                securityProperties.setEncryptionUser(encrCrypto.getDefaultX509Identifier());
             }
-            if (securityProperties.getEncryptionUser() == null && user != null) {
-                securityProperties.setEncryptionUser(user);
-            }
+        }
+        
+        if (securityProperties.getSignatureUser() == null && user != null) {
+            securityProperties.setSignatureUser(user);
+        }
+        if (securityProperties.getEncryptionUser() == null && user != null) {
+            securityProperties.setEncryptionUser(user);
         }
     }
     

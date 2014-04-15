@@ -236,7 +236,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         
         // Crypto loading only applies for Map
         Map<String, Object> config = getProperties();
-        if (config != null) {
+        if (config != null && !config.isEmpty()) {
             Crypto sigVerCrypto = 
                 loadCrypto(
                     msg,
