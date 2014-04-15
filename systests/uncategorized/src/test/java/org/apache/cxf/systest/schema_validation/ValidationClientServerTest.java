@@ -61,9 +61,37 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         assertTrue("server did not launch correctly", launchServer(ValidationServer.class, true));
     }
 
-    // TODO : Change this test so that we test the combinations of
-    // client and server with schema validation enabled/disabled...
-    // Only tests client side validation enabled/server side disabled.
+    @Test
+    public void testSchemaValidationProviderPayload() throws Exception {
+        doProviderTest("PProvider");
+    }
+    @Test
+    public void testSchemaValidationProviderMessage() throws Exception {
+        doProviderTest("MProvider");
+    }
+    private void doProviderTest(String postfix) throws Exception {
+        SchemaValidation validation = createService(Boolean.FALSE, postfix);
+        SomeRequest req = new SomeRequest();
+        req.setId("9999999999");
+        try {
+            validation.doSomething(req);
+            fail("Should have faulted");
+        } catch (DoSomethingFault e) {
+            assertEquals("1234", e.getFaultInfo().getErrorCode());
+        }
+        req.setId("8888888888");
+        try {
+            validation.doSomething(req);
+            fail("Should have faulted");
+        } catch (DoSomethingFault e) {
+            fail("Should not have happened");
+        } catch (WebServiceException e) {
+            String expected = "Value '1' is not facet-valid";
+            assertTrue(e.getMessage().indexOf(expected) != -1);
+        }
+        ((java.io.Closeable)validation).close();
+    }
+    
     @Test
     public void testSchemaValidationServer() throws Exception {
         SchemaValidation validation = createService(Boolean.FALSE, "SoapPortValidate");
