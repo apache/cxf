@@ -529,6 +529,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                             }
                         }
                         EndpointInfo ei = service.getEndpointInfo(endpointName);
+                        if (location != null) {
+                            ei.setAddress(location);
+                        }
                         Endpoint endpoint = new EndpointImpl(bus, service, ei);
                         client = new ClientImpl(bus, endpoint);
                     }
