@@ -94,6 +94,7 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class InjectionUtils {
     
@@ -106,6 +107,8 @@ public final class InjectionUtils {
     private static final String HTTP_SERVLET_RESPONSE_CLASS_NAME = "javax.servlet.http.HttpServletResponse";
         
     private static final String PARAM_HANDLERS_FIRST = "check.parameter.handlers.first";
+    private static final String ENUM_CONVERSION_CASE_SENSITIVE = "enum.conversion.case.sensitive";    
+    
     private static final String IGNORE_MATRIX_PARAMETERS = "ignore.matrix.parameters";
     
     private InjectionUtils() {
@@ -1246,20 +1249,17 @@ public final class InjectionUtils {
             } 
         }
     }
-    
-    public static <T> Object convertStringToPrimitive(String value, Class<?> cls) {
+    public static Object convertStringToPrimitive(String value, Class<?> cls) {
         if (String.class == cls) {
             return value;
-        }
-        if (cls.isPrimitive()) {
+        } else if (cls.isPrimitive()) {
             return PrimitiveUtils.read(value, cls);
         } else if (cls.isEnum()) {
-            try {
-                Method m  = cls.getMethod("valueOf", new Class[]{String.class});
-                return m.invoke(null, value.toUpperCase());
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            if (m == null || !MessageUtils.getContextualBoolean(m, ENUM_CONVERSION_CASE_SENSITIVE, false)) {
+                value = value.toUpperCase();
             }
+            return invokeValueOf(value, cls);
         } else {
             try {
                 Constructor<?> c = cls.getConstructor(new Class<?>[]{String.class});
@@ -1267,12 +1267,16 @@ public final class InjectionUtils {
             } catch (Throwable ex) {
                 // try valueOf
             }
-            try {
-                Method m = cls.getMethod("valueOf", new Class[]{String.class});
-                return cls.cast(m.invoke(null, value));
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+            return invokeValueOf(value, cls);
+        }
+    }
+    
+    private static Object invokeValueOf(String value, Class<?> cls) {
+        try {
+            Method m  = cls.getMethod("valueOf", new Class[]{String.class});
+            return m.invoke(null, value);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
     
