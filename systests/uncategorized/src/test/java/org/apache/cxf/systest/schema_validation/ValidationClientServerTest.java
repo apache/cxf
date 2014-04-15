@@ -33,8 +33,8 @@ import javax.xml.ws.Service.Mode;
 import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
-import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.schema_validation.DoSomethingFault;
@@ -332,7 +332,7 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         
         ((BindingProvider)validation).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, validationConfig);
         ((BindingProvider)validation).getResponseContext().put(Message.SCHEMA_VALIDATION_ENABLED, validationConfig);
-        new LoggingFeature().initialize((Client)validation, getBus());
+        new LoggingFeature().initialize(ClientProxy.getClient(validation), getBus());
         return validation;
     }
 }
