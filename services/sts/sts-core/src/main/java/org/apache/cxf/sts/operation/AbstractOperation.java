@@ -428,7 +428,7 @@ public abstract class AbstractOperation {
     /**
      * Extract an address from an AppliesTo DOM element
      */
-    protected static String extractAddressFromAppliesTo(Element appliesTo) {
+    protected String extractAddressFromAppliesTo(Element appliesTo) {
         LOG.fine("Parsing AppliesTo element");
         if (appliesTo != null) {
             Element endpointRef = 
@@ -443,6 +443,15 @@ public abstract class AbstractOperation {
                 if (address != null) {
                     LOG.fine("Found address element");
                     return address.getTextContent();
+                }
+            } else if (appliesTo.getNamespaceURI() != null) {
+                Element uri = 
+                    DOMUtils.getFirstChildWithName(
+                        appliesTo, appliesTo.getNamespaceURI(), "URI"
+                    );
+                if (uri != null) {
+                    LOG.fine("Found URI element");
+                    return uri.getTextContent();
                 }
             }
         }
