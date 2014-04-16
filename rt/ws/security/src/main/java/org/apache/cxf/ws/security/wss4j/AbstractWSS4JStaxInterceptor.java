@@ -208,6 +208,8 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                 synchronized (info) {
                     info.setProperty(SecurityConstants.CALLBACK_HANDLER, o);
                 }
+                soapMessage.getExchange().get(Endpoint.class).put(SecurityConstants.CALLBACK_HANDLER, o);
+                soapMessage.getExchange().put(SecurityConstants.CALLBACK_HANDLER, o);
             }
         }            
         
