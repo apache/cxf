@@ -87,9 +87,8 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     private void checkAsymmetricBinding(
         AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (ais.isEmpty()) {
+        AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (ais == null) {
             return;
         }
         
@@ -125,9 +124,10 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws XMLSecurityException {
         boolean transportPolicyInEffect = 
-            !getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING).isEmpty();
-        if (!transportPolicyInEffect && !(getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING).isEmpty()
-            && getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING).isEmpty())) {
+            getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING) != null;
+        if (!transportPolicyInEffect 
+            && !(getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING) == null
+                && getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING) == null)) {
             return;
         }
         
@@ -192,9 +192,8 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     private void checkSymmetricBinding(
         AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (ais.isEmpty()) {
+        AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (ais == null) {
             return;
         }
         
@@ -283,10 +282,8 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     protected boolean isNonceCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
-                getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
-            
-            if (!ais.isEmpty()) {
+            AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.USERNAME_TOKEN);
+            if (ais != null) {
                 return true;
             }
         }
@@ -301,10 +298,8 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     protected boolean isTimestampCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
-                getAllAssertionsByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
-            
-            if (!ais.isEmpty()) {
+            AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
+            if (ais != null) {
                 return true;
             }
         }
@@ -319,10 +314,8 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     protected boolean isSamlCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
-                getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
-            
-            if (!ais.isEmpty()) {
+            AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.SAML_TOKEN);
+            if (ais != null) {
                 return true;
             }
         }

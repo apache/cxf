@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j;
 
-import java.util.Collection;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
@@ -62,7 +60,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     }
     
     private void checkAsymmetricBinding(
-        AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
+        SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
         if (s == null) {
@@ -93,7 +91,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     }
     
     private void checkTransportBinding(
-        AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
+        SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
         if (s == null) {
@@ -124,7 +122,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     }
     
     private void checkSymmetricBinding(
-        AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
+        SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
         if (s == null) {
@@ -185,36 +183,33 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     ) throws WSSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         
-        Collection<AssertionInfo> asymAis = 
-            getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (!asymAis.isEmpty()) {
-            checkAsymmetricBinding(aim, msg, securityProperties);
+        AssertionInfo asymAis = getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (asymAis != null) {
+            checkAsymmetricBinding(msg, securityProperties);
         }
         
-        Collection<AssertionInfo> symAis = 
-            getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (!symAis.isEmpty()) {
-            checkSymmetricBinding(aim, msg, securityProperties);
+        AssertionInfo symAis = getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (symAis != null) {
+            checkSymmetricBinding(msg, securityProperties);
         }
         
-        Collection<AssertionInfo> transAis = 
-            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (!transAis.isEmpty()) {
-            checkTransportBinding(aim, msg, securityProperties);
+        AssertionInfo transAis = getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (transAis != null) {
+            checkTransportBinding(msg, securityProperties);
         }
         
         super.configureProperties(msg, outboundSecurityContext, securityProperties);
         
-        if (!transAis.isEmpty()) {
-            TransportBinding binding = (TransportBinding)transAis.iterator().next().getAssertion();
+        if (transAis != null) {
+            TransportBinding binding = (TransportBinding)transAis.getAssertion();
             new StaxTransportBindingHandler(
                 securityProperties, msg, binding, outboundSecurityContext).handleBinding();
-        } else if (!asymAis.isEmpty()) {
-            AsymmetricBinding binding = (AsymmetricBinding)asymAis.iterator().next().getAssertion();
+        } else if (asymAis != null) {
+            AsymmetricBinding binding = (AsymmetricBinding)asymAis.getAssertion();
             new StaxAsymmetricBindingHandler(
                 securityProperties, msg, binding, outboundSecurityContext).handleBinding();
-        } else if (!symAis.isEmpty()) {
-            SymmetricBinding binding = (SymmetricBinding)symAis.iterator().next().getAssertion();
+        } else if (symAis != null) {
+            SymmetricBinding binding = (SymmetricBinding)symAis.getAssertion();
             new StaxSymmetricBindingHandler(
                 securityProperties, msg, binding, outboundSecurityContext).handleBinding();
         } else {

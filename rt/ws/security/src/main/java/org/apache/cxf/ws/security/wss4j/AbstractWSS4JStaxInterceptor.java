@@ -24,7 +24,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -440,24 +439,20 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         return null;
     }
     
-    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
+    protected AssertionInfo getFirstAssertionByLocalname(
         AssertionInfoMap aim, String localname
     ) {
         Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            return sp11Ais.iterator().next();
+        }
+        
         Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-
-        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
-            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
-            if (sp11Ais != null) {
-                ais.addAll(sp11Ais);
-            }
-            if (sp12Ais != null) {
-                ais.addAll(sp12Ais);
-            }
-            return ais;
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            return sp12Ais.iterator().next();
         }
 
-        return Collections.emptySet();
+        return null;
     }
     
     private static Properties getProps(Object o, URL propsURL, SoapMessage message) {
@@ -503,10 +498,11 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     protected Crypto getEncryptionCrypto(
             Object e, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        Crypto encrCrypto = null;
-        if (e instanceof Crypto) {
-            encrCrypto = (Crypto)e;
-        } else if (e != null) {
+        if (e == null) {
+            return null;
+        } else if (e instanceof Crypto) {
+            return (Crypto)e;
+        } else {
             URL propsURL = getPropertiesFileURL(e, message);
             Properties props = getProps(e, propsURL, message);
             if (props == null) {
@@ -515,7 +511,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
             }
 
-            encrCrypto = CryptoFactory.getInstance(props,
+            Crypto encrCrypto = CryptoFactory.getInstance(props,
                     Loader.getClassLoader(CryptoFactory.class),
                     getPasswordEncryptor(message, securityProperties));
 
@@ -523,17 +519,18 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             synchronized (info) {
                 info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
             }
+            return encrCrypto;
         }
-        return encrCrypto;
     }
         
     protected Crypto getSignatureCrypto(
         Object s, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        Crypto signCrypto = null;
-        if (s instanceof Crypto) {
-            signCrypto = (Crypto)s;
-        } else if (s != null) {
+        if (s == null) {
+            return null;
+        } else if (s instanceof Crypto) {
+            return (Crypto)s;
+        } else {
             URL propsURL = getPropertiesFileURL(s, message);
             Properties props = getProps(s, propsURL, message);
             if (props == null) {
@@ -542,7 +539,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
             }
 
-            signCrypto = CryptoFactory.getInstance(props,
+            Crypto signCrypto = CryptoFactory.getInstance(props,
                     Loader.getClassLoader(CryptoFactory.class),
                     getPasswordEncryptor(message, securityProperties));
 
@@ -550,8 +547,8 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             synchronized (info) {
                 info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
             }
+            return signCrypto;
         }
-        return signCrypto;
     }
 
     private ClassLoader getClassLoader() {

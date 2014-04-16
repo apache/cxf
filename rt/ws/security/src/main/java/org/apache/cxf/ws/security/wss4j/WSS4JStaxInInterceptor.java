@@ -386,6 +386,9 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     
     private Validator loadValidator(String validatorKey, SoapMessage message) throws WSSecurityException {
         Object o = message.getContextualProperty(validatorKey);
+        if (o == null) {
+            return null;
+        }
         try {
             if (o instanceof Validator) {
                 return (Validator)o;
@@ -395,7 +398,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 return (Validator)ClassLoaderUtils.loadClass(o.toString(),
                                                              WSS4JStaxInInterceptor.class)
                                                              .newInstance();
-            } else if (o != null) {
+            } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
                                                   "Cannot load Validator: " + o);
             }
@@ -404,8 +407,6 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
-        
-        return null;
     }
 
     private class TokenStoreCallbackHandler implements CallbackHandler {
