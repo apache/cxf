@@ -429,7 +429,7 @@ public abstract class AbstractOperation {
     /**
      * Extract an address from an AppliesTo DOM element
      */
-    protected String extractAddressFromAppliesTo(Element appliesTo) {
+    protected static String extractAddressFromAppliesTo(Element appliesTo) {
         LOG.fine("Parsing AppliesTo element");
         if (appliesTo != null) {
             Element endpointRef = 
