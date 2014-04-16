@@ -397,12 +397,12 @@ public final class ProviderFactory {
         
     @SuppressWarnings("unchecked")
     public <T extends Throwable> ResponseExceptionMapper<T> createResponseExceptionMapper(
-                                 Class<?> paramType) {
+                                 Message m, Class<?> paramType) {
         
         List<ResponseExceptionMapper<?>> candidates = new LinkedList<ResponseExceptionMapper<?>>();
         
         for (ProviderInfo<ResponseExceptionMapper<?>> em : responseExceptionMappers) {
-            handleMapper(candidates, em, paramType, null, ResponseExceptionMapper.class, true);
+            handleMapper(candidates, em, paramType, m, ResponseExceptionMapper.class, true);
         }
         if (candidates.size() == 0) {
             return null;

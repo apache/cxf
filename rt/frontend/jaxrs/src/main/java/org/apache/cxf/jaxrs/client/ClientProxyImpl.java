@@ -326,7 +326,7 @@ public class ClientProxyImpl extends AbstractClient implements
     
     private static ResponseExceptionMapper<?> findExceptionMapper(Message message, Class<?> exType) {
         ProviderFactory pf = ProviderFactory.getInstance(message);
-        return pf.createResponseExceptionMapper(exType);
+        return pf.createResponseExceptionMapper(message, exType);
     }
     
     private MultivaluedMap<String, String> setRequestHeaders(MultivaluedMap<String, String> headers,          
