@@ -21,13 +21,28 @@ package org.apache.cxf.jaxrs.validation;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.validation.BeanValidationInInterceptor;
+import org.apache.cxf.validation.BeanValidationOutInterceptor;
+import org.apache.cxf.validation.BeanValidationProvider;
 
 
 public class JAXRSBeanValidationFeature extends AbstractFeature {
 
+    private BeanValidationProvider validationProvider;
+    
     @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(new JAXRSBeanValidationInInterceptor());
-        provider.getOutInterceptors().add(new JAXRSBeanValidationOutInterceptor());
+    protected void initializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
+        BeanValidationInInterceptor in = new JAXRSBeanValidationInInterceptor();
+        BeanValidationOutInterceptor out = new JAXRSBeanValidationOutInterceptor();
+        if (validationProvider != null) {
+            in.setProvider(validationProvider);
+            out.setProvider(validationProvider);
+        }
+        interceptorProvider.getInInterceptors().add(in);
+        interceptorProvider.getOutInterceptors().add(out);
+    }
+
+    public void setProvider(BeanValidationProvider provider) {
+        this.validationProvider = provider;
     }
 }

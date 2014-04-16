@@ -25,9 +25,21 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 
 public class BeanValidationFeature extends AbstractFeature {
 
+    private BeanValidationProvider validationProvider;
+    
     @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(new BeanValidationInInterceptor());
-        provider.getOutInterceptors().add(new BeanValidationOutInterceptor());
+    protected void initializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
+        BeanValidationInInterceptor in = new BeanValidationInInterceptor();
+        BeanValidationOutInterceptor out = new BeanValidationOutInterceptor();
+        if (validationProvider != null) {
+            in.setProvider(validationProvider);
+            out.setProvider(validationProvider);
+        }
+        interceptorProvider.getInInterceptors().add(in);
+        interceptorProvider.getOutInterceptors().add(out);
+    }
+
+    public void setProvider(BeanValidationProvider provider) {
+        this.validationProvider = provider;
     }
 }
