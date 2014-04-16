@@ -36,6 +36,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -61,7 +62,13 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
     public static void start() throws Exception {
         Bus b = createStaticBus();
         b.setProperty(AsyncHTTPConduit.USE_ASYNC, AsyncHTTPConduitFactory.UseAsyncPolicy.ALWAYS);
+        b.setProperty("org.apache.cxf.transport.http.async.MAX_CONNECTIONS", 501);
+        
         BusFactory.setThreadDefaultBus(b);
+        
+        AsyncHTTPConduitFactory hcf = (AsyncHTTPConduitFactory)b.getExtension(HTTPConduitFactory.class);
+        assertEquals(501, hcf.maxConnections);
+        
         ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
                               new org.apache.hello_world_soap_http.GreeterImpl() {
                 public String greetMeLater(long cnt) {
