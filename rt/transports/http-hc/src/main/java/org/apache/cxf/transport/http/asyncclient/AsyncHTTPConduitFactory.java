@@ -24,8 +24,6 @@ import java.io.InterruptedIOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
@@ -85,7 +83,7 @@ import org.apache.http.protocol.RequestUserAgent;
 /**
  * 
  */
-@NoJSR250Annotations(unlessNull = "bus")
+@NoJSR250Annotations
 public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     
     //TCP related properties
@@ -277,11 +275,6 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
             return null;
         }
         return new AsyncHTTPConduit(f.getBus(), localInfo, target, this);
-    }
-
-    @Resource 
-    public void setBus(Bus b) {
-        addListener(b);
     }
 
     public void shutdown() {
