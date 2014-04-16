@@ -86,8 +86,7 @@ import org.apache.http.protocol.RequestUserAgent;
  * 
  */
 @NoJSR250Annotations(unlessNull = "bus")
-public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPConduitFactory {
-
+public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     
     //TCP related properties
     public static final String TCP_NODELAY = "org.apache.cxf.transport.http.async.TCP_NODELAY";
@@ -284,14 +283,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     public void setBus(Bus b) {
         addListener(b);
     }
-    public void initComplete() {
-    }
-    public synchronized void preShutdown() {
-        shutdown();
-    }
-    public void postShutdown() {
-    }    
-    
+
     public void shutdown() {
         if (ioReactor != null) {
             shutdown(ioReactor, connectionManager);
@@ -317,7 +309,15 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
 
 
     private void addListener(Bus b) {
-        b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
+        b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(new BusLifeCycleListener() {
+            public void initComplete() {
+            }
+            public void preShutdown() {
+                shutdown();
+            }
+            public void postShutdown() {
+            }
+        });
     }
     
     
