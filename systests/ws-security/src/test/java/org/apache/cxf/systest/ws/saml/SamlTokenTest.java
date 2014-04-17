@@ -20,14 +20,9 @@
 package org.apache.cxf.systest.ws.saml;
 
 import java.net.URL;
-<<<<<<< HEAD
-=======
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
->>>>>>> 6d27230... [CXF-5674] - CXF Support in "Audience Restriction" of SAML 2 (SOAP)
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -45,17 +40,10 @@ import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
-<<<<<<< HEAD
+import org.apache.ws.security.saml.ext.bean.AudienceRestrictionBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-=======
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
->>>>>>> 6d27230... [CXF-5674] - CXF Support in "Audience Restriction" of SAML 2 (SOAP)
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -834,14 +822,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
-<<<<<<< HEAD
-=======
     
     @org.junit.Test
     public void testAudienceRestriction() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -852,18 +838,14 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort2");
         DoubleItPortType saml2Port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        String portNumber = PORT2;
-        if (STAX_PORT.equals(test.getPort())) {
-            portNumber = STAX_PORT2;
-        }
-        updateAddressPort(saml2Port, portNumber);
+        updateAddressPort(saml2Port, PORT2);
 
         // Create a SAML Token with an AudienceRestrictionCondition
         ConditionsBean conditions = new ConditionsBean();
         List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<AudienceRestrictionBean>();
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList(
-            "https://localhost:" + portNumber + "/DoubleItSaml2Transport2"));
+            "https://localhost:" + PORT2 + "/DoubleItSaml2Transport2"));
         audienceRestrictions.add(audienceRestriction);
         conditions.setAudienceRestrictions(audienceRestrictions);
         
@@ -879,7 +861,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             // Now use an "unknown" audience restriction
             audienceRestriction = new AudienceRestrictionBean();
             audienceRestriction.setAudienceURIs(Collections.singletonList(
-                "https://localhost:" + portNumber + "/DoubleItSaml2Transport2unknown"));
+                "https://localhost:" + PORT2 + "/DoubleItSaml2Transport2unknown"));
             audienceRestrictions.clear();
             audienceRestrictions.add(audienceRestriction);
             conditions.setAudienceRestrictions(audienceRestrictions);
@@ -892,5 +874,4 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
     }
     
->>>>>>> 6d27230... [CXF-5674] - CXF Support in "Audience Restriction" of SAML 2 (SOAP)
 }
