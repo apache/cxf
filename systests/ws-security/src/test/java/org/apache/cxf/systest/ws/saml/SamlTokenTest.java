@@ -20,8 +20,11 @@
 package org.apache.cxf.systest.ws.saml;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -39,6 +42,7 @@ import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
@@ -994,6 +998,61 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testAudienceRestriction() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort2");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(saml2Port, portNumber);
+
+        // Create a SAML Token with an AudienceRestrictionCondition
+        ConditionsBean conditions = new ConditionsBean();
+        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<AudienceRestrictionBean>();
+        AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+        audienceRestriction.setAudienceURIs(Collections.singletonList(
+            "https://localhost:" + portNumber + "/DoubleItSaml2Transport2"));
+        audienceRestrictions.add(audienceRestriction);
+        conditions.setAudienceRestrictions(audienceRestrictions);
+        
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setConditions(conditions);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", callbackHandler
+        );
+        
+        saml2Port.doubleIt(25);
+        
+        try {
+            // Now use an "unknown" audience restriction
+            audienceRestriction = new AudienceRestrictionBean();
+            audienceRestriction.setAudienceURIs(Collections.singletonList(
+                "https://localhost:" + portNumber + "/DoubleItSaml2Transport2unknown"));
+            audienceRestrictions.clear();
+            audienceRestrictions.add(audienceRestriction);
+            conditions.setAudienceRestrictions(audienceRestrictions);
+            callbackHandler.setConditions(conditions);
+            
+            saml2Port.doubleIt(25);
+            fail("Failure expected on unknown AudienceRestriction");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
     }
     
 }
