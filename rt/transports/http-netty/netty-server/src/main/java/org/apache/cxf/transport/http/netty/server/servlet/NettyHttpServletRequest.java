@@ -416,20 +416,20 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getAuthType() {
-        throw new IllegalStateException(
-                "Method 'getAuthType' not yet implemented!");
+        // CXF Calls this method to cache the Request informaiton
+        return null;
     }
 
     @Override
     public String getPathTranslated() {
-        throw new IllegalStateException(
-                "Method 'getPathTranslated' not yet implemented!");
+        // CXF Calls this method to cache the Request informaiton
+        return null;
     }
 
     @Override
     public String getRemoteUser() {
-        throw new IllegalStateException(
-                "Method 'getRemoteUser' not yet implemented!");
+        // CXF Calls this method to cache the Request informaiton
+        return null;
     }
 
     @Override
@@ -452,8 +452,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public boolean isRequestedSessionIdValid() {
-        throw new IllegalStateException(
-                "Method 'isRequestedSessionIdValid' not yet implemented!");
+        return false;
     }
 
     @Override
