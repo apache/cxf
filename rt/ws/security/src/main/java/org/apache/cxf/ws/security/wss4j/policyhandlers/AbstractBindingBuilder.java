@@ -390,6 +390,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         if (tokensInfos != null) {
             for (AssertionInfo assertionInfo : tokensInfos) {
                 if (assertionInfo.getAssertion() instanceof SupportingTokens) {
+                    assertionInfo.setAsserted(true);
                     handleSupportingTokens((SupportingTokens)assertionInfo.getAssertion(), endorse, ret);
                 }
             }

@@ -355,10 +355,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             properties.addAction(actionToPerform);
             
-            for (SecurePart encPart : encrParts) {
-                properties.addEncryptionPart(encPart);
-            }
-            
+            properties.getEncryptionSecureParts().addAll(encrParts);
             properties.setEncryptionKeyIdentifier(getKeyIdentifierType(recToken, encrToken));
             
             // Find out do we also need to include the token as per the Inclusion requirement
@@ -424,9 +421,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             actionList.add(actionToPerform);
         }
         
-        for (SecurePart sigPart : sigParts) {
-            properties.addSignaturePart(sigPart);
-        }
+        properties.getSignatureSecureParts().addAll(sigParts);
         
         AbstractToken sigToken = wrapper.getToken();
         configureSignature(wrapper, sigToken, false);

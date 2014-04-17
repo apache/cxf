@@ -19,11 +19,9 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -410,6 +408,22 @@ public abstract class AbstractCommonBindingHandler {
         }
     }
     
+    protected AssertionInfo getFirstAssertionByLocalname(
+        AssertionInfoMap aim, String localname
+    ) {
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            return sp11Ais.iterator().next();
+        }
+
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            return sp12Ais.iterator().next();
+        }
+
+        return null;
+    }
+    
     protected Collection<AssertionInfo> getAllAssertionsByLocalname(String localname) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         return getAllAssertionsByLocalname(aim, localname);
@@ -500,21 +514,7 @@ public abstract class AbstractCommonBindingHandler {
         }
         return st;
     }
-    
-    protected Collection<Assertion> findAndAssertPolicy(QName n) {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
-        if (ais != null && !ais.isEmpty()) {
-            List<Assertion> p = new ArrayList<Assertion>(ais.size());
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-                p.add(ai.getAssertion());
-            }
-            return p;
-        }
-        return null;
-    } 
-    
+   
     protected void assertPolicy(QName n) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.getAssertionInfo(n);

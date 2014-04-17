@@ -419,10 +419,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 properties.setUse200512Namespace(true);
             }
             
-            for (SecurePart encPart : encrParts) {
-                properties.addEncryptionPart(encPart);
-            }
-            
+            properties.getEncryptionSecureParts().addAll(encrParts);
             properties.addAction(actionToPerform);
 
             if (isRequestor()) {
@@ -532,9 +529,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             actionList.add(actionToPerform);
         }
 
-        for (SecurePart sigPart : sigParts) {
-            properties.addSignaturePart(sigPart);
-        }
+        properties.getSignatureSecureParts().addAll(sigParts);
         
         AbstractToken sigToken = wrapper.getToken();
         if (sbinding.isProtectTokens() && sigToken instanceof X509Token && isRequestor()) {
