@@ -40,7 +40,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
 
 
 public class NettyHttpServerEngine implements ServerEngine {
@@ -151,17 +150,14 @@ public class NettyHttpServerEngine implements ServerEngine {
         bootstrap.group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel.class)
             .option(ChannelOption.SO_REUSEADDR, true);
-                
-        // Set up the idle handler
-        IdleStateHandler idleStateHandler = 
-            new IdleStateHandler(getReadIdleTime(), getWriteIdleTime(), 0);
+
         // Set up the event pipeline factory.
         servletPipeline = 
             new NettyHttpServletPipelineFactory(
                  tlsServerParameters, sessionSupport, 
                  threadingParameters.getThreadPoolSize(),
                  maxChunkContentSize,
-                 handlerMap, idleStateHandler);
+                 handlerMap, this);
         // Start the servletPipeline's timer
         servletPipeline.start();
         bootstrap.childHandler(servletPipeline);

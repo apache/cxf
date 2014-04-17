@@ -35,7 +35,6 @@ import org.apache.cxf.transport.http.netty.server.session.HttpSessionStore;
 import org.apache.cxf.transport.https.SSLUtils;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.group.ChannelGroup;
@@ -58,8 +57,6 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     private final ChannelGroup allChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);;
 
     private final HttpSessionWatchdog watchdog;
-
-    private final ChannelHandler idleStateHandler;
     
     private final TLSServerParameters tlsServerParameters;
     
@@ -71,16 +68,18 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     
     private final EventExecutorGroup applicationExecutor;
 
+    private final NettyHttpServerEngine nettyHttpServerEngine;
+
     public NettyHttpServletPipelineFactory(TLSServerParameters tlsServerParameters, 
                                            boolean supportSession, int threadPoolSize, int maxChunkContentSize,
                                            Map<String, NettyHttpContextHandler> handlerMap,
-                                           IdleStateHandler idleStateHandler) {
+                                           NettyHttpServerEngine engine) {
         this.supportSession = supportSession;
-        this.idleStateHandler = idleStateHandler;
         this.watchdog = new HttpSessionWatchdog();
         this.handlerMap = handlerMap;
         this.tlsServerParameters = tlsServerParameters;
         this.maxChunkContentSize = maxChunkContentSize;
+        this.nettyHttpServerEngine = engine;
         //TODO need to configure the thread size of EventExecutorGroup
         applicationExecutor = new DefaultEventExecutorGroup(16);
     }
@@ -151,7 +150,9 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         // Remove the following line if you don't want automatic content
         // compression.
         pipeline.addLast("deflater", new HttpContentCompressor());
-        pipeline.addLast("idle", this.idleStateHandler);
+        // Set up the idle handler
+        pipeline.addLast("idle", new IdleStateHandler(nettyHttpServerEngine.getReadIdleTime(),
+                nettyHttpServerEngine.getWriteIdleTime(), 0));
 
         return pipeline;
     }
