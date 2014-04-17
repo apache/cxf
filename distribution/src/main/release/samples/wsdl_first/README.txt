@@ -85,6 +85,11 @@ Using either UNIX or Windows:
 There is no special Maven profile for the Spring client and server but you can
 easily set it up yourself.
 
+If you want to run the client and server with netty transport, you can use below command to  
+start up the server and client:
+  mvn -Pserver-netty (from one command line window -- only if using embedded Netty transport)
+  mvn -Pclient-netty (from one command line window -- only if using embedded Netty transport)
+
 If you're using Tomcat (embedded or standalone) for the web service provider:
 ----------------------------------------------------
 1.) Update the soap:address value in the resources/CustomerService.wsdl value,
