@@ -433,7 +433,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
         JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, 
-                                            MessageUtils.isTrue(ignoreParam),
+                                            ignoreParam == null || MessageUtils.isTrue(ignoreParam),
                                             getStaticSubResolutionValue(servletConfig));
         String splitChar = getParameterSplitChar(servletConfig);
         setAllInterceptors(bean, servletConfig, splitChar);
