@@ -166,7 +166,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostBookWithEnvelopingSig() throws Exception {
         if (test.streaming || STAX_PORT.equals(test.port)) {
-         // Enveloping not supported for streaming code
+            // Enveloping not supported for streaming code
             return;
         }
         String address = "https://localhost:" + test.port + "/xmlsig/bookstore/books";
@@ -210,6 +210,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             bean.getOutInterceptors().add(sigOutInterceptor);
             
             XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
+            sigInInterceptor.setRequireSignature(true);
             if (!useKeyInfo) {
                 sigInInterceptor.setSignatureVerificationAlias("alice");
             }
@@ -438,6 +439,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             bean.getOutInterceptors().add(encInterceptor);
             
             XmlSecInInterceptor encInInterceptor = new XmlSecInInterceptor();
+            encInInterceptor.setRequireEncryption(true);
             bean.getInInterceptors().add(encInInterceptor);
         } else {
             if (sign) {

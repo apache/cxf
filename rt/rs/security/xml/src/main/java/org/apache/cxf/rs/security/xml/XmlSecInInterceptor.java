@@ -364,7 +364,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
         private final boolean encryptionRequired;
         
         public StaxActionInInterceptor(boolean signatureRequired, boolean encryptionRequired) {
-            super(Phase.PRE_PROTOCOL);
+            super(Phase.PRE_LOGICAL);
             this.signatureRequired = signatureRequired;
             this.encryptionRequired = encryptionRequired;
         }

@@ -56,17 +56,21 @@ under the License.
         <property name="encryptionKeyTransportAlgo" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
         <property name="encryptionSymmetricKeyAlgo" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
     </bean>
-    <bean id="xmlSecInHandler" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
-        <property name="decryptionAlias" value="bob" />
+    <bean id="xmlSigInHandler" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
+        <property name="requireSignature" value="true"/>
         <property name="signatureVerificationAlias" value="alice" />
+    </bean>
+    <bean id="xmlEncInHandler" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
+        <property name="decryptionAlias" value="bob" />
+        <property name="requireEncryption" value="true"/>
     </bean>
     <bean id="xmlSecInHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
         <property name="signatureProperties" ref="sigProps"/>
         <property name="encryptionProperties" ref="encProps"/>
         <property name="decryptionAlias" value="bob" />
         <property name="signatureVerificationAlias" value="alice" />
-        <property name="requireSignature" value="true"/>
         <property name="requireEncryption" value="true"/>
+        <property name="requireSignature" value="true"/>
     </bean>
     <bean id="xmlSigOutHandler" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
         <property name="signRequest" value="true"/>
@@ -79,6 +83,12 @@ under the License.
     </bean>
     <bean id="xmlSigOutHandlerNoKeyInfo" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
         <property name="signRequest" value="true"/>
+    </bean>
+    <bean id="xmlSecInHandler" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
+        <property name="requireSignature" value="true"/>
+        <property name="signatureVerificationAlias" value="alice" />
+        <property name="decryptionAlias" value="bob" />
+        <property name="requireEncryption" value="true"/>
     </bean>
     <bean id="xmlSecOutHandler" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
         <property name="signRequest" value="true"/>
@@ -94,7 +104,7 @@ under the License.
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:inInterceptors>
-            <ref bean="xmlSecInHandler"/>
+            <ref bean="xmlSigInHandler"/>
         </jaxrs:inInterceptors>
         <jaxrs:outInterceptors>
             <ref bean="xmlSigOutHandler"/>
@@ -110,7 +120,7 @@ under the License.
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:inInterceptors>
-            <ref bean="xmlSecInHandler"/>
+            <ref bean="xmlSigInHandler"/>
         </jaxrs:inInterceptors>
         <jaxrs:outInterceptors>
             <ref bean="xmlSigOutHandlerNoKeyInfo"/>
@@ -126,7 +136,7 @@ under the License.
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:inInterceptors>
-            <ref bean="xmlSecInHandler"/>
+            <ref bean="xmlEncInHandler"/>
         </jaxrs:inInterceptors>
         <jaxrs:outInterceptors>
             <ref bean="xmlEncOutHandler"/>
