@@ -18,29 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs.discovery;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 
-import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
-
-public class BookStore implements BookStoreInterface {
-    @POST
-    @Path("/books")
-    @Valid
-    public BookWithValidation addBook(@NotNull @FormParam("id") String id,
-            @FormParam("name") String name) {        
-        return new BookWithValidation(name, id);
-    }
+@Path("/bookstore/")
+public interface BookStoreInterface {
     
-    @GET
-    @Path("/book/{id}")
-    @Valid
-    public BookWithValidation getBook(@NotNull @PathParam("id") String id) {        
-        return new BookWithValidation("", id);
-    }
 }

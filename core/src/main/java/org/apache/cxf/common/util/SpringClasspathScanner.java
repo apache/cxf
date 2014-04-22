@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -53,9 +54,12 @@ class SpringClasspathScanner extends ClasspathScanner {
         
         final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
             new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
+        final Map< Class< ? extends Annotation >, Collection< String > > matchingInterfaces = 
+            new HashMap< Class< ? extends Annotation >, Collection< String > >();
         
         for (Class< ? extends Annotation > annotation: annotations) {
-            classes.put(annotation, new ArrayList< Class < ? > >());
+            classes.put(annotation, new HashSet< Class < ? > >());
+            matchingInterfaces.put(annotation, new HashSet< String >());
         }
         
         if (basePackages == null || basePackages.isEmpty()) {
@@ -69,7 +73,9 @@ class SpringClasspathScanner extends ClasspathScanner {
                 + (scanAllPackages ? "" : ClassUtils.convertClassNameToResourcePath(basePackage)) 
                 + ALL_CLASS_FILES;
             
-            final Resource[] resources = resolver.getResources(packageSearchPath);                        
+            final Resource[] resources = resolver.getResources(packageSearchPath);    
+            final Map<String, String[]> nonMatchingClasses = new HashMap<String, String[]>();
+            
             for (final Resource resource: resources) {
                 final MetadataReader reader = factory.getMetadataReader(resource);
                 final AnnotationMetadata metadata = reader.getAnnotationMetadata();
@@ -79,12 +85,29 @@ class SpringClasspathScanner extends ClasspathScanner {
                 }
                 
                 for (Class< ? extends Annotation > annotation: annotations) {
-                    if (metadata.isAnnotated(annotation.getName())) {                                
-                        classes.get(annotation).add(ClassLoaderUtils.loadClass(metadata.getClassName(), getClass()));
+                    boolean concreteClass = !metadata.isInterface() && !metadata.isAbstract();
+                    if (metadata.isAnnotated(annotation.getName())) {
+                        if (concreteClass) {
+                            classes.get(annotation).add(
+                                ClassLoaderUtils.loadClass(metadata.getClassName(), getClass()));
+                        } else {
+                            matchingInterfaces.get(annotation).add(metadata.getClassName());    
+                        }
+                    } else if (concreteClass && metadata.getInterfaceNames().length > 0) {
+                        nonMatchingClasses.put(metadata.getClassName(), metadata.getInterfaceNames());
                     }
                 }
-                
-            }                        
+            }
+            for (Map.Entry<Class<? extends Annotation>, Collection<String>> e1 : matchingInterfaces.entrySet()) {
+                for (Map.Entry<String, String[]> e2 : nonMatchingClasses.entrySet()) {
+                    for (String intName : e2.getValue()) {
+                        if (e1.getValue().contains(intName)) {
+                            classes.get(e1.getKey()).add(ClassLoaderUtils.loadClass(e2.getKey(), getClass()));
+                            break;
+                        }
+                    }
+                }
+            }
         }
         
         return classes;
