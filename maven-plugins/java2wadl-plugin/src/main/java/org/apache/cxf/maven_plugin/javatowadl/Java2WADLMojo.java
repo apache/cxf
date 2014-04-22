@@ -124,6 +124,7 @@ public class Java2WADLMojo extends AbstractMojo {
    
       
     public void execute() throws MojoExecutionException {
+        
         getResourcesList();
         WadlGenerator wadlGenernator = new WadlGenerator(getBus());
         DocumentationProvider documentationProvider = null;
@@ -131,7 +132,7 @@ public class Java2WADLMojo extends AbstractMojo {
             try {
                 documentationProvider = (DocumentationProvider)getClassLoader().loadClass(docProvider).
                     getConstructor(new Class[] {String.class}).
-                    newInstance(new Object[] {project.getBuild().getDirectory() + "/classes" });
+                    newInstance(new Object[] {project.getBuild().getDirectory()});
                 wadlGenernator.setDocumentationProvider(documentationProvider);
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
