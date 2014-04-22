@@ -248,20 +248,18 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         
         Participants participants = providerParameters.getTokenRequirements().getParticipants();
         if (participants != null) {
-            if (participants.getPrimaryParticipant() instanceof Element) {
-                String address = 
-                    extractAddressFromParticipantsEPR((Element)participants.getPrimaryParticipant());
-                if (address != null) {
-                    AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
-                    audienceRestriction.setAudienceURIs(Collections.singletonList(address));
-                    audienceRestrictions.add(audienceRestriction);
-                }
+            String address = 
+                extractAddressFromParticipantsEPR(participants.getPrimaryParticipant());
+            if (address != null) {
+                AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+                audienceRestriction.setAudienceURIs(Collections.singletonList(address));
+                audienceRestrictions.add(audienceRestriction);
             }
-            
+
             if (participants.getParticipants() != null) {
                 for (Object participant : participants.getParticipants()) {
                     if (participant != null) {
-                        String address = extractAddressFromParticipantsEPR(participant);
+                        address = extractAddressFromParticipantsEPR(participant);
                         if (address != null) {
                             AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
                             audienceRestriction.setAudienceURIs(Collections.singletonList(address));
