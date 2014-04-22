@@ -332,11 +332,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testPostEncryptedSignedBook() throws Exception {
-        if (STAX_PORT.equals(test.port)) {
-            // TODO We are not processing encrypted Signatures correctly
-            return;
-        }
-        
         String address = "https://localhost:" + test.port + "/xmlsec-validate/bookstore/books";
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
@@ -353,11 +348,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testPostEncryptedSignedBookInvalid() throws Exception {
-        if (STAX_PORT.equals(test.port)) {
-            // TODO We are not processing encrypted Signatures correctly
-            return;
-        }
-        
         String address = "https://localhost:" + test.port + "/xmlsec-validate/bookstore/books";
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
@@ -384,10 +374,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testPostEncryptedSignedBookUseReqSigCert() throws Exception {
-        if (STAX_PORT.equals(test.port)) {
-            // TODO Supporting UseReqSigCert
-            return;
-        }
         String address = "https://localhost:" + test.port + "/xmlsec-useReqSigCert/bookstore/books";
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
@@ -429,7 +415,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         bean.setProperties(properties);
         if (streaming) {
             XmlSecOutInterceptor encInterceptor = new XmlSecOutInterceptor();
-            encInterceptor.setKeyIdentifierType(encryptionProperties.getEncryptionKeyIdType());
+            encInterceptor.setEncryptionKeyIdentifierType(encryptionProperties.getEncryptionKeyIdType());
             encInterceptor.setSymmetricEncAlgorithm(encryptionProperties.getEncryptionSymmetricKeyAlgo());
             encInterceptor.setEncryptionDigestAlgorithm(encryptionProperties.getEncryptionDigestAlgo());
             encInterceptor.setEncryptRequest(true);

@@ -59,6 +59,9 @@ import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSec;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
@@ -157,6 +160,12 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 && !MessageUtils.isRequestor(message)) {
                 sendingCert = 
                     message.getExchange().getInMessage().getContent(X509Certificate.class);
+                if (sendingCert == null) {
+                    @SuppressWarnings("unchecked")
+                    final List<SecurityEvent> incomingSecurityEventList = 
+                        (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
+                    sendingCert = getUseReqSigCert(incomingSecurityEventList);
+                }
             } else {
                 CryptoLoader loader = new CryptoLoader();
                 Crypto crypto = loader.getCrypto(message, 
@@ -204,6 +213,36 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 properties.addEncryptionPart(securePart);
             }
         }
+    }
+    
+    private X509Certificate getUseReqSigCert(List<SecurityEvent> incomingSecurityEventList) 
+        throws XMLSecurityException {
+        SecurityToken signatureToken = getSignatureToken(incomingSecurityEventList);
+        if (signatureToken != null && signatureToken.getX509Certificates() != null
+            && signatureToken.getX509Certificates().length > 0) {
+            return signatureToken.getX509Certificates()[0];
+        }
+        return null;
+    }
+    
+    private SecurityToken getSignatureToken(List<SecurityEvent> incomingSecurityEventList) 
+        throws XMLSecurityException {
+        if (incomingSecurityEventList != null) {
+            for (int i = 0; i < incomingSecurityEventList.size(); i++) {
+                SecurityEvent securityEvent = incomingSecurityEventList.get(i);
+                if (securityEvent instanceof TokenSecurityEvent) {
+                    @SuppressWarnings("unchecked")
+                    TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent 
+                        = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
+                    if (tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(
+                        SecurityTokenConstants.TokenUsage_Signature)
+                    ) {
+                        return tokenSecurityEvent.getSecurityToken();
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     private X509Certificate getCertificateFromCrypto(Crypto crypto, String user) throws Exception {
@@ -344,7 +383,7 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
         this.encryptionProperties = properties;
     }
     
-    public void setKeyIdentifierType(String type) {
+    public void setEncryptionKeyIdentifierType(String type) {
         encryptionProperties.setEncryptionKeyIdType(type);   
     }
     
@@ -378,6 +417,10 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public void setSignatureDigestAlgorithm(String algo) {
         sigProps.setSignatureDigestAlgo(algo);
+    }
+    
+    public void setSignatureKeyIdentifierType(String type) {
+        sigProps.setSignatureKeyIdType(type);   
     }
     
     public final XmlSecStaxOutInterceptorInternal createEndingInterceptor() {
