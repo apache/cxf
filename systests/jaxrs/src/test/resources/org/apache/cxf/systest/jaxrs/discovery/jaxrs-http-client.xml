@@ -26,7 +26,7 @@ under the License.
 	   http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd">	
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
-    <jaxrs:client id="bookService" address="http://localhost:${testutil.ports.jaxrs-http}" base-packages="org.apache.cxf.systest.jaxrs.discovery"/>
+    <jaxrs:client id="bookService" address="http://localhost:${testutil.ports.jaxrs-http}" basePackages="org.apache.cxf.systest.jaxrs.discovery"/>
 
 </beans>
 

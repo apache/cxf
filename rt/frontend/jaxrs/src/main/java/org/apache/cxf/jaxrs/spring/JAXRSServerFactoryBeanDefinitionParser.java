@@ -74,7 +74,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
         } else if ("serviceName".equals(name)) {
             QName q = parseQName(e, val);
             bean.addPropertyValue(name, q);
-        } else if ("base-packages".equals(name)) {            
+        } else if ("basePackages".equals(name)) {            
             bean.addPropertyValue("basePackages", ClasspathScanner.parsePackages(val));
         } else {
             mapToProperty(bean, name, val);

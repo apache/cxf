@@ -28,5 +28,5 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 	<import resource="classpath:/META-INF/cxf/cxf.xml"/>
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
 
-    <jaxrs:server address="/" base-packages="org.apache.cxf.jaxrs.validation, org.apache.cxf.systest.jaxrs.discovery" />
+    <jaxrs:server address="/" basePackages="org.apache.cxf.jaxrs.validation, org.apache.cxf.systest.jaxrs.discovery" />
 </beans>
