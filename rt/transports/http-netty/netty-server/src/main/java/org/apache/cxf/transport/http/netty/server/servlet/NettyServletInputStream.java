@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import javax.servlet.ServletInputStream;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.handler.codec.http.HttpContent;
 
@@ -30,9 +31,11 @@ import io.netty.handler.codec.http.HttpContent;
 public class NettyServletInputStream extends ServletInputStream {
 
     private final ByteBufInputStream in;
+    private final ByteBuf byteBuf;
 
     public NettyServletInputStream(HttpContent httpContent) {
-        this.in = new ByteBufInputStream(httpContent.content());
+        this.byteBuf = httpContent.content();
+        this.in = new ByteBufInputStream(byteBuf);
     }
 
     @Override
@@ -48,6 +51,11 @@ public class NettyServletInputStream extends ServletInputStream {
     @Override
     public int read(byte[] buf, int offset, int len) throws IOException {
         return this.in.read(buf, offset, len);
+    }
+    
+    public void close() throws IOException {
+        // we need to release the ByteBufInputStream
+        byteBuf.release();
     }
     
 }
