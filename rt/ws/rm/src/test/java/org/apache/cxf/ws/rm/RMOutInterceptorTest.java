@@ -29,6 +29,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.easymock.EasyMock;
@@ -163,8 +164,54 @@ public class RMOutInterceptorTest extends Assert {
         control.verify();
     }
     
+    @Test
+    public void testRM11TerminateSequence() throws RMException, SequenceFault {
+        testRMTerminateSequence(RM11Constants.NAMESPACE_URI, Names.WSA_NAMESPACE_NAME,
+                                RM11Constants.TERMINATE_SEQUENCE_ACTION,
+                                org.apache.cxf.ws.addressing.Names.WSA_ANONYMOUS_ADDRESS,
+                                org.apache.cxf.ws.addressing.Names.WSA_ANONYMOUS_ADDRESS);
+    }
+
+    @Test
+    public void testRM10TerminateSequence() throws RMException, SequenceFault {
+        testRMTerminateSequence(RM10Constants.NAMESPACE_URI, Names.WSA_NAMESPACE_NAME,
+                                RM10Constants.TERMINATE_SEQUENCE_ACTION,
+                                org.apache.cxf.ws.addressing.Names.WSA_ANONYMOUS_ADDRESS,
+                                org.apache.cxf.ws.addressing.Names.WSA_NONE_ADDRESS);
+    }
+
+    private void testRMTerminateSequence(String wsrmnsuri, String wsansuri,
+                                         String action, String breplyto, String areplyto) 
+        throws RMException, SequenceFault {
+        AddressingProperties maps = createMAPs(action, "localhost:9000/GreeterPort", breplyto); 
+
+        Message message = control.createMock(Message.class);
+        Exchange exchange = control.createMock(Exchange.class);
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();
+        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
+        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND))
+            .andReturn(maps).anyTimes();
+        RMManager manager = control.createMock(RMManager.class);
+        RMConfiguration config = new RMConfiguration();
+        config.setRMNamespace(wsrmnsuri);
+        config.setRM10AddressingNamespace(wsansuri);
+        EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(config).anyTimes();
+        control.replay();
+        RMOutInterceptor rmi = new RMOutInterceptor();
+        rmi.setManager(manager);
+        rmi.handle(message);
+
+        assertEquals(areplyto,
+                     maps.getReplyTo().getAddress().getValue());
+        control.verify();
+    }
+
     private AddressingProperties createMAPs(String action, String to, String replyTo) {
         AddressingProperties maps = new AddressingProperties();
+        AttributedURIType actionuri =  new AttributedURIType();
+        actionuri.setValue(action);
+        maps.setAction(actionuri);
         maps.setTo(RMUtils.createReference(to));
         EndpointReferenceType epr = RMUtils.createReference(replyTo);
         maps.setReplyTo(epr);
