@@ -205,7 +205,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             }
         } 
         if (constants.getSequenceAckAction().equals(action)
-            || constants.getTerminateSequenceAction().equals(action)) {
+            || (constants.getTerminateSequenceAction().equals(action)
+                && RM10Constants.NAMESPACE_URI.equals(rmUri))) {
             maps.setReplyTo(RMUtils.createNoneReference());
         }
         
