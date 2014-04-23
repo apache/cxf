@@ -26,6 +26,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import org.apache.cxf.systest.jaxrs.discovery.sub.BookStoreInterface;
 import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
 
 public class BookStore implements BookStoreInterface {

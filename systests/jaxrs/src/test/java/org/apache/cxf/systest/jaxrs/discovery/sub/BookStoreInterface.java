@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.discovery;
+package org.apache.cxf.systest.jaxrs.discovery.sub;
 
 import javax.ws.rs.Path;
 

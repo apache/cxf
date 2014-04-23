@@ -56,6 +56,7 @@ class SpringClasspathScanner extends ClasspathScanner {
             new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
         final Map< Class< ? extends Annotation >, Collection< String > > matchingInterfaces = 
             new HashMap< Class< ? extends Annotation >, Collection< String > >();
+        final Map<String, String[]> nonMatchingClasses = new HashMap<String, String[]>();
         
         for (Class< ? extends Annotation > annotation: annotations) {
             classes.put(annotation, new HashSet< Class < ? > >());
@@ -74,7 +75,7 @@ class SpringClasspathScanner extends ClasspathScanner {
                 + ALL_CLASS_FILES;
             
             final Resource[] resources = resolver.getResources(packageSearchPath);    
-            final Map<String, String[]> nonMatchingClasses = new HashMap<String, String[]>();
+            
             
             for (final Resource resource: resources) {
                 final MetadataReader reader = factory.getMetadataReader(resource);
@@ -98,13 +99,13 @@ class SpringClasspathScanner extends ClasspathScanner {
                     }
                 }
             }
-            for (Map.Entry<Class<? extends Annotation>, Collection<String>> e1 : matchingInterfaces.entrySet()) {
-                for (Map.Entry<String, String[]> e2 : nonMatchingClasses.entrySet()) {
-                    for (String intName : e2.getValue()) {
-                        if (e1.getValue().contains(intName)) {
-                            classes.get(e1.getKey()).add(ClassLoaderUtils.loadClass(e2.getKey(), getClass()));
-                            break;
-                        }
+        }
+        for (Map.Entry<Class<? extends Annotation>, Collection<String>> e1 : matchingInterfaces.entrySet()) {
+            for (Map.Entry<String, String[]> e2 : nonMatchingClasses.entrySet()) {
+                for (String intName : e2.getValue()) {
+                    if (e1.getValue().contains(intName)) {
+                        classes.get(e1.getKey()).add(ClassLoaderUtils.loadClass(e2.getKey(), getClass()));
+                        break;
                     }
                 }
             }
