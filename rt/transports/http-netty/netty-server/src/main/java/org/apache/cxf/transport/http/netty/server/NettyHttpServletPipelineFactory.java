@@ -81,7 +81,7 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         this.maxChunkContentSize = maxChunkContentSize;
         this.nettyHttpServerEngine = engine;
         //TODO need to configure the thread size of EventExecutorGroup
-        applicationExecutor = new DefaultEventExecutorGroup(16);
+        applicationExecutor = new DefaultEventExecutorGroup(threadPoolSize);
     }
 
 
