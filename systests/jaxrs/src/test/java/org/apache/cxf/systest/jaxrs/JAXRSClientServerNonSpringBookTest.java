@@ -165,7 +165,17 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     
     @Test
     public void testGetBook123Application11PerRequest() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:" + PORT + "/application11/thebooks/bookstore2/bookheaders");
+        doTestPerRequest("http://localhost:" + PORT + "/application11/thebooks/bookstore2/bookheaders");
+    }
+    
+    @Test
+    public void testGetBook123TwoApplications() throws Exception {
+        doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks/bookstore2/bookheaders");
+        doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks2/bookstore2/bookheaders");
+    }
+    
+    private void doTestPerRequest(String address) throws Exception {
+        WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("application/xml");
         Book book = wc.get(Book.class);

@@ -38,9 +38,9 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public abstract class AbstractResourceInfo {
+    public static final String CONSTRUCTOR_PROXY_MAP = "jaxrs-constructor-proxy-map";
     private static final String FIELD_PROXY_MAP = "jaxrs-field-proxy-map";
     private static final String SETTER_PROXY_MAP = "jaxrs-setter-proxy-map";
-    private static final String CONSTRUCTOR_PROXY_MAP = "jaxrs-constructor-proxy-map";
     
     protected boolean root;
     protected Class<?> resourceClass;

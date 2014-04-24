@@ -100,7 +100,9 @@ public class BookApplication extends Application {
             if (ap == null) {
                 throw new RuntimeException();
             }
-            if (ui.getRequestUri().toString().endsWith("/application11/thebooks/bookstore2/bookheaders")) {
+            String uri = ui.getRequestUri().toString();
+            if (uri.endsWith("/application11/thebooks/bookstore2/bookheaders")
+                || uri.contains("/application6")) {
                 context.getHeaders().put("BOOK", Arrays.asList("1", "2"));    
             }
             
@@ -124,7 +126,9 @@ public class BookApplication extends Application {
             if (ap == null) {
                 throw new RuntimeException();
             }
-            if (ui.getRequestUri().toString().endsWith("/application11/thebooks/bookstore2/bookheaders")) {
+            String uri = ui.getRequestUri().toString();
+            if (uri.endsWith("/application11/thebooks/bookstore2/bookheaders")
+                || uri.contains("/application6")) {
                 context.getHeaders().add("BOOK", "3");    
             }
             

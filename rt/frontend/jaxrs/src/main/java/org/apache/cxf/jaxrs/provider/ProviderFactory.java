@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,6 +66,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -1069,7 +1070,23 @@ public abstract class ProviderFactory {
     
     protected ProviderInfo<? extends Object> createProviderFromConstructor(Constructor<?> c, 
                                                                  Map<Class<?>, Object> values) {
+        
+        
+        Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> proxiesMap = 
+            CastUtils.cast((Map<?, ?>)getBus().getProperty(AbstractResourceInfo.CONSTRUCTOR_PROXY_MAP));
+        Map<Class<?>, ThreadLocalProxy<?>> existingProxies = null; 
+        if (proxiesMap != null) {
+            existingProxies = proxiesMap.get(c.getDeclaringClass());
+        }
+        Class<?>[] paramTypes = c.getParameterTypes();
         Object[] cArgs = ResourceUtils.createConstructorArguments(c, null, false, values);
+        if (existingProxies != null && existingProxies.size() <= paramTypes.length) {
+            for (int i = 0; i < paramTypes.length; i++) {
+                if (cArgs[i] instanceof ThreadLocalProxy) {
+                    cArgs[i] = existingProxies.get(paramTypes[i]);
+                }
+            }
+        } 
         Object instance = null;
         try {
             instance = c.newInstance(cArgs);
@@ -1078,8 +1095,7 @@ public abstract class ProviderFactory {
                                        + " can not be instantiated"); 
         }
         Map<Class<?>, ThreadLocalProxy<?>> proxies = 
-            new HashMap<Class<?>, ThreadLocalProxy<?>>();
-        Class<?>[] paramTypes = c.getParameterTypes();
+            new LinkedHashMap<Class<?>, ThreadLocalProxy<?>>();
         for (int i = 0; i < paramTypes.length; i++) {
             if (cArgs[i] instanceof ThreadLocalProxy) {
                 @SuppressWarnings("unchecked")

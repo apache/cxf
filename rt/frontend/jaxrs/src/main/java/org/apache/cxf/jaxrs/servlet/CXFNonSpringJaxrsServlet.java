@@ -427,23 +427,35 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         
     }
     
-    protected void createServerFromApplication(String cName, ServletConfig servletConfig) 
+    protected void createServerFromApplication(String applicationNames, ServletConfig servletConfig) 
         throws ServletException {
-        Application app = createApplicationInstance(cName, servletConfig);
         
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
-        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, 
-                                            ignoreParam == null || MessageUtils.isTrue(ignoreParam),
-                                            getStaticSubResolutionValue(servletConfig));
-        String splitChar = getParameterSplitChar(servletConfig);
-        setAllInterceptors(bean, servletConfig, splitChar);
-        setInvoker(bean, servletConfig);
-        setExtensions(bean, servletConfig);
-        setDocLocation(bean, servletConfig);
-        setSchemasLocations(bean, servletConfig);
+        boolean ignoreApplicationPath = ignoreParam == null || MessageUtils.isTrue(ignoreParam);
         
-        bean.setBus(getBus());
-        bean.create();
+        String[] classNames = StringUtils.split(applicationNames, getParameterSplitChar(servletConfig));
+        
+        if (classNames.length > 1 && ignoreApplicationPath) {
+            throw new ServletException("\"" + IGNORE_APP_PATH_PARAM 
+                + "\" parameter must be set to false for multiple Applications be supported");
+        }
+        
+        for (String cName : classNames) {
+            Application app = createApplicationInstance(cName, servletConfig);
+            
+            JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, 
+                                                ignoreApplicationPath,
+                                                getStaticSubResolutionValue(servletConfig));
+            String splitChar = getParameterSplitChar(servletConfig);
+            setAllInterceptors(bean, servletConfig, splitChar);
+            setInvoker(bean, servletConfig);
+            setExtensions(bean, servletConfig);
+            setDocLocation(bean, servletConfig);
+            setSchemasLocations(bean, servletConfig);
+            
+            bean.setBus(getBus());
+            bean.create();
+        }
     }
     
     protected Application createApplicationInstance(String appClassName, ServletConfig servletConfig) 
