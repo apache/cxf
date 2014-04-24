@@ -26,6 +26,7 @@ import javax.servlet.Servlet;
 
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
@@ -43,7 +44,14 @@ import org.osgi.service.cm.ManagedServiceFactory;
 public class HTTPTransportActivator 
     implements BundleActivator {
     
+    private static final String DISABLE_DEFAULT_HTTP_TRANSPORT = "org.apache.cxf.osgi.http.transport.disable";
+    
     public void start(BundleContext context) throws Exception {
+        
+        if (PropertyUtils.isTrue(context.getProperty(DISABLE_DEFAULT_HTTP_TRANSPORT))) {
+            return;
+        }
+        
         ConfigAdminHttpConduitConfigurer conduitConfigurer = new ConfigAdminHttpConduitConfigurer();
         DestinationRegistry destinationRegistry = new DestinationRegistryImpl();
         HTTPTransportFactory transportFactory = new HTTPTransportFactory(destinationRegistry);
