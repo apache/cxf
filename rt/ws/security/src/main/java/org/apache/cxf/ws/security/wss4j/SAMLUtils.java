@@ -247,6 +247,10 @@ public final class SAMLUtils {
             return true;
         }
         
+        if (subjectPublicKey == null && subjectCerts != null && subjectCerts.length > 0) {
+            subjectPublicKey = subjectCerts[0].getPublicKey();
+        }
+
         //
         // Now try the message-level signatures
         //
