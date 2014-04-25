@@ -164,7 +164,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     
         // Return the authorization challenge data to the end user 
         OAuthAuthorizationData data = 
-            createAuthorizationData(client, params, redirectUri, permissions);
+            createAuthorizationData(client, params, userSubject, redirectUri, permissions);
         personalizeData(data, userSubject);
         return Response.ok(data).build();
         
@@ -173,12 +173,15 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     /**
      * Create the authorization challenge data 
      */
-    protected OAuthAuthorizationData createAuthorizationData(
-        Client client, MultivaluedMap<String, String> params, String redirectUri, List<OAuthPermission> perms) {
+    protected OAuthAuthorizationData createAuthorizationData(Client client, 
+                                                             MultivaluedMap<String, String> params,
+                                                             UserSubject subject,
+                                                             String redirectUri, 
+                                                             List<OAuthPermission> perms) {
         
         OAuthAuthorizationData secData = new OAuthAuthorizationData();
         
-        addAuthenticityTokenToSession(secData);
+        addAuthenticityTokenToSession(secData, params, subject);
                 
         secData.setPermissions(perms);
         secData.setProposedScope(OAuthUtils.convertPermissionsToScope(perms));
@@ -214,9 +217,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     protected Response completeAuthorization(MultivaluedMap<String, String> params) {
         // Make sure the end user has authenticated, check if HTTPS is used
         SecurityContext securityContext = getAndValidateSecurityContext();
+        UserSubject userSubject = createUserSubject(securityContext);
         
         // Make sure the session is valid
-        if (!compareRequestAndSessionTokens(params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN))) {
+        String sessionToken = params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
+        if (!compareRequestAndSessionTokens(sessionToken, params, userSubject)) {
             throw ExceptionUtils.toBadRequestException(null, null);     
         }
         //TODO: additionally we can check that the Principal that got authenticated
@@ -248,7 +253,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                          partialMatchScopeValidation)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
-        UserSubject userSubject = createUserSubject(securityContext);
         
         // Request a new grant
         return createGrant(params,
@@ -324,10 +328,14 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return redirectUri;
     }
     
-    private void addAuthenticityTokenToSession(OAuthAuthorizationData secData) {
+    private void addAuthenticityTokenToSession(OAuthAuthorizationData secData,
+                                               MultivaluedMap<String, String> params,
+                                               UserSubject subject) {
         final String sessionToken;
         if (this.sessionAuthenticityTokenProvider != null) {
-            sessionToken = this.sessionAuthenticityTokenProvider.createSessionToken(getMessageContext());
+            sessionToken = this.sessionAuthenticityTokenProvider.createSessionToken(getMessageContext(),
+                                                                                    params,
+                                                                                    subject);
         } else {
             HttpSession session = getMessageContext().getHttpServletRequest().getSession();
             sessionToken = UUID.randomUUID().toString();
@@ -336,10 +344,14 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         secData.setAuthenticityToken(sessionToken);
     }
     
-    private boolean compareRequestAndSessionTokens(String requestToken) {
+    private boolean compareRequestAndSessionTokens(String requestToken,
+                                                   MultivaluedMap<String, String> params,
+                                                   UserSubject subject) {
         final String sessionToken;
         if (this.sessionAuthenticityTokenProvider != null) {
-            sessionToken = sessionAuthenticityTokenProvider.removeSessionToken(getMessageContext());
+            sessionToken = sessionAuthenticityTokenProvider.removeSessionToken(getMessageContext(),
+                                                                               params,
+                                                                               subject);
         } else {
             HttpSession session = getMessageContext().getHttpServletRequest().getSession();
             sessionToken = (String)session.getAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);

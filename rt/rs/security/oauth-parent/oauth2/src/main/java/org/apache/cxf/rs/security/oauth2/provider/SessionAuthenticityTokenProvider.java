@@ -19,7 +19,10 @@
 
 package org.apache.cxf.rs.security.oauth2.provider;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 /**
  * SessionAuthenticityTokenProvider responsible for storing and retrieving tokens 
@@ -31,23 +34,35 @@ public interface SessionAuthenticityTokenProvider {
      * Creates a new session token and stores it
      * 
      * @param mc the {@link MessageContext} of this request
+     * @param params redirection-based grant request parameters
+     * @param subject authenticated end user
      * @return the created session token
      */
-    String createSessionToken(MessageContext mc);
+    String createSessionToken(MessageContext mc,
+                              MultivaluedMap<String, String> params,
+                              UserSubject subject);
 
     /**
      * Retrieves the stored session token
      * 
      * @param mc the {@link MessageContext} of this request
+     * @param params grant authorization parameters
+     * @param subject authenticated end user
      * @return the stored token
      */
-    String getSessionToken(MessageContext mc);
+    String getSessionToken(MessageContext mc,
+                           MultivaluedMap<String, String> params,
+                           UserSubject subject);
 
     /**
      * Removes the stored session token
      * 
      * @param mc the {@link MessageContext} of this request
+     * @param params grant authorization parameters
+     * @param subject authenticated end user
      */
-    String removeSessionToken(MessageContext mc);
+    String removeSessionToken(MessageContext mc,
+                              MultivaluedMap<String, String> params,
+                              UserSubject subject);
 
 }
