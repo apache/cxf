@@ -546,8 +546,8 @@ public final class HttpUtils {
     }
     
     public static String getEncoding(MediaType mt, String defaultEncoding) {
-        String charset = mt == null ? "UTF-8" : mt.getParameters().get("charset");
-        return charset == null ? "UTF-8" : charset;
+        String charset = mt == null ? defaultEncoding : mt.getParameters().get("charset");
+        return charset == null ? defaultEncoding : charset;
     }
     
     public static URI resolve(UriBuilder baseBuilder, URI uri) {
