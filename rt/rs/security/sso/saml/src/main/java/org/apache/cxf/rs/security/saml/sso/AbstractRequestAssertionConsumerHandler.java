@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -33,6 +34,7 @@ import java.util.zip.DataFormatException;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
 
@@ -125,6 +127,34 @@ public class AbstractRequestAssertionConsumerHandler extends AbstractSSOSpHandle
             }
         }
         super.close();
+    }
+    
+    protected Response doProcessSamlResponse(String encodedSamlResponse,
+                                             String relayState,
+                                             boolean postBinding) {
+        RequestState requestState = processRelayState(relayState);
+       
+        String contextCookie = createSecurityContext(requestState,
+                                                    encodedSamlResponse,
+                                                   relayState,
+                                                   postBinding);
+       
+        // Finally, redirect to the service provider endpoint
+        URI targetURI = getTargetURI(requestState.getTargetAddress());
+        return Response.seeOther(targetURI).header("Set-Cookie", contextCookie).build();
+    }
+    
+    private URI getTargetURI(String targetAddress) {
+        if (targetAddress != null) {
+            try {
+                return URI.create(targetAddress);
+            } catch (IllegalArgumentException ex) {
+                reportError("INVALID_TARGET_URI");
+            }
+        } else {
+            reportError("MISSING_TARGET_URI");
+        }
+        throw ExceptionUtils.toBadRequestException(null, null);
     }
     
     protected String createSecurityContext(RequestState requestState,

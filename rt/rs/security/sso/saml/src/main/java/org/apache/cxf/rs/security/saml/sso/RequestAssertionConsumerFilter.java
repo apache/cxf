@@ -25,14 +25,12 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 
 @PreMatching
 @BindingPriority(BindingPriority.AUTHENTICATION)
@@ -66,21 +64,7 @@ public class RequestAssertionConsumerFilter extends AbstractRequestAssertionCons
             JAXRSUtils.getCurrentMessage().put(SSOConstants.RACS_IS_COLLOCATED, Boolean.TRUE);
             return;
         }
-        RequestState requestState = processRelayState(relayState);
-        String targetUri = requestState.getTargetAddress();
-        if (targetUri != null 
-            && targetUri.startsWith(ct.getUriInfo().getRequestUri().toString())) {
-            reportError("INVALID_TARGET_URI");
-            ct.abortWith(Response.status(400).build());
-            return;
-        }
-            
-        
-        String contextCookie = createSecurityContext(requestState,
-                                                     encodedSamlResponse,
-                                                     relayState,
-                                                     postBinding);
-        ct.getHeaders().add(HttpHeaders.COOKIE, contextCookie);
+        ct.abortWith(doProcessSamlResponse(encodedSamlResponse, relayState, postBinding));
         
     }
     
