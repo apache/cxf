@@ -45,6 +45,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_MEDIA_TYPE_MAP, 
                         "multipart/form-data=org.apache.cxf.jaxrs.ext.multipart.MultipartBody");
             context.put(WadlToolConstants.CFG_NO_VOID_FOR_EMPTY_RESPONSES, "true");
+            context.put(WadlToolConstants.CFG_GENERATE_RESPONSE_IF_HEADERS_SET, "true");
+            context.put(WadlToolConstants.CFG_GENERATE_RESPONSE_FOR_METHODS, "getName");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
             
             container.setContext(context);

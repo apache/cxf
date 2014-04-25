@@ -161,7 +161,7 @@ Examples:
                 </annotation>
                 <switch>impl</switch>
             </option>
-            
+
             <option id="generateEnums" maxOccurs="1">
                 <annotation>
                     Specifies that Enum classes can be generated to represent
@@ -209,7 +209,22 @@ Examples:
                 </annotation>
                 <switch>supportMultipleXmlReps</switch>
             </option>
- 
+            <option id="generateResponseIfHeadersSet" maxOccurs="1">
+                <annotation>
+                   Use JAX-RS Response return type if WADL Response element has 'header' parameters   
+                </annotation>
+                <switch>generateResponseIfHeadersSet</switch>
+            </option>
+            <option id="generateResponseForMethods" maxOccurs="unbounded">
+                <annotation>
+                    Specifies a comma separated list of method names or identifiers 
+                    which need to have JAXRS Response return type generated                     
+                </annotation>
+                <associatedArgument placement="immediate">
+                    <annotation>methodNames</annotation>
+                </associatedArgument>
+                <switch>generateResponseForMethods</switch>
+            </option>
             <option id="async" maxOccurs="unbounded">
                 <annotation>
                     Specifies a comma separated list of method names or identifiers 
