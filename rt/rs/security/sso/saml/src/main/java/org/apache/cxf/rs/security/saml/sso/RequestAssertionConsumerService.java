@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
-import java.net.URI;
-
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -28,9 +26,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.apache.cxf.jaxrs.utils.ExceptionUtils;
-import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 
 @Path("sso")
 public class RequestAssertionConsumerService extends AbstractRequestAssertionConsumerHandler {
@@ -46,33 +41,5 @@ public class RequestAssertionConsumerService extends AbstractRequestAssertionCon
     public Response getSamlResponse(@QueryParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
                                     @QueryParam(SSOConstants.RELAY_STATE) String relayState) {
         return doProcessSamlResponse(encodedSamlResponse, relayState, false);
-    }
-    
-    protected Response doProcessSamlResponse(String encodedSamlResponse,
-                                             String relayState,
-                                             boolean postBinding) {
-        RequestState requestState = processRelayState(relayState);
-       
-        String contextCookie = createSecurityContext(requestState,
-                                                    encodedSamlResponse,
-                                                   relayState,
-                                                   postBinding);
-       
-        // Finally, redirect to the service provider endpoint
-        URI targetURI = getTargetURI(requestState.getTargetAddress());
-        return Response.seeOther(targetURI).header("Set-Cookie", contextCookie).build();
-    }
-    
-    private URI getTargetURI(String targetAddress) {
-        if (targetAddress != null) {
-            try {
-                return URI.create(targetAddress);
-            } catch (IllegalArgumentException ex) {
-                reportError("INVALID_TARGET_URI");
-            }
-        } else {
-            reportError("MISSING_TARGET_URI");
-        }
-        throw ExceptionUtils.toBadRequestException(null, null);
     }
 }
