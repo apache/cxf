@@ -35,6 +35,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
+import org.apache.cxf.sts.cache.CacheUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.realm.CertConstraintsParser;
@@ -331,20 +332,11 @@ public class SAMLTokenValidator implements TokenValidator {
                 validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
             }
             
-            SecurityToken securityToken = new SecurityToken(assertion.getId(), null, validTill.toDate());
-            securityToken.setToken(assertion.getElement());
-            securityToken.setPrincipal(principal);
-            
-            if (tokenRealm != null) {
-                Properties props = new Properties();
-                props.setProperty(STSConstants.TOKEN_REALM, tokenRealm);
-                securityToken.setProperties(props);
-            }
-
-            int hash = Arrays.hashCode(signatureValue);
-            securityToken.setTokenHash(hash);
-            String identifier = Integer.toString(hash);
-            tokenStore.add(identifier, securityToken);
+            SecurityToken securityToken = 
+                CacheUtils.createSecurityTokenForStorage(assertion.getElement(), assertion.getId(), 
+                    validTill.toDate(), principal, tokenRealm,
+                    null);
+            CacheUtils.storeTokenInCache(securityToken, tokenStore, signatureValue);
         }
     }
 
