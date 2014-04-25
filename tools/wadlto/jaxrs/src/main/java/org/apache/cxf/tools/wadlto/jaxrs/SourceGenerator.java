@@ -188,6 +188,7 @@ public class SourceGenerator {
     private boolean skipSchemaGeneration;
     private boolean inheritResourceParams;
     private boolean useVoidForEmptyResponses = true;
+    private boolean generateResponseIfHeadersSet;
     
     private Map<String, String> properties; 
     
@@ -197,6 +198,7 @@ public class SourceGenerator {
     private List<InputSource> schemaPackageFiles = Collections.emptyList();
     private List<String> compilerArgs = new ArrayList<String>();
     private Set<String> suspendedAsyncMethods = Collections.emptySet();
+    private Set<String> responseMethods = Collections.emptySet();
     private Map<String, String> schemaPackageMap = Collections.emptyMap();
     private Map<String, String> javaTypeMap = Collections.emptyMap();
     private Map<String, String> schemaTypeMap = Collections.emptyMap();
@@ -225,6 +227,11 @@ public class SourceGenerator {
     public void setUseVoidForEmptyResponses(boolean use) {
         this.useVoidForEmptyResponses = use;
     }
+    
+    public void setGenerateResponseIfHeadersSet(boolean set) {
+        this.generateResponseIfHeadersSet = true;
+    }
+    
     public String getWadlNamespace() {
         return wadlNamespace;
     }
@@ -239,6 +246,10 @@ public class SourceGenerator {
     
     public void setSuspendedAsyncMethods(Set<String> asyncMethods) {
         this.suspendedAsyncMethods = asyncMethods;
+    }
+    
+    public void setResponseMethods(Set<String> responseMethods) {
+        this.responseMethods = responseMethods;
     }
     
     private String getClassPackageName(String wadlPackageName) {
@@ -673,8 +684,9 @@ public class SourceGenerator {
         if (id.length() == 0) {
             id = methodNameLowerCase;
         }
-        final boolean suspendedAsync = suspendedAsyncMethods.contains(methodNameLowerCase)
-            || methodNameLowerCase != id && suspendedAsyncMethods.contains(id.toLowerCase());
+        final boolean responseRequired = isMethodMatched(responseMethods, methodNameLowerCase, id);
+        final boolean suspendedAsync = responseRequired ? false
+            : isMethodMatched(suspendedAsyncMethods, methodNameLowerCase, id);
         
         boolean jaxpSourceRequired = xmlRequestReps.size() > 1 && !supportMultipleXmlReps;
         int numOfMethods = jaxpSourceRequired ? 1 : xmlRequestReps.size(); 
@@ -713,8 +725,10 @@ public class SourceGenerator {
                 sbCode.append("public ");
             }
             boolean responseTypeAvailable = true;
+            
             if (methodNameLowerCase.length() > 0) {
-                responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, info, suspendedAsync);
+                responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, info, 
+                                                          responseRequired, suspendedAsync);
                 String genMethodName = id + suffixName;
                 if (methodNameLowerCase.equals(genMethodName)) {
                     List<PathSegment> segments = JAXRSUtils.getPathSegments(currentPath, true, true);
@@ -768,6 +782,15 @@ public class SourceGenerator {
             }
             sbCode.append(getLineSep()).append(getLineSep());
         }
+    }
+    
+    private static boolean isMethodMatched(Set<String> methodNames, String methodNameLowerCase, String id) {
+        if (methodNames.isEmpty()) {
+            return false;
+        }
+        return methodNames.contains(methodNameLowerCase) 
+            || methodNameLowerCase != id && methodNames.contains(id.toLowerCase())
+            || methodNames.size() == 1 && "*".equals(methodNames.iterator().next());
     }
 
     private List<Element> getXmlReps(List<Element> repElements) {
@@ -857,6 +880,7 @@ public class SourceGenerator {
                                       StringBuilder sbCode,
                                       Set<String> imports,  
                                       ContextInfo info,
+                                      boolean responseRequired,
                                       boolean suspendedAsync) {
         
         Element okResponse = !suspendedAsync ? getOKResponse(responseEls) : null;
@@ -867,25 +891,37 @@ public class SourceGenerator {
         } else {
             repElements = CastUtils.cast(Collections.emptyList(), Element.class);
         }
-        
-        if (repElements.size() == 0) {
-            if (useVoidForEmptyResponses || suspendedAsync) {
-                sbCode.append("void ");
-            } else {
-                addImport(imports, Response.class.getName());
-                sbCode.append("Response ");
+        if (!suspendedAsync && !responseRequired && responseEls.size() == 1 && generateResponseIfHeadersSet) {
+            List<Element> outResponseParamElements = 
+                getParameters(responseEls.get(0), info.getInheritedParams(), false);
+            if (outResponseParamElements.size() > 0) {
+                writeJaxrResponse(sbCode, imports);
+                return true;
             }
-            return false;
         }
-        String elementName = getElementRefName(
+        if (repElements.size() == 0) {
+            if (useVoidForEmptyResponses && !responseRequired || suspendedAsync) {
+                sbCode.append("void ");
+                return false;
+            } else {
+                writeJaxrResponse(sbCode, imports);
+                return true;
+            }
+        }
+        
+        String elementName = responseRequired ? null : getElementRefName(
                 getActualRepElement(repElements, getXmlReps(repElements).get(0)), info, imports);
         if (elementName != null) {
             sbCode.append(elementName + " ");
         } else {
-            addImport(imports, Response.class.getName());
-            sbCode.append("Response ");
+            writeJaxrResponse(sbCode, imports);
         }
         return true;
+    }
+    
+    private void writeJaxrResponse(StringBuilder sbCode, Set<String> imports) {
+        addImport(imports, Response.class.getName());
+        sbCode.append(Response.class.getSimpleName()).append(" ");
     }
     
     private Element getOKResponse(List<Element> responseEls) {

@@ -172,6 +172,7 @@
                     <response>
                         <representation mediaType="application/xml" element="prefix1:thechapter"/>
                         <representation mediaType="application/json"/>
+                        <param name="Cache-Control" style="header" type="xsd:string"/>
                     </response>
                 </method>
             </resource>

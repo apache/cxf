@@ -151,6 +151,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setMediaTypeMap(getMediaTypeMap());
 
         sg.setSuspendedAsyncMethods(getSuspendedAsyncMethods());
+        sg.setResponseMethods(getResponseMethods());
         
         sg.setGenerateEnums(context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS));
         sg.setInheritResourceParams(context.optionSet(WadlToolConstants.CFG_INHERIT_PARAMS));
@@ -160,6 +161,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         if (noVoidForEmptyResponses) {
             sg.setUseVoidForEmptyResponses(false);
         }
+        
+        sg.setGenerateResponseIfHeadersSet(context.optionSet(WadlToolConstants.CFG_GENERATE_RESPONSE_IF_HEADERS_SET));
         
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
@@ -209,7 +212,15 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     }
     
     public Set<String> getSuspendedAsyncMethods() {
-        Object value = context.get(WadlToolConstants.CFG_SUSPENDED_ASYNC);
+        return parseMethodList(WadlToolConstants.CFG_SUSPENDED_ASYNC);
+    }
+    
+    public Set<String> getResponseMethods() {
+        return parseMethodList(WadlToolConstants.CFG_GENERATE_RESPONSE_FOR_METHODS);
+    }
+    
+    private Set<String> parseMethodList(String paramName) {
+        Object value = context.get(paramName);
         if (value != null) {
             Set<String> methods = new HashSet<String>();
             String[] values = value.toString().split(",");
