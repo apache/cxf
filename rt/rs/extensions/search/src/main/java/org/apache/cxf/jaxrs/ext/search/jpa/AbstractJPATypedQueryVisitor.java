@@ -198,7 +198,9 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         case EQUALS:
             if (clazz.equals(String.class)) {
                 String theValue = SearchUtils.toSqlWildcardString(value.toString(), isWildcardStringMatch());
-                if (theValue.contains("%")) {
+                if (SearchUtils.containsEscapedChar(theValue)) {
+                    pred = builder.like((Expression<String>)exp, theValue, '\\');
+                } else if (theValue.contains("%")) {
                     pred = builder.like((Expression<String>)exp, theValue);
                 } else {
                     pred = builder.equal(exp, clazz.cast(value));
@@ -210,7 +212,9 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         case NOT_EQUALS:
             if (clazz.equals(String.class)) {
                 String theValue = SearchUtils.toSqlWildcardString(value.toString(), isWildcardStringMatch());
-                if (theValue.contains("%")) {
+                if (SearchUtils.containsEscapedChar(theValue)) {
+                    pred = builder.notLike((Expression<String>)exp, theValue, '\\');
+                } else if (theValue.contains("%")) {
                     pred = builder.notLike((Expression<String>)exp, theValue);
                 } else {
                     pred = builder.notEqual(exp, clazz.cast(value));

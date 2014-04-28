@@ -37,13 +37,13 @@ public class SQLPrinterVisitorTest extends Assert {
 
     @Test
     public void testSQL1() throws SearchParseException {
-        SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
+        SearchCondition<Condition> filter = parser.parse("name==ami%*;level=gt=10");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor.visitor());
         String sql = visitor.getQuery();
         
-        assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') AND (level > '10')".equals(sql)
-                   || "SELECT * FROM table WHERE (level > '10') AND (name LIKE 'ami%')".equals(sql));
+        assertTrue("SELECT * FROM table WHERE (name LIKE 'ami\\%%') AND (level > '10')".equals(sql)
+                   || "SELECT * FROM table WHERE (level > '10') AND (name LIKE 'ami\\%%')".equals(sql));
     }
     
     @Test
