@@ -81,19 +81,19 @@ final class NegotiationUtils {
     }
 
     static Trust10 getTrust10(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
-        if (ais.isEmpty()) {
+        AssertionInfo ai = getFirstAssertionByLocalname(aim, SPConstants.TRUST_10);
+        if (ai == null) {
             return null;
         }
-        return (Trust10)ais.iterator().next().getAssertion();
+        return (Trust10)ai.getAssertion();
     }
     
     static Trust13 getTrust13(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
-        if (ais.isEmpty()) {
+        AssertionInfo ai = getFirstAssertionByLocalname(aim, SPConstants.TRUST_13);
+        if (ai == null) {
             return null;
         }
-        return (Trust13)ais.iterator().next().getAssertion();
+        return (Trust13)ai.getAssertion();
     }
     
     static TokenStore getTokenStore(Message message) {
@@ -329,6 +329,22 @@ final class NegotiationUtils {
         }
             
         return Collections.emptySet();
+    }
+    
+    static AssertionInfo getFirstAssertionByLocalname(
+        AssertionInfoMap aim, String localname
+    ) {
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            return sp11Ais.iterator().next();
+        }
+
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            return sp12Ais.iterator().next();
+        }
+
+        return null;
     }
     
     static boolean isThereAnAssertionByLocalname(
