@@ -113,6 +113,15 @@ public final class WebSocketUtils {
         return buffer.toString();
     }
 
+    /**
+     * Build response bytes with the status and type information specified in the headers.
+     *
+     * @param headers
+     * @param data
+     * @param offset
+     * @param length
+     * @return
+     */
     public static byte[] buildResponse(Map<String, String> headers, byte[] data, int offset, int length) {
         StringBuilder sb = new StringBuilder();
         String v = headers.get(SC_KEY);
@@ -123,15 +132,24 @@ public final class WebSocketUtils {
         }
         sb.append(CRLF);
         
-        byte[] hb = sb.toString().getBytes();
-        byte[] longdata = new byte[hb.length + length];
-        System.arraycopy(hb, 0, longdata, 0, hb.length);
+        byte[] longdata = sb.toString().getBytes();
         if (data != null && length > 0) {
+            final byte[] hb = longdata;
+            longdata = new byte[hb.length + length];
+            System.arraycopy(hb, 0, longdata, 0, hb.length);
             System.arraycopy(data, offset, longdata, hb.length, length);
         }
         return longdata;
     }
 
+    /**
+     * Build response bytes without status and type information.
+     *
+     * @param data
+     * @param offset
+     * @param length
+     * @return
+     */
     public static byte[] buildResponse(byte[] data, int offset, int length) {
         byte[] longdata = new byte[length + 2];
         longdata[0] = 0x0d;
@@ -140,5 +158,35 @@ public final class WebSocketUtils {
         return longdata;
     }
     
+    /**
+     * Build request bytes with the specified method, url, headers, and content entity.
+     * 
+     * @param method
+     * @param url
+     * @param headers
+     * @param data
+     * @param offset
+     * @param length
+     * @return
+     */
+    public static byte[] buildRequest(String method, String url, Map<String, String> headers,
+                                      byte[] data, int offset, int length) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(method).append(' ').append(url).append(CRLF);
+        String v = headers.get("Content-Type");
+        if (v != null) {
+            sb.append("Content-Type: ").append(v).append(CRLF);
+        }
+        sb.append(CRLF);
+
+        byte[] longdata = sb.toString().getBytes();
+        if (data != null && length > 0) {
+            final byte[] hb = longdata;
+            longdata = new byte[hb.length + length];
+            System.arraycopy(hb, 0, longdata, 0, hb.length);
+            System.arraycopy(data, offset, longdata, hb.length, length);
+        }
+        return longdata;
+    }
 
 }

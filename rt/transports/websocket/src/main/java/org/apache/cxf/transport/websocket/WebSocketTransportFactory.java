@@ -37,7 +37,10 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.cxf.transport.http.HttpDestinationFactory;
+import org.apache.cxf.transport.websocket.ahc.AhcWebSocketConduit;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 @NoJSR250Annotations
@@ -105,8 +108,19 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
      */
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target, Bus bus)
         throws IOException {
-        //TODO add on implementation using ning
-        throw new RuntimeException("not implemented yet");
+        HTTPConduit conduit = new AhcWebSocketConduit(bus, endpointInfo, target);
+
+        String address = conduit.getAddress();
+        if (address != null && address.indexOf('?') != -1) {
+            address = address.substring(0, address.indexOf('?'));
+        }
+        HTTPConduitConfigurer c1 = bus.getExtension(HTTPConduitConfigurer.class);
+        if (c1 != null) {
+            c1.configure(conduit.getBeanName(), address, conduit);
+        }
+        configure(bus, conduit, conduit.getBeanName(), address);
+        conduit.finalizeConfig();
+        return conduit;
     }
 
     /**
