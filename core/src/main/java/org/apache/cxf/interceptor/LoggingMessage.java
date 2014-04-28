@@ -50,6 +50,10 @@ public final class LoggingMessage {
         responseCode = new StringBuilder();
     }
     
+    public String getId() {
+        return id;
+    }
+    
     public static String nextId() {
         return Integer.toString(ID.incrementAndGet());
     }
