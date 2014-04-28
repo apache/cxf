@@ -52,6 +52,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.xml.security.Init;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutboundXMLSec;
@@ -85,6 +86,10 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private List<QName> elementsToSign = new ArrayList<QName>();
     private List<QName> elementsToEncrypt = new ArrayList<QName>();
     private boolean keyInfoMustBeAvailable = true;
+    
+    static {
+        Init.init();
+    }
 
     public XmlSecOutInterceptor() {
         super(Phase.PRE_STREAM);

@@ -22,7 +22,7 @@ import org.apache.xml.security.encryption.XMLCipher;
 
 public class EncryptionProperties {
     private String encryptionKeyTransportAlgo = XMLCipher.RSA_OAEP;
-    private String encryptionSymmetricKeyAlgo;
+    private String encryptionSymmetricKeyAlgo = XMLCipher.AES_256;
     private String encryptionDigestAlgo;
     private String encryptionKeyIdType;
     
