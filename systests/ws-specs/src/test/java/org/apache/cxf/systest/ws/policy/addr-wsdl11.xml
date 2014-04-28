@@ -28,4 +28,6 @@
         </cxf:features>
     </cxf:bus>
     <p:externalAttachment location="${temp.location}/addr-external-wsdl11.xml"/>
+    <bean id="uriDomainExpressionBuilder" class="org.apache.cxf.ws.policy.attachment.external.URIDomainExpressionBuilder"/>
+    
 </beans>

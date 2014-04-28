@@ -30,7 +30,6 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.greeter_control.BasicGreeterService;
 import org.apache.cxf.greeter_control.Greeter;
-import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -38,7 +37,6 @@ import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -130,29 +128,8 @@ public class AddressingPolicyExternalAttachmentWsdl11Test extends AbstractBusCli
         LOG.fine("Created greeter client.");     
         ConnectionHelper.setKeepAliveConnection(greeter, true);
 
-        // oneway
-
-        //greeter.greetMeOneWay("CXF");
-
-        // two-way
-
         assertEquals("CXF", greeter.greetMe("cxf")); 
      
-        // exception
-
-        try {
-            greeter.pingMe();
-        } catch (PingMeFault ex) {
-            fail("First invocation should have succeeded.");
-        } 
-       
-        try {
-            greeter.pingMe();
-            fail("Expected PingMeFault not thrown.");
-        } catch (PingMeFault ex) {
-            assertEquals(2, ex.getFaultInfo().getMajor());
-            assertEquals(1, ex.getFaultInfo().getMinor());
-        } 
         ((Closeable)greeter).close();
 
     }
