@@ -88,6 +88,9 @@ public final class SecurityUtils {
     
     public static X509Certificate[] getCertificates(Crypto crypto, String user)
         throws Exception {
+        if (crypto == null) {
+            throw new Exception("Crypto instance is null");
+        }
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(user);
         X509Certificate[] issuerCerts = crypto.getX509Certificates(cryptoType);
