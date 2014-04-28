@@ -54,6 +54,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutboundXMLSec;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -153,10 +154,10 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private void configureEncryption(Message message, XMLSecurityProperties properties) 
         throws Exception {
-        properties.setEncryptionSymAlgorithm(
-            encryptionProperties.getEncryptionSymmetricKeyAlgo());
-        properties.setEncryptionKey(
-            getSymmetricKey(encryptionProperties.getEncryptionSymmetricKeyAlgo()));
+        String symEncAlgo = encryptionProperties.getEncryptionSymmetricKeyAlgo() == null
+            ? XMLCipher.AES_256 : encryptionProperties.getEncryptionSymmetricKeyAlgo();
+        properties.setEncryptionSymAlgorithm(symEncAlgo);
+        properties.setEncryptionKey(getSymmetricKey(symEncAlgo));
         if (encryptSymmetricKey) {
             X509Certificate sendingCert = null;
             String userName = 
