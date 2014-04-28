@@ -53,10 +53,15 @@ public final class SearchUtils {
     }
     
     public static String toSqlWildcardString(String value, boolean alwaysWildcard) {
+        if (value.contains("\\")) {
+            value = value.replaceAll("\\\\", "\\\\\\\\"); 
+        }
+        if (value.contains("%")) {
+            value = value.replaceAll("%", "\\\\%");
+        }
         if (!value.contains("*")) {
             return alwaysWildcard ? "%" + value + "%" : value;
         }
-        
         if (value.startsWith("*")) { 
             value = "%" + value.substring(1);
         }
@@ -64,6 +69,10 @@ public final class SearchUtils {
             value = value.substring(0, value.length() - 1) + "%";
         }
         return value;
+    }
+    
+    public static boolean containsEscapedChar(String value) {
+        return value.contains("\\%") || value.contains("\\\\");
     }
     
     public static void startSqlQuery(StringBuilder sb, 
@@ -94,10 +103,10 @@ public final class SearchUtils {
         String op;
         switch (ct) {
         case EQUALS:
-            op = value.contains("%") ? "LIKE" : "=";
+            op = containsEscapedChar(value) || value.contains("%") ? "LIKE" : "=";
             break;
         case NOT_EQUALS:
-            op = value.contains("%") ? "NOT LIKE" : "<>";
+            op = containsEscapedChar(value) || value.contains("%") ? "NOT LIKE" : "<>";
             break;
         case GREATER_THAN:
             op = ">";
