@@ -20,24 +20,34 @@
 package org.apache.cxf.rs.security.oauth2.services;
 
 import java.security.Principal;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
+import javax.security.auth.x500.X500Principal;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.ClientCredentialType;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
+import org.apache.cxf.rs.security.oauth2.provider.ClientIdProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 
 public class AbstractTokenService extends AbstractOAuthService {
     private boolean canSupportPublicClients;
     private boolean writeCustomErrors;
+    private ClientIdProvider clientIdProvider;
     
     /**
      * Make sure the client is authenticated
@@ -47,36 +57,36 @@ public class AbstractTokenService extends AbstractOAuthService {
         SecurityContext sc = getMessageContext().getSecurityContext();
         
         if (params.containsKey(OAuthConstants.CLIENT_ID)) {
-            // both client_id and client_secret are expected in the form payload
+            // Both client_id and client_secret are expected in the form payload
             client = getAndValidateClient(params.getFirst(OAuthConstants.CLIENT_ID),
                                           params.getFirst(OAuthConstants.CLIENT_SECRET));
         } else if (sc.getUserPrincipal() != null) {
-            // client has already authenticated
+            // Client has already been authenticated
             Principal p = sc.getUserPrincipal();
-            String scheme = sc.getAuthenticationScheme();
-            if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(scheme)) {
-                // section 2.3.1
+            if (p.getName() != null) {
                 client = getClient(p.getName());
             } else {
-                // section 2.3.2
-                // the client has authenticated itself using some other scheme
-                // in which case the mapping between the scheme and the client_id
-                // should've been done and the client_id is expected
-                // on the current message
-                Object clientIdProp = getMessageContext().get(OAuthConstants.CLIENT_ID);
-                if (clientIdProp != null) {
-                    client = getClient(clientIdProp.toString());
-                    // TODO: consider matching client.getUserSubject().getLoginName() 
-                    // against principal.getName() ?
+                // Most likely a container-level authentication, possibly 2-way TLS, 
+                // Check if the mapping between Principal and Client Id has been done in a filter
+                String clientId = (String)getMessageContext().get(OAuthConstants.CLIENT_ID);
+                if (StringUtils.isEmpty(clientId) && clientIdProvider != null) {
+                    // Check Custom ClientIdProvider
+                    clientId = clientIdProvider.getClientId(getMessageContext());
                 }
+                if (!StringUtils.isEmpty(clientId)) {
+                    client = getClient(clientId);
+                } 
             }
-        } else {
-            // the client id and secret are expected to be in the Basic scheme data
-            String[] parts = 
-                AuthorizationUtils.getAuthorizationParts(getMessageContext());
-            if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(parts[0])) {
-                String[] authInfo = AuthorizationUtils.getBasicAuthParts(parts[1]);
-                client = getAndValidateClient(authInfo[0], authInfo[1]);
+        } 
+        
+        if (client == null) {
+            TLSSessionInfo tlsSessionInfo = 
+                (TLSSessionInfo)getMessageContext().get(TLSSessionInfo.class.getName());
+            if (tlsSessionInfo != null) {
+                client = getClientFromTLSCertificates(sc, tlsSessionInfo);
+            } else {
+                // Basic Authentication is expected by default
+                client = getClientFromBasicAuthScheme();
             }
         }
         
@@ -89,19 +99,93 @@ public class AbstractTokenService extends AbstractOAuthService {
     // Get the Client and check the id and secret
     protected Client getAndValidateClient(String clientId, String clientSecret) {
         Client client = getClient(clientId);
+        if (clientSecret != null 
+            && (client.getClientCredentialType() == null 
+            || !ClientCredentialType.PASSWORD.equals(client.getClientCredentialType()))) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
         if (canSupportPublicClients 
             && !client.isConfidential() 
-            && client.getClientSecret() == null 
+            && client.getClientCredential() == null 
             && clientSecret == null) {
             return client;
         }
-        if (clientSecret == null || client.getClientSecret() == null 
+        if (clientSecret == null || client.getClientCredential() == null 
             || !client.getClientId().equals(clientId) 
-            || !client.getClientSecret().equals(clientSecret)) {
+            || !client.getClientCredential().equals(clientSecret)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         return client;
     }
+    
+    protected Client getClientFromBasicAuthScheme() {
+        String[] parts = AuthorizationUtils.getAuthorizationParts(getMessageContext());
+        if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(parts[0])) {
+            String[] authInfo = AuthorizationUtils.getBasicAuthParts(parts[1]);
+            return getAndValidateClient(authInfo[0], authInfo[1]);
+        } else {
+            return null;
+        }
+    }
+    
+    protected Client getClientFromTLSCertificates(SecurityContext sc, TLSSessionInfo tlsSessionInfo) {
+        Client client = null;
+        if (tlsSessionInfo != null) {
+            String authScheme = sc.getAuthenticationScheme();
+            if (StringUtils.isEmpty(authScheme)) {
+                // Pure 2-way TLS authentication
+                String clientId = getClientIdFromTLSCertificates(sc, tlsSessionInfo);
+                if (!StringUtils.isEmpty(clientId)) {
+                    client = getClient(clientId);
+                    // Validate the client identified from certificates
+                    validateTwoWayTlsClient(sc, tlsSessionInfo, client);
+                }
+            } else if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(authScheme)) {
+                // Basic Authentication on top of 2-way TLS
+                client = getClientFromBasicAuthScheme();    
+            }
+        }
+        return client;
+    }
+    
+    protected String getClientIdFromTLSCertificates(SecurityContext sc, TLSSessionInfo tlsInfo) {
+        Certificate[] clientCerts = tlsInfo.getPeerCertificates();
+        if (clientCerts != null && clientCerts.length > 0) {
+            X500Principal x509Principal = ((X509Certificate)clientCerts[0]).getSubjectX500Principal();
+            return x509Principal.getName();    
+        }
+        return null;
+    }
+    
+    protected void validateTwoWayTlsClient(SecurityContext sc, TLSSessionInfo tlsSessionInfo, Client client) {
+        ClientCredentialType credType = client.getClientCredentialType();
+        if (credType != ClientCredentialType.X509CERTIFICATE && credType != ClientCredentialType.PUBLIC_KEY) {
+            reportInvalidClient();
+        } else if (client.getClientCredential() != null) {
+            // Client has a Base64 encoded representation of the certificate loaded
+            // so lets validate the TLS certificates
+            compareCertificates(tlsSessionInfo, client.getClientCredential(), credType);
+        }
+    }
+    
+    protected void compareCertificates(TLSSessionInfo tlsInfo, 
+                                       String base64EncodedCert,
+                                       ClientCredentialType type) {
+        Certificate[] clientCerts = tlsInfo.getPeerCertificates();
+        try {
+            X509Certificate cert = (X509Certificate)clientCerts[0];
+            byte[] encodedKey = type == ClientCredentialType.PUBLIC_KEY 
+                ? cert.getPublicKey().getEncoded() : cert.getEncoded();
+            byte[] clientKey = Base64Utility.decode(base64EncodedCert);
+            if (Arrays.equals(encodedKey, clientKey)) {
+                return;
+            }
+        } catch (Exception ex) {
+            reportInvalidClient();
+        }
+    }
+    
+    
     
     protected Response handleException(OAuthServiceException ex, String error) {
         OAuthError customError = ex.getError();
@@ -167,5 +251,9 @@ public class AbstractTokenService extends AbstractOAuthService {
     
     public void setWriteCustomErrors(boolean writeCustomErrors) {
         this.writeCustomErrors = writeCustomErrors;
+    }
+
+    public void setClientIdProvider(ClientIdProvider clientIdProvider) {
+        this.clientIdProvider = clientIdProvider;
     }
 }

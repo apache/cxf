@@ -32,9 +32,8 @@ public class Client implements Serializable {
     private static final long serialVersionUID = -5550840247125850922L;
     
     private String clientId;
-    // TODO: Consider introducing ClientCredentials instead
-    // so that a secret, public key, etc can be kept
-    private String clientSecret;
+    private String clientCred;
+    private ClientCredentialType clientCredentialType = ClientCredentialType.PASSWORD;
     
     private String applicationName;
     private String applicationDescription;
@@ -54,21 +53,31 @@ public class Client implements Serializable {
         
     }
     
-    public Client(String clientId, String clientSecret, boolean isConfidential) {
+    public Client(String clientId, String clientCred, boolean isConfidential) {
         this.clientId = clientId;
-        this.clientSecret = clientSecret;
+        this.clientCred = clientCred;
         this.isConfidential = isConfidential;
     }
 
     public Client(String clientId, 
-                  String clientSecret,
+                  String clientCred,
                   boolean isConfidential,
                   String applicationName,
                   String applicationWebUri) {
-        this(clientId, clientSecret, isConfidential);
+        this(clientId, clientCred, isConfidential);
         this.applicationName = applicationName;
         this.applicationWebUri = applicationWebUri;
         
+    }
+    
+    public Client(String clientId, 
+                  String clientCred,
+                  ClientCredentialType clientCredType,
+                  boolean isConfidential,
+                  String applicationName,
+                  String applicationWebUri) {
+        this(clientId, clientCred, isConfidential, applicationName, applicationWebUri);
+        this.clientCredentialType = clientCredType;
     }
     
     /**
@@ -87,12 +96,26 @@ public class Client implements Serializable {
      * Gets the client secret
      * @return the secret
      */
+    @Deprecated
     public String getClientSecret() {
-        return clientSecret;
+        return clientCred;
     }
 
+    @Deprecated
     public void setClientSecret(String secret) {
-        this.clientSecret = secret;
+        this.clientCred = secret;
+    }
+    
+    /**
+     * Gets the client credential
+     * @return the secret
+     */
+    public String getClientCredential() {
+        return clientCred;
+    }
+
+    public void setClientCredential(String cred) {
+        this.clientCred = cred;
     }
     
     /**
@@ -278,5 +301,13 @@ public class Client implements Serializable {
 
     public void setRegisteredAudiences(List<String> registeredAudiences) {
         this.registeredAudiences = registeredAudiences;
+    }
+
+    public ClientCredentialType getClientCredentialType() {
+        return clientCredentialType;
+    }
+
+    public void setClientCredentialType(ClientCredentialType clientCredentialType) {
+        this.clientCredentialType = clientCredentialType;
     }
 }

@@ -18,10 +18,13 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oauth2;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.ClientCredentialType;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -33,12 +36,27 @@ import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 
 public class OAuthDataProviderImpl implements OAuthDataProvider {
 
-    @Override
-    public Client getClient(String clientId) throws OAuthServiceException {
+    private Map<String, Client> clients = new HashMap<String, Client>();
+    
+    public OAuthDataProviderImpl() {
         Client client = new Client("alice", "alice", true);
         client.getAllowedGrantTypes().add(Constants.SAML2_BEARER_GRANT);
         client.getAllowedGrantTypes().add("custom_grant");
-        return client;
+        clients.put(client.getClientId(), client);
+        
+        Client client2 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US", 
+                                    null,
+                                    ClientCredentialType.X509CERTIFICATE,
+                                    true,
+                                    null,
+                                    null);
+        client.getAllowedGrantTypes().add("custom_grant");
+        clients.put(client2.getClientId(), client2);
+    }
+    
+    @Override
+    public Client getClient(String clientId) throws OAuthServiceException {
+        return clients.get(clientId);
     }
 
     @Override

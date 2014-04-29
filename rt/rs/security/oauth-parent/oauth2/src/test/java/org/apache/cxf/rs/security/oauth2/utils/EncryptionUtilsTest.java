@@ -179,7 +179,7 @@ public class EncryptionUtilsTest extends Assert {
                                                   new ByteArrayInputStream(decrypted.getBytes()));
         
         assertEquals(c.getClientId(), c2.getClientId());
-        assertEquals(c.getClientSecret(), c2.getClientSecret());
+        assertEquals(c.getClientCredential(), c2.getClientCredential());
         assertTrue(c2.isConfidential());
         assertEquals("subject", c2.getSubject().getLogin());
         assertEquals("id", c2.getSubject().getId());
