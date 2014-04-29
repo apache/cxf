@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.ws.rs.BindingPriority;
@@ -27,7 +28,6 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -37,24 +37,28 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 public class RequestAssertionConsumerFilter extends AbstractRequestAssertionConsumerHandler 
     implements ContainerRequestFilter {
 
+    private boolean supportPostBinding;
+    
     @Override
     public void filter(ContainerRequestContext ct) throws IOException {
         String httpMethod = ct.getMethod();
-        if (HttpMethod.GET.equals(httpMethod)) {
+        if (HttpMethod.GET.equals(httpMethod) && !supportPostBinding) {
             MultivaluedMap<String, String> params = ct.getUriInfo().getQueryParameters();
             processParams(ct, params, false);
-        } else if (HttpMethod.POST.equals(httpMethod) 
+        } else if (HttpMethod.POST.equals(httpMethod)
+            && supportPostBinding
             && MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(ct.getMediaType())) {
             String strForm = IOUtils.toString(ct.getEntityStream());
             MultivaluedMap<String, String> params = JAXRSUtils.getStructuredParams(strForm, "&", false, false);
-            processParams(ct, params, true);
-        } else {
-            ct.abortWith(Response.status(400).build());
+            if (!processParams(ct, params, true)) {
+                // restore the stream
+                ct.setEntityStream(new ByteArrayInputStream(strForm.getBytes()));
+            }
         }
         
     }
     
-    protected void processParams(ContainerRequestContext ct,
+    protected boolean processParams(ContainerRequestContext ct,
                                  MultivaluedMap<String, String> params, 
                                  boolean postBinding) {
         String encodedSamlResponse = params.getFirst(SSOConstants.SAML_RESPONSE);
@@ -62,10 +66,13 @@ public class RequestAssertionConsumerFilter extends AbstractRequestAssertionCons
         if (relayState == null && encodedSamlResponse == null) { 
             // initial redirect to IDP has not happened yet, let the SAML authentication filter do it
             JAXRSUtils.getCurrentMessage().put(SSOConstants.RACS_IS_COLLOCATED, Boolean.TRUE);
-            return;
+            return false;
         }
         ct.abortWith(doProcessSamlResponse(encodedSamlResponse, relayState, postBinding));
-        
+        return true;
+    }
+    public void setSupportPostBinding(boolean supportPostBinding) {
+        this.supportPostBinding = supportPostBinding;
     }
     
 }
