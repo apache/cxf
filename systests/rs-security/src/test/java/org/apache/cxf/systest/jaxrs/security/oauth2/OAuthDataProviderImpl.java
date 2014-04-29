@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.ClientCredentialType;
+import org.apache.cxf.rs.security.oauth2.common.ClientCredential;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -45,8 +45,7 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
         clients.put(client.getClientId(), client);
         
         Client client2 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US", 
-                                    null,
-                                    ClientCredentialType.X509CERTIFICATE,
+                                    new ClientCredential(ClientCredential.Type.X509CERTIFICATE),
                                     true,
                                     null,
                                     null);

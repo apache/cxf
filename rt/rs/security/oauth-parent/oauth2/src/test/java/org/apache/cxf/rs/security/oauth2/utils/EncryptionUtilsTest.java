@@ -170,7 +170,6 @@ public class EncryptionUtilsTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         jsonp.writeTo(c, Client.class, new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
                       new MetadataMap<String, Object>(), bos);
-        
         String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.key);
         String decrypted = EncryptionUtils.decryptSequence(encrypted, p.key);
         Client c2 = jsonp.readFrom(Client.class, Client.class, 

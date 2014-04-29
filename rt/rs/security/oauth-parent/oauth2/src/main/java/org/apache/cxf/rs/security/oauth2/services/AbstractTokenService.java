@@ -36,7 +36,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.ClientCredentialType;
+import org.apache.cxf.rs.security.oauth2.common.ClientCredential;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.ClientIdProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -100,8 +100,8 @@ public class AbstractTokenService extends AbstractOAuthService {
     protected Client getAndValidateClient(String clientId, String clientSecret) {
         Client client = getClient(clientId);
         if (clientSecret != null 
-            && (client.getClientCredentialType() == null 
-            || !ClientCredentialType.PASSWORD.equals(client.getClientCredentialType()))) {
+            && (client.getClientCredential().getType() == null 
+            || ClientCredential.Type.PASSWORD != client.getClientCredential().getType())) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         if (canSupportPublicClients 
@@ -112,7 +112,7 @@ public class AbstractTokenService extends AbstractOAuthService {
         }
         if (clientSecret == null || client.getClientCredential() == null 
             || !client.getClientId().equals(clientId) 
-            || !client.getClientCredential().equals(clientSecret)) {
+            || !client.getClientCredential().getCredential().equals(clientSecret)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         return client;
@@ -158,23 +158,24 @@ public class AbstractTokenService extends AbstractOAuthService {
     }
     
     protected void validateTwoWayTlsClient(SecurityContext sc, TLSSessionInfo tlsSessionInfo, Client client) {
-        ClientCredentialType credType = client.getClientCredentialType();
-        if (credType != ClientCredentialType.X509CERTIFICATE && credType != ClientCredentialType.PUBLIC_KEY) {
+        ClientCredential.Type credType = client.getClientCredential().getType();
+        if (credType != ClientCredential.Type.X509CERTIFICATE 
+            && credType != ClientCredential.Type.PUBLIC_KEY) {
             reportInvalidClient();
-        } else if (client.getClientCredential() != null) {
+        } else if (client.getClientCredential().getCredential() != null) {
             // Client has a Base64 encoded representation of the certificate loaded
             // so lets validate the TLS certificates
-            compareCertificates(tlsSessionInfo, client.getClientCredential(), credType);
+            compareCertificates(tlsSessionInfo, client.getClientCredential().getCredential(), credType);
         }
     }
     
     protected void compareCertificates(TLSSessionInfo tlsInfo, 
                                        String base64EncodedCert,
-                                       ClientCredentialType type) {
+                                       ClientCredential.Type type) {
         Certificate[] clientCerts = tlsInfo.getPeerCertificates();
         try {
             X509Certificate cert = (X509Certificate)clientCerts[0];
-            byte[] encodedKey = type == ClientCredentialType.PUBLIC_KEY 
+            byte[] encodedKey = type == ClientCredential.Type.PUBLIC_KEY 
                 ? cert.getPublicKey().getEncoded() : cert.getEncoded();
             byte[] clientKey = Base64Utility.decode(base64EncodedCert);
             if (Arrays.equals(encodedKey, clientKey)) {
