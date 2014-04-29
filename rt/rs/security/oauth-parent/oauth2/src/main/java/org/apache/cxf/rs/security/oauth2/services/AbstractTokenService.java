@@ -58,7 +58,7 @@ public class AbstractTokenService extends AbstractOAuthService {
         
         if (params.containsKey(OAuthConstants.CLIENT_ID)) {
             // Both client_id and client_secret are expected in the form payload
-            client = getAndValidateClient(params.getFirst(OAuthConstants.CLIENT_ID),
+            client = getAndValidateClientFromIdAndSecret(params.getFirst(OAuthConstants.CLIENT_ID),
                                           params.getFirst(OAuthConstants.CLIENT_SECRET));
         } else if (sc.getUserPrincipal() != null) {
             // Client has already been authenticated
@@ -97,7 +97,7 @@ public class AbstractTokenService extends AbstractOAuthService {
     }
     
     // Get the Client and check the id and secret
-    protected Client getAndValidateClient(String clientId, String clientSecret) {
+    protected Client getAndValidateClientFromIdAndSecret(String clientId, String clientSecret) {
         Client client = getClient(clientId);
         if (clientSecret != null 
             && (client.getClientCredential().getType() == null 
@@ -122,7 +122,7 @@ public class AbstractTokenService extends AbstractOAuthService {
         String[] parts = AuthorizationUtils.getAuthorizationParts(getMessageContext());
         if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(parts[0])) {
             String[] authInfo = AuthorizationUtils.getBasicAuthParts(parts[1]);
-            return getAndValidateClient(authInfo[0], authInfo[1]);
+            return getAndValidateClientFromIdAndSecret(authInfo[0], authInfo[1]);
         } else {
             return null;
         }
