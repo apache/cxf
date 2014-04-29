@@ -27,7 +27,6 @@ import java.net.HttpURLConnection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -259,14 +258,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
     
     private static Locale stringToLocale(String locale) {
         // use the IETF BCP 47 delimiter but accept the toString delimiter for cxf 2.7.x
-        final String ch;
-        if (locale.indexOf('_') > 0) {
-            LOG.log(Level.WARNING, "invalid IETF BCP 47 language tag: {0}", locale);
-            ch = "_";
-        } else {
-            ch = "-";
-        }
-        String parts[] = locale.split(ch, 0);
+        String parts[] = locale.split("-", 0);
         if (parts.length == 1) {
             return new Locale(parts[0]);
         } else if (parts.length == 2) {
