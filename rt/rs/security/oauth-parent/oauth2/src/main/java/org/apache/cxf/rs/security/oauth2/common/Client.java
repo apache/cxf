@@ -32,7 +32,7 @@ public class Client implements Serializable {
     private static final long serialVersionUID = -5550840247125850922L;
     
     private String clientId;
-    private ClientCredential clientCred;
+    private ClientKey clientKey;
     
     private String applicationName;
     private String applicationDescription;
@@ -52,30 +52,30 @@ public class Client implements Serializable {
         
     }
     
-    public Client(String clientId, String clientCred, boolean isConfidential) {
+    public Client(String clientId, String clientSecret, boolean isConfidential) {
         this.clientId = clientId;
-        this.clientCred = clientCred == null ? null : new ClientCredential(clientCred);
+        this.clientKey = clientSecret == null ? null : new ClientKey(clientSecret);
         this.isConfidential = isConfidential;
     }
 
     public Client(String clientId, 
-                  String clientCred,
+                  String clientSecret,
                   boolean isConfidential,
                   String applicationName,
                   String applicationWebUri) {
-        this(clientId, clientCred, isConfidential);
+        this(clientId, clientSecret, isConfidential);
         this.applicationName = applicationName;
         this.applicationWebUri = applicationWebUri;
         
     }
     
     public Client(String clientId, 
-                  ClientCredential clientCred,
+                  ClientKey clientKey,
                   boolean isConfidential,
                   String applicationName,
                   String applicationWebUri) {
         this.clientId = clientId;
-        this.clientCred = clientCred;
+        this.clientKey = clientKey;
         this.isConfidential = isConfidential;
         this.applicationName = applicationName;
         this.applicationWebUri = applicationWebUri;
@@ -99,12 +99,12 @@ public class Client implements Serializable {
      * it has to be a Base64 encoded representation
      * @return the credential
      */
-    public ClientCredential getClientCredential() {
-        return clientCred;
+    public ClientKey getClientKey() {
+        return clientKey;
     }
 
-    public void setClientCredential(ClientCredential cred) {
-        this.clientCred = cred;
+    public void setClientKey(ClientKey key) {
+        this.clientKey = key;
     }
     
     /**

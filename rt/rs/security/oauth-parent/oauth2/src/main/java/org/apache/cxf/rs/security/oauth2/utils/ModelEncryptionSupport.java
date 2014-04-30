@@ -31,7 +31,7 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.ClientCredential;
+import org.apache.cxf.rs.security.oauth2.common.ClientKey;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -324,9 +324,8 @@ public final class ModelEncryptionSupport {
 
     private static Client recreateClientInternal(String sequence) {
         String[] parts = getParts(sequence);
-        ClientCredential clientCred = StringUtils.isEmpty(parts[1]) 
-            ? null : new ClientCredential(parts[1], 
-                                          ClientCredential.Type.valueOf(parts[2]));
+        ClientKey clientCred = StringUtils.isEmpty(parts[1]) ? null 
+            : new ClientKey(parts[1], ClientKey.Type.valueOf(parts[2]));
         Client c = new Client(parts[0], 
                               clientCred, 
                               Boolean.valueOf(parts[3]), 
@@ -346,7 +345,7 @@ public final class ModelEncryptionSupport {
         // 0: id
         state.append(tokenizeString(client.getClientId()));
         state.append(SEP);
-        ClientCredential cred = client.getClientCredential();
+        ClientKey cred = client.getClientKey();
         // 1: secret
         state.append(tokenizeString(cred == null ? null : cred.getCredential()));
         state.append(SEP);

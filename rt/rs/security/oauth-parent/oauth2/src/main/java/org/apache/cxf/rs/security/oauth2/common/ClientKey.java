@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 import java.io.Serializable;
 
-public class ClientCredential implements Serializable {
+public class ClientKey implements Serializable {
     private static final long serialVersionUID = 6151645789585333184L;
     public enum Type {
         PASSWORD,
@@ -31,19 +31,19 @@ public class ClientCredential implements Serializable {
     private String credential;
     private Type type;
     
-    public ClientCredential() {
+    public ClientKey() {
         
     }
     
-    public ClientCredential(String password) {
+    public ClientKey(String password) {
         this(password, Type.PASSWORD);
     }
     
-    public ClientCredential(Type type) {
+    public ClientKey(Type type) {
         this(null, type);
     }
     
-    public ClientCredential(String cred, Type type) {
+    public ClientKey(String cred, Type type) {
         this.credential = cred;
         this.type = type;
     }
@@ -68,8 +68,8 @@ public class ClientCredential implements Serializable {
         return (credential == null ? 37 : credential.hashCode()) * type.hashCode(); 
     }
     public boolean equals(Object obj) {
-        if (obj instanceof ClientCredential) {
-            ClientCredential other = (ClientCredential)obj;
+        if (obj instanceof ClientKey) {
+            ClientKey other = (ClientKey)obj;
             if (this.credential == null && other.credential != null
                 || this.credential != null && other.credential == null) {
                 return false;

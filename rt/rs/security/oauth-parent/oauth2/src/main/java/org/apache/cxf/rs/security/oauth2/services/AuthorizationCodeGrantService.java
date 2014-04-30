@@ -126,7 +126,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
 
     @Override
     protected boolean canSupportPublicClient(Client c) {
-        return canSupportPublicClients && !c.isConfidential() && c.getClientCredential() == null;
+        return canSupportPublicClients && !c.isConfidential() && c.getClientKey() == null;
     }
 
     @Override
