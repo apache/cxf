@@ -24,8 +24,7 @@ public class ClientKey implements Serializable {
     private static final long serialVersionUID = 6151645789585333184L;
     public enum Type {
         PASSWORD,
-        X509CERTIFICATE,
-        PUBLIC_KEY
+        X509CERTIFICATE
     }
     
     private String key;

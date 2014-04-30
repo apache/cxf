@@ -159,8 +159,7 @@ public class AbstractTokenService extends AbstractOAuthService {
     
     protected void validateTwoWayTlsClient(SecurityContext sc, TLSSessionInfo tlsSessionInfo, Client client) {
         ClientKey.Type credType = client.getClientKey().getType();
-        if (credType != ClientKey.Type.X509CERTIFICATE 
-            && credType != ClientKey.Type.PUBLIC_KEY) {
+        if (credType != ClientKey.Type.X509CERTIFICATE) {
             reportInvalidClient();
         } else if (client.getClientKey().getKey() != null) {
             // Client has a Base64 encoded representation of the certificate loaded
@@ -175,8 +174,7 @@ public class AbstractTokenService extends AbstractOAuthService {
         Certificate[] clientCerts = tlsInfo.getPeerCertificates();
         try {
             X509Certificate cert = (X509Certificate)clientCerts[0];
-            byte[] encodedKey = type == ClientKey.Type.PUBLIC_KEY 
-                ? cert.getPublicKey().getEncoded() : cert.getEncoded();
+            byte[] encodedKey = cert.getEncoded();
             byte[] clientKey = Base64Utility.decode(base64EncodedCert);
             if (Arrays.equals(encodedKey, clientKey)) {
                 return;
