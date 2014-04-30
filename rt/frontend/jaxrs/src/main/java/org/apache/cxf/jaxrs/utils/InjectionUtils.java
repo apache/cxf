@@ -1254,7 +1254,7 @@ public final class InjectionUtils {
     public static Object convertStringToPrimitive(String value, Class<?> cls, Annotation[] anns) {
         Message m = JAXRSUtils.getCurrentMessage();
         if (m != null) {
-            ParamConverter<?> pc = ServerProviderFactory.getInstance(m).createParameterHandler(cls, anns);
+            ParamConverter<?> pc = ProviderFactory.getInstance(m).createParameterHandler(cls, anns);
             if (pc != null) {
                 return pc.fromString(value);
             }
