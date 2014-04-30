@@ -36,7 +36,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.ClientKey;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.ClientIdProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -82,11 +81,14 @@ public class AbstractTokenService extends AbstractOAuthService {
         if (client == null) {
             TLSSessionInfo tlsSessionInfo = 
                 (TLSSessionInfo)getMessageContext().get(TLSSessionInfo.class.getName());
-            if (tlsSessionInfo != null) {
-                client = getClientFromTLSCertificates(sc, tlsSessionInfo);
-            } else {
+            client = getClientFromTLSCertificates(sc, tlsSessionInfo);
+            if (client == null) {
                 // Basic Authentication is expected by default
                 client = getClientFromBasicAuthScheme();
+            }
+            if (client != null && tlsSessionInfo != null) {
+                // Validate the client application certificates
+                compareTlsCertificates(tlsSessionInfo, client.getApplicationCertificate());
             }
         }
         
@@ -99,20 +101,15 @@ public class AbstractTokenService extends AbstractOAuthService {
     // Get the Client and check the id and secret
     protected Client getAndValidateClientFromIdAndSecret(String clientId, String clientSecret) {
         Client client = getClient(clientId);
-        if (clientSecret != null 
-            && (client.getClientKey().getType() == null 
-            || ClientKey.Type.PASSWORD != client.getClientKey().getType())) {
-            throw ExceptionUtils.toNotAuthorizedException(null, null);
-        }
         if (canSupportPublicClients 
             && !client.isConfidential() 
-            && client.getClientKey() == null 
+            && client.getClientSecret() == null 
             && clientSecret == null) {
             return client;
         }
-        if (clientSecret == null || client.getClientKey() == null 
+        if (clientSecret == null || client.getClientSecret() == null 
             || !client.getClientId().equals(clientId) 
-            || !client.getClientKey().getKey().equals(clientSecret)) {
+            || !client.getClientSecret().equals(clientSecret)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         return client;
@@ -130,19 +127,11 @@ public class AbstractTokenService extends AbstractOAuthService {
     
     protected Client getClientFromTLSCertificates(SecurityContext sc, TLSSessionInfo tlsSessionInfo) {
         Client client = null;
-        if (tlsSessionInfo != null) {
-            String authScheme = sc.getAuthenticationScheme();
-            if (StringUtils.isEmpty(authScheme)) {
-                // Pure 2-way TLS authentication
-                String clientId = getClientIdFromTLSCertificates(sc, tlsSessionInfo);
-                if (!StringUtils.isEmpty(clientId)) {
-                    client = getClient(clientId);
-                    // Validate the client identified from certificates
-                    validateTwoWayTlsClient(sc, tlsSessionInfo, client);
-                }
-            } else if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(authScheme)) {
-                // Basic Authentication on top of 2-way TLS
-                client = getClientFromBasicAuthScheme();    
+        if (tlsSessionInfo != null && StringUtils.isEmpty(sc.getAuthenticationScheme())) {
+            // Pure 2-way TLS authentication
+            String clientId = getClientIdFromTLSCertificates(sc, tlsSessionInfo);
+            if (!StringUtils.isEmpty(clientId)) {
+                client = getClient(clientId);
             }
         }
         return client;
@@ -157,30 +146,19 @@ public class AbstractTokenService extends AbstractOAuthService {
         return null;
     }
     
-    protected void validateTwoWayTlsClient(SecurityContext sc, TLSSessionInfo tlsSessionInfo, Client client) {
-        ClientKey.Type credType = client.getClientKey().getType();
-        if (credType != ClientKey.Type.X509CERTIFICATE) {
-            reportInvalidClient();
-        } else if (client.getClientKey().getKey() != null) {
-            // Client has a Base64 encoded representation of the certificate loaded
-            // so lets validate the TLS certificates
-            compareCertificates(tlsSessionInfo, client.getClientKey().getKey(), credType);
-        }
-    }
-    
-    protected void compareCertificates(TLSSessionInfo tlsInfo, 
-                                       String base64EncodedCert,
-                                       ClientKey.Type type) {
-        Certificate[] clientCerts = tlsInfo.getPeerCertificates();
-        try {
-            X509Certificate cert = (X509Certificate)clientCerts[0];
-            byte[] encodedKey = cert.getEncoded();
-            byte[] clientKey = Base64Utility.decode(base64EncodedCert);
-            if (Arrays.equals(encodedKey, clientKey)) {
-                return;
+    protected void compareTlsCertificates(TLSSessionInfo tlsInfo, String base64EncodedCert) {
+        if (tlsInfo != null && base64EncodedCert != null) {
+            Certificate[] clientCerts = tlsInfo.getPeerCertificates();
+            try {
+                X509Certificate cert = (X509Certificate)clientCerts[0];
+                byte[] encodedKey = cert.getEncoded();
+                byte[] clientKey = Base64Utility.decode(base64EncodedCert);
+                if (Arrays.equals(encodedKey, clientKey)) {
+                    return;
+                }
+            } catch (Exception ex) {
+                reportInvalidClient();
             }
-        } catch (Exception ex) {
-            reportInvalidClient();
         }
     }
     

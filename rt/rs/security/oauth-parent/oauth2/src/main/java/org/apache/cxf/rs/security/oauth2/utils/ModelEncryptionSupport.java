@@ -29,9 +29,7 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.ClientKey;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -324,20 +322,18 @@ public final class ModelEncryptionSupport {
 
     private static Client recreateClientInternal(String sequence) {
         String[] parts = getParts(sequence);
-        ClientKey clientCred = StringUtils.isEmpty(parts[1]) ? null 
-            : new ClientKey(parts[1], ClientKey.Type.valueOf(parts[2]));
         Client c = new Client(parts[0], 
-                              clientCred, 
-                              Boolean.valueOf(parts[3]), 
-                              getStringPart(parts[4]), getStringPart(parts[5]));
-        c.setApplicationDescription(getStringPart(parts[6]));
-        c.setApplicationLogoUri(getStringPart(parts[7]));
-        c.setAllowedGrantTypes(parseSimpleList(parts[8]));
-        c.setRegisteredScopes(parseSimpleList(parts[9]));
-        c.setRedirectUris(parseSimpleList(parts[10]));
-        c.setRegisteredAudiences(parseSimpleList(parts[11]));
-        c.setProperties(parseSimpleMap(parts[12]));
-        c.setSubject(recreateUserSubject(parts[13]));
+                              parts[1], 
+                              Boolean.valueOf(parts[2]), 
+                              getStringPart(parts[3]), getStringPart(parts[4]));
+        c.setApplicationDescription(getStringPart(parts[5]));
+        c.setApplicationLogoUri(getStringPart(parts[6]));
+        c.setAllowedGrantTypes(parseSimpleList(parts[7]));
+        c.setRegisteredScopes(parseSimpleList(parts[8]));
+        c.setRedirectUris(parseSimpleList(parts[9]));
+        c.setRegisteredAudiences(parseSimpleList(parts[10]));
+        c.setProperties(parseSimpleMap(parts[11]));
+        c.setSubject(recreateUserSubject(parts[12]));
         return c; 
     }
     private static String tokenizeClient(Client client) {
@@ -345,12 +341,8 @@ public final class ModelEncryptionSupport {
         // 0: id
         state.append(tokenizeString(client.getClientId()));
         state.append(SEP);
-        ClientKey cred = client.getClientKey();
         // 1: secret
-        state.append(tokenizeString(cred == null ? null : cred.getKey()));
-        state.append(SEP);
-        // 1.1: secret type
-        state.append(tokenizeString(cred == null ? null : cred.getType().toString()));
+        state.append(tokenizeString(client.getClientSecret()));
         state.append(SEP);
         // 2: confidentiality
         state.append(client.isConfidential());

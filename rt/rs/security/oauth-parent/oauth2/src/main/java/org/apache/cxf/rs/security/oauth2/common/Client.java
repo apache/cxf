@@ -32,12 +32,13 @@ public class Client implements Serializable {
     private static final long serialVersionUID = -5550840247125850922L;
     
     private String clientId;
-    private ClientKey clientKey;
+    private String clientSecret;
     
     private String applicationName;
     private String applicationDescription;
     private String applicationWebUri;
     private String applicationLogoUri;
+    private String applicationCertificate;
     private List<String> redirectUris = new LinkedList<String>();
     
     private boolean isConfidential;
@@ -54,7 +55,7 @@ public class Client implements Serializable {
     
     public Client(String clientId, String clientSecret, boolean isConfidential) {
         this.clientId = clientId;
-        this.clientKey = clientSecret == null ? null : new ClientKey(clientSecret);
+        this.clientSecret = clientSecret;
         this.isConfidential = isConfidential;
     }
 
@@ -69,20 +70,8 @@ public class Client implements Serializable {
         
     }
     
-    public Client(String clientId, 
-                  ClientKey clientKey,
-                  boolean isConfidential,
-                  String applicationName,
-                  String applicationWebUri) {
-        this.clientId = clientId;
-        this.clientKey = clientKey;
-        this.isConfidential = isConfidential;
-        this.applicationName = applicationName;
-        this.applicationWebUri = applicationWebUri;
-    }
-    
     /**
-     * Gets the client registration id
+     * Get the client registration id
      * @return the consumer key
      */
     public String getClientId() {
@@ -94,19 +83,17 @@ public class Client implements Serializable {
     }
     
     /**
-     * Get the client credential.
-     * If it is a certificate or public key and not null then 
-     * it has to be a Base64 encoded representation
-     * @return the credential
+     * Get the client secret
+     * @return the consumer key
      */
-    public ClientKey getClientKey() {
-        return clientKey;
+    public String getClientSecret() {
+        return clientSecret;
     }
 
-    public void setClientKey(ClientKey key) {
-        this.clientKey = key;
+    public void setClientSecret(String id) {
+        clientSecret = id;
     }
-    
+        
     /**
      * Gets the name of the third-party application
      * this client represents
@@ -288,7 +275,24 @@ public class Client implements Serializable {
         return registeredAudiences;
     }
 
+    /**
+     * Set the list of registered audiences
+     * @param registeredAudiences audiences
+     */
     public void setRegisteredAudiences(List<String> registeredAudiences) {
         this.registeredAudiences = registeredAudiences;
+    }
+
+    public String getApplicationCertificate() {
+        return applicationCertificate;
+    }
+
+    /*
+     * Set the optional Base64 encoded Application Public X509 Certificate
+     * It can be used in combination with the clientSecret property to support 
+     * Basic or other password-aware authentication on top of 2-way TLS.
+     */
+    public void setApplicationCertificate(String applicationCertificate) {
+        this.applicationCertificate = applicationCertificate;
     }
 }
