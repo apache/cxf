@@ -68,8 +68,6 @@ public final class JMSConfigFactory {
         
         jmsConfig.setPriority(endpoint.getPriority());
         
-        jmsConfig.setReconnectOnException(endpoint.isReconnectOnException());
-        
         jmsConfig.setExplicitQosEnabled(true);
         jmsConfig.setMessageType(endpoint.getMessageType().value());
         boolean pubSubDomain = endpoint.getJmsVariant().contains(JMSEndpoint.TOPIC);

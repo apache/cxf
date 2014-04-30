@@ -44,7 +44,6 @@ public class JMSConfiguration {
     private String userName;
     private String password;
     private DestinationResolver destinationResolver = new JMSDestinationResolver();
-    private boolean reconnectOnException = true;
     private boolean pubSubNoLocal;
     private Long clientReceiveTimeout = 60000L;
     private Long serverReceiveTimeout;
@@ -336,12 +335,9 @@ public class JMSConfiguration {
         return useConduitIdSelector;
     }
 
-    public boolean isReconnectOnException() {
-        return reconnectOnException;
-    }
-
+    @Deprecated
     public void setReconnectOnException(boolean reconnectOnException) {
-        this.reconnectOnException = reconnectOnException;
+        // Ignore. We always reconnect on exceptions
     }
 
     public ConnectionFactory getConnectionFactory() {

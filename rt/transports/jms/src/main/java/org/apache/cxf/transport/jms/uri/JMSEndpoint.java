@@ -31,62 +31,56 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**
- * 
+ * Parses and holds configuration retrieved from a SOAP/JMS spec URI
  */
 public class JMSEndpoint {
+    // JMS Variants
     public static final String JNDI = "jndi";
     public static final String TOPIC = "topic";
     public static final String QUEUE = "queue";
     public static final String JNDI_TOPIC = "jndi-topic";
 
-    // shared parameters
-    public static final String DELIVERYMODE_PARAMETER_NAME = "deliveryMode";
-    public static final String TIMETOLIVE_PARAMETER_NAME = "timeToLive";
-    public static final String PRIORITY_PARAMETER_NAME = "priority";
-    public static final String REPLYTONAME_PARAMETER_NAME = "replyToName";
-    // The new configuration to set the message type of jms message body
-    public static final String MESSAGE_TYPE_PARAMETER_NAME = "messageType";
-
-    // default parameters
+    // default values
     public static final DeliveryModeType DELIVERYMODE_DEFAULT = DeliveryModeType.PERSISTENT;
     public static final long TIMETOLIVE_DEFAULT = Message.DEFAULT_TIME_TO_LIVE;
     public static final int PRIORITY_DEFAULT = Message.DEFAULT_PRIORITY;
 
-    // jndi parameters ? need to be sure.
-    public static final String JNDICONNECTIONFACTORYNAME_PARAMETER_NAME = "jndiConnectionFactoryName";
-    public static final String JNDIINITIALCONTEXTFACTORY_PARAMETER_NAME = "jndiInitialContextFactory";
-    public static final String JNDIURL_PARAMETER_NAME = "jndiURL";
+    /**
+     * All parameters with this prefix will go to jndiParameters and be used
+     * as the jndi inital context properties
+     */
     public static final String JNDI_PARAMETER_NAME_PREFIX = "jndi-";
 
-    // queue and topic parameters
-    public static final String TOPICREPLYTONAME_PARAMETER_NAME = "topicReplyToName";
-    
-    Map<String, String> jndiParameters = new HashMap<String, String>();
-    Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, String> jndiParameters = new HashMap<String, String>();
+    private Map<String, String> parameters = new HashMap<String, String>();
     
     private String endpointUri;
     private ConnectionFactory connectionFactory;
     private String jmsVariant;
     private String destinationName;
+
+    /**
+     * URI parameters
+     * Will be filled from URI query parameters with matching names
+     */
+    private String conduitIdSelectorPrefix;
     private DeliveryModeType deliveryMode;
-    private MessageType messageType;
-    private long timeToLive;
-    private Integer priority;
-    private String replyToName;
-    private String topicReplyToName;
+    private String durableSubscriptionName;
     private String jndiConnectionFactoryName = "ConnectionFactory";
     private String jndiInitialContextFactory;
-    private String jndiURL;
-    private String username;
-    private String password;
-    private boolean reconnectOnException = true;
-    private String durableSubscriptionName;
-    private long receiveTimeout = 60000L;
-    private String targetService;
-    private boolean sessionTransacted;
-    private String conduitIdSelectorPrefix;
-    private boolean useConduitIdSelector = true;
     private String jndiTransactionManagerName;
+    private String jndiURL;
+    private MessageType messageType;
+    private String password;
+    private Integer priority;
+    private long receiveTimeout = 60000L;
+    private String replyToName;
+    private boolean sessionTransacted;
+    private String targetService;
+    private long timeToLive;
+    private String topicReplyToName;
+    private boolean useConduitIdSelector = true;
+    private String username;
 
     /**
      * @param uri
@@ -352,12 +346,6 @@ public class JMSEndpoint {
     }
     public void setPassword(String password) {
         this.password = password;
-    }
-    public boolean isReconnectOnException() {
-        return reconnectOnException;
-    }
-    public void setReconnectOnException(boolean reconnectOnException) {
-        this.reconnectOnException = reconnectOnException;
     }
     public String getDurableSubscriptionName() {
         return durableSubscriptionName;
