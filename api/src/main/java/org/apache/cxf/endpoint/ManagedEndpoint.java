@@ -36,6 +36,7 @@ import org.apache.cxf.management.annotation.ManagedResource;
 public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListener {
     public static final String ENDPOINT_NAME = "managed.endpoint.name";
     public static final String SERVICE_NAME = "managed.service.name";
+    public static final String INSTANCE_ID = "managed.instance.id";
 
     protected final Bus bus;
     protected final Endpoint endpoint;
@@ -109,8 +110,12 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
         }
         endpointName = ObjectName.quote(endpointName);
         buffer.append(ManagementConstants.PORT_NAME_PROP).append('=').append(endpointName).append(',');
+        String instanceId = (String)endpoint.get(INSTANCE_ID);
+        if (StringUtils.isEmpty(instanceId)) {
+            instanceId = new StringBuffer().append(endpoint.hashCode()).toString();
+        }
         // Added the instance id to make the ObjectName unique
-        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(endpoint.hashCode());
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(instanceId);
         
         //Use default domain name of server
         return new ObjectName(buffer.toString());
