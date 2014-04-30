@@ -41,7 +41,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
 
     List<Boolean> isOverlaidStack = new LinkedList<Boolean>();
     boolean isOverlaid = true;
-    boolean textOverlay;
+    Boolean textOverlay;
     
     public OverlayW3CDOMStreamWriter(Document document) {
         super(document);
@@ -82,7 +82,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         }
         isOverlaid = isOverlaidStack.remove(0);
         super.writeEndElement();
-        textOverlay = false;
+        textOverlay = null;
     }
     public void writeStartElement(String local) throws XMLStreamException {
         isOverlaidStack.add(0, isOverlaid);
@@ -110,6 +110,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                     if (nd2.getFirstChild() == null) {
                         //optimize a case where we KNOW anything added cannot be an overlay
                         isOverlaid = false;
+                        textOverlay = null;
                     }
                     return;
                 }
@@ -118,6 +119,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         }
         super.writeStartElement(local);
         isOverlaid = false;
+        textOverlay = Boolean.FALSE;
     }
 
     protected void adjustOverlaidNode(Node nd2, String pfx) {
@@ -149,6 +151,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                     if (nd2.getFirstChild() == null) {
                         //optimize a case where we KNOW anything added cannot be an overlay
                         isOverlaid = false;
+                        textOverlay = null;
                     }
                     return;
                 }
@@ -157,6 +160,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         }
         super.writeStartElement(namespace, local);
         isOverlaid = false;
+        textOverlay = false;
     }
 
     public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
@@ -190,6 +194,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                         if (nd2.getFirstChild() == null) {
                             //optimize a case where we KNOW anything added cannot be an overlay
                             isOverlaid = false;
+                            textOverlay = null;
                         }
                         return;
                     }
@@ -198,12 +203,13 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
             }
             super.writeStartElement(prefix, local, namespace);
             isOverlaid = false;
+            textOverlay = false;
         }
     }
     
     public void writeCharacters(String text) throws XMLStreamException {
-        if (!isOverlaid) {
-            super.writeCharacters(text); 
+        if (!isOverlaid || textOverlay == null) {
+            super.writeCharacters(text);
         } else if (!textOverlay) {
             Element nd = getCurrentNode();
             Node txt = nd.getFirstChild();
