@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.provider.jsr353;
+package org.apache.cxf.jaxrs.provider.jsrjsonp;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +45,7 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 @Produces({"application/json", "application/*+json" })
 @Consumes({"application/json", "application/*+json" })
 @Provider
-public class JsonJsr353Provider implements MessageBodyReader<JsonStructure>, MessageBodyWriter<JsonStructure> {
+public class JsrJsonpProvider implements MessageBodyReader<JsonStructure>, MessageBodyWriter<JsonStructure> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return JsonStructure.class.isAssignableFrom(type) 

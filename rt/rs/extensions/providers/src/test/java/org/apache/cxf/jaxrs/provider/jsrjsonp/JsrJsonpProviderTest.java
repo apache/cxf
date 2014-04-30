@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.provider.jsr353;
+package org.apache.cxf.jaxrs.provider.jsrjsonp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,12 +38,12 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
-public class JsonJsr353ProviderTest extends Assert {
-    private JsonJsr353Provider provider;
+public class JsrJsonpProviderTest extends Assert {
+    private JsrJsonpProvider provider;
     
     @Before
     public void setUp() {
-        provider = new JsonJsr353Provider();
+        provider = new JsrJsonpProvider();
     }
     
     @Test(expected = IOException.class)

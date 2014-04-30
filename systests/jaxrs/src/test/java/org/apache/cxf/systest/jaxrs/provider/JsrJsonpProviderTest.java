@@ -32,7 +32,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.provider.jsr353.JsonJsr353Provider;
+import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.junit.Before;
@@ -45,8 +45,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.IsNull.nullValue;
 
 
-public class JsonJsr353ProviderTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(JsonJsr353ProviderTest.class);
+public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(JsrJsonpProviderTest.class);
     
     @Ignore
     public static class Server extends AbstractBusTestServerBase {        
@@ -55,7 +55,7 @@ public class JsonJsr353ProviderTest extends AbstractBusClientServerTestBase {
             sf.setResourceClasses(BookJsonStore.class);
             sf.setResourceProvider(BookJsonStore.class, 
                 new SingletonResourceProvider(new BookJsonStore()));
-            sf.setProvider(new JsonJsr353Provider());
+            sf.setProvider(new JsrJsonpProvider());
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.create();
         }
@@ -185,7 +185,7 @@ public class JsonJsr353ProviderTest extends AbstractBusClientServerTestBase {
     private static WebClient createWebClient(final String url) {
         return WebClient
             .create("http://localhost:" + PORT + url, 
-                Arrays.< Object >asList(new JsonJsr353Provider()))
+                Arrays.< Object >asList(new JsrJsonpProvider()))
             .accept(MediaType.APPLICATION_JSON);
     }
 
