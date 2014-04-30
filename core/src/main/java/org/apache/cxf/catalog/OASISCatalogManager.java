@@ -70,6 +70,11 @@ public class OASISCatalogManager {
         catalog = getCatalog(resolver);
         loadContextCatalogs(DEFAULT_CATALOG_NAME);
     }
+    
+    public boolean hasCatalogs() {
+        return !loadedCatalogs.isEmpty();
+    }
+    
     private static Object getCatalog(EntityResolver resolver) {
         try {
             return ((CatalogResolver)resolver).getCatalog();
