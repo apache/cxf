@@ -801,8 +801,8 @@ public class DynamicClientFactory {
 
     private void hackInNewInternalizationLogic(SchemaCompiler schemaCompiler,
                                                final OASISCatalogManager catalog) {
+        Object o = ((ReflectionInvokationHandler)Proxy.getInvocationHandler(schemaCompiler)).getTarget();
         try {
-            Object o = ((ReflectionInvokationHandler)Proxy.getInvocationHandler(schemaCompiler)).getTarget();
             Field f = o.getClass().getDeclaredField("forest");
             Object forest = ReflectionUtil.setAccessible(f).get(o);
             // Set the error handler
@@ -811,16 +811,29 @@ public class DynamicClientFactory {
                     m.invoke(forest, o);
                 }
             }
-            
-            f = forest.getClass().getDeclaredField("logic");
-            Object xil = ReflectionUtil.setAccessible(f).get(forest);
-            if (xil.getClass().getName().contains(".internal.")) {
-                xil = createWrapperLogic(xil, catalog);
-                ReflectionUtil.setAccessible(f).set(forest, xil);
-            }
         } catch (Throwable ex)  {
-            //ignore
-            ex.printStackTrace();
+            //ignorable, just won't get all the errors
+            LOG.info("Unable to set error handler on " + o.getClass());
+        }
+        if (catalog.hasCatalogs()) {
+            try {
+                Field f = o.getClass().getDeclaredField("forest");
+                Object forest = ReflectionUtil.setAccessible(f).get(o);
+                f = forest.getClass().getDeclaredField("logic");
+                Object xil = ReflectionUtil.setAccessible(f).get(forest);
+                if (!xil.getClass().getName().contains(".internal.")) {
+                    xil = createWrapperLogic(xil, catalog);
+                    if (xil != null) {
+                        ReflectionUtil.setAccessible(f).set(forest, xil);
+                    }
+                } else {
+                    LOG.warning("Cannot set a catalog resolver into the JDK internal XJC compiler.  Catalog"
+                        + " resolved schemas may not work correctly");
+                }
+            } catch (Throwable ex)  {
+                LOG.log(Level.WARNING, "Cannot set a catalog resolver into the XJC compiler.  Catalog"
+                    + " resolved schemas may not work correctly", ex);
+            }
         }
     }
     private Object createWrapperLogic(final Object xil, final OASISCatalogManager catalog) {
