@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 
 public final class FileUtils {
@@ -76,13 +77,26 @@ public final class FileUtils {
         if (!checkExists.canWrite()) {
             throw new RuntimeException("The directory " 
                                    + checkExists.getAbsolutePath() 
-                                   + " is now writable, please set java.io.tempdir"
-                                   + " to an writable directory");
+                                   + " is not writable, please set java.io.tempdir"
+                                   + " to a writable directory");
         }
-        File f = new File(s, "cxf-tmp-" + x);
+        if (checkExists.getUsableSpace() < 1024 * 1024) {
+            LogUtils.getL7dLogger(FileUtils.class).warning("The directory " + s + " has very "
+                                                           + "little usable temporary space.  Operations"
+                                                           + " requiring temporary files may fail.");
+        }
+        File f = new File(checkExists, "cxf-tmp-" + x);
+        int count = 0;
         while (!f.mkdir()) {
+            
+            if (count > 10000) {
+                throw new RuntimeException("Could not create a temporary directory in "
+                                           + s + ",  please set java.io.tempdir"
+                                           + " to a writable directory");
+            }
             x = (int)(Math.random() * 1000000);
-            f = new File(s, "cxf-tmp-" + x);
+            f = new File(checkExists, "cxf-tmp-" + x);
+            count++;
         }
         File newTmpDir  = f;
         final File f2 = f;
