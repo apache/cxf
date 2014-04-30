@@ -97,8 +97,11 @@ public final class JMSFactory {
     }
 
     public static Connection createConnection(JMSConfiguration jmsConfig) throws JMSException {
-        Connection connection = jmsConfig.getConnectionFactory().createConnection(jmsConfig.getUserName(),
-                                                                                  jmsConfig.getPassword());
+        String username = jmsConfig.getUserName();
+        ConnectionFactory cf = jmsConfig.getConnectionFactory();
+        Connection connection = username != null 
+            ? cf.createConnection(username, jmsConfig.getPassword())
+            : cf.createConnection();
         if (jmsConfig.getDurableSubscriptionClientId() != null) {
             connection.setClientID(jmsConfig.getDurableSubscriptionClientId());
         }
