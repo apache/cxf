@@ -94,7 +94,6 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class InjectionUtils {
     
@@ -1250,12 +1249,21 @@ public final class InjectionUtils {
         }
     }
     public static Object convertStringToPrimitive(String value, Class<?> cls) {
+        return convertStringToPrimitive(value, cls, new Annotation[]{});
+    }
+    public static Object convertStringToPrimitive(String value, Class<?> cls, Annotation[] anns) {
+        Message m = JAXRSUtils.getCurrentMessage();
+        if (m != null) {
+            ParamConverter<?> pc = ServerProviderFactory.getInstance(m).createParameterHandler(cls, anns);
+            if (pc != null) {
+                return pc.fromString(value);
+            }
+        }
         if (String.class == cls) {
             return value;
         } else if (cls.isPrimitive()) {
             return PrimitiveUtils.read(value, cls);
         } else if (cls.isEnum()) {
-            Message m = PhaseInterceptorChain.getCurrentMessage();
             if (m == null || !MessageUtils.getContextualBoolean(m, ENUM_CONVERSION_CASE_SENSITIVE, false)) {
                 value = value.toUpperCase();
             }
