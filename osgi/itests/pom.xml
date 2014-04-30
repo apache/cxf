@@ -30,16 +30,27 @@
     <packaging>jar</packaging>
     <properties>
         <pax.exam.version>3.4.0</pax.exam.version>
-        <pax.url.version>1.2.8</pax.url.version>
         <cxf.surefire.fork.mode>once</cxf.surefire.fork.mode>
     </properties>
     <dependencies>
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-jms</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         
+        <!-- Karaf features -->
         <dependency>
             <groupId>org.apache.cxf.karaf</groupId>
             <artifactId>apache-cxf</artifactId>
@@ -47,23 +58,14 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-        
         <dependency>
-        	<groupId>org.apache.karaf</groupId>
-        	<artifactId>apache-karaf</artifactId>
-        	<version>${cxf.karaf.version}</version>
-        	<type>tar.gz</type>
-        	<exclusions>
-        	    <exclusion>
-        	      <groupId>org.eclipse</groupId>
-        	      <artifactId>osgi</artifactId>
-        	    </exclusion>
-        	    <exclusion>
-        	      <groupId>org.apache.xerces</groupId>
-        	      <artifactId>xercesImpl</artifactId>
-        	    </exclusion>
-        	</exclusions>
+        	<groupId>org.apache.activemq</groupId>
+        	<artifactId>activemq-karaf</artifactId>
+        	<version>5.9.1</version>
+        	<type>xml</type>
+        	<classifier>features</classifier>
         </dependency>
+        
         <dependency>
         	<groupId>org.apache.karaf.features</groupId>
         	<artifactId>org.apache.karaf.features.core</artifactId>
@@ -76,9 +78,12 @@
         </dependency>
         <dependency>
         	<groupId>org.osgi</groupId>
+        	<artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.osgi</groupId>
         	<artifactId>org.osgi.compendium</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-atinject_1.0_spec</artifactId>
@@ -117,13 +122,6 @@
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-link-mvn</artifactId>
             <version>${pax.exam.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-aether</artifactId>
-            <version>1.2.8</version>
             <scope>test</scope>
         </dependency>
 

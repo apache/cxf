@@ -20,6 +20,7 @@
 package org.apache.cxf.osgi.itests;
 
 
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +44,6 @@ import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.karaf.features.FeaturesService;
 import org.junit.Assert;
-import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.ProbeBuilder;
 import org.ops4j.pax.exam.TestProbeBuilder;
@@ -57,25 +57,34 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
+import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.when;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 
 /**
  * 
  */
 public class CXFOSGiTestSupport {
+    static final String KARAF_VERSION = "2.3.5";
     static final Long COMMAND_TIMEOUT = 10000L;
     static final Long DEFAULT_TIMEOUT = 20000L;
     static final Long SERVICE_TIMEOUT = 30000L;
 
     @Inject
     protected BundleContext bundleContext;
-    
+
     @Inject
     protected FeaturesService featureService;
-    
-    ExecutorService executor = Executors.newCachedThreadPool();
+
+    protected ExecutorService executor = Executors.newCachedThreadPool();
+
+    protected MavenUrlReference cxfUrl;
+    protected MavenUrlReference karafUrl;
 
     /**
      * @param probe
@@ -89,35 +98,33 @@ public class CXFOSGiTestSupport {
 
     /**
      * Create an {@link org.ops4j.pax.exam.Option} for using a .
-     *
+     * 
      * @return
      */
     protected Option cxfBaseConfig() {
-        MavenUrlReference karafUrl = maven()
-            .groupId("org.apache.karaf")
-            .artifactId("apache-karaf")
-            .versionAsInProject()
+        karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf").version(KARAF_VERSION)
             .type("tar.gz");
-        MavenUrlReference cxfUrl = maven()
-            .groupId("org.apache.cxf.karaf")
-            .artifactId("apache-cxf")
-            .versionAsInProject()
-            .type("xml")
-            .classifier("features");
-        return CoreOptions.composite(
-             karafDistributionConfiguration()
-                .frameworkUrl(karafUrl)
-                .karafVersion("2.3.3")
-                .name("Apache Karaf")
-                .unpackDirectory(new File("target/paxexam/")),
-             features(cxfUrl, "cxf-core", "cxf-jaxws")
-        );
+        cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
+            .type("xml").classifier("features");
+        String localRepo = System.getProperty("localRepository");
+        return composite(karafDistributionConfiguration()
+                             .frameworkUrl(karafUrl)
+                             .karafVersion(KARAF_VERSION)
+                             .name("Apache Karaf")
+                             .useDeployFolder(false)
+                             .unpackDirectory(new File("target/paxexam/")),
+                         keepRuntimeFolder(),
+                         features(cxfUrl, "cxf-core", "cxf-jaxws"),
+                         systemProperty("java.awt.headless").value("true"),
+                         when(localRepo != null)
+                             .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                                                  "org.ops4j.pax.url.mvn.localRepository",
+                                                                  localRepo)));
     }
 
     /**
-     * Executes a shell command and returns output as a String.
-     * Commands have a default timeout of 10 seconds.
-     *
+     * Executes a shell command and returns output as a String. Commands have a default timeout of 10 seconds.
+     * 
      * @param command
      * @return
      */
@@ -126,12 +133,11 @@ public class CXFOSGiTestSupport {
     }
 
     /**
-     * Executes a shell command and returns output as a String.
-     * Commands have a default timeout of 10 seconds.
-     *
+     * Executes a shell command and returns output as a String. Commands have a default timeout of 10 seconds.
+     * 
      * @param command The command to execute.
      * @param timeout The amount of time in millis to wait for the command to execute.
-     * @param silent  Specifies if the command should be displayed in the screen.
+     * @param silent Specifies if the command should be displayed in the screen.
      * @return
      */
     protected String executeCommand(final String command, final Long timeout, final Boolean silent) {
@@ -139,23 +145,22 @@ public class CXFOSGiTestSupport {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final PrintStream printStream = new PrintStream(byteArrayOutputStream);
         final CommandProcessor commandProcessor = getOsgiService(CommandProcessor.class);
-        final CommandSession commandSession 
-            = commandProcessor.createSession(System.in, printStream, System.err);
-        FutureTask<String> commandFuture = new FutureTask<String>(
-                new Callable<String>() {
-                    public String call() {
-                        try {
-                            if (!silent) {
-                                System.err.println(command);
-                            }
-                            commandSession.execute(command);
-                        } catch (Exception e) {
-                            e.printStackTrace(System.err);
-                        }
-                        printStream.flush();
-                        return byteArrayOutputStream.toString();
+        final CommandSession commandSession = commandProcessor.createSession(System.in, printStream,
+                                                                             System.err);
+        FutureTask<String> commandFuture = new FutureTask<String>(new Callable<String>() {
+            public String call() {
+                try {
+                    if (!silent) {
+                        System.err.println(command);
                     }
-                });
+                    commandSession.execute(command);
+                } catch (Exception e) {
+                    e.printStackTrace(System.err);
+                }
+                printStream.flush();
+                return byteArrayOutputStream.toString();
+            }
+        });
 
         try {
             executor.submit(commandFuture);
@@ -169,9 +174,8 @@ public class CXFOSGiTestSupport {
     }
 
     /**
-     * Executes multiple commands inside a Single Session.
-     * Commands have a default timeout of 10 seconds.
-     *
+     * Executes multiple commands inside a Single Session. Commands have a default timeout of 10 seconds.
+     * 
      * @param commands
      * @return
      */
@@ -180,22 +184,21 @@ public class CXFOSGiTestSupport {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final PrintStream printStream = new PrintStream(byteArrayOutputStream);
         final CommandProcessor commandProcessor = getOsgiService(CommandProcessor.class);
-        final CommandSession commandSession 
-            = commandProcessor.createSession(System.in, printStream, System.err);
-        FutureTask<String> commandFuture = new FutureTask<String>(
-                new Callable<String>() {
-                    public String call() {
-                        try {
-                            for (String command : commands) {
-                                System.err.println(command);
-                                commandSession.execute(command);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace(System.err);
-                        }
-                        return byteArrayOutputStream.toString();
+        final CommandSession commandSession = commandProcessor.createSession(System.in, printStream,
+                                                                             System.err);
+        FutureTask<String> commandFuture = new FutureTask<String>(new Callable<String>() {
+            public String call() {
+                try {
+                    for (String command : commands) {
+                        System.err.println(command);
+                        commandSession.execute(command);
                     }
-                });
+                } catch (Exception e) {
+                    e.printStackTrace(System.err);
+                }
+                return byteArrayOutputStream.toString();
+            }
+        });
 
         try {
             executor.submit(commandFuture);
@@ -221,8 +224,8 @@ public class CXFOSGiTestSupport {
     }
 
     /*
-    * Explode the dictionary into a ,-delimited list of key=value pairs
-    */
+     * Explode the dictionary into a ,-delimited list of key=value pairs
+     */
     private static String explode(Dictionary<String, String> dictionary) {
         Enumeration<String> keys = dictionary.keys();
         StringBuffer result = new StringBuffer();
@@ -245,7 +248,7 @@ public class CXFOSGiTestSupport {
     }
 
     @SuppressWarnings({
-        "rawtypes", "unchecked"
+        "unchecked"
     })
     protected <T> T getOsgiService(Class<T> type, String filter, long timeout) {
         ServiceTracker tracker = null;
@@ -287,10 +290,10 @@ public class CXFOSGiTestSupport {
             throw new RuntimeException(e);
         }
     }
-    
+
     /**
      * Finds a free port starting from the give port numner.
-     *
+     * 
      * @return
      */
     protected int getFreePort(int port) {
@@ -302,7 +305,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Returns true if port is available for use.
-     *
+     * 
      * @param port
      * @return
      */
@@ -316,7 +319,7 @@ public class CXFOSGiTestSupport {
             ds.setReuseAddress(true);
             return true;
         } catch (IOException e) {
-            //ignore
+            // ignore
         } finally {
             if (ds != null) {
                 ds.close();
@@ -337,17 +340,16 @@ public class CXFOSGiTestSupport {
     /**
      * Provides an iterable collection of references, even if the original array is null
      */
-    @SuppressWarnings("rawtypes")
     private static Collection<ServiceReference> asCollection(ServiceReference[] references) {
-        return references != null ? Arrays.asList(references) : Collections.<ServiceReference>emptyList();
+        return references != null ? Arrays.asList(references) : Collections.<ServiceReference> emptyList();
     }
-    
+
     protected void assertBundleStarted(String name) {
         Bundle bundle = findBundleByName(name);
         Assert.assertNotNull("Bundle " + name + " should be installed", bundle);
         Assert.assertEquals("Bundle " + name + " should be started", Bundle.ACTIVE, bundle.getState());
     }
-    
+
     protected Bundle findBundleByName(String symbolicName) {
         for (Bundle bundle : bundleContext.getBundles()) {
             if (bundle.getSymbolicName().equals(symbolicName)) {
@@ -356,10 +358,7 @@ public class CXFOSGiTestSupport {
         }
         return null;
     }
-    
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
+
     public void assertServicePublished(String filter, int timeout) {
         try {
             Filter serviceFilter = bundleContext.createFilter(filter);
@@ -371,10 +370,10 @@ public class CXFOSGiTestSupport {
                 throw new IllegalStateException("Expected service with filter " + filter + " was not found");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Unexpected exception occured" , e);
+            throw new RuntimeException("Unexpected exception occured", e);
         }
     }
-    
+
     public void assertBlueprintNamespacePublished(String namespace, int timeout) {
         assertServicePublished(String.format("(&(objectClass=org.apache.aries.blueprint.NamespaceHandler)"
                                              + "(osgi.service.blueprint.namespace=%s))", namespace), timeout);
