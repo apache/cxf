@@ -48,6 +48,7 @@ public class OAuthAuthorizationData implements Serializable {
     private String applicationWebUri;
     private String applicationDescription;
     private String applicationLogoUri;
+    private String applicationCertificate;
     private Map<String, String> extraApplicationProperties = new HashMap<String, String>();
     
     private List<? extends Permission> permissions;
@@ -260,6 +261,14 @@ public class OAuthAuthorizationData implements Serializable {
 
     public void setAudience(String audience) {
         this.audience = audience;
+    }
+
+    public String getApplicationCertificate() {
+        return applicationCertificate;
+    }
+
+    public void setApplicationCertificate(String applicationCertificate) {
+        this.applicationCertificate = applicationCertificate;
     }
 
 }

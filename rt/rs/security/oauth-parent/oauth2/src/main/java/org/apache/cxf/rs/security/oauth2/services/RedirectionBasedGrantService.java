@@ -196,6 +196,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         secData.setApplicationDescription(client.getApplicationDescription());
         secData.setApplicationLogoUri(client.getApplicationLogoUri());
         secData.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
+        secData.setApplicationName(client.getApplicationCertificate());
         Map<String, String> extraProperties = client.getProperties();
         secData.setExtraApplicationProperties(extraProperties);
         String replyTo = getMessageContext().getUriInfo()
