@@ -28,7 +28,7 @@ public class ClientKey implements Serializable {
         PUBLIC_KEY
     }
     
-    private String credential;
+    private String key;
     private Type type;
     
     public ClientKey() {
@@ -43,17 +43,17 @@ public class ClientKey implements Serializable {
         this(null, type);
     }
     
-    public ClientKey(String cred, Type type) {
-        this.credential = cred;
+    public ClientKey(String key, Type type) {
+        this.key = key;
         this.type = type;
     }
 
-    public String getCredential() {
-        return credential;
+    public String getKey() {
+        return key;
     }
 
-    public void setCredential(String credential) {
-        this.credential = credential;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public Type getType() {
@@ -65,16 +65,16 @@ public class ClientKey implements Serializable {
     }
     
     public int hashCode() {
-        return (credential == null ? 37 : credential.hashCode()) * type.hashCode(); 
+        return (key == null ? 37 : key.hashCode()) * type.hashCode(); 
     }
     public boolean equals(Object obj) {
         if (obj instanceof ClientKey) {
             ClientKey other = (ClientKey)obj;
-            if (this.credential == null && other.credential != null
-                || this.credential != null && other.credential == null) {
+            if (this.key == null && other.key != null
+                || this.key != null && other.key == null) {
                 return false;
             }
-            return this.credential.equals(other.credential) && this.type.equals(other.type);
+            return this.key.equals(other.key) && this.type.equals(other.type);
         } else {
             return false;
         }

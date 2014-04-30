@@ -112,7 +112,7 @@ public class AbstractTokenService extends AbstractOAuthService {
         }
         if (clientSecret == null || client.getClientKey() == null 
             || !client.getClientId().equals(clientId) 
-            || !client.getClientKey().getCredential().equals(clientSecret)) {
+            || !client.getClientKey().getKey().equals(clientSecret)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         return client;
@@ -162,10 +162,10 @@ public class AbstractTokenService extends AbstractOAuthService {
         if (credType != ClientKey.Type.X509CERTIFICATE 
             && credType != ClientKey.Type.PUBLIC_KEY) {
             reportInvalidClient();
-        } else if (client.getClientKey().getCredential() != null) {
+        } else if (client.getClientKey().getKey() != null) {
             // Client has a Base64 encoded representation of the certificate loaded
             // so lets validate the TLS certificates
-            compareCertificates(tlsSessionInfo, client.getClientKey().getCredential(), credType);
+            compareCertificates(tlsSessionInfo, client.getClientKey().getKey(), credType);
         }
     }
     

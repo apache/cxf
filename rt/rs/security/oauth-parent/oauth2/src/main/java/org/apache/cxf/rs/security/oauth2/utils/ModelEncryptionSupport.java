@@ -347,7 +347,7 @@ public final class ModelEncryptionSupport {
         state.append(SEP);
         ClientKey cred = client.getClientKey();
         // 1: secret
-        state.append(tokenizeString(cred == null ? null : cred.getCredential()));
+        state.append(tokenizeString(cred == null ? null : cred.getKey()));
         state.append(SEP);
         // 1.1: secret type
         state.append(tokenizeString(cred == null ? null : cred.getType().toString()));
