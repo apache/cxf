@@ -63,6 +63,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-aries-blueprint</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf.services.wsn</groupId>
             <artifactId>cxf-services-wsn-api</artifactId>
             <version>${project.version}</version>

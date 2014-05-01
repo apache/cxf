@@ -56,6 +56,7 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
                 mavenBundle().groupId("org.apache.cxf").artifactId("cxf-core").versionAsInProject(),
                 mavenBundle().groupId("org.apache.servicemix.bundles")
                     .artifactId("org.apache.servicemix.bundles.wsdl4j").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-aries-blueprint").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-wsdl").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-databinding-jaxb").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-bindings-xml").versionAsInProject(),

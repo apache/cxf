@@ -23,11 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
-import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
 import org.apache.cxf.bus.extension.Extension;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
-import org.apache.cxf.internal.CXFAPINamespaceHandler;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -68,23 +65,6 @@ public class CXFActivator implements BundleActivator {
         extensions.add(createOsgiBusListenerExtension(context));
         extensions.add(createManagedWorkQueueListExtension(workQueues));
         ExtensionRegistry.addExtensions(extensions);
-
-        BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-                
-            @Override
-            public Object createNamespaceHandler() {
-                return new CXFAPINamespaceHandler();
-            }
-        };
-        NamespaceHandlerRegisterer.register(context, factory,
-                                            "http://cxf.apache.org/blueprint/core",
-                                            "http://cxf.apache.org/configuration/beans",
-                                            "http://cxf.apache.org/configuration/parameterized-types",
-                                            "http://cxf.apache.org/configuration/security",
-                                            "http://schemas.xmlsoap.org/wsdl/",
-                                            "http://www.w3.org/2005/08/addressing",
-                                            "http://schemas.xmlsoap.org/ws/2004/08/addressing");
-
     }
 
     private ServiceRegistration registerManagedServiceFactory(BundleContext context,

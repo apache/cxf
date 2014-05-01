@@ -59,6 +59,14 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-aries-blueprint</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http</artifactId>
             <version>${cxf.netty.version}</version>

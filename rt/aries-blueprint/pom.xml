@@ -19,48 +19,61 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-rt-ws-addr</artifactId>
+    <artifactId>cxf-aries-blueprint</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache CXF Runtime WS Addressing</name>
-    <description>Apache CXF Runtime WS Addressing</description>
+    <name>Apache CXF Aries Blueprint Support</name>
+    <description>Apache CXF Aries Blueprint Support</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
-        <relativePath>../../../parent/pom.xml</relativePath>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
+    
     <properties>
-    	<cxf.bundle.activator>org.apache.cxf.ws.addressing.blueprint.Activator</cxf.bundle.activator>
+        <cxf.bundle.activator>org.apache.cxf.configuration.blueprint.internal.CXFActivator</cxf.bundle.activator>
+        <cxf.osgi.export>
+            !org.apache.cxf.configuration.blueprint.internal,
+            org.apache.cxf.configuration.blueprint.*,
+            org.apache.cxf.bus.blueprint.*
+        </cxf.osgi.export>
         <cxf.osgi.import>
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/ws/addressing"
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/blueprint/core",
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/configuration/beans",
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/configuration/parameterized-types",
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/configuration/security"
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://schemas.xmlsoap.org/wsdl/",
         </cxf.export.service>
     </properties>
+    
     <dependencies>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
             <artifactId>org.apache.aries.blueprint.core</artifactId>
-            <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <optional>true</optional>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <optional>true</optional>
-        </dependency>
+        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -72,32 +85,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-core</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-spring</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-aries-blueprint</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-bindings-soap</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-policy</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        
     </dependencies>
 </project>

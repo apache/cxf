@@ -39,6 +39,11 @@
     		<version>${project.version}</version>
     	</dependency>
     	<dependency>
+    		<groupId>org.apache.cxf</groupId>
+    		<artifactId>cxf-aries-blueprint</artifactId>
+    		<version>${project.version}</version>
+    	</dependency>
+    	<dependency>
     		<groupId>org.apache.ws.xmlschema</groupId>
     		<artifactId>xmlschema-core</artifactId>
     	</dependency>

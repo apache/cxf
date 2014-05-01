@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.internal;
+package org.apache.cxf.configuration.blueprint.internal;
 
 import java.net.URL;
 import java.util.Set;

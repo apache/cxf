@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.internal;
+package org.apache.cxf.configuration.blueprint.internal;
 
 import org.junit.Assert;
 import org.junit.Test;

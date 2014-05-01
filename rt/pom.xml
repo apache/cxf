@@ -31,6 +31,7 @@
     </parent>
     <modules>
         <module>spring</module>
+        <module>aries-blueprint</module>
         <module>wsdl</module>
         <module>transports/local</module>
         <module>databinding/jaxb</module>

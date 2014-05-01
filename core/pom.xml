@@ -54,20 +54,11 @@
             com.sun.xml.bind.api;resolution:=optional,
             com.sun.xml.bind.api.impl;resolution:=optional,
             com.sun.xml.internal.bind.api;resolution:=optional,
-            com.sun.xml.internal.bind.api.impl;resolution:=optional,
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional
+            com.sun.xml.internal.bind.api.impl;resolution:=optional
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*
         </cxf.osgi.dynamic.import>
-        <!-- keep in sync with services exported in activator -->
-        <cxf.export.service>
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/blueprint/core",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/configuration/beans",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/configuration/parameterized-types",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/configuration/security"
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://schemas.xmlsoap.org/wsdl/",
-        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>
@@ -150,12 +141,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
