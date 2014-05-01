@@ -468,14 +468,19 @@ public final class InjectionUtils {
             try {
                 result = evaluateFactoryMethod(value, cls, pType, mName);
                 if (result != null) {
+                    factoryMethodEx = null;
                     break;
                 }
             } catch (Exception ex) {
-                // Don't throw exception immediately, but store it and try other factory methods
+                // If it is enum and the method name is "fromValue" then don't throw 
+                // the exception immediately but try the next factory method
                 factoryMethodEx = ex;
+                if (!cls.isEnum() || !"fromValue".equals(mName)) {
+                    break;
+                }
             }            
         }
-        if ((factoryMethodEx != null) && (result == null)) {
+        if (factoryMethodEx != null) {
             Throwable t = getOrThrowActualException(factoryMethodEx);
             LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_VALUE_OF_FAILURE", 
                                                                BUNDLE, 
@@ -500,8 +505,6 @@ public final class InjectionUtils {
             // no luck: try another factory methods
         } catch (IllegalAccessException ex) {
             // factory method is not accessible: try another
-        } catch (IllegalArgumentException ex) {
-            // String argument doesn't fit to factory method: try another
         }
 
         return null;
