@@ -20,15 +20,18 @@ The following jars are required for all CXF usage:
 - geronimo-annotation.jar (Or the Sun equivalent) [6]
 - geronimo-javamail.jar (Or the Sun equivalent) [6]
   (MAY be able to remove javamail if you don't use any MTOM/SAAJ type things)
-- geronimo-stax-api.jar (Or the Sun equivalent) [6]
 - neethi.jar
 - jaxb-api.jar  [6]
 - jaxb-impl.jar (this is a [6] for normal runtime, but is required for 
                  tooling and the dynamic clients)
-- XmlSchema.jar
-- woodstox-core-asl.jar  [6] or another StAX implementation
-- stax2-api-3.0.1.jar [6] for woodstox above
+- xmlschema-core.jar
+- woodstox-core-asl.jar
+- stax2-api-3.0.1.jar
 - wsdl4j.jar
+
+Note: woodstox and stax2-api can be removed if you set the 
+"org.apache.cxf.stax.allowInsecureParser” system property to true.  This
+is NOT recommended as it opens up various DOS attacks.
 
 The following jars are required for XML catalog support:
 - xml-resolver.jar 
@@ -58,7 +61,7 @@ For XML Configuration support:
 - FastInfoset.jar
 
 For hosting web services within WARs while using Spring-based CXFServlet:
-- spring.web.jar
+- spring-web.jar
 
 For standalone HTTP support:
 - geronimo-servlet.jar
@@ -72,7 +75,7 @@ For XmlBeans databinding support:
 - xmlbeans.jar
 
 For WS-Security support:
-- bcprov-jdk15.jar
+- bcprov-jdk15.jar (optional depending on algorithms used)
 - wss4j.jar
 - xmlsec.jar
 - ehcache-core.jar
@@ -89,7 +92,7 @@ For JAX-RS support:
 - commons-codec.jar (Needed for Abdera)
 - jaxen.jar (Needed for Abdera)
 - axiom* (Needed for Abdera)
-- javax.ws.rs-apijar
+- javax.ws.rs-api.jar
 - jettison.jar (Needed for JSON services only)
 - oauth*.jar (Needed for OAuth support)
 
@@ -106,7 +109,7 @@ For the Async HTTP client transport
 - httpasyncclient.jar
 - httpcore.jar
 - httpclient.jar
-- httpcore-nio-4.2.2.jar
+- httpcore-nio.jar
 
 For CORBA support:
 - antlr.jar
@@ -116,8 +119,8 @@ For JavaScript functionality:
 
 For schema validation with the Aegis data binding.
 
- - msv-core.jar (version 2010.1)
- - xsdlib:jar (version 2010.1)
+ - msv-core.jar (version 2011.1)
+ - xsdlib.jar (version 2010.1)
  - isorelax.jar (version 20030108)
  - relaxngDatatype.jar (version 20020414)
 
