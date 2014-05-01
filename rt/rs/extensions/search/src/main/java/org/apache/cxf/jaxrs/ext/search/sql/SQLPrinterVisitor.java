@@ -72,7 +72,8 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
                 validatePropertyValue(name, value);
                 
                 value = SearchUtils.toSqlWildcardString(value, isWildcardStringMatch());
-                                
+                value = SearchUtils.duplicateSingleQuoteIfNeeded(value);
+                
                 if (tableAlias != null) {
                     name = tableAlias + "." + name;
                 }

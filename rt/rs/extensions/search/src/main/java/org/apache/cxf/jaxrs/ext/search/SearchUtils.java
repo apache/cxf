@@ -70,6 +70,13 @@ public final class SearchUtils {
         return value;
     }
     
+    public static String duplicateSingleQuoteIfNeeded(String value) {
+        if (value.indexOf('\'') != -1 && value.indexOf("\'\'") == -1) {
+            value = value.replaceAll("\'", "\'\'");
+        }
+        return value;
+    }
+    
     public static boolean containsEscapedChar(String value) {
         return value.contains("\\%") || value.contains("\\\\") || value.contains("\\_");
     }
