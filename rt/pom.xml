@@ -30,6 +30,7 @@
         <version>3.0.0-SNAPSHOT</version>
     </parent>
     <modules>
+        <module>spring</module>
         <module>wsdl</module>
         <module>transports/local</module>
         <module>databinding/jaxb</module>
