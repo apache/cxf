@@ -24,18 +24,18 @@ import javax.jws.WebService;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 
-
 import org.apache.cxf.annotations.FactoryType;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.types.GreetMeResponse;
 import org.apache.cxf.greeter_control.types.PingMeResponse;
 import org.apache.cxf.greeter_control.types.SayHiResponse;
+import org.apache.cxf.service.invoker.spring.SpringBeanFactory;
 
 @WebService(serviceName = "GreeterService",
             portName = "GreeterPort",
             endpointInterface = "org.apache.cxf.greeter_control.Greeter", 
             targetNamespace = "http://cxf.apache.org/greeter_control")
-@FactoryType(value = FactoryType.Type.Spring, args = { "SpringBean" })
+@FactoryType(factoryClass = SpringBeanFactory.class, args = { "SpringBean" })
 public class SpringAnnotationGreeterImpl implements Greeter {
     String name;
     

@@ -24,6 +24,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.service.invoker.Factory;
 /**
  * Defines the factory used for the service.
  * 
@@ -45,16 +48,21 @@ public @interface FactoryType {
      *    1) The Class for the service
      *    2) String[] of the args from above 
      */
-    Class<?> factoryClass() default DEFAULT.class;
+    Class<? extends Factory> factoryClass() default DEFAULT.class;
     
     enum Type {
         Singleton,
         Session,
         Pooled, //args[0] is the size of the pool
-        PerRequest,
-        Spring, //args[0] is the Spring bean name
+        PerRequest
     };
     
-    static final class DEFAULT { }
+    static final class DEFAULT implements Factory {
+        public Object create(Exchange e) throws Throwable {
+            return null;
+        }
+        public void release(Exchange e, Object o) {
+        }
+    }
 }
 
