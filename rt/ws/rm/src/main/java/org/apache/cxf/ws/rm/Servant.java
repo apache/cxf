@@ -214,13 +214,14 @@ public class Servant implements Invoker {
         Identifier offeredId = reliableEndpoint.getProxy().getOfferedIdentifier();
         if (null != offeredId) {
             AcceptType accept = createResponse.getAccept();
-            assert null != accept;
-            Destination dest = reliableEndpoint.getDestination();
-            String address = accept.getAcksTo().getAddress().getValue();
-            if (!RMUtils.getAddressingConstants().getNoneURI().equals(address)) {
-                DestinationSequence ds =  new DestinationSequence(offeredId, accept.getAcksTo(), dest,
-                    protocol);
-                dest.addSequence(ds);
+            if (accept != null) {
+                Destination dest = reliableEndpoint.getDestination();
+                String address = accept.getAcksTo().getAddress().getValue();
+                if (!RMUtils.getAddressingConstants().getNoneURI().equals(address)) {
+                    DestinationSequence ds =  new DestinationSequence(offeredId, accept.getAcksTo(), dest,
+                                                                      protocol);
+                    dest.addSequence(ds);
+                }
             }
         }
     }
