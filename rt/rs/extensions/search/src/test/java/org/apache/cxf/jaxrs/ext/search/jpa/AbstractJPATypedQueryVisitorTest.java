@@ -133,7 +133,7 @@ public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
             br3.setBook(b3);
             b3.setId(11);
             b3.setBookTitle("num11");
-            b3.setAddress(new OwnerAddress("Street3"));
+            b3.setAddress(new OwnerAddress("Street&'3"));
             b3.getAuthors().add("Barry");
             OwnerInfo info3 = new OwnerInfo();
             info3.setName(new Name("Bill"));

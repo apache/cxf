@@ -236,7 +236,23 @@ public class JPATypedQueryVisitorFiqlTest extends AbstractJPATypedQueryVisitorTe
         assertEquals("Street2", book.getAddress().getStreet());
         
     }
+    
+    @Test
+    public void testEqualsAddressQuery4() throws Exception {
+        Map<String, String> beanPropertiesMap = new HashMap<String, String>();
+        beanPropertiesMap.put("street", "address.street");
+        List<Book> books = queryBooks("street==Str*t*", null, beanPropertiesMap);
+        assertEquals(3, books.size());
+    }
 
+    @Test
+    public void testEqualsAddressQuery5() throws Exception {
+        Map<String, String> beanPropertiesMap = new HashMap<String, String>();
+        beanPropertiesMap.put("street", "address.street");
+        List<Book> books = queryBooks("street==Street&'3", null, beanPropertiesMap);
+        assertEquals(1, books.size());
+    }
+    
     @Test
     public void testEqualsOwnerNameQuery() throws Exception {
         List<Book> books = queryBooks("ownerInfo.name.name==Fred");
