@@ -56,23 +56,22 @@ public final class SearchUtils {
         if (value.contains("\\")) {
             value = value.replaceAll("\\\\", "\\\\\\\\"); 
         }
+        if (value.contains("_")) {
+            value = value.replaceAll("_", "\\\\_");
+        }
         if (value.contains("%")) {
             value = value.replaceAll("%", "\\\\%");
         }
         if (!value.contains("*")) {
             return alwaysWildcard ? "%" + value + "%" : value;
-        }
-        if (value.startsWith("*")) { 
-            value = "%" + value.substring(1);
-        }
-        if (value.endsWith("*")) { 
-            value = value.substring(0, value.length() - 1) + "%";
+        } else {
+            value = value.replaceAll("\\*", "%");
         }
         return value;
     }
     
     public static boolean containsEscapedChar(String value) {
-        return value.contains("\\%") || value.contains("\\\\");
+        return value.contains("\\%") || value.contains("\\\\") || value.contains("\\_");
     }
     
     public static void startSqlQuery(StringBuilder sb, 

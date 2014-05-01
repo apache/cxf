@@ -133,7 +133,7 @@ public class JPATypedQueryVisitorTest extends Assert {
             br3.setBook(b3);
             b3.setId(11);
             b3.setBookTitle("num11");
-            b3.setAddress(new OwnerAddress("Street3"));
+            b3.setAddress(new OwnerAddress("Street&'3"));
             b3.getAuthors().add("Barry");
             OwnerInfo info3 = new OwnerInfo();
             info3.setName(new Name("Bill"));
@@ -373,6 +373,22 @@ public class JPATypedQueryVisitorTest extends Assert {
         assertTrue(10 == book.getId());
         assertEquals("Street2", book.getAddress().getStreet());
         
+    }
+
+    @Test
+    public void testEqualsAddressQuery4() throws Exception {
+        Map<String, String> beanPropertiesMap = new HashMap<String, String>();
+        beanPropertiesMap.put("street", "address.street");
+        List<Book> books = queryBooks("street==Str*t*", null, beanPropertiesMap);
+        assertEquals(3, books.size());
+    }
+    
+    @Test
+    public void testEqualsAddressQuery5() throws Exception {
+        Map<String, String> beanPropertiesMap = new HashMap<String, String>();
+        beanPropertiesMap.put("street", "address.street");
+        List<Book> books = queryBooks("street==Street&'3", null, beanPropertiesMap);
+        assertEquals(1, books.size());
     }
 
     @Test
