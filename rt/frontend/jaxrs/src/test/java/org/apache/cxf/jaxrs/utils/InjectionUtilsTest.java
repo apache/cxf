@@ -42,7 +42,6 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -135,6 +134,13 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(2, map.get("d.s").size());
         assertTrue(map.get("d.s").contains("set1"));
         assertTrue(map.get("d.s").contains("set2"));
+    }
+
+    @Test
+    public void testInstantiateJAXBEnum() {
+        CarType carType = InjectionUtils.handleParameter("AUDI", false, CarType.class, null,
+                                                         ParameterType.QUERY, null);
+        assertEquals("Type is wrong", CarType.AUDI, carType);
     }
 
     static class CustomerBean1 {
@@ -270,4 +276,31 @@ public class InjectionUtilsTest extends Assert {
         }
     
     }
+    
+    public static enum CarType {
+
+        AUDI("Audi"),
+        GOLF("Golf"),
+        BMW("BMW");
+        private final String value;
+
+        CarType(String v) {
+            value = v;
+        }
+
+        public String value() {
+            return value;
+        }
+
+        public static CarType fromValue(String v) {
+            for (CarType c: CarType.values()) {
+                if (c.value.equals(v)) {
+                    return c;
+                }
+            }
+            throw new IllegalArgumentException(v);
+        }
+
+    }
+
 }

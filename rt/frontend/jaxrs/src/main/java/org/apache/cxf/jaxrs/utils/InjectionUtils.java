@@ -408,12 +408,7 @@ public final class InjectionUtils {
             String[] methodNames = cls.isEnum() 
                 ? new String[] {"fromString", "fromValue", "valueOf"} 
                 : new String[] {"valueOf", "fromString"};
-            for (String mName : methodNames) {   
-                result = evaluateFactoryMethod(value, cls, pType, mName);
-                if (result != null) {
-                    break;
-                }
-            }
+            result = evaluateFactoryMethods(value, pType, result, cls, methodNames);
         }
         
         if (adapterHasToBeUsed) {
@@ -433,7 +428,6 @@ public final class InjectionUtils {
         return pClass.cast(result);
     }
 
-    
     private static <T> T createFromParameterHandler(String value, 
                                                     Class<T> pClass,
                                                     Annotation[] anns,
@@ -466,25 +460,50 @@ public final class InjectionUtils {
                          .entity(errorMessage.toString()).build();
         throw ExceptionUtils.toInternalServerErrorException(null, r);
     }
-    
+
+    private static Object evaluateFactoryMethods(String value, ParameterType pType, Object result,
+                                                 Class<?> cls, String[] methodNames) {
+        Exception factoryMethodEx = null; 
+        for (String mName : methodNames) {
+            try {
+                result = evaluateFactoryMethod(value, cls, pType, mName);
+                if (result != null) {
+                    break;
+                }
+            } catch (Exception ex) {
+                // Don't throw exception immediately, but store it and try other factory methods
+                factoryMethodEx = ex;
+            }            
+        }
+        if ((factoryMethodEx != null) && (result == null)) {
+            Throwable t = getOrThrowActualException(factoryMethodEx);
+            LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_VALUE_OF_FAILURE", 
+                                                               BUNDLE, 
+                                                               cls.getName()).toString());
+            throw new WebApplicationException(t, HttpUtils.getParameterFailureStatus(pType));
+        } else {
+            return result;
+        }
+    }
+
     private static <T> T evaluateFactoryMethod(String value,
-                                                Class<T> pClass, 
-                                                ParameterType pType, 
-                                                String methodName) {
+                                               Class<T> pClass,
+                                               ParameterType pType,
+                                               String methodName) 
+        throws InvocationTargetException {
         try {
             Method m = pClass.getMethod(methodName, new Class<?>[]{String.class});
             if (Modifier.isStatic(m.getModifiers())) {
                 return pClass.cast(m.invoke(null, new Object[]{value}));
             }
         } catch (NoSuchMethodException ex) {
-            // no luck
-        } catch (Exception ex) {
-            Throwable t = getOrThrowActualException(ex);
-            LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_VALUE_OF_FAILURE", 
-                                                               BUNDLE, 
-                                                               pClass.getName()).toString());
-            throw new WebApplicationException(t, HttpUtils.getParameterFailureStatus(pType));
+            // no luck: try another factory methods
+        } catch (IllegalAccessException ex) {
+            // factory method is not accessible: try another
+        } catch (IllegalArgumentException ex) {
+            // String argument doesn't fit to factory method: try another
         }
+
         return null;
     }
     
