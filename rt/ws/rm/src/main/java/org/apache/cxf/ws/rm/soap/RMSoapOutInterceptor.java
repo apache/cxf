@@ -20,8 +20,6 @@
 package org.apache.cxf.ws.rm.soap;
 
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,10 +53,6 @@ import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.SequenceFault;
-import org.apache.cxf.ws.rm.SourceSequence;
-import org.apache.cxf.ws.rm.v200702.AckRequestedType;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 /**
  * Protocol Handler responsible for {en|de}coding the RM 
@@ -133,26 +127,6 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
         if (null == rmps) {
             return;
         }
-        
-        SourceSequence seq = rmps.getSourceSequence();
-        SequenceType sequence = rmps.getSequence();
-        if (seq == null || sequence == null) {
-            LOG.warning("sequence not set for outbound message, skipped acknowledgement request"); 
-        } else if (seq.needAcknowledge(rmps.getMessageNumber())) {
-            
-            // waiting for prior acknowledgments, add AckRequested
-            Collection<AckRequestedType> reqs = rmps.getAcksRequested();
-            if (reqs == null) {
-                reqs = new ArrayList<AckRequestedType>();
-            }
-            Identifier identifier = new Identifier();
-            identifier.setValue(sequence.getIdentifier().getValue());
-            AckRequestedType ackRequest = new AckRequestedType();
-            ackRequest.setIdentifier(identifier);
-            reqs.add(ackRequest);
-            rmps.setAcksRequested(reqs);
-        }
-        
         LOG.log(Level.FINE, "encoding RMPs in SOAP headers");
         try {
             

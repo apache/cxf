@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,8 +32,12 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
+import org.apache.cxf.ws.rm.manager.AckRequestModeType;
+import org.apache.cxf.ws.rm.manager.SourcePolicyType;
+import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 /**
  * 
@@ -90,11 +95,18 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             RMProperties rmpsIn = RMContextUtils.retrieveRMProperties(msg, false);
             if (null != rmpsIn && null != rmpsIn.getSequence()) {
                 inSeqId = rmpsIn.getSequence().getIdentifier();
+                
+                SourceSequence seq = rmpsIn.getSourceSequence();
+                SequenceType sequence = rmpsIn.getSequence();
+                if (seq == null || sequence == null) {
+                    LOG.warning("sequence not set for outbound message, skipped acknowledgement request"); 
+                } else {
+                    addAckRequest(msg, rmpsIn, seq, sequence);
+                }
             }
         }
         
-        // add Acknowledgements (to application messages or explicitly 
-        // created Acknowledgement messages only)
+        // add Acknowledgements (to application messages or explicitly created Acknowledgement messages only)
         boolean isAck = constants.getSequenceAckAction().equals(action);
         if (isApplicationMessage || isAck) {
             AttributedURIType to = maps.getTo();
@@ -112,6 +124,41 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         
         assertReliability(msg);
+    }
+
+    /**
+     * Add AcknowledgementRequested to message if needed. The AckRequest mode set either in the message
+     * properties or in the source policy is used to determine whether AcknowledgementRequested is always
+     * added, never added, or added only when we're waiting for the acknowledgement to a previously-sent
+     * message.
+     *  
+     * @param msg
+     * @param rmpsIn
+     * @param seq
+     * @param sequence
+     */
+    protected void addAckRequest(Message msg, RMProperties rmpsIn, SourceSequence seq, SequenceType sequence) {
+        AckRequestModeType mode = (AckRequestModeType)msg.get(RMMessageConstants.ACK_REQUEST_MODE);
+        if (mode == null) {
+            mode = AckRequestModeType.PENDING;
+            SourcePolicyType policy = getManager().getSourcePolicy();
+            if (policy.isSetAckRequestMode()) {
+                mode = policy.getAckRequestMode();
+            }
+        }
+        if (AckRequestModeType.ALWAYS == mode
+            || (mode == AckRequestModeType.PENDING && seq.needAcknowledge(rmpsIn.getMessageNumber()))) {
+            Collection<AckRequestedType> reqs = rmpsIn.getAcksRequested();
+            if (reqs == null) {
+                reqs = new ArrayList<AckRequestedType>();
+            }
+            Identifier identifier = new Identifier();
+            identifier.setValue(sequence.getIdentifier().getValue());
+            AckRequestedType ackRequest = new AckRequestedType();
+            ackRequest.setIdentifier(identifier);
+            reqs.add(ackRequest);
+            rmpsIn.setAcksRequested(reqs);
+        }
     }
     
     void addAcknowledgements(Destination destination, RMProperties rmpsOut, Identifier inSeqId,  AttributedURIType to) {

@@ -48,6 +48,10 @@ public final class RMMessageConstants {
     /** Client callback (must be instance of {@link MessageCallback}). */
     public static final String RM_CLIENT_CALLBACK = "org.apache.cxf.rm.clientCallback";
     
+    /** Mode for requesting acknowledgements ({@link org.apache.cxf.ws.rm.managerAckRequestMode} value,
+     *  overrides SourcePolicy configuration). */
+    public static final String ACK_REQUEST_MODE = "org.apache.cxf.rm.ackRequestMode";
+    
     static final String RM_PROTOCOL_VARIATION = "org.apache.cxf.ws.rm.protocol";
 
     // keep this constant in the ws-rm package until it finds a general use outside of ws-rm

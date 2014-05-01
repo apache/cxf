@@ -86,6 +86,15 @@
                 </xs:documentation>
             </xs:annotation>      
         </xs:attribute>
+        <xs:attribute name="ackRequestMode" type="tns:AckRequestModeType" use="optional" default="pending">
+            <xs:annotation>
+                <xs:documentation>
+                    When AckRequested will be included in a message being sent. The default value "pending"
+                    means AckRequested will only be included when a previously-send message is waiting for
+                    acknowledgement.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="DestinationPolicyType">
@@ -250,6 +259,19 @@
         </xs:simpleType>
       </xs:attribute>
     </xs:complexType>
+    
+    <xs:simpleType name="AckRequestModeType">
+      <xs:annotation>
+        <xs:documentation>
+          Mode controlling when AckRequested will be included in a message being sent.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="never" />
+        <xs:enumeration value="always" />
+        <xs:enumeration value="pending" />
+      </xs:restriction>
+    </xs:simpleType>
 
  
     <xs:element name="deliveryAssurance" type="tns:DeliveryAssuranceType"/>
