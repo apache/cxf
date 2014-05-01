@@ -736,7 +736,7 @@ public final class StaxUtils {
                     writer.writeEndElement();
                 }
                 read--;
-                if (read <= 0 && !fragment) {
+                if (read <= 0 && fragment) {
                     return;
                 }
                 if (isThreshold && !countStack.isEmpty()) {

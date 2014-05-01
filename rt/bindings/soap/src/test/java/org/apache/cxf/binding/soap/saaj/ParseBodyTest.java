@@ -48,26 +48,13 @@ public class ParseBodyTest extends Assert {
         //System.out.println("Original[" + n + "]: " + data);
 
         xmlReader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(data.getBytes("utf-8")));
-        xmlReader.next();
-        xmlReader.next();
-
+        
+        //reader should be on the start element for the 
+        assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.next());
+        assertEquals("Body", xmlReader.getLocalName());
+        
         factory = MessageFactory.newInstance();
         soapMessage = factory.createMessage();
-    }
-
-    @Test
-    public void testUsingReadDocElementsData0() throws Exception {
-        testUsingReadDocElements(0);
-    }
-
-    @Test
-    public void testUsingReadDocElementsData1() throws Exception {
-        testUsingReadDocElements(1);
-    }
-
-    @Test
-    public void testUsingReadDocElementsData2() throws Exception {
-        testUsingReadDocElements(2);
     }
 
     @Test
@@ -83,20 +70,6 @@ public class ParseBodyTest extends Assert {
     @Test
     public void testUsingStaxUtilsCopyWithSAAJWriterData2() throws Exception {
         testUsingStaxUtilsCopyWithSAAJWriter(2);
-    }
-
-    private void testUsingReadDocElements(int n) throws Exception {
-        prepare(n);
-        StaxUtils.readDocElements(soapMessage.getSOAPPart().getEnvelope().getBody(), xmlReader, true, true);
-
-        DOMSource bodySource = new DOMSource(soapMessage.getSOAPPart().getEnvelope().getBody());
-        xmlReader = StaxUtils.createXMLStreamReader(bodySource);
-
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        StaxUtils.copy(xmlReader, buf);
-        String result = buf.toString();
-        //System.out.println("UsingReadDocElements: " + result);
-        assertEquals(DATA[n], result);
     }
 
     private void testUsingStaxUtilsCopyWithSAAJWriter(int n) throws Exception {

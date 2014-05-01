@@ -364,4 +364,40 @@ public class StaxUtilsTest extends Assert {
             // ignore
         }
     }
+    
+    @Test
+    public void testCopyFromTheMiddle() throws Exception {
+        String innerXml =
+                "<inner>\n"
+                + "<body>body text here</body>\n"
+                + "</inner>";
+        String xml =
+                "<outer>\n"
+                + innerXml + "\n"
+                + "</outer>";
+
+        StringReader reader = new StringReader(xml);
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        dbf.setValidating(false);
+
+        Document doc = dbf.newDocumentBuilder().parse(new InputSource(reader));
+        Source source = new DOMSource(doc);
+
+        // Skip <outer>
+        XMLStreamReader sreader = StaxUtils.createXMLStreamReader(source);
+        while (!"inner".equals(sreader.getLocalName())) {
+            sreader.next();
+        }
+
+        StringWriter sw = new StringWriter();
+        XMLStreamWriter swriter = StaxUtils.createXMLStreamWriter(sw);
+
+        StaxUtils.copy(sreader, swriter, true, true);
+        swriter.flush();
+        swriter.close();
+
+        System.out.println(sw.toString());
+        assertEquals(innerXml, sw.toString());
+    }    
 }

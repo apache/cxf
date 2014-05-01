@@ -102,7 +102,7 @@ public class LogicalMessageImpl implements LogicalMessage {
                         reader = message.getContent(XMLStreamReader.class);
                         //content must be an element thing, skip over any whitespace
                         StaxUtils.toNextTag(reader);
-                        StaxUtils.copy(reader, writer);
+                        StaxUtils.copy(reader, writer, true);
                         source = new DOMSource(writer.getDocument().getDocumentElement());
                         reader = StaxUtils.createXMLStreamReader(writer.getDocument());
                     } catch (ParserConfigurationException e) {

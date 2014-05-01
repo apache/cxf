@@ -189,10 +189,10 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                                                      elementName.getNamespaceURI());
                         }
                     }
-                    StaxUtils.copy(reader, output, true);
+                    StaxUtils.copy(reader, output, false);
                     output.writeEndElement();
                 } else {
-                    StaxUtils.copy(reader, output, true);
+                    StaxUtils.copy(reader, output, false);
                 }
             } else if (needToRender(part)) {
                 output.writeStartElement(part.getConcreteName().getNamespaceURI(),
