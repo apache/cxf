@@ -17,9 +17,10 @@
  * under the License.
  */
 
-package org.apache.cxf.service.invoker;
+package org.apache.cxf.service.invoker.spring;
 
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.service.invoker.Factory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -34,11 +35,14 @@ import org.springframework.context.ApplicationContextAware;
  * to pool the beans or the SessionFactory or similar.
  */
 public class SpringBeanFactory implements Factory, ApplicationContextAware {
-    ApplicationContext ctx;
-    String beanName;
+    volatile ApplicationContext ctx;
+    final String beanName;
     
     public SpringBeanFactory(String name) {
         beanName = name;
+    }
+    public SpringBeanFactory(Class<?> cls, String args[]) {
+        beanName = args[0];
     }
     
     /** {@inheritDoc}*/

@@ -53,7 +53,6 @@ import org.apache.cxf.service.invoker.PerRequestFactory;
 import org.apache.cxf.service.invoker.PooledFactory;
 import org.apache.cxf.service.invoker.SessionFactory;
 import org.apache.cxf.service.invoker.SingletonFactory;
-import org.apache.cxf.service.invoker.SpringBeanFactory;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.FaultInfo;
@@ -190,16 +189,13 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                     case Pooled:
                         f = new PooledFactory(cls, Integer.parseInt(scope.args()[0]));
                         break;
-                    case Spring:
-                        f = new SpringBeanFactory(scope.args()[0]);
-                        break;
                     default:
                         f = new SingletonFactory(cls);
                         break;
                     }
                 } else {
                     try {
-                        f = (Factory)scope.factoryClass().getConstructor(Class.class, String[].class)
+                        f = scope.factoryClass().getConstructor(Class.class, String[].class)
                             .newInstance(cls, scope.args());
                     } catch (Throwable t) {
                         throw new ServiceConstructionException(t);
