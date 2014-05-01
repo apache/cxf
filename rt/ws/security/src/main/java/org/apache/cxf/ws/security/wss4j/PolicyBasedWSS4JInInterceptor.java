@@ -55,6 +55,7 @@ import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -803,7 +804,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         // SIGNED_PARTS and ENCRYPTED_PARTS only apply to non-Transport bindings
         //
         boolean check = true;
-        if (!isTransportBinding(aim)) {
+        if (!isTransportBinding(aim, msg)) {
             check &= assertTokens(
                 aim, SPConstants.SIGNED_PARTS, signed, msg, soapHeader, soapBody, CoverageType.SIGNED
             );
@@ -1039,20 +1040,34 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return true;
     }
 
-    private boolean isTransportBinding(AssertionInfoMap aim) {
+    private boolean isTransportBinding(AssertionInfoMap aim, SoapMessage message) {
         Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+            getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
         if (ais.size() > 0) {
-            ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-            if (ais.size() > 0) {
-                return false;
-            }
-            ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-            if (ais.size() > 0) {
-                return false;
-            }
+            return false;
+        }
+        
+        ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (ais.size() > 0) {
+            return false;
+        }
+        
+        ais = getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (ais.size() > 0) {
             return true;
         }
+        
+        // No bindings, check if we are using TLS
+        TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
+        if (tlsInfo != null) {
+            // We don't need to check these policies for TLS
+            assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
+            assertPolicy(aim, SP11Constants.ENCRYPTED_PARTS);
+            assertPolicy(aim, SP12Constants.SIGNED_PARTS);
+            assertPolicy(aim, SP11Constants.SIGNED_PARTS);
+            return true;
+        }
+        
         return false;
     }
     
