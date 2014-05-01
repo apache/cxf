@@ -181,6 +181,14 @@ public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
         assertThat(((JsonObject)obj.get(0)).getInt("id"), equalTo(1));
         assertThat(((JsonObject)obj.get(0)).getString("name"), equalTo("Book 1"));
     }
+    
+    @Test
+    public void testPostBadJsonObject() {
+        final Response r = createWebClient("/bookstore/books")
+            .header("Content-Type", MediaType.APPLICATION_JSON)
+            .post("blabla");
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());        
+    }
 
     private static WebClient createWebClient(final String url) {
         return WebClient
