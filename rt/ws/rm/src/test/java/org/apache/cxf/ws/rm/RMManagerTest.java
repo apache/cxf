@@ -415,6 +415,7 @@ public class RMManagerTest extends Assert {
         proxy.createSequence(EasyMock.isA(EndpointReferenceType.class),
                              (RelatesToType)EasyMock.isNull(),
                              EasyMock.eq(false),
+                             EasyMock.eq(false),
                              EasyMock.isA(ProtocolVariation.class),
                              EasyMock.isA(Exchange.class));
         EasyMock.expectLastCall().andReturn(createResponse);

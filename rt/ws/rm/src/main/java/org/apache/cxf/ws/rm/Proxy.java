@@ -129,7 +129,8 @@ public class Proxy {
     }
 
     public CreateSequenceResponseType createSequence(EndpointReferenceType defaultAcksTo, RelatesToType relatesTo, 
-             boolean isServer, final ProtocolVariation protocol, final Exchange exchange) throws RMException {
+        boolean isServer, boolean oneWay, final ProtocolVariation protocol, final Exchange exchange)
+        throws RMException {
         
         SourcePolicyType sp = reliableEndpoint.getManager().getSourcePolicy();
         CreateSequenceType create = new CreateSequenceType();        
@@ -150,7 +151,7 @@ public class Proxy {
             create.setExpires(expires);
         }
         
-        if (sp.isIncludeOffer()) {
+        if (!oneWay && sp.isIncludeOffer()) {
             OfferType offer = new OfferType();
             d = sp.getOfferedSequenceExpiration();
             if (null != d) {
