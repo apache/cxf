@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>transfer</artifactId>
+  <packaging>jar</packaging>
+  <name>Apache CXF Runtime WS Transfer</name>
+  <url>http://cxf.apache.org</url>
+  
+  <parent>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-parent</artifactId>
+      <version>3.0.0-SNAPSHOT</version>
+      <relativePath>../../../parent/pom.xml</relativePath>
+  </parent>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.cxf</groupId>
+              <artifactId>cxf-xjc-plugin</artifactId>
+              <version>${cxf.xjc-utils.version}</version>
+              <executions>
+                  <execution>
+                      <id>generate-sources</id>
+                      <phase>generate-sources</phase>
+                      <goals>
+                          <goal>xsdtojava</goal>
+                      </goals>
+                      <configuration>
+                          <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                          <xsdOptions>
+                              <xsdOption>
+                                  <xsd>${basedir}/src/main/resources/schemas/transfer.xsd</xsd>
+                                  <packagename>org.apache.cxf.ws.transfer</packagename>
+                                  <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
+                              </xsdOption>
+                          </xsdOptions>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
+      </plugins>
+  </build>
+</project>
