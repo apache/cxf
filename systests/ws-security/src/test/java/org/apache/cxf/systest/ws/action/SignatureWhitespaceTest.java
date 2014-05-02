@@ -95,7 +95,7 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         
         URL wsdl = SignatureWhitespaceTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItSignaturePort");
+        QName portQName = new QName(NAMESPACE, "DoubleItSignaturePort2");
 
         Dispatch<StreamSource> dispatch = 
             service.createDispatch(portQName, StreamSource.class, Service.Mode.MESSAGE);
