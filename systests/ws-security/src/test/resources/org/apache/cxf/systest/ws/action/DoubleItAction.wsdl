@@ -66,6 +66,9 @@
         <wsdl:port name="DoubleItSamlTokenPort" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItSamlToken" />
         </wsdl:port>
+        <wsdl:port name="DoubleItSignaturePort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItSignature"/>
+        </wsdl:port>
     </wsdl:service>
 
 </wsdl:definitions>
