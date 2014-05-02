@@ -82,13 +82,14 @@ public class RM10PolicyWsdlTest extends RMPolicyWsdlTestBase {
 
         ConnectionHelper.setKeepAliveConnection(greeter, true);
 
-        // oneway
-
-        greeter.greetMeOneWay("CXF");
 
         // two-way
 
         assertEquals("CXF", greeter.greetMe("cxf")); 
+
+        // oneway
+
+        greeter.greetMeOneWay("CXF");
      
         // exception
 
@@ -118,14 +119,14 @@ public class RM10PolicyWsdlTest extends RMPolicyWsdlTestBase {
         
         mf.verifyMessages(5, true);
         String[] expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceAction(), 
-                                                 GREETMEONEWAY_ACTION,
                                                  GREETME_ACTION, 
+                                                 GREETMEONEWAY_ACTION,
                                                  PINGME_ACTION,
                                                  PINGME_ACTION};
         mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3", "4"}, true);
         mf.verifyLastMessage(new boolean[] {false, false, false, false, false}, true);
-        mf.verifyAcknowledgements(new boolean[] {false, false, false, true, true}, true);
+        mf.verifyAcknowledgements(new boolean[] {false, false, true, false, true}, true);
 
         mf.verifyMessages(4, false);
 //        mf.verifyMessages(9, false);
