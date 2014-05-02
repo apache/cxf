@@ -43,7 +43,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
@@ -917,8 +916,6 @@ public final class EndpointReferenceUtils {
             jm.marshal(jaxEle, writer); 
             return new DOMSource(writer.getDocument());
         } catch (JAXBException e) {
-            //ignore
-        } catch (ParserConfigurationException e) {
             //ignore
         }
         return null;

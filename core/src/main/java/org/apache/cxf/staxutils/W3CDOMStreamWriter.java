@@ -24,7 +24,6 @@ import java.util.Stack;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -46,7 +45,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     private boolean nsRepairing;
     private Map<String, Object> properties = Collections.emptyMap();
 
-    public W3CDOMStreamWriter() throws ParserConfigurationException {
+    public W3CDOMStreamWriter() {
         document = DOMUtils.newDocument();
     }
 
@@ -299,7 +298,11 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
-        currentNode.appendChild(document.createTextNode(text));
+        if (currentNode != null) {
+            currentNode.appendChild(document.createTextNode(text));
+        } else {
+            document.appendChild(document.createTextNode(text));
+        }
     }
 
     public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {

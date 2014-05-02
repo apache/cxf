@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import javax.activation.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
@@ -40,6 +39,7 @@ import javax.xml.ws.LogicalMessage;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -98,15 +98,15 @@ public class LogicalMessageImpl implements LogicalMessage {
 
                 if (source == null) {
                     try {
-                        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+                        Document doc = DOMUtils.newDocument();
+                        W3CDOMStreamWriter writer = new W3CDOMStreamWriter(doc.createDocumentFragment());
                         reader = message.getContent(XMLStreamReader.class);
                         //content must be an element thing, skip over any whitespace
                         StaxUtils.toNextTag(reader);
                         StaxUtils.copy(reader, writer, true);
-                        source = new DOMSource(writer.getDocument().getDocumentElement());
-                        reader = StaxUtils.createXMLStreamReader(writer.getDocument());
-                    } catch (ParserConfigurationException e) {
-                        throw new Fault(e);
+                        doc.appendChild(DOMUtils.getFirstElement(writer.getCurrentFragment()));
+                        source = new DOMSource(doc.getDocumentElement());
+                        reader = StaxUtils.createXMLStreamReader(doc.getDocumentElement());
                     } catch (XMLStreamException e) {
                         throw new Fault(e);
                     }
@@ -114,12 +114,7 @@ public class LogicalMessageImpl implements LogicalMessage {
                 message.setContent(XMLStreamReader.class, reader);
                 message.setContent(Source.class, source);
             } else if (!(source instanceof DOMSource)) {
-                W3CDOMStreamWriter writer;
-                try {
-                    writer = new W3CDOMStreamWriter();
-                } catch (ParserConfigurationException e) {
-                    throw new Fault(e);
-                }
+                W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
                 XMLStreamReader reader = message.getContent(XMLStreamReader.class);
                 if (reader == null) {
                     reader = StaxUtils.createXMLStreamReader(source);
@@ -266,8 +261,6 @@ public class LogicalMessageImpl implements LogicalMessage {
             Source source = new DOMSource(writer.getDocument().getDocumentElement());            
             
             setPayload(source);
-        } catch (ParserConfigurationException e) {
-            throw new WebServiceException(e);
         } catch (JAXBException e) {
             throw new WebServiceException(e);
         }
