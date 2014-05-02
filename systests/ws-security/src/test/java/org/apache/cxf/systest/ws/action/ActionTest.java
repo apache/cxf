@@ -28,7 +28,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.systest.ws.action.server.Server;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -64,7 +63,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void test3DESEncryptionGivenKey() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client/client.xml");
+        URL busFile = ActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -86,7 +85,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testUsernameToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client/client.xml");
+        URL busFile = ActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -124,7 +123,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenReplay() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client/client.xml");
+        URL busFile = ActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -160,7 +159,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignedTimestampReplay() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client/client.xml");
+        URL busFile = ActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -196,7 +195,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSAMLToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client/client.xml");
+        URL busFile = ActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

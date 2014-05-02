@@ -370,10 +370,10 @@ public class StaxUtilsTest extends Assert {
         String innerXml =
                 "<inner>\n"
                 + "<body>body text here</body>\n"
-                + "</inner>";
+                + "</inner>\n";
         String xml =
                 "<outer>\n"
-                + innerXml + "\n"
+                + innerXml
                 + "</outer>";
 
         StringReader reader = new StringReader(xml);
@@ -397,7 +397,8 @@ public class StaxUtilsTest extends Assert {
         swriter.flush();
         swriter.close();
 
-        System.out.println(sw.toString());
+        //System.out.println(innerXml);
+        //System.out.println(sw.toString());
         assertEquals(innerXml, sw.toString());
     }    
 }

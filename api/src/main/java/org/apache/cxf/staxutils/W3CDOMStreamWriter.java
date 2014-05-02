@@ -299,7 +299,11 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
-        currentNode.appendChild(document.createTextNode(text));
+        if (currentNode != null) {
+            currentNode.appendChild(document.createTextNode(text));
+        } else {
+            document.appendChild(document.createTextNode(text));
+        }
     }
 
     public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {

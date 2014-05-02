@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.action.server;
+package org.apache.cxf.systest.ws.action;
 
 import java.net.URL;
 

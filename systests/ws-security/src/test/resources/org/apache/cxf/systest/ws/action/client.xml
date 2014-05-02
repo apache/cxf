@@ -17,101 +17,150 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="           http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd           http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd           http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd           http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd           http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:http="http://cxf.apache.org/transports/http/configuration"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xmlns:p="http://cxf.apache.org/policy"
+       xmlns:sec="http://cxf.apache.org/configuration/security"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+          http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd
+          http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd
+          http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd
+          http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+          http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd"
+>
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleIt3DESEncryptionPort" createdFromAPI="true">
-        <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-                <constructor-arg>
-                    <map>
-                        <entry key="action" value="Encrypt"/>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleIt3DESEncryptionPort" 
+                  createdFromAPI="true">
+       <jaxws:outInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Encrypt"/> 
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.action.SecretKeyPasswordCallback"/>
                         <entry key="encryptSymmetricEncryptionKey" value="false"/>
-                        <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
-                    </map>
-                </constructor-arg>
-            </bean>
-        </jaxws:outInterceptors>
-        <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-                <constructor-arg>
-                    <map>
-                        <entry key="action" value="Encrypt"/>
+                        <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/> 
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:outInterceptors>
+       <jaxws:inInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Encrypt"/> 
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.action.SecretKeyPasswordCallback"/>
-                        <entry key="isBSPCompliant" value="false"/>
-                    </map>
-                </constructor-arg>
-            </bean>
-        </jaxws:inInterceptors>
+                        <entry key="isBSPCompliant" value="false"/>  
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:inInterceptors>
     </jaxws:client>
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItUsernameTokenPort" createdFromAPI="true">
-        <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-                <constructor-arg>
-                    <map>
-                        <entry key="action" value="UsernameToken"/>
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItUsernameTokenPort" 
+                  createdFromAPI="true">
+       <jaxws:outInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="UsernameToken"/> 
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
                         <entry key="user" value="Alice"/>
-                    </map>
-                </constructor-arg>
-            </bean>
-        </jaxws:outInterceptors>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:outInterceptors>
     </jaxws:client>
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItEncryptedPasswordPort" createdFromAPI="true">
-        <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-                <constructor-arg>
-                    <map>
-                        <entry key="action" value="Encrypt"/>
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItEncryptedPasswordPort" 
+                  createdFromAPI="true">
+       <jaxws:outInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Encrypt"/> 
+                        <entry key="passwordCallbackClass" 
+                               value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
                         <entry key="encryptionPropFile" value="bob-enc.properties"/>
                         <entry key="encryptionUser" value="bob"/>
-                    </map>
-                </constructor-arg>
-            </bean>
-        </jaxws:outInterceptors>
-        <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-                <constructor-arg>
-                    <map>
-                        <entry key="action" value="Encrypt"/>
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:outInterceptors>
+       <jaxws:inInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Encrypt"/> 
+                        <entry key="passwordCallbackClass" 
+                               value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
                         <entry key="decryptionPropFile" value="alice-enc.properties"/>
-                    </map>
-                </constructor-arg>
-            </bean>
-        </jaxws:inInterceptors>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:inInterceptors>
     </jaxws:client>
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSignedTimestampPort" createdFromAPI="true">
-        <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-                <constructor-arg>
-                    <map>
-                        <entry key="action" value="Signature Timestamp"/>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSignedTimestampPort" 
+                  createdFromAPI="true">
+       <jaxws:outInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Signature Timestamp"/> 
                         <entry key="signatureUser" value="alice"/>
-                        <entry key="signaturePropFile" value="alice.properties"/>
+                        <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
                         <entry key="signatureKeyIdentifier" value="DirectReference"/>
-                        <entry key="signatureParts" value="{}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"/>
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-                    </map>
-                </constructor-arg>
-            </bean>
-        </jaxws:outInterceptors>
-        <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-                <constructor-arg>
-                    <map>
-                        <entry key="action" value="Signature"/>
-                        <entry key="signatureVerificationPropFile" value="alice.properties"/>
-                    </map>
-                </constructor-arg>
-            </bean>
-        </jaxws:inInterceptors>
+                        <entry key="signatureParts"
+                               value="{}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{}{http://schemas.xmlsoap.org/soap/envelope/}Body;" />
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:outInterceptors>
+       <jaxws:inInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Signature"/> 
+                        <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:inInterceptors>
+    </jaxws:client>
+    
+    <bean id="samlCallbackHandler" class="org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler">
+        <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:bearer" />
+    </bean>
+    
+    <util:properties id="samlProperties" location="classpath:saml_sv.properties"/>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSamlTokenPort" 
+                  createdFromAPI="true">
+       <jaxws:outInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="SAMLTokenUnsigned"/> 
+                        <entry key="samlCallbackRef" value-ref="samlCallbackHandler"/>
+                        <entry key="samlPropRefId" value="samlPropertiesId" />
+                        <entry key="samlPropertiesId" value-ref="samlProperties" />
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:outInterceptors>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSignaturePort" createdFromAPI="true">
         <jaxws:outInterceptors>
@@ -120,9 +169,9 @@
                     <map>
                         <entry key="action" value="Signature"/>
                         <entry key="signatureUser" value="alice"/>
-                        <entry key="signaturePropFile" value="alice.properties"/>
+                        <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
                         <entry key="signatureKeyIdentifier" value="DirectReference"/>
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.wssec10.server.KeystorePasswordCallback"/>
                     </map>
                 </constructor-arg>
             </bean>
@@ -132,10 +181,12 @@
                 <constructor-arg>
                     <map>
                         <entry key="action" value="Signature"/>
-                        <entry key="signatureVerificationPropFile" value="alice.properties"/>
+                        <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
                     </map>
                 </constructor-arg>
             </bean>
         </jaxws:inInterceptors>
     </jaxws:client>
+    
+    
 </beans>
