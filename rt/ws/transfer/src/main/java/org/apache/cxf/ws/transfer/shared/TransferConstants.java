@@ -53,6 +53,8 @@ public final class TransferConstants {
     public static final String ACTION_CREATE = "http://www.w3.org/2011/03/ws-tra/Create";
     public static final String ACTION_CREATE_RESPONSE = "http://www.w3.org/2011/03/ws-tra/CreateResponse";
     
+    public static final String RESOURCE_REMOTE_SUFFIX = "_factory";
+    
     private TransferConstants() {
         
     }
