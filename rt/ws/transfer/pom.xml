@@ -41,7 +41,7 @@
                           <goal>xsdtojava</goal>
                       </goals>
                       <configuration>
-                          <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                          <sourceRoot>${basedir}/target/generated-sources/xjc</sourceRoot>
                           <xsdOptions>
                               <xsdOption>
                                   <xsd>${basedir}/src/main/resources/schemas/transfer.xsd</xsd>
