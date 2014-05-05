@@ -148,13 +148,15 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testWSAddressingWithJms() throws Exception {
+        Bus bus = BusFactory.getDefaultBus();
+        BusFactory.setDefaultBus(bus);
+
         QName serviceName = new QName("http://apache.org/hello_world_doc_lit", 
                                  "SOAPService8");
         QName portName = new QName("http://apache.org/hello_world_doc_lit", "SoapPort8");
         URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
-        Greeter greeter = markForClose(service.getPort(portName, Greeter.class, 
-                                                       cff, new AddressingFeature()));
+        Greeter greeter = service.getPort(portName, Greeter.class, new AddressingFeature());
 
         for (int idx = 0; idx < 5; idx++) {
 
@@ -174,5 +176,6 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
             }
 
         }
+        bus.shutdown(true);
     }
 }
