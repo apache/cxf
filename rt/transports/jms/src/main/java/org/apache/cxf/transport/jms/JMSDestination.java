@@ -105,6 +105,13 @@ public class JMSDestination extends AbstractMultiplexDestination
      * @return the inbuilt backchannel
      */
     protected Conduit getInbuiltBackChannel(Message inMessage) {
+        //with JMS, non-robust OneWays will never need to send back a response, even a "202" response.
+        boolean robust =
+        MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
+        if (inMessage.getExchange().isOneWay()
+            && !robust) {
+            return null;
+        }
         EndpointReferenceType anon = EndpointReferenceUtils.getAnonymousEndpointReference();
         return new BackChannelConduit(this, anon, inMessage);
     }

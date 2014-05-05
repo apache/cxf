@@ -24,6 +24,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.AddressingFeature;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -40,6 +41,7 @@ import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -143,5 +145,34 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
             throw (Exception)ex.getCause();
         }
         bus.shutdown(true);
+    }
+    @Test
+    public void testWSAddressingWithJms() throws Exception {
+        QName serviceName = new QName("http://apache.org/hello_world_doc_lit", 
+                                 "SOAPService8");
+        QName portName = new QName("http://apache.org/hello_world_doc_lit", "SoapPort8");
+        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
+        SOAPService2 service = new SOAPService2(wsdl, serviceName);
+        Greeter greeter = markForClose(service.getPort(portName, Greeter.class, 
+                                                       cff, new AddressingFeature()));
+
+        for (int idx = 0; idx < 5; idx++) {
+
+            greeter.greetMeOneWay("test String");
+
+            String greeting = greeter.greetMe("Milestone-" + idx);
+            Assert.assertEquals(new String("Hello Milestone-") + idx, greeting);
+
+            String reply = greeter.sayHi();
+            Assert.assertEquals("Bonjour", reply);
+
+            try {
+                greeter.pingMe();
+                Assert.fail("Should have thrown FaultException");
+            } catch (PingMeFault ex) {
+                Assert.assertNotNull(ex.getFaultInfo());
+            }
+
+        }
     }
 }
