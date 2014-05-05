@@ -41,7 +41,6 @@ import com.meterware.servletunit.ServletUnitClient;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_soap_http.BaseGreeterImpl;
 
@@ -182,7 +181,6 @@ public class CXFServletTest extends AbstractServletTest {
         assertEquals("text/xml", res.getContentType());
         Document doc = StaxUtils.read(res.getInputStream());
         assertNotNull(doc);
-        XMLUtils.printDOM(doc);
         
         assertValid("//wsdl:operation[@name='greetMe']", doc);
         assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/greeter']", doc);
