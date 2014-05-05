@@ -230,6 +230,9 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
                     methods.add(actual.toLowerCase());
                 }
             }
+            if (methods.isEmpty()) {
+                methods.add("*");
+            }
             return methods;
         } else {
             return Collections.emptySet();
