@@ -148,7 +148,7 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testWSAddressingWithJms() throws Exception {
-        Bus bus = BusFactory.getDefaultBus();
+        Bus bus = BusFactory.newInstance().createBus();
         BusFactory.setDefaultBus(bus);
 
         QName serviceName = new QName("http://apache.org/hello_world_doc_lit", 
