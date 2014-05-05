@@ -42,6 +42,7 @@ import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
@@ -87,6 +88,13 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
      * @return the inbuilt backchannel
      */
     protected Conduit getInbuiltBackChannel(Message inMessage) {
+        //with JMS, non-robust OneWays will never need to send back a response, even a "202" response.
+        boolean robust =
+            MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
+        if (inMessage.getExchange().isOneWay()
+            && !robust) {
+            return null;
+        }
         return new BackChannelConduit(inMessage, jmsConfig, connection);
     }
 
