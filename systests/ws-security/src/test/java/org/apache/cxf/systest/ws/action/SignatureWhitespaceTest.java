@@ -82,7 +82,6 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO test not working
     @org.junit.Test
     public void testTrailingWhitespaceInSOAPBody() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
