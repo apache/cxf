@@ -216,6 +216,9 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         return server;
     }
 
+    public Server getServer() {
+        return server;
+    }
 
     protected void setBeanInfo(ProviderFactory factory) {
         List<ClassResourceInfo> cris = serviceFactory.getClassResourceInfo();
