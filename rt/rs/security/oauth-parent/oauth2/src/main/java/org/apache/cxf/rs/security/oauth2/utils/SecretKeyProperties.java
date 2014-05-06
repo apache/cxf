@@ -25,14 +25,16 @@ public class SecretKeyProperties {
     private String keyAlgo;
     private int keySize;
     private int blockSize = -1;
+    private byte[] additionalData;
     private SecureRandom secureRandom;
     private AlgorithmParameterSpec algoSpec;
-    private boolean compressionSupported = true;
+    private boolean compressionSupported;
+    
     public SecretKeyProperties() {
-        this("AES", 128);
     }
+    
     public SecretKeyProperties(String keyAlgo) {
-        this(keyAlgo, 128);
+        this(keyAlgo, -1);
     }
     public SecretKeyProperties(String keyAlgo, int keySize) {
         this.keyAlgo = keyAlgo;
@@ -73,6 +75,12 @@ public class SecretKeyProperties {
     }
     public void setCompressionSupported(boolean compressionSupported) {
         this.compressionSupported = compressionSupported;
+    }
+    public byte[] getAdditionalData() {
+        return additionalData;
+    }
+    public void setAdditionalData(byte[] additionalData) {
+        this.additionalData = additionalData;
     }
     
     
