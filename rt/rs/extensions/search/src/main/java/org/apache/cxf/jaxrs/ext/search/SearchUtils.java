@@ -78,7 +78,11 @@ public final class SearchUtils {
     }
     
     public static boolean containsEscapedChar(String value) {
-        return value.contains("\\%") || value.contains("\\\\") || value.contains("\\_");
+        return containsEscapedPercent(value) || value.contains("\\\\") || value.contains("\\_");
+    }
+    
+    public static boolean containsEscapedPercent(String value) {
+        return value.contains("\\%");
     }
     
     public static void startSqlQuery(StringBuilder sb, 
@@ -109,10 +113,10 @@ public final class SearchUtils {
         String op;
         switch (ct) {
         case EQUALS:
-            op = containsEscapedChar(value) || value.contains("%") ? "LIKE" : "=";
+            op = containsEscapedPercent(value) || value.contains("%") ? "LIKE" : "=";
             break;
         case NOT_EQUALS:
-            op = containsEscapedChar(value) || value.contains("%") ? "NOT LIKE" : "<>";
+            op = containsEscapedPercent(value) || value.contains("%") ? "NOT LIKE" : "<>";
             break;
         case GREATER_THAN:
             op = ">";

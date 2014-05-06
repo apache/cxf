@@ -31,6 +31,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
@@ -198,7 +199,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         case EQUALS:
             if (clazz.equals(String.class)) {
                 String theValue = SearchUtils.toSqlWildcardString(value.toString(), isWildcardStringMatch());
-                if (SearchUtils.containsEscapedChar(theValue)) {
+                if (SearchUtils.containsEscapedPercent(theValue)) {
                     pred = builder.like((Expression<String>)exp, theValue, '\\');
                 } else if (theValue.contains("%")) {
                     pred = builder.like((Expression<String>)exp, theValue);
@@ -212,7 +213,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         case NOT_EQUALS:
             if (clazz.equals(String.class)) {
                 String theValue = SearchUtils.toSqlWildcardString(value.toString(), isWildcardStringMatch());
-                if (SearchUtils.containsEscapedChar(theValue)) {
+                if (SearchUtils.containsEscapedPercent(theValue)) {
                     pred = builder.notLike((Expression<String>)exp, theValue, '\\');
                 } else if (theValue.contains("%")) {
                     pred = builder.notLike((Expression<String>)exp, theValue);
@@ -286,7 +287,13 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     private Path<?> getNextPath(Path<?> element, String name, ClassValue cv, CollectionCheckInfo collSize) {
         if (collSize == null
             && (cv.isCollection(name) || isJoinProperty(name)) && (element == root || element instanceof Join)) {
-            return element == root ? root.join(name) : ((Join<?, ?>)element).join(name);
+            
+            final Path<?> path = getExistingJoinProperty((From<?, ?>)element, name);
+            if (path != null) {
+                return path;
+            } else {
+                return element == root ? root.join(name) : ((Join<?, ?>)element).join(name);
+            }
         } else {
             return element.get(name);
         }
@@ -296,4 +303,14 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         return joinProperties == null ? false : joinProperties.contains(prop);
     }
     
+    private Path<?> getExistingJoinProperty(From<?, ?> element, String prop) {
+        final Set<?> joins = element.getJoins();
+        for (Object object : joins) {
+            Join<?, ?> join = (Join<?, ?>) object;
+            if (join.getAttribute().getName().equals(prop)) {
+                return join;
+            }
+        }
+        return null;
+    }
 }
