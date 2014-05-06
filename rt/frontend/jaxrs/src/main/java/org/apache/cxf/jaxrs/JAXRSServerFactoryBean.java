@@ -217,6 +217,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         return server;
     }
 
+    public Server getServer() {
+        return server;
+    }
+    
     protected ServerProviderFactory setupFactory(Endpoint ep) { 
         ServerProviderFactory factory = ServerProviderFactory.createInstance(getBus()); 
         setBeanInfo(factory);

@@ -35,6 +35,7 @@ import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -120,6 +121,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
         super.doParse(element, ctx, bean);
 
         bean.setInitMethodName("create");
+        bean.setDestroyMethodName("destroy");
         
         // We don't really want to delay the registration of our Server
         bean.setLazyInit(false);
@@ -155,6 +157,13 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
 
         public SpringJAXRSServerFactoryBean(JAXRSServiceFactoryBean sf) {
             super(sf);
+        }
+        
+        public void destroy() {
+            Server server = super.getServer();
+            if (server != null && server.isStarted()) {
+                server.destroy();
+            }
         }
         
         public void setBasePackages(List<String> basePackages) {
