@@ -209,8 +209,10 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
     
             message.setContent(List.class, parameters);
         } catch (Fault f) {
-            if (!isRequestor(message)) {
+            if (isRequestor(message)) {
                 f.setFaultCode(Fault.FAULT_CODE_CLIENT);
+            } else {
+                f.setFaultCode(Fault.FAULT_CODE_SERVER);
             }
             throw f;
         }
