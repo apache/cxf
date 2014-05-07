@@ -138,6 +138,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
             <optional>true</optional>
