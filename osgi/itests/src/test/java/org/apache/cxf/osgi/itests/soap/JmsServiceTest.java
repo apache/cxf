@@ -21,6 +21,8 @@ package org.apache.cxf.osgi.itests.soap;
 import java.io.InputStream;
 import java.util.Collections;
 
+import javax.jms.ConnectionFactory;
+
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
@@ -37,7 +39,6 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.Constants;
-
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
@@ -58,11 +59,16 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress("jms:queue:greeter");
+        ConnectionFactory connectionFactory = createConnectionFactory();
+        factory.setFeatures(Collections.singletonList(new ConnectionFactoryFeature(connectionFactory)));
+        return factory.create(Greeter.class);
+    }
+
+    private ActiveMQConnectionFactory createConnectionFactory() {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
         connectionFactory.setUserName("karaf");
         connectionFactory.setPassword("karaf");
-        factory.setFeatures(Collections.singletonList(new ConnectionFactoryFeature(connectionFactory)));
-        return factory.create(Greeter.class);
+        return connectionFactory;
     }
 
     @Configuration

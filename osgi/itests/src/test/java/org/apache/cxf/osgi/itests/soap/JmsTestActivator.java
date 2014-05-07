@@ -20,6 +20,8 @@ package org.apache.cxf.osgi.itests.soap;
 
 import java.util.Collections;
 
+import javax.jms.ConnectionFactory;
+
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -32,22 +34,24 @@ public class JmsTestActivator implements BundleActivator {
 
     @Override
     public void start(BundleContext bc) throws Exception {
-        /*
-        ServiceTracker tracker = new ServiceTracker(bc, ConnectionFactory.class.getName(), null);
-        */
-        // This can block the activator. Use an async approach in production code
-        /*
-        ConnectionFactory connectionFactory = (ConnectionFactory)tracker.getService();
-        */
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-        connectionFactory.setUserName("karaf");
-        connectionFactory.setPassword("karaf");
+        ConnectionFactory connectionFactory = createConnectionFactory();
+        server = publishService(connectionFactory);
+    }
+
+    private Server publishService(ConnectionFactory connectionFactory) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress("jms:queue:greeter");
         factory.setFeatures(Collections.singletonList(new ConnectionFactoryFeature(connectionFactory)));
         factory.setServiceBean(new GreeterImpl());
-        server = factory.create();
+        return factory.create();
+    }
+
+    private ActiveMQConnectionFactory createConnectionFactory() {
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+        connectionFactory.setUserName("karaf");
+        connectionFactory.setPassword("karaf");
+        return connectionFactory;
     }
 
     @Override
