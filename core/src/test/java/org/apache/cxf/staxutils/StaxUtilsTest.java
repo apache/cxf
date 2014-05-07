@@ -346,7 +346,8 @@ public class StaxUtilsTest extends Assert {
     public void testDefaultPrefixInRootElementWithJDKInternalCopyTransformer() throws Exception {
         TransformerFactory trf = null;
         try {
-            trf = TransformerFactory.newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null);
+            trf = TransformerFactory
+                .newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             String xml = "<root xmlns=\"urn:org.apache.cxf:test\">Text</root>";
             StringReader stringReader = new StringReader(xml);

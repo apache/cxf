@@ -19,7 +19,6 @@
 
 package org.apache.cxf.staxutils;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
