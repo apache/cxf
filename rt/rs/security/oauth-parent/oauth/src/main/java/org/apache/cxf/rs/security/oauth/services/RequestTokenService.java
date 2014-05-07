@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
 
 
 /**
- * This resource issues a temporarily request token to the Client
+ * This resource issues a temporary request token to the Client
  * which will be later authorised and exchanged for the access token 
  */
 @Path("/initiate")

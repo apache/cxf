@@ -44,7 +44,7 @@ under the License.
             </tr>
             <tr>
                 <td>Callback URL:</td>
-                <td>${client.callbackURL}</td>
+                <td>${client.callbackURI}</td>
             </tr>
             <tr>
                 <td colspan="2">
