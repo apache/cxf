@@ -14,45 +14,30 @@
         <cm:default-properties>
             <cm:property name="xkms.enableXKRSS" value="true"/>
             <cm:property name="xkms.logExceptions" value="false"/>
-            <cm:property name="xkms.certificate.repo" value="ldap"/>
+            <cm:property name="xkms.certificate.repo" value="file"/>
             <cm:property name="xkms.file.storageDir" value="data/xkms/certificates"/>
-            <cm:property name="xkms.ldap.url" value="tcp:localhost:389"/>
-            <cm:property name="xkms.ldap.user" value=""/>
-            <cm:property name="xkms.ldap.pwd" value=""/>
-            <cm:property name="xkms.ldap.retry" value="2"/>
-            <cm:property name="xkms.ldap.rootDN" value=""/>
             <cm:property name="xkms.enableRevocation" value="true"/>
         </cm:default-properties>
     </cm:property-placeholder>
-    <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.repo.ldap.LdapSearch">
-        <argument value="${xkms.ldap.url}"/>
-        <argument value="${xkms.ldap.user}"/>
-        <argument value="${xkms.ldap.pwd}"/>
-        <argument value="${xkms.ldap.retry}"/>
+    <service interface="org.apache.cxf.xkms.x509.repo.CertificateRepo" activation="eager">
+    	<service-properties>
+    		<entry key="name" value="file"/>
+    	</service-properties>
+    	<bean class="org.apache.cxf.xkms.x509.repo.file.FileCertificateRepo">
+        	<argument value="${xkms.file.storageDir}"/>
+	    </bean>
+    </service>
+    
+    <bean id="certificateRepoFactory" class="org.apache.cxf.xkms.service.CertificateRepoProxyFactory" destroy-method="close">
+    	<argument value="org.apache.cxf.xkms.x509.repo.CertificateRepo"/>
+    	<argument value="(name=${xkms.certificate.repo})"/>
+    	<argument ref="blueprintBundleContext"/>
     </bean>
-    <bean id="ldapSchemaConfig" class="org.apache.cxf.xkms.x509.repo.ldap.LdapSchemaConfig">
-        <property name="certObjectClass" value="${xkms.ldap.schema.certObjectClass}"/>
-        <property name="attrUID" value="${xkms.ldap.schema.attrUID}"/>
-        <property name="attrIssuerID" value="${xkms.ldap.schema.attrIssuerID}"/>
-        <property name="attrSerialNumber" value="${xkms.ldap.schema.attrSerialNumber}"/>
-        <property name="attrEndpoint" value="${xkms.ldap.schema.attrEndpoint}"/>
-        <property name="attrCrtBinary" value="${xkms.ldap.schema.attrCrtBinary}"/>
-        <property name="attrCrlBinary" value="${xkms.ldap.schema.attrCrlBinary}"/>
-        <property name="constAttrNamesCSV" value="${xkms.ldap.schema.constAttrNamesCSV}"/>
-        <property name="constAttrValuesCSV" value="${xkms.ldap.schema.constAttrValuesCSV}"/>
-        <property name="serviceCertRDNTemplate" value="${xkms.ldap.schema.serviceCertRDNTemplate}"/>
-        <property name="serviceCertUIDTemplate" value="${xkms.ldap.schema.serviceCertUIDTemplate}"/>
-        <property name="trustedAuthorityFilter" value="${xkms.ldap.schema.trustedAuthorities}"/>
-        <property name="crlFilter" value="${xkms.ldap.schema.crls}"/>
-        <property name="intermediateFilter" value="${xkms.ldap.schema.intermediates}"/>
-    </bean>
-    <bean id="certificateRepo" class="org.apache.cxf.xkms.x509.repo.CertificateRepoFactory" factory-method="createRepository">
-        <argument value="${xkms.certificate.repo}"/>
-        <argument ref="ldapSearch"/>
-        <argument ref="ldapSchemaConfig"/>
-        <argument value="${xkms.ldap.rootDN}"/>
-        <argument value="${xkms.file.storageDir}"/>
-    </bean>
+    
+    <bean id="certificateRepo" class="org.apache.cxf.xkms.service.CertificateRepoProxyFactory"
+    	factory-ref="certificateRepoFactory" 
+    	factory-method="create"/>
+
     <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator"/>
     <bean id="trustedAuthorityValidator" class="org.apache.cxf.xkms.x509.validator.TrustedAuthorityValidator">
         <argument ref="certificateRepo"/>

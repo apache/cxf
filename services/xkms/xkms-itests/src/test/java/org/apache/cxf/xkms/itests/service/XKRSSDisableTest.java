@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.xkms.itests.service;
 
-import java.io.File;
 import java.util.UUID;
 
 import org.apache.cxf.xkms.handlers.XKMSConstants;
@@ -31,15 +30,22 @@ import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.CoreOptions;
+import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 
 @RunWith(PaxExam.class)
 public class XKRSSDisableTest extends BasicIntegrationTest {
 
-    @Override
-    protected File getConfigFile() {
-        return new File("src/test/resources/etc/org.apache.cxf.xkms_noXKRSS.cfg");
+    @Configuration
+    public Option[] getConfig() {
+        return new Option[] {
+            CoreOptions.composite(super.getConfig()),
+            editConfigurationFilePut("etc/org.apache.cxf.xkms.cfg", "xkms.enableXKRSS", "false")
+        };
     }
 
     @Test

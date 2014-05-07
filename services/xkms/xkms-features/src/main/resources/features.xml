@@ -33,12 +33,21 @@
     <feature name="cxf-xkms-service" version="${project.version}">
         <feature>cxf-jaxws</feature>
         <feature>cxf-http</feature>
+        <feature>wss4j</feature>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-common/${project.version}</bundle>
-        <bundle>mvn:${project.groupId}/cxf-services-xkms-service/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-x509-handlers/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-services-xkms-service/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-osgi/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.cxf.xkms.cfg">
             mvn:${project.groupId}/cxf-services-xkms-features/${project.version}/cfg/org.apache.cxf.xkms
+        </configfile>
+    </feature>
+    
+    <feature name="cxf-xkms-ldap" version="${project.version}">
+        <feature>cxf-xkms-service</feature>
+        <bundle>mvn:${project.groupId}/cxf-services-xkms-x509-repo-ldap/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.cxf.xkms.ldap.cfg">
+            mvn:${project.groupId}/cxf-services-xkms-features/${project.version}/cfg/org.apache.cxf.xkms.ldap
         </configfile>
     </feature>
 </features>

@@ -65,6 +65,11 @@
             <artifactId>cxf-services-xkms-x509-handlers</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.services.xkms</groupId>
+            <artifactId>cxf-services-xkms-x509-repo-ldap</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>

@@ -22,8 +22,8 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <pax-exam.version>3.2.0</pax-exam.version>
-        <karaf.version>2.3.1</karaf.version>
+        <pax.exam.version>3.4.0</pax.exam.version>
+        <karaf.version>2.3.5</karaf.version>
     </properties>
     <dependencies>
         <dependency>
@@ -66,49 +66,65 @@
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-junit4</artifactId>
-            <version>${pax-exam.version}</version>
+            <version>${pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam</artifactId>
+            <version>${pax.exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-karaf</artifactId>
-            <version>${pax-exam.version}</version>
+            <version>${pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-aether</artifactId>
-            <version>1.6.0</version>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-link-mvn</artifactId>
+            <version>${pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.karaf</groupId>
-            <artifactId>apache-karaf</artifactId>
-            <version>${karaf.version}</version>
-            <type>tar.gz</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.karaf</groupId>
-                    <artifactId>org.apache.karaf.client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse</groupId>
-                    <artifactId>osgi</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-jcl</artifactId>
+        	<version>1.7.7</version>
         </dependency>
     </dependencies>
     <build>
         <plugins>
+        	<!-- generate dependency versions -->
+            <plugin>
+                <groupId>org.apache.servicemix.tooling</groupId>
+                <artifactId>depends-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                    	<phase>generate-resources</phase>
+                        <id>generate-depends-file</id>
+                        <goals>
+                            <goal>generate-depends-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
                         <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level>
-                        <project.version>${project.version}</project.version>
                         <karaf.version>${karaf.version}</karaf.version>
-                        <buildDirectory>${project.build.directory}</buildDirectory>
                         <org.ops4j.pax.url.mvn.localRepository>${maven.repo.local}</org.ops4j.pax.url.mvn.localRepository>
                     </systemPropertyVariables>
                 </configuration>

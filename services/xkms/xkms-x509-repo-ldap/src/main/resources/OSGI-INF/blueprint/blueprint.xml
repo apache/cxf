@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+    license agreements. See the NOTICE file distributed with this work for additional 
+    information regarding copyright ownership. The ASF licenses this file to 
+    you under the Apache License, Version 2.0 (the "License"); you may not use 
+    this file except in compliance with the License. You may obtain a copy of 
+    the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+    by applicable law or agreed to in writing, software distributed under the 
+    License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+    OF ANY KIND, either express or implied. See the License for the specific 
+    language governing permissions and limitations under the License. -->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:ext="http://www.osgi.org/xmlns/blueprint-ext/v1.1.0" xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd                         http://www.osgi.org/xmlns/blueprint-ext/v1.1.0 https://svn.apache.org/repos/asf/aries/tags/blueprint-0.3.1/blueprint-core/src/main/resources/org/apache/aries/blueprint/ext/blueprint-ext.xsd                           http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.0.0.xsd                         http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/schemas/blueprint/jaxws.xsd                         http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd ">
+    <cm:property-placeholder persistent-id="org.apache.cxf.xkms.ldap" update-strategy="reload">
+        <cm:default-properties>
+            <cm:property name="xkms.ldap.url" value="tcp:localhost:389"/>
+            <cm:property name="xkms.ldap.user" value=""/>
+            <cm:property name="xkms.ldap.pwd" value=""/>
+            <cm:property name="xkms.ldap.retry" value="2"/>
+            <cm:property name="xkms.ldap.rootDN" value=""/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+    <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.repo.ldap.LdapSearch">
+        <argument value="${xkms.ldap.url}"/>
+        <argument value="${xkms.ldap.user}"/>
+        <argument value="${xkms.ldap.pwd}"/>
+        <argument value="${xkms.ldap.retry}"/>
+    </bean>
+    <bean id="ldapSchemaConfig" class="org.apache.cxf.xkms.x509.repo.ldap.LdapSchemaConfig">
+        <property name="certObjectClass" value="${xkms.ldap.schema.certObjectClass}"/>
+        <property name="attrUID" value="${xkms.ldap.schema.attrUID}"/>
+        <property name="attrIssuerID" value="${xkms.ldap.schema.attrIssuerID}"/>
+        <property name="attrSerialNumber" value="${xkms.ldap.schema.attrSerialNumber}"/>
+        <property name="attrEndpoint" value="${xkms.ldap.schema.attrEndpoint}"/>
+        <property name="attrCrtBinary" value="${xkms.ldap.schema.attrCrtBinary}"/>
+        <property name="attrCrlBinary" value="${xkms.ldap.schema.attrCrlBinary}"/>
+        <property name="constAttrNamesCSV" value="${xkms.ldap.schema.constAttrNamesCSV}"/>
+        <property name="constAttrValuesCSV" value="${xkms.ldap.schema.constAttrValuesCSV}"/>
+        <property name="serviceCertRDNTemplate" value="${xkms.ldap.schema.serviceCertRDNTemplate}"/>
+        <property name="serviceCertUIDTemplate" value="${xkms.ldap.schema.serviceCertUIDTemplate}"/>
+        <property name="trustedAuthorityFilter" value="${xkms.ldap.schema.trustedAuthorities}"/>
+        <property name="crlFilter" value="${xkms.ldap.schema.crls}"/>
+        <property name="intermediateFilter" value="${xkms.ldap.schema.intermediates}"/>
+    </bean>
+    <bean id="certificateRepo" class="org.apache.cxf.xkms.x509.repo.ldap.LdapCertificateRepo">
+        <argument ref="ldapSearch"/>
+        <argument ref="ldapSchemaConfig"/>
+        <argument value="${xkms.ldap.rootDN}"/>
+    </bean>
+    <service ref="certificateRepo" interface="org.apache.cxf.xkms.x509.repo.CertificateRepo">
+    	<service-properties>
+    		<entry key="name" value="ldap"/>
+    	</service-properties>
+    </service>
+</blueprint>

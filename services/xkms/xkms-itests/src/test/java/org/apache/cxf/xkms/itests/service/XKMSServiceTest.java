@@ -39,7 +39,6 @@ import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -63,7 +62,6 @@ public class XKMSServiceTest extends BasicIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void testLocateByEndpoint() throws URISyntaxException, Exception {
         LocateRequestType request = XKMS_OF.createLocateRequestType();
         setGenericRequestParams(request);
@@ -83,8 +81,7 @@ public class XKMSServiceTest extends BasicIntegrationTest {
 
         request.setQueryKeyBinding(queryKeyBindingType);
         LocateResultType result = xkmsService.locate(request);
-        Assert.assertEquals(ResultMajorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_SUCCESS.value(),
-                            result.getResultMajor());
+        assertSuccess(result);
         List<UnverifiedKeyBindingType> keyBinding = result.getUnverifiedKeyBinding();
         Assert.assertEquals(1, keyBinding.size());
         KeyInfoType keyInfo = keyBinding.get(0).getKeyInfo();

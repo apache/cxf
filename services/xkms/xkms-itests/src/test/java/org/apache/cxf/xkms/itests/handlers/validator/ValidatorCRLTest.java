@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.xkms.itests.handlers.validator;
 
-import java.io.File;
 import java.io.InputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -41,9 +40,14 @@ import org.apache.cxf.xkms.model.xmldsig.X509DataType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.CoreOptions;
+import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 
 @RunWith(PaxExam.class)
 public class ValidatorCRLTest extends BasicIntegrationTest {
@@ -56,9 +60,12 @@ public class ValidatorCRLTest extends BasicIntegrationTest {
     
     private static final Logger LOG = LoggerFactory.getLogger(ValidatorCRLTest.class);
     
-    @Override
-    protected File getConfigFile() {
-        return new File("src/test/resources/etc/org.apache.cxf.xkms_revocation.cfg");
+    @Configuration
+    public Option[] getConfig() {
+        return new Option[] {
+            CoreOptions.composite(super.getConfig()),
+            editConfigurationFilePut("etc/org.apache.cxf.xkms.cfg", "xkms.enableRevocation", "true")
+        };
     }
     
     @Test
