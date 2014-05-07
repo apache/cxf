@@ -40,6 +40,10 @@ under the License.
             <td>${clientInfo.secretKey}</td>
         </tr>
         <tr>
+            <td>Callback URL:</td>
+            <td>${clientInfo.callbackURI}</td>
+        </tr>
+        <tr>
             <td colspan="2">
                 <input type="submit" value="Register New Client"/>
             </td>
