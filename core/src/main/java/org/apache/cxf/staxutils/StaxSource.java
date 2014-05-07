@@ -117,6 +117,15 @@ public class StaxSource extends SAXSource implements XMLReader {
                     String qname = prefix != null && prefix.length() > 0 
                         ? prefix + ":" + localName : localName;
                     contentHandler.endElement(uri, localName, qname);
+                    // namespaces
+                    for (int i = 0; i < streamReader.getNamespaceCount(); i++) {
+                        String nsPrefix = streamReader.getNamespacePrefix(i);
+                        String nsUri = streamReader.getNamespaceURI(i);
+                        if (nsUri == null) {
+                            nsUri = "";
+                        }
+                        contentHandler.endPrefixMapping(nsPrefix);
+                    }
                     break;
                 }
                 case XMLStreamConstants.ENTITY_DECLARATION:
@@ -135,6 +144,15 @@ public class StaxSource extends SAXSource implements XMLReader {
                     String prefix = streamReader.getPrefix();
                     String qname = prefix != null && prefix.length() > 0 
                         ? prefix + ":" + localName : localName;
+                    // namespaces
+                    for (int i = 0; i < streamReader.getNamespaceCount(); i++) {
+                        String nsPrefix = streamReader.getNamespacePrefix(i);
+                        String nsUri = streamReader.getNamespaceURI(i);
+                        if (nsUri == null) {
+                            nsUri = "";
+                        }
+                        contentHandler.startPrefixMapping(nsPrefix, nsUri);
+                    }
                     contentHandler.startElement(uri == null ? "" : uri, localName, qname, getAttributes());
                     break;
                 }
@@ -171,30 +189,7 @@ public class StaxSource extends SAXSource implements XMLReader {
 
     protected Attributes getAttributes() {
         AttributesImpl attrs = new AttributesImpl();
-        // Adding namespace declaration as attributes is necessary because
-        // the xalan implementation that ships with SUN JDK 1.4 is bugged
-        // and does not handle the startPrefixMapping method
-        for (int i = 0; i < streamReader.getNamespaceCount(); i++) {
-            String prefix = streamReader.getNamespacePrefix(i);
-            String uri = streamReader.getNamespaceURI(i);
-            if (uri == null) {
-                uri = "";
-            }
-            // Default namespace
-            if (prefix == null || prefix.length() == 0) {
-                attrs.addAttribute("", 
-                                   "", 
-                                   XMLConstants.XMLNS_ATTRIBUTE, 
-                                   "CDATA", 
-                                   uri);
-            } else {
-                attrs.addAttribute(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, 
-                                   prefix, 
-                                   XMLConstants.XMLNS_ATTRIBUTE + ":" + prefix, 
-                                   "CDATA", 
-                                   uri);
-            }
-        }
+
         for (int i = 0; i < streamReader.getAttributeCount(); i++) {
             String uri = streamReader.getAttributeNamespace(i);
             String localName = streamReader.getAttributeLocalName(i);
