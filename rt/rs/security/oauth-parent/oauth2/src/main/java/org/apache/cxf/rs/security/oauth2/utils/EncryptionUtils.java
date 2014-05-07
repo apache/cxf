@@ -20,17 +20,24 @@
 package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
 
@@ -58,6 +65,56 @@ public final class EncryptionUtils {
                                              publicKey,
                                              props);
         return encodeBytes(encryptedBytes);
+    }
+    
+    public static RSAPublicKey getRsaPublicKey(KeyFactory factory, 
+                                         String encodedModulus,
+                                         String encodedPublicExponent) {
+        try {
+            return getRSAPublicKey(factory, 
+                                Base64UrlUtility.decode(encodedModulus),
+                                Base64UrlUtility.decode(encodedPublicExponent));
+        } catch (Base64Exception ex) { 
+            throw new EncryptionException(ex);
+        }
+    }
+    
+    public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
+                                         byte[] modulusBytes,
+                                         byte[] publicExponentBytes) {
+        BigInteger modulus =  new BigInteger(1, modulusBytes);
+        BigInteger publicExponent =  new BigInteger(1, publicExponentBytes);
+        try {
+            return (RSAPublicKey)factory.generatePublic(
+                new RSAPublicKeySpec(modulus, publicExponent));
+        } catch (Exception ex) { 
+            throw new EncryptionException(ex);
+        }    
+    }
+    
+    public static RSAPrivateKey getRSAPrivateKey(KeyFactory factory, 
+                                               String encodedModulus,
+                                               String encodedPrivateExponent) {
+        try {
+            return getRSAPrivateKey(factory, 
+                                   Base64UrlUtility.decode(encodedModulus),
+                                   Base64UrlUtility.decode(encodedPrivateExponent));
+        } catch (Base64Exception ex) { 
+            throw new EncryptionException(ex);
+        }
+    }
+      
+    public static RSAPrivateKey getRSAPrivateKey(KeyFactory factory,
+                                         byte[] modulusBytes,
+                                         byte[] privateExponentBytes) {
+        BigInteger modulus =  new BigInteger(1, modulusBytes);
+        BigInteger privateExponent =  new BigInteger(1, privateExponentBytes);
+        try {
+            return (RSAPrivateKey)factory.generatePrivate(
+                new RSAPrivateKeySpec(modulus, privateExponent));
+        } catch (Exception ex) { 
+            throw new EncryptionException(ex);
+        }    
     }
     
     public static SecretKey getSecretKey() throws Exception {

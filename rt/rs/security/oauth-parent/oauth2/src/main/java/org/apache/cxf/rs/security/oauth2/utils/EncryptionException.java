@@ -21,6 +21,10 @@ package org.apache.cxf.rs.security.oauth2.utils;
 public class EncryptionException extends RuntimeException {
     private static final long serialVersionUID = -8231433265954055715L;
 
+    public EncryptionException(String message) {
+        super(message);
+    }
+    
     public EncryptionException(Throwable t) {
         super(t);
     }
