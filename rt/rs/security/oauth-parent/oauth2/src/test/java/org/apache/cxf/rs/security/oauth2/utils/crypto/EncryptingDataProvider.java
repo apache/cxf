@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +36,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class EncryptingDataProvider implements OAuthDataProvider {
 
@@ -45,7 +46,7 @@ public class EncryptingDataProvider implements OAuthDataProvider {
     private Map<String, String> refreshTokens = new HashMap<String, String>();
     
     public EncryptingDataProvider() throws Exception {
-        key = EncryptionUtils.getSecretKey();
+        key = EncryptionUtils.getSecretKey("AES");
         String encryptedClient = ModelEncryptionSupport.encryptClient(new Client("1", "2", true), key);
         clients = Collections.singletonMap("1", encryptedClient);
     }

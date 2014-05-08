@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -28,20 +28,27 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
  * The utility Message Digest generator which can be used for generating
  * random values
  */
-public class MessageDigestGenerator {
+public final class MessageDigestUtils {
+    
     public static final String ALGO_SHA_1 = "SHA-1";
     public static final String ALGO_SHA_256 = "SHA-256";
     public static final String ALGO_MD5 = "MD5";
     
-    private String algorithm = ALGO_MD5;
+    private MessageDigestUtils() {
         
-    public String generate(byte[] input) throws OAuthServiceException {
+    }
+        
+    public static String generate(byte[] input) throws OAuthServiceException {
+        return generate(input, ALGO_MD5);
+    }   
+    
+    public static String generate(byte[] input, String algo) throws OAuthServiceException {    
         if (input == null) {
             throw new OAuthServiceException("You have to pass input to Token Generator");
         }
 
         try {
-            byte[] messageDigest = createDigest(input, algorithm);
+            byte[] messageDigest = createDigest(input, algo);
             StringBuffer hexString = new StringBuffer();
             for (int i = 0; i < messageDigest.length; i++) {
                 hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
@@ -53,7 +60,7 @@ public class MessageDigestGenerator {
         }
     }
 
-    public byte[] createDigest(String input, String algo) {
+    public static byte[] createDigest(String input, String algo) {
         try {
             return createDigest(input.getBytes("UTF-8"), algo);
         } catch (UnsupportedEncodingException e) {
@@ -63,14 +70,11 @@ public class MessageDigestGenerator {
         }   
     }
     
-    public byte[] createDigest(byte[] input, String algo) throws NoSuchAlgorithmException { 
+    public static byte[] createDigest(byte[] input, String algo) throws NoSuchAlgorithmException { 
         MessageDigest md = MessageDigest.getInstance(algo);
         md.reset();
         md.update(input);
         return md.digest();
     }
     
-    public void setAlgorithm(String algo) {
-        this.algorithm = algo;
-    }
 }

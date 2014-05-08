@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 public class EncryptionException extends RuntimeException {
     private static final long serialVersionUID = -8231433265954055715L;

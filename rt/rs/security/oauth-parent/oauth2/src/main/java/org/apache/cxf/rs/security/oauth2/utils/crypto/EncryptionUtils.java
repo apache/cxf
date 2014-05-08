@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.lang.reflect.Method;
 import java.math.BigInteger;
@@ -37,9 +37,9 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 
 /**
@@ -55,33 +55,42 @@ public final class EncryptionUtils {
     
     public static String encryptSecretKey(SecretKey secretKey, PublicKey publicKey) 
         throws EncryptionException {
-        SecretKeyProperties props = new SecretKeyProperties(publicKey.getAlgorithm());
+        KeyProperties props = new KeyProperties(publicKey.getAlgorithm());
         return encryptSecretKey(secretKey, publicKey, props);
     }
     
     public static String encryptSecretKey(SecretKey secretKey, PublicKey publicKey,
-        SecretKeyProperties props) throws EncryptionException {
+        KeyProperties props) throws EncryptionException {
         byte[] encryptedBytes = encryptBytes(secretKey.getEncoded(), 
                                              publicKey,
                                              props);
         return encodeBytes(encryptedBytes);
     }
     
-    public static RSAPublicKey getRsaPublicKey(KeyFactory factory, 
-                                         String encodedModulus,
-                                         String encodedPublicExponent) {
+    public static RSAPublicKey getRsaPublicKey(String encodedModulus,
+                                               String encodedPublicExponent) {
         try {
-            return getRSAPublicKey(factory, 
-                                Base64UrlUtility.decode(encodedModulus),
-                                Base64UrlUtility.decode(encodedPublicExponent));
-        } catch (Base64Exception ex) { 
+            return getRSAPublicKey(Base64UrlUtility.decode(encodedModulus),
+                                   Base64UrlUtility.decode(encodedPublicExponent));
+        } catch (Exception ex) { 
             throw new EncryptionException(ex);
         }
     }
     
+    public static RSAPublicKey getRSAPublicKey(byte[] modulusBytes,
+                                               byte[] publicExponentBytes) {
+        try {
+            return getRSAPublicKey(KeyFactory.getInstance("RSA"), 
+                                   modulusBytes,
+                                   publicExponentBytes);
+        } catch (Exception ex) { 
+            throw new EncryptionException(ex);
+        }         
+    }
+    
     public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
-                                         byte[] modulusBytes,
-                                         byte[] publicExponentBytes) {
+                                               byte[] modulusBytes,
+                                               byte[] publicExponentBytes) {
         BigInteger modulus =  new BigInteger(1, modulusBytes);
         BigInteger publicExponent =  new BigInteger(1, publicExponentBytes);
         try {
@@ -92,18 +101,27 @@ public final class EncryptionUtils {
         }    
     }
     
-    public static RSAPrivateKey getRSAPrivateKey(KeyFactory factory, 
-                                               String encodedModulus,
-                                               String encodedPrivateExponent) {
+    public static RSAPrivateKey getRSAPrivateKey(String encodedModulus,
+                                                 String encodedPrivateExponent) {
         try {
-            return getRSAPrivateKey(factory, 
-                                   Base64UrlUtility.decode(encodedModulus),
-                                   Base64UrlUtility.decode(encodedPrivateExponent));
-        } catch (Base64Exception ex) { 
+            return getRSAPrivateKey(Base64UrlUtility.decode(encodedModulus),
+                                    Base64UrlUtility.decode(encodedPrivateExponent));
+        } catch (Exception ex) { 
             throw new EncryptionException(ex);
         }
     }
-      
+     
+    public static RSAPrivateKey getRSAPrivateKey(byte[] modulusBytes,
+                                                 byte[] privateExponentBytes) {
+        try {
+            return getRSAPrivateKey(KeyFactory.getInstance("RSA"), 
+                                   modulusBytes,
+                                   privateExponentBytes);
+        } catch (Exception ex) { 
+            throw new EncryptionException(ex);
+        }    
+    }
+    
     public static RSAPrivateKey getRSAPrivateKey(KeyFactory factory,
                                          byte[] modulusBytes,
                                          byte[] privateExponentBytes) {
@@ -117,15 +135,11 @@ public final class EncryptionUtils {
         }    
     }
     
-    public static SecretKey getSecretKey() throws Exception {
-        return getSecretKey("AES");
-    }
-    
     public static SecretKey getSecretKey(String symEncAlgo) throws EncryptionException {
-        return getSecretKey(new SecretKeyProperties(symEncAlgo));
+        return getSecretKey(new KeyProperties(symEncAlgo));
     }
     
-    public static SecretKey getSecretKey(SecretKeyProperties props) throws EncryptionException {
+    public static SecretKey getSecretKey(KeyProperties props) throws EncryptionException {
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance(props.getKeyAlgo());
             AlgorithmParameterSpec algoSpec = props.getAlgoSpec();
@@ -156,11 +170,11 @@ public final class EncryptionUtils {
     
     public static String decryptSequence(String encodedToken, String encodedSecretKey)
         throws EncryptionException {
-        return decryptSequence(encodedToken, encodedSecretKey, new SecretKeyProperties("AES"));
+        return decryptSequence(encodedToken, encodedSecretKey, new KeyProperties("AES"));
     }
     
     public static String decryptSequence(String encodedData, String encodedSecretKey, 
-        SecretKeyProperties props) throws EncryptionException {
+        KeyProperties props) throws EncryptionException {
         SecretKey key = decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         return decryptSequence(encodedData, key, props);
     }
@@ -170,7 +184,7 @@ public final class EncryptionUtils {
     }
     
     public static String decryptSequence(String encodedData, Key secretKey,
-        SecretKeyProperties props) throws EncryptionException {
+        KeyProperties props) throws EncryptionException {
         byte[] encryptedBytes = decodeSequence(encodedData);
         byte[] bytes = decryptBytes(encryptedBytes, secretKey, props);
         try {
@@ -185,7 +199,7 @@ public final class EncryptionUtils {
     }
     
     public static String encryptSequence(String sequence, Key secretKey,
-        SecretKeyProperties keyProps) throws EncryptionException {
+        KeyProperties keyProps) throws EncryptionException {
         try {
             byte[] bytes = encryptBytes(sequence.getBytes("UTF-8"), secretKey, keyProps);
             return encodeBytes(bytes);
@@ -207,7 +221,7 @@ public final class EncryptionUtils {
     }
     
     public static byte[] encryptBytes(byte[] bytes, Key secretKey,
-        SecretKeyProperties keyProps) throws EncryptionException {
+        KeyProperties keyProps) throws EncryptionException {
         return processBytes(bytes, secretKey, keyProps, Cipher.ENCRYPT_MODE);
     }
     
@@ -216,7 +230,7 @@ public final class EncryptionUtils {
     }
     
     public static byte[] decryptBytes(byte[] bytes, Key secretKey, 
-        SecretKeyProperties keyProps) throws EncryptionException {
+        KeyProperties keyProps) throws EncryptionException {
         return processBytes(bytes, secretKey, keyProps, Cipher.DECRYPT_MODE);
     }
     
@@ -225,12 +239,12 @@ public final class EncryptionUtils {
                                        Key wrapperKey,
                                        String wrapperKeyAlgo)  throws EncryptionException {
         return wrapSecretKey(new SecretKeySpec(keyBytes, keyAlgo), wrapperKey, 
-                             new SecretKeyProperties(wrapperKeyAlgo));
+                             new KeyProperties(wrapperKeyAlgo));
     }
     
     public static byte[] wrapSecretKey(SecretKey secretKey,
                                        Key wrapperKey,
-                                       SecretKeyProperties keyProps)  throws EncryptionException {
+                                       KeyProperties keyProps)  throws EncryptionException {
         try {
             Cipher c = initCipher(wrapperKey, keyProps, Cipher.WRAP_MODE);
             return c.wrap(secretKey);
@@ -244,13 +258,13 @@ public final class EncryptionUtils {
                                             Key unwrapperKey,
                                             String unwrapperKeyAlgo)  throws EncryptionException {
         return unwrapSecretKey(wrappedBytes, wrappedKeyAlgo, unwrapperKey, 
-                               new SecretKeyProperties(unwrapperKeyAlgo));
+                               new KeyProperties(unwrapperKeyAlgo));
     }
     
     public static SecretKey unwrapSecretKey(byte[] wrappedBytes,
                                             String wrappedKeyAlgo,
                                             Key unwrapperKey,
-                                            SecretKeyProperties keyProps)  throws EncryptionException {
+                                            KeyProperties keyProps)  throws EncryptionException {
         try {
             Cipher c = initCipher(unwrapperKey, keyProps, Cipher.UNWRAP_MODE);
             return (SecretKey)c.unwrap(wrappedBytes, wrappedKeyAlgo, Cipher.SECRET_KEY);
@@ -261,7 +275,7 @@ public final class EncryptionUtils {
     
     private static byte[] processBytes(byte[] bytes, 
                                       Key secretKey, 
-                                      SecretKeyProperties keyProps, 
+                                      KeyProperties keyProps, 
                                       int mode)  throws EncryptionException {
         boolean compressionSupported = keyProps != null && keyProps.isCompressionSupported();
         if (compressionSupported && mode == Cipher.ENCRYPT_MODE) {
@@ -294,7 +308,7 @@ public final class EncryptionUtils {
         }
     }
     
-    public static Cipher initCipher(Key secretKey, SecretKeyProperties keyProps, int mode)  throws EncryptionException {
+    public static Cipher initCipher(Key secretKey, KeyProperties keyProps, int mode)  throws EncryptionException {
         try {
             String algorithm = keyProps != null && keyProps.getKeyAlgo() != null 
                 ? keyProps.getKeyAlgo() : secretKey.getAlgorithm();
@@ -337,7 +351,7 @@ public final class EncryptionUtils {
     public static SecretKey decodeSecretKey(String encodedSecretKey, String secretKeyAlgo) 
         throws EncryptionException {
         byte[] secretKeyBytes = decodeSequence(encodedSecretKey);
-        return recreateSecretKey(secretKeyBytes, secretKeyAlgo);
+        return createSecretKeySpec(secretKeyBytes, secretKeyAlgo);
     }
     
     public static SecretKey decryptSecretKey(String encodedEncryptedSecretKey,
@@ -350,20 +364,20 @@ public final class EncryptionUtils {
                                              String secretKeyAlgo,
                                              PrivateKey privateKey)
         throws EncryptionException {
-        SecretKeyProperties props = new SecretKeyProperties(privateKey.getAlgorithm());
+        KeyProperties props = new KeyProperties(privateKey.getAlgorithm());
         return decryptSecretKey(encodedEncryptedSecretKey, secretKeyAlgo, props, privateKey);
     }
     
     public static SecretKey decryptSecretKey(String encodedEncryptedSecretKey,
                                              String secretKeyAlgo,
-                                             SecretKeyProperties props,
+                                             KeyProperties props,
                                              PrivateKey privateKey) throws EncryptionException {
         byte[] encryptedBytes = decodeSequence(encodedEncryptedSecretKey);
         byte[] descryptedBytes = decryptBytes(encryptedBytes, privateKey, props);
-        return recreateSecretKey(descryptedBytes, secretKeyAlgo);
+        return createSecretKeySpec(descryptedBytes, secretKeyAlgo);
     }
     
-    public static SecretKey recreateSecretKey(byte[] bytes, String algo) {
+    public static SecretKey createSecretKeySpec(byte[] bytes, String algo) {
         return new SecretKeySpec(bytes, algo);
     }
     

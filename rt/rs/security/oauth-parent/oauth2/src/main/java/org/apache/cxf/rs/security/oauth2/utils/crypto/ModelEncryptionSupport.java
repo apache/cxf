@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.security.Key;
 import java.util.Arrays;
@@ -51,7 +51,7 @@ public final class ModelEncryptionSupport {
     }
      
     public static String encryptClient(Client client, Key secretKey,
-                                       SecretKeyProperties props) throws EncryptionException {
+                                       KeyProperties props) throws EncryptionException {
         String tokenSequence = tokenizeClient(client);
         return EncryptionUtils.encryptSequence(tokenSequence, secretKey, props);
     }
@@ -61,7 +61,7 @@ public final class ModelEncryptionSupport {
     }
     
     public static String encryptAccessToken(ServerAccessToken token, Key secretKey,
-                                            SecretKeyProperties props) throws EncryptionException {
+                                            KeyProperties props) throws EncryptionException {
         String tokenSequence = tokenizeServerToken(token);
         return EncryptionUtils.encryptSequence(tokenSequence, secretKey, props);
     }
@@ -71,7 +71,7 @@ public final class ModelEncryptionSupport {
     }
     
     public static String encryptRefreshToken(RefreshToken token, Key secretKey,
-                                             SecretKeyProperties props) throws EncryptionException {
+                                             KeyProperties props) throws EncryptionException {
         String tokenSequence = tokenizeRefreshToken(token);
         
         return EncryptionUtils.encryptSequence(tokenSequence, secretKey, props);
@@ -83,7 +83,7 @@ public final class ModelEncryptionSupport {
     }
     
     public static String encryptCodeGrant(ServerAuthorizationCodeGrant grant, Key secretKey,
-                                          SecretKeyProperties props) throws EncryptionException {
+                                          KeyProperties props) throws EncryptionException {
         String tokenSequence = tokenizeCodeGrant(grant);
         
         return EncryptionUtils.encryptSequence(tokenSequence, secretKey, props);
@@ -91,11 +91,11 @@ public final class ModelEncryptionSupport {
     
     public static Client decryptClient(String encodedSequence, String encodedSecretKey) 
         throws EncryptionException {
-        return decryptClient(encodedSequence, encodedSecretKey, new SecretKeyProperties("AES"));
+        return decryptClient(encodedSequence, encodedSecretKey, new KeyProperties("AES"));
     }
     
     public static Client decryptClient(String encodedSequence, String encodedSecretKey,
-                                       SecretKeyProperties props) throws EncryptionException {
+                                       KeyProperties props) throws EncryptionException {
         SecretKey key = EncryptionUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         return decryptClient(encodedSequence, key, props);
     }
@@ -105,7 +105,7 @@ public final class ModelEncryptionSupport {
     }
     
     public static Client decryptClient(String encodedData, Key secretKey, 
-                                       SecretKeyProperties props) throws EncryptionException {
+                                       KeyProperties props) throws EncryptionException {
         String decryptedSequence = EncryptionUtils.decryptSequence(encodedData, secretKey, props);
         return recreateClient(decryptedSequence);
     }
@@ -113,13 +113,13 @@ public final class ModelEncryptionSupport {
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
                                                  String encodedToken, 
                                                  String encodedSecretKey) throws EncryptionException {
-        return decryptAccessToken(provider, encodedToken, encodedSecretKey, new SecretKeyProperties("AES"));
+        return decryptAccessToken(provider, encodedToken, encodedSecretKey, new KeyProperties("AES"));
     }
     
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
                                                  String encodedToken, 
                                                  String encodedSecretKey,
-                                                 SecretKeyProperties props) throws EncryptionException {
+                                                 KeyProperties props) throws EncryptionException {
         SecretKey key = EncryptionUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         return decryptAccessToken(provider, encodedToken, key, props);
     }
@@ -133,7 +133,7 @@ public final class ModelEncryptionSupport {
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
                                                  String encodedData, 
                                                  Key secretKey, 
-                                                 SecretKeyProperties props) throws EncryptionException {
+                                                 KeyProperties props) throws EncryptionException {
         String decryptedSequence = EncryptionUtils.decryptSequence(encodedData, secretKey, props);
         return recreateAccessToken(provider, encodedData, decryptedSequence);
     }
@@ -141,13 +141,13 @@ public final class ModelEncryptionSupport {
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
                                                    String encodedToken, 
                                                    String encodedSecretKey) throws EncryptionException {
-        return decryptRefreshToken(provider, encodedToken, encodedSecretKey, new SecretKeyProperties("AES"));
+        return decryptRefreshToken(provider, encodedToken, encodedSecretKey, new KeyProperties("AES"));
     }
     
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
                                                   String encodedToken, 
                                                   String encodedSecretKey,
-                                                  SecretKeyProperties props) throws EncryptionException {
+                                                  KeyProperties props) throws EncryptionException {
         SecretKey key = EncryptionUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         return decryptRefreshToken(provider, encodedToken, key, props);
     }
@@ -161,7 +161,7 @@ public final class ModelEncryptionSupport {
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
                                                    String encodedData, 
                                                    Key key, 
-                                                   SecretKeyProperties props) throws EncryptionException {
+                                                   KeyProperties props) throws EncryptionException {
         String decryptedSequence = EncryptionUtils.decryptSequence(encodedData, key, props);
         return recreateRefreshToken(provider, encodedData, decryptedSequence);
     }
@@ -169,13 +169,13 @@ public final class ModelEncryptionSupport {
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
                                                    String encodedToken, 
                                                    String encodedSecretKey) throws EncryptionException {
-        return decryptCodeGrant(provider, encodedToken, encodedSecretKey, new SecretKeyProperties("AES"));
+        return decryptCodeGrant(provider, encodedToken, encodedSecretKey, new KeyProperties("AES"));
     }
     
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
                                                   String encodedToken, 
                                                   String encodedSecretKey,
-                                                  SecretKeyProperties props) throws EncryptionException {
+                                                  KeyProperties props) throws EncryptionException {
         SecretKey key = EncryptionUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         return decryptCodeGrant(provider, encodedToken, key, props);
     }
@@ -189,7 +189,7 @@ public final class ModelEncryptionSupport {
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
                                                    String encodedData, 
                                                    Key key, 
-                                                   SecretKeyProperties props) throws EncryptionException {
+                                                   KeyProperties props) throws EncryptionException {
         String decryptedSequence = EncryptionUtils.decryptSequence(encodedData, key, props);
         return recreateCodeGrant(provider, decryptedSequence);
     }

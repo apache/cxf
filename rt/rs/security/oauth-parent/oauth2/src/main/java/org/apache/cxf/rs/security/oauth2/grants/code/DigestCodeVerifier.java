@@ -19,13 +19,13 @@
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
-import org.apache.cxf.rs.security.oauth2.utils.MessageDigestGenerator;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.MessageDigestUtils;
 
 public class DigestCodeVerifier implements CodeVerifierTransformer {
 
     public String transformCodeVerifier(String codeVerifier) {
-        MessageDigestGenerator mdg = new MessageDigestGenerator();
-        byte[] digest = mdg.createDigest(codeVerifier, MessageDigestGenerator.ALGO_SHA_256);
+        byte[] digest = MessageDigestUtils.createDigest(codeVerifier, 
+                                                        MessageDigestUtils.ALGO_SHA_256);
         int length = digest.length > 128 / 8 ? 128 / 8 : digest.length;
         
         return Base64UrlUtility.encodeChunk(digest, 0, length);

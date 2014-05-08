@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -95,7 +95,7 @@ public class EncryptionUtilsTest extends Assert {
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
         
-        SecretKey secretKey = EncryptionUtils.getSecretKey();
+        SecretKey secretKey = EncryptionUtils.getSecretKey("AES");
         String encryptedSecretKey = EncryptionUtils.encryptSecretKey(secretKey, publicKey);
         
         String encryptedToken = ModelEncryptionSupport.encryptAccessToken(token, secretKey);
@@ -147,9 +147,9 @@ public class EncryptionUtilsTest extends Assert {
         jsonp.writeTo(token, BearerAccessToken.class, new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
                       new MetadataMap<String, Object>(), bos);
         
-        SecretKeyProperties props1 = new SecretKeyProperties(publicKey.getAlgorithm());
+        KeyProperties props1 = new KeyProperties(publicKey.getAlgorithm());
         String encrypted = EncryptionUtils.encryptSequence(bos.toString(), publicKey, props1);
-        SecretKeyProperties props2 = new SecretKeyProperties(privateKey.getAlgorithm());
+        KeyProperties props2 = new KeyProperties(privateKey.getAlgorithm());
         String decrypted = EncryptionUtils.decryptSequence(encrypted, privateKey, props2);
         ServerAccessToken token2 = jsonp.readFrom(BearerAccessToken.class, BearerAccessToken.class, 
                                                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 

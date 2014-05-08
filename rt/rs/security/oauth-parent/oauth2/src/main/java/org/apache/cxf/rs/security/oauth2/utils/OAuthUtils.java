@@ -35,6 +35,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.MessageDigestUtils;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 
@@ -112,11 +113,10 @@ public final class OAuthUtils {
     public static String generateRandomTokenKey(String digestAlgo) throws OAuthServiceException {
         try {
             byte[] bytes = UUID.randomUUID().toString().getBytes("UTF-8");
-            MessageDigestGenerator gen = new MessageDigestGenerator();
-            if (digestAlgo != null) {
-                gen.setAlgorithm(digestAlgo);
+            if (digestAlgo == null) {
+                digestAlgo = MessageDigestUtils.ALGO_MD5;
             }
-            return gen.generate(bytes);
+            return MessageDigestUtils.generate(bytes, digestAlgo);
         } catch (Exception ex) {
             throw new OAuthServiceException(OAuthConstants.SERVER_ERROR, ex);
         }

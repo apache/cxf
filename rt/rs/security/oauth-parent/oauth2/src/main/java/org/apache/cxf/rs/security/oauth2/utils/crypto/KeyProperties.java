@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 
-public class SecretKeyProperties {
+public class KeyProperties {
     private String keyAlgo;
     private int keySize;
     private int blockSize = -1;
@@ -30,13 +30,13 @@ public class SecretKeyProperties {
     private AlgorithmParameterSpec algoSpec;
     private boolean compressionSupported;
     
-    public SecretKeyProperties() {
+    public KeyProperties() {
     }
     
-    public SecretKeyProperties(String keyAlgo) {
+    public KeyProperties(String keyAlgo) {
         this(keyAlgo, -1);
     }
-    public SecretKeyProperties(String keyAlgo, int keySize) {
+    public KeyProperties(String keyAlgo, int keySize) {
         this.keyAlgo = keyAlgo;
         this.keySize = keySize;
     }
