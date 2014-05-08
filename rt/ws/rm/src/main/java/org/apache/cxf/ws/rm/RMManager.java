@@ -457,12 +457,11 @@ public class RMManager {
                 LOG.log(Level.INFO, msg.toString());
                 throw new RMException(msg);
             }
-            boolean oneWay = message.getExchange().isOneWay();
             Proxy proxy = source.getReliableEndpoint().getProxy();
             ProtocolVariation protocol = config.getProtocolVariation();
             Exchange exchange = new ExchangeImpl();
             CreateSequenceResponseType createResponse = 
-                proxy.createSequence(acksTo, relatesTo, isServer, oneWay, protocol, exchange);
+                proxy.createSequence(acksTo, relatesTo, isServer, protocol, exchange);
             if (!isServer) {
                 Servant servant = source.getReliableEndpoint().getServant();
                 servant.createSequenceResponse(createResponse, protocol);

@@ -365,10 +365,10 @@ public class ProxyTest extends Assert {
         RelatesToType relatesTo = control.createMock(RelatesToType.class);
         control.replay();
         if (isServer) {
-            assertNull(proxy.createSequence(defaultAcksTo, relatesTo, isServer, false,
+            assertNull(proxy.createSequence(defaultAcksTo, relatesTo, isServer, 
                                             ProtocolVariation.RM10WSA200408, exchange));
         } else {
-            assertNotNull(proxy.createSequence(defaultAcksTo, relatesTo, isServer, false,
+            assertNotNull(proxy.createSequence(defaultAcksTo, relatesTo, isServer, 
                                                ProtocolVariation.RM10WSA200408, exchange));
         }
     }

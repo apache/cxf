@@ -204,16 +204,20 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         Client client = ClientProxy.getClient(greeter);
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
         
-        Collection<DestinationSequence> dss = store.getDestinationSequences(id);
-        assertEquals(0, dss.size());
+        Collection<DestinationSequence> dss =
+            store.getDestinationSequences(id);
+        assertEquals(1, dss.size());
         
-        Collection<SourceSequence> sss = store.getSourceSequences(id);
+        Collection<SourceSequence> sss =
+            store.getSourceSequences(id);
         assertEquals(1, sss.size());
         
-        Collection<RMMessage> msgs = store.getMessages(sss.iterator().next().getIdentifier(), true);
+        Collection<RMMessage> msgs = 
+            store.getMessages(sss.iterator().next().getIdentifier(), true);
         assertEquals(2, msgs.size());  
         
-        msgs = store.getMessages(sss.iterator().next().getIdentifier(), false);
+        msgs = 
+            store.getMessages(sss.iterator().next().getIdentifier(), false);
         assertEquals(0, msgs.size());  
     }
     
@@ -286,10 +290,12 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         Client client = ClientProxy.getClient(greeter);
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
         
-        Collection<DestinationSequence> dss = store.getDestinationSequences(id);
-        assertEquals(0, dss.size());
+        Collection<DestinationSequence> dss =
+            store.getDestinationSequences(id);
+        assertEquals(1, dss.size());
         
-        Collection<SourceSequence> sss = store.getSourceSequences(id);
+        Collection<SourceSequence> sss =
+            store.getSourceSequences(id);
         assertEquals(1, sss.size());
         
         int i = 0;

@@ -61,6 +61,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
 
     public static final String PORT = allocatePort(ManagedEndpointsTest.class);
 
+    private static final String[] EMPTY_SIGNATURE = new String[0];
     private static final String[] ONESTRING_SIGNATURE = new String[]{"java.lang.String"};
     private static final String[] ONEBOOLEAN_SIGNATURE = new String[]{"boolean"};
     
@@ -158,14 +159,20 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         o = mbs.invoke(serverEndpointName, "getDestinationSequenceIds", null, null);
         verifyArray("Expected sequence identifier", o, new String[]{sseqId}, false); 
         
-        verifyNoDestinationSequence(mbs, clientEndpointName);
+        String dseqId = getSingleDestinationSequenceId(mbs, clientEndpointName);
 
-        testOperation(mbs, greeter, clientEndpointName, serverEndpointName, sseqId);
+        testOperation(mbs, greeter, clientEndpointName, serverEndpointName, sseqId, dseqId);
         
         mbs.invoke(clientEndpointName, "terminateSourceSequence", new Object[]{sseqId}, ONESTRING_SIGNATURE);
         o = mbs.invoke(clientEndpointName, "getSourceSequenceIds", 
             new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("Source sequence terminated", o instanceof String[] && 0 == ((String[])o).length);
+        
+        mbs.invoke(clientEndpointName, "terminateDestinationSequence", new Object[]{dseqId}, ONESTRING_SIGNATURE);
+        o = mbs.invoke(clientEndpointName, "getDestinationSequenceIds", 
+            new Object[]{}, EMPTY_SIGNATURE);
+        assertTrue("Destination sequence terminated", o instanceof String[] && 0 == ((String[])o).length);
+        
     }
 
     @Test
@@ -213,9 +220,9 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         o = mbs.invoke(serverEndpointName, "getDestinationSequenceIds", null, null);
         verifyArray("Expected sequence identifier", o, new String[]{sseqId}, false); 
         
-        verifyNoDestinationSequence(mbs, clientEndpointName);
+        String dseqId = getSingleDestinationSequenceId(mbs, clientEndpointName);
     
-        testOperation(mbs, greeter, clientEndpointName, serverEndpointName, sseqId);
+        testOperation(mbs, greeter, clientEndpointName, serverEndpointName, sseqId, dseqId);
         
         mbs.invoke(clientEndpointName, "closeSourceSequence", new Object[]{sseqId}, ONESTRING_SIGNATURE);
         o = mbs.invoke(clientEndpointName, "getSourceSequenceIds", 
@@ -226,14 +233,24 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         o = mbs.invoke(clientEndpointName, "getSourceSequenceIds", 
             new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("Source sequence terminated", o instanceof String[] && 0 == ((String[])o).length);
+       
+        mbs.invoke(clientEndpointName, "terminateDestinationSequence", new Object[]{dseqId}, ONESTRING_SIGNATURE);
+        o = mbs.invoke(clientEndpointName, "getDestinationSequenceIds", 
+            new Object[]{}, EMPTY_SIGNATURE);
+        assertTrue("Destination sequence terminated", o instanceof String[] && 0 == ((String[])o).length);
+        
     }
 
     private void testOperation(MBeanServer mbs, final Greeter greeter, ObjectName clientEndpointName,
-        ObjectName serverEndpointName, String sseqId) throws ReflectionException,
+        ObjectName serverEndpointName, String sseqId, String dseqId) throws ReflectionException,
         InstanceNotFoundException, MBeanException, InterruptedException {
         AcknowledgementListener listener = new AcknowledgementListener();
         mbs.addNotificationListener(clientEndpointName, listener, null, null);
         Object o;
+        o = mbs.invoke(serverEndpointName, "getSourceSequenceIds", 
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        verifyArray("Expected sequence identifier", o, new String[]{dseqId}, false); 
+        
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
                        new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
@@ -304,11 +321,12 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         assertTrue("No unacknowledged message", o instanceof Long[] && 0 == ((Long[])o).length);
     }
 
-    private void verifyNoDestinationSequence(MBeanServer mbs, ObjectName clientEndpointName)
+    private String getSingleDestinationSequenceId(MBeanServer mbs, ObjectName clientEndpointName)
         throws ReflectionException, InstanceNotFoundException, MBeanException {
         Object o;
         o = mbs.invoke(clientEndpointName, "getDestinationSequenceIds", null, null);
-        assertTrue("No sequence expected", o instanceof String[] && 0 == ((String[])o).length);
+        assertTrue("One sequence expected", o instanceof String[] && 1 == ((String[])o).length);
+        return ((String[])o)[0];
     }
 
     private String getSingleSourceSequenceId(MBeanServer mbs, ObjectName clientEndpointName)
