@@ -80,6 +80,7 @@
                     <execution>
                         <phase>generate-sources</phase>
                         <configuration>
+                            <fork>${cxf.codegenplugin.forkmode}</fork>
                             <defaultOptions>
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
