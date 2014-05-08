@@ -283,6 +283,8 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
             }
         } else if (consts.getSequenceAckAction().equals(action)) {
             boi = bi.getOperation(consts.getSequenceAckOperationName()); 
+        } else if (consts.getAckRequestedAction().equals(action)) {
+            boi = bi.getOperation(consts.getAckRequestedOperationName()); 
         } else if (consts.getTerminateSequenceAction().equals(action)) {
             boi = bi.getOperation(consts.getTerminateSequenceOperationName()); 
         } else if (RM11Constants.INSTANCE.getTerminateSequenceResponseAction().equals(action)) {
@@ -295,10 +297,15 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
             boi = bi.getOperation(RM11Constants.INSTANCE.getCloseSequenceOperationName());
             isOneway = false;
         }
-        assert boi != null;
-        exchange.put(BindingOperationInfo.class, boi);
-        exchange.put(OperationInfo.class, boi.getOperationInfo());
-        exchange.setOneWay(isOneway); 
+        
+        // make sure the binding information has been set
+        if (boi == null) {
+            LOG.fine("No BindingInfo for action " + action);
+        } else {
+            exchange.put(BindingOperationInfo.class, boi);
+            exchange.put(OperationInfo.class, boi.getOperationInfo());
+            exchange.setOneWay(isOneway); 
+        }
         
         // Fix requestor role (as the client side message observer always sets it to TRUE) 
         // to allow unmarshalling the body of a server originated TerminateSequence request.
