@@ -112,11 +112,11 @@ public final class CryptoUtils {
         }
     }
      
-    public byte[] signData(byte[] data, PrivateKey key, String signAlgo) {
+    public static byte[] signData(byte[] data, PrivateKey key, String signAlgo) {
         return signData(data, key, signAlgo, null, null);
     }
     
-    public byte[] signData(byte[] data, PrivateKey key, String signAlgo, SecureRandom random,
+    public static byte[] signData(byte[] data, PrivateKey key, String signAlgo, SecureRandom random,
                            AlgorithmParameterSpec params) {
         try {
             Signature s = Signature.getInstance(signAlgo);
@@ -135,11 +135,11 @@ public final class CryptoUtils {
         }
     }
     
-    public void verifySignature(byte[] data, byte[] signature, PublicKey key, String signAlgo) {
+    public static void verifySignature(byte[] data, byte[] signature, PublicKey key, String signAlgo) {
         verifySignature(data, signature, key, signAlgo, null);
     }
     
-    public void verifySignature(byte[] data, byte[] signature, PublicKey key, String signAlgo, 
+    public static void verifySignature(byte[] data, byte[] signature, PublicKey key, String signAlgo, 
                                 AlgorithmParameterSpec params) {
         try {
             Signature s = Signature.getInstance(signAlgo);
