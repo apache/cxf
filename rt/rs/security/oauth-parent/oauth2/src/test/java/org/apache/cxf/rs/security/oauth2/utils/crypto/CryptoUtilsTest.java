@@ -48,7 +48,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class EncryptionUtilsTest extends Assert {
+public class CryptoUtilsTest extends Assert {
     
     private CodeGrantEncryptingDataProvider p;
     
@@ -95,12 +95,12 @@ public class EncryptionUtilsTest extends Assert {
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
         
-        SecretKey secretKey = EncryptionUtils.getSecretKey("AES");
-        String encryptedSecretKey = EncryptionUtils.encryptSecretKey(secretKey, publicKey);
+        SecretKey secretKey = CryptoUtils.getSecretKey("AES");
+        String encryptedSecretKey = CryptoUtils.encryptSecretKey(secretKey, publicKey);
         
         String encryptedToken = ModelEncryptionSupport.encryptAccessToken(token, secretKey);
         token.setTokenKey(encryptedToken);
-        SecretKey decryptedSecretKey = EncryptionUtils.decryptSecretKey(encryptedSecretKey, privateKey);
+        SecretKey decryptedSecretKey = CryptoUtils.decryptSecretKey(encryptedSecretKey, privateKey);
         ServerAccessToken token2 = ModelEncryptionSupport.decryptAccessToken(p, encryptedToken, decryptedSecretKey);
         // compare tokens
         compareAccessTokens(token, token2);
@@ -118,8 +118,8 @@ public class EncryptionUtilsTest extends Assert {
         jsonp.writeTo(token, BearerAccessToken.class, new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
                       new MetadataMap<String, Object>(), bos);
         
-        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.key);
-        String decrypted = EncryptionUtils.decryptSequence(encrypted, p.key);
+        String encrypted = CryptoUtils.encryptSequence(bos.toString(), p.key);
+        String decrypted = CryptoUtils.decryptSequence(encrypted, p.key);
         ServerAccessToken token2 = jsonp.readFrom(BearerAccessToken.class, BearerAccessToken.class, 
                                                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
                                                   new MetadataMap<String, String>(), 
@@ -148,9 +148,9 @@ public class EncryptionUtilsTest extends Assert {
                       new MetadataMap<String, Object>(), bos);
         
         KeyProperties props1 = new KeyProperties(publicKey.getAlgorithm());
-        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), publicKey, props1);
+        String encrypted = CryptoUtils.encryptSequence(bos.toString(), publicKey, props1);
         KeyProperties props2 = new KeyProperties(privateKey.getAlgorithm());
-        String decrypted = EncryptionUtils.decryptSequence(encrypted, privateKey, props2);
+        String decrypted = CryptoUtils.decryptSequence(encrypted, privateKey, props2);
         ServerAccessToken token2 = jsonp.readFrom(BearerAccessToken.class, BearerAccessToken.class, 
                                                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
                                                   new MetadataMap<String, String>(), 
@@ -170,8 +170,8 @@ public class EncryptionUtilsTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         jsonp.writeTo(c, Client.class, new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
                       new MetadataMap<String, Object>(), bos);
-        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.key);
-        String decrypted = EncryptionUtils.decryptSequence(encrypted, p.key);
+        String encrypted = CryptoUtils.encryptSequence(bos.toString(), p.key);
+        String decrypted = CryptoUtils.decryptSequence(encrypted, p.key);
         Client c2 = jsonp.readFrom(Client.class, Client.class, 
                                                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
                                                   new MetadataMap<String, String>(), 
@@ -196,8 +196,8 @@ public class EncryptionUtilsTest extends Assert {
                       MediaType.APPLICATION_JSON_TYPE,
                       new MetadataMap<String, Object>(), bos);
         
-        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.key);
-        String decrypted = EncryptionUtils.decryptSequence(encrypted, p.key);
+        String encrypted = CryptoUtils.encryptSequence(bos.toString(), p.key);
+        String decrypted = CryptoUtils.decryptSequence(encrypted, p.key);
         ServerAuthorizationCodeGrant grant2 = jsonp.readFrom(ServerAuthorizationCodeGrant.class,
                                                              Client.class, 
                                                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 

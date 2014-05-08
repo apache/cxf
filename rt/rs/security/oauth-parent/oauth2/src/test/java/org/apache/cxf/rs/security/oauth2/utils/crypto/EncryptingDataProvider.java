@@ -46,7 +46,7 @@ public class EncryptingDataProvider implements OAuthDataProvider {
     private Map<String, String> refreshTokens = new HashMap<String, String>();
     
     public EncryptingDataProvider() throws Exception {
-        key = EncryptionUtils.getSecretKey("AES");
+        key = CryptoUtils.getSecretKey("AES");
         String encryptedClient = ModelEncryptionSupport.encryptClient(new Client("1", "2", true), key);
         clients = Collections.singletonMap("1", encryptedClient);
     }
