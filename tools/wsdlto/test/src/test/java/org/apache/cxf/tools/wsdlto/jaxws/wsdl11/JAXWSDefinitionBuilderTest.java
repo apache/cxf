@@ -20,13 +20,13 @@
 package org.apache.cxf.tools.wsdlto.jaxws.wsdl11;
 
 import java.util.Map;
+
 import javax.wsdl.Binding;
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
-import javax.wsdl.extensions.http.HTTPAddress;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
