@@ -44,7 +44,7 @@
         <wsdl:part name="out" type="xsd:string"/>
         <wsdl:part name="inOutHeader" element="x1:headerMessage"/>
     </wsdl:message>
-    <wsdl:portType name="TestRPCHeader">
+    <wsdl:portType name="TestRPCHeaderPort">
         <wsdl:operation name="testHeader1">
             <wsdl:input name="testHeader1Request" message="tns:testHeader1Request"/>
             <wsdl:output name="testHeader1Response" message="tns:testHeader1Response"/>
@@ -54,7 +54,7 @@
             <wsdl:output name="testInOutHeaderResponse" message="tns:testInOutHeaderResponse"/>
         </wsdl:operation>
     </wsdl:portType>
-    <wsdl:binding name="TestHeader_SOAPRPCBinding" type="tns:TestRPCHeader">
+    <wsdl:binding name="TestHeader_SOAPRPCBinding" type="tns:TestRPCHeaderPort">
         <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="testHeader1">
             <soap:operation/>

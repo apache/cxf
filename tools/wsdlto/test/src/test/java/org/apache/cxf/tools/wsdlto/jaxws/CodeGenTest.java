@@ -1172,7 +1172,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                        // to figure out which parts are headers and which are body for rpc/lit
         processor.setContext(env);
         processor.execute();
-        Class<?> cls = classLoader.loadClass("org.apache.header_test.rpc.TestRPCHeader");
+        Class<?> cls = classLoader.loadClass("org.apache.header_test.rpc.TestRPCHeaderPort");
 
         Method meths[] = cls.getMethods();
         for (Method m : meths) {

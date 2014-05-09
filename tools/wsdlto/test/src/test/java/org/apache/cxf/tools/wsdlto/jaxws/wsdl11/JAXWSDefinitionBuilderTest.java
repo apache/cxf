@@ -20,13 +20,13 @@
 package org.apache.cxf.tools.wsdlto.jaxws.wsdl11;
 
 import java.util.Map;
+
 import javax.wsdl.Binding;
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
-import javax.wsdl.extensions.http.HTTPAddress;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
@@ -34,6 +34,7 @@ import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11.JAXWSDefinitionBuilder;
 import org.apache.cxf.wsdl.JAXBExtensibilityElement;
+import org.apache.cxf.wsdl.http.AddressType;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,8 +77,8 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         if (obj instanceof JAXBExtensibilityElement) {
             obj = ((JAXBExtensibilityElement)obj).getValue();
         }
-        assertTrue(obj.getClass().getName() + " is not an HTTPAddress",
-                   obj instanceof HTTPAddress);
+        assertTrue(obj.getClass().getName() + " is not an AddressType",
+                   obj instanceof AddressType);
 
         Binding binding = port.getBinding();
         assertNotNull(binding);
