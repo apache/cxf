@@ -28,7 +28,7 @@ public interface ResourceManager {
     
     void delete(ReferenceParametersType ref);
     
-    Representation put(ReferenceParametersType ref, Representation newRepresentation);
+    void put(ReferenceParametersType ref, Representation newRepresentation);
     
     ReferenceParametersType create(Representation initRepresentation);
 }
