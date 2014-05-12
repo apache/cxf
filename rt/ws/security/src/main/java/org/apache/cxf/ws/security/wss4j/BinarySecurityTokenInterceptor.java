@@ -19,8 +19,16 @@
 
 package org.apache.cxf.ws.security.wss4j;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
-<<<<<<< HEAD
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
@@ -29,39 +37,31 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.processor.BinarySecurityTokenProcessor;
-import org.apache.ws.security.validate.Validator;
-=======
-import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.processor.BinarySecurityTokenProcessor;
+import org.apache.wss4j.dom.validate.Validator;
 import org.apache.wss4j.policy.model.AbstractToken;
->>>>>>> 2120019... Adding a test-case for adding + parsing a BinarySecurityToken
 
 /**
- * An interceptor to add a Kerberos token to the security header of an outbound request, and to
- * process a Kerberos Token on an inbound request. It takes the Kerberos Token from the message 
- * context on the outbound side, where it was previously placed by the 
- * KerberosTokenInterceptorProvider.
+ * An interceptor to add a BinarySecurityToken token to the security header of an outbound request, and to
+ * process a BinarySecurityToken on an inbound request. It takes the BinarySecurityToken from the message 
+ * context on the outbound side.
  */
-public class KerberosTokenInterceptor extends BinarySecurityTokenInterceptor {
+public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
 
-    public KerberosTokenInterceptor() {
+    public BinarySecurityTokenInterceptor() {
         super();
     }
     
-<<<<<<< HEAD
     protected void processToken(SoapMessage message) {
         Header h = findSecurityHeader(message, false);
         if (h == null) {
@@ -84,7 +84,7 @@ public class KerberosTokenInterceptor extends BinarySecurityTokenInterceptor {
                         WSHandlerResult rResult = new WSHandlerResult(null, bstResults);
                         results.add(0, rResult);
 
-                        assertTokens(message, SP12Constants.KERBEROS_TOKEN, false);
+                        assertTokens(message);
                         
                         Principal principal = 
                             (Principal)bstResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -121,13 +121,13 @@ public class KerberosTokenInterceptor extends BinarySecurityTokenInterceptor {
                         return (Validator)((Class<?>)o).newInstance();
                     } else if (o instanceof String) {
                         return (Validator)ClassLoaderUtils.loadClass(o.toString(),
-                                                                     KerberosTokenInterceptor.class)
+                                                                     BinarySecurityTokenInterceptor.class)
                                                                      .newInstance();
                     }
                 } catch (RuntimeException t) {
                     throw t;
-                } catch (Throwable t) {
-                    throw new WSSecurityException(t.getMessage(), t);
+                } catch (Exception ex) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                 }
                 return super.getValidator(qName);
             }
@@ -140,8 +140,9 @@ public class KerberosTokenInterceptor extends BinarySecurityTokenInterceptor {
         return results;
     }
     
-    protected Token assertTokens(SoapMessage message) {
-        return assertTokens(message, SP12Constants.KERBEROS_TOKEN, true);
+    protected AbstractToken assertTokens(SoapMessage message) {
+        // Assert tokens here if required
+        return null;
     }
 
     protected void addToken(SoapMessage message) {
@@ -155,13 +156,24 @@ public class KerberosTokenInterceptor extends BinarySecurityTokenInterceptor {
         Header h = findSecurityHeader(message, true);
         Element el = (Element)h.getObject();
         el.appendChild(el.getOwnerDocument().importNode(securityToken.getToken(), true));
-=======
-    protected AbstractToken assertTokens(SoapMessage message) {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        assertPolicy(aim, "WssKerberosV5ApReqToken11");
-        assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
-        return assertTokens(message, SPConstants.KERBEROS_TOKEN, false);
->>>>>>> 2120019... Adding a test-case for adding + parsing a BinarySecurityToken
     }
 
+    private SecurityToken getSecurityToken(SoapMessage message) {
+        if (message.getContextualProperty(SecurityConstants.TOKEN) instanceof SecurityToken) {
+            return (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
+        }
+        
+        // Get the TokenStore
+        TokenStore tokenStore = getTokenStore(message);
+        if (tokenStore == null) {
+            return null;
+        }
+        
+        String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+        if (id != null) {
+            return tokenStore.getToken(id);
+        }
+        return null;
+    }
+    
 }

@@ -49,7 +49,25 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+<<<<<<< HEAD
     
+=======
+    <wsdl:binding name="DoubleItNoSecurityBinding" type="tns:DoubleItPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+>>>>>>> 2120019... Adding a test-case for adding + parsing a BinarySecurityToken
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItSignedSupportingPort" binding="tns:DoubleItStandardBinding">
             <soap:address location="http://localhost:9010/DoubleItSignedSupporting" />
@@ -95,6 +113,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItSignedEndorsingSupportingPort3" binding="tns:DoubleItStandardBinding">
             <soap:address location="http://localhost:9010/DoubleItSignedEndorsingSupporting3" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItBinarySecurityTokenPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9010/DoubleItBinarySecurityToken"/>
         </wsdl:port>
     </wsdl:service>
     
