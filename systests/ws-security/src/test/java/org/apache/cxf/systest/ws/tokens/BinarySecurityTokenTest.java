@@ -27,14 +27,16 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.tokens.server.BSTServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -68,7 +70,7 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
     public void testBinarySecurityToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BinarySecurityTokenTest.class.getResource("client.xml");
+        URL busFile = BinarySecurityTokenTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

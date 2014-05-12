@@ -27,10 +27,10 @@ import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.Assert;

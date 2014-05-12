@@ -246,5 +246,11 @@
             </p:policies>
         </jaxws:features>
     </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItBinarySecurityTokenPort" createdFromAPI="true">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.BinarySecurityTokenInterceptor" />
+        </jaxws:outInterceptors>
+    </jaxws:client>
 	
 </beans>

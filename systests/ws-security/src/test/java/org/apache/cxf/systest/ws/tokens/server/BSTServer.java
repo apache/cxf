@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.tokens;
+package org.apache.cxf.systest.ws.tokens.server;
 
 import java.net.URL;
 
