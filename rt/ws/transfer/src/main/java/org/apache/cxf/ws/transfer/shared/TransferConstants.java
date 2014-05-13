@@ -55,6 +55,11 @@ public final class TransferConstants {
     
     public static final String RESOURCE_REMOTE_SUFFIX = "_factory";
     
+    public static final String REF_PARAMS_EL_NAME = "ReferenceParametersType";
+    public static final String REF_PARAMS_ATTR_NAME = "IsReferenceParameter";
+    public static final String REF_PARAMS_EL_NAMESPACE = "http://www.w3.org/2005/08/addressing";
+    public static final String REF_PARAMS_CONTEXT_KEY = "referenceParametersType";
+    
     private TransferConstants() {
         
     }
