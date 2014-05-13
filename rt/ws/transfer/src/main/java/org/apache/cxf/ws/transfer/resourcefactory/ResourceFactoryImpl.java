@@ -29,13 +29,11 @@ import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.CreateResponse;
 import org.apache.cxf.ws.transfer.EndpointReferenceType;
 import org.apache.cxf.ws.transfer.ReferenceParametersType;
-import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceReference;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
-import org.apache.cxf.ws.transfer.shared.faults.InvalidRepresentation;
 import org.apache.cxf.ws.transfer.validationtransformation.ResourceValidator;
-import org.apache.cxf.ws.transfer.validationtransformation.ValidatorResult;
+import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
 
 /**
  * ResourceFactory implementation.
@@ -48,7 +46,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
     
     @Override
     public CreateResponse create(Create body) {
-        validationAndTransformation(body.getRepresentation());
+        ValidAndTransformHelper.validationAndTransformation(validators, body.getRepresentation());
         ResourceReference resourceReference = resourceResolver.resolve(body);
         if (resourceReference.getResourceManager() != null) {
             return createLocally(body, resourceReference);
@@ -74,21 +72,6 @@ public class ResourceFactoryImpl implements ResourceFactory {
 
     public void setValidators(List<ResourceValidator> validators) {
         this.validators = validators;
-    }
-    
-    private void validationAndTransformation(Representation representation) {
-        if (validators != null && !validators.isEmpty()) {
-            for (ResourceValidator validator : validators) {
-                ValidatorResult valResult = validator.validate(representation);
-                if (valResult.isValidate()) {
-                    if (valResult.getTransformer() != null) {
-                        valResult.getTransformer().transform(representation);
-                    }
-                    return;
-                }
-            }
-            throw new InvalidRepresentation();
-        }
     }
     
     private CreateResponse createLocally(Create body, ResourceReference ref) {
