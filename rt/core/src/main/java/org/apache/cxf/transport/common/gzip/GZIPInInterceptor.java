@@ -60,6 +60,9 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) throws Fault {
+        if (isGET(message)) {
+            return;
+        }
         // check for Content-Encoding header - we are only interested in
         // messages that say they are gzipped.
         Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message
