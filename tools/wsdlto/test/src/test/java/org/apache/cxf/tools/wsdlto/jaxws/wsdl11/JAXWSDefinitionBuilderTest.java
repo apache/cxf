@@ -33,7 +33,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11.JAXWSDefinitionBuilder;
-import org.apache.cxf.transport.jms.AddressType;
+import org.apache.cxf.wsdl.http.AddressType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,8 +71,8 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         assertNotNull(port);
 
         assertEquals(1, port.getExtensibilityElements().size());
-        assertTrue(port.getExtensibilityElements().get(0).getClass().getName() + " is not an HTTPAddress",
-                   port.getExtensibilityElements().get(0) instanceof HTTPAddress);
+        assertTrue(port.getExtensibilityElements().get(0).getClass().getName() + " is not an AddressType",
+                   port.getExtensibilityElements().get(0) instanceof AddressType);
 
         Binding binding = port.getBinding();
         assertNotNull(binding);
@@ -111,6 +111,6 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         assertNotNull(port);
 
         assertEquals(3, port.getExtensibilityElements().size());
-        assertTrue(port.getExtensibilityElements().get(0) instanceof AddressType);
+        assertTrue(port.getExtensibilityElements().get(0) instanceof org.apache.cxf.transport.jms.AddressType);
     }
 }
