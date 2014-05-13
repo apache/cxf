@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.ProcessingException;
@@ -101,6 +102,19 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         Book book = wc.get(Book.class);
         assertEquals(124L, book.getId());
         assertEquals("root", book.getName());
+    }
+    @Test
+    public void testGetBookQueryGZIP() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/";
+        WebClient wc = WebClient.create(address);
+        wc.acceptEncoding("gzip,deflate");
+        wc.encoding("gzip");
+        InputStream r = wc.get(InputStream.class);
+        assertNotNull(r);
+        GZIPInputStream in = new GZIPInputStream(r);
+        String s = IOUtils.toString(in);
+        in.close();
+        assertTrue(s, s.contains("id>124"));
     }
     
     @Test
