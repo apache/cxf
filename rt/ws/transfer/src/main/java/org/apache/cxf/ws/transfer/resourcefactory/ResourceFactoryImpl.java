@@ -75,10 +75,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
     }
     
     private CreateResponse createLocally(Create body, ResourceReference ref) {
-        ReferenceParametersType referenceParams = 
-                    ref
-                    .getResourceManager()
-                    .create(body.getRepresentation());
+        ReferenceParametersType referenceParams = ref.getResourceManager().create(body.getRepresentation());
             
         CreateResponse response = new CreateResponse();
         response.setResourceCreated(new EndpointReferenceType());
@@ -88,6 +85,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
                 .setValue(ref.getResourceURL());
         response.getResourceCreated()
                 .setReferenceParameters(referenceParams);
+        response.setRepresentation(body.getRepresentation());
 
         return response;
     }
