@@ -15,19 +15,16 @@ supported.
 
 The following jars are required for all CXF usage:
 - cxf.jar
-- commons-logging.jar
-- geronimo-activation.jar (Or the Sun equivalent) [6]
-- geronimo-annotation.jar (Or the Sun equivalent) [6]
 - geronimo-javamail.jar (Or the Sun equivalent) [6]
-  (MAY be able to remove javamail if you don't use any MTOM/SAAJ type things)
-- neethi.jar
+  (MAY be able to remove javamail if you don't use any MIME/MTOM/SAAJ type things)
 - jaxb-api.jar  [6]
 - jaxb-impl.jar (this is a [6] for normal runtime, but is required for 
                  tooling and the dynamic clients)
 - xmlschema-core.jar
 - woodstox-core-asl.jar
-- stax2-api-3.0.1.jar
-- wsdl4j.jar
+- stax2-api.jar
+- slf4j-*.jar
+- jcl-over-slf4j.jar
 
 Note: woodstox and stax2-api can be removed if you set the 
 "org.apache.cxf.stax.allowInsecureParser” system property to true.  This
@@ -46,6 +43,8 @@ For Java2WSDL and WSDL2Java:
         JAXB code generation)
 
 For JAX-WS support:
+- neethi.jar
+- wsdl4j.jar
 - geronimo-jaxws_2.2_spec-1.0.jar (Or the Sun equivalent) [6]
 - saaj-api.jar [6]
 - saaj-impl.jar [6]
@@ -58,15 +57,18 @@ For XML Configuration support:
 - spring-beans.jar
 - spring-context.jar
 - spring-core.jar
-- FastInfoset.jar
 
 For hosting web services within WARs while using Spring-based CXFServlet:
 - spring-web.jar
 
-For standalone HTTP support:
+For standalone HTTP support use Jetty:
 - geronimo-servlet.jar
 - jetty-*.jar
 - sl4j.jar & sl4j-jdk14.jar (optional - but improves logging)
+
+For standalone HTTP support use Netty:
+- geronimo-servlet.jar
+- netty-*.jar
  
 For Aegis support:
 - jdom.jar (optional, if you want to map xsd:anyType to JDOM)
@@ -75,16 +77,17 @@ For XmlBeans databinding support:
 - xmlbeans.jar
 
 For WS-Security support:
-- bcprov-jdk15.jar (optional depending on algorithms used)
-- wss4j.jar
+- wss4j-*.jar
 - xmlsec.jar
 - ehcache-core.jar
+- jasypt.jar
 
 For SAML support in WS-Security
 - joda-time.jar 
 - opensaml.jar
 - openws.jar
 - xmltooling.jar
+- xalan.jar
 
 For JAX-RS support:
 - abdera*  (optional: for AtomPub support, but also needed for the 
@@ -98,8 +101,7 @@ For JAX-RS support:
 
 For JMS transport
 - geronimo-jms.jar (Or the Sun equivalent)
-- spring-jms.jar
-- spring-tx.jar
+- geronimo-jta.jar (Or the Sun equivalent)
 
 For the UDP transport
 - mina-core.jar
@@ -119,14 +121,17 @@ For JavaScript functionality:
 
 For schema validation with the Aegis data binding.
 
- - msv-core.jar (version 2011.1)
- - xsdlib.jar (version 2010.1)
- - isorelax.jar (version 20030108)
- - relaxngDatatype.jar (version 20020414)
+ - msv-core.jar
+ - xsdlib.jar
+ - isorelax.jar
+ - relaxngDatatype.jar
 
 For the WS-Notification Service:
  - cxf-services-wsn-api.jar
  - cxf-services-wsn-core.jar  
+ - activemq*.jar
+ - hawtbuf.jar
+ - geronimo-j2ee-management_1.1_spec.jar
 
 For the CXF Security Token Service:
  - cxf-services-sts-core.jar
