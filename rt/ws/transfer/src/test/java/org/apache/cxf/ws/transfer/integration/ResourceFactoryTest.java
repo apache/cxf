@@ -61,7 +61,7 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
             refParam.getAny().add(uuidEl);
             return refParam;
         } catch (ParserConfigurationException ex) {
-            throw new RuntimeException();
+            throw new RuntimeException(ex);
         }
     }
     
