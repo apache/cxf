@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -63,6 +64,7 @@ import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -397,7 +399,9 @@ public class RMManagerTest extends Assert {
         control.verify();
     }
     
+    
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetNewSequence() throws NoSuchMethodException, SequenceFault, RMException {
         Method m = RMManager.class.getDeclaredMethod("getSource", new Class[] {Message.class});
         manager = control.createMock(RMManager.class, new Method[] {m});
@@ -405,6 +409,7 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(RMContextUtils.getProtocolVariation(message))
             .andReturn(ProtocolVariation.RM10WSA200408);
         Exchange exchange = control.createMock(Exchange.class);
+        EasyMock.expect(message.keySet()).andReturn(new HashSet<String>()).anyTimes();
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();
         EasyMock.expect(exchange.getInMessage()).andReturn(null).anyTimes();
@@ -429,7 +434,8 @@ public class RMManagerTest extends Assert {
         proxy.createSequence(EasyMock.isA(EndpointReferenceType.class),
                              (RelatesToType)EasyMock.isNull(),
                              EasyMock.eq(false),
-                             EasyMock.isA(ProtocolVariation.class));
+                             EasyMock.isA(ProtocolVariation.class),
+                             EasyMock.isA(HashMap.class));
         EasyMock.expectLastCall().andReturn(createResponse);
         Servant servant = control.createMock(Servant.class);
         EasyMock.expect(rme.getServant()).andReturn(servant);

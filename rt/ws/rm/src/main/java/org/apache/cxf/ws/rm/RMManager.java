@@ -445,8 +445,16 @@ public class RMManager {
                 throw new RMException(msg);
             }
             Proxy proxy = source.getReliableEndpoint().getProxy();
+            Map<String, Object> context = new HashMap<String, Object>(16);
+            for (String key : message.keySet()) {
+                //copy other properties?
+                if (key.startsWith("ws-security")) {
+                    context.put(key, message.getContextualProperty(key));                  
+                }
+            }
+            
             CreateSequenceResponseType createResponse = 
-                proxy.createSequence(acksTo, relatesTo, isServer, protocol);
+                proxy.createSequence(acksTo, relatesTo, isServer, protocol, context);
             if (!isServer) {
                 Servant servant = source.getReliableEndpoint().getServant();
                 servant.createSequenceResponse(createResponse, protocol);
