@@ -125,6 +125,7 @@ public class MemoryResourceManager implements ResourceManager {
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.newDocument();
             Element uuidEl = doc.createElementNS(TransferConstants.TRANSFER_2011_03_NAMESPACE, LOCAL_NAME);
+            uuidEl.setTextContent(uuid);
             refParam.getAny().add(uuidEl);
             return refParam;
         } catch (TransformerConfigurationException ex) {
