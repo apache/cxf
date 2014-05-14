@@ -1,4 +1,4 @@
-Apache CXF 3.0.0-milestone1 Release Notes
+Apache CXF 3.0.0 Release Notes
 
 1. Overview
 
@@ -20,12 +20,7 @@ compatible with CXF 2.x and some migration efforts may be required.
 
 Users are encourage to review the migration guide at:
 http://cxf.apache.org/docs/30-migration-guide.html
-for further information and requirements for upgrading to 2.7.x.
-
-In addition, this is a “milestone” release to allow users to test
-the new functionality and offer more suggestions.  While the API’s
-and such are close to final, some more changes may occur between now
-and the final 3.0 release.
+for further information and requirements for upgrading from 2.7.x.
 
 
 2. Installation Prerequisites 
