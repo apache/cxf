@@ -114,7 +114,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);
         boolean isPartialResponse = MessageUtils.isPartialResponse(msg);
         RMConstants constants = protocol.getConstants();
-        boolean isLastMessage = constants.getCloseSequenceAction().equals(action);
+        boolean isLastMessage = RM10Constants.CLOSE_SEQUENCE_ACTION.equals(action);
         
         RMProperties rmpsOut = RMContextUtils.retrieveRMProperties(msg, true);
         if (null == rmpsOut) {
