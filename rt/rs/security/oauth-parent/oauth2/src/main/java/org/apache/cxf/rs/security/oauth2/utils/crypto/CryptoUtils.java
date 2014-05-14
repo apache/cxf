@@ -68,7 +68,7 @@ public final class CryptoUtils {
         return encodeBytes(encryptedBytes);
     }
     
-    public static RSAPublicKey getRsaPublicKey(String encodedModulus,
+    public static RSAPublicKey getRSAPublicKey(String encodedModulus,
                                                String encodedPublicExponent) {
         try {
             return getRSAPublicKey(Base64UrlUtility.decode(encodedModulus),

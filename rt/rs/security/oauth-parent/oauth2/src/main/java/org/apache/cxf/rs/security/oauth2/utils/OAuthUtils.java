@@ -35,7 +35,6 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.MessageDigestUtils;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 
