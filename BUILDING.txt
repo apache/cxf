@@ -6,8 +6,7 @@ Initial Setup
 
 1) Install J2SE SDK, which can be downloaded from 
    http://www.oracle.com/technetwork/java/archive-139210.html#javase
-   CXF supports most versions newer than 1.5.0_13 with the exception 
-   of Java 6 updates 1-3.
+   CXF supports most versions newer than 1.6.0_04
 
 2) Make sure that your JAVA_HOME environment variable is set to the newly installed 
    JDK location, and that your PATH includes %JAVA_HOME%\bin (windows) or 
@@ -33,7 +32,7 @@ Building
    This will compile Apache CXF without running the tests and takes less
    time to build.
    Depending on the load of remote Maven repositories, you may have 
-   to run "mvn" several times utill the required dependencies are 
+   to run "mvn" several times until the required dependencies are 
    all located in your local maven repository. It usually takes some time for 
    maven to download required dependencies in the first build.
 
