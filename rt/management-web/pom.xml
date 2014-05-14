@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -184,7 +184,7 @@
                                             <entry key="org.eclipse.jdt.core.compiler.problem.unusedLocal" value="ignore" />
                                             <entry key="org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation" value="ignore" />
                                             <entry key="org.eclipse.jdt.core.compiler.problem.deprecation" value="ignore" />
-                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedPrivateMember" value="ignore"/>
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedPrivateMember" value="ignore" />
                                         </propertyfile>
                                     </target>
                                 </configuration>

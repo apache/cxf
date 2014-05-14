@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-parent</artifactId>
@@ -40,7 +40,7 @@
         <cxf.compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</cxf.compile.flags>
         <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
         <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
-        <cxf.codegen.jvmArgs/>
+        <cxf.codegen.jvmArgs />
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
         <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
