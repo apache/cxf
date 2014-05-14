@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -391,6 +392,7 @@ public class RMManagerTest extends Assert {
         manager = control.createMock(RMManager.class, new Method[] {m});
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
+        EasyMock.expect(message.getContextualPropertyKeys()).andReturn(new HashSet<String>()).anyTimes();
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();
         EasyMock.expect(exchange.getInMessage()).andReturn(null).anyTimes();
@@ -416,7 +418,7 @@ public class RMManagerTest extends Assert {
                              (RelatesToType)EasyMock.isNull(),
                              EasyMock.eq(false),
                              EasyMock.isA(ProtocolVariation.class),
-                             EasyMock.isA(Exchange.class));
+                             EasyMock.isA(Exchange.class), EasyMock.isA(HashMap.class));
         EasyMock.expectLastCall().andReturn(createResponse);
         Servant servant = control.createMock(Servant.class);
         EasyMock.expect(rme.getServant()).andReturn(servant);

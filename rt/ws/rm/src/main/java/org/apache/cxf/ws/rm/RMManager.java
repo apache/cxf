@@ -22,6 +22,7 @@ package org.apache.cxf.ws.rm;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -460,8 +461,16 @@ public class RMManager {
             Proxy proxy = source.getReliableEndpoint().getProxy();
             ProtocolVariation protocol = config.getProtocolVariation();
             Exchange exchange = new ExchangeImpl();
+            Map<String, Object> context = new HashMap<String, Object>(16);
+            for (String key : message.getContextualPropertyKeys()) {
+                //copy other properties?
+                if (key.startsWith("ws-security")) {
+                    context.put(key, message.getContextualProperty(key));                  
+                }
+            }
+            
             CreateSequenceResponseType createResponse = 
-                proxy.createSequence(acksTo, relatesTo, isServer, protocol, exchange);
+                proxy.createSequence(acksTo, relatesTo, isServer, protocol, exchange, context);
             if (!isServer) {
                 Servant servant = source.getReliableEndpoint().getServant();
                 servant.createSequenceResponse(createResponse, protocol);

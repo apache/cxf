@@ -129,8 +129,8 @@ public class Proxy {
     }
 
     public CreateSequenceResponseType createSequence(EndpointReferenceType defaultAcksTo, RelatesToType relatesTo, 
-             boolean isServer, final ProtocolVariation protocol, final Exchange exchange) throws RMException {
-        
+             boolean isServer, final ProtocolVariation protocol, final Exchange exchange, Map<String, Object> context) 
+        throws RMException {
         SourcePolicyType sp = reliableEndpoint.getManager().getSourcePolicy();
         CreateSequenceType create = new CreateSequenceType();        
 
@@ -196,7 +196,7 @@ public class Proxy {
         }
         
         
-        Object resp = invoke(oi, protocol, new Object[] {send}, null, exchange);
+        Object resp = invoke(oi, protocol, new Object[] {send}, context, exchange);
         return codec.convertReceivedCreateSequenceResponse(resp);
     }
     
@@ -307,6 +307,9 @@ public class Proxy {
         
         BindingOperationInfo boi = bi.getOperation(oi);
         try {
+            if (context != null) {
+                client.getRequestContext().putAll(context);
+            }
             Object[] result = client.invoke(boi, params, context, exchange);
             if (result != null && result.length > 0) {
                 return result[0];

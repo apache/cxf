@@ -50,6 +50,7 @@ import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.OfferType;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -270,12 +271,15 @@ public class ProxyTest extends Assert {
         BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
         EasyMock.expect(bi.getOperation(oi)).andReturn(boi).anyTimes();
         Client client = control.createMock(Client.class);
+        EasyMock.expect(client.getRequestContext()).andReturn(new HashMap<String, Object>()).anyTimes();
+        
         EasyMock.expect(proxy.createClient(bus, endpoint, ProtocolVariation.RM10WSA200408, conduit, replyTo))
             .andReturn(client).anyTimes();  
         Object[] args = new Object[] {};
         Map<String, Object> context = new HashMap<String, Object>();
         Object[] results = new Object[] {"a", "b", "c"};
         Exchange exchange = control.createMock(Exchange.class);
+        
         EasyMock.expect(client.invoke(boi, args, context, exchange)).andReturn(results).anyTimes();
         
         control.replay();
@@ -354,22 +358,23 @@ public class ProxyTest extends Assert {
             csr = new org.apache.cxf.ws.rm.v200502.CreateSequenceResponseType();
         }
         ExchangeImpl exchange = new ExchangeImpl();
-        EasyMock.expect(proxy.invoke(EasyMock.same(oi), EasyMock.isA(ProtocolVariation.class), 
-             EasyMock.isA(Object[].class), (Map<String, Object>)EasyMock.isNull(),
-             EasyMock.isA(Exchange.class))).andReturn(csr).anyTimes();
         
+        EasyMock.expect(proxy.invoke(EasyMock.same(oi), EasyMock.isA(ProtocolVariation.class), 
+             EasyMock.isA(Object[].class), EasyMock.isA(Map.class),
+             EasyMock.isA(Exchange.class))).andReturn(csr).anyTimes();
         EndpointReferenceType defaultAcksTo = control.createMock(EndpointReferenceType.class);
         AttributedURIType aut = control.createMock(AttributedURIType.class);
         EasyMock.expect(aut.getValue()).andReturn("here").anyTimes();
         EasyMock.expect(defaultAcksTo.getAddress()).andReturn(aut).anyTimes();
         RelatesToType relatesTo = control.createMock(RelatesToType.class);
         control.replay();
+        Map<String, Object> context = new HashMap<String, Object>();
         if (isServer) {
             assertNull(proxy.createSequence(defaultAcksTo, relatesTo, isServer, 
-                                            ProtocolVariation.RM10WSA200408, exchange));
+                                            ProtocolVariation.RM10WSA200408, exchange, context));
         } else {
             assertNotNull(proxy.createSequence(defaultAcksTo, relatesTo, isServer, 
-                                               ProtocolVariation.RM10WSA200408, exchange));
+                                               ProtocolVariation.RM10WSA200408, exchange, context));
         }
     }
     
