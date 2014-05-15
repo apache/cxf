@@ -61,8 +61,10 @@ public class SecurityContextImpl implements SecurityContext {
     }
 
     public Principal getUserPrincipal() {
-        org.apache.cxf.security.SecurityContext sc = 
-            m.get(org.apache.cxf.security.SecurityContext.class);
+        org.apache.cxf.security.SecurityContext sc = m.getContent(org.apache.cxf.security.SecurityContext.class);
+        if (sc == null) {
+            sc = m.get(org.apache.cxf.security.SecurityContext.class);
+        }
         return sc == null ? null : sc.getUserPrincipal();
     }
 
