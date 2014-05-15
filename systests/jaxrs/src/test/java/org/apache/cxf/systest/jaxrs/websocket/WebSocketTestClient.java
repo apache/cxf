@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs.websocket;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -36,6 +37,7 @@ import com.ning.http.client.websocket.WebSocketTextListener;
 import com.ning.http.client.websocket.WebSocketUpgradeHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.transport.websocket.WebSocketConstants;
 
 
 
@@ -57,8 +59,8 @@ class WebSocketTestClient {
     private String url;
     
     public WebSocketTestClient(String url) {
-        this.received = new ArrayList<Object>();
-        this.fragments = new ArrayList<Object>();
+        this.received = Collections.synchronizedList(new ArrayList<Object>());
+        this.fragments = Collections.synchronizedList(new ArrayList<Object>());
         this.latch = new CountDownLatch(1);
         this.client = new AsyncHttpClient();
         this.url = url;
@@ -214,6 +216,7 @@ class WebSocketTestClient {
         private int pos; 
         private int statusCode;
         private String contentType;
+        private String id;
         private Object entity;
         
         public Response(Object data) {
@@ -228,6 +231,8 @@ class WebSocketTestClient {
                         String v = line.substring(del + 1).trim();
                         if ("Content-Type".equalsIgnoreCase(h)) {
                             contentType = v;
+                        } else if (WebSocketConstants.DEFAULT_RESPONSE_ID_KEY.equals(h)) {
+                            id = v;
                         }
                     }
                 }
@@ -239,7 +244,6 @@ class WebSocketTestClient {
                 System.arraycopy((byte[])data, pos, (byte[])entity, 0, ((byte[])entity).length);
             }
         }
-                
             
         
         public int getStatusCode() {
@@ -256,6 +260,10 @@ class WebSocketTestClient {
         
         public String getTextEntity() {
             return gettext(entity);
+        }
+
+        public String getId() {
+            return id;
         }
 
         public String toString() {

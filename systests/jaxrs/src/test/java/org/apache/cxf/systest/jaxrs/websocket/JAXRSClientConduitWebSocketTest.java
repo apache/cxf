@@ -75,7 +75,63 @@ public class JAXRSClientConduitWebSocketTest extends AbstractBusClientServerTest
         //resource.getBookBought();
 
     }
-    
+
+    @Test
+    public void testCallsWithIDReferences() throws Exception {
+        String address = "ws://localhost:" + getPort() + "/websocket";
+
+        BookStoreWebSocket resource = JAXRSClientFactory.create(address, BookStoreWebSocket.class, null, true);
+        Client client = WebClient.client(resource);
+        client.header(HttpHeaders.USER_AGENT, JAXRSClientConduitWebSocketTest.class.getName());
+        
+        // call the POST service twice (a unique requestId is automatically included to correlate the response)
+        EchoBookIdRunner[] runners = new EchoBookIdRunner[2];
+        runners[0] = new EchoBookIdRunner(resource, 549);
+        runners[1] = new EchoBookIdRunner(resource, 495);
+        
+        new Thread(runners[0]).start();
+        new Thread(runners[1]).start();
+        
+        long timetowait = 5000;
+        while (timetowait > 0) {
+            if (runners[0].isCompleted() && runners[1].isCompleted()) {
+                break;
+            }
+            Thread.sleep(500);
+            timetowait -= 500;
+        }
+        assertEquals(Long.valueOf(549), runners[0].getValue());
+        assertEquals(Long.valueOf(495), runners[1].getValue());
+    }    
+
+    private static class EchoBookIdRunner implements Runnable {
+        private BookStoreWebSocket resource;
+        private long input;
+        private Long value;
+        private boolean completed;
+
+        public EchoBookIdRunner(BookStoreWebSocket resource, long input) {
+            this.resource = resource;
+            this.input = input;
+        }
+
+        public void run() {
+            try {
+                value = resource.echoBookId(input);
+            } finally {
+                completed = true;
+            }
+        }
+
+        public Long getValue() {
+            return value;
+        }
+
+        public boolean isCompleted() {
+            return completed;
+        }
+    }
+
     protected String getPort() {
         return PORT;
     }

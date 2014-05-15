@@ -17,36 +17,16 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket.ahc;
-
-import java.net.URI;
+package org.apache.cxf.transport.websocket;
 
 /**
- * TODO consolidate this class with the local Request class of AhcWebSocketConduit
+ * 
  */
-class AhcWebSocketRequest {
-    private URI uri;
-    private String method;
-    
-    public AhcWebSocketRequest(URI uri, String method) {
-        this.uri = uri;
-        this.method = method;
-    }
+public final class WebSocketConstants {
+    public static final String DEFAULT_REQUEST_ID_KEY = "requestId";
+    public static final String DEFAULT_RESPONSE_ID_KEY = "responseId";
 
-    public URI getUri() {
-        return uri;
-    }
-
-    public void setUri(URI uri) {
-        this.uri = uri;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
+    private WebSocketConstants() {
     }
 
 }

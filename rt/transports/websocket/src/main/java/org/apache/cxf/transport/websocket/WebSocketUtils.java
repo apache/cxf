@@ -22,6 +22,7 @@ package org.apache.cxf.transport.websocket;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
@@ -34,6 +35,7 @@ public final class WebSocketUtils {
     static final String SM_KEY = "$sm";
     static final String FLUSHED_KEY = "$flushed";
     private static final String CRLF = "\r\n";
+    private static final String COLSP = ": ";
     private static final String DEFAULT_SC = "200";
 
     private WebSocketUtils() {
@@ -126,10 +128,7 @@ public final class WebSocketUtils {
         StringBuilder sb = new StringBuilder();
         String v = headers.get(SC_KEY);
         sb.append(v == null ? DEFAULT_SC : v).append(CRLF);
-        v = headers.get("Content-Type");
-        if (v != null) {
-            sb.append("Content-Type: ").append(v).append(CRLF);
-        }
+        appendHeaders(headers, sb);
         sb.append(CRLF);
         
         byte[] longdata = sb.toString().getBytes();
@@ -173,10 +172,7 @@ public final class WebSocketUtils {
                                       byte[] data, int offset, int length) {
         StringBuilder sb = new StringBuilder();
         sb.append(method).append(' ').append(url).append(CRLF);
-        String v = headers.get("Content-Type");
-        if (v != null) {
-            sb.append("Content-Type: ").append(v).append(CRLF);
-        }
+        appendHeaders(headers, sb);
         sb.append(CRLF);
 
         byte[] longdata = sb.toString().getBytes();
@@ -189,4 +185,11 @@ public final class WebSocketUtils {
         return longdata;
     }
 
+    private static void appendHeaders(Map<String, String> headers, StringBuilder sb) {
+        for (Entry<String, String> header : headers.entrySet()) {
+            if (!header.getKey().startsWith("$")) {
+                sb.append(header.getKey()).append(COLSP).append(header.getValue()).append(CRLF);
+            }
+        }
+    }
 }

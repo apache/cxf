@@ -20,11 +20,13 @@
 package org.apache.cxf.systest.jaxrs.websocket;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.websocket.WebSocketConstants;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -254,6 +256,55 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         }
     }
     
+    @Test
+    public void testCallsWithIDReferences() throws Exception {
+        String address = "ws://localhost:" + getPort() + "/websocket/web/bookstore";
+
+        WebSocketTestClient wsclient = new WebSocketTestClient(address);
+        wsclient.connect();
+        try {
+            // call the POST service without requestId
+            wsclient.sendTextMessage(
+                "POST /websocket/web/bookstore/booksplain\r\nContent-Type: text/plain\r\n\r\n459");
+            assertTrue("response expected", wsclient.await(3));
+            List<WebSocketTestClient.Response> received = wsclient.getReceivedResponses();
+            WebSocketTestClient.Response resp = received.get(0);
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("text/plain", resp.getContentType());
+            String value = resp.getTextEntity();
+            assertEquals("459", value);
+            String id = resp.getId();
+            assertNull("response id is incorrect", id);
+            
+            // call the POST service twice with a unique requestId 
+            wsclient.reset(2);
+            String reqid1 = UUID.randomUUID().toString();
+            String reqid2 = UUID.randomUUID().toString();
+            wsclient.sendTextMessage(
+                "POST /websocket/web/bookstore/booksplain\r\nContent-Type: text/plain\r\n" 
+                + WebSocketConstants.DEFAULT_REQUEST_ID_KEY + ": " + reqid1 + "\r\n\r\n549");
+            wsclient.sendTextMessage(
+                "POST /websocket/web/bookstore/booksplain\r\nContent-Type: text/plain\r\n" 
+                + WebSocketConstants.DEFAULT_REQUEST_ID_KEY + ": " + reqid2 + "\r\n\r\n495");
+            assertTrue("response expected", wsclient.await(3));
+            received = wsclient.getReceivedResponses();
+            for (WebSocketTestClient.Response r : received) {
+                assertEquals(200, r.getStatusCode());
+                assertEquals("text/plain", r.getContentType());
+                value = r.getTextEntity();
+                id = r.getId();
+                if (reqid1.equals(id)) {
+                    assertEquals("549", value);
+                } else if (reqid2.equals(id)) {
+                    assertEquals("495", value);
+                } else {
+                    fail("unexpected responseId: " + id);
+                }
+            }
+        } finally {
+            wsclient.close();
+        }
+    }
     
     protected String getPort() {
         return PORT;

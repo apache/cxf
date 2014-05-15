@@ -321,6 +321,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
         if (LOG.isLoggable(Level.INFO)) {
             LOG.log(Level.INFO, "setHeader({0}, {1})", new Object[]{name, value});
         }
+        responseHeaders.put(name, value);
     }
 
     @Override

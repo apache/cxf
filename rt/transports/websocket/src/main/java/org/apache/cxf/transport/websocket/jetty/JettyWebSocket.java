@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.transport.websocket.InvalidPathException;
+import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketServletHolder;
 import org.apache.cxf.transport.websocket.WebSocketVirtualServletRequest;
 import org.apache.cxf.transport.websocket.WebSocketVirtualServletResponse;
@@ -50,6 +51,10 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
     private Connection webSocketConnection;
     private WebSocketServletHolder webSocketHolder;
     private String protocol;
+
+    //REVISIT make these keys configurable
+    private String requestIdKey = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
+    private String responseIdKey = WebSocketConstants.DEFAULT_RESPONSE_ID_KEY;
     
     public JettyWebSocket(JettyWebSocketManager manager, HttpServletRequest request, String protocol) {
         this.manager = manager;
@@ -103,6 +108,10 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             response = createServletResponse();
             request = createServletRequest(data, offset, length);
             if (manager != null) {
+                String reqid = request.getHeader(requestIdKey);
+                if (reqid != null) {
+                    response.setHeader(responseIdKey, reqid);
+                }
                 manager.service(request, response);
             }
         } catch (InvalidPathException ex) { 

@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.websocket.InvalidPathException;
+import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
 import org.apache.cxf.transport.websocket.WebSocketServletHolder;
 import org.apache.cxf.transport.websocket.WebSocketVirtualServletRequest;
@@ -55,6 +56,9 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
 
     protected AtmosphereWebSocketServletDestination destination;
     
+    //REVISIT make these keys configurable
+    private String requestIdKey = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
+    private String responseIdKey = WebSocketConstants.DEFAULT_RESPONSE_ID_KEY;
     
     public AtmosphereWebSocketServletDestination getDestination() {
         return destination;
@@ -88,14 +92,22 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     /** {@inheritDoc}*/
     @Override
     public List<AtmosphereRequest> onMessage(WebSocket webSocket, byte[] data, int offset, int length) {
-        LOG.info("onMessage(WebSocket, byte[], int, int)");
+        return invokeService(webSocket, new ByteArrayInputStream(data, offset, length));
+    }
+    
+    protected List<AtmosphereRequest> invokeService(WebSocket webSocket,  InputStream stream) {
+        LOG.info("invokeService(WebSocket, InputStream)");
         HttpServletRequest request = null;
-        HttpServletResponse response = null;
+        HttpServletResponse response = null;        
         try {
             WebSocketServletHolder webSocketHolder = new AtmosphereWebSocketServletHolder(webSocket);
             response = createServletResponse(webSocketHolder);
-            request = createServletRequest(webSocketHolder, data, offset, length);
+            request = createServletRequest(webSocketHolder, stream);
             if (destination != null) {
+                String reqid = request.getHeader(requestIdKey);
+                if (reqid != null) {
+                    response.setHeader(responseIdKey, reqid);
+                }
                 ((WebSocketDestinationService)destination).invokeInternal(null, 
                     webSocket.resource().getRequest().getServletContext(),
                     request, response);
@@ -104,13 +116,12 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
             reportErrorStatus(response, 400);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Failed to invoke service", e);
-            reportErrorStatus(response, 500);
         }
         return null;
     }
 
     // may want to move this error reporting code to WebSocketServletHolder
-    private void reportErrorStatus(HttpServletResponse response, int status) {
+    protected void reportErrorStatus(HttpServletResponse response, int status) {
         if (response != null) {
             response.setStatus(status);
             try {
@@ -142,12 +153,12 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
         LOG.info("onError(WebSocket, WebSocketException)");
     }
 
-    protected WebSocketVirtualServletRequest createServletRequest(WebSocketServletHolder webSocketHolder, 
-                                                                  byte[] data, int offset, int length) 
-        throws IOException {
-        return new WebSocketVirtualServletRequest(webSocketHolder, 
-                                                  new ByteArrayInputStream(data, offset, length));
-    }
+//    protected WebSocketVirtualServletRequest createServletRequest(WebSocketServletHolder webSocketHolder, 
+//                                                                  byte[] data, int offset, int length) 
+//        throws IOException {
+//        return new WebSocketVirtualServletRequest(webSocketHolder, 
+//                                                  new ByteArrayInputStream(data, offset, length));
+//    }
     
     protected WebSocketVirtualServletRequest createServletRequest(WebSocketServletHolder webSocketHolder, 
                                                                   InputStream stream)

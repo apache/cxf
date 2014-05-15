@@ -22,15 +22,9 @@ package org.apache.cxf.transport.websocket.atmosphere;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.transport.websocket.WebSocketDestinationService;
-import org.apache.cxf.transport.websocket.WebSocketServletHolder;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.websocket.WebSocket;
 import org.atmosphere.websocket.WebSocketProtocolStream;
@@ -51,23 +45,6 @@ public class AtmosphereWebSocketStreamHandler extends AtmosphereWebSocketHandler
 
     @Override
     public List<AtmosphereRequest> onBinaryStream(WebSocket webSocket, InputStream stream) {
-        LOG.info("onBinaryStream(WebSocket, InputStream)");
-        
-        try {
-            WebSocketServletHolder webSocketHolder = new AtmosphereWebSocketServletHolder(webSocket);
-            HttpServletRequest request = createServletRequest(webSocketHolder, stream);
-            HttpServletResponse response = createServletResponse(webSocketHolder);
-            if (destination != null) {
-                ((WebSocketDestinationService)destination).invokeInternal(null, 
-                    webSocket.resource().getRequest().getServletContext(),
-                    request, response);
-            }
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "Failed to invoke service", e);
-        }
-        return null;
+        return invokeService(webSocket, stream);
     }
-
-
-
 }

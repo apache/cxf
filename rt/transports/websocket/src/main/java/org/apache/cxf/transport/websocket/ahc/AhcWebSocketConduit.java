@@ -25,8 +25,10 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collections;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,6 +45,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
+import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -56,8 +59,11 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     private AsyncHttpClient ahcclient;
     private WebSocket websocket;
 
-    //FIXME use a ref-id based request and response association instead of using this sequential queue
-    private BlockingQueue<Response> responseQueue = new ArrayBlockingQueue<Response>(4096);
+    //REVISIT make these keys configurable
+    private String requestIdKey = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
+    private String responseIdKey = WebSocketConstants.DEFAULT_RESPONSE_ID_KEY;
+    
+    private Map<String, RequestResponse> uncorrelatedRequests = new ConcurrentHashMap<String, RequestResponse>();
 
     public AhcWebSocketConduit(Bus b, EndpointInfo ei, EndpointReferenceType t) throws IOException {
         super(b, ei, t);
@@ -72,6 +78,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         if (!"ws".equals(s) && !"wss".equals(s)) {
             throw new MalformedURLException("unknown protocol: " + s);
         }
+        
         message.put("http.scheme", currentURL.getScheme());
         String httpRequestMethod =
                 (String)message.get(Message.HTTP_REQUEST_METHOD);
@@ -80,14 +87,16 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
             message.put(Message.HTTP_REQUEST_METHOD, httpRequestMethod);
         }
 
-        final AhcWebSocketRequest request = new AhcWebSocketRequest(currentURL, httpRequestMethod);
-        message.put(AhcWebSocketRequest.class, request);
+        final AhcWebSocketConduitRequest request = new AhcWebSocketConduitRequest(currentURL, httpRequestMethod);
+        final int rtimeout = determineReceiveTimeout(message, csPolicy);
+        request.setReceiveTimeout(rtimeout);
+        message.put(AhcWebSocketConduitRequest.class, request);
     }
 
     @Override
     protected OutputStream createOutputStream(Message message, boolean needToCacheRequest,
                                               boolean isChunking, int chunkThreshold) throws IOException {
-        AhcWebSocketRequest entity = message.get(AhcWebSocketRequest.class);
+        AhcWebSocketConduitRequest entity = message.get(AhcWebSocketConduitRequest.class);
         AhcWebSocketWrappedOutputStream out =
             new AhcWebSocketWrappedOutputStream(message, needToCacheRequest, isChunking, chunkThreshold,
                                                 getConduitName(), entity.getUri());
@@ -95,17 +104,18 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     }
 
     public class AhcWebSocketWrappedOutputStream extends WrappedOutputStream {
-        private Request request;
+        private AhcWebSocketConduitRequest entity;
         private Response response;
 
         protected AhcWebSocketWrappedOutputStream(Message message, boolean possibleRetransmit,
                                                   boolean isChunking, int chunkThreshold, String conduitName, URI url) {
             super(message, possibleRetransmit, isChunking, chunkThreshold, conduitName, url);
 
+            entity = message.get(AhcWebSocketConduitRequest.class);
             //REVISIT how we prepare the request
-            this.request = new Request();
-            request.setMethod((String)outMessage.get(Message.HTTP_REQUEST_METHOD));
-            request.setPath(url.getPath() + (String)outMessage.getContextualProperty("org.apache.cxf.request.uri"));
+            entity.setPath(url.getPath() + (String)message.getContextualProperty("org.apache.cxf.request.uri"));
+            entity.setId(UUID.randomUUID().toString());
+            uncorrelatedRequests.put(entity.getId(), new RequestResponse(entity));
         }
 
         @Override
@@ -117,9 +127,13 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
                 @Override
                 public void write(byte b[], int off, int len) throws IOException {
                     //REVISIT support multiple writes and flush() to write the entire block data?
+                    // or provides the fragment mode?
+                    Map<String, String> headers = new HashMap<String, String>();
+                    headers.put("Content-Type", entity.getContentType());
+                    headers.put(requestIdKey, entity.getId());
                     websocket.sendMessage(WebSocketUtils.buildRequest(
-                        request.getMethod(), request.getPath(),
-                        Collections.<String, String>singletonMap("Content-Type", request.getContentType()),
+                        entity.getMethod(), entity.getPath(),
+                        headers,
                         b, off, len));
                 }
 
@@ -137,9 +151,11 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         @Override
         protected void handleNoOutput() throws IOException {
             connect();
+            Map<String, String> headers = new HashMap<String, String>();
+            headers.put(requestIdKey, entity.getId());
             websocket.sendMessage(WebSocketUtils.buildRequest(
-                request.getMethod(), request.getPath(),
-                Collections.<String, String>emptyMap(),
+                entity.getMethod(), entity.getPath(),
+                headers,
                 null, 0, 0));
         }
 
@@ -151,8 +167,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         @Override
         protected void setProtocolHeaders() throws IOException {
             Headers h = new Headers(outMessage);
-            request.setContentType(h.determineContentType());
-
+            entity.setContentType(h.determineContentType());
             //REVISIT may provide an option to add other headers
 //          boolean addHeaders = MessageUtils.isTrue(outMessage.getContextualProperty(Headers.ADD_HEADERS_PROPERTY));
         }
@@ -255,17 +270,25 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
             }
         }
 
-        synchronized Response getResponse() throws IOException {
+        Response getResponse() throws IOException {
             if (response == null) {
-                //TODO add a configurable timeout
-                try {
-                    response = responseQueue.take();
-                } catch (InterruptedException e) {
-                    // ignore
+                String rid = entity.getId();
+                RequestResponse rr = uncorrelatedRequests.get(rid);
+                synchronized (rr) {
+                    try {
+                        long timetowait = entity.getReceiveTimeout();
+                        response = rr.getResponse();
+                        if (response == null) {
+                            rr.wait(timetowait);
+                            response = rr.getResponse();
+                        }
+                    } catch (InterruptedException e) {
+                        // ignore
+                    }
                 }
-            }
-            if (response == null) {
-                throw new IOException("timeout");
+                if (response == null) {
+                    throw new IOException("timeout");
+                }
             }
             return response;
         }
@@ -293,8 +316,14 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "onMessage({0})", message);
             }
-
-            responseQueue.add(new Response(message));
+            Response resp = new Response(responseIdKey, message);
+            RequestResponse rr = uncorrelatedRequests.get(resp.getId());
+            if (rr != null) {
+                synchronized (rr) {
+                    rr.setResponse(resp);
+                    rr.notifyAll();
+                }
+            }
         }
 
         public void onFragment(byte[] fragment, boolean last) {
@@ -306,8 +335,14 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "onMessage({0})", message);
             }
-
-            responseQueue.add(new Response(message));
+            Response resp = new Response(responseIdKey, message);
+            RequestResponse rr = uncorrelatedRequests.get(resp.getId());
+            if (rr != null) {
+                synchronized (rr) {
+                    rr.setResponse(resp);
+                    rr.notifyAll();
+                }
+            }
         }
 
         public void onFragment(String fragment, boolean last) {
@@ -316,43 +351,17 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         }
     }
 
-    // Request and Response are used to represent request and response messages trasfered over the websocket
-    //REVIST move these classes to be used in other places
-    static class Request {
-        private String method;
-        private String url;
-        private String contentType;
-
-        public String getMethod() {
-            return method;
-        }
-        public void setMethod(String method) {
-            this.method = method;
-        }
-
-        public String getPath() {
-            return url;
-        }
-        public void setPath(String path) {
-            this.url = path;
-        }
-
-        public String getContentType() {
-            return contentType;
-        }
-        public void setContentType(String contentType) {
-            this.contentType = contentType;
-        }
-    }
-
+    // Request and Response are used to represent request and response messages transfered over the websocket
+    //REVIST move these classes to be used in other places after finalizing their contained information.
     static class Response {
         private Object data;
         private int pos;
         private int statusCode;
         private String contentType;
+        private String id;
         private Object entity;
 
-        public Response(Object data) {
+        public Response(String idKey, Object data) {
             this.data = data;
             String line = readLine();
             if (line != null) {
@@ -364,6 +373,8 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
                         String v = line.substring(del + 1).trim();
                         if ("Content-Type".equalsIgnoreCase(h)) {
                             contentType = v;
+                        } else if (idKey.equals(h)) {
+                            id = v;
                         }
                     }
                 }
@@ -382,6 +393,10 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
 
         public String getContentType() {
             return contentType;
+        }
+
+        public String getId() {
+            return id;
         }
 
         public Object getEntity() {
@@ -423,4 +438,20 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         }
     }
 
+    static class RequestResponse {
+        private AhcWebSocketConduitRequest request;
+        private Response response;
+        public RequestResponse(AhcWebSocketConduitRequest request) {
+            this.request = request;
+        }
+        public AhcWebSocketConduitRequest getRequest() {
+            return request;
+        }
+        public Response getResponse() {
+            return response;
+        }
+        public void setResponse(Response response) {
+            this.response = response;
+        }
+    }
 }
