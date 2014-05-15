@@ -440,6 +440,7 @@ public final class InjectionUtils {
         return pClass.cast(result);
     }
 
+
     private static <T> T instantiateFromParameterHandler(String value, 
                                                      Class<T> pClass,
                                                      Annotation[] anns,  
@@ -452,7 +453,7 @@ public final class InjectionUtils {
         }
     }
     
-    private static <T> T createFromParameterHandler(String value, 
+    public static <T> T createFromParameterHandler(String value, 
                                                     Class<T> pClass,
                                                     Annotation[] anns,
                                                     Message message) {
@@ -1253,11 +1254,9 @@ public final class InjectionUtils {
     }
     public static Object convertStringToPrimitive(String value, Class<?> cls, Annotation[] anns) {
         Message m = JAXRSUtils.getCurrentMessage();
-        if (m != null) {
-            ParamConverter<?> pc = ProviderFactory.getInstance(m).createParameterHandler(cls, anns);
-            if (pc != null) {
-                return pc.fromString(value);
-            }
+        Object obj = createFromParameterHandler(value, cls, anns, m);
+        if (obj != null) {
+            return obj;
         }
         if (String.class == cls) {
             return value;

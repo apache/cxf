@@ -62,7 +62,7 @@ public final class SearchUtils {
         if (value.contains("%")) {
             value = value.replaceAll("%", "\\\\%");
         }
-        if (!value.contains("*")) {
+        if (!containsWildcard(value)) {
             return alwaysWildcard ? "%" + value + "%" : value;
         } else {
             value = value.replaceAll("\\*", "%");
@@ -79,6 +79,10 @@ public final class SearchUtils {
     
     public static boolean containsEscapedChar(String value) {
         return containsEscapedPercent(value) || value.contains("\\\\") || value.contains("\\_");
+    }
+    
+    public static boolean containsWildcard(String value) {
+        return value.contains("*");
     }
     
     public static boolean containsEscapedPercent(String value) {
@@ -107,16 +111,17 @@ public final class SearchUtils {
         sb.append(" WHERE ");
     }
     
-    public static String conditionTypeToSqlOperator(ConditionType ct, String value) {
+    public static String conditionTypeToSqlOperator(ConditionType ct, String value, String originalValue) {
         // TODO : if we have the same column involved, ex a >= 123 and a <=244 then 
         // we may try to use IN or BETWEEN, depending on the values
+        final boolean wildcardAvailable = SearchUtils.containsWildcard(originalValue);
         String op;
         switch (ct) {
         case EQUALS:
-            op = containsEscapedPercent(value) || value.contains("%") ? "LIKE" : "=";
+            op = wildcardAvailable ? "LIKE" : "=";
             break;
         case NOT_EQUALS:
-            op = containsEscapedPercent(value) || value.contains("%") ? "NOT LIKE" : "<>";
+            op = wildcardAvailable ? "NOT LIKE" : "<>";
             break;
         case GREATER_THAN:
             op = ">";
