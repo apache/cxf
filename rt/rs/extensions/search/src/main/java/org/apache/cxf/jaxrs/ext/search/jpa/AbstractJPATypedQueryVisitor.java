@@ -198,11 +198,15 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
             break;
         case EQUALS:
             if (clazz.equals(String.class)) {
-                String theValue = SearchUtils.toSqlWildcardString(value.toString(), isWildcardStringMatch());
-                if (SearchUtils.containsEscapedPercent(theValue)) {
-                    pred = builder.like((Expression<String>)exp, theValue, '\\');
-                } else if (theValue.contains("%")) {
-                    pred = builder.like((Expression<String>)exp, theValue);
+                final String originalValue = value.toString();
+                
+                String theValue = SearchUtils.toSqlWildcardString(originalValue, isWildcardStringMatch());
+                if (SearchUtils.containsWildcard(originalValue)) {
+                    if (SearchUtils.containsEscapedChar(theValue)) {
+                        pred = builder.like((Expression<String>)exp, theValue, '\\');
+                    } else {                
+                        pred = builder.like((Expression<String>)exp, theValue);
+                    }
                 } else {
                     pred = builder.equal(exp, clazz.cast(value));
                 }
@@ -212,11 +216,15 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
             break;
         case NOT_EQUALS:
             if (clazz.equals(String.class)) {
-                String theValue = SearchUtils.toSqlWildcardString(value.toString(), isWildcardStringMatch());
-                if (SearchUtils.containsEscapedPercent(theValue)) {
-                    pred = builder.notLike((Expression<String>)exp, theValue, '\\');
-                } else if (theValue.contains("%")) {
-                    pred = builder.notLike((Expression<String>)exp, theValue);
+                final String originalValue = value.toString();
+                
+                String theValue = SearchUtils.toSqlWildcardString(originalValue, isWildcardStringMatch());
+                if (SearchUtils.containsWildcard(originalValue)) {
+                    if (SearchUtils.containsEscapedChar(theValue)) {
+                        pred = builder.notLike((Expression<String>)exp, theValue, '\\');
+                    } else {                
+                        pred = builder.notLike((Expression<String>)exp, theValue);
+                    }
                 } else {
                     pred = builder.notEqual(exp, clazz.cast(value));
                 }

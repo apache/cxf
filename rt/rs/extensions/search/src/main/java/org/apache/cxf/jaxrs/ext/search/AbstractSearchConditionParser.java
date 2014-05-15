@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Collections;
@@ -34,6 +36,8 @@ import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheck;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public abstract class AbstractSearchConditionParser<T> implements SearchConditionParser<T> {
@@ -105,7 +109,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         if (index == -1) {
             Object castedValue = value;
             if (Date.class.isAssignableFrom(valueType)) {
-                castedValue = convertToDate(value);
+                castedValue = convertToDate(valueType, value);
             } else {
                 boolean isPrimitive = InjectionUtils.isPrimitive(valueType);
                 boolean isPrimitiveOrEnum = isPrimitive || valueType.isEnum();
@@ -157,7 +161,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                 boolean isPrimitive = !returnCollection 
                     && InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
                 boolean lastTry = names.length == 2 
-                    && (isPrimitive || returnType == Date.class || returnCollection);
+                    && (isPrimitive || Date.class.isAssignableFrom(returnType) || returnCollection);
                 
                 Object valueObject = ownerBean != null ? ownerBean 
                     : actualType.isInterface() 
@@ -170,7 +174,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                 if (lastTry) {
                     if (!returnCollection) {
                         nextObject = isPrimitive ? InjectionUtils.convertStringToPrimitive(value, returnType) 
-                            : convertToDate(value);
+                            : convertToDate(returnType, value);
                     } else {
                         CollectionCheck collCheck = getCollectionCheck(originalPropName, true, actualReturnType);
                         if (collCheck == null) {
@@ -249,18 +253,20 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         }
     }
     
-    private Object convertToDate(String value) throws SearchParseException {
+    private Object convertToDate(Class<?> valueType, String value) throws SearchParseException {
+        
+        Message m = JAXRSUtils.getCurrentMessage();
+        Object obj = InjectionUtils.createFromParameterHandler(value, valueType, new Annotation[]{}, m);
+        if (obj != null) {
+            return obj;
+        }
+        
         try {
-            DateFormat df = SearchUtils.getDateFormat(contextProperties);
-            String dateValue = value;
-            if (SearchUtils.isTimeZoneSupported(contextProperties, Boolean.FALSE)) {
-                // zone in XML is "+01:00" in Java is "+0100"; stripping semicolon
-                int idx = value.lastIndexOf(':');
-                if (idx != -1) {
-                    dateValue = value.substring(0, idx) + value.substring(idx + 1);
-                }
+            if (Timestamp.class.isAssignableFrom(valueType)) {
+                return convertToTimestamp(value);
+            } else {
+                return convertToDefaultDate(value);
             }
-            return df.parse(dateValue);
         } catch (ParseException e) {
             // is that duration?
             try {
@@ -273,6 +279,24 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                 throw new SearchParseException("Can parse " + value + " neither as date nor duration", e);
             }
         }
+    }
+    
+    private Timestamp convertToTimestamp(String value) throws ParseException {
+        Date date = convertToDefaultDate(value);
+        return new Timestamp(date.getTime());
+    }
+    
+    private Date convertToDefaultDate(String value) throws ParseException {
+        DateFormat df = SearchUtils.getDateFormat(contextProperties);
+        String dateValue = value;
+        if (SearchUtils.isTimeZoneSupported(contextProperties, Boolean.FALSE)) {
+            // zone in XML is "+01:00" in Java is "+0100"; stripping semicolon
+            int idx = value.lastIndexOf(':');
+            if (idx != -1) {
+                dateValue = value.substring(0, idx) + value.substring(idx + 1);
+            }
+        }
+        return df.parse(dateValue);
     }
     
     private String getMethodNameSuffix(String name) {

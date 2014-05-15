@@ -68,10 +68,10 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
         if (statement != null) {
             if (statement.getProperty() != null) {
                 String name = getRealPropertyName(statement.getProperty());
-                String value = getPropertyValue(name, statement.getValue());
-                validatePropertyValue(name, value);
+                String originalValue = getPropertyValue(name, statement.getValue());
+                validatePropertyValue(name, originalValue);
                 
-                value = SearchUtils.toSqlWildcardString(value, isWildcardStringMatch());
+                String value = SearchUtils.toSqlWildcardString(originalValue, isWildcardStringMatch());
                 value = SearchUtils.duplicateSingleQuoteIfNeeded(value);
                 
                 if (tableAlias != null) {
@@ -79,7 +79,8 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
                 }
                 
                 sb.append(name).append(" ").append(
-                            SearchUtils.conditionTypeToSqlOperator(sc.getConditionType(), value))
+                            SearchUtils.conditionTypeToSqlOperator(sc.getConditionType(), value, 
+                                                                   originalValue))
                             .append(" ").append("'").append(value).append("'");
             }
         } else {
