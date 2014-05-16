@@ -71,7 +71,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         final Exchange exchange = message.getExchange(); 
         
         exchange.put(Message.REST_MESSAGE, Boolean.TRUE);
-        if (exchange.get(Response.class) == null) {
+        Response response = exchange.get(Response.class);
+        if (response == null) {
             try {
                 processRequest(message, exchange);
                 if (exchange.isOneWay()) {
@@ -84,9 +85,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
         
-        Response r = exchange.get(Response.class);
-        if (r != null) {
-            createOutMessage(message, r);
+        response = exchange.get(Response.class);
+        if (response != null) {
+            createOutMessage(message, response);
             message.getInterceptorChain().doInterceptStartingAt(message,
                                                                 OutgoingChainInterceptor.class.getName());
         }
