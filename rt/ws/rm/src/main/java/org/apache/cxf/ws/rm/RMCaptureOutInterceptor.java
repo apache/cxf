@@ -142,12 +142,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         
         Map<?, ?> invocationContext = (Map<?, ?>)msg.get(Message.INVOCATION_CONTEXT);
-        
-        // special check for closing RM 1.0 sequence with no application message
-        //  need to generate Sequence header for the LastMessage element anyway, in this case
-        boolean close10 = isLastMessage && RM10Constants.NAMESPACE_URI.equals(rmNamespace) && invocationContext != null;
-        
-        if ((isApplicationMessage || close10) && !isPartialResponse) {
+        if ((isApplicationMessage || (isLastMessage && invocationContext != null)) && !isPartialResponse) {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("inbound sequence: " + (null == inSeqId ? "null" : inSeqId.getValue()));
             }
