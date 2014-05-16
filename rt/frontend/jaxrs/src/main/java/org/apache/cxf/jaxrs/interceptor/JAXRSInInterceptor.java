@@ -71,16 +71,17 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         final Exchange exchange = message.getExchange(); 
         
         exchange.put(Message.REST_MESSAGE, Boolean.TRUE);
-        
-        try {
-            processRequest(message);
-            if (exchange.isOneWay()) {
-                ServerProviderFactory.getInstance(message).clearThreadLocalProxies();
+        if (exchange.get(Response.class) == null) {
+            try {
+                processRequest(message, exchange);
+                if (exchange.isOneWay()) {
+                    ServerProviderFactory.getInstance(message).clearThreadLocalProxies();
+                }
+            } catch (Fault ex) {
+                convertExceptionToResponseIfPossible(ex.getCause(), message);
+            } catch (RuntimeException ex) {
+                convertExceptionToResponseIfPossible(ex, message);
             }
-        } catch (Fault ex) {
-            convertExceptionToResponseIfPossible(ex.getCause(), message);
-        } catch (RuntimeException ex) {
-            convertExceptionToResponseIfPossible(ex, message);
         }
         
         Response r = exchange.get(Response.class);
@@ -91,7 +92,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
     
-    private void processRequest(Message message) {
+    private void processRequest(Message message, Exchange exchange) {
         
         ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(message);
         
@@ -149,7 +150,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         } catch (IllegalArgumentException ex) {
             throw ExceptionUtils.toNotAcceptableException(null, null);
         }
-        message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
+        exchange.put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
 
         //1. Matching target resource class
         List<ClassResourceInfo> resources = JAXRSUtils.getRootResources(message);
@@ -174,11 +175,11 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         try {                
             ori = JAXRSUtils.findTargetMethod(matchedResources, message, 
                       httpMethod, matchedValues, requestContentType, acceptContentTypes, true);
-            setExchangeProperties(message, ori, matchedValues, resources.size());
+            setExchangeProperties(message, exchange, ori, matchedValues, resources.size());
         } catch (WebApplicationException ex) {
             if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), httpMethod)) {
                 Response response = JAXRSUtils.createResponse(resources, null, null, 200, true);
-                message.getExchange().put(Response.class, response);
+                exchange.put(Response.class, response);
                 return;
             } else {
                 throw ex;
@@ -194,8 +195,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
             LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
         }
-        
-        setExchangeProperties(message, ori, matchedValues, resources.size());
         
         // Global and name-bound post-match request filters
         if (JAXRSUtils.runContainerRequestFilters(providerFactory,
@@ -230,10 +229,11 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         message.getExchange().put(Throwable.class, ex);
     }
     
-    private void setExchangeProperties(Message message, OperationResourceInfo ori, 
-                                      MultivaluedMap<String, String> values,
-                                      int numberOfResources) {
-        final Exchange exchange = message.getExchange();
+    private void setExchangeProperties(Message message,
+                                       Exchange exchange,
+                                       OperationResourceInfo ori, 
+                                       MultivaluedMap<String, String> values,
+                                       int numberOfResources) {
         final ClassResourceInfo cri = ori.getClassResourceInfo();
         exchange.put(OperationResourceInfo.class, ori);
         exchange.put(JAXRSUtils.ROOT_RESOURCE_CLASS, cri);
