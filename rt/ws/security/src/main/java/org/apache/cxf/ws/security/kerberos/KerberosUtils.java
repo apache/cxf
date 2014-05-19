@@ -19,6 +19,9 @@
 
 package org.apache.cxf.ws.security.kerberos;
 
+import javax.security.auth.callback.CallbackHandler;
+
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.SecurityConstants;
 
@@ -36,8 +39,35 @@ public final class KerberosUtils {
             .getContextualProperty(SecurityConstants.KERBEROS_CLIENT);
         if (client == null) {
             client = new KerberosClient();
+            
+            String jaasContext = 
+                (String)message.getContextualProperty(SecurityConstants.KERBEROS_JAAS_CONTEXT_NAME);
+            String kerberosSpn = 
+                (String)message.getContextualProperty(SecurityConstants.KERBEROS_SPN);
+            CallbackHandler callbackHandler = 
+                getCallbackHandler(
+                    message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER)
+                );
+            client.setContextName(jaasContext);
+            client.setServiceName(kerberosSpn);
+            client.setCallbackHandler(callbackHandler);
         }
         return client;
+    }
+    
+    private static CallbackHandler getCallbackHandler(Object o) {
+        CallbackHandler handler = null;
+        if (o instanceof CallbackHandler) {
+            handler = (CallbackHandler)o;
+        } else if (o instanceof String) {
+            try {
+                handler = (CallbackHandler)ClassLoaderUtils.loadClass((String)o, 
+                                                                      KerberosUtils.class).newInstance();
+            } catch (Exception e) {
+                handler = null;
+            }
+        }
+        return handler;
     }
     
 }
