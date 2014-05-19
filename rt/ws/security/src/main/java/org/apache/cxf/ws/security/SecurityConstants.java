@@ -249,12 +249,12 @@ public final class SecurityConstants {
     public static final String SPNEGO_CLIENT_ACTION = "ws-security.spnego.client.action";
     
     /**
-     * The JAAS Context name to use for Kerberos. This is currently only supported for SPNEGO.
+     * The JAAS Context name to use for Kerberos.
      */
     public static final String KERBEROS_JAAS_CONTEXT_NAME = "ws-security.kerberos.jaas.context";
     
     /**
-     * The Kerberos Service Provider Name (spn) to use. This is currently only supported for SPNEGO.
+     * The Kerberos Service Provider Name (spn) to use.
      */
     public static final String KERBEROS_SPN = "ws-security.kerberos.spn";
     
