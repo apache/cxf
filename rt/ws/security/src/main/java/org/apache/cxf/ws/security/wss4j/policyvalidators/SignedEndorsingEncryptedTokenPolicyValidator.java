@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+<<<<<<< HEAD
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
@@ -37,6 +38,21 @@ import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.ws.security.WSSecurityEngineResult;
+=======
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
+import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.KerberosToken;
+import org.apache.wss4j.policy.model.KeyValueToken;
+import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SecurityContextToken;
+import org.apache.wss4j.policy.model.SpnegoContextToken;
+import org.apache.wss4j.policy.model.SupportingTokens;
+import org.apache.wss4j.policy.model.UsernameToken;
+import org.apache.wss4j.policy.model.X509Token;
+>>>>>>> 0dcfa2f... [CXF-5750,CXF-5751] - Support SpnegoContextTokens with the TransportBinding, Support policy validation for SupportingToken SpnegoContextTokens
 
 /**
  * Validate a SignedEndorsingEncryptedSupportingToken policy. 
@@ -108,7 +124,8 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
                     if (!processUsernameTokens()) {
                         processingFailed = true;
                     }
-                } else if (token instanceof SecurityContextToken) {
+                } else if (token instanceof SecurityContextToken
+                    || token instanceof SpnegoContextToken) {
                     if (!processSCTokens()) {
                         processingFailed = true;
                     }
