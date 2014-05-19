@@ -46,12 +46,7 @@ import org.junit.BeforeClass;
 @org.junit.Ignore
 public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
-<<<<<<< HEAD
-=======
     static final String PORT2 = allocatePort(Server.class, 2);
-    static final String STAX_PORT = allocatePort(StaxServer.class);
-    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
->>>>>>> 0dcfa2f... [CXF-5750,CXF-5751] - Support SpnegoContextTokens with the TransportBinding, Support policy validation for SupportingToken SpnegoContextTokens
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -142,11 +137,6 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
             return;
         }
         
-        if (test.isStreaming()) {
-            // TODO Supporting streaming Snego outbound
-            return;
-        }
-
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SpnegoTokenTest.class.getResource("client.xml");
 
@@ -159,15 +149,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSpnegoTransportPort");
         DoubleItPortType spnegoPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        String portNumber = PORT2;
-        if (STAX_PORT.equals(test.getPort())) {
-            portNumber = STAX_PORT2;
-        }
-        updateAddressPort(spnegoPort, portNumber);
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(spnegoPort);
-        }
+        updateAddressPort(spnegoPort, PORT2);
         
         spnegoPort.doubleIt(25);
         
@@ -181,11 +163,6 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
             return;
         }
         
-        if (test.isStreaming()) {
-            // TODO Supporting streaming Snego outbound
-            return;
-        }
-
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SpnegoTokenTest.class.getResource("client.xml");
 
@@ -198,15 +175,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSpnegoTransportEndorsingPort");
         DoubleItPortType spnegoPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        String portNumber = PORT2;
-        if (STAX_PORT.equals(test.getPort())) {
-            portNumber = STAX_PORT2;
-        }
-        updateAddressPort(spnegoPort, portNumber);
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(spnegoPort);
-        }
+        updateAddressPort(spnegoPort, PORT2);
         
         spnegoPort.doubleIt(25);
         

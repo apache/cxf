@@ -89,6 +89,7 @@ import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
+import org.apache.cxf.ws.security.policy.model.SpnegoContextToken;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
@@ -101,7 +102,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.Assertion;
-<<<<<<< HEAD
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
@@ -131,72 +132,6 @@ import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.util.WSSecurityUtil;
-=======
-import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
-import org.apache.wss4j.common.crypto.PasswordEncryptor;
-import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.WSSecBase;
-import org.apache.wss4j.dom.message.WSSecDKSign;
-import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.WSSecSignature;
-import org.apache.wss4j.dom.message.WSSecSignatureConfirmation;
-import org.apache.wss4j.dom.message.WSSecTimestamp;
-import org.apache.wss4j.dom.message.WSSecUsernameToken;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
-import org.apache.wss4j.dom.message.token.X509Security;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.policy.SPConstants;
-import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
-import org.apache.wss4j.policy.model.AbstractBinding;
-import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
-import org.apache.wss4j.policy.model.AbstractToken;
-import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
-import org.apache.wss4j.policy.model.AbstractTokenWrapper;
-import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
-import org.apache.wss4j.policy.model.AsymmetricBinding;
-import org.apache.wss4j.policy.model.Attachments;
-import org.apache.wss4j.policy.model.ContentEncryptedElements;
-import org.apache.wss4j.policy.model.EncryptedElements;
-import org.apache.wss4j.policy.model.EncryptedParts;
-import org.apache.wss4j.policy.model.Header;
-import org.apache.wss4j.policy.model.IssuedToken;
-import org.apache.wss4j.policy.model.KerberosToken;
-import org.apache.wss4j.policy.model.KeyValueToken;
-import org.apache.wss4j.policy.model.Layout.LayoutType;
-import org.apache.wss4j.policy.model.SamlToken;
-import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
-import org.apache.wss4j.policy.model.SecureConversationToken;
-import org.apache.wss4j.policy.model.SecurityContextToken;
-import org.apache.wss4j.policy.model.SignedElements;
-import org.apache.wss4j.policy.model.SignedParts;
-import org.apache.wss4j.policy.model.SpnegoContextToken;
-import org.apache.wss4j.policy.model.SupportingTokens;
-import org.apache.wss4j.policy.model.SymmetricBinding;
-import org.apache.wss4j.policy.model.UsernameToken;
-import org.apache.wss4j.policy.model.Wss10;
-import org.apache.wss4j.policy.model.Wss11;
-import org.apache.wss4j.policy.model.X509Token;
-import org.apache.wss4j.policy.model.X509Token.TokenType;
->>>>>>> 0dcfa2f... [CXF-5750,CXF-5751] - Support SpnegoContextTokens with the TransportBinding, Support policy validation for SupportingToken SpnegoContextTokens
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -548,12 +483,8 @@ public abstract class AbstractBindingBuilder {
                 && (token instanceof IssuedToken
                     || token instanceof SecureConversationToken
                     || token instanceof SecurityContextToken
-<<<<<<< HEAD
-                    || token instanceof KerberosToken)) {
-=======
                     || token instanceof KerberosToken
-                    || token instanceof SpnegoContextToken) {
->>>>>>> 0dcfa2f... [CXF-5750,CXF-5751] - Support SpnegoContextTokens with the TransportBinding, Support policy validation for SupportingToken SpnegoContextTokens
+                    || token instanceof SpnegoContextToken)) {
                 //ws-trust/ws-sc stuff.......
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
