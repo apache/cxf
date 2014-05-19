@@ -1577,23 +1577,37 @@ public abstract class AbstractBindingBuilder {
         policyAsserted(wrapper);
         
         if (!tokenTypeSet) {
+<<<<<<< HEAD
             if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER) {
+=======
+            boolean requestor = isRequestor();
+            if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_NEVER
+                || token instanceof X509Token 
+                && ((token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
+                    && !requestor) 
+                || (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR
+                    && requestor))) {
+>>>>>>> 1091ca3... Minor changes to how tokens are referenced
                 Wss10 wss = getWss10();
                 policyAsserted(wss);
                 if (wss == null || wss.isMustSupportRefKeyIdentifier()) {
                     secBase.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
                 } else if (wss.isMustSupportRefIssuerSerial()) {
                     secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-                } else if (wss instanceof Wss11
-                                && ((Wss11) wss).isMustSupportRefThumbprint()) {
+                } else if (wss instanceof Wss11 && ((Wss11) wss).isMustSupportRefThumbprint()) {
                     secBase.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+                } else {
+                    secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
                 }
+<<<<<<< HEAD
             } else if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
                 && !isRequestor() && token instanceof X509Token) {
                 secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             } else if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR
                 && isRequestor() && token instanceof X509Token) {
                 secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+=======
+>>>>>>> 1091ca3... Minor changes to how tokens are referenced
             } else {
                 secBase.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
             }
