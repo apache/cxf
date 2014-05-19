@@ -107,7 +107,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     utBuilder.prepare(saaj.getSOAPPart());
                     utBuilder.appendToHeader(secHeader);
                 }
-            } else if (token instanceof IssuedToken || token instanceof KerberosToken) {
+            } else if (token instanceof IssuedToken || token instanceof KerberosToken
+                || token instanceof SpnegoContextToken) {
                 SecurityToken secTok = getSecurityToken();
                 
                 if (isTokenRequired(token.getIncludeTokenType())) {

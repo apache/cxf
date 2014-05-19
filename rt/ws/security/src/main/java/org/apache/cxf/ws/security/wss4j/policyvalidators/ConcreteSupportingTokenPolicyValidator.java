@@ -33,6 +33,7 @@ import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SecurityContextToken;
+import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SupportingTokens;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
@@ -103,7 +104,8 @@ public class ConcreteSupportingTokenPolicyValidator extends AbstractSupportingTo
                     if (!processKeyValueTokens()) {
                         processingFailed = true;
                     }
-                } else if (token instanceof SecurityContextToken) {
+                } else if (token instanceof SecurityContextToken
+                    || token instanceof SpnegoContextToken) {
                     if (!processSCTokens()) {
                         processingFailed = true;
                     }

@@ -50,7 +50,9 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String PORT2 = allocatePort(Server.class, 2);
     static final String STAX_PORT = allocatePort(StaxServer.class);
+    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -193,4 +195,81 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testSpnegoOverTransport() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
+        if (test.isStreaming()) {
+            // TODO Supporting streaming Snego outbound
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SpnegoTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SpnegoTokenTest.class.getResource("DoubleItSpnego.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSpnegoTransportPort");
+        DoubleItPortType spnegoPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(spnegoPort, portNumber);
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(spnegoPort);
+        }
+        
+        spnegoPort.doubleIt(25);
+        
+        ((java.io.Closeable)spnegoPort).close();
+    }
+    
+    @org.junit.Test
+    public void testSpnegoOverTransportEndorsing() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
+        if (test.isStreaming()) {
+            // TODO Supporting streaming Snego outbound
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SpnegoTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SpnegoTokenTest.class.getResource("DoubleItSpnego.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSpnegoTransportEndorsingPort");
+        DoubleItPortType spnegoPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(spnegoPort, portNumber);
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(spnegoPort);
+        }
+        
+        spnegoPort.doubleIt(25);
+        
+        ((java.io.Closeable)spnegoPort).close();
+    }
 }

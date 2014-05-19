@@ -132,6 +132,7 @@ import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.SecurityContextToken;
 import org.apache.wss4j.policy.model.SignedElements;
 import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SupportingTokens;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
@@ -418,7 +419,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             } else if (token instanceof IssuedToken
                     || token instanceof SecureConversationToken
                     || token instanceof SecurityContextToken
-                    || token instanceof KerberosToken) {
+                    || token instanceof KerberosToken
+                    || token instanceof SpnegoContextToken) {
                 //ws-trust/ws-sc stuff.......
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
