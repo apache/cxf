@@ -96,6 +96,23 @@
        </jaxws:properties> 
      
     </jaxws:endpoint> 
+
+    <jaxws:endpoint 
+       id="KerberosOverTransport2"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransport2" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItKerberosTransportPort2"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+           <entry key="ws-security.is-bsp-compliant" value="false"/>
+           <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
     
     <jaxws:endpoint 
        id="KerberosOverSymmetric"

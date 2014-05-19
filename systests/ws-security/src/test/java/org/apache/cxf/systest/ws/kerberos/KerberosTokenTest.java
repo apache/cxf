@@ -100,7 +100,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     public void testKerberosOverTransportDifferentConfiguration() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = KerberosTokenTest.class.getResource("client.xml");
+        URL busFile = KerberosTokenTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -111,16 +111,8 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItKerberosTransportPort2");
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        String portNumber = PORT2;
-        if (STAX_PORT.equals(test.getPort())) {
-            portNumber = STAX_PORT2;
-        }
-        updateAddressPort(kerberosPort, portNumber);
         
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(kerberosPort);
-        }
-        
+        updateAddressPort(kerberosPort, PORT2);
         kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
