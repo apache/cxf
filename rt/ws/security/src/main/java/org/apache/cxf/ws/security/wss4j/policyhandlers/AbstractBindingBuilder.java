@@ -1577,17 +1577,13 @@ public abstract class AbstractBindingBuilder {
         policyAsserted(wrapper);
         
         if (!tokenTypeSet) {
-<<<<<<< HEAD
-            if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER) {
-=======
             boolean requestor = isRequestor();
-            if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_NEVER
+            if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER
                 || token instanceof X509Token 
-                && ((token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
+                && ((token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
                     && !requestor) 
-                || (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR
+                || (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR
                     && requestor))) {
->>>>>>> 1091ca3... Minor changes to how tokens are referenced
                 Wss10 wss = getWss10();
                 policyAsserted(wss);
                 if (wss == null || wss.isMustSupportRefKeyIdentifier()) {
@@ -1599,15 +1595,6 @@ public abstract class AbstractBindingBuilder {
                 } else {
                     secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
                 }
-<<<<<<< HEAD
-            } else if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
-                && !isRequestor() && token instanceof X509Token) {
-                secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-            } else if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR
-                && isRequestor() && token instanceof X509Token) {
-                secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-=======
->>>>>>> 1091ca3... Minor changes to how tokens are referenced
             } else {
                 secBase.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
             }
