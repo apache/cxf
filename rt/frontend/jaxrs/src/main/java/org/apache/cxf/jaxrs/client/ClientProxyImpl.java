@@ -203,13 +203,16 @@ public class ClientProxyImpl extends AbstractClient implements
         
         headers.putAll(paramHeaders);
         setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
-            bodyIndex == -1 ? null : params[bodyIndex].getClass(), m.getReturnType());
+            bodyIndex == -1 || params[bodyIndex] == null ? null : params[bodyIndex].getClass(), m.getReturnType());
         
         getState().setTemplates(getTemplateParametersMap(ori.getURITemplate(), pathParams));
         
         Object body = null;
         if (bodyIndex != -1) {
             body = params[bodyIndex];
+            if (body == null) {
+                bodyIndex = -1;
+            }
         } else if (types.containsKey(ParameterType.FORM))  {
             body = handleForm(m, params, types, beanParamsList);
         } else if (types.containsKey(ParameterType.REQUEST_BODY))  {
