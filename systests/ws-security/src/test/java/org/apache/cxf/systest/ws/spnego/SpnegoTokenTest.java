@@ -138,7 +138,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         }
         
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SpnegoTokenTest.class.getResource("client.xml");
+        URL busFile = SpnegoTokenTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -164,7 +164,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         }
         
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SpnegoTokenTest.class.getResource("client.xml");
+        URL busFile = SpnegoTokenTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
