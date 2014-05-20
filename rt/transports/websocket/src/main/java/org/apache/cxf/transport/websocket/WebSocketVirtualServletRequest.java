@@ -75,6 +75,10 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
             throw new InvalidPathException();
         }
         this.attributes = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
+        Object v = websocket.getAttribute("org.apache.cxf.transport.endpoint.address");
+        if (v != null) {
+            attributes.put("org.apache.cxf.transport.endpoint.address", v);
+        }
     }
 
     @Override

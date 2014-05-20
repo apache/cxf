@@ -264,6 +264,10 @@
         <bundle dependency="true">mvn:org.apache.mina/mina-core/${cxf.mina.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-udp/${project.version}</bundle>
     </feature>
+    <feature name="cxf-transports-websocket" version="${project.version}" resolver="(obr)">
+        <feature version="[3,4)">cxf-http</feature>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-websocket/${project.version}</bundle>
+    </feature>
     <feature name="cxf-javascript" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-bindings-soap</feature>
