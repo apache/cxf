@@ -27,6 +27,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -164,10 +165,17 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
     private static class JettyWebSocketServletHolder implements WebSocketServletHolder {
         private JettyWebSocket webSocket;
         private Map<String, Object> requestProperties;
-
+        private Map<String, Object> requestAttributes;
+        
         public JettyWebSocketServletHolder(JettyWebSocket webSocket, HttpServletRequest request) {
             this.webSocket = webSocket;
             this.requestProperties = readProperties(request);
+            this.requestAttributes = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
+            // attributes that are needed for finding the operation in some cases
+            Object v = request.getAttribute("org.apache.cxf.transport.endpoint.address");
+            if (v != null) {
+                requestAttributes.put("org.apache.cxf.transport.endpoint.address", v);
+            }
         }
 
         @SuppressWarnings("unchecked")
@@ -200,7 +208,7 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             properties.put("secure", request.isSecure());
             properties.put("authType", request.getAuthType());
             properties.put("dispatcherType", request.getDispatcherType());
-            
+
             return properties;
         }
 
@@ -317,6 +325,11 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         @Override
         public Principal getUserPrincipal() {
             return getRequestProperty("userPrincipal", Principal.class);
+        }
+
+        @Override
+        public Object getAttribute(String name) {
+            return requestAttributes.get(name);
         }
 
         @Override

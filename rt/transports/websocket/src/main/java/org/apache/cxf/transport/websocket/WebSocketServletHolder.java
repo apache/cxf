@@ -54,5 +54,6 @@ public interface WebSocketServletHolder {
     ServletContext getServletContext();
     int getServerPort();
     Principal getUserPrincipal();
+    Object getAttribute(String name);
     void write(byte[] data, int offset, int length) throws IOException;
 }

@@ -294,6 +294,11 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
         }
 
         @Override
+        public Object getAttribute(String name) {
+            return webSocket.resource().getRequest().getAttribute(name);
+        }
+
+        @Override
         public void write(byte[] data, int offset, int length) throws IOException {
             webSocket.write(data, offset, length);
         }
