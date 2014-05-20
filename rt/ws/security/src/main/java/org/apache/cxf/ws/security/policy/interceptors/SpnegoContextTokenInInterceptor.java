@@ -37,6 +37,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
@@ -190,6 +191,11 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());
             token.setTokenType(sct.getTokenType());
+            
+            SecurityContext sc = exchange.getInMessage().get(SecurityContext.class);
+            if (sc != null) {
+                token.setSecurityContext(sc);
+            }
             
             writer.getCurrentNode().appendChild(sct.getElement());
             writer.writeEndElement();        
