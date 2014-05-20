@@ -116,14 +116,69 @@ public class Java2WADLMojo extends AbstractMojo {
      */
     private boolean useJson;
 
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean singleResourceMultipleMethods;
    
-      
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean useSingleSlashResource;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean ignoreForwardSlash;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean addResourceAndMethodIds;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean linkJsonToXmlSchema;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean checkAbsolutePathSlash;
+    
+    /**
+     * @parameter
+     */
+    private String applicationTitle;
+    
+    /**
+     * @parameter
+     */
+    private String namespacePrefix;
+    
     public void execute() throws MojoExecutionException {
         getResourcesList();
         WadlGenerator wadlGenernator = new WadlGenerator(getBus());
+        setExtraProperties(wadlGenerator);
         StringBuilder sbMain = wadlGenernator.generateWADL(getBaseURI(), classResourceInfos, useJson, null, null);
         getLog().debug("the wadl is =====> \n" + sbMain.toString());
         generateWadl(sbMain.toString());
+    }
+    
+    private void setExtraProperties(WadlGenerator wg) {
+        wg.setSingleResourceMultipleMethods(singleResourceMultipleMethods);
+        wg.setUseSingleSlashResource(useSingleSlashResource);
+        wg.setIgnoreForwardSlash(ignoreForwardSlash);
+        wg.setAddResourceAndMethodIds(addResourceAndMethodIds);
+        wg.setLinkJsonToXmlSchema(linkJsonToXmlSchema);
+        wg.setCheckAbsolutePathSlash(checkAbsolutePathSlash);
+         
+        if (applicationTitle != null) {
+            wg.setApplicationTitle(applicationTitle);
+        } 
+        if (namespacePrefix != null) {
+            wg.setNamespacePrefix(namespacePrefix);
+        }
     }
     
     private void generateWadl(String wadl) throws MojoExecutionException {
