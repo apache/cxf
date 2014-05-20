@@ -418,9 +418,11 @@ public class BookStore {
     @Path("/collectionBook")
     @Produces({"application/xml", "application/json" })
     @Consumes({"application/xml", "application/json" })
-    public List<Book> postBookGetCollection(Book book) throws Exception {
+    public List<Book> postBookGetCollection(@Nullable Book book) throws Exception {
         List<Book> list = new ArrayList<Book>();
-        list.add(book);
+        if (book != null) {
+            list.add(book);
+        }
         return list;
     }
     

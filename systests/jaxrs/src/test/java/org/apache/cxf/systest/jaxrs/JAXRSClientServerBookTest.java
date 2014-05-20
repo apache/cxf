@@ -347,6 +347,17 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testPostNullGetEmptyCollectionProxy() throws Exception {
+        
+        String endpointAddress = "http://localhost:" + PORT; 
+        BookStore bs = JAXRSClientFactory.create(endpointAddress, BookStore.class);
+        List<Book> books = bs.postBookGetCollection(null);
+        assertNotNull(books);
+        assertEquals(0, books.size());
+        
+    }
+    
+    @Test
     public void testPostObjectGetCollection() throws Exception {
         
         String endpointAddress =
