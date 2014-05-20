@@ -50,6 +50,7 @@
         <module>jax_rs/content_negotiation</module>
         <module>jax_rs/basic_https</module>
         <module>jax_rs/basic</module>
+        <module>jax_rs/websocket</module>
         <module>callback</module>
         <module>wsdl_first_pure_xml</module>
         <module>jaxws_dispatch_provider</module>
