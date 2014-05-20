@@ -166,7 +166,7 @@ public class ClientProxyImpl extends AbstractClient implements
         
         List<Object> pathParams = getPathParamValues(m, params, types, beanParamsList, ori);
         
-        int bodyIndex = getBodyIndex(types, ori);
+        int bodyIndex = getBodyIndex(types, ori, params);
         
         UriBuilder builder = getCurrentBuilder().clone(); 
         if (isRoot) {
@@ -205,13 +205,16 @@ public class ClientProxyImpl extends AbstractClient implements
         
         headers.putAll(paramHeaders);
         setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
-            bodyIndex == -1 ? null : params[bodyIndex].getClass(), m.getReturnType());
+            bodyIndex == -1 || params[bodyIndex] == null ? null : params[bodyIndex].getClass(), m.getReturnType());
         
         getState().setTemplates(getTemplateParametersMap(ori.getURITemplate(), pathParams));
         
         Object body = null;
         if (bodyIndex != -1) {
             body = params[bodyIndex];
+            if (body == null) {
+                bodyIndex = -1;
+            }
         } else if (types.containsKey(ParameterType.FORM))  {
             body = handleForm(m, params, types, beanParamsList);
         } else if (types.containsKey(ParameterType.REQUEST_BODY))  {
@@ -275,7 +278,8 @@ public class ClientProxyImpl extends AbstractClient implements
     }
     
     private static int getBodyIndex(MultivaluedMap<ParameterType, Parameter> map, 
-                                    OperationResourceInfo ori) {
+                                    OperationResourceInfo ori,
+                                    Object[] params) {
         List<Parameter> list = map.get(ParameterType.REQUEST_BODY);
         int index = list == null || list.size() > 1 ? -1 : list.get(0).getIndex();
         if (ori.isSubResourceLocator() && index != -1) {
