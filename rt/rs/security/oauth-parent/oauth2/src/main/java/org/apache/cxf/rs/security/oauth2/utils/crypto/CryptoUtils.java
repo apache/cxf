@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.Key;
@@ -36,8 +37,10 @@ import java.security.spec.RSAPublicKeySpec;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
@@ -112,6 +115,28 @@ public final class CryptoUtils {
         }
     }
      
+    public static AlgorithmParameterSpec getContentEncryptionCipherSpec(int authTagLength, byte[] iv) {
+        // this can be overridden if needed
+        if (authTagLength > 0) {
+            return CryptoUtils.getGCMParameterSpec(authTagLength, iv);
+        } else if (iv.length > 0) {
+            return new IvParameterSpec(iv);
+        } else {
+            return null;
+        }
+    }
+    
+    public static AlgorithmParameterSpec getGCMParameterSpec(int authTagLength, byte[] iv) {
+        try {
+            // In case Java 6 compiler is used
+            Class<?> c = ClassLoaderUtils.loadClass("javax.crypto.spec.GCMParameterSpec", CryptoUtils.class);
+            Constructor<?> ctr = c.getConstructor(new Class[]{int.class, byte[].class});
+            return (AlgorithmParameterSpec)ctr.newInstance(new Object[]{authTagLength, iv});
+        } catch (Throwable t) {
+            throw new SecurityException(t);
+        }
+    }
+    
     public static byte[] signData(byte[] data, PrivateKey key, String signAlgo) {
         return signData(data, key, signAlgo, null, null);
     }
