@@ -142,11 +142,6 @@ public class Java2WADLMojo extends AbstractMojo {
     private boolean linkJsonToXmlSchema;
     
     /**
-     * @parameter default-value="false"
-     */
-    private boolean checkAbsolutePathSlash;
-    
-    /**
      * @parameter
      */
     private String applicationTitle;
@@ -158,9 +153,9 @@ public class Java2WADLMojo extends AbstractMojo {
     
     public void execute() throws MojoExecutionException {
         getResourcesList();
-        WadlGenerator wadlGenernator = new WadlGenerator(getBus());
+        WadlGenerator wadlGenerator = new WadlGenerator(getBus());
         setExtraProperties(wadlGenerator);
-        StringBuilder sbMain = wadlGenernator.generateWADL(getBaseURI(), classResourceInfos, useJson, null, null);
+        StringBuilder sbMain = wadlGenerator.generateWADL(getBaseURI(), classResourceInfos, useJson, null, null);
         getLog().debug("the wadl is =====> \n" + sbMain.toString());
         generateWadl(sbMain.toString());
     }
@@ -171,7 +166,6 @@ public class Java2WADLMojo extends AbstractMojo {
         wg.setIgnoreForwardSlash(ignoreForwardSlash);
         wg.setAddResourceAndMethodIds(addResourceAndMethodIds);
         wg.setLinkJsonToXmlSchema(linkJsonToXmlSchema);
-        wg.setCheckAbsolutePathSlash(checkAbsolutePathSlash);
          
         if (applicationTitle != null) {
             wg.setApplicationTitle(applicationTitle);
