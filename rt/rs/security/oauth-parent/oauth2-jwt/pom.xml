@@ -14,31 +14,43 @@
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
   KIND, either express or implied. See the License for the
-  specific language governing scopes and limitations
+  specific language governing permissions and limitations
   under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-rt-rs-security-oauth-parent</artifactId>
-    <packaging>pom</packaging>
-    <name>Apache CXF Runtime RS Security OAuth Parent</name>
-    <description>Apache CXF Runtime RS Security OAuth Parent</description>
+    <artifactId>cxf-rt-rs-security-oauth2-jwt</artifactId>
+    <packaging>bundle</packaging>
+    <name>Apache CXF Runtime OAuth 2.0 JWT</name>
+    <description>Apache CXF Runtime OAuth 2.0 JWT</description>
     <url>http://cxf.apache.org</url>
     <parent>
+        <artifactId>cxf-rt-rs-security-oauth-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-parent</artifactId>
         <version>3.0.1-SNAPSHOT</version>
-        <relativePath>../../../../parent/pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-    <properties>
-        <cxf.osgi.import>
-            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-        </cxf.osgi.import>
-    </properties>
-    <modules>
-        <module>oauth</module>
-        <module>oauth2</module>
-        <module>oauth2-saml</module>
-        <module>oauth2-jwt</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-security-oauth2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+         <groupId>org.bouncycastle</groupId>
+         <artifactId>bcprov-ext-jdk15on</artifactId>
+         <version>1.50</version>
+        </dependency>
+        <!--test dependencies-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
