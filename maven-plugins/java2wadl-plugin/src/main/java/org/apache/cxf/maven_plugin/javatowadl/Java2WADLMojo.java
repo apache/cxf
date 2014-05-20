@@ -121,27 +121,82 @@ public class Java2WADLMojo extends AbstractMojo {
      */
     private boolean useJson;
 
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean singleResourceMultipleMethods;
    
-      
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean useSingleSlashResource;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean ignoreForwardSlash;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean addResourceAndMethodIds;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean linkJsonToXmlSchema;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean checkAbsolutePathSlash;
+    
+    /**
+     * @parameter
+     */
+    private String applicationTitle;
+    
+    /**
+     * @parameter
+     */
+    private String namespacePrefix;
+    
     public void execute() throws MojoExecutionException {
         
         getResourcesList();
-        WadlGenerator wadlGenernator = new WadlGenerator(getBus());
+        WadlGenerator wadlGenerator = new WadlGenerator(getBus());
         DocumentationProvider documentationProvider = null;
         if (docProvider != null) {
             try {
                 documentationProvider = (DocumentationProvider)getClassLoader().loadClass(docProvider).
                     getConstructor(new Class[] {String.class}).
                     newInstance(new Object[] {project.getBuild().getDirectory()});
-                wadlGenernator.setDocumentationProvider(documentationProvider);
+                wadlGenerator.setDocumentationProvider(documentationProvider);
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
         }
-            
-        StringBuilder sbMain = wadlGenernator.generateWADL(getBaseURI(), classResourceInfos, useJson, null, null);
+        setExtraProperties(wadlGenerator);
+        
+        StringBuilder sbMain = wadlGenerator.generateWADL(getBaseURI(), classResourceInfos, useJson, null, null);
         getLog().debug("the wadl is =====> \n" + sbMain.toString());
         generateWadl(sbMain.toString());
+    }
+    
+    private void setExtraProperties(WadlGenerator wg) {
+        wg.setSingleResourceMultipleMethods(singleResourceMultipleMethods);
+        wg.setUseSingleSlashResource(useSingleSlashResource);
+        wg.setIgnoreForwardSlash(ignoreForwardSlash);
+        wg.setAddResourceAndMethodIds(addResourceAndMethodIds);
+        wg.setLinkJsonToXmlSchema(linkJsonToXmlSchema);
+        wg.setCheckAbsolutePathSlash(checkAbsolutePathSlash);
+         
+        if (applicationTitle != null) {
+            wg.setApplicationTitle(applicationTitle);
+        } 
+        if (namespacePrefix != null) {
+            wg.setNamespacePrefix(namespacePrefix);
+        }
     }
     
     private void generateWadl(String wadl) throws MojoExecutionException {
