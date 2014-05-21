@@ -27,17 +27,17 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public class JweDecryptor {
     private JweCompactConsumer jweConsumer;
-    private Key privateKey;
+    private Key decryptionKey;
     private boolean unwrap;
     private CeProvider ceProvider = new CeProvider();
-    public JweDecryptor(String jweContent, Key privateKey, boolean unwrap) {    
+    public JweDecryptor(String jweContent, Key decryptionKey, boolean unwrap) {    
         this.jweConsumer = new JweCompactConsumer(jweContent);
-        this.privateKey = privateKey;
+        this.decryptionKey = decryptionKey;
         this.unwrap = unwrap;
     }
     
-    protected Key getPrivateKey() {
-        return privateKey;
+    protected Key getDecryptionKey() {
+        return decryptionKey;
     }
     
     protected byte[] getDecryptedContentEncryptionKey() {
@@ -45,11 +45,11 @@ public class JweDecryptor {
         KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm());
         if (!unwrap) {
             keyProps.setBlockSize(getKeyCipherBlockSize());
-            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(), privateKey, keyProps);
+            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(), decryptionKey, keyProps);
         } else {
             return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(), 
                                                getContentEncryptionAlgorithm(), 
-                                               privateKey, 
+                                               decryptionKey, 
                                                keyProps).getEncoded();
         }
     }
