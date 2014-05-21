@@ -39,6 +39,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
@@ -418,7 +419,8 @@ public class RMManagerTest extends Assert {
                              (RelatesToType)EasyMock.isNull(),
                              EasyMock.eq(false),
                              EasyMock.isA(ProtocolVariation.class),
-                             EasyMock.isA(Exchange.class), EasyMock.isA(HashMap.class));
+                             EasyMock.isA(Exchange.class), 
+                             CastUtils.cast(EasyMock.isA(HashMap.class), String.class, Object.class));
         EasyMock.expectLastCall().andReturn(createResponse);
         Servant servant = control.createMock(Servant.class);
         EasyMock.expect(rme.getServant()).andReturn(servant);
