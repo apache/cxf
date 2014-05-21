@@ -134,7 +134,6 @@ public class WadlGenerator implements RequestHandler {
     private boolean ignoreForwardSlash;
     private boolean addResourceAndMethodIds;
     private boolean ignoreRequests;
-    private boolean linkJsonToXmlSchema;
     private boolean linkAnyMediaTypeToXmlSchema;
     private boolean useJaxbContextForQnames = true;
     private boolean supportCollections = true;
@@ -171,7 +170,7 @@ public class WadlGenerator implements RequestHandler {
         this.ignoreMessageWriters = other.ignoreMessageWriters;
         this.ignoreForwardSlash = other.ignoreForwardSlash; 
         this.ignoreRequests = other.ignoreRequests;
-        this.linkJsonToXmlSchema = other.linkJsonToXmlSchema;  
+        this.linkAnyMediaTypeToXmlSchema = other.linkAnyMediaTypeToXmlSchema;  
         this.privateAddresses = other.privateAddresses;
         this.resolver = other.resolver;
         this.addResourceAndMethodIds = other.addResourceAndMethodIds;
@@ -800,8 +799,7 @@ public class WadlGenerator implements RequestHandler {
                 if (isJson) {
                     sb.append(" element=\"").append(theActualType.getSimpleName()).append("\"");
                 } else if (qnameResolver != null
-                           && (mt.getSubtype().contains("xml") || linkAnyMediaTypeToXmlSchema
-                           || linkJsonToXmlSchema && mt.getSubtype().contains("json"))
+                           && (linkAnyMediaTypeToXmlSchema || mt.getSubtype().contains("xml"))
                            && jaxbTypes.contains(theActualType)) {
                     generateQName(sb, qnameResolver, clsMap, theActualType, isCollection,
                                   getBodyAnnotations(ori, inbound));
@@ -1416,7 +1414,7 @@ public class WadlGenerator implements RequestHandler {
     }
 
     public void setLinkJsonToXmlSchema(boolean link) {
-        linkJsonToXmlSchema = link;
+        setLinkAnyMediaTypeToXmlSchema(link);
     }
 
     public void setLinkAnyMediaTypeToXmlSchema(boolean link) {
