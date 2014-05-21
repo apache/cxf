@@ -134,7 +134,6 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean ignoreForwardSlash;
     private boolean addResourceAndMethodIds;
     private boolean ignoreRequests;
-    private boolean linkJsonToXmlSchema;
     private boolean linkAnyMediaTypeToXmlSchema;
     private boolean useJaxbContextForQnames = true;
     private boolean supportCollections = true;
@@ -862,8 +861,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 if (isJson) {
                     sb.append(" element=\"").append(theActualType.getSimpleName()).append("\"");
                 } else if (qnameResolver != null
-                           && (mt.getSubtype().contains("xml") || linkAnyMediaTypeToXmlSchema
-                               || linkJsonToXmlSchema && mt.getSubtype().contains("json"))
+                           && (linkAnyMediaTypeToXmlSchema || mt.getSubtype().contains("xml"))
                            && jaxbTypes.contains(theActualType)) {
                     generateQName(sb, qnameResolver, clsMap, theActualType, isCollection,
                                   getBodyAnnotations(ori, inbound));
@@ -1537,7 +1535,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     @Deprecated
     public void setLinkJsonToXmlSchema(boolean link) {
-        linkJsonToXmlSchema = link;
+        setLinkAnyMediaTypeToXmlSchema(link);
     }
     public void setLinkAnyMediaTypeToXmlSchema(boolean link) {
         linkAnyMediaTypeToXmlSchema = link;
