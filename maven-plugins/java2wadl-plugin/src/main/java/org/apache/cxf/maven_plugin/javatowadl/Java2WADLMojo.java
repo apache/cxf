@@ -139,7 +139,7 @@ public class Java2WADLMojo extends AbstractMojo {
     /**
      * @parameter default-value="false"
      */
-    private boolean linkJsonToXmlSchema;
+    private boolean linkAnyMediaTypeToXmlSchema;
     
     /**
      * @parameter
@@ -165,7 +165,7 @@ public class Java2WADLMojo extends AbstractMojo {
         wg.setUseSingleSlashResource(useSingleSlashResource);
         wg.setIgnoreForwardSlash(ignoreForwardSlash);
         wg.setAddResourceAndMethodIds(addResourceAndMethodIds);
-        wg.setLinkJsonToXmlSchema(linkJsonToXmlSchema);
+        wg.setLinkAnyMediaTypeToXmlSchema(linkAnyMediaTypeToXmlSchema);
          
         if (applicationTitle != null) {
             wg.setApplicationTitle(applicationTitle);
