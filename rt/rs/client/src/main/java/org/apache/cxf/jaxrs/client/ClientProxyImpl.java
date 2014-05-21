@@ -166,7 +166,7 @@ public class ClientProxyImpl extends AbstractClient implements
         
         List<Object> pathParams = getPathParamValues(m, params, types, beanParamsList, ori);
         
-        int bodyIndex = getBodyIndex(types, ori, params);
+        int bodyIndex = getBodyIndex(types, ori);
         
         UriBuilder builder = getCurrentBuilder().clone(); 
         if (isRoot) {
@@ -278,8 +278,7 @@ public class ClientProxyImpl extends AbstractClient implements
     }
     
     private static int getBodyIndex(MultivaluedMap<ParameterType, Parameter> map, 
-                                    OperationResourceInfo ori,
-                                    Object[] params) {
+                                    OperationResourceInfo ori) {
         List<Parameter> list = map.get(ParameterType.REQUEST_BODY);
         int index = list == null || list.size() > 1 ? -1 : list.get(0).getIndex();
         if (ori.isSubResourceLocator() && index != -1) {
