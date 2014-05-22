@@ -214,6 +214,12 @@ public class JettyHTTPServerEngineTest extends Assert {
             assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello") > 0);
         }
         
+        // check if the system property change could work
+        System.setProperty("org.apache.cxf.transports.http_jetty.DontCheckUrl", "true");
+        engine.addServant(new URL(urlStr + "/test"), handler2);
+        // clean up the System property setting
+        System.clearProperty("org.apache.cxf.transports.http_jetty.DontCheckUrl");
+        
         engine.addServant(new URL(urlStr2), handler2);
         
         Set<ObjectName>  s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
