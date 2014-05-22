@@ -21,5 +21,5 @@ package org.apache.cxf.rs.security.oauth2.jws;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 
 public interface JwsSignatureValidator {
-    void validate(JwtHeaders headers, String unsignedText, byte[] signature);
+    boolean verify(JwtHeaders headers, String unsignedText, byte[] signature);
 }

@@ -20,6 +20,6 @@ package org.apache.cxf.rs.security.oauth2.jws;
 
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 
-public interface JwsSignatureProvider {
-    byte[] sign(JwtHeaders headers, String text);
+public interface JwsSignatureVerifier {
+    byte[] sign(JwtHeaders headers, String unsignedText);
 }
