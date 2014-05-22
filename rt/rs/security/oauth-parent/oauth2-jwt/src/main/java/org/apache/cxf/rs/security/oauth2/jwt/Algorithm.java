@@ -25,7 +25,7 @@ import java.util.Map;
 
 
 
-public enum Algorithms {
+public enum Algorithm {
     // Signature
     HmacSHA256(JwtConstants.HMAC_SHA_256_ALGO),
     HmacSHA384(JwtConstants.HMAC_SHA_384_ALGO),
@@ -74,10 +74,10 @@ public enum Algorithms {
     private final String jwtName;
     private final String javaName;
 
-    private Algorithms(String jwtName) {
+    private Algorithm(String jwtName) {
         this(jwtName, null);
     }
-    private Algorithms(String jwtName, String javaName) {
+    private Algorithm(String jwtName, String javaName) {
         this.jwtName = jwtName;
         this.javaName = javaName;
     }

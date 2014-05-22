@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oauth2.jws;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithms;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
@@ -41,7 +41,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureValidator {
             return CryptoUtils.verifySignature(unsignedText.getBytes("UTF-8"), 
                                                signature, 
                                                key, 
-                                               Algorithms.toJavaName(headers.getAlgorithm()),
+                                               Algorithm.toJavaName(headers.getAlgorithm()),
                                                signatureSpec);
         } catch (Exception ex) {
             throw new SecurityException(ex);

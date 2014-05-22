@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oauth2.jws;
 import java.util.Arrays;
 
 import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithms;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
@@ -52,7 +52,7 @@ public class HmacJwsSignatureProvider implements JwsSignatureVerifier, JwsSignat
     
     private byte[] computeMac(JwtHeaders headers, String text) {
         return HmacUtils.computeHmac(key, 
-                                     Algorithms.toJavaName(headers.getAlgorithm()), 
+                                     Algorithm.toJavaName(headers.getAlgorithm()), 
                                      text);
     }
 

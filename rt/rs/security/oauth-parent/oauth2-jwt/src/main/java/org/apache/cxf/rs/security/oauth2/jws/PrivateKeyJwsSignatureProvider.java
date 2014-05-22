@@ -22,7 +22,7 @@ import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithms;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
@@ -49,7 +49,7 @@ public class PrivateKeyJwsSignatureProvider implements JwsSignatureVerifier {
         try {
             return CryptoUtils.signData(unsignedText.getBytes("UTF-8"), 
                                         key, 
-                                        Algorithms.toJavaName(headers.getAlgorithm()),
+                                        Algorithm.toJavaName(headers.getAlgorithm()),
                                         random,
                                         signatureSpec);
         } catch (Exception ex) {

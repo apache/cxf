@@ -34,7 +34,7 @@ public class JwtHeaders extends AbstractJwtObject {
         init(algorithm);
     }
     
-    public JwtHeaders(Algorithms algo) {
+    public JwtHeaders(Algorithm algo) {
         init(algo.getJwtName());
     }
     
