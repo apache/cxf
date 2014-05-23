@@ -244,7 +244,8 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         if (!StringUtils.isEmpty(ss)) {
             Iterator<String> linesIterator = Arrays.asList(causeSuffixSplitter.split(ss)).iterator();
             while (linesIterator.hasNext()) {
-                String oneLine = linesIterator.next();                if (oneLine.startsWith("Caused by:")) {
+                String oneLine = linesIterator.next();
+                if (oneLine.startsWith("Caused by:")) {
                     cause = getCause(linesIterator, oneLine);
                     break;
                 }
