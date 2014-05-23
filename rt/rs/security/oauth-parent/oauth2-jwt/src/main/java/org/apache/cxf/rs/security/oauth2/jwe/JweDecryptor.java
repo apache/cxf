@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithms;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
@@ -74,10 +74,10 @@ public class JweDecryptor {
                                                    getContentEncryptionCipherInitVector());
     }
     protected String getKeyEncryptionAlgorithm() {
-        return Algorithms.toJavaName(getJweHeaders().getKeyEncryptionAlgorithm());
+        return Algorithm.toJavaName(getJweHeaders().getKeyEncryptionAlgorithm());
     }
     protected String getContentEncryptionAlgorithm() {
-        return Algorithms.toJavaName(getJweHeaders().getContentEncryptionAlgorithm());
+        return Algorithm.toJavaName(getJweHeaders().getContentEncryptionAlgorithm());
     }
     protected byte[] getEncryptedContentEncryptionKey() {
         return getJweConsumer().getEncryptedContentEncryptionKey();

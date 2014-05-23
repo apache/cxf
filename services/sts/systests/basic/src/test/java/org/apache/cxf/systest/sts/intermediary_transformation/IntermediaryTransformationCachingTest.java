@@ -23,6 +23,7 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -30,6 +31,7 @@ import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -100,12 +102,27 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
         
         TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
 
-        // Make initial successful invocation
+        ((BindingProvider)transportPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
+        
+        // Make initial successful invocation (for "alice")
         doubleIt(transportPort, 25);
         
         // Make another invocation - this should work as the intermediary caches the token
         // even though its STSClient is disabled after the first invocation
         doubleIt(transportPort, 30);
+        
+        transportPort = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportPort, PORT);
+        TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
+
+        ((BindingProvider)transportPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
+        
+        // Make invocation for "bob"...this should fail as the intermediary's STS client is disabled
+        try {
+            doubleIt(transportPort, 35);
+        } catch (SOAPFaultException ex) {
+            // expected
+        }
         
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);

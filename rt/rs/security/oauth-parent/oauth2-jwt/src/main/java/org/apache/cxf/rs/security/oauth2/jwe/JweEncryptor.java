@@ -22,7 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithms;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
@@ -85,10 +85,10 @@ public class JweEncryptor {
     }
     
     protected String getContentEncryptionKeyEncryptionAlgo() {
-        return Algorithms.toJavaName(headers.getKeyEncryptionAlgorithm());
+        return Algorithm.toJavaName(headers.getKeyEncryptionAlgorithm());
     }
     protected String getContentEncryptionAlgo() {
-        return Algorithms.toJavaName(headers.getContentEncryptionAlgorithm());
+        return Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
     }
     
     protected int getAuthTagLen() {
@@ -98,7 +98,7 @@ public class JweEncryptor {
     public String getJweContent(byte[] content) {
         byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey();
         
-        String contentEncryptionAlgoJavaName = Algorithms.toJavaName(headers.getContentEncryptionAlgorithm());
+        String contentEncryptionAlgoJavaName = Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
         byte[] additionalEncryptionParam = headers.toCipherAdditionalAuthData(writer);
         keyProps.setAdditionalData(additionalEncryptionParam);

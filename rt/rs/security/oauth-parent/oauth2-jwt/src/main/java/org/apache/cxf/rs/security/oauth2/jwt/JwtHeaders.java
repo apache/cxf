@@ -30,9 +30,23 @@ public class JwtHeaders extends AbstractJwtObject {
     public JwtHeaders() {
     }
     
+    public JwtHeaders(String algorithm) {
+        init(algorithm);
+    }
+    
+    public JwtHeaders(Algorithm algo) {
+        init(algo.getJwtName());
+    }
+    
     public JwtHeaders(Map<String, Object> values) {
         super(values);
     }
+    
+    private void init(String algo) {
+        setType(JwtConstants.TYPE_JWT);
+        this.setAlgorithm(algo);
+    }
+    
     
     public void setType(String type) {
         setHeader(JwtConstants.HEADER_TYPE, type);

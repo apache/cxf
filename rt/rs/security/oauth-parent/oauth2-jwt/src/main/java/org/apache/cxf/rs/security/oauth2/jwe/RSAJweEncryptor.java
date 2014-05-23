@@ -22,7 +22,7 @@ import java.security.interfaces.RSAPrivateKey;
 
 import javax.crypto.SecretKey;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithms;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 
 public class RSAJweEncryptor extends JweEncryptor {
@@ -31,8 +31,8 @@ public class RSAJweEncryptor extends JweEncryptor {
     }
     public RSAJweEncryptor(RSAPrivateKey privateKey, SecretKey secretKey, byte[] iv) {
         this(privateKey, 
-             new JweHeaders(Algorithms.RSA_OAEP_ALGO.getJwtName(),
-                            Algorithms.toJwtName(secretKey.getAlgorithm())), 
+             new JweHeaders(Algorithm.RSA_OAEP_ALGO.getJwtName(),
+                            Algorithm.toJwtName(secretKey.getAlgorithm())), 
              secretKey.getEncoded(), iv, 128, true);
     }
     

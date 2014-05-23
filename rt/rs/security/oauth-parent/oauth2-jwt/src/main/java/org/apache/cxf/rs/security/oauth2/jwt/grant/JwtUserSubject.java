@@ -16,10 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.jws;
+package org.apache.cxf.rs.security.oauth2.jwt.grant;
 
-import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtToken;
 
-public interface JwsSignatureProvider {
-    byte[] sign(JwtHeaders headers, String unsignedText);
+public class JwtUserSubject extends UserSubject {
+    private static final long serialVersionUID = -1135272749329239037L;
+    private JwtToken token;
+    public JwtUserSubject(String user, JwtToken token) {
+        super(user);
+        this.token = token;
+    }
+    public JwtToken getToken() {
+        return token;
+    }
 }

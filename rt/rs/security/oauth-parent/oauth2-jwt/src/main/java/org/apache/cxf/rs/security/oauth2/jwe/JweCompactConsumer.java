@@ -24,7 +24,7 @@ import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 
 import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithms;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
@@ -91,7 +91,7 @@ public class JweCompactConsumer {
     public byte[] getDecryptedContent(ContentEncryptionProvider provider) {
         byte[] cek = provider.getContentEncryptionKey(getJweHeaders(), getEncryptedContentEncryptionKey());
         KeyProperties keyProperties = new KeyProperties(
-            Algorithms.toJavaName(getJweHeaders().getContentEncryptionAlgorithm()));
+            Algorithm.toJavaName(getJweHeaders().getContentEncryptionAlgorithm()));
         keyProperties.setAdditionalData(getContentEncryptionCipherAAD());
         
         AlgorithmParameterSpec spec = provider.getContentEncryptionCipherSpec(getJweHeaders(),

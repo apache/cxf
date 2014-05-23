@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithms;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
@@ -33,9 +33,7 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.jwk.JsonWebKey;
-import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -86,14 +84,9 @@ public class JwsCompactReaderWriterTest extends Assert {
      
     @Test
     public void testWriteJwsSignedByMacSpecExample() throws Exception {
-        JwtHeaders headers = new JwtHeaders();
-        headers.setType(JwtConstants.TYPE_JWT);
-        headers.setAlgorithm(Algorithms.HmacSHA256.getJwtName());
+        JwtHeaders headers = new JwtHeaders(Algorithm.HmacSHA256.getJwtName());
         JwsCompactProducer jws = initSpecJwtTokenWriter(headers);
-        String plain = jws.getUnsignedEncodedToken();
-        
-        byte[] mac = computeMac(plain);
-        jws.setSignatureOctets(mac);
+        jws.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY));
         
         assertEquals(ENCODED_TOKEN_SIGNED_BY_MAC, jws.getSignedEncodedToken());
         
@@ -101,9 +94,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     
     @Test
     public void testWriteReadJwsUnsigned() throws Exception {
-        JwtHeaders headers = new JwtHeaders();
-        headers.setType(JwtConstants.TYPE_JWT);
-        headers.setAlgorithm(JwtConstants.PLAIN_TEXT_ALGO);
+        JwtHeaders headers = new JwtHeaders(JwtConstants.PLAIN_TEXT_ALGO);
         
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("https://jwt-idp.example.com");
@@ -126,13 +117,11 @@ public class JwsCompactReaderWriterTest extends Assert {
     @Test
     public void testReadJwsSignedByMacSpecExample() throws Exception {
         JwsCompactConsumer jws = new JwsCompactConsumer(ENCODED_TOKEN_SIGNED_BY_MAC);
-        String plain = jws.getUnsignedEncodedToken();
-        byte[] mac = computeMac(plain);
-        Arrays.equals(mac, jws.getDecodedSignature());
+        assertTrue(jws.verifySignatureWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY)));
         JwtToken token = jws.getJwtToken();
         JwtHeaders headers = token.getHeaders();
         assertEquals(JwtConstants.TYPE_JWT, headers.getType());
-        assertEquals(Algorithms.HmacSHA256.getJwtName(), headers.getAlgorithm());
+        assertEquals(Algorithm.HmacSHA256.getJwtName(), headers.getAlgorithm());
         validateSpecClaim(token.getClaims());
     }
     
@@ -155,9 +144,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     }
     
     private void doTestWriteJwsWithJwkSignedByMac(Object jsonWebKey) throws Exception {
-        JwtHeaders headers = new JwtHeaders();
-        headers.setType(JwtConstants.TYPE_JWT);
-        headers.setAlgorithm(Algorithms.HmacSHA256.getJwtName());
+        JwtHeaders headers = new JwtHeaders(Algorithm.HmacSHA256.getJwtName());
         
         headers.setHeader(JwtConstants.HEADER_JSON_WEB_KEY, jsonWebKey);
         
@@ -168,11 +155,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         
         JwtToken token = new JwtToken(headers, claims);
         JwsCompactProducer jws = new JwsCompactProducer(token, getWriter());
-        
-        String plain = jws.getUnsignedEncodedToken();
-        
-        byte[] mac = computeMac(plain);
-        jws.setSignatureOctets(mac);
+        jws.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY));
         
         assertEquals(ENCODED_TOKEN_WITH_JSON_KEY_SIGNED_BY_MAC, jws.getSignedEncodedToken());
     }
@@ -180,13 +163,11 @@ public class JwsCompactReaderWriterTest extends Assert {
     @Test
     public void testReadJwsWithJwkSignedByMac() throws Exception {
         JwsCompactConsumer jws = new JwsCompactConsumer(ENCODED_TOKEN_WITH_JSON_KEY_SIGNED_BY_MAC);
-        String plain = jws.getUnsignedEncodedToken();
-        byte[] mac = computeMac(plain);
-        Arrays.equals(mac, jws.getDecodedSignature());
+        assertTrue(jws.verifySignatureWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY)));
         JwtToken token = jws.getJwtToken();
         JwtHeaders headers = token.getHeaders();
         assertEquals(JwtConstants.TYPE_JWT, headers.getType());
-        assertEquals(Algorithms.HmacSHA256.getJwtName(), headers.getAlgorithm());
+        assertEquals(Algorithm.HmacSHA256.getJwtName(), headers.getAlgorithm());
         
         JsonWebKey key = headers.getJsonWebKey();
         assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
@@ -207,15 +188,10 @@ public class JwsCompactReaderWriterTest extends Assert {
     @Test
     public void testWriteReadJwsSignedByPrivateKey() throws Exception {
         JwtHeaders headers = new JwtHeaders();
-        headers.setAlgorithm(Algorithms.SHA256withRSA.getJwtName());
+        headers.setAlgorithm(Algorithm.SHA256withRSA.getJwtName());
         JwsCompactProducer jws = initSpecJwtTokenWriter(headers);
-        String plain = jws.getUnsignedEncodedToken();
-        
         PrivateKey key = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
-        byte[] sig = CryptoUtils.signData(plain.getBytes("UTF-8"), key, 
-                                          Algorithms.SHA256withRSA.getJavaName());
-        
-        jws.setSignatureOctets(sig);
+        jws.signWith(new PrivateKeyJwsSignatureProvider(key));
         
         assertEquals(ENCODED_TOKEN_SIGNED_BY_PRIVATE_KEY, jws.getSignedEncodedToken());
     }
@@ -223,13 +199,11 @@ public class JwsCompactReaderWriterTest extends Assert {
     @Test
     public void testReadJwsSignedByPrivateKey() throws Exception {
         JwsCompactConsumer jws = new JwsCompactConsumer(ENCODED_TOKEN_SIGNED_BY_PRIVATE_KEY);
-        String plain = jws.getUnsignedEncodedToken();
         RSAPublicKey key = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
-        CryptoUtils.verifySignature(plain.getBytes("UTF-8"), jws.getDecodedSignature(), key, 
-                                    Algorithms.SHA256withRSA.getJavaName());
+        assertTrue(jws.verifySignatureWith(new PublicKeyJwsSignatureVerifier(key)));
         JwtToken token = jws.getJwtToken();
         JwtHeaders headers = token.getHeaders();
-        assertEquals(Algorithms.SHA256withRSA.getJwtName(), headers.getAlgorithm());
+        assertEquals(Algorithm.SHA256withRSA.getJwtName(), headers.getAlgorithm());
         validateSpecClaim(token.getClaims());
     }
     
@@ -244,10 +218,6 @@ public class JwsCompactReaderWriterTest extends Assert {
         return new JwsCompactProducer(token, getWriter());
     }
 
-    private byte[] computeMac(String plain) throws Exception {
-        byte[] key = Base64UrlUtility.decode(ENCODED_MAC_KEY);
-        return HmacUtils.computeHmac(key, Algorithms.HmacSHA256.getJavaName(), plain);
-    }
     
     private JwtTokenWriter getWriter() {
         JwtTokenReaderWriter jsonWriter = new JwtTokenReaderWriter();

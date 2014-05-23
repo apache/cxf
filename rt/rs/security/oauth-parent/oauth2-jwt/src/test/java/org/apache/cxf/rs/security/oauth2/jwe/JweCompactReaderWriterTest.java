@@ -26,7 +26,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactReaderWriterTest;
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithms;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -68,7 +68,7 @@ public class JweCompactReaderWriterTest extends Assert {
         if (!IGNORE_TESTS) {    
             try {
                 // Java 8 apparently has it
-                Cipher.getInstance(Algorithms.A256GCM_ALGO_JAVA);
+                Cipher.getInstance(Algorithm.A256GCM_ALGO_JAVA);
             } catch (Throwable t) {
                 // Oracle Java 7
                 Security.addProvider(new BouncyCastleProvider());    
@@ -105,7 +105,7 @@ public class JweCompactReaderWriterTest extends Assert {
     
     private String encryptContent(String content) throws Exception {
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
-        SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, Algorithms.A256GCM_ALGO.getJavaName());
+        SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, Algorithm.A256GCM_ALGO.getJavaName());
         RSAJweEncryptor encryptor = new RSAJweEncryptor(privateKey, key, INIT_VECTOR);
         return encryptor.getJweContent(content);
     }

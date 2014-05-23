@@ -91,14 +91,17 @@ public class JwsCompactConsumer {
         }
         return token;
     }
-    public void validateSignatureWith(JwsSignatureValidator validator) {
-        validator.validate(getJwtHeaders(), getUnsignedEncodedToken(), getDecodedSignature());
+    public boolean verifySignatureWith(JwsSignatureVerifier validator) {
+        if (!validator.verify(getJwtHeaders(), getUnsignedEncodedToken(), getDecodedSignature())) {
+            throw new SecurityException();
+        }
+        return true;
     }
     private static String decodeToString(String encoded) {
         try {
             return new String(decode(encoded), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            throw new OAuthServiceException(ex);
+            throw new SecurityException(ex);
         }
         
     }
@@ -107,7 +110,7 @@ public class JwsCompactConsumer {
         try {
             return Base64UrlUtility.decode(encoded);
         } catch (Base64Exception ex) {
-            throw new OAuthServiceException(ex);
+            throw new SecurityException(ex);
         }
     }
 }

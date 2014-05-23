@@ -30,7 +30,7 @@ import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -101,6 +101,7 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         
         TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
 
+        ((BindingProvider)transportPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
         doubleIt(transportPort, 25);
         
         ((java.io.Closeable)transportPort).close();
