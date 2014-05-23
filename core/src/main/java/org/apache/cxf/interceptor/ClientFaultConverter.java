@@ -22,12 +22,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -36,7 +39,6 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
@@ -59,6 +61,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamReader;
  */
 public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     public static final String DISABLE_FAULT_MAPPING = "disable-fault-mapping";
+    public static final Pattern causeSuffixSplitter = Pattern.compile(Message.EXCEPTION_CAUSE_SUFFIX, Pattern.LITERAL | Pattern.MULTILINE);
     private static final Logger LOG = LogUtils.getLogger(ClientFaultConverter.class);
 
     public ClientFaultConverter() {
@@ -239,11 +242,11 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 XPathConstants.STRING);
         List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
         if (!StringUtils.isEmpty(ss)) {
-            StringTokenizer st = new StringTokenizer(ss, Message.EXCEPTION_CAUSE_SUFFIX);
-            while (st.hasMoreTokens()) {
-                String oneLine = st.nextToken();
+            Iterator<String> linesIterator = Arrays.asList(causeSuffixSplitter.split(ss)).iterator();
+            while (linesIterator.hasNext()) {
+                String oneLine = linesIterator.next();
                 if (oneLine.startsWith("Caused by:")) {
-                    cause = getCause(st, oneLine);
+                    cause = getCause(linesIterator, oneLine);
                     break;
                 }
                 stackTraceList.add(parseStackTrackLine(oneLine));
@@ -263,15 +266,15 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     }
 
     // recursively parse the causes and instantiate corresponding throwables
-    private Throwable getCause(StringTokenizer st, String firstLine) {
+    private Throwable getCause(Iterator<String> linesIterator, String firstLine) {
         // The actual exception class of the cause might be unavailable at the
         // client -> use a standard throwable to represent the cause.
         Throwable res = new Throwable(firstLine.substring(firstLine.indexOf(":") + 2));
         List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
-        while (st.hasMoreTokens()) {
-            String oneLine = st.nextToken();
+        while (linesIterator.hasNext()) {
+            String oneLine = linesIterator.next();
             if (oneLine.startsWith("Caused by:")) {
-                Throwable nestedCause = getCause(st, oneLine);
+                Throwable nestedCause = getCause(linesIterator, oneLine);
                 res.initCause(nestedCause);
                 break;
             }
