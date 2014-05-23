@@ -214,6 +214,10 @@ public final class CryptoUtils {
         return getSecretKey(new KeyProperties(symEncAlgo));
     }
     
+    public static SecretKey getSecretKey(String symEncAlgo, int keySize) throws SecurityException {
+        return getSecretKey(new KeyProperties(symEncAlgo, keySize));
+    }
+    
     public static SecretKey getSecretKey(KeyProperties props) throws SecurityException {
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance(props.getKeyAlgo());

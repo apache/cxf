@@ -80,7 +80,7 @@ public class JweEncryptor {
     protected byte[] getContentEncryptionKey() {
         if (cek == null && cekEncryptionKey != null) {
             String algo = headers.getContentEncryptionAlgorithm();
-            return CryptoUtils.generateSecureRandomBytes(Algorithm.valueOf(algo).getKeySizeBits() / 8);
+            return CryptoUtils.getSecretKey(algo, Algorithm.valueOf(algo).getKeySizeBits()).getEncoded();
         } else {
             return cek;
         }

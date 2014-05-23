@@ -104,15 +104,15 @@ public class JweCompactReaderWriterTest extends Assert {
     }
     
     private String encryptContent(String content) throws Exception {
-        RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
+        RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
         SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, Algorithm.A256GCM_ALGO.getJavaName());
-        RSAJweEncryptor encryptor = new RSAJweEncryptor(privateKey, key, INIT_VECTOR);
+        RSAJweEncryptor encryptor = new RSAJweEncryptor(publicKey, key, INIT_VECTOR);
         return encryptor.getJweContent(content);
     }
     
     private void decrypt(String jweContent, String plainContent) throws Exception {
-        RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
-        RSAJweDecryptor decryptor = new RSAJweDecryptor(jweContent, publicKey);
+        RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
+        RSAJweDecryptor decryptor = new RSAJweDecryptor(jweContent, privateKey);
         String decryptedText = decryptor.getDecryptedContentText();
         assertEquals(decryptedText, plainContent);
     }
