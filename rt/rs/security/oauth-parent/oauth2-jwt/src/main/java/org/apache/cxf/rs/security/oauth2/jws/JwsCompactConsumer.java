@@ -91,7 +91,7 @@ public class JwsCompactConsumer {
         }
         return token;
     }
-    public boolean verifySignatureWith(JwsSignatureValidator validator) {
+    public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         if (!validator.verify(getJwtHeaders(), getUnsignedEncodedToken(), getDecodedSignature())) {
             throw new SecurityException();
         }

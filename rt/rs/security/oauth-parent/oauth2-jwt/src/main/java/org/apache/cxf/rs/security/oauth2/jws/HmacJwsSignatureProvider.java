@@ -26,7 +26,7 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
 
-public class HmacJwsSignatureProvider implements JwsSignatureVerifier, JwsSignatureValidator {
+public class HmacJwsSignatureProvider implements JwsSignatureProvider, JwsSignatureVerifier {
     private byte[] key;
     public HmacJwsSignatureProvider(byte[] key) {
         this.key = key;

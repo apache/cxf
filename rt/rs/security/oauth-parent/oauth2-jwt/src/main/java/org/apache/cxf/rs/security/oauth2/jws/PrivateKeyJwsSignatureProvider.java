@@ -26,7 +26,7 @@ import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
-public class PrivateKeyJwsSignatureProvider implements JwsSignatureVerifier {
+public class PrivateKeyJwsSignatureProvider implements JwsSignatureProvider {
     private PrivateKey key;
     private SecureRandom random; 
     private AlgorithmParameterSpec signatureSpec;

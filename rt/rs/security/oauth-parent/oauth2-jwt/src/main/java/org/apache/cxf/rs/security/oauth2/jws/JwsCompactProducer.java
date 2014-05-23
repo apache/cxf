@@ -65,7 +65,7 @@ public class JwsCompactProducer {
         }
         return getUnsignedEncodedToken() + "." + (noSignature ? "" : signature);
     }
-    public void signWith(JwsSignatureVerifier signer) { 
+    public void signWith(JwsSignatureProvider signer) { 
         setSignatureOctets(signer.sign(token.getHeaders(), getUnsignedEncodedToken()));
     }
     
