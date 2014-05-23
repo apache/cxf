@@ -54,20 +54,20 @@ public class AbstractTokenService extends AbstractOAuthService {
     protected Client authenticateClientIfNeeded(MultivaluedMap<String, String> params) {
         Client client = null;
         SecurityContext sc = getMessageContext().getSecurityContext();
+        Principal principal = sc.getUserPrincipal();
+        String clientIdParameter = params.getFirst(OAuthConstants.CLIENT_ID);
         
-        if (params.containsKey(OAuthConstants.CLIENT_ID)) {
+        if (principal == null && clientIdParameter != null) {
             // Both client_id and client_secret are expected in the form payload
-            client = getAndValidateClientFromIdAndSecret(params.getFirst(OAuthConstants.CLIENT_ID),
+            client = getAndValidateClientFromIdAndSecret(clientIdParameter,
                                           params.getFirst(OAuthConstants.CLIENT_SECRET));
-        } else if (sc.getUserPrincipal() != null) {
+        } else if (principal != null) {
             // Client has already been authenticated
-            Principal p = sc.getUserPrincipal();
-            if (p.getName() != null) {
-                client = getClient(p.getName());
+            if (principal.getName() != null) {
+                client = getClient(principal.getName());
             } else {
-                // Most likely a container-level authentication, possibly 2-way TLS, 
-                // Check if the mapping between Principal and Client Id has been done in a filter
-                String clientId = (String)getMessageContext().get(OAuthConstants.CLIENT_ID);
+                String clientId = clientIdParameter != null ? clientIdParameter 
+                    : (String)getMessageContext().get(OAuthConstants.CLIENT_ID);
                 if (StringUtils.isEmpty(clientId) && clientIdProvider != null) {
                     // Check Custom ClientIdProvider
                     clientId = clientIdProvider.getClientId(getMessageContext());
