@@ -71,6 +71,13 @@ public final class CryptoUtils {
         return encodeBytes(encryptedBytes);
     }
     
+    public static byte[] generateSecureRandomBytes(int size) {
+        SecureRandom sr = new SecureRandom();
+        byte[] bytes = new byte[size];
+        sr.nextBytes(bytes);
+        return bytes;
+    }
+    
     public static RSAPublicKey getRSAPublicKey(String encodedModulus,
                                                String encodedPublicExponent) {
         try {

@@ -27,18 +27,18 @@ import java.util.Map;
 
 public enum Algorithm {
     // Signature
-    HmacSHA256(JwtConstants.HMAC_SHA_256_ALGO),
-    HmacSHA384(JwtConstants.HMAC_SHA_384_ALGO),
-    HmacSHA512(JwtConstants.HMAC_SHA_512_ALGO),
+    HmacSHA256(JwtConstants.HMAC_SHA_256_ALGO, 256),
+    HmacSHA384(JwtConstants.HMAC_SHA_384_ALGO, 384),
+    HmacSHA512(JwtConstants.HMAC_SHA_512_ALGO, 512),
     
-    SHA256withRSA(JwtConstants.RS_SHA_256_ALGO),
-    SHA384withRSA(JwtConstants.RS_SHA_384_ALGO),
-    SHA512withRSA(JwtConstants.RS_SHA_512_ALGO),
+    SHA256withRSA(JwtConstants.RS_SHA_256_ALGO, 256),
+    SHA384withRSA(JwtConstants.RS_SHA_384_ALGO, 384),
+    SHA512withRSA(JwtConstants.RS_SHA_512_ALGO, 512),
     
     // Key Encryption
-    RSA_OAEP_ALGO(JwtConstants.RSA_OAEP_ALGO, "RSA/ECB/OAEPWithSHA-1AndMGF1Padding"),
+    RSA_OAEP_ALGO(JwtConstants.RSA_OAEP_ALGO, "RSA/ECB/OAEPWithSHA-1AndMGF1Padding", -1),
     // Content Encryption
-    A256GCM_ALGO(JwtConstants.A256GCM_ALGO, "AES/GCM/NoPadding");
+    A256GCM_ALGO(JwtConstants.A256GCM_ALGO, "AES/GCM/NoPadding", 256);
     
     public static final String HMAC_SHA_256_JAVA = "HmacSHA256";
     public static final String HMAC_SHA_384_JAVA = "HmacSHA384";
@@ -73,13 +73,15 @@ public enum Algorithm {
     }
     private final String jwtName;
     private final String javaName;
-
-    private Algorithm(String jwtName) {
-        this(jwtName, null);
+    private final int keySizeBits;
+    
+    private Algorithm(String jwtName, int keySizeBits) {
+        this(jwtName, null, keySizeBits);
     }
-    private Algorithm(String jwtName, String javaName) {
+    private Algorithm(String jwtName, String javaName, int keySizeBits) {
         this.jwtName = jwtName;
         this.javaName = javaName;
+        this.keySizeBits = keySizeBits;
     }
 
     public String getJwtName() {
@@ -90,6 +92,10 @@ public enum Algorithm {
         return javaName == null ? name() : javaName;
     }
 
+    public int getKeySizeBits() {
+        return keySizeBits;
+    }
+    
     public static String toJwtName(String javaName) {    
         return JAVA_TO_JWT_NAMES.get(javaName);
     }

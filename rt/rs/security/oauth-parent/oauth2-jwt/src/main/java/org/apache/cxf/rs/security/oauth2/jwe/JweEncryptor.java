@@ -29,24 +29,36 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public class JweEncryptor {
+    protected static final int DEFAULT_IV_SIZE = 96;
+    protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private Key cekEncryptionKey;
     private JweHeaders headers;
     private JwtHeadersWriter writer = new JwtTokenReaderWriter();
     private byte[] cek;
     private byte[] iv;
-    private int authTagLen;
+    private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
     private boolean wrap;
     
-    public JweEncryptor(JweHeaders headers, byte[] iv, int authTagLen) {
+    public JweEncryptor(String contentEncryptionAlgo, byte[] cek) {
+        this(new JweHeaders(contentEncryptionAlgo), cek);
+    }
+    public JweEncryptor(JweHeaders headers, byte[] cek) {
         this.headers = headers;
+        this.cek = cek;
+    }
+    public JweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
+        this(headers, cek);
         this.iv = iv;
         this.authTagLen = authTagLen;
     }
+    public JweEncryptor(JweHeaders headers, Key cekEncryptionKey) {
+        this.headers = headers;
+        this.cekEncryptionKey = cekEncryptionKey;
+    }
     public JweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, 
                                    int authTagLen, boolean wrap) {
-        this(headers, iv, authTagLen);
+        this(headers, cek, iv, authTagLen);
         this.cekEncryptionKey = cekEncryptionKey;
-        this.cek = cek;
         this.wrap = wrap;
     }
     public JweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, int authTagLen, 
@@ -57,28 +69,32 @@ public class JweEncryptor {
         }
     }
     
-    protected AlgorithmParameterSpec getContentEncryptionCipherSpec() {
-        return CryptoUtils.getContentEncryptionCipherSpec(getAuthTagLen(), getIv());
+    protected AlgorithmParameterSpec getContentEncryptionCipherSpec(byte[] theIv) {
+        return CryptoUtils.getContentEncryptionCipherSpec(getAuthTagLen(), theIv);
     }
     
-    protected byte[] getIv() {
-        return iv;
+    protected byte[] getContentEncryptionCipherInitVector() {
+        return iv == null ? CryptoUtils.generateSecureRandomBytes(DEFAULT_IV_SIZE) : iv;
     }
     
-    protected byte[] cek() {
-        return cek;
+    protected byte[] getContentEncryptionKey() {
+        if (cek == null && cekEncryptionKey != null) {
+            String algo = headers.getContentEncryptionAlgorithm();
+            return CryptoUtils.generateSecureRandomBytes(Algorithm.valueOf(algo).getKeySizeBits() / 8);
+        } else {
+            return cek;
+        }
     }
     
-    protected byte[] getEncryptedContentEncryptionKey() {
-        if (cekEncryptionKey == null) {
-            // direct key encryption
+    protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
+        if (theCek == null) {
             return new byte[]{};
         } else  {
             KeyProperties secretKeyProperties = new KeyProperties(getContentEncryptionKeyEncryptionAlgo());
             if (!wrap) {
-                return CryptoUtils.encryptBytes(cek, cekEncryptionKey, secretKeyProperties);
+                return CryptoUtils.encryptBytes(theCek, cekEncryptionKey, secretKeyProperties);
             } else {
-                return CryptoUtils.wrapSecretKey(cek, getContentEncryptionAlgo(), cekEncryptionKey, 
+                return CryptoUtils.wrapSecretKey(theCek, getContentEncryptionAlgo(), cekEncryptionKey, 
                                                  secretKeyProperties.getKeyAlgo());
             }
         }
@@ -96,23 +112,26 @@ public class JweEncryptor {
     }
     
     public String getJweContent(byte[] content) {
-        byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey();
+        byte[] theCek = getContentEncryptionKey();
+        byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey(theCek);
         
         String contentEncryptionAlgoJavaName = Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
         byte[] additionalEncryptionParam = headers.toCipherAdditionalAuthData(writer);
         keyProps.setAdditionalData(additionalEncryptionParam);
-        AlgorithmParameterSpec specParams = getContentEncryptionCipherSpec();
+        
+        byte[] theIv = getContentEncryptionCipherInitVector();
+        AlgorithmParameterSpec specParams = getContentEncryptionCipherSpec(theIv);
         keyProps.setAlgoSpec(specParams);
         
         byte[] cipherText = CryptoUtils.encryptBytes(
             content, 
-            CryptoUtils.createSecretKeySpec(cek, contentEncryptionAlgoJavaName),
+            CryptoUtils.createSecretKeySpec(theCek, contentEncryptionAlgoJavaName),
             keyProps);
         
         JweCompactProducer producer = new JweCompactProducer(headers, 
                                              jweContentEncryptionKey,
-                                             iv,
+                                             theIv,
                                              cipherText,
                                              getAuthTagLen());
         return producer.getJweContent();

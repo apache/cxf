@@ -26,14 +26,18 @@ import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 
 public class RSAJweEncryptor extends JweEncryptor {
+    public RSAJweEncryptor(RSAPrivateKey privateKey, String contentEncryptionAlgo) {
+        super(new JweHeaders(Algorithm.RSA_OAEP_ALGO.getJwtName(),
+                             contentEncryptionAlgo), privateKey);
+    }
     public RSAJweEncryptor(RSAPrivateKey privateKey, JweHeaders headers, byte[] cek, byte[] iv) {
-        this(privateKey, headers, cek, iv, 128, true);
+        this(privateKey, headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH, true);
     }
     public RSAJweEncryptor(RSAPrivateKey privateKey, SecretKey secretKey, byte[] iv) {
         this(privateKey, 
              new JweHeaders(Algorithm.RSA_OAEP_ALGO.getJwtName(),
                             Algorithm.toJwtName(secretKey.getAlgorithm())), 
-             secretKey.getEncoded(), iv, 128, true);
+             secretKey.getEncoded(), iv, DEFAULT_AUTH_TAG_LENGTH, true);
     }
     
     public RSAJweEncryptor(RSAPrivateKey privateKey, JweHeaders headers, byte[] cek, byte[] iv, 
@@ -43,7 +47,7 @@ public class RSAJweEncryptor extends JweEncryptor {
     
     public RSAJweEncryptor(RSAPrivateKey privateKey, JweHeaders headers, byte[] cek, byte[] iv, 
                               JwtHeadersWriter writer) {
-        this(privateKey, headers, cek, iv, 128, true, null);
+        this(privateKey, headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH, true, null);
     }
     public RSAJweEncryptor(RSAPrivateKey privateKey, JweHeaders headers, byte[] cek, byte[] iv, 
                               int authTagLen, boolean wrap, JwtHeadersWriter writer) {

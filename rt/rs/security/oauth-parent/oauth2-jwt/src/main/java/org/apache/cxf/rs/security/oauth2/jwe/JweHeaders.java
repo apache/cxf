@@ -41,12 +41,19 @@ public class JweHeaders extends JwtHeaders {
     public JweHeaders(String keyEncAlgo, String ctEncAlgo) {
         this(keyEncAlgo, ctEncAlgo, false);
     }
+    public JweHeaders(String ctEncAlgo) {
+        this(null, ctEncAlgo, false);
+    }
+    public JweHeaders(String ctEncAlgo, boolean deflate) {
+        this(null, ctEncAlgo, deflate);
+    }
     public JweHeaders(String keyEncAlgo, String ctEncAlgo, boolean deflate) {
         init(keyEncAlgo, ctEncAlgo, deflate);
     }
-    
     private void init(String keyEncAlgo, String ctEncAlgo, boolean deflate) {
-        setKeyEncryptionAlgorithm(keyEncAlgo);
+        if (keyEncAlgo != null) {
+            setKeyEncryptionAlgorithm(keyEncAlgo);    
+        }
         setContentEncryptionAlgorithm(ctEncAlgo);
         if (deflate) {
             setZipAlgorithm(JwtConstants.DEFLATE_ZIP_ALGORITHM);
