@@ -43,9 +43,9 @@ class QNamesMap {
                 if (keys[i].getLocalPart().equals(key.getLocalPart())) {
                     return values[i];
                 } else if ("*".equals(keys[i].getLocalPart())) {
-                    // assume it is something like {somens}* : *
-                    return "*".equals(values[i]) ? new QName(key.getLocalPart()) 
-                        : new QName(values[i].getNamespaceURI(), key.getLocalPart());
+                    // assume it is something like {somens}* => * or {somens}* => {anotherns}*
+                    // and return QName(nsuri, lcname) which covers both cases.
+                    return new QName(values[i].getNamespaceURI(), key.getLocalPart());
                 }
             }
         }
