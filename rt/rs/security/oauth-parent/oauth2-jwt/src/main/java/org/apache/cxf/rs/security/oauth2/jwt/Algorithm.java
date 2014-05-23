@@ -74,6 +74,7 @@ public enum Algorithm {
         JWT_TO_JAVA_NAMES.put(JwtConstants.RS_SHA_512_ALGO, RS_SHA_512_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_OAEP_ALGO, RSA_OAEP_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_OAEP_256_ALGO, RSA_OAEP_256_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_1_5_ALGO, RSA_1_5_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.A256GCM_ALGO, A256GCM_ALGO_JAVA);
     }
     private final String jwtName;
