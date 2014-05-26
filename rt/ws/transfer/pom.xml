@@ -25,6 +25,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cxf-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -61,6 +66,7 @@
                               <xsdOption>
                                   <xsd>${basedir}/src/main/resources/schemas/transfer.xsd</xsd>
                                   <packagename>org.apache.cxf.ws.transfer</packagename>
+                                  <bindingFile>${basedir}/src/main/resources/schemas/transfer.xjb</bindingFile>
                                   <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                               </xsdOption>
                           </xsdOptions>

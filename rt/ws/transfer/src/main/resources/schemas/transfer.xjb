@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bindings version="2.0" xmlns="http://java.sun.com/xml/ns/jaxb"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <bindings schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd">
+        <schemaBindings map="false"/>
+        <bindings node="//xs:complexType[@name='ReferenceParametersType']">
+            <class ref="org.apache.cxf.ws.addressing.ReferenceParametersType"/>
+        </bindings>
+        <bindings node="//xs:complexType[@name='EndpointReferenceType']">
+            <class ref="org.apache.cxf.ws.addressing.EndpointReferenceType"/>
+        </bindings>
+        <bindings node="//xs:complexType[@name='AttributedURIType']">
+            <class ref="org.apache.cxf.ws.addressing.AttributedURIType"/>
+        </bindings>
+    </bindings>
+</bindings>

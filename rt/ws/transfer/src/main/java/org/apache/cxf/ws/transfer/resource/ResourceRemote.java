@@ -19,9 +19,10 @@
 
 package org.apache.cxf.ws.transfer.resource;
 
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.CreateResponse;
-import org.apache.cxf.ws.transfer.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
 
@@ -36,6 +37,7 @@ public class ResourceRemote extends ResourceLocal implements ResourceFactory {
         ValidAndTransformHelper.validationAndTransformation(getValidators(), body.getRepresentation());
         ReferenceParametersType refParams = getManager().create(body.getRepresentation());
         CreateResponse response = new CreateResponse();
+        response.setResourceCreated(new EndpointReferenceType());
         response.getResourceCreated().setReferenceParameters(refParams);
         response.setRepresentation(body.getRepresentation());
         return response;

@@ -19,4 +19,5 @@
 
 SYSTEM "http://www.w3.org/2011/03/ws-tra" "transfer.xsd"
 SYSTEM "http://www.w3.org/2005/08/addressing" "ws-addr.xsd"
+SYSTEM "http://www.w3.org/2006/03/addressing/ws-addr.xsd" "ws-addr.xsd"
 

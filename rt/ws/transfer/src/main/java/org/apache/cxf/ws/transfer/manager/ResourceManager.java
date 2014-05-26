@@ -19,7 +19,7 @@
 
 package org.apache.cxf.ws.transfer.manager;
 
-import org.apache.cxf.ws.transfer.ReferenceParametersType;
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Representation;
 
 public interface ResourceManager {
