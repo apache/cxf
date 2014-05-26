@@ -22,8 +22,10 @@ package org.apache.cxf.systest.ws.rm;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -64,8 +66,8 @@ import org.junit.Test;
  */
 public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(MessageCallbackOnewayTest.class);
-    private static final String GREETER_ADDRESS 
-        = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
+    private static final String GREETER_ADDRESS  = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
+    private static final Long RETRANSMISSION_INTERVAL = new Long(2000);
 
     private static final Logger LOG = LogUtils.getLogger(MessageCallbackOnewayTest.class);
 
@@ -90,10 +92,24 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         Thread.sleep(100);
     }
     
-    private void verifyCallback(int index, boolean accept, long mnum) {
-        Callback cb = callback.getCallbacks().get(index);
-        assertEquals(accept, cb.isAccept());
-        assertEquals(mnum, cb.getMsgNumber());
+    /**
+     * Checks that all callbacks are received, that messages are accepted in order, and that each message is accepted
+     * before it is acknowledged (order of acknowledgements doesn't really matter).
+     */
+    private void verifyCallbacks() {
+        List<Callback> cbs = callback.getCallbacks();
+        Set<Long> acks = new HashSet<Long>();
+        long nextNum = 1;
+        for (Callback cb: cbs) {
+            if (cb.isAccept()) {
+                assertEquals(nextNum++, cb.getMsgNumber());
+            } else {
+                assertTrue(cb.getMsgNumber() < nextNum);
+                Long num = Long.valueOf(cb.getMsgNumber());
+                assertFalse(acks.contains(num));
+                acks.add(num);
+            }
+        }
     }
 
     @Test    
@@ -111,18 +127,13 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        callback.waitDone(6, 3000, 60000);
-        verifyCallback(0, true, 1);
-        verifyCallback(1, true, 2);
-        verifyCallback(2, true, 3);
-        verifyCallback(3, false, 3);
-        verifyCallback(4, false, 1);
-        verifyCallback(5, true, 4);
+        callback.waitDone(8, 3000, 60000);
+        verifyCallbacks();
     }
 
     @Test    
@@ -140,19 +151,14 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
         
-        callback.waitDone(6, 3000, 60000);
-        verifyCallback(0, true, 1);
-        verifyCallback(1, true, 2);
-        verifyCallback(2, true, 3);
-        verifyCallback(3, false, 3);
-        verifyCallback(4, false, 1);
-        verifyCallback(5, true, 4);
+        callback.waitDone(8, 3000, 60000);
+        verifyCallbacks();
     }
 
     @Test    
@@ -170,19 +176,14 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
         
-        callback.waitDone(6, 3000, 60000);
-        verifyCallback(0, true, 1);
-        verifyCallback(1, true, 2);
-        verifyCallback(2, true, 3);
-        verifyCallback(3, false, 3);
-        verifyCallback(4, false, 1);
-        verifyCallback(5, true, 4);
+        callback.waitDone(8, 3000, 60000);
+        verifyCallbacks();
     }
 
     @Test    
@@ -200,21 +201,14 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
         
         callback.waitDone(8, 3000, 60000);
-        verifyCallback(0, true, 1);
-        verifyCallback(1, true, 2);
-        verifyCallback(2, true, 3);
-        verifyCallback(3, false, 2);
-        verifyCallback(4, false, 1);
-        verifyCallback(5, true, 4);
-        verifyCallback(6, false, 4);
-        verifyCallback(7, false, 3);
+        verifyCallbacks();
     }
 
     // --- test utilities ---
@@ -362,6 +356,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
             synchronized (callbacks) {
                 callbacks.add(new Callback(true, msgNum));
                 callbacks.notifyAll();
+                System.out.println("Message accepted " + msgNum);
             }
         }
 
@@ -370,6 +365,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
             synchronized (callbacks) {
                 callbacks.add(new Callback(false, msgNum));
                 callbacks.notifyAll();
+                System.out.println("Message acknowledged " + msgNum);
             }
         }
         
