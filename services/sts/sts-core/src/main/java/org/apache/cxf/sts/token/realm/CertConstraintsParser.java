@@ -59,6 +59,10 @@ public class CertConstraintsParser {
         }
     }
     
+    public Collection<Pattern> getCompiledSubjectContraints() {
+        return subjectDNPatterns;
+    }
+    
     /**
      * @return      true if the certificate's SubjectDN matches the constraints defined in the
      *              subject DNConstraints; false, otherwise. The certificate subject DN only
