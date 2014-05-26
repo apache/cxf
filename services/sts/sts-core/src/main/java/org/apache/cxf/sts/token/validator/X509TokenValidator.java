@@ -32,11 +32,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
-<<<<<<< HEAD
-
-=======
 import org.apache.cxf.sts.token.realm.CertConstraintsParser;
->>>>>>> cf05755... Add certificate path validation for X.509 tokens in the STS
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
 
 import org.apache.ws.security.WSConstants;
