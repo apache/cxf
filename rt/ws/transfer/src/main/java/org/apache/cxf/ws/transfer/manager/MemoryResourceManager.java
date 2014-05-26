@@ -40,7 +40,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import org.apache.cxf.ws.transfer.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Representation;
-import org.apache.cxf.ws.transfer.shared.TransferConstants;
 import org.apache.cxf.ws.transfer.shared.faults.UnknownResource;
 
 /**
@@ -49,7 +48,9 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownResource;
  */
 public class MemoryResourceManager implements ResourceManager {
     
-    protected static final String LOCAL_NAME = "UUID";
+    protected static final String REF_NAMESPACE = "http://www.cxf.apache.org/MemoryResourceManager";
+    
+    protected static final String REF_LOCAL_NAME = "UUID";
     
     protected Map<String, String> storage;
     
@@ -124,7 +125,7 @@ public class MemoryResourceManager implements ResourceManager {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.newDocument();
-            Element uuidEl = doc.createElementNS(TransferConstants.TRANSFER_2011_03_NAMESPACE, LOCAL_NAME);
+            Element uuidEl = doc.createElementNS(REF_NAMESPACE, REF_LOCAL_NAME);
             uuidEl.setTextContent(uuid);
             refParam.getAny().add(uuidEl);
             return refParam;
@@ -141,8 +142,8 @@ public class MemoryResourceManager implements ResourceManager {
         for (Object object : ref.getAny()) {
             Element element = (Element) object;
             if (
-                TransferConstants.TRANSFER_2011_03_NAMESPACE.equals(element.getNamespaceURI())
-                && LOCAL_NAME.equals(element.getLocalName())
+                REF_NAMESPACE.equals(element.getNamespaceURI())
+                && REF_LOCAL_NAME.equals(element.getLocalName())
             ) {
                 return element.getTextContent();
             }
