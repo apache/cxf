@@ -42,7 +42,7 @@ import org.apache.cxf.ws.transfer.shared.TransferConstants;
         name = TransferConstants.NAME_RESOURCE)
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @Addressing(enabled = true, required = true)
-@HandlerChain(file = "handler-chains/reference-parameter-parsing.xml")
+@HandlerChain(file = "/handler-chains/reference-parameter-parsing.xml")
 public interface Resource {
 
     @Action(

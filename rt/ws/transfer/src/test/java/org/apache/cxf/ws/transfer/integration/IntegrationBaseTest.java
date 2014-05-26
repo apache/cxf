@@ -27,11 +27,12 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
+import org.apache.cxf.ws.transfer.resource.ResourceRemote;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactoryImpl;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.SimpleResourceResolver;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 
 /**
  *
@@ -43,18 +44,24 @@ public class IntegrationBaseTest {
     
     public static final String RESOURCE_ADDRESS = "local://ResourceLocal";
     
-    protected static Bus bus;
+    public static final String RESOURCE_REMOTE_ADDRESS = "local://ResourceRemote";
     
-    protected static Server resourceFactory;
+    public static final String RESOURCE_REMOTE_MANAGER_ADDRESS = "local://ResourceRemote_factory";
     
-    protected static ResourceManager manager;
+    protected Bus bus;
     
-    protected static LoggingInInterceptor logInInterceptor;
+    protected Server resourceFactory;
     
-    protected static LoggingOutInterceptor logOutInterceptor;
+    protected Server resourceRemote;
     
-    @BeforeClass
-    public static void beforeClass() {
+    protected ResourceManager manager;
+    
+    protected LoggingInInterceptor logInInterceptor;
+    
+    protected LoggingOutInterceptor logOutInterceptor;
+    
+    @Before
+    public void before() {
         bus = BusFactory.getDefaultBus();
         logInInterceptor = new LoggingInInterceptor(new PrintWriter(System.out));
         logInInterceptor.setPrettyLogging(true);
@@ -62,13 +69,13 @@ public class IntegrationBaseTest {
         logOutInterceptor.setPrettyLogging(true);
     }
     
-    @AfterClass
-    public static void afterClass() {
+    @After
+    public void after() {
         bus.shutdown(true);
         bus = null;
     }
     
-    protected void createResourceFactory() {
+    protected void createLocalResourceFactory() {
         ResourceFactoryImpl implementor = new ResourceFactoryImpl();
         implementor.setResourceResolver(new SimpleResourceResolver(RESOURCE_ADDRESS, manager));
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
@@ -79,4 +86,25 @@ public class IntegrationBaseTest {
         resourceFactory = factory.create();
     }
     
+    protected void createRemoteResourceFactory() {
+        ResourceFactoryImpl implementor = new ResourceFactoryImpl();
+        implementor.setResourceResolver(new SimpleResourceResolver(RESOURCE_REMOTE_ADDRESS, null));
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
+        factory.setServiceClass(ResourceFactory.class);
+        factory.setAddress(RESOURCE_FACTORY_ADDRESS);
+        factory.setServiceBean(implementor);
+        resourceFactory = factory.create();
+    }
+    
+    protected void createRemoteResource() {
+        ResourceRemote implementor = new ResourceRemote();
+        implementor.setManager(manager);
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
+        factory.setServiceClass(ResourceFactory.class);
+        factory.setAddress(RESOURCE_REMOTE_MANAGER_ADDRESS);
+        factory.setServiceBean(implementor);
+        resourceRemote = factory.create();
+    }
 }
