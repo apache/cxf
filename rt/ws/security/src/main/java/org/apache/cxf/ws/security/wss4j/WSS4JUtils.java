@@ -92,7 +92,12 @@ public final class WSS4JUtils {
                 if (replayCache == null) {
                     String cacheKey = instanceKey;
                     if (info.getName() != null) {
-                        cacheKey += "-" + info.getName().toString();
+                        int hashcode = info.getName().toString().hashCode();
+                        if (hashcode < 0) {
+                            cacheKey += hashcode;
+                        } else {
+                            cacheKey += "-" + hashcode;
+                        }
                     }
                     URL configFile = getConfigFileURL(message);
 
@@ -159,7 +164,12 @@ public final class WSS4JUtils {
                 if (cacheIdentifier != null) {
                     cacheKey += "-" + cacheIdentifier;
                 } else if (info.getName() != null) {
-                    cacheKey += "-" + info.getName().toString();
+                    int hashcode = info.getName().toString().hashCode();
+                    if (hashcode < 0) {
+                        cacheKey += hashcode;
+                    } else {
+                        cacheKey += "-" + hashcode;
+                    }
                 }
                 tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
                 info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
