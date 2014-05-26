@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.token.validator;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,13 +27,16 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Text;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
+<<<<<<< HEAD
 
+=======
+import org.apache.cxf.sts.token.realm.CertConstraintsParser;
+>>>>>>> cf05755... Add certificate path validation for X.509 tokens in the STS
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
 
 import org.apache.ws.security.WSConstants;
@@ -59,7 +63,17 @@ public class X509TokenValidator implements TokenValidator {
     private static final Logger LOG = LogUtils.getL7dLogger(X509TokenValidator.class);
     
     private Validator validator = new SignatureTrustValidator();
+    
+    private CertConstraintsParser certConstraints = new CertConstraintsParser();
 
+    /**
+     * Set a list of Strings corresponding to regular expression constraints on the subject DN
+     * of a certificate
+     */
+    public void setSubjectConstraints(List<String> subjectConstraints) {
+        certConstraints.setSubjectConstraints(subjectConstraints);
+    }
+    
     /**
      * Set the WSS4J Validator instance to use to validate the token.
      * @param validator the WSS4J Validator instance to use to validate the token
@@ -103,6 +117,7 @@ public class X509TokenValidator implements TokenValidator {
         requestData.setWssConfig(WSSConfig.getNewInstance());
         requestData.setCallbackHandler(callbackHandler);
         requestData.setMsgContext(tokenParameters.getWebServiceContext().getMessageContext());
+        requestData.setSubjectCertConstraints(certConstraints.getCompiledSubjectContraints());
 
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
