@@ -110,22 +110,13 @@ public final class NegotiationUtils {
             if (create && tokenStore == null) {
                 TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
                 String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
-<<<<<<< HEAD
                 if (info.getName() != null) {
-                    cacheKey += "-" + info.getName().toString();
-=======
-                String cacheIdentifier = 
-                    (String)message.getContextualProperty(SecurityConstants.CACHE_IDENTIFIER);
-                if (cacheIdentifier != null) {
-                    cacheKey += "-" + cacheIdentifier;
-                } else if (info.getName() != null) {
                     int hashcode = info.getName().toString().hashCode();
                     if (hashcode < 0) {
                         cacheKey += hashcode;
                     } else {
                         cacheKey += "-" + hashcode;
                     }
->>>>>>> 0fe383e... Fix for CXF-5766 on 2.7.x
                 }
                 tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
                 info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
