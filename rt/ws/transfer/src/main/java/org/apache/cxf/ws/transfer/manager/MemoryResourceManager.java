@@ -51,10 +51,33 @@ public class MemoryResourceManager implements ResourceManager {
     protected static final String REF_NAMESPACE = "http://www.cxf.apache.org/MemoryResourceManager";
     
     protected static final String REF_LOCAL_NAME = "UUID";
+
+    protected static Transformer transformer;
+    
+    protected static Document document;
     
     protected Map<String, String> storage;
     
     public MemoryResourceManager() {
+        if (transformer == null) {
+            try {
+                TransformerFactory tf = TransformerFactory.newInstance();
+                transformer = tf.newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            } catch (TransformerConfigurationException ex) {
+                throw new IllegalArgumentException(
+                        "Exception occurred during creation of the Transformer instance.", ex);
+            }
+        }
+        if (document == null) {
+            try {
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                document = db.newDocument();
+            } catch (ParserConfigurationException ex) {
+                throw new IllegalArgumentException("Exception occured during creation of the Document instance.", ex);
+            }
+        }
         storage = new HashMap<String, String>();
     }
 
@@ -96,17 +119,12 @@ public class MemoryResourceManager implements ResourceManager {
             if (!storage.containsKey(uuid)) {
                 throw new UnknownResource();
             }
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             StringWriter writer = new StringWriter();
             transformer.transform(new DOMSource((Node) newRepresentation.getAny()), new StreamResult(writer));
             storage.put(uuid, writer.toString());
-        } catch (TransformerConfigurationException ex) {
-            throw new RuntimeException(ex);
         } catch (TransformerException ex) {
-            throw new RuntimeException(ex);
-        }
+            throw new RuntimeException("Exception occured during serialization of the Representation.", ex);
+        } 
     }
 
     @Override
@@ -114,27 +132,18 @@ public class MemoryResourceManager implements ResourceManager {
         try {
             // Store xmlResource
             String uuid = UUID.randomUUID().toString();
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             StringWriter writer = new StringWriter();
             transformer.transform(new DOMSource((Node) initRepresentation.getAny()), new StreamResult(writer));
             storage.put(uuid, writer.toString());
             // Create referenceParameter
             ReferenceParametersType refParam = new ReferenceParametersType();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.newDocument();
-            Element uuidEl = doc.createElementNS(REF_NAMESPACE, REF_LOCAL_NAME);
+            
+            Element uuidEl = document.createElementNS(REF_NAMESPACE, REF_LOCAL_NAME);
             uuidEl.setTextContent(uuid);
             refParam.getAny().add(uuidEl);
             return refParam;
-        } catch (TransformerConfigurationException ex) {
-            throw new RuntimeException(ex);
         } catch (TransformerException ex) {
-            throw new RuntimeException(ex);
-        } catch (ParserConfigurationException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException("Exception occured during serialization of the Representation.", ex);
         }
     }
     
