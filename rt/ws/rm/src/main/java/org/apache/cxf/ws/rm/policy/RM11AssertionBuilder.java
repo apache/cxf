@@ -60,17 +60,6 @@ public class RM11AssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
         }
 
         @Override
-        public boolean equal(PolicyComponent policyComponent) {
-//            if (policyComponent.getType() != Constants.TYPE_ASSERTION
-//                || !getName().equals(((Assertion)policyComponent).getName())) {
-//                return false;
-//            }
-//            JaxbAssertion<RMAssertion> other = JaxbAssertion.cast((Assertion)policyComponent);
-            // TODO: implement the handling for delivery assurances in the policy
-            return false;  
-        }
-        
-        @Override
         protected Assertion clone(boolean b) {
             RMPolicyAssertion a = new RMPolicyAssertion();
             a.setData(getData());
