@@ -94,7 +94,12 @@ public final class WSS4JUtils {
                     ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
                     String cacheKey = instanceKey;
                     if (info.getName() != null) {
-                        cacheKey += "-" + info.getName().toString();
+                        int hashcode = info.getName().toString().hashCode();
+                        if (hashcode < 0) {
+                            cacheKey += hashcode;
+                        } else {
+                            cacheKey += "-" + hashcode;
+                        }
                     }
                     replayCache = replayCacheFactory.newReplayCache(cacheKey, message);
                     info.setProperty(instanceKey, replayCache);
@@ -106,6 +111,132 @@ public final class WSS4JUtils {
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Fetch the result of a given action from a given result list.
+     * 
+     * @param resultList The result list to fetch an action from
+     * @param action The action to fetch
+     * @return The result fetched from the result list, null if the result
+     *         could not be found
+     */
+    public static List<WSSecurityEngineResult> fetchAllActionResults(
+        List<WSSecurityEngineResult> resultList,
+        int action
+    ) {
+        return fetchAllActionResults(resultList, Collections.singletonList(action));
+    }
+    
+    /**
+     * Fetch the results of a given number of actions action from a given result list.
+     * 
+     * @param resultList The result list to fetch an action from
+     * @param actions The list of actions to fetch
+     * @return The list of matching results fetched from the result list
+     */
+    public static List<WSSecurityEngineResult> fetchAllActionResults(
+        List<WSSecurityEngineResult> resultList,
+        List<Integer> actions
+    ) {
+        List<WSSecurityEngineResult> actionResultList = Collections.emptyList();
+        if (actions == null || actions.isEmpty()) {
+            return actionResultList;
+        }
+        
+        for (WSSecurityEngineResult result : resultList) {
+            //
+            // Check the result of every action whether it matches the given action
+            //
+            int resultAction = 
+                ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+            if (actions.contains(resultAction)) {
+                if (actionResultList.isEmpty()) {
+                    actionResultList = new ArrayList<WSSecurityEngineResult>();
+                }
+                actionResultList.add(result);
+            }
+        }
+        return actionResultList;
+    }
+<<<<<<< HEAD
+=======
+    
+    public static TokenStore getTokenStore(Message message, boolean create) {
+        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        synchronized (info) {
+            TokenStore tokenStore = 
+                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
+            if (tokenStore == null) {
+                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
+            }
+            if (create && tokenStore == null) {
+                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
+                String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
+                String cacheIdentifier = 
+                    (String)message.getContextualProperty(SecurityConstants.CACHE_IDENTIFIER);
+                if (cacheIdentifier != null) {
+                    cacheKey += "-" + cacheIdentifier;
+                } else if (info.getName() != null) {
+                    int hashcode = info.getName().toString().hashCode();
+                    if (hashcode < 0) {
+                        cacheKey += hashcode;
+                    } else {
+                        cacheKey += "-" + hashcode;
+                    }
+                }
+                tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
+                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
+            }
+            return tokenStore;
+        }
+    }
+    
+    public static String parseAndStoreStreamingSecurityToken(
+        org.apache.xml.security.stax.securityToken.SecurityToken securityToken,
+        Message message
+    ) throws XMLSecurityException {
+        if (securityToken == null) {
+            return null;
+        }
+        SecurityToken existingToken = getTokenStore(message).getToken(securityToken.getId());
+        if (existingToken == null || existingToken.isExpired()) {
+            Date created = new Date();
+            Date expires = new Date();
+            expires.setTime(created.getTime() + 300000);
+
+            SecurityToken cachedTok = new SecurityToken(securityToken.getId(), created, expires);
+            cachedTok.setSHA1(securityToken.getSha1Identifier());
+
+            if (securityToken.getTokenType() != null) {
+                if (securityToken.getTokenType() == WSSecurityTokenConstants.EncryptedKeyToken) {
+                    cachedTok.setTokenType(WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE);
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.KerberosToken) {
+                    cachedTok.setTokenType(WSSConstants.NS_GSS_Kerberos5_AP_REQ);
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.Saml11Token) {
+                    cachedTok.setTokenType(WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE);
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.Saml20Token) {
+                    cachedTok.setTokenType(WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE);
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.SecureConversationToken
+                    || securityToken.getTokenType() == WSSecurityTokenConstants.SecurityContextToken) {
+                    cachedTok.setTokenType(WSSConstants.NS_WSC_05_02);
+                }
+            }
+
+            for (String key : securityToken.getSecretKey().keySet()) {
+                Key keyObject = securityToken.getSecretKey().get(key);
+                if (keyObject != null) {
+                    cachedTok.setKey(keyObject);
+                    if (keyObject instanceof SecretKey) {
+                        cachedTok.setSecret(keyObject.getEncoded());
+                    }
+                    break;
+                }
+            }
+            getTokenStore(message).add(cachedTok);
+>>>>>>> 779cf32... [CXF-5766] - Caching nonces to disk may not work if the service QName is too long
+
+    /**
+>>>>>>> 49a9e00... [CXF-5766] - Caching nonces to disk may not work if the service QName is too long
      * Map a WSSecurityException FaultCode to a standard error String, so as not to leak
      * internal configuration to an attacker.
      */
