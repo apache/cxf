@@ -98,7 +98,10 @@ public class ResourceFactoryImpl implements ResourceFactory {
         factory.setAddress(ref.getResourceURL() 
                 + TransferConstants.RESOURCE_REMOTE_SUFFIX);
         ResourceFactory client = (ResourceFactory) factory.create();
-        
-        return client.create(body);
+        CreateResponse response = client.create(body);
+        // Adding of endpoint address to the response.
+        response.getResourceCreated().setAddress(new AttributedURIType());
+        response.getResourceCreated().getAddress().setValue(ref.getResourceURL());
+        return response;
     }
 }
