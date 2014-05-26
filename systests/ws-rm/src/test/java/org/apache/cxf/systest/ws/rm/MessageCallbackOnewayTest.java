@@ -356,7 +356,6 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
             synchronized (callbacks) {
                 callbacks.add(new Callback(true, msgNum));
                 callbacks.notifyAll();
-                System.out.println("Message accepted " + msgNum);
             }
         }
 
@@ -365,7 +364,6 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
             synchronized (callbacks) {
                 callbacks.add(new Callback(false, msgNum));
                 callbacks.notifyAll();
-                System.out.println("Message acknowledged " + msgNum);
             }
         }
         
