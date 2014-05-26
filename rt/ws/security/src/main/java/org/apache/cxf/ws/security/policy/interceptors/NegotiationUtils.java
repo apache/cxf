@@ -116,7 +116,12 @@ public final class NegotiationUtils {
                 if (cacheIdentifier != null) {
                     cacheKey += "-" + cacheIdentifier;
                 } else if (info.getName() != null) {
-                    cacheKey += "-" + info.getName().toString();
+                    int hashcode = info.getName().toString().hashCode();
+                    if (hashcode < 0) {
+                        cacheKey += hashcode;
+                    } else {
+                        cacheKey += "-" + hashcode;
+                    }
                 }
                 tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
                 info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
