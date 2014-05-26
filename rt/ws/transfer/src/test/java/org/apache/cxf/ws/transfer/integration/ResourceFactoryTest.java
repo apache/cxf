@@ -19,14 +19,11 @@
 
 package org.apache.cxf.ws.transfer.integration;
 
-import java.io.PrintWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.CreateResponse;
@@ -80,8 +77,8 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         factory.setBus(bus);
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_FACTORY_ADDRESS);
-        factory.getInInterceptors().add(new LoggingInInterceptor(new PrintWriter(System.out)));
-        factory.getOutInterceptors().add(new LoggingOutInterceptor(new PrintWriter(System.out)));
+        factory.getInInterceptors().add(logInInterceptor);
+        factory.getOutInterceptors().add(logOutInterceptor);
         ResourceFactory client = (ResourceFactory) factory.create();
         Create createRequest = new Create();
         Representation representation = new Representation();

@@ -19,9 +19,12 @@
 
 package org.apache.cxf.ws.transfer.integration;
 
+import java.io.PrintWriter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
@@ -46,9 +49,17 @@ public class IntegrationBaseTest {
     
     protected static ResourceManager manager;
     
+    protected static LoggingInInterceptor logInInterceptor;
+    
+    protected static LoggingOutInterceptor logOutInterceptor;
+    
     @BeforeClass
     public static void beforeClass() {
         bus = BusFactory.getDefaultBus();
+        logInInterceptor = new LoggingInInterceptor(new PrintWriter(System.out));
+        logInInterceptor.setPrettyLogging(true);
+        logOutInterceptor = new LoggingOutInterceptor(new PrintWriter(System.out));
+        logOutInterceptor.setPrettyLogging(true);
     }
     
     @AfterClass
