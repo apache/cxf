@@ -137,60 +137,7 @@
     <bean id="SAMLConditionsProvider" class="org.apache.cxf.sts.token.provider.DefaultConditionsProvider">
         <property name="acceptClientLifetime" value="true"/>
     </bean>
-<<<<<<< HEAD
 
-	<bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
-		<property name="endpoints" ref="transportEndpoints" />
-	</bean>
-
-	<util:list id="transportEndpoints">
-		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
-		</value>
-	</util:list>
-
-	<bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-		<property name="signaturePropertiesFile" value="stsKeystore.properties" />
-		<property name="signatureUsername" value="mystskey" />
-		<property name="callbackHandlerClass"
-			value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
-		<property name="encryptionPropertiesFile" value="stsKeystore.properties" />
-		<property name="issuer" value="DoubleItSTSIssuer" />
-		<property name="encryptionUsername" value="myservicekey" />
-	</bean>
-
-	<jaxws:endpoint id="localSTS" implementor="#transportSTSProviderBean"
-		address="https://localhost:${testutil.ports.STSServerPOP}/SecurityTokenService/Transport"
-		wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
-		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
-		depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService"
-		endpointName="ns1:Transport_Port">
-	</jaxws:endpoint>
-	
-	<httpj:engine-factory id="ClientAuthHttpsSettings"
-		bus="cxf">
-		<httpj:engine port="${testutil.ports.STSServerPOP}">
-			<httpj:tlsServerParameters>
-				<sec:trustManagers>
-					<sec:keyStore type="jks" password="stsspass" resource="stsstore.jks" />
-				</sec:trustManagers>
-				<sec:keyManagers keyPassword="stskpass">
-					<sec:keyStore type="jks" password="stsspass" resource="stsstore.jks" />
-				</sec:keyManagers>
-				<sec:cipherSuitesFilter>
-					<sec:include>.*_EXPORT_.*</sec:include>
-					<sec:include>.*_EXPORT1024_.*</sec:include>
-					<sec:include>.*_WITH_DES_.*</sec:include>
-					<sec:include>.*_WITH_AES_.*</sec:include>
-					<sec:include>.*_WITH_NULL_.*</sec:include>
-					<sec:exclude>.*_DH_anon_.*</sec:exclude>
-				</sec:cipherSuitesFilter>
-				<sec:clientAuthentication want="true"
-					required="true" />
-			</httpj:tlsServerParameters>
-		</httpj:engine>
-	</httpj:engine-factory>
-   
-=======
     <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
         <property name="endpoints" ref="transportEndpoints"/>
     </bean>
@@ -238,6 +185,5 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
->>>>>>> 7851f41... [CXF-5768] - Fallback to "Issue" if "Renew" fails in the STSClient
 </beans>
 

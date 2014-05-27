@@ -30,11 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-<<<<<<< HEAD
-
-=======
 import org.apache.cxf.common.logging.LogUtils;
->>>>>>> 7851f41... [CXF-5768] - Fallback to "Issue" if "Renew" fails in the STSClient
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
