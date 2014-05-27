@@ -26,9 +26,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
+<<<<<<< HEAD
 
+=======
+import org.apache.cxf.common.logging.LogUtils;
+>>>>>>> 7851f41... [CXF-5768] - Fallback to "Issue" if "Renew" fails in the STSClient
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -70,6 +76,8 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
  * 
  */
 public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(IssuedTokenInterceptorProvider.class);
     
     private static final long serialVersionUID = -6936475570762840527L;
     private static final String ASSOCIATED_TOKEN = 
@@ -426,10 +434,30 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     
                     client.setTemplate(itok.getRstTemplate());
                     return client.renewSecurityToken(tok);
-                } catch (RuntimeException e) {
-                    throw e;
-                } catch (Exception e) {
-                    throw new Fault(e);
+                } catch (RuntimeException ex) {
+                    LOG.log(Level.WARNING, "Error renewing a token", ex);
+                    boolean issueAfterFailedRenew = 
+                        MessageUtils.getContextualBoolean(
+                            message, SecurityConstants.STS_ISSUE_AFTER_FAILED_RENEW, true
+                        );
+                    if (issueAfterFailedRenew) {
+                        // Perhaps the STS does not support renewing, so try to issue a new token
+                        return issueToken(message, aim, itok);
+                    } else {
+                        throw ex;
+                    }
+                } catch (Exception ex) {
+                    LOG.log(Level.WARNING, "Error renewing a token", ex);
+                    boolean issueAfterFailedRenew = 
+                        MessageUtils.getContextualBoolean(
+                            message, SecurityConstants.STS_ISSUE_AFTER_FAILED_RENEW, true
+                        );
+                    if (issueAfterFailedRenew) {
+                        // Perhaps the STS does not support renewing, so try to issue a new token
+                        return issueToken(message, aim, itok);
+                    } else {
+                        throw new Fault(ex);
+                    }
                 } finally {
                     client.setTrust((Trust10)null);
                     client.setTrust((Trust13)null);

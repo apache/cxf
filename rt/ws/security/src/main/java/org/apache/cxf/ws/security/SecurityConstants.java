@@ -412,6 +412,13 @@ public final class SecurityConstants {
     public static final String STS_TOKEN_DO_CANCEL = "ws-security.sts.token.do.cancel";
     
     /**
+     * Whether to fall back to calling "issue" after failing to renew an expired token. Some
+     * STSs do not support the renew binding, and so we should just issue a new token after expiry.
+     * The default is true.
+     */
+    public static final String STS_ISSUE_AFTER_FAILED_RENEW = "ws-security.issue.after.failed.renew";
+    
+    /**
      * Set this to "false" to not cache a SecurityToken per proxy object in the 
      * IssuedTokenInterceptorProvider. This should be done if a token is being retrieved
      * from an STS in an intermediary. The default value is "true".
