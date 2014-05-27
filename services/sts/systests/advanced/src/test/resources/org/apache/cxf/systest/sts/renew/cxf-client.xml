@@ -65,32 +65,61 @@
                     <property name="allowRenewingAfterExpiry" value="true"/>
                 </bean>
             </entry>
+            <entry key="ws-security.issue.after.failed.renew" value="false"/>
         </jaxws:properties>
     </jaxws:client>
+    
+    <bean id="saml2STSClient" class="org.apache.cxf.ws.security.trust.STSClient">
+        <constructor-arg ref="cxf"/>
+        <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
+        <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+        <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+        <property name="ttl" value="8"/>
+        <property name="enableLifetime" value="true"/>
+        <property name="allowRenewingAfterExpiry" value="true"/>
+        <property name="properties">
+            <map>
+                <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
+                <entry key="ws-security.sts.token.usecert" value="true"/>
+            </map>
+        </property>
+    </bean>
+                
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSaml2Port" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.username" value="alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.signature.username" value="myclientkey"/>
-            <entry key="ws-security.sts.client">
-                <bean class="org.apache.cxf.ws.security.trust.STSClient">
-                    <constructor-arg ref="cxf"/>
-                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
-                    <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
-                    <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
-                    <property name="ttl" value="8"/>
-                    <property name="enableLifetime" value="true"/>
-                    <property name="allowRenewingAfterExpiry" value="true"/>
-                    <property name="properties">
-                        <map>
-                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                            <entry key="ws-security.sts.token.usecert" value="true"/>
-                        </map>
-                    </property>
-                </bean>
-            </entry>
+            <entry key="ws-security.sts.client" value-ref="saml2STSClient" />
+        </jaxws:properties>
+    </jaxws:client>
+    
+     <bean id="saml2STSNoRenewClient" class="org.apache.cxf.ws.security.trust.STSClient">
+        <constructor-arg ref="cxf"/>
+        <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServerPOP}/SecurityTokenService/TransportSoap12?wsdl"/>
+        <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+        <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Soap12_Port"/>
+        <property name="ttl" value="8"/>
+        <property name="enableLifetime" value="true"/>
+        <property name="allowRenewingAfterExpiry" value="true"/>
+        <property name="properties">
+            <map>
+                <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
+                <entry key="ws-security.sts.token.usecert" value="true"/>
+            </map>
+        </property>
+    </bean>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSaml2NoRenewPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+            <entry key="ws-security.signature.username" value="myclientkey"/>
+            <entry key="ws-security.sts.client" value-ref="saml2STSNoRenewClient" />
         </jaxws:properties>
     </jaxws:client>
     <http:conduit name="https://localhost:.*">
