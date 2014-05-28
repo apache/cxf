@@ -107,14 +107,17 @@
         <cxf.jasypt.bundle.version>1.9.0_1</cxf.jasypt.bundle.version>
         <cxf.javax.ws.rs.version>2.0</cxf.javax.ws.rs.version>
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
-        <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
-        <cxf.jaxb21.xjc.version>2.1.13</cxf.jaxb21.xjc.version>
-        <cxf.jaxb22.version>2.2.7</cxf.jaxb22.version>
-        <cxf.jaxb22.impl.version>2.2.7</cxf.jaxb22.impl.version>
-        <cxf.jaxb22.xjc.version>2.2.7</cxf.jaxb22.xjc.version>
+        <cxf.jaxb21.impl.version>2.1.14</cxf.jaxb21.impl.version>
+        <cxf.jaxb21.core.version>2.1.14</cxf.jaxb21.core.version>
+        <cxf.jaxb21.xjc.version>2.1.14</cxf.jaxb21.xjc.version>
+        <cxf.jaxb22.version>2.2.11</cxf.jaxb22.version>
+        <cxf.jaxb22.impl.version>2.2.10-b140310.1920</cxf.jaxb22.impl.version>
+        <cxf.jaxb22.core.version>2.2.10-b140310.1920</cxf.jaxb22.core.version>
+        <cxf.jaxb22.xjc.version>2.2.10-b140310.1920</cxf.jaxb22.xjc.version>
         <!-- by default, we use jaxb 2.1, but java5 profile will override to 2.2 -->
         <cxf.jaxb.version>${cxf.jaxb21.version}</cxf.jaxb.version>
         <cxf.jaxb.impl.version>${cxf.jaxb21.impl.version}</cxf.jaxb.impl.version>
+        <cxf.jaxb.core.version>${cxf.jaxb21.core.version}</cxf.jaxb.core.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb21.xjc.version}</cxf.jaxb.xjc.version>
         <cxf.joda.time.version>2.2</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
@@ -1340,6 +1343,21 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <version>${cxf.jaxb.core.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>txw2</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>jaxme</groupId>
                 <artifactId>jaxme2</artifactId>
                 <version>0.5.1</version>
@@ -1704,6 +1722,7 @@
                 <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
                 <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
                 <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
+                <cxf.jaxb.core.version>${cxf.jaxb22.core.version}</cxf.jaxb.core.version>
             </properties>
             <build>
                 <plugins>
@@ -1736,6 +1755,7 @@
                 <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
                 <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
                 <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
+                <cxf.jaxb.core.version>${cxf.jaxb22.core.version}</cxf.jaxb.core.version>
                 <cxf.codegen.jvmArgs>-Djavax.xml.accessExternalSchema=file</cxf.codegen.jvmArgs>
             </properties>
             <build>

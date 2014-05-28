@@ -18,6 +18,7 @@ The following jars are required for all CXF usage:
 - geronimo-javamail.jar (Or the Sun equivalent) [6]
   (MAY be able to remove javamail if you don't use any MIME/MTOM/SAAJ type things)
 - jaxb-api.jar  [6]
+- jaxb-core.jar  [6]
 - jaxb-impl.jar (this is a [6] for normal runtime, but is required for 
                  tooling and the dynamic clients)
 - xmlschema-core.jar
