@@ -38,7 +38,7 @@ import org.junit.BeforeClass;
  * A test for CXF-5679.
  */
 public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(SignatureServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -49,7 +49,7 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
                 "Server failed to launch",
                 // run the server in the same process
                 // set this to false to fork
-                launchServer(Server.class, true)
+                launchServer(SignatureServer.class, true)
         );
     }
     
