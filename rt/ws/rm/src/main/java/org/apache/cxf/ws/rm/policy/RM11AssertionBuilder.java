@@ -30,7 +30,6 @@ import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder;
 import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rmp.v200702.RMAssertion;
 import org.apache.neethi.Assertion;
-import org.apache.neethi.PolicyComponent;
 
 /**
  * 
