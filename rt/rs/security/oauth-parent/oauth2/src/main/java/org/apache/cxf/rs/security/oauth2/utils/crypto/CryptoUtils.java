@@ -317,7 +317,8 @@ public final class CryptoUtils {
                                        String keyAlgo,
                                        Key wrapperKey,
                                        String wrapperKeyAlgo)  throws SecurityException {
-        return wrapSecretKey(new SecretKeySpec(keyBytes, keyAlgo), wrapperKey, 
+        return wrapSecretKey(new SecretKeySpec(keyBytes, convertJCECipherToSecretKeyName(keyAlgo)), 
+                             wrapperKey, 
                              new KeyProperties(wrapperKeyAlgo));
     }
     
@@ -457,7 +458,7 @@ public final class CryptoUtils {
     }
     
     public static SecretKey createSecretKeySpec(byte[] bytes, String algo) {
-        return new SecretKeySpec(bytes, algo);
+        return new SecretKeySpec(bytes, convertJCECipherToSecretKeyName(algo));
     }
     
     public static byte[] decodeSequence(String encodedSequence) throws SecurityException {
@@ -468,4 +469,18 @@ public final class CryptoUtils {
         }
     }
     
+    private static String convertJCECipherToSecretKeyName(String jceCipherName) {
+        if (jceCipherName != null) {
+            if (jceCipherName.startsWith("AES")) {
+                return "AES";
+            } else if (jceCipherName.startsWith("DESede")) {
+                return "DESede";
+            } else if (jceCipherName.startsWith("SEED")) {
+                return "SEED";
+            } else if (jceCipherName.startsWith("Camellia")) {
+                return "Camellia";
+            }
+        }
+        return null;
+    }
 }

@@ -27,9 +27,9 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactReaderWriterTest;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -105,8 +105,8 @@ public class JweCompactReaderWriterTest extends Assert {
     
     private String encryptContent(String content) throws Exception {
         RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
-        SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, Algorithm.A256GCM_ALGO.getJavaName());
-        RSAJweEncryptor encryptor = new RSAJweEncryptor(publicKey, key, INIT_VECTOR);
+        SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, "AES");
+        RSAJweEncryptor encryptor = new RSAJweEncryptor(publicKey, key, JwtConstants.A256GCM_ALGO, INIT_VECTOR);
         return encryptor.getJweContent(content);
     }
     
