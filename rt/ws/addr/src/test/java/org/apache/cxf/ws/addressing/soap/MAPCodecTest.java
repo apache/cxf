@@ -375,7 +375,7 @@ public class MAPCodecTest extends Assert {
                     ? VersionTransformer.Names200403.EPR_TYPE : null, 6, unmarshaller);
     }
 
-    private <T> void setUpHeaderDecode(List<Header> headers, String uri, String name, Class<T> clz,
+    private <T> void setUpHeaderDecode(List<Header> headers, String uri, String name, Class<?> clz,
                                        int index, Unmarshaller unmarshaller) throws Exception {
         Element headerElement = control.createMock(Element.class);
         headers.add(new Header(new QName(uri, name), headerElement));
@@ -384,7 +384,8 @@ public class MAPCodecTest extends Assert {
         headerElement.getLocalName();
         EasyMock.expectLastCall().andReturn(name);
         Object v = expectedValues[index];
-        JAXBElement<?> jaxbElement = new JAXBElement<T>(new QName(uri, name), clz, clz.cast(v));
+        @SuppressWarnings("unchecked")
+        JAXBElement<?> jaxbElement = new JAXBElement<Object>(new QName(uri, name), (Class<Object>)clz, clz.cast(v));
         unmarshaller.unmarshal(headerElement, clz);
         EasyMock.expectLastCall().andReturn(jaxbElement);
     }

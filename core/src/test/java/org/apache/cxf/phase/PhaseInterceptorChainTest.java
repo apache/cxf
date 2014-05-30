@@ -430,14 +430,12 @@ public class PhaseInterceptorChainTest extends Assert {
         return p;
     }
     
-    
-    @SuppressWarnings("unchecked")
     void setUpPhaseInterceptorInvocations(AbstractPhaseInterceptor<Message> p,
             boolean fail, boolean expectFault) {
         p.handleMessage(message);
         if (fail) {
             EasyMock.expectLastCall().andThrow(new RuntimeException());
-            message.setContent(EasyMock.isA(Class.class),
+            message.setContent(EasyMock.eq(Exception.class),
                                EasyMock.isA(Exception.class));
             EasyMock.expectLastCall();
         } else {
