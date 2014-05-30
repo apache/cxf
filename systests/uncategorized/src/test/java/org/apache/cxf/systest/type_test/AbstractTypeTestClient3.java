@@ -35,7 +35,6 @@ import javax.xml.ws.Holder;
 import org.w3c.dom.Element;
 
 import org.apache.type_test.doc.TestAnonEnumList;
-import org.apache.type_test.doc.TestQNameList;
 import org.apache.type_test.types1.DerivedChoiceBaseArray;
 import org.apache.type_test.types1.DerivedChoiceBaseChoice;
 import org.apache.type_test.types1.DerivedChoiceBaseStruct;
