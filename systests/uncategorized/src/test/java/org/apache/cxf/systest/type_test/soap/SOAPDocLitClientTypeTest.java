@@ -47,7 +47,7 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
     public void updatePort() throws Exception {
         updateAddressPort(docClient, PORT);
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         boolean ok = launchServer(SOAPDocLitServerImpl.class, true);
