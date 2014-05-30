@@ -381,7 +381,7 @@
         <profile>
             <id>jdk17</id>
             <activation>
-                <jdk>1.7</jdk>
+                <jdk>[1.7,1.9)</jdk>
             </activation>
             <properties>
                 <cxf.spi-dir>spi-2.2</cxf.spi-dir>
