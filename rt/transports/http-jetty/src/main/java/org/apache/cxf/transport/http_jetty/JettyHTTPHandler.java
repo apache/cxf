@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.transport.http.HttpUrlUtil;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -34,10 +35,14 @@ public class JettyHTTPHandler extends AbstractHandler {
     protected ServletContext servletContext;
     private String urlName;
     private boolean contextMatchExact;
+    private Bus bus;
 
     public JettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
         contextMatchExact = cmExact;
         jettyHTTPDestination = jhd;
+    }
+    public JettyHTTPHandler(Bus bus) {
+        this.bus = bus;
     }
 
     public void setServletContext(ServletContext sc) {
@@ -68,6 +73,7 @@ public class JettyHTTPHandler extends AbstractHandler {
         
     }
 
-
-
+    public Bus getBus() {
+        return jettyHTTPDestination != null ? jettyHTTPDestination.getBus() : bus;
+    }
 }
