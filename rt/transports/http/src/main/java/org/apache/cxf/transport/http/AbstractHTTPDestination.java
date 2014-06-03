@@ -111,7 +111,7 @@ public abstract class AbstractHTTPDestination
     protected final String path;
 
     // Configuration values
-    protected HTTPServerPolicy serverPolicy;
+    protected volatile HTTPServerPolicy serverPolicy;
     protected String contextMatchStrategy = "stem";
     protected boolean fixedParameterOrder;
     protected boolean multiplexWithAddress;
@@ -513,18 +513,28 @@ public abstract class AbstractHTTPDestination
         cproviderFactory = bus.getExtension(ContinuationProviderFactory.class);
     }
 
-    private void calcServerPolicy(Message m) {
+    private synchronized HTTPServerPolicy calcServerPolicyInternal(Message m) {
+        HTTPServerPolicy sp = serverPolicy;
         if (!serverPolicyCalced) {
             PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
             if (pde != null) {
-                serverPolicy = pde.getServerEndpointPolicy(m, endpointInfo, this, new ServerPolicyCalculator());
+                sp = pde.getServerEndpointPolicy(m, endpointInfo, this, new ServerPolicyCalculator());
             }
-            if (null == serverPolicy) {
-                serverPolicy = endpointInfo.getTraversedExtensor(
+            if (null == sp) {
+                sp = endpointInfo.getTraversedExtensor(
                         new HTTPServerPolicy(), HTTPServerPolicy.class);
             }
+            serverPolicy = sp;
+            serverPolicyCalced = true;
         }
-        serverPolicyCalced = true;
+        return sp;
+    }
+    private HTTPServerPolicy calcServerPolicy(Message m) {
+        HTTPServerPolicy sp = serverPolicy;
+        if (!serverPolicyCalced) {
+            sp = calcServerPolicyInternal(m);
+        }
+        return sp;
     }
     
     /**
@@ -581,9 +591,9 @@ public abstract class AbstractHTTPDestination
         }
 
         cacheInput(outMessage);
-        calcServerPolicy(outMessage);
-        if (serverPolicy != null) {
-            new Headers(outMessage).setFromServerPolicy(serverPolicy);
+        HTTPServerPolicy sp = calcServerPolicy(outMessage);
+        if (sp != null) {
+            new Headers(outMessage).setFromServerPolicy(sp);
         }
 
         OutputStream responseStream = null;
@@ -879,8 +889,7 @@ public abstract class AbstractHTTPDestination
     }
 
     public HTTPServerPolicy getServer() {
-        calcServerPolicy(null);
-        return serverPolicy;
+        return calcServerPolicy(null);
     }
 
     public void setServer(HTTPServerPolicy server) {
@@ -892,7 +901,7 @@ public abstract class AbstractHTTPDestination
     
     public void assertMessage(Message message) {
         PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
-        pde.assertMessage(message, serverPolicy, new ServerPolicyCalculator());
+        pde.assertMessage(message, calcServerPolicy(message), new ServerPolicyCalculator());
     }
 
     public boolean canAssert(QName type) {

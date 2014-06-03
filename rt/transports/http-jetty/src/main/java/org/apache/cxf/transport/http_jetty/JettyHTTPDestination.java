@@ -51,6 +51,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
+import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.eclipse.jetty.http.Generator;
 import org.eclipse.jetty.io.AbstractConnection;
 import org.eclipse.jetty.server.AbstractHttpConnection.Output;
@@ -242,8 +243,9 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
                 setHeadFalse(c);
             }
         }
-        if (getServer().isSetRedirectURL()) {
-            resp.sendRedirect(getServer().getRedirectURL());
+        HTTPServerPolicy sp = getServer();
+        if (sp.isSetRedirectURL()) {
+            resp.sendRedirect(sp.getRedirectURL());
             resp.flushBuffer();
             baseRequest.setHandled(true);
             return;
