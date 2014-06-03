@@ -19,12 +19,17 @@
 package org.apache.cxf.jaxrs.validation;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.List;
 
+import javax.validation.ValidationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.logging.FaultListener;
+import org.apache.cxf.logging.NoOpFaultListener;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.validation.BeanValidationInInterceptor;
@@ -41,6 +46,17 @@ public class JAXRSBeanValidationInInterceptor extends BeanValidationInIntercepto
     @Override
     protected Object getServiceObject(Message message) {
         return ValidationUtils.getResourceInstance(message);
+    }
+    
+    @Override
+    protected void handleValidation(final Message message, final Object resourceInstance,
+                                    final Method method, final List<Object> arguments) {
+        try {
+            super.handleValidation(message, resourceInstance, method, arguments);
+        } catch (ValidationException ex) {
+            message.put(FaultListener.class.getName(), new NoOpFaultListener());
+            throw ex;
+        }
     }
     
     @Override
