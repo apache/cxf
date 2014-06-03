@@ -84,8 +84,8 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
     private Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
     private WSSSecurityProperties userSecurityProperties;
-    private Set<String> before = new HashSet<String>();
-    private Set<String> after = new HashSet<String>();
+    private final Set<String> before = new HashSet<String>();
+    private final Set<String> after = new HashSet<String>();
     private String phase;
     private String id;
     
@@ -308,18 +308,10 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         return after;
     }
 
-    public void setAfter(Set<String> after) {
-        this.after = after;
-    }
-
     public Set<String> getBefore() {
         return before;
     }
 
-    public void setBefore(Set<String> before) {
-        this.before = before;
-    }
-    
     protected boolean isRequestor(SoapMessage message) {
         return MessageUtils.isRequestor(message);
     }

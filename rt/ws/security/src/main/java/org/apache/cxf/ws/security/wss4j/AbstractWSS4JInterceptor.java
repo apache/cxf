@@ -61,8 +61,8 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     }
 
     private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
-    private Set<String> before = new HashSet<String>();
-    private Set<String> after = new HashSet<String>();
+    private final Set<String> before = new HashSet<String>();
+    private final Set<String> after = new HashSet<String>();
     private String phase;
     private String id;
     
@@ -144,18 +144,10 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         return after;
     }
 
-    public void setAfter(Set<String> after) {
-        this.after = after;
-    }
-
     public Set<String> getBefore() {
         return before;
     }
 
-    public void setBefore(Set<String> before) {
-        this.before = before;
-    }
-    
     protected boolean isRequestor(SoapMessage message) {
         return MessageUtils.isRequestor(message);
     }  
