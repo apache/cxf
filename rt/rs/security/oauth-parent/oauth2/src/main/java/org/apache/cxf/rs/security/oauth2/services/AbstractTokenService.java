@@ -62,36 +62,34 @@ public class AbstractTokenService extends AbstractOAuthService {
                 client = getAndValidateClientFromIdAndSecret(clientId,
                                               params.getFirst(OAuthConstants.CLIENT_SECRET));
             }
+        } else if (principal.getName() != null) {
+            client = getClient(principal.getName());
         } else {
-            // Client has already been authenticated
-            if (principal.getName() != null) {
-                client = getClient(principal.getName());
-            } else {
-                String clientId = retrieveClientId(params);
-                if (clientId != null) {
-                    client = getClient(clientId);
-                } 
-            }
-        } 
-        
+            String clientId = retrieveClientId(params);
+            if (clientId != null) {
+                client = getClient(clientId);
+            } 
+        }
         if (client == null) {
-            TLSSessionInfo tlsSessionInfo = 
-                (TLSSessionInfo)getMessageContext().get(TLSSessionInfo.class.getName());
-            client = getClientFromTLSCertificates(sc, tlsSessionInfo);
+            client = getClientFromTLSCertificates(sc, getTlsSessionInfo());
             if (client == null) {
                 // Basic Authentication is expected by default
                 client = getClientFromBasicAuthScheme();
             }
-            if (client != null && tlsSessionInfo != null) {
-                // Validate the client application certificates
-                compareTlsCertificates(tlsSessionInfo, client.getApplicationCertificate());
-            }
         }
-        
+        if (client != null && client.getApplicationCertificate() != null) {
+            // Validate the client application certificates
+            compareTlsCertificates(getTlsSessionInfo(), client.getApplicationCertificate());
+        }
         if (client == null) {
             reportInvalidClient();
         }
         return client;
+    }
+    
+    private TLSSessionInfo getTlsSessionInfo() {
+
+        return (TLSSessionInfo)getMessageContext().get(TLSSessionInfo.class.getName());
     }
     
     protected String retrieveClientId(MultivaluedMap<String, String> params) {
@@ -154,7 +152,7 @@ public class AbstractTokenService extends AbstractOAuthService {
     }
     
     protected void compareTlsCertificates(TLSSessionInfo tlsInfo, String base64EncodedCert) {
-        if (tlsInfo != null && base64EncodedCert != null) {
+        if (tlsInfo != null) {
             Certificate[] clientCerts = tlsInfo.getPeerCertificates();
             try {
                 X509Certificate cert = (X509Certificate)clientCerts[0];
@@ -164,9 +162,10 @@ public class AbstractTokenService extends AbstractOAuthService {
                     return;
                 }
             } catch (Exception ex) {
-                reportInvalidClient();
+                // throw exception later
             }
         }
+        reportInvalidClient();
     }
     
     

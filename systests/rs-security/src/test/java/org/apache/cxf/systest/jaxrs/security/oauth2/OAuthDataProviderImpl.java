@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oauth2;
 
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -37,20 +41,35 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
 
     private Map<String, Client> clients = new HashMap<String, Client>();
     
-    public OAuthDataProviderImpl() {
+    public OAuthDataProviderImpl() throws Exception {
         Client client = new Client("alice", "alice", true);
         client.getAllowedGrantTypes().add(Constants.SAML2_BEARER_GRANT);
         client.getAllowedGrantTypes().add("custom_grant");
         clients.put(client.getClientId(), client);
+
+        
+        KeyStore keyStore = loadKeyStore(); 
+        Certificate cert = keyStore.getCertificate("morpit");
+        String encodedCert = Base64Utility.encode(cert.getEncoded());
         
         Client client2 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US", 
                                     null,
                                     true,
                                     null,
                                     null);
-        client.getAllowedGrantTypes().add("custom_grant");
+        client2.getAllowedGrantTypes().add("custom_grant");
+        client2.setApplicationCertificate(encodedCert);
         clients.put(client2.getClientId(), client2);
     }
+
+    private KeyStore loadKeyStore() throws Exception {
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        InputStream is = this.getClass().getResourceAsStream("/org/apache/cxf/systest/http/resources/Truststore.jks");
+        ks.load(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'});
+        return ks;
+    }
+
+    
     
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
