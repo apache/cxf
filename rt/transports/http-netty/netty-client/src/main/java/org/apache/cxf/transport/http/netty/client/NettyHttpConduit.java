@@ -291,7 +291,8 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                 bootstrap.handler(new NettyHttpClientPipelineFactory(null));
             }
             ChannelFuture connFuture = 
-                bootstrap.connect(new InetSocketAddress(url.getHost(), url.getPort()));
+                bootstrap.connect(new InetSocketAddress(url.getHost(), url.getPort() != -1 ? url.getPort()
+                                                            : "http".equals(url.getScheme()) ? 80 : 443));
 
             // Setup the call back on the NettyHttpClientRequest
             ChannelFutureListener listener = new ChannelFutureListener() {
