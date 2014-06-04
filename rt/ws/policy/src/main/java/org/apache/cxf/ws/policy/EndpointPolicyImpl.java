@@ -189,7 +189,11 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
     }
     
-    void initializeVocabulary() {
+    synchronized void initializeVocabulary() {
+        if (vocabulary != null) {
+            return;
+        }
+
         vocabulary = new ArrayList<Assertion>();
         if (requestor) {
             faultVocabulary = new ArrayList<Assertion>();
@@ -269,7 +273,11 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
     }
 
-    void initializeInterceptors() {
+    synchronized void initializeInterceptors() {
+        if (interceptors != null) {
+            return;
+        }
+
         if (engine == null || engine.getBus() == null
             || engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class) == null) {
             return;
