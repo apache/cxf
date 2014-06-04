@@ -50,9 +50,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     private Policy policy;
     private Collection<Assertion> chosenAlternative;
     
-    private Collection<Assertion> vocabulary;
+    private volatile Collection<Assertion> vocabulary;
     private Collection<Assertion> faultVocabulary;
-    private List<Interceptor<? extends Message>> interceptors;
+    private volatile List<Interceptor<? extends Message>> interceptors;
     private List<Interceptor<? extends Message>> faultInterceptors;
     
     private EndpointInfo ei;
@@ -107,28 +107,28 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         return chosenAlternative;
     }
     
-    public synchronized Collection<Assertion> getVocabulary() {
+    public Collection<Assertion> getVocabulary() {
         if (vocabulary == null) {
             initializeVocabulary();
         }
         return vocabulary;
     }
     
-    public synchronized Collection<Assertion> getFaultVocabulary() {
+    public Collection<Assertion> getFaultVocabulary() {
         if (vocabulary == null) {
             initializeVocabulary();
         }
         return faultVocabulary;
     }    
     
-    public synchronized List<Interceptor<? extends Message>> getInterceptors() {
+    public List<Interceptor<? extends Message>> getInterceptors() {
         if (interceptors == null) {
             initializeInterceptors();
         }
         return interceptors;
     }
     
-    public synchronized List<Interceptor<? extends Message>> getFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getFaultInterceptors() {
         if (interceptors == null) {
             initializeInterceptors();
         }
@@ -194,9 +194,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             return;
         }
 
-        vocabulary = new ArrayList<Assertion>();
+        List<Assertion> v = new ArrayList<Assertion>();
+        List<Assertion> fv = null;
         if (requestor) {
-            faultVocabulary = new ArrayList<Assertion>();
+            fv = new ArrayList<Assertion>();
         }
        
         // vocabulary of alternative chosen for endpoint
@@ -205,9 +206,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                 if (a.isOptional()) {
                     continue;
                 }
-                vocabulary.add(a);            
-                if (null != faultVocabulary) {
-                    faultVocabulary.add(a);
+                v.add(a);            
+                if (null != fv) {
+                    fv.add(a);
                 }
             }
         }
@@ -220,28 +221,32 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                 p = engine.getEffectiveServerRequestPolicy(ei, boi);
                 Collection<Assertion> c = engine.getAssertions(p, false);
                 if (c != null) {
-                    addAll(vocabulary, c);
+                    addAll(v, c);
                 }
             } else {
                 p = engine.getEffectiveClientResponsePolicy(ei, boi);
                 Collection<Assertion> c = engine.getAssertions(p, false);
                 if (c != null) {
-                    addAll(vocabulary, c);
-                    if (null != faultVocabulary) {
-                        addAll(faultVocabulary, c);
+                    addAll(v, c);
+                    if (null != fv) {
+                        addAll(fv, c);
                     }
                 }
-                if (boi.getFaults() != null && null != faultVocabulary) {
+                if (boi.getFaults() != null && null != fv) {
                     for (BindingFaultInfo bfi : boi.getFaults()) {
                         p = engine.getEffectiveClientFaultPolicy(ei, boi, bfi);
                         c = engine.getAssertions(p, false);
                         if (c != null) {
-                            addAll(faultVocabulary, c);
+                            addAll(fv, c);
                         }
                     }
                 }
             }
         }
+        if (requestor) {
+            faultVocabulary = fv;
+        }
+        vocabulary = v;
     }
 
     Collection<Assertion> getSupportedAlternatives(Policy p) {
@@ -292,8 +297,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             }
         }
 
+        List<Interceptor<? extends Message>> tmp = null;
         if (requestor) {
-            interceptors = new ArrayList<Interceptor<? extends Message>>(out);
+            tmp = new ArrayList<Interceptor<? extends Message>>(out);
             out.clear();
             for (Assertion a : getChosenAlternative()) {
                 initializeInterceptors(reg, out, a, true);
@@ -313,10 +319,11 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                     }
                 }
             }
-            interceptors = new ArrayList<Interceptor<? extends Message>>(out);
+            tmp = new ArrayList<Interceptor<? extends Message>>(out);
         } else {
-            interceptors = new ArrayList<Interceptor<? extends Message>>(out);            
+            tmp = new ArrayList<Interceptor<? extends Message>>(out);            
         }
+        interceptors = tmp;
     }
     
     // for test
