@@ -34,6 +34,7 @@ import javax.wsdl.extensions.soap.SOAPHeader;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding;
@@ -287,6 +288,12 @@ public class ServiceProcessor extends AbstractProcessor {
             processOperation(model, bop, binding);
         }
         jport.setJavaDoc(port.getDocumentation());
+        JAXWSBinding bind = port.getExtensor(JAXWSBinding.class);
+        if (bind != null) {
+            jport.setMethodName(bind.getMethodName());
+            jport.setJavaDoc(bind.getMethodJavaDoc());
+        }
+        
         return jport;
     }
     private void processBindings(JavaModel model) {
