@@ -154,7 +154,10 @@ public class JavaPort {
         methodName = mname;       
     }
     
-    public String getMethodName(String mname) {
+    public String getMethodName() {
+        if (methodName == null) {
+            return "get" + getName();
+        }
         return methodName;
     }
 

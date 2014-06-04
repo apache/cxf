@@ -186,7 +186,7 @@ $port.javaDoc
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public ${portClassName} get${port.Name}() {
+    public ${portClassName} ${port.MethodName}() {
         return super.getPort($port.Name, ${portClassName}.class);
     }
 
@@ -204,7 +204,7 @@ $port.javaDoc
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public ${portClassName} get${port.Name}(WebServiceFeature... features) {
+    public ${portClassName} ${port.MethodName}(WebServiceFeature... features) {
         return super.getPort($port.Name, ${portClassName}.class, features);
     }
 #end
