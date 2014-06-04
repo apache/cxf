@@ -31,6 +31,7 @@ import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Fault;
 import javax.wsdl.Operation;
+import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.wsdl.extensions.ExtensionRegistry;
@@ -92,6 +93,7 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
         registerJAXWSBinding(registry, Service.class);
         registerJAXWSBinding(registry, Fault.class);
         registerJAXWSBinding(registry, PortType.class);
+        registerJAXWSBinding(registry, Port.class);
         registerJAXWSBinding(registry, Operation.class);
         registerJAXWSBinding(registry, Binding.class);
         registerJAXWSBinding(registry, BindingOperation.class);
