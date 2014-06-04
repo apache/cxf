@@ -55,24 +55,20 @@ public class AbstractTokenService extends AbstractOAuthService {
         Client client = null;
         SecurityContext sc = getMessageContext().getSecurityContext();
         Principal principal = sc.getUserPrincipal();
-        String clientIdParameter = params.getFirst(OAuthConstants.CLIENT_ID);
         
-        if (principal == null && clientIdParameter != null) {
-            // Both client_id and client_secret are expected in the form payload
-            client = getAndValidateClientFromIdAndSecret(clientIdParameter,
-                                          params.getFirst(OAuthConstants.CLIENT_SECRET));
-        } else if (principal != null) {
+        if (principal == null) {
+            String clientId = retrieveClientId(params);
+            if (clientId != null) {
+                client = getAndValidateClientFromIdAndSecret(clientId,
+                                              params.getFirst(OAuthConstants.CLIENT_SECRET));
+            }
+        } else {
             // Client has already been authenticated
             if (principal.getName() != null) {
                 client = getClient(principal.getName());
             } else {
-                String clientId = clientIdParameter != null ? clientIdParameter 
-                    : (String)getMessageContext().get(OAuthConstants.CLIENT_ID);
-                if (StringUtils.isEmpty(clientId) && clientIdProvider != null) {
-                    // Check Custom ClientIdProvider
-                    clientId = clientIdProvider.getClientId(getMessageContext());
-                }
-                if (!StringUtils.isEmpty(clientId)) {
+                String clientId = retrieveClientId(params);
+                if (clientId != null) {
                     client = getClient(clientId);
                 } 
             }
@@ -96,6 +92,17 @@ public class AbstractTokenService extends AbstractOAuthService {
             reportInvalidClient();
         }
         return client;
+    }
+    
+    protected String retrieveClientId(MultivaluedMap<String, String> params) {
+        String clientId = params.getFirst(OAuthConstants.CLIENT_ID);
+        if (clientId == null) {
+            clientId = (String)getMessageContext().get(OAuthConstants.CLIENT_ID);
+        }
+        if (clientId == null && clientIdProvider != null) {
+            clientId = clientIdProvider.getClientId(getMessageContext());
+        }
+        return clientId;
     }
     
     // Get the Client and check the id and secret
