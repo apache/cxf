@@ -18,10 +18,13 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
+import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.PolicyConstants;
@@ -35,6 +38,7 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
     private static final String MS_NS = "http://schemas.microsoft.com/ws/2005/07/securitypolicy";
+    private static final Logger LOG = LogUtils.getL7dLogger(KeyValueTokenBuilder.class);
 
     public KeyValueTokenBuilder() {
     }
@@ -62,19 +66,18 @@ public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
 
         Element polEl = PolicyConstants.findPolicyElement(element);
         if (polEl == null) {
-            throw new IllegalArgumentException(
-                "sp:KeyValueToken/wsp:Policy must have a value"
-            );
-        }
-        
-        token.setPolicy(polEl);
-        Element child = DOMUtils.getFirstElement(polEl);
-        if (child != null) {
-            QName qname = new QName(child.getNamespaceURI(), child.getLocalName());
-            if ("RsaKeyValue".equals(qname.getLocalPart())) {
-                token.setForceRsaKeyValue(true);
+            LOG.warning("sp:KeyValueToken/wsp:Policy should have a value!");
+        } else {
+            token.setPolicy(polEl);
+            Element child = DOMUtils.getFirstElement(polEl);
+            if (child != null) {
+                QName qname = new QName(child.getNamespaceURI(), child.getLocalName());
+                if ("RsaKeyValue".equals(qname.getLocalPart())) {
+                    token.setForceRsaKeyValue(true);
+                }
             }
         }
+
         return token;
     }
 
