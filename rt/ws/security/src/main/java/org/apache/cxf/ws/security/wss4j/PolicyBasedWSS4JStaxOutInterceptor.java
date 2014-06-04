@@ -49,7 +49,6 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         boolean enableStax = 
             MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
         if (aim != null && enableStax) {
-            getProperties().clear();
             super.handleMessage(msg);
         }
     }

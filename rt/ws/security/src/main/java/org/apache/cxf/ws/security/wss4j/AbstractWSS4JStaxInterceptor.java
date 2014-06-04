@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -81,9 +82,9 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractWSS4JStaxInterceptor.class);
 
-    private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
+    private final Map<String, Object> properties;
+    private final WSSSecurityProperties userSecurityProperties;
     private Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
-    private WSSSecurityProperties userSecurityProperties;
     private final Set<String> before = new HashSet<String>();
     private final Set<String> after = new HashSet<String>();
     private String phase;
@@ -93,17 +94,21 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         super();
         id = getClass().getName();
         userSecurityProperties = securityProperties;
+        properties = null;
     }
     
     public AbstractWSS4JStaxInterceptor(Map<String, Object> properties) {
         super();
         id = getClass().getName();
         this.properties = properties;
+        userSecurityProperties = null;
     }
     
     public AbstractWSS4JStaxInterceptor() {
         super();
         id = getClass().getName();
+        userSecurityProperties = null;
+        properties = null;
     }
 
     protected WSSSecurityProperties createSecurityProperties() {
@@ -261,13 +266,12 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     }
     
     public Object getOption(String key) {
-        return properties.get(key);
+        if (properties != null) {
+            return properties.get(key);
+        }
+        return null;
     }
     
-    public void setProperty(String key, String value) {
-        properties.put(key, value);
-    }
-
     public String getPassword(Object msgContext) {
         return (String)((Message)msgContext).getContextualProperty("password");
     }
@@ -301,7 +305,10 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     }
     
     public Map<String, Object> getProperties() {
-        return properties;
+        if (properties != null) {
+            return properties;
+        }
+        return Collections.emptyMap();
     }
 
     public Set<String> getAfter() {
