@@ -74,8 +74,8 @@ public final class JMSConfigFactory {
         jmsConfig.setPubSubDomain(pubSubDomain);
 
         jmsConfig.setDurableSubscriptionName(endpoint.getDurableSubscriptionName());
-        // TODO We might need a separate config here
-        jmsConfig.setDurableSubscriptionClientId(endpoint.getDurableSubscriptionName());
+
+        jmsConfig.setClientID(endpoint.getClientID());
 
         jmsConfig.setReceiveTimeout(endpoint.getReceiveTimeout());
         jmsConfig.setTimeToLive(endpoint.getTimeToLive());

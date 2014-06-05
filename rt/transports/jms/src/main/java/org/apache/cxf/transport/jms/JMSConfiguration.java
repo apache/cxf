@@ -58,7 +58,7 @@ public class JMSConfiguration {
 
     private volatile String messageSelector;
     private boolean subscriptionDurable;
-    private String durableSubscriptionClientId;
+    private String clientID;
     private String durableSubscriptionName;
 
     private String targetDestination;
@@ -354,12 +354,12 @@ public class JMSConfiguration {
         return factory;
     }
     
-    public String getDurableSubscriptionClientId() {
-        return durableSubscriptionClientId;
+    public String getClientID() {
+        return clientID;
     }
 
-    public void setDurableSubscriptionClientId(String durableSubscriptionClientId) {
-        this.durableSubscriptionClientId = durableSubscriptionClientId;
+    public void setClientID(String clientID) {
+        this.clientID = clientID;
     }
 
     public void setTargetService(String targetService) {
