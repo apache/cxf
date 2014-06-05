@@ -102,8 +102,8 @@ public final class JMSFactory {
         Connection connection = username != null 
             ? cf.createConnection(username, jmsConfig.getPassword())
             : cf.createConnection();
-        if (jmsConfig.getDurableSubscriptionClientId() != null) {
-            connection.setClientID(jmsConfig.getDurableSubscriptionClientId());
+        if (jmsConfig.getClientID() != null) {
+            connection.setClientID(jmsConfig.getClientID());
         }
         return connection;
     }
