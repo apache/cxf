@@ -97,6 +97,10 @@ public enum Algorithm {
     public String getJavaName() {
         return javaName == null ? name() : javaName;
     }
+    
+    public String getJavaAlgoName() {
+        return stripAlgoProperties(getJavaName());
+    }
 
     public int getKeySizeBits() {
         return keySizeBits;
@@ -107,6 +111,18 @@ public enum Algorithm {
     }
     public static String toJavaName(String jwtName) {    
         return JWT_TO_JAVA_NAMES.get(jwtName);
+    }
+    public static String toJavaAlgoNameOnly(String jwtName) {    
+        return stripAlgoProperties(toJavaName(jwtName));
+    }
+    public static String stripAlgoProperties(String javaName) {    
+        if (javaName != null) {
+            int index = javaName.indexOf('/');
+            if (index != -1) {
+                javaName = javaName.substring(0, index);
+            }
+        }
+        return javaName;
     }
     
 }
