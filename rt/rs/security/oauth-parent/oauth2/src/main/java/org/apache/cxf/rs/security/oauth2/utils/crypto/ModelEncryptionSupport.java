@@ -328,12 +328,13 @@ public final class ModelEncryptionSupport {
                               getStringPart(parts[3]), getStringPart(parts[4]));
         c.setApplicationDescription(getStringPart(parts[5]));
         c.setApplicationLogoUri(getStringPart(parts[6]));
-        c.setAllowedGrantTypes(parseSimpleList(parts[7]));
-        c.setRegisteredScopes(parseSimpleList(parts[8]));
-        c.setRedirectUris(parseSimpleList(parts[9]));
-        c.setRegisteredAudiences(parseSimpleList(parts[10]));
-        c.setProperties(parseSimpleMap(parts[11]));
-        c.setSubject(recreateUserSubject(parts[12]));
+        c.setApplicationLogoUri(getStringPart(parts[7]));
+        c.setAllowedGrantTypes(parseSimpleList(parts[8]));
+        c.setRegisteredScopes(parseSimpleList(parts[9]));
+        c.setRedirectUris(parseSimpleList(parts[10]));
+        c.setRegisteredAudiences(parseSimpleList(parts[11]));
+        c.setProperties(parseSimpleMap(parts[12]));
+        c.setSubject(recreateUserSubject(parts[13]));
         return c; 
     }
     private static String tokenizeClient(Client client) {
@@ -359,22 +360,25 @@ public final class ModelEncryptionSupport {
         // 6: app logo URI
         state.append(tokenizeString(client.getApplicationLogoUri()));
         state.append(SEP);
-        // 7: grants
+        // 7: app certificate
+        state.append(tokenizeString(client.getApplicationCertificate()));
+        state.append(SEP);
+        // 8: grants
         state.append(client.getAllowedGrantTypes().toString());
         state.append(SEP);
-        // 8: redirect URIs
+        // 9: redirect URIs
         state.append(client.getRedirectUris().toString());
         state.append(SEP);
-        // 9: registered scopes
+        // 10: registered scopes
         state.append(client.getRegisteredScopes().toString());
         state.append(SEP);
-        // 10: registered audiences
+        // 11: registered audiences
         state.append(client.getRegisteredAudiences().toString());
         state.append(SEP);
-        // 11: properties
+        // 12: properties
         state.append(client.getProperties().toString());
         state.append(SEP);
-        // 12: subject
+        // 13: subject
         tokenizeUserSubject(state, client.getSubject());
         
         return state.toString();
