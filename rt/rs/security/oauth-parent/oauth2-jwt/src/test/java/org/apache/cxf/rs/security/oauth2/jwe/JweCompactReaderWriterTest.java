@@ -36,10 +36,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JweCompactReaderWriterTest extends Assert {
-    private static final boolean IGNORE_TESTS;
-    static {
-        IGNORE_TESTS = System.getProperty("java.version").contains("1.6");
-    }
     private static final byte[] CONTENT_ENCRYPTION_KEY = {
         (byte)177, (byte)161, (byte)244, (byte)128, 84, (byte)143, (byte)225,
         115, 63, (byte)180, 3, (byte)255, 107, (byte)154, (byte)212, (byte)246,
@@ -65,29 +61,21 @@ public class JweCompactReaderWriterTest extends Assert {
      
     @BeforeClass
     public static void registerBouncyCastleIfNeeded() throws Exception {
-        if (!IGNORE_TESTS) {    
-            try {
-                // Java 8 apparently has it
-                Cipher.getInstance(Algorithm.A256GCM_ALGO_JAVA);
-            } catch (Throwable t) {
-                // Oracle Java 7
-                Security.addProvider(new BouncyCastleProvider());    
-            }
+        try {
+            // Java 8 apparently has it
+            Cipher.getInstance(Algorithm.A256GCM_ALGO_JAVA);
+        } catch (Throwable t) {
+            // Oracle Java 7
+            Security.addProvider(new BouncyCastleProvider());    
         }
     }
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        if (!IGNORE_TESTS) {    
-            Security.removeProvider(BouncyCastleProvider.class.getName());    
-        }
+        Security.removeProvider(BouncyCastleProvider.class.getName());    
     }
     
     @Test
     public void testEncryptDecryptSpecExample() throws Exception {
-        if (IGNORE_TESTS) {
-            return;
-        }
-        
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
         String jweContent = encryptContent(specPlainText);
         
@@ -96,9 +84,6 @@ public class JweCompactReaderWriterTest extends Assert {
     
     @Test
     public void testEncryptDecryptJwsToken() throws Exception {
-        if (IGNORE_TESTS) {
-            return;
-        }
         String jweContent = encryptContent(JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC);
         decrypt(jweContent, JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC);
     }

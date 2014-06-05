@@ -33,6 +33,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -41,6 +42,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
@@ -50,6 +52,9 @@ import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
  * Encryption helpers
  */
 public final class CryptoUtils {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(CryptoUtils.class);
+    
     private CryptoUtils() {
     }
     
@@ -140,7 +145,7 @@ public final class CryptoUtils {
             Constructor<?> ctr = c.getConstructor(new Class[]{int.class, byte[].class});
             return (AlgorithmParameterSpec)ctr.newInstance(new Object[]{authTagLength, iv});
         } catch (Throwable t) {
-            throw new SecurityException(t);
+            return new IvParameterSpec(iv);
         }
     }
     
@@ -408,8 +413,12 @@ public final class CryptoUtils {
             }
             if (keyProps != null && keyProps.getAdditionalData() != null) {
                 // TODO: call updateAAD directly after switching to Java7
-                Method m = Cipher.class.getMethod("updateAAD", new Class[]{byte[].class});
-                m.invoke(c, new Object[]{keyProps.getAdditionalData()});
+                try {
+                    Method m = Cipher.class.getMethod("updateAAD", new Class[]{byte[].class});
+                    m.invoke(c, new Object[]{keyProps.getAdditionalData()});
+                } catch (NoSuchMethodException ex) {
+                    LOG.fine(ex.getMessage());
+                }
             }
             return c;
         } catch (Exception ex) {
