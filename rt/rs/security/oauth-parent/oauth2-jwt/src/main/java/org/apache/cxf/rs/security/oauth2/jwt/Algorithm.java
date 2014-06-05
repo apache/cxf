@@ -49,6 +49,7 @@ public enum Algorithm {
     public static final String RSA_OAEP_ALGO_JAVA = "RSA/ECB/OAEPWithSHA-1AndMGF1Padding";
     public static final String RSA_OAEP_256_ALGO_JAVA = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
     public static final String RSA_1_5_ALGO_JAVA = "RSA/ECB/PKCS1Padding";
+    public static final String AES_ALGO_JAVA = "AES";
     public static final String A256GCM_ALGO_JAVA = "AES/GCM/NoPadding";
     
     private static final Map<String, String> JAVA_TO_JWT_NAMES;
@@ -65,6 +66,7 @@ public enum Algorithm {
         JAVA_TO_JWT_NAMES.put(RSA_OAEP_256_ALGO_JAVA, JwtConstants.RSA_OAEP_256_ALGO);
         JAVA_TO_JWT_NAMES.put(RSA_1_5_ALGO_JAVA, JwtConstants.RSA_1_5_ALGO);
         JAVA_TO_JWT_NAMES.put(A256GCM_ALGO_JAVA, JwtConstants.A256GCM_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_ALGO_JAVA, JwtConstants.A256GCM_ALGO);
         JWT_TO_JAVA_NAMES = new HashMap<String, String>();
         JWT_TO_JAVA_NAMES.put(JwtConstants.HMAC_SHA_256_ALGO, HMAC_SHA_256_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.HMAC_SHA_384_ALGO, HMAC_SHA_384_JAVA);

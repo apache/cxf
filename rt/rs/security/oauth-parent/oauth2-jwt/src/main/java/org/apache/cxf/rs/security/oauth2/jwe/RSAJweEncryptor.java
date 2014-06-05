@@ -40,7 +40,7 @@ public class RSAJweEncryptor extends JweEncryptor {
              secretKey.getEncoded(), iv, DEFAULT_AUTH_TAG_LENGTH, true);
     }
     public RSAJweEncryptor(RSAPublicKey publicKey, SecretKey secretKey, byte[] iv) {
-        this(publicKey, secretKey, Algorithm.stripAlgoProperties(secretKey.getAlgorithm()), iv);
+        this(publicKey, secretKey, Algorithm.toJwtName(secretKey.getAlgorithm()), iv);
     }
     
     public RSAJweEncryptor(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv, 
