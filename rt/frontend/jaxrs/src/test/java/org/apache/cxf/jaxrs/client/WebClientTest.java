@@ -27,6 +27,7 @@ import java.util.Collections;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 
+import org.apache.cxf.jaxrs.resources.BookDescriptor;
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 
@@ -291,6 +292,14 @@ public class WebClientTest extends Assert {
         // interface
         BookInterface proxy = JAXRSClientFactory.create("http://foo", BookInterface.class);
         proxy.getBook(null);
+    }
+
+    @Test
+    public void testBeanParam() {
+        // interface
+        BookInterface proxy = JAXRSClientFactory.create("http://foo", BookInterface.class);
+        BookDescriptor d = new BookDescriptor(2013, "123123123");
+        BookDescriptor bookDescriptor = proxy.getBookDescriptor(d);
     }
     
     private static class ParamConverterProviderImpl implements ParamConverterProvider {

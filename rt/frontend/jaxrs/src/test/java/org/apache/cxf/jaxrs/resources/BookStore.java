@@ -36,13 +36,12 @@ public class BookStore extends BookSuperClass implements BookInterface {
     public Book getBook(String id) {
         return null;
     }
-    
+
     @Override
     public Book getNewBook(String id, Boolean isNew) {
         return null;
     }
-    
-    
+
 
     @POST
     @Path("/books")
@@ -71,6 +70,11 @@ public class BookStore extends BookSuperClass implements BookInterface {
     public String getAuthor() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public BookDescriptor getBookDescriptor(BookDescriptor descriptor) {
+        return descriptor;
     }
 }
 
