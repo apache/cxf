@@ -20,6 +20,7 @@
 
 package org.apache.cxf.jaxrs.resources;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -73,8 +74,19 @@ public class BookStore extends BookSuperClass implements BookInterface {
     }
 
     @Override
-    public BookDescriptor getBookDescriptor(BookDescriptor descriptor) {
-        return descriptor;
+    public void getBookDescriptor(BookDescriptor descriptor) {
+    }
+
+    @Override
+    public void getBookDescriptor(BookDescriptor2 descriptor) {
+    }
+
+    @Override
+    public void getBookDescriptor(BookDescriptor3 descriptor) {
+    }
+
+    @Override
+    public void getBookDescriptor(BookDescriptor4 descriptor) {
     }
 }
 

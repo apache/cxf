@@ -24,10 +24,14 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Collections;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.apache.cxf.jaxrs.resources.BookDescriptor;
+import org.apache.cxf.jaxrs.resources.BookDescriptor2;
+import org.apache.cxf.jaxrs.resources.BookDescriptor3;
+import org.apache.cxf.jaxrs.resources.BookDescriptor4;
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 
@@ -294,12 +298,36 @@ public class WebClientTest extends Assert {
         proxy.getBook(null);
     }
 
-    @Test
+    @Test(expected = NotFoundException.class)
     public void testBeanParam() {
         // interface
-        BookInterface proxy = JAXRSClientFactory.create("http://foo", BookInterface.class);
+        BookInterface proxy = JAXRSClientFactory.create("http://localhost", BookInterface.class);
         BookDescriptor d = new BookDescriptor(2013, "123123123");
-        BookDescriptor bookDescriptor = proxy.getBookDescriptor(d);
+        proxy.getBookDescriptor(d);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void testBeanParam2() {
+        // interface
+        BookInterface proxy = JAXRSClientFactory.create("http://localhost", BookInterface.class);
+        BookDescriptor2 d = new BookDescriptor2(2013, "123123123");
+        proxy.getBookDescriptor(d);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void testBeanParam3() {
+        // interface
+        BookInterface proxy = JAXRSClientFactory.create("http://localhost", BookInterface.class);
+        BookDescriptor3 d = new BookDescriptor3(2013, "123123123");
+        proxy.getBookDescriptor(d);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void testBeanParam4() {
+        // interface
+        BookInterface proxy = JAXRSClientFactory.create("http://localhost", BookInterface.class);
+        BookDescriptor4 d = new BookDescriptor4(2013, "123123123");
+        proxy.getBookDescriptor(d);
     }
     
     private static class ParamConverterProviderImpl implements ParamConverterProvider {

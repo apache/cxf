@@ -8,34 +8,34 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @since 05.06.2014
  */
 @XmlRootElement(name = "BookDescriptor")
-public class BookDescriptor {
+public class BookDescriptor4 {
     private Integer year;
     private String isbn;
 
-    public BookDescriptor(Integer year, String isbn) {
+    public BookDescriptor4(Integer year, String isbn) {
         this.isbn = isbn;
         this.year = year;
     }
 
-    public BookDescriptor() {
+    public BookDescriptor4() {
     }
 
-
-    @PathParam("year")
     public Integer getYear() {
         return year;
     }
 
-    @PathParam("isbn")
     public String getIsbn() {
         return isbn;
     }
 
-    public void setYear( Integer year) {
+
+    @PathParam("year")
+    public void setYear(@PathParam("isbn") Integer year) {
         this.year = year;
     }
 
-    public void setIsbn( String isbn) {
+    @PathParam("isbn")
+    public void setIsbn(@PathParam("isbn") String isbn) {
         this.isbn = isbn;
     }
 }
