@@ -27,29 +27,37 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public class JweDecryptor {
     private JweCompactConsumer jweConsumer;
-    private Key decryptionKey;
+    private Key cekDecryptionKey;
+    private byte[] contentDecryptionKey;
     private boolean unwrap;
     private CeProvider ceProvider = new CeProvider();
-    public JweDecryptor(String jweContent, Key decryptionKey, boolean unwrap) {    
+    public JweDecryptor(String jweContent, Key cekDecryptionKey, boolean unwrap) {    
         this.jweConsumer = new JweCompactConsumer(jweContent);
-        this.decryptionKey = decryptionKey;
+        this.cekDecryptionKey = cekDecryptionKey;
         this.unwrap = unwrap;
     }
-    
-    protected Key getDecryptionKey() {
-        return decryptionKey;
+    public JweDecryptor(String jweContent, Key contentDecryptionKey) {    
+        this(jweContent, null, false);
+        this.contentDecryptionKey = contentDecryptionKey.getEncoded();
+    }
+    protected Key getCekDecryptionKey() {
+        return cekDecryptionKey;
     }
     
-    protected byte[] getDecryptedContentEncryptionKey() {
+    protected byte[] getContentEncryptionKey() {
         // This can be overridden if needed
+        if (contentDecryptionKey != null) {
+            return contentDecryptionKey;
+        }
+        
         KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm());
         if (!unwrap) {
             keyProps.setBlockSize(getKeyCipherBlockSize());
-            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(), decryptionKey, keyProps);
+            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(), getCekDecryptionKey(), keyProps);
         } else {
             return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(), 
                                                getContentEncryptionAlgorithm(), 
-                                               decryptionKey, 
+                                               getCekDecryptionKey(), 
                                                keyProps).getEncoded();
         }
     }
@@ -105,7 +113,7 @@ public class JweDecryptor {
 
         @Override
         public byte[] getContentEncryptionKey(JweHeaders headers, byte[] encryptedKey) {
-            return getDecryptedContentEncryptionKey();
+            return JweDecryptor.this.getContentEncryptionKey();
         }
 
         @Override

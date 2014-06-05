@@ -30,6 +30,6 @@ public class RSAJweDecryptor extends JweDecryptor {
         this(jweContent, privateKey, true);
     }
     protected int getKeyCipherBlockSize() {
-        return ((RSAPublicKey)getDecryptionKey()).getModulus().toByteArray().length;
+        return ((RSAPublicKey)getCekDecryptionKey()).getModulus().toByteArray().length;
     }
 }

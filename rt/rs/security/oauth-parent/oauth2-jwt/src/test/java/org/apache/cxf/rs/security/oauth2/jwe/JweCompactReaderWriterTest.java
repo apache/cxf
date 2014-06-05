@@ -30,6 +30,7 @@ import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -81,6 +82,13 @@ public class JweCompactReaderWriterTest extends Assert {
         
         decrypt(jweContent, specPlainText);
     }
+    @Test
+    public void testDirectKeyEncryptDecrypt() throws Exception {
+        final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
+        String jweContent = encryptContentDirect(specPlainText);
+        
+        decryptDirect(jweContent, specPlainText);
+    }
     
     @Test
     public void testEncryptDecryptJwsToken() throws Exception {
@@ -94,10 +102,20 @@ public class JweCompactReaderWriterTest extends Assert {
         RSAJweEncryptor encryptor = new RSAJweEncryptor(publicKey, key, JwtConstants.A256GCM_ALGO, INIT_VECTOR);
         return encryptor.getJweContent(content);
     }
-    
+    private String encryptContentDirect(String content) throws Exception {
+        SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, "AES");
+        JweEncryptor encryptor = new JweEncryptor(key, INIT_VECTOR);
+        return encryptor.getJweContent(content);
+    }
     private void decrypt(String jweContent, String plainContent) throws Exception {
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
         RSAJweDecryptor decryptor = new RSAJweDecryptor(jweContent, privateKey);
+        String decryptedText = decryptor.getDecryptedContentText();
+        assertEquals(decryptedText, plainContent);
+    }
+    private void decryptDirect(String jweContent, String plainContent) throws Exception {
+        SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, "AES");
+        JweDecryptor decryptor = new JweDecryptor(jweContent, key);
         String decryptedText = decryptor.getDecryptedContentText();
         assertEquals(decryptedText, plainContent);
     }
