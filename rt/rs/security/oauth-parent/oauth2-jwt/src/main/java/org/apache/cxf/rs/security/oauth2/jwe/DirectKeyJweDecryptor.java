@@ -18,18 +18,10 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
+import java.security.Key;
 
-
-public class RSAJweDecryptor extends WrappedKeyJweDecryptor {
-    public RSAJweDecryptor(String jweContent, RSAPrivateKey privateKey, boolean unwrap) {    
-        super(jweContent, privateKey, unwrap);
-    }
-    public RSAJweDecryptor(String jweContent, RSAPrivateKey privateKey) {    
-        this(jweContent, privateKey, true);
-    }
-    protected int getKeyCipherBlockSize() {
-        return ((RSAPublicKey)getCekDecryptionKey()).getModulus().toByteArray().length;
+public class DirectKeyJweDecryptor extends AbstractJweDecryptor {
+    public DirectKeyJweDecryptor(String jweContent, Key contentDecryptionKey) {    
+        super(jweContent, contentDecryptionKey);
     }
 }

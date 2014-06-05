@@ -25,18 +25,18 @@ import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
-public class JweDecryptor {
+public abstract class AbstractJweDecryptor {
     private JweCompactConsumer jweConsumer;
     private Key cekDecryptionKey;
     private byte[] contentDecryptionKey;
     private boolean unwrap;
     private CeProvider ceProvider = new CeProvider();
-    public JweDecryptor(String jweContent, Key cekDecryptionKey, boolean unwrap) {    
+    protected AbstractJweDecryptor(String jweContent, Key cekDecryptionKey, boolean unwrap) {    
         this.jweConsumer = new JweCompactConsumer(jweContent);
         this.cekDecryptionKey = cekDecryptionKey;
         this.unwrap = unwrap;
     }
-    public JweDecryptor(String jweContent, Key contentDecryptionKey) {    
+    protected AbstractJweDecryptor(String jweContent, Key contentDecryptionKey) {    
         this(jweContent, null, false);
         this.contentDecryptionKey = contentDecryptionKey.getEncoded();
     }
@@ -113,7 +113,7 @@ public class JweDecryptor {
 
         @Override
         public byte[] getContentEncryptionKey(JweHeaders headers, byte[] encryptedKey) {
-            return JweDecryptor.this.getContentEncryptionKey();
+            return AbstractJweDecryptor.this.getContentEncryptionKey();
         }
 
         @Override

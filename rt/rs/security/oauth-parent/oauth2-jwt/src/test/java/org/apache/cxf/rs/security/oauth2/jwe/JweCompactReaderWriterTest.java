@@ -104,7 +104,7 @@ public class JweCompactReaderWriterTest extends Assert {
     }
     private String encryptContentDirect(String content) throws Exception {
         SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, "AES");
-        JweEncryptor encryptor = new JweEncryptor(key, INIT_VECTOR);
+        DirectKeyJweEncryptor encryptor = new DirectKeyJweEncryptor(key, INIT_VECTOR);
         return encryptor.getJweContent(content);
     }
     private void decrypt(String jweContent, String plainContent) throws Exception {
@@ -115,7 +115,7 @@ public class JweCompactReaderWriterTest extends Assert {
     }
     private void decryptDirect(String jweContent, String plainContent) throws Exception {
         SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, "AES");
-        JweDecryptor decryptor = new JweDecryptor(jweContent, key);
+        DirectKeyJweDecryptor decryptor = new DirectKeyJweDecryptor(jweContent, key);
         String decryptedText = decryptor.getDecryptedContentText();
         assertEquals(decryptedText, plainContent);
     }

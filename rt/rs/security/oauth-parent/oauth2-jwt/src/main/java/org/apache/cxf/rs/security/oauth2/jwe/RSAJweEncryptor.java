@@ -25,7 +25,7 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 
-public class RSAJweEncryptor extends JweEncryptor {
+public class RSAJweEncryptor extends WrappedKeyJweEncryptor {
     public RSAJweEncryptor(RSAPublicKey publicKey, String contentEncryptionAlgo) {
         super(new JweHeaders(Algorithm.RSA_OAEP_ALGO.getJwtName(),
                              contentEncryptionAlgo), publicKey);

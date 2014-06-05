@@ -30,7 +30,7 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
-public class JweEncryptor {
+public abstract class AbstractJweEncryptor {
     protected static final int DEFAULT_IV_SIZE = 96;
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private Key cekEncryptionKey;
@@ -41,34 +41,34 @@ public class JweEncryptor {
     private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
     private boolean wrap;
     
-    public JweEncryptor(SecretKey cek, byte[] iv) {
+    protected AbstractJweEncryptor(SecretKey cek, byte[] iv) {
         this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm())), cek.getEncoded(), iv);
     }
-    public JweEncryptor(JweHeaders headers, byte[] cek, byte[] iv) {
+    protected AbstractJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv) {
         this.headers = headers;
         this.cek = cek;
         this.iv = iv;
     }
-    public JweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
+    protected AbstractJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
         this(headers, cek, iv);
         this.authTagLen = authTagLen;
     }
-    public JweEncryptor(JweHeaders headers, Key cekEncryptionKey) {
+    protected AbstractJweEncryptor(JweHeaders headers, Key cekEncryptionKey) {
         this.headers = headers;
         this.cekEncryptionKey = cekEncryptionKey;
     }
-    public JweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv) {
+    protected AbstractJweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv) {
         this(headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH);
         this.cekEncryptionKey = cekEncryptionKey;
     }
-    public JweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, 
+    protected AbstractJweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, 
                                    int authTagLen, boolean wrap) {
         this(headers, cek, iv, authTagLen);
         this.cekEncryptionKey = cekEncryptionKey;
         this.wrap = wrap;
     }
     
-    public JweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, int authTagLen, 
+    protected AbstractJweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, int authTagLen, 
                                    boolean wrap, JwtHeadersWriter writer) {
         this(headers, cekEncryptionKey, cek, iv, authTagLen, wrap);
         if (writer != null) {
