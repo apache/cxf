@@ -94,9 +94,12 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         final LoggingMessage buffer 
             = new LoggingMessage("Inbound Message\n----------------------------", id);
 
-        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
-        if (responseCode != null) {
-            buffer.getResponseCode().append(responseCode);
+        if (!Boolean.TRUE.equals(message.get(Message.DECOUPLED_CHANNEL_MESSAGE))) {
+            // avoid logging the default responseCode 200 for the decoupled responses
+            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+            if (responseCode != null) {
+                buffer.getResponseCode().append(responseCode);
+            }
         }
 
         String encoding = (String)message.get(Message.ENCODING);
