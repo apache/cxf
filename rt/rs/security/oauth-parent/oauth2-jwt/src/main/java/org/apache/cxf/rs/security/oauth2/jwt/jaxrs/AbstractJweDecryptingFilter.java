@@ -18,18 +18,27 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptionOutput;
+import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptor;
+import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
 
-@PreMatching
-public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
-    @Override
-    public void filter(ContainerRequestContext context) throws IOException {
-        context.setEntityStream(new ByteArrayInputStream(
-            decrypt(context.getEntityStream())));
+public class AbstractJweDecryptingFilter {
+    private JweDecryptor decryptor;
+    protected byte[] decrypt(InputStream is) throws IOException {
+        JweDecryptionOutput out = decryptor.decrypt(new String(IOUtils.readBytesFromStream(is), "UTF-8"));
+        validateHeaders(out.getHeaders());
+        return out.getContent();
     }
+
+    protected void validateHeaders(JweHeaders headers) {
+        // complete
+    }
+    public void setDecryptor(JweDecryptor decryptor) {
+        this.decryptor = decryptor;
+    }
+
 }

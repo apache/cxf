@@ -21,15 +21,16 @@ package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientResponseContext;
+import javax.ws.rs.client.ClientResponseFilter;
 
-@PreMatching
-public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
+public class JweClientResponseFilter  extends AbstractJweDecryptingFilter implements ClientResponseFilter {
     @Override
-    public void filter(ContainerRequestContext context) throws IOException {
-        context.setEntityStream(new ByteArrayInputStream(
-            decrypt(context.getEntityStream())));
+    public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
+        res.setEntityStream(new ByteArrayInputStream(
+            decrypt(res.getEntityStream())));
+        
     }
+
 }

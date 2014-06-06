@@ -20,16 +20,29 @@ package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 
-@PreMatching
-public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptor;
+
+public class JweWriterInterceptor implements WriterInterceptor {
+    private JweEncryptor encryptor;
+
     @Override
-    public void filter(ContainerRequestContext context) throws IOException {
-        context.setEntityStream(new ByteArrayInputStream(
-            decrypt(context.getEntityStream())));
+    public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
+        OutputStream actualOs = ctx.getOutputStream();
+        CachedOutputStream cos = new CachedOutputStream(); 
+        ctx.setOutputStream(cos);
+        ctx.proceed();
+        String jweContent = encryptor.encrypt(cos.getBytes());
+        IOUtils.copy(new ByteArrayInputStream(jweContent.getBytes("UTF-8")), actualOs);
+        actualOs.flush();
+        // TODO: figure out what to do with the content type
     }
+    
 }

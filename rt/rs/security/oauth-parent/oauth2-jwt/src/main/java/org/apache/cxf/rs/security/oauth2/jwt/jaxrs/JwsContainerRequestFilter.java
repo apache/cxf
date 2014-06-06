@@ -19,16 +19,49 @@
 package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 
-@PreMatching
-public class JwsContainerRequestFilter implements ContainerRequestFilter {
+import org.apache.cxf.rs.security.oauth2.jwt.JwtToken;
+
+public class JwsContainerRequestFilter implements 
+    MessageBodyWriter<JwtToken>, MessageBodyReader<JwtToken> {
 
     @Override
-    public void filter(ContainerRequestContext context) throws IOException {
+    public boolean isReadable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
+        return cls == JwtToken.class;
+    }
+
+    @Override
+    public JwtToken readFrom(Class<JwtToken> cls, Type t, Annotation[] anns, MediaType mt,
+                             MultivaluedMap<String, String> headers, InputStream is) throws IOException,
+        WebApplicationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public long getSize(JwtToken token, Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
+        return -1;
+    }
+
+    @Override
+    public boolean isWriteable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
+        return cls == JwtToken.class;
+    }
+
+    @Override
+    public void writeTo(JwtToken token, Class<?> cls, Type type, Annotation[] anns, MediaType mt,
+                        MultivaluedMap<String, Object> headers, OutputStream os) throws IOException,
+        WebApplicationException {
         // TODO Auto-generated method stub
         
     }
