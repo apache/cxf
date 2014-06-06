@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
  */
 public class LocalClientState implements ClientState {
     private static final String HTTP_SCHEME = "http";
+    private static final String WS_SCHEME = "ws";
     
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>(false, true);
     private MultivaluedMap<String, String> templates;
@@ -47,7 +48,7 @@ public class LocalClientState implements ClientState {
     
     public LocalClientState(URI baseURI) {
         this.baseURI = baseURI;
-        if (isHttpScheme(baseURI)) {
+        if (isSupportedScheme(baseURI)) {
             this.currentBuilder = new UriBuilderImpl().uri(baseURI);
         } else {
             this.currentBuilder = new UriBuilderImpl().uri("/");
@@ -130,7 +131,7 @@ public class LocalClientState implements ClientState {
                                 MultivaluedMap<String, String> headers,
                                 MultivaluedMap<String, String> templatesMap) {
         ClientState state = null;
-        if (isHttpScheme(currentURI)) {
+        if (isSupportedScheme(currentURI)) {
             state = new LocalClientState(currentURI);
         } else {
             state = new LocalClientState(baseURI, currentURI);
@@ -149,7 +150,8 @@ public class LocalClientState implements ClientState {
         return state;
     }
     
-    private static boolean isHttpScheme(URI uri) {
-        return !StringUtils.isEmpty(uri.getScheme()) && uri.getScheme().startsWith(HTTP_SCHEME);
+    private static boolean isSupportedScheme(URI uri) {
+        return !StringUtils.isEmpty(uri.getScheme()) 
+            && (uri.getScheme().startsWith(HTTP_SCHEME) || uri.getScheme().startsWith(WS_SCHEME));
     }
 }
