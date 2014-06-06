@@ -40,7 +40,7 @@ public abstract class AbstractJweDecryptor {
     public String getDecryptedContentText() {
         return jweConsumer.getDecryptedContentText(ceProvider);
     }
-    public JweHeaders getHeaders() {
+    protected JweHeaders getHeaders() {
         return getJweConsumer().getJweHeaders();
     }
     
