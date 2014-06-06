@@ -19,7 +19,6 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2;
 
 import java.io.InputStream;
-import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
 public class OAuthDataProviderImpl implements OAuthDataProvider {
@@ -48,8 +48,7 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
         clients.put(client.getClientId(), client);
 
         
-        KeyStore keyStore = loadKeyStore(); 
-        Certificate cert = keyStore.getCertificate("morpit");
+        Certificate cert = loadCert();
         String encodedCert = Base64Utility.encode(cert.getEncoded());
         
         Client client2 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US", 
@@ -62,11 +61,9 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
         clients.put(client2.getClientId(), client2);
     }
 
-    private KeyStore loadKeyStore() throws Exception {
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+    private Certificate loadCert() throws Exception {
         InputStream is = this.getClass().getResourceAsStream("/org/apache/cxf/systest/http/resources/Truststore.jks");
-        ks.load(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'});
-        return ks;
+        return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit");
     }
 
     

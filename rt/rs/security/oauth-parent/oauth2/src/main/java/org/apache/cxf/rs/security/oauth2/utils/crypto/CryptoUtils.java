@@ -120,11 +120,18 @@ public final class CryptoUtils {
         }    
     }
     
-    public static PublicKey loadPrivateKey(InputStream storeLocation, char[] storePassword, String alias) {
+    public static Certificate loadCertificate(InputStream storeLocation, char[] storePassword, String alias) {
         try {
             KeyStore keyStore = loadKeyStore(storeLocation, storePassword);
-            Certificate cert = keyStore.getCertificate(alias);
-            return cert.getPublicKey();
+            return keyStore.getCertificate(alias);
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }
+    }
+    
+    public static PublicKey loadPublicKey(InputStream storeLocation, char[] storePassword, String alias) {
+        try {
+            return loadCertificate(storeLocation, storePassword, alias).getPublicKey();
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
