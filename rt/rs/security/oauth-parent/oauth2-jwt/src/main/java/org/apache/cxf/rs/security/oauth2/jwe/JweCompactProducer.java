@@ -89,9 +89,9 @@ public class JweCompactProducer {
         StringBuilder sb = new StringBuilder();
         return sb.append(encodedHeaders)
                  .append('.')
-                 .append(encodedContentEncryptionKey)
+                 .append(encodedContentEncryptionKey == null ? "" : encodedContentEncryptionKey)
                  .append('.')
-                 .append(encodedInitVector)
+                 .append(encodedInitVector == null ? "" : encodedInitVector)
                  .append('.')
                  .append(encodedEncryptedContent)
                  .append('.')

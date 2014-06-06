@@ -68,8 +68,7 @@ public class JwtTokenReaderWriter implements JwtTokenReader, JwtTokenWriter {
         
     }
     
-    @Override
-    public JwtToken fromJson(String headersJson, String claimsJson) {
+    private JwtToken fromJson(String headersJson, String claimsJson) {
         JwtHeaders headers = fromJsonHeaders(headersJson);
         JwtClaims claims = fromJsonClaims(claimsJson);
         return new JwtToken(headers, claims);

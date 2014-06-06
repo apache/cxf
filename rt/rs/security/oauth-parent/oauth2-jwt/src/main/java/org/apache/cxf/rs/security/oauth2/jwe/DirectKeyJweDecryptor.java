@@ -21,7 +21,20 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 import java.security.Key;
 
 public class DirectKeyJweDecryptor extends AbstractJweDecryptor {
+    private byte[] contentDecryptionKey;
     public DirectKeyJweDecryptor(String jweContent, Key contentDecryptionKey) {    
-        super(jweContent, contentDecryptionKey);
+        this(jweContent, contentDecryptionKey, null);
+    }
+    public DirectKeyJweDecryptor(String jweContent, Key contentDecryptionKey, JweCryptoProperties props) {    
+        super(jweContent, props);
+        this.contentDecryptionKey = contentDecryptionKey.getEncoded();
+    }
+    @Override
+    protected byte[] getContentEncryptionKey() {
+        byte[] encryptedCEK = getEncryptedContentEncryptionKey();
+        if (encryptedCEK != null && encryptedCEK.length > 0) {
+            throw new SecurityException();
+        }
+        return contentDecryptionKey;
     }
 }

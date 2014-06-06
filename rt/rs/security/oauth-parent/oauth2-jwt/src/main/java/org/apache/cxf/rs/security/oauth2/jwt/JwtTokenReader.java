@@ -21,6 +21,5 @@ package org.apache.cxf.rs.security.oauth2.jwt;
 
 public interface JwtTokenReader extends JwtHeadersReader {
     JwtClaims fromJsonClaims(String jsonClaims);
-    JwtToken fromJson(String jsonHeaders, String jsonClaims);
     JwtToken fromJson(JwtTokenJson jsonPair);
 }

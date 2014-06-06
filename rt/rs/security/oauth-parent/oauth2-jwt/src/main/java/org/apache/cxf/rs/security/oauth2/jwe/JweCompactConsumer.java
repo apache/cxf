@@ -26,6 +26,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersReader;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
@@ -40,6 +41,12 @@ public class JweCompactConsumer {
     private byte[] authTag;
     private JweHeaders jweHeaders;
     public JweCompactConsumer(String jweContent) {
+        this(jweContent, null);
+    }
+    public JweCompactConsumer(String jweContent, JweCryptoProperties props) {
+        this(jweContent, props, new JwtTokenReaderWriter());
+    }
+    public JweCompactConsumer(String jweContent, JweCryptoProperties props, JwtHeadersReader reader) {
         String[] parts = jweContent.split("\\.");
         if (parts.length != 5) {
             throw new SecurityException("5 JWE parts are expected");
@@ -54,9 +61,16 @@ public class JweCompactConsumer {
             encryptedContentWithTag = new byte[cipherText.length + authTag.length];
             System.arraycopy(cipherText, 0, encryptedContentWithTag, 0, cipherText.length);
             System.arraycopy(authTag, 0, encryptedContentWithTag, cipherText.length, authTag.length);
-            jweHeaders = new JweHeaders(new JwtTokenReaderWriter().fromJsonHeaders(headersJson).asMap());
+            jweHeaders = new JweHeaders(reader.fromJsonHeaders(headersJson).asMap());
+            enforceJweCryptoProperties(props);
         } catch (Base64Exception ex) {
             throw new SecurityException(ex);
+        }
+    }
+    
+    private void enforceJweCryptoProperties(JweCryptoProperties props) {
+        if (props != null) {
+            //TODO: Validate
         }
     }
     

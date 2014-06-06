@@ -37,14 +37,21 @@ public class JwsCompactConsumer {
     private String headersJson;
     private String claimsJson;
     private JwtToken token;
+    private JwsSignatureProperties props;
     public JwsCompactConsumer(String encodedJws) {
-        this(encodedJws, null);
+        this(encodedJws, null, null);
+    }
+    public JwsCompactConsumer(String encodedJws, JwsSignatureProperties props) {
+        this(encodedJws, props, null);
     }
     public JwsCompactConsumer(String encodedJws, JwtTokenReader r) {
+        this(encodedJws, null, r);
+    }
+    public JwsCompactConsumer(String encodedJws, JwsSignatureProperties props, JwtTokenReader r) {
         if (r != null) {
             this.reader = r;
         }
-        
+        this.props = props;
         String[] parts = encodedJws.split("\\.");
         if (parts.length != 3) {
             if (parts.length == 2 && encodedJws.endsWith(".")) {
@@ -87,15 +94,21 @@ public class JwsCompactConsumer {
     }
     public JwtToken getJwtToken() {
         if (token == null) {
-            token = reader.fromJson(headersJson, claimsJson);
+            token = reader.fromJson(new JwtTokenJson(headersJson, claimsJson));
         }
         return token;
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
+        enforceJweSignatureProperties();
         if (!validator.verify(getJwtHeaders(), getUnsignedEncodedToken(), getDecodedSignature())) {
             throw new SecurityException();
         }
         return true;
+    }
+    private void enforceJweSignatureProperties() {
+        if (props != null) {
+            //TODO:
+        }
     }
     private static String decodeToString(String encoded) {
         try {

@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.oauth2.jwe;
 
 import java.io.UnsupportedEncodingException;
-import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.SecretKey;
@@ -33,13 +32,11 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 public abstract class AbstractJweEncryptor {
     protected static final int DEFAULT_IV_SIZE = 96;
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
-    private Key cekEncryptionKey;
     private JweHeaders headers;
     private JwtHeadersWriter writer = new JwtTokenReaderWriter();
     private byte[] cek;
     private byte[] iv;
     private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
-    private boolean wrap;
     
     protected AbstractJweEncryptor(SecretKey cek, byte[] iv) {
         this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm())), cek.getEncoded(), iv);
@@ -53,24 +50,12 @@ public abstract class AbstractJweEncryptor {
         this(headers, cek, iv);
         this.authTagLen = authTagLen;
     }
-    protected AbstractJweEncryptor(JweHeaders headers, Key cekEncryptionKey) {
+    protected AbstractJweEncryptor(JweHeaders headers) {
         this.headers = headers;
-        this.cekEncryptionKey = cekEncryptionKey;
     }
-    protected AbstractJweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv) {
-        this(headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH);
-        this.cekEncryptionKey = cekEncryptionKey;
-    }
-    protected AbstractJweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, 
-                                   int authTagLen, boolean wrap) {
+    protected AbstractJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen, 
+                                   JwtHeadersWriter writer) {
         this(headers, cek, iv, authTagLen);
-        this.cekEncryptionKey = cekEncryptionKey;
-        this.wrap = wrap;
-    }
-    
-    protected AbstractJweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, int authTagLen, 
-                                   boolean wrap, JwtHeadersWriter writer) {
-        this(headers, cekEncryptionKey, cek, iv, authTagLen, wrap);
         if (writer != null) {
             this.writer = writer;
         }
@@ -85,31 +70,11 @@ public abstract class AbstractJweEncryptor {
     }
     
     protected byte[] getContentEncryptionKey() {
-        if (cek == null && cekEncryptionKey != null) {
-            String algo = headers.getContentEncryptionAlgorithm();
-            return CryptoUtils.getSecretKey(algo, Algorithm.valueOf(algo).getKeySizeBits()).getEncoded();
-        } else {
-            return cek;
-        }
+        return cek;
     }
     
-    protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
-        if (cekEncryptionKey == null) {
-            return cek;
-        } else {
-            KeyProperties secretKeyProperties = new KeyProperties(getContentEncryptionKeyEncryptionAlgo());
-            if (!wrap) {
-                return CryptoUtils.encryptBytes(theCek, cekEncryptionKey, secretKeyProperties);
-            } else {
-                return CryptoUtils.wrapSecretKey(theCek, getContentEncryptionAlgo(), cekEncryptionKey, 
-                                                 secretKeyProperties.getKeyAlgo());
-            }
-        }
-    }
+    protected abstract byte[] getEncryptedContentEncryptionKey(byte[] theCek);
     
-    protected String getContentEncryptionKeyEncryptionAlgo() {
-        return Algorithm.toJavaName(headers.getKeyEncryptionAlgorithm());
-    }
     protected String getContentEncryptionAlgo() {
         return Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
     }
@@ -117,11 +82,11 @@ public abstract class AbstractJweEncryptor {
     protected int getAuthTagLen() {
         return authTagLen;
     }
-    
+    protected JweHeaders getJweHeaders() {
+        return headers;
+    }
     public String getJweContent(byte[] content) {
         byte[] theCek = getContentEncryptionKey();
-        byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey(theCek);
-        
         String contentEncryptionAlgoJavaName = Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
         byte[] additionalEncryptionParam = headers.toCipherAdditionalAuthData(writer);
@@ -136,6 +101,7 @@ public abstract class AbstractJweEncryptor {
             CryptoUtils.createSecretKeySpec(theCek, contentEncryptionAlgoJavaName),
             keyProps);
         
+        byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey(theCek);
         JweCompactProducer producer = new JweCompactProducer(headers, 
                                              jweContentEncryptionKey,
                                              theIv,

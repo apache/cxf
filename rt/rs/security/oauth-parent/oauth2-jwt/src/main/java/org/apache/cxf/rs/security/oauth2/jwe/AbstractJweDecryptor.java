@@ -18,52 +18,20 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public abstract class AbstractJweDecryptor {
     private JweCompactConsumer jweConsumer;
-    private Key cekDecryptionKey;
-    private byte[] contentDecryptionKey;
-    private boolean unwrap;
     private CeProvider ceProvider = new CeProvider();
-    protected AbstractJweDecryptor(String jweContent, Key cekDecryptionKey, boolean unwrap) {    
-        this.jweConsumer = new JweCompactConsumer(jweContent);
-        this.cekDecryptionKey = cekDecryptionKey;
-        this.unwrap = unwrap;
-    }
-    protected AbstractJweDecryptor(String jweContent, Key contentDecryptionKey) {    
-        this(jweContent, null, false);
-        this.contentDecryptionKey = contentDecryptionKey.getEncoded();
-    }
-    protected Key getCekDecryptionKey() {
-        return cekDecryptionKey;
+    protected AbstractJweDecryptor(String jweContent, JweCryptoProperties props) {    
+        this.jweConsumer = new JweCompactConsumer(jweContent, props);
     }
     
-    protected byte[] getContentEncryptionKey() {
-        // This can be overridden if needed
-        if (contentDecryptionKey != null) {
-            return contentDecryptionKey;
-        }
-        
-        KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm());
-        if (!unwrap) {
-            keyProps.setBlockSize(getKeyCipherBlockSize());
-            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(), getCekDecryptionKey(), keyProps);
-        } else {
-            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(), 
-                                               getContentEncryptionAlgorithm(), 
-                                               getCekDecryptionKey(), 
-                                               keyProps).getEncoded();
-        }
-    }
-    protected int getKeyCipherBlockSize() {
-        return -1;
-    }
+    protected abstract byte[] getContentEncryptionKey();
+    
     public byte[] getDecryptedContent() {
         
         return jweConsumer.getDecryptedContent(ceProvider);
@@ -72,23 +40,19 @@ public abstract class AbstractJweDecryptor {
     public String getDecryptedContentText() {
         return jweConsumer.getDecryptedContentText(ceProvider);
     }
-    public JweHeaders getJweHeaders() {
+    public JweHeaders getHeaders() {
         return getJweConsumer().getJweHeaders();
     }
     
     protected AlgorithmParameterSpec getContentDecryptionCipherSpec() {
-        // this can be overridden if needed
         return CryptoUtils.getContentEncryptionCipherSpec(getEncryptionAuthenticationTagLenBits(), 
                                                    getContentEncryptionCipherInitVector());
     }
-    protected String getKeyEncryptionAlgorithm() {
-        return Algorithm.toJavaName(getJweHeaders().getKeyEncryptionAlgorithm());
-    }
-    protected String getContentEncryptionAlgorithm() {
-        return Algorithm.toJavaName(getJweHeaders().getContentEncryptionAlgorithm());
-    }
     protected byte[] getEncryptedContentEncryptionKey() {
         return getJweConsumer().getEncryptedContentEncryptionKey();
+    }
+    protected String getContentEncryptionAlgorithm() {
+        return Algorithm.toJavaName(getHeaders().getContentEncryptionAlgorithm());
     }
     protected byte[] getContentEncryptionCipherAAD() {
         return getJweConsumer().getContentEncryptionCipherAAD();

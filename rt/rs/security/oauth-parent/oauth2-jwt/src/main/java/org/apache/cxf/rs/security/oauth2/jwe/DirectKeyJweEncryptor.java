@@ -32,4 +32,7 @@ public class DirectKeyJweEncryptor extends AbstractJweEncryptor {
     public DirectKeyJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
         super(headers, cek, iv, authTagLen);
     }
+    protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
+        return new byte[0];
+    }
 }

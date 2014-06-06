@@ -20,11 +20,44 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 
 import java.security.Key;
 
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
+
 public class WrappedKeyJweDecryptor extends AbstractJweDecryptor {
-    public WrappedKeyJweDecryptor(String jweContent, Key cekDecryptionKey, boolean unwrap) {    
-        super(jweContent, cekDecryptionKey, unwrap);
-    }
+    private Key cekDecryptionKey;
+    private boolean unwrap;
     public WrappedKeyJweDecryptor(String jweContent, Key cekDecryptionKey) {    
         this(jweContent, cekDecryptionKey, true);
+    }
+    public WrappedKeyJweDecryptor(String jweContent, Key cekDecryptionKey, boolean unwrap) {    
+        this(jweContent, cekDecryptionKey, unwrap, null);
+    }
+    public WrappedKeyJweDecryptor(String jweContent, Key cekDecryptionKey, boolean unwrap,
+                                  JweCryptoProperties props) {    
+        super(jweContent, props);
+        this.cekDecryptionKey = cekDecryptionKey;
+        this.unwrap = unwrap;
+    }
+    protected byte[] getContentEncryptionKey() {
+        KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm());
+        if (!unwrap) {
+            keyProps.setBlockSize(getKeyCipherBlockSize());
+            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(), getCekDecryptionKey(), keyProps);
+        } else {
+            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(), 
+                                               getContentEncryptionAlgorithm(), 
+                                               getCekDecryptionKey(), 
+                                               keyProps).getEncoded();
+        }
+    }
+    protected Key getCekDecryptionKey() {
+        return cekDecryptionKey;
+    }
+    protected int getKeyCipherBlockSize() {
+        return -1;
+    }
+    protected String getKeyEncryptionAlgorithm() {
+        return Algorithm.toJavaName(getHeaders().getKeyEncryptionAlgorithm());
     }
 }

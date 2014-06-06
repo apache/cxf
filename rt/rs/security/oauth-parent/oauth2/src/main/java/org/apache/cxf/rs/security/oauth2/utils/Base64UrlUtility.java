@@ -73,8 +73,13 @@ public final class Base64UrlUtility {
     }
 
     public static String encodeChunk(byte[] id, int offset, int length) {
-        String encoded = new String(Base64Utility.encodeChunk(id, offset, length));
-        return encoded.replace("+", "-").replace('/', '_').replace("=", "");
+        char[] chunk = Base64Utility.encodeChunk(id, offset, length);
+        if (chunk != null) {
+            String encoded = new String(chunk);
+            return encoded.replace("+", "-").replace('/', '_').replace("=", "");
+        } else {
+            return null;
+        }
     }
      
 
