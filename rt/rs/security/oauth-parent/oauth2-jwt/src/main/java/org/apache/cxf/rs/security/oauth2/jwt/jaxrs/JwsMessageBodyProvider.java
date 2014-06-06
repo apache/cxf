@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,11 +31,19 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.rs.security.oauth2.jws.JwsCompactConsumer;
+import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
+import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
+import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtToken;
 
-public class JwsContainerRequestFilter implements 
+public class JwsMessageBodyProvider implements 
     MessageBodyWriter<JwtToken>, MessageBodyReader<JwtToken> {
 
+    private JwsSignatureProvider sigProvider;
+    private JwsSignatureVerifier sigVerifier;
+    
     @Override
     public boolean isReadable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
         return cls == JwtToken.class;
@@ -44,8 +53,9 @@ public class JwsContainerRequestFilter implements
     public JwtToken readFrom(Class<JwtToken> cls, Type t, Annotation[] anns, MediaType mt,
                              MultivaluedMap<String, String> headers, InputStream is) throws IOException,
         WebApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(is));
+        p.verifySignatureWith(sigVerifier);
+        return p.getJwtToken();
     }
 
     @Override
@@ -62,8 +72,19 @@ public class JwsContainerRequestFilter implements
     public void writeTo(JwtToken token, Class<?> cls, Type type, Annotation[] anns, MediaType mt,
                         MultivaluedMap<String, Object> headers, OutputStream os) throws IOException,
         WebApplicationException {
-        // TODO Auto-generated method stub
-        
+        JwsCompactProducer p = new JwsCompactProducer(token);
+        p.signWith(sigProvider);
+        IOUtils.copy(new ByteArrayInputStream(p.getSignedEncodedToken().getBytes("UTF-8")), os);
+    }
+
+    
+    public void setSigProvider(JwsSignatureProvider sigProvider) {
+        this.sigProvider = sigProvider;
+    }
+
+    
+    public void setSigVerifier(JwsSignatureVerifier sigVerifier) {
+        this.sigVerifier = sigVerifier;
     }
 
 }
