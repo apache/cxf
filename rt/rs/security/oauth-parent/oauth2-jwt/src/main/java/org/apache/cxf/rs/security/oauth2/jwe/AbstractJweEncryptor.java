@@ -29,7 +29,7 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
-public abstract class AbstractJweEncryptor {
+public abstract class AbstractJweEncryptor implements JweEncryptor {
     protected static final int DEFAULT_IV_SIZE = 96;
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private JweHeaders headers;
@@ -85,7 +85,7 @@ public abstract class AbstractJweEncryptor {
     protected JweHeaders getJweHeaders() {
         return headers;
     }
-    public String getJweContent(byte[] content) {
+    public String encrypt(byte[] content) {
         byte[] theCek = getContentEncryptionKey();
         String contentEncryptionAlgoJavaName = Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
@@ -110,9 +110,9 @@ public abstract class AbstractJweEncryptor {
         return producer.getJweContent();
     }
     
-    public String getJweContent(String text) {
+    public String encryptText(String text) {
         try {
-            return getJweContent(text.getBytes("UTF-8"));
+            return encrypt(text.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException ex) {
             throw new SecurityException(ex);
         }

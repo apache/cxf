@@ -23,23 +23,27 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
-public abstract class AbstractJweDecryptor {
+public abstract class AbstractJweDecryptor implements JweDecryptor {
     private JweCompactConsumer jweConsumer;
     private CeProvider ceProvider = new CeProvider();
-    protected AbstractJweDecryptor(String jweContent, JweCryptoProperties props) {    
-        this.jweConsumer = new JweCompactConsumer(jweContent, props);
+    private JweCryptoProperties props;
+    protected AbstractJweDecryptor(JweCryptoProperties props) {
+        this.props = props;
     }
     
     protected abstract byte[] getContentEncryptionKey();
     
-    public byte[] getDecryptedContent() {
-        
-        return jweConsumer.getDecryptedContent(ceProvider);
-        
+    public JweDecryptionOutput decrypt(String content) {
+        byte[] bytes = getJweConsumer(content).getDecryptedContent(ceProvider);
+        return new JweDecryptionOutput(getHeaders(), bytes);
     }
-    public String getDecryptedContentText() {
-        return jweConsumer.getDecryptedContentText(ceProvider);
+    private JweCompactConsumer getJweConsumer(String jweContent) {
+        if (jweConsumer == null) {
+            this.jweConsumer = new JweCompactConsumer(jweContent, props);
+        }
+        return jweConsumer;
     }
+    
     protected JweHeaders getHeaders() {
         return getJweConsumer().getJweHeaders();
     }

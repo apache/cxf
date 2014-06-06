@@ -18,23 +18,26 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.security.Key;
+import java.io.UnsupportedEncodingException;
 
-public class DirectKeyJweDecryptor extends AbstractJweDecryptor {
-    private byte[] contentDecryptionKey;
-    public DirectKeyJweDecryptor(Key contentDecryptionKey) {    
-        this(contentDecryptionKey, null);
+public class JweDecryptionOutput {
+    private JweHeaders headers;
+    private byte[] content;
+    public JweDecryptionOutput(JweHeaders headers, byte[] content) {
+        this.headers = headers;
+        this.content = content;
     }
-    public DirectKeyJweDecryptor(Key contentDecryptionKey, JweCryptoProperties props) {    
-        super(props);
-        this.contentDecryptionKey = contentDecryptionKey.getEncoded();
+    public JweHeaders getHeaders() {
+        return headers;
     }
-    @Override
-    protected byte[] getContentEncryptionKey() {
-        byte[] encryptedCEK = getEncryptedContentEncryptionKey();
-        if (encryptedCEK != null && encryptedCEK.length > 0) {
-            throw new SecurityException();
+    public byte[] getContent() {
+        return content;
+    }
+    public String getContentText() {
+        try {
+            return new String(getContent(), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new SecurityException(ex);
         }
-        return contentDecryptionKey;
     }
 }

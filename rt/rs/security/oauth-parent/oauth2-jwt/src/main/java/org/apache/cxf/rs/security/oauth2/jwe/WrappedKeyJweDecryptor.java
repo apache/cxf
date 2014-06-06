@@ -27,15 +27,15 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 public class WrappedKeyJweDecryptor extends AbstractJweDecryptor {
     private Key cekDecryptionKey;
     private boolean unwrap;
-    public WrappedKeyJweDecryptor(String jweContent, Key cekDecryptionKey) {    
-        this(jweContent, cekDecryptionKey, true);
+    public WrappedKeyJweDecryptor(Key cekDecryptionKey) {    
+        this(cekDecryptionKey, true);
     }
-    public WrappedKeyJweDecryptor(String jweContent, Key cekDecryptionKey, boolean unwrap) {    
-        this(jweContent, cekDecryptionKey, unwrap, null);
+    public WrappedKeyJweDecryptor(Key cekDecryptionKey, boolean unwrap) {    
+        this(cekDecryptionKey, unwrap, null);
     }
-    public WrappedKeyJweDecryptor(String jweContent, Key cekDecryptionKey, boolean unwrap,
+    public WrappedKeyJweDecryptor(Key cekDecryptionKey, boolean unwrap,
                                   JweCryptoProperties props) {    
-        super(jweContent, props);
+        super(props);
         this.cekDecryptionKey = cekDecryptionKey;
         this.unwrap = unwrap;
     }

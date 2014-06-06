@@ -19,15 +19,18 @@
 
 package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
+import java.security.cert.Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
@@ -115,6 +118,35 @@ public final class CryptoUtils {
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }    
+    }
+    
+    public static PublicKey loadPrivateKey(InputStream storeLocation, char[] storePassword, String alias) {
+        try {
+            KeyStore keyStore = loadKeyStore(storeLocation, storePassword);
+            Certificate cert = keyStore.getCertificate(alias);
+            return cert.getPublicKey();
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }
+    }
+    
+    public static PrivateKey loadPrivateKey(InputStream storeLocation, char[] storePassword, 
+                                          char[] keyPassword, String alias) {
+        try {
+            KeyStore keyStore = loadKeyStore(storeLocation, storePassword);
+            KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
+                keyStore.getEntry(alias, new KeyStore.PasswordProtection(keyPassword));
+            return pkEntry.getPrivateKey();
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }
+    }
+    
+    
+    private static KeyStore loadKeyStore(InputStream storeLocation, char[] storePassword) throws Exception {
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        ks.load(storeLocation, storePassword);
+        return ks;
     }
     
     public static RSAPrivateKey getRSAPrivateKey(String encodedModulus,

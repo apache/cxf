@@ -24,15 +24,15 @@ import java.security.interfaces.RSAPublicKey;
 
 public class RSAJweDecryptor extends WrappedKeyJweDecryptor {
     
-    public RSAJweDecryptor(String jweContent, RSAPrivateKey privateKey) {    
-        this(jweContent, privateKey, true);
+    public RSAJweDecryptor(RSAPrivateKey privateKey) {    
+        this(privateKey, true);
     }
-    public RSAJweDecryptor(String jweContent, RSAPrivateKey privateKey, boolean unwrap) {    
-        this(jweContent, privateKey, unwrap, null);
+    public RSAJweDecryptor(RSAPrivateKey privateKey, boolean unwrap) {    
+        this(privateKey, unwrap, null);
     }
-    public RSAJweDecryptor(String jweContent, RSAPrivateKey privateKey, boolean unwrap,
+    public RSAJweDecryptor(RSAPrivateKey privateKey, boolean unwrap,
                            JweCryptoProperties props) {    
-        super(jweContent, privateKey, unwrap, props);
+        super(privateKey, unwrap, props);
     }
     
     protected int getKeyCipherBlockSize() {
