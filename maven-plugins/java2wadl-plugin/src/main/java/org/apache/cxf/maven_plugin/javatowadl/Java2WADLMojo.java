@@ -30,9 +30,7 @@ import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.DocumentationProvider;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
@@ -274,30 +272,26 @@ public class Java2WADLMojo extends AbstractMojo {
     
     private void getResourcesList() throws MojoExecutionException {
         for (String className : classResourceNames) {
-            Object bean = null;
+            Class<?> beanClass = null;
             try {
-                bean = getClassLoader().loadClass(className).newInstance();
+                beanClass = getClassLoader().loadClass(className);
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             } 
-            Class<?> realClass = ClassHelper.getRealClass(bean);
-            ClassResourceInfo cri = getCreatedFromModel(realClass);
+            ClassResourceInfo cri = getCreatedFromModel(beanClass);
             if (cri != null) {
                 if (!InjectionUtils.isConcreteClass(cri.getServiceClass())) {
                     cri = new ClassResourceInfo(cri);
                     classResourceInfos.add(cri);
                 }
-                cri.setResourceClass(bean.getClass());
-                cri.setResourceProvider(new SingletonResourceProvider(bean));
+                cri.setResourceClass(beanClass);
                 continue;
             }
             
-            cri = ResourceUtils.createClassResourceInfo(bean.getClass(), realClass, true, true,
+            cri = ResourceUtils.createClassResourceInfo(beanClass, beanClass, true, true,
                                                         getBus());
             if (cri != null) {
                 classResourceInfos.add(cri);
-                cri.setResourceProvider(
-                                   new SingletonResourceProvider(bean));
             }
         }
     }
