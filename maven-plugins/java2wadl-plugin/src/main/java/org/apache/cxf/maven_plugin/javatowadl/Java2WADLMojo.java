@@ -23,13 +23,19 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.Path;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.DocumentationProvider;
@@ -97,6 +103,10 @@ public class Java2WADLMojo extends AbstractMojo {
      */
     private List<String> classResourceNames;
     
+    /**
+     * @parameter
+     */
+    private String basePackages;
     
     /**
      * @parameter expression="${project}"
@@ -170,8 +180,8 @@ public class Java2WADLMojo extends AbstractMojo {
     private String outputFileExtension;
     
     public void execute() throws MojoExecutionException {
-        
-        getResourcesList();
+        List<Class<?>> resourceClasses = loadResourceClasses();
+        initClassResourceInfoList(resourceClasses);
         WadlGenerator wadlGenerator = new WadlGenerator(getBus());
         DocumentationProvider documentationProvider = null;
         if (docProvider != null) {
@@ -188,7 +198,7 @@ public class Java2WADLMojo extends AbstractMojo {
         
         StringBuilder sbMain = wadlGenerator.generateWADL(getBaseURI(), classResourceInfos, useJson, null, null);
         getLog().debug("the wadl is =====> \n" + sbMain.toString());
-        generateWadl(sbMain.toString());
+        generateWadl(resourceClasses, sbMain.toString());
     }
     
     private void setExtraProperties(WadlGenerator wg) {
@@ -207,7 +217,7 @@ public class Java2WADLMojo extends AbstractMojo {
         }
     }
     
-    private void generateWadl(String wadl) throws MojoExecutionException {
+    private void generateWadl(List<Class<?>> resourceClasses, String wadl) throws MojoExecutionException {
      
         if (outputFile == null && project != null) {
             // Put the wadl in target/generated/wadl
@@ -215,10 +225,8 @@ public class Java2WADLMojo extends AbstractMojo {
             String name = null;
             if (outputFileName != null) {
                 name = outputFileName;
-            } else if (classResourceNames.size() == 1) {
-                String className = classResourceNames.get(0);
-                int i = className.lastIndexOf('.');
-                name = className.substring(i + 1);
+            } else if (resourceClasses.size() == 1) {
+                name = resourceClasses.get(0).getSimpleName();
             } else {
                 name = "application";
             }
@@ -288,15 +296,32 @@ public class Java2WADLMojo extends AbstractMojo {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }
-    
-    private void getResourcesList() throws MojoExecutionException {
+    private List<Class<?>> loadResourceClasses() throws MojoExecutionException {
+        List<Class<?>> resourceClasses = new ArrayList<Class<?>>(classResourceNames.size());
         for (String className : classResourceNames) {
-            Class<?> beanClass = null;
             try {
-                beanClass = getClassLoader().loadClass(className);
+                resourceClasses.add(getClassLoader().loadClass(className));
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             } 
+        }
+        if (resourceClasses.isEmpty() && basePackages != null) {
+            try {
+                @SuppressWarnings("unchecked")
+                final Map< Class< ? extends Annotation >, Collection< Class< ? > > > discoveredClasses = 
+                    ClasspathScanner.findClasses(ClasspathScanner.parsePackages(basePackages), Path.class);
+                if (discoveredClasses.containsKey(Path.class)) {
+                    resourceClasses.addAll(discoveredClasses.get(Path.class));
+                }
+            } catch (Exception ex) {
+                // ignore
+            }
+        }
+        return resourceClasses;
+    }
+    
+    private void initClassResourceInfoList(List<Class<?>> resourceClasses) throws MojoExecutionException {
+        for (Class<?> beanClass : resourceClasses) {
             ClassResourceInfo cri = getCreatedFromModel(beanClass);
             if (cri != null) {
                 if (!InjectionUtils.isConcreteClass(cri.getServiceClass())) {
