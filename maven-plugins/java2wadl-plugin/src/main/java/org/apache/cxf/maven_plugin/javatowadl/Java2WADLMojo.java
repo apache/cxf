@@ -215,8 +215,6 @@ public class Java2WADLMojo extends AbstractMojo {
             String name = null;
             if (outputFileName != null) {
                 name = outputFileName;
-            } else if (applicationTitle != null) {
-                name = applicationTitle.replaceAll(" ", "");    
             } else if (classResourceNames.size() == 1) {
                 String className = classResourceNames.get(0);
                 int i = className.lastIndexOf('.');
