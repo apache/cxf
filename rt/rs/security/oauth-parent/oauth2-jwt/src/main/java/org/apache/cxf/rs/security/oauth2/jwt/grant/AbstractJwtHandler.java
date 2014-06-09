@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
+import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -34,13 +35,16 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  */
 public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     private Set<String> supportedIssuers; 
+    private JwsSignatureVerifier jwsVefifier;
         
     protected AbstractJwtHandler(List<String> grants) {
         super(grants);
     }
     
-    protected void validateSignature(JwtHeaders headers, String plainSequence, byte[] signature) {
-        
+    protected void validateSignature(JwtHeaders headers, String unsignedText, byte[] signature) {
+        if (jwsVefifier.verify(headers, unsignedText, signature)) {    
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
     }
     
     protected void validateClaims(Client client, JwtClaims claims) {
@@ -87,6 +91,10 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     }
     public void setSupportedIssuers(Set<String> supportedIssuers) {
         this.supportedIssuers = supportedIssuers;
+    }
+
+    public void setJwsVefifier(JwsSignatureVerifier jwsVefifier) {
+        this.jwsVefifier = jwsVefifier;
     }
     
 }
