@@ -445,6 +445,12 @@ public class SoapBindingFactory extends AbstractBindingFactory {
 
         ServiceInfo serviceInfo = bop.getBinding().getService();
 
+        if (header != null && header.getMessage() == null) {
+            throw new RuntimeException("Problem with WSDL: soap:header element" 
+                + " for operation " + bop.getName() + " under binding " + bop.getBinding().getName()
+                + " does not contain a valid message attribute.");
+        }
+        
         if (header != null && serviceInfo.getMessage(header.getMessage()) == null) {
             Definition def = (Definition)serviceInfo.getProperty(WSDLServiceBuilder.WSDL_DEFINITION);
             SchemaCollection schemas = serviceInfo.getXmlSchemaCollection();
