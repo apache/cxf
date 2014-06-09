@@ -159,6 +159,16 @@ public class Java2WADLMojo extends AbstractMojo {
      */
     private String namespacePrefix;
     
+    /**
+     * @parameter 
+     */
+    private String outputFileName;
+    
+    /**
+     * @parameter default-value="wadl"
+     */
+    private String outputFileExtension;
+    
     public void execute() throws MojoExecutionException {
         
         getResourcesList();
@@ -201,11 +211,21 @@ public class Java2WADLMojo extends AbstractMojo {
      
         if (outputFile == null && project != null) {
             // Put the wadl in target/generated/wadl
-            String className = classResourceNames.get(0);
-            int i = className.lastIndexOf('.');
-            String name = className.substring(i + 1);
-            outputFile = (project.getBuild().getDirectory() + "/generated/wadl/" + name + ".wadl")
-                .replace("/", File.separator);
+            
+            String name = null;
+            if (outputFileName != null) {
+                name = outputFileName;
+            } else if (applicationTitle != null) {
+                name = applicationTitle.replaceAll(" ", "");    
+            } else if (classResourceNames.size() == 1) {
+                String className = classResourceNames.get(0);
+                int i = className.lastIndexOf('.');
+                name = className.substring(i + 1);
+            } else {
+                name = "application";
+            }
+            outputFile = (project.getBuild().getDirectory() + "/generated/wadl/" + name + "." 
+                + outputFileExtension).replace("/", File.separator);
         }
         
         BufferedWriter writer = null;
@@ -248,7 +268,8 @@ public class Java2WADLMojo extends AbstractMojo {
         if (address != null) {
             return address;
         } else {
-            return "http://localhost/cxf/";
+            // the consumer may use the original target URI to figure out absolute URI 
+            return "/";
         }
     }
 

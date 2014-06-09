@@ -1605,7 +1605,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             return new ExternalSchemaWriter(externalSchemaLinks, ui);
         } else if (externalSchemasCache != null) {
             return new StringSchemaWriter(externalSchemasCache, externalSchemaLinks, ui);
-        } else if (context != null) {
+        } else {
             SchemaCollection coll = getSchemaCollection(resourceTypes, context);
             if (coll != null) {
                 return new SchemaCollectionWriter(coll);
