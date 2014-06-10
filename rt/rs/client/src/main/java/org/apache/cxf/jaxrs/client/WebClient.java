@@ -679,7 +679,8 @@ public class WebClient extends AbstractClient {
     public WebClient to(String newAddress, boolean forward) {
         getState().setTemplates(null);
         if (forward) {
-            if (!newAddress.startsWith(getBaseURI().toString())) {
+            if (!newAddress.startsWith("/") 
+                && !newAddress.startsWith(getBaseURI().toString())) {
                 throw new IllegalArgumentException("Base address can not be preserved");
             }
             resetCurrentBuilder(URI.create(newAddress));

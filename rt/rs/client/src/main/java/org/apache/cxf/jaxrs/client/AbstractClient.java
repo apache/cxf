@@ -340,7 +340,6 @@ public abstract class AbstractClient implements Client {
     
     protected void resetBaseAddress(URI uri) {
         state.setBaseURI(uri);
-        resetCurrentBuilder(uri);
     }
     
     protected void resetCurrentBuilder(URI uri) {
