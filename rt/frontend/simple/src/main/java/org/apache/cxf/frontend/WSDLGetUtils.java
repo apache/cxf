@@ -38,6 +38,7 @@ import javax.wsdl.Import;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.Types;
+import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
@@ -46,6 +47,7 @@ import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
@@ -74,19 +76,18 @@ import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
  * 
  */
 public class WSDLGetUtils {
-    
+
     public static final String AUTO_REWRITE_ADDRESS = "autoRewriteSoapAddress";
     public static final String AUTO_REWRITE_ADDRESS_ALL = "autoRewriteSoapAddressForAllServices";
     public static final String PUBLISHED_ENDPOINT_URL = "publishedEndpointUrl";
     public static final String WSDL_CREATE_IMPORTS = "org.apache.cxf.wsdl.create.imports";
-    
+
     private static final String WSDLS_KEY = WSDLGetUtils.class.getName() + ".WSDLs";
     private static final String SCHEMAS_KEY = WSDLGetUtils.class.getName() + ".Schemas";
     
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLGetInterceptor.class);
     
     public WSDLGetUtils() {
-        //never constructed
     }
 
 
@@ -96,16 +97,13 @@ public class WSDLGetUtils {
                             EndpointInfo endpointInfo) {
         Map<String, String> params = new HashMap<String, String>();
         params.put("wsdl", "");
-        new WSDLGetUtils().getDocument(message, base, 
-                                       params, ctxUri, 
-                                       endpointInfo);
+        getDocument(message, base, 
+                    params, ctxUri, 
+                    endpointInfo);
         
         Map<String, Definition> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
                                                     .getProperty(WSDLS_KEY));
         return mp.keySet();
-    }
-    private String buildUrl(String base, String ctxUri, String s) {
-        return base + ctxUri + "?" + s;
     }
     public Map<String, String> getSchemaLocations(Message message,
                                                   String base,
@@ -113,9 +111,9 @@ public class WSDLGetUtils {
                                                   EndpointInfo endpointInfo) {
         Map<String, String> params = new HashMap<String, String>();
         params.put("wsdl", "");
-        new WSDLGetUtils().getDocument(message, base, 
-                                       params, ctxUri, 
-                                       endpointInfo);
+        getDocument(message, base, 
+                    params, ctxUri, 
+                    endpointInfo);
       
         Map<String, SchemaReference> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
                                                          .getProperty(SCHEMAS_KEY));
@@ -136,133 +134,24 @@ public class WSDLGetUtils {
                             Map<String, String> params,
                             String ctxUri,
                             EndpointInfo endpointInfo) {
+        Document doc = null;
         try {
             Bus bus = message.getExchange().getBus();
-            Object prop = message.getContextualProperty(PUBLISHED_ENDPOINT_URL);
-            if (prop == null) {
-                prop = endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL);
-            }
-            if (prop != null) {
-                base = String.valueOf(prop);
-            }
-            String wsdl = params.get("wsdl");
-            if (wsdl != null) {
-                // Always use the URL decoded version to ensure that we have a
-                // canonical representation of the import URL for lookup.
-                wsdl = URLDecoder.decode(wsdl, "utf-8");
-            }
-            
-            String xsd =  params.get("xsd");
-            if (xsd != null) {
-                // Always use the URL decoded version to ensure that we have a
-                // canonical representation of the import URL for lookup.
-                xsd = URLDecoder.decode(xsd, "utf-8");
-            }
-            
-            Map<String, Definition> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
-                                                        .getProperty(WSDLS_KEY));
-            Map<String, SchemaReference> smp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
-                                                        .getProperty(SCHEMAS_KEY));
+            base = getPublishedEndpointURL(message, base, endpointInfo);
+            //making sure this are existing map objects for the endpoint.
+            Map<String, Definition> mp = getWSDLKeyDefinition(endpointInfo);
+            Map<String, SchemaReference> smp = getSchemaKeySchemaReference(endpointInfo);
+            updateWSDLKeyDefinition(bus, mp, message, smp, base, endpointInfo);
 
-            if (mp == null) {
-                endpointInfo.getService().setProperty(WSDLS_KEY,
-                                                      new ConcurrentHashMap<String, Definition>(8, 0.75f, 4));
-                mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
-                                    .getProperty(WSDLS_KEY));
+            //
+            if (params.containsKey("wsdl")) {
+                String wsdl = URLDecoder.decode(params.get("wsdl"), "utf-8");
+                doc = writeWSDLDocument(message, mp, smp, wsdl, base, endpointInfo);
+            } else if (params.get("xsd") != null) {
+                String xsd = URLDecoder.decode(params.get("xsd"), "utf-8");
+                doc = readXSDDocument(bus, xsd, smp, base);
+                updateDoc(doc, base, mp, smp, message, xsd, null);
             }
-            if (smp == null) {
-                endpointInfo.getService().setProperty(SCHEMAS_KEY,
-                                                      new ConcurrentHashMap<String, SchemaReference>(8, 0.75f, 4));
-                smp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
-                                    .getProperty(SCHEMAS_KEY));
-            }
-            
-            if (!mp.containsKey("")) {
-                ServiceWSDLBuilder builder = 
-                    new ServiceWSDLBuilder(bus, endpointInfo.getService());
-
-                builder.setUseSchemaImports(
-                     MessageUtils.getContextualBoolean(message, WSDL_CREATE_IMPORTS, false));
-                
-                // base file name is ignored if createSchemaImports == false!
-                builder.setBaseFileName(endpointInfo.getService().getName().getLocalPart());
-                
-                Definition def = builder.build(new HashMap<String, SchemaInfo>());
-
-                mp.put("", def);
-                updateDefinition(bus, def, mp, smp, base, endpointInfo, "");
-            }
-            
-            
-            Document doc;
-            if (xsd == null) {
-                Definition def = mp.get(wsdl);
-                if (def == null) {
-                    String wsdl2 = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus),
-                                                       wsdl,
-                                                       base);
-                    if (wsdl2 != null) {
-                        def = mp.get(wsdl2);
-                    }
-                }
-                if (def == null) {
-                    throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("WSDL_NOT_FOUND",
-                                                                                        LOG, wsdl), null);
-                }
-                
-                synchronized (def) {
-                    //writing a def is not threadsafe.  Sync on it to make sure
-                    //we don't get any ConcurrentModificationExceptions
-                    if (endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL) != null) {
-                        String epurl = 
-                            String.valueOf(endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL));
-                        updatePublishedEndpointUrl(epurl, def, endpointInfo.getName());
-                        base = epurl;
-                    }
-
-                    WSDLWriter wsdlWriter = bus.getExtension(WSDLManager.class)
-                        .getWSDLFactory().newWSDLWriter();
-                    def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
-                    doc = wsdlWriter.getDocument(def);
-                }
-            } else {
-                SchemaReference si = smp.get(xsd);
-                if (si == null) {
-                    String xsd2 = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus),
-                                                       xsd,
-                                                       base);
-                    if (xsd2 != null) { 
-                        si = smp.get(xsd2);
-                    }
-                }
-                if (si == null) {
-                    throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("SCHEMA_NOT_FOUND", 
-                                                                                        LOG, wsdl), null);
-                }
-                
-                String uri = si.getReferencedSchema().getDocumentBaseURI();
-                uri = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus),
-                                          uri,
-                                          si.getReferencedSchema().getDocumentBaseURI());
-                if (uri == null) {
-                    uri = si.getReferencedSchema().getDocumentBaseURI();
-                }
-                ResourceManagerWSDLLocator rml = new ResourceManagerWSDLLocator(uri,
-                                                                                bus);
-                
-                InputSource src = rml.getBaseInputSource();
-                if (src.getByteStream() != null || src.getCharacterStream() != null) {
-                    doc = StaxUtils.read(src);
-                } else { // last resort lets try for the referenced schema itself.
-                    // its not thread safe if we use the same document
-                    doc = StaxUtils.read(
-                            new DOMSource(si.getReferencedSchema().getElement().getOwnerDocument()));
-                }
-            }
-            
-            updateDoc(doc, base, mp, smp, message, xsd, wsdl);
-            
-            return doc;
         } catch (WSDLQueryException wex) {
             throw wex;
         } catch (Exception wex) {
@@ -270,6 +159,7 @@ public class WSDLGetUtils {
                                                      LOG,
                                                      base), wex);
         }
+        return doc;
     }
     
     protected String mapUri(String base, Map<String, SchemaReference> smp, String loc, String xsd)
@@ -291,16 +181,16 @@ public class WSDLGetUtils {
         }
         return null;
     }
-    
-    protected void updateDoc(Document doc, 
-                           String base,
-                           Map<String, Definition> mp,
-                           Map<String, SchemaReference> smp,
-                           Message message,
-                           String xsd,
-                           String wsdl) {        
+
+    protected void updateDoc(Document doc,
+                             String base,
+                             Map<String, Definition> mp,
+                             Map<String, SchemaReference> smp,
+                             Message message,
+                             String xsd,
+                             String wsdl) {
         List<Element> elementList = null;
-        
+
         try {
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                               "http://www.w3.org/2001/XMLSchema", "import");
@@ -311,7 +201,7 @@ public class WSDLGetUtils {
                     el.setAttribute("schemaLocation", sl);
                 }
             }
-            
+
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                               "http://www.w3.org/2001/XMLSchema",
                                                               "include");
@@ -338,12 +228,7 @@ public class WSDLGetUtils {
             for (Element el : elementList) {
                 String sl = el.getAttribute("location");
                 try {
-                    if (!StringUtils.isEmpty(wsdl) && !(new URI(sl).isAbsolute())) {
-                        sl = new URI(wsdl).resolve(sl).toString();
-                    }
-                    if (StringUtils.isEmpty(wsdl) && !(new URI(sl).isAbsolute())) {
-                        sl = new URI(".").resolve(sl).toString();
-                    }
+                    sl = getLocationURI(sl, wsdl);
                 } catch (URISyntaxException e) {
                     //ignore
                 }
@@ -397,19 +282,20 @@ public class WSDLGetUtils {
         }
     }
 
-    protected void rewriteAddress(String base, Element el, String soapNS) {
-        List<Element> sadEls = DOMUtils.findAllElementsByTagNameNS(el,
-                                             soapNS,
-                                             "address");
+    protected void rewriteAddress(String base,
+                                  Element el,
+                                  String soapNS) {
+        List<Element> sadEls = DOMUtils.findAllElementsByTagNameNS(el, soapNS, "address");
         for (Element soapAddress : sadEls) {
             soapAddress.setAttribute("location", base);
         }
     }
 
-    protected void rewriteAddressProtocolHostPort(String base, Element el, String httpBasePathProp, String soapNS) {
-        List<Element> sadEls = DOMUtils.findAllElementsByTagNameNS(el,
-                                             soapNS,
-                                             "address");
+    protected void rewriteAddressProtocolHostPort(String base,
+                                                  Element el,
+                                                  String httpBasePathProp,
+                                                  String soapNS) {
+        List<Element> sadEls = DOMUtils.findAllElementsByTagNameNS(el, soapNS, "address");
         for (Element soapAddress : sadEls) {
             String location = soapAddress.getAttribute("location").trim();
             try {
@@ -433,7 +319,9 @@ public class WSDLGetUtils {
         }
     }
 
-    protected String resolveWithCatalogs(OASISCatalogManager catalogs, String start, String base) {
+    protected String resolveWithCatalogs(OASISCatalogManager catalogs,
+                                         String start,
+                                         String base) {
         try {
             return new OASISCatalogManagerHelper().resolve(catalogs, start, base);
         } catch (Exception ex) {
@@ -441,13 +329,15 @@ public class WSDLGetUtils {
         }
         return null;
     }
-    
+
     protected void updateDefinition(Bus bus,
-                                 Definition def, Map<String, Definition> done,
-                                 Map<String, SchemaReference> doneSchemas,
-                                 String base, EndpointInfo ei, String docBase) {
-        OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);    
-        
+                                    Definition def,
+                                    Map<String, Definition> done,
+                                    Map<String, SchemaReference> doneSchemas,
+                                    String base,
+                                    String docBase) {
+        OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);
+
         Collection<List<?>> imports = CastUtils.cast((Collection<?>)def.getImports().values());
         for (List<?> lst : imports) {
             List<Import> impLst = CastUtils.cast(lst);
@@ -455,56 +345,50 @@ public class WSDLGetUtils {
                 String start = imp.getLocationURI();
                 String decodedStart = null;
                 // Always use the URL decoded version to ensure that we have a
-                // canonical representation of the import URL for lookup. 
-                
-                try {    
+                // canonical representation of the import URL for lookup.
+
+                try {
                     decodedStart = URLDecoder.decode(start, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     throw new WSDLQueryException(
-                            new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
+                        new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                             LOG,
                             start), e);
                 }
-                
+
                 String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
-                
+
                 if (resolvedSchemaLocation == null) {
                     try {
                         //check to see if it's already in a URL format.  If so, leave it.
                         new URL(start);
                     } catch (MalformedURLException e) {
                         try {
-                            if (!StringUtils.isEmpty(docBase) && !(new URI(start).isAbsolute())) {
-                                start = new URI(docBase).resolve(start).toString();
-                                decodedStart = URLDecoder.decode(start, "utf-8");
-                            } 
-                            if (StringUtils.isEmpty(docBase) && !(new URI(start).isAbsolute())) {
-                                start = new URI(".").resolve(start).toString();
-                                decodedStart = URLDecoder.decode(start, "utf-8");
-                            }
+                            start = getLocationURI(start, docBase);
+                            decodedStart = URLDecoder.decode(start, "utf-8");
                         } catch (Exception e1) {
                             //ignore
-                        } 
+                        }
                         if (done.put(decodedStart, imp.getDefinition()) == null) {
-                            updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, ei, start);
+                            updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, start);
                         }
                     }
                 } else {
                     if (done.put(decodedStart, imp.getDefinition()) == null) {
                         done.put(resolvedSchemaLocation, imp.getDefinition());
-                        updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, ei, start);
+                        updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, start);
                     }
                 }
             }
-        }      
-        
-        
+        }
+
+
         /* This doesn't actually work.   Setting setSchemaLocationURI on the import
         * for some reason doesn't actually result in the new URI being written
         * */
         Types types = def.getTypes();
         if (types != null) {
-            for (ExtensibilityElement el 
+            for (ExtensibilityElement el
                 : CastUtils.cast(types.getExtensibilityElements(), ExtensibilityElement.class)) {
                 if (el instanceof Schema) {
                     Schema see = (Schema)el;
@@ -512,29 +396,31 @@ public class WSDLGetUtils {
                 }
             }
         }
-    }    
-    
+    }
+
     public void updateWSDLPublishedEndpointAddress(Definition def, EndpointInfo endpointInfo)
     {
         synchronized (def) {
             //writing a def is not threadsafe.  Sync on it to make sure
             //we don't get any ConcurrentModificationExceptions
             if (endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL) != null) {
-                String epurl = 
+                String epurl =
                     String.valueOf(endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL));
                 updatePublishedEndpointUrl(epurl, def, endpointInfo.getName());
             }
         }
     }
 
-    protected void updatePublishedEndpointUrl(String publishingUrl, Definition def, QName name) {
+    protected void updatePublishedEndpointUrl(String publishingUrl,
+                                              Definition def,
+                                              QName name) {
         Collection<Service> services = CastUtils.cast(def.getAllServices().values());
         for (Service service : services) {
             Collection<Port> ports = CastUtils.cast(service.getPorts().values());
             if (ports.isEmpty()) {
                 continue;
             }
-            
+
             if (name == null) {
                 setSoapAddressLocationOn(ports.iterator().next(), publishingUrl);
                 break; // only update the first port since we don't target any specific port
@@ -547,7 +433,7 @@ public class WSDLGetUtils {
             }
         }
     }
-    
+
     protected void setSoapAddressLocationOn(Port port, String url) {
         List<?> extensions = port.getExtensibilityElements();
         for (Object extension : extensions) {
@@ -558,32 +444,32 @@ public class WSDLGetUtils {
             }
         }
     }
-    
-    protected void updateSchemaImports(Bus bus, 
+
+    protected void updateSchemaImports(Bus bus,
                                        Schema schema,
                                        String docBase,
                                        Map<String, SchemaReference> doneSchemas,
                                        String base) {
-        OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);    
+        OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);
         Collection<List<?>>  imports = CastUtils.cast((Collection<?>)schema.getImports().values());
         for (List<?> lst : imports) {
             List<SchemaImport> impLst = CastUtils.cast(lst);
             for (SchemaImport imp : impLst) {
                 String start = findSchemaLocation(doneSchemas, imp, docBase);
-                
+
                 if (start != null) {
                     String decodedStart = null;
                     // Always use the URL decoded version to ensure that we have a
-                    // canonical representation of the import URL for lookup. 
+                    // canonical representation of the import URL for lookup.
                     try {
                         decodedStart = URLDecoder.decode(start, "utf-8");
                     } catch (UnsupportedEncodingException e) {
                         throw new WSDLQueryException(
-                                new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
+                            new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                                 LOG,
                                 start), e);
                     }
-                    
+
                     if (!doneSchemas.containsKey(decodedStart)) {
                         String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                         if (resolvedSchemaLocation == null) {
@@ -605,7 +491,7 @@ public class WSDLGetUtils {
                 }
             }
         }
-        
+
         List<SchemaReference> includes = CastUtils.cast(schema.getIncludes());
         for (SchemaReference included : includes) {
             String start = findSchemaLocation(doneSchemas, included, docBase);
@@ -613,16 +499,16 @@ public class WSDLGetUtils {
             if (start != null) {
                 String decodedStart = null;
                 // Always use the URL decoded version to ensure that we have a
-                // canonical representation of the import URL for lookup. 
+                // canonical representation of the import URL for lookup.
                 try {
                     decodedStart = URLDecoder.decode(start, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     throw new WSDLQueryException(
-                            new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
+                        new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                             LOG,
                             start), e);
                 }
-                
+
                 String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                 if (resolvedSchemaLocation == null) {
                     if (!doneSchemas.containsKey(decodedStart)) {
@@ -635,7 +521,7 @@ public class WSDLGetUtils {
                             }
                         }
                     }
-                } else if (!doneSchemas.containsKey(decodedStart) 
+                } else if (!doneSchemas.containsKey(decodedStart)
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
                     doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
@@ -650,16 +536,16 @@ public class WSDLGetUtils {
             if (start != null) {
                 String decodedStart = null;
                 // Always use the URL decoded version to ensure that we have a
-                // canonical representation of the import URL for lookup. 
+                // canonical representation of the import URL for lookup.
                 try {
                     decodedStart = URLDecoder.decode(start, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     throw new WSDLQueryException(
-                            new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
+                        new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                             LOG,
                             start), e);
                 }
-                
+
                 String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                 if (resolvedSchemaLocation == null) {
                     if (!doneSchemas.containsKey(decodedStart)) {
@@ -672,7 +558,7 @@ public class WSDLGetUtils {
                             }
                         }
                     }
-                } else if (!doneSchemas.containsKey(decodedStart) 
+                } else if (!doneSchemas.containsKey(decodedStart)
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
                     doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
@@ -682,7 +568,9 @@ public class WSDLGetUtils {
         }
     }
 
-    private String findSchemaLocation(Map<String, SchemaReference> doneSchemas, SchemaReference imp, String docBase) {
+    private String findSchemaLocation(Map<String, SchemaReference> doneSchemas,
+                                      SchemaReference imp,
+                                      String docBase) {
         String schemaLocationURI = imp.getSchemaLocationURI();
         if (docBase != null && imp.getReferencedSchema() != null) {
             try {
@@ -694,12 +582,12 @@ public class WSDLGetUtils {
             } catch (Exception e) {
                 //ignore
             }
-                    
+
         }
-        
+
         if (imp.getReferencedSchema() != null) {
             for (Map.Entry<String, SchemaReference> e : doneSchemas.entrySet()) {
-                if (e.getValue().getReferencedSchema().getElement() 
+                if (e.getValue().getReferencedSchema().getElement()
                     == imp.getReferencedSchema().getElement()) {
                     doneSchemas.put(schemaLocationURI, imp);
                     imp.setSchemaLocationURI(e.getKey());
@@ -710,4 +598,282 @@ public class WSDLGetUtils {
         return schemaLocationURI;
     }
 
+    /**
+     * Write the contents of a wsdl Definition object to a file.
+     *
+     * @param message
+     * @param mp  a map of known wsdl Definition objects
+     * @param smp a map of known xsd SchemaReference objects
+     * @param wsdl name of the wsdl file to write
+     * @param base the request URL
+     * @param endpointInfo information for a web service 'port' inside of a service
+     * @return Document
+     * @throws WSDLException
+     */
+    public Document writeWSDLDocument(Message message,
+                                      Map<String, Definition> mp,
+                                      Map<String, SchemaReference> smp,
+                                      String wsdl,
+                                      String base,
+                                      EndpointInfo endpointInfo) throws WSDLException {
+
+        Document doc = null;
+        Bus bus = message.getExchange().getBus();
+        Definition def = lookupDefinition(bus, mp, wsdl, base);
+        String epurl = base;
+
+        synchronized (def) {
+            //writing a def is not threadsafe.  Sync on it to make sure
+            //we don't get any ConcurrentModificationExceptions
+            epurl = getPublishableEndpointUrl(def, epurl, endpointInfo);
+
+            WSDLWriter wsdlWriter = bus.getExtension(WSDLManager.class)
+                .getWSDLFactory().newWSDLWriter();
+            def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
+            doc = wsdlWriter.getDocument(def);
+        }
+
+        updateDoc(doc, epurl, mp, smp, message, null, wsdl);
+        return doc;
+    }
+
+    /**
+     * Retrieve the published endpoint url from the working information set.
+     *
+     * @param def a wsdl as class objects
+     * @param epurl the request URL
+     * @param endpointInfo information for a web service 'port' inside of a service
+     * @return String
+     */
+    public String getPublishableEndpointUrl(Definition def,
+                                            String epurl,
+                                            EndpointInfo endpointInfo) {
+
+        if (endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL) != null) {
+            epurl = String.valueOf(
+                endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL));
+            updatePublishedEndpointUrl(epurl, def, endpointInfo.getName());
+        }
+        return epurl;
+    }
+
+    /**
+     * Read the schema file and return as a Document object.
+     *
+     * @param bus CXF's hub for access to internal constructs
+     * @param xsd name of xsd file to be read
+     * @param smp a map of known xsd SchemaReference objects
+     * @param base the request URL
+     * @return Document
+     * @throws XMLStreamException
+     */
+    protected Document readXSDDocument(Bus bus,
+                                       String xsd,
+                                       Map<String, SchemaReference> smp,
+                                       String base) throws XMLStreamException {
+        Document doc = null;
+        SchemaReference si = lookupSchemaReference(bus, xsd, smp, base);
+
+        String uri = si.getReferencedSchema().getDocumentBaseURI();
+        uri = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus),
+            uri, si.getReferencedSchema().getDocumentBaseURI());
+        if (uri == null) {
+            uri = si.getReferencedSchema().getDocumentBaseURI();
+        }
+        ResourceManagerWSDLLocator rml = new ResourceManagerWSDLLocator(uri, bus);
+
+        InputSource src = rml.getBaseInputSource();
+        if (src.getByteStream() != null || src.getCharacterStream() != null) {
+            doc = StaxUtils.read(src);
+        } else { // last resort lets try for the referenced schema itself.
+            // its not thread safe if we use the same document
+            doc = StaxUtils.read(
+                new DOMSource(si.getReferencedSchema().getElement().getOwnerDocument()));
+        }
+
+        return doc;
+    }
+
+    /**
+     * Create a wsdl Definition object from the endpoint information and register
+     * it in the local data structure for future reference.
+     *
+     * @param bus CXF's hub for access to internal constructs
+     * @param mp  a map of known wsdl Definition objects
+     * @param message
+     * @param smp a map of known xsd SchemaReference objects
+     * @param base the request URL
+     * @param endpointInfo information for a web service 'port' inside of a service
+     * @throws WSDLException
+     */
+    protected void updateWSDLKeyDefinition(Bus bus,
+                                           Map<String, Definition> mp,
+                                           Message message,
+                                           Map<String, SchemaReference> smp,
+                                           String base,
+                                           EndpointInfo endpointInfo) throws WSDLException {
+        if (!mp.containsKey("")) {
+            ServiceWSDLBuilder builder =
+                new ServiceWSDLBuilder(bus, endpointInfo.getService());
+
+            builder.setUseSchemaImports(
+                MessageUtils.getContextualBoolean(message, WSDL_CREATE_IMPORTS, false));
+
+            // base file name is ignored if createSchemaImports == false!
+            builder.setBaseFileName(endpointInfo.getService().getName().getLocalPart());
+
+            Definition def = builder.build(new HashMap<String, SchemaInfo>());
+
+            mp.put("", def);
+            updateDefinition(bus, def, mp, smp, base, "");
+        }
+
+    }
+
+    /**
+     * Retrieve the map of known xsd SchemaReference objects for this endpoint.
+     *
+     * @param endpointInfo information for a web service 'port' inside of a service
+     * @return Map<String, SchemaReference>
+     */
+    protected Map<String, SchemaReference> getSchemaKeySchemaReference(EndpointInfo endpointInfo) {
+        Map<String, SchemaReference> smp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
+            .getProperty(SCHEMAS_KEY));
+        if (smp == null) {
+            endpointInfo.getService().setProperty(SCHEMAS_KEY,
+                new ConcurrentHashMap<String, SchemaReference>(8, 0.75f, 4));
+            smp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
+                .getProperty(SCHEMAS_KEY));
+        }
+        return smp;
+    }
+
+    /**
+     * Retrieve the map of known wsdl Definition objects for this endpoint.
+     *
+     * @param endpointInfo  information for a web service 'port' inside of a service
+     * @return Map<String, Definition>
+     */
+    protected Map<String, Definition> getWSDLKeyDefinition(EndpointInfo endpointInfo) {
+        Map<String, Definition> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
+            .getProperty(WSDLS_KEY));
+        if (mp == null) {
+            endpointInfo.getService().setProperty(WSDLS_KEY,
+                new ConcurrentHashMap<String, Definition>(8, 0.75f, 4));
+            mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService().getProperty(WSDLS_KEY));
+        }
+        return mp;
+    }
+
+    /**
+     * Retrieve the published endpoint url from the working information set.
+     *
+     * @param message
+     * @param base the request URL
+     * @param endpointInfo information for a web service 'port' inside of a service
+     * @return  String or NULL if none found
+     */
+    protected String getPublishedEndpointURL(Message message,
+                                             String base,
+                                             EndpointInfo endpointInfo) {
+
+        Object prop = message.getContextualProperty(PUBLISHED_ENDPOINT_URL);
+        if (prop == null) {
+            prop = endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL);
+        }
+        if (prop != null) {
+            base = String.valueOf(prop);
+        }
+        return base;
+    }
+
+    /**
+     * Look for the schema filename in existing data structures and in system catalog
+     * and register it in the local data structure.
+     *
+     * @param bus CXF's hub for access to internal constructs
+     * @param mp  local structure of found wsdl files.
+     * @param wsdl name of wsdl file for lookup
+     * @param base the request URL
+     * @return Definition
+     */
+    private Definition lookupDefinition(Bus bus,
+                                        Map<String, Definition> mp,
+                                        String wsdl,
+                                        String base) {
+        Definition def = mp.get(wsdl);
+        if (def == null) {
+            String wsdl2 = resolveWithCatalogs(
+                OASISCatalogManager.getCatalogManager(bus), wsdl, base);
+            if (wsdl2 != null) {
+                def = mp.get(wsdl2);
+            }
+        }
+
+        if (def == null) {
+            throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("WSDL_NOT_FOUND",
+                LOG, wsdl), null);
+        }
+        return def;
+    }
+
+    /**
+     * Look for the schema filename in existing data structures and in system catalog
+     * and register it in the local data structure.
+     *
+     * @param bus CXF's hub for access to internal constructs
+     * @param xsd name of xsd file for lookup
+     * @param smp local structure of found xsd files.
+     * @param base the request URL
+     * @return SchemaReference
+     */
+    private SchemaReference lookupSchemaReference(Bus bus,
+                                                  String xsd,
+                                                  Map<String, SchemaReference> smp,
+                                                  String base) {
+        SchemaReference si = smp.get(xsd);
+        if (si == null) {
+            String xsd2 = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus),
+                xsd, base);
+            if (xsd2 != null) {
+                si = smp.get(xsd2);
+            }
+        }
+        if (si == null) {
+            throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("SCHEMA_NOT_FOUND",
+                LOG, xsd), null);
+        }
+        return si;
+    }
+
+    /**
+     * Utility that generates either a relative URI path if the start path
+     * is not an absolute path.
+     * @param startLoc   start path
+     * @param docBase  path to be adjusted as required
+     * @return String
+     * @throws URISyntaxException
+     */
+    private String getLocationURI(String startLoc, String docBase) throws URISyntaxException {
+
+        if (!(new URI(startLoc).isAbsolute())) {
+            if (StringUtils.isEmpty(docBase)) {
+                startLoc = new URI(".").resolve(startLoc).toString();
+            } else {
+                startLoc = new URI(docBase).resolve(startLoc).toString();
+            }
+        }
+        return startLoc;
+    }
+
+    /**
+     * Utility that generates a URL query.
+     * @param base  the request URL
+     * @param ctxUri  the path information
+     * @param s  the query text
+     * @return String
+     */
+    private String buildUrl(String base, String ctxUri, String s) {
+        return base + ctxUri + "?" + s;
+    }
 }

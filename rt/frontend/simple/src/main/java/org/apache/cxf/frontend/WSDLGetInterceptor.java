@@ -37,7 +37,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 
 public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -68,9 +67,14 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
         String baseUri = (String)message.get(Message.REQUEST_URL);
         String ctx = (String)message.get(Message.PATH_INFO);
 
+        WSDLGetUtils utils = (WSDLGetUtils)message.getContextualProperty(WSDLGetUtils.class.getName());
+        if (utils == null) {
+            utils = new WSDLGetUtils();
+            message.put(WSDLGetUtils.class, utils);
+        }
         Map<String, String> map = UrlUtils.parseQueryString(query);
-        if (isRecognizedQuery(map, baseUri, ctx, message.getExchange().getEndpoint().getEndpointInfo())) {
-            Document doc = getDocument(message, baseUri, map, ctx);
+        if (isRecognizedQuery(map)) {
+            Document doc = getDocument(utils, message, baseUri, map, ctx);
             
             Endpoint e = message.getExchange().get(Endpoint.class);
             Message mout = new MessageImpl();
@@ -112,7 +116,9 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
         
     }
 
-    private Document getDocument(Message message, String base, Map<String, String> params, String ctxUri) {
+    private Document getDocument(WSDLGetUtils utils,
+                                 Message message, String base,
+                                 Map<String, String> params, String ctxUri) {
         // cannot have two wsdl's being generated for the same endpoint at the same
         // time as the addresses may get mixed up
         // For WSDL's the WSDLWriter does not share any state between documents.
@@ -120,13 +126,12 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
         // any addresses and returning them, so for both WSDL and XSD this is the only part that needs
         // to be synchronized.
         synchronized (message.getExchange().getEndpoint()) {
-            return new WSDLGetUtils().getDocument(message, base, params, ctxUri, 
-                                                  message.getExchange().getEndpoint().getEndpointInfo());
+            return utils.getDocument(message, base, params, ctxUri, 
+                                     message.getExchange().getEndpoint().getEndpointInfo());
         }
     }
 
-    private boolean isRecognizedQuery(Map<String, String> map, String baseUri, String ctx,
-                                     EndpointInfo endpointInfo) {
+    private boolean isRecognizedQuery(Map<String, String> map) {
 
         if (map.containsKey("wsdl") || map.containsKey("xsd")) {
             return true;
