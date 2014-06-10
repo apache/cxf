@@ -367,7 +367,7 @@ public class DynamicClientFactory {
         }
         
         List<File> srcFiles = FileUtils.getFilesRecurse(src, ".+\\.java$"); 
-        if (!compileJavaSrc(classPath.toString(), srcFiles, classes.toString())) {
+        if (srcFiles.size() > 0 && !compileJavaSrc(classPath.toString(), srcFiles, classes.toString())) {
             LOG.log(Level.SEVERE , new Message("COULD_NOT_COMPILE_SRC", LOG, wsdlUrl).toString());
         }
         FileUtils.removeDir(src);
