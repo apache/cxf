@@ -34,7 +34,8 @@ import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
  */
 public class LocalClientState implements ClientState {
     private static final String HTTP_SCHEME = "http";
-    
+    private static final String WS_SCHEME = "ws";
+
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>(false, true);
     private MultivaluedMap<String, String> templates;
     private Response response;
@@ -154,6 +155,6 @@ public class LocalClientState implements ClientState {
     
     private static boolean isSupportedScheme(URI uri) {
         return !StringUtils.isEmpty(uri.getScheme()) 
-            && uri.getScheme().startsWith(HTTP_SCHEME);
+            && (uri.getScheme().startsWith(HTTP_SCHEME) || uri.getScheme().startsWith(WS_SCHEME));
     }
 }

@@ -112,20 +112,20 @@ public class WebClientTest extends Assert {
     public void testBaseCurrentWebSocketPath() {
         WebClient wc = WebClient.create("ws://foo");
         assertEquals(URI.create("ws://foo"), wc.getBaseURI());
-        assertEquals(URI.create("/"), wc.getCurrentURI());
+        assertEquals(URI.create("ws://foo"), wc.getCurrentURI());
         wc.path("a");
         assertEquals(URI.create("ws://foo"), wc.getBaseURI());
-        assertEquals(URI.create("/a"), wc.getCurrentURI());
+        assertEquals(URI.create("ws://foo/a"), wc.getCurrentURI());
     }
     
     @Test 
     public void testNewBaseCurrentWebSocketPath() {
         WebClient wc = WebClient.create("ws://foo");
         assertEquals(URI.create("ws://foo"), wc.getBaseURI());
-        assertEquals(URI.create("/"), wc.getCurrentURI());
+        assertEquals(URI.create("ws://foo"), wc.getCurrentURI());
         wc.to("ws://bar", false);
         assertEquals(URI.create("ws://bar"), wc.getBaseURI());
-        assertEquals(URI.create("/"), wc.getCurrentURI());
+        assertEquals(URI.create("ws://bar"), wc.getCurrentURI());
     }
     
     @Test 

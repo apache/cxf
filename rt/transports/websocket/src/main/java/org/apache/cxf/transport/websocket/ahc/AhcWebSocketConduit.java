@@ -113,7 +113,12 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
 
             entity = message.get(AhcWebSocketConduitRequest.class);
             //REVISIT how we prepare the request
-            entity.setPath(url.getPath() + (String)message.getContextualProperty("org.apache.cxf.request.uri"));
+            String requri = (String)message.getContextualProperty("org.apache.cxf.request.uri");
+            if (requri.startsWith("ws")) {
+                entity.setPath(requri.substring(requri.indexOf(url.getPath())));
+            } else {
+                entity.setPath(url.getPath() + requri);
+            }
             entity.setId(UUID.randomUUID().toString());
             uncorrelatedRequests.put(entity.getId(), new RequestResponse(entity));
         }
