@@ -623,7 +623,10 @@ public final class ResourceUtils {
         
         MessageBodyWriter<?> writer = jaxbWriter;
         if (writer == null) {
-            writer = new JAXBElementProvider<Object>();
+            JAXBElementProvider<Object> defaultWriter = new JAXBElementProvider<Object>();
+            defaultWriter.setMarshallAsJaxbElement(true);
+            defaultWriter.setXmlTypeAsJaxbElementOnly(true);
+            writer = defaultWriter;
         }
         if (writer.isWriteable(type, type, anns, MediaType.APPLICATION_XML_TYPE)) {
             types.getAllTypes().put(type, type);
