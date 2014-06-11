@@ -50,7 +50,8 @@ public class NettyHttpClientRequest {
                                        uri.getPath().toString(), content);
         // setup the default headers
         request.headers().set("Connection", "keep-alive");
-        request.headers().set("Host", uri.getHost() + ":" + uri.getPort());
+        request.headers().set("Host", uri.getHost() + ":"
+            + (uri.getPort() != -1 ? uri.getPort() : "http".equals(uri.getScheme()) ? 80 : 443));
     }
 
     public HttpRequest getRequest() {
