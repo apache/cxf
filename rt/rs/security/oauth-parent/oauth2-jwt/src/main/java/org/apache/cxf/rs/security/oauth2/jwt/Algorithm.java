@@ -36,9 +36,11 @@ public enum Algorithm {
     SHA512withRSA(JwtConstants.RS_SHA_512_ALGO, 512),
     
     // Key Encryption
-    RSA_OAEP_ALGO(JwtConstants.RSA_OAEP_ALGO, "RSA/ECB/OAEPWithSHA-1AndMGF1Padding", -1),
+    RSA_OAEP(JwtConstants.RSA_OAEP_ALGO, "RSA/ECB/OAEPWithSHA-1AndMGF1Padding", -1),
     // Content Encryption
-    A256GCM_ALGO(JwtConstants.A256GCM_ALGO, "AES/GCM/NoPadding", 256);
+    A128GCM(JwtConstants.A128GCM_ALGO, "AES/GCM/NoPadding", 128),
+    A192GCM(JwtConstants.A192GCM_ALGO, "AES/GCM/NoPadding", 192),
+    A256GCM(JwtConstants.A256GCM_ALGO, "AES/GCM/NoPadding", 256);
     
     public static final String HMAC_SHA_256_JAVA = "HmacSHA256";
     public static final String HMAC_SHA_384_JAVA = "HmacSHA384";
@@ -50,7 +52,7 @@ public enum Algorithm {
     public static final String RSA_OAEP_256_ALGO_JAVA = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
     public static final String RSA_1_5_ALGO_JAVA = "RSA/ECB/PKCS1Padding";
     public static final String AES_ALGO_JAVA = "AES";
-    public static final String A256GCM_ALGO_JAVA = "AES/GCM/NoPadding";
+    public static final String AES_GCM_ALGO_JAVA = "AES/GCM/NoPadding";
     
     private static final Map<String, String> JAVA_TO_JWT_NAMES;
     private static final Map<String, String> JWT_TO_JAVA_NAMES;
@@ -65,8 +67,6 @@ public enum Algorithm {
         JAVA_TO_JWT_NAMES.put(RSA_OAEP_ALGO_JAVA, JwtConstants.RSA_OAEP_ALGO);
         JAVA_TO_JWT_NAMES.put(RSA_OAEP_256_ALGO_JAVA, JwtConstants.RSA_OAEP_256_ALGO);
         JAVA_TO_JWT_NAMES.put(RSA_1_5_ALGO_JAVA, JwtConstants.RSA_1_5_ALGO);
-        JAVA_TO_JWT_NAMES.put(A256GCM_ALGO_JAVA, JwtConstants.A256GCM_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_ALGO_JAVA, JwtConstants.A256GCM_ALGO);
         JWT_TO_JAVA_NAMES = new HashMap<String, String>();
         JWT_TO_JAVA_NAMES.put(JwtConstants.HMAC_SHA_256_ALGO, HMAC_SHA_256_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.HMAC_SHA_384_ALGO, HMAC_SHA_384_JAVA);
@@ -77,7 +77,9 @@ public enum Algorithm {
         JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_OAEP_ALGO, RSA_OAEP_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_OAEP_256_ALGO, RSA_OAEP_256_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_1_5_ALGO, RSA_1_5_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A256GCM_ALGO, A256GCM_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.A256GCM_ALGO, AES_GCM_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.A192GCM_ALGO, AES_GCM_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.A128GCM_ALGO, AES_GCM_ALGO_JAVA);
     }
     private final String jwtName;
     private final String javaName;
@@ -108,8 +110,13 @@ public enum Algorithm {
         return keySizeBits;
     }
     
-    public static String toJwtName(String javaName) {    
-        return JAVA_TO_JWT_NAMES.get(javaName);
+    public static String toJwtName(String javaName, int keyBitSize) {
+        //TODO: perhaps a key should be a name+keysize pair
+        String name = JAVA_TO_JWT_NAMES.get(javaName);
+        if (name == null && javaName.startsWith(AES_ALGO_JAVA)) {
+            name = "A" + keyBitSize + "GCM";
+        } 
+        return name;
     }
     public static String toJavaName(String jwtName) {    
         return JWT_TO_JAVA_NAMES.get(jwtName);

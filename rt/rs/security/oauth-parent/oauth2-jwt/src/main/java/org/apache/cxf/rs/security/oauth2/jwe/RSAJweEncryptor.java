@@ -27,7 +27,7 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 
 public class RSAJweEncryptor extends WrappedKeyJweEncryptor {
     public RSAJweEncryptor(RSAPublicKey publicKey, String contentEncryptionAlgo) {
-        super(new JweHeaders(Algorithm.RSA_OAEP_ALGO.getJwtName(),
+        super(new JweHeaders(Algorithm.RSA_OAEP.getJwtName(),
                              contentEncryptionAlgo), publicKey);
     }
     public RSAJweEncryptor(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv) {
@@ -36,11 +36,13 @@ public class RSAJweEncryptor extends WrappedKeyJweEncryptor {
     public RSAJweEncryptor(RSAPublicKey publicKey, SecretKey secretKey, String secretKeyJwtAlgorithm,
                            byte[] iv) {
         this(publicKey, 
-             new JweHeaders(Algorithm.RSA_OAEP_ALGO.getJwtName(), secretKeyJwtAlgorithm),
-             secretKey.getEncoded(), iv, DEFAULT_AUTH_TAG_LENGTH, true);
+             new JweHeaders(Algorithm.RSA_OAEP.getJwtName(), secretKeyJwtAlgorithm),
+             secretKey != null ? secretKey.getEncoded() : null, iv, DEFAULT_AUTH_TAG_LENGTH, true);
     }
     public RSAJweEncryptor(RSAPublicKey publicKey, SecretKey secretKey, byte[] iv) {
-        this(publicKey, secretKey, Algorithm.toJwtName(secretKey.getAlgorithm()), iv);
+        this(publicKey, secretKey, 
+             Algorithm.toJwtName(secretKey.getAlgorithm(),
+                                 secretKey.getEncoded().length * 8), iv);
     }
     
     public RSAJweEncryptor(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv, 

@@ -27,7 +27,6 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactReaderWriterTest;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
-import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -64,7 +63,7 @@ public class JweCompactReaderWriterTest extends Assert {
     public static void registerBouncyCastleIfNeeded() throws Exception {
         try {
             // Java 8 apparently has it
-            Cipher.getInstance(Algorithm.A256GCM_ALGO_JAVA);
+            Cipher.getInstance(Algorithm.AES_GCM_ALGO_JAVA);
         } catch (Throwable t) {
             // Oracle Java 7
             Security.addProvider(new BouncyCastleProvider());    
@@ -78,32 +77,42 @@ public class JweCompactReaderWriterTest extends Assert {
     @Test
     public void testEncryptDecryptSpecExample() throws Exception {
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
-        String jweContent = encryptContent(specPlainText);
+        String jweContent = encryptContent(specPlainText, true);
         
         decrypt(jweContent, specPlainText);
     }
     @Test
     public void testDirectKeyEncryptDecrypt() throws Exception {
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
-        String jweContent = encryptContentDirect(specPlainText);
+        SecretKey key = createSecretKey(true);
+        String jweContent = encryptContentDirect(key, specPlainText);
         
-        decryptDirect(jweContent, specPlainText);
+        decryptDirect(key, jweContent, specPlainText);
     }
     
     @Test
     public void testEncryptDecryptJwsToken() throws Exception {
-        String jweContent = encryptContent(JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC);
+        String jweContent = encryptContent(JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC, false);
         decrypt(jweContent, JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC);
     }
     
-    private String encryptContent(String content) throws Exception {
+    private String encryptContent(String content, boolean createIfException) throws Exception {
         RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
-        SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, "AES");
-        RSAJweEncryptor encryptor = new RSAJweEncryptor(publicKey, key, JwtConstants.A256GCM_ALGO, INIT_VECTOR);
+        SecretKey key = createSecretKey(createIfException);
+        String jwtKeyName = null;
+        if (key == null) {
+            // the encryptor will generate it
+            jwtKeyName = Algorithm.A128GCM.getJwtName();
+        } else {
+            jwtKeyName = Algorithm.toJwtName(key.getAlgorithm(), key.getEncoded().length * 8);
+        }
+        RSAJweEncryptor encryptor = new RSAJweEncryptor(publicKey, 
+                                                        key, 
+                                                        jwtKeyName, 
+                                                        INIT_VECTOR);
         return encryptor.encryptText(content);
     }
-    private String encryptContentDirect(String content) throws Exception {
-        SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, "AES");
+    private String encryptContentDirect(SecretKey key, String content) throws Exception {
         DirectKeyJweEncryptor encryptor = new DirectKeyJweEncryptor(key, INIT_VECTOR);
         return encryptor.encryptText(content);
     }
@@ -113,11 +122,19 @@ public class JweCompactReaderWriterTest extends Assert {
         String decryptedText = decryptor.decrypt(jweContent).getContentText();
         assertEquals(decryptedText, plainContent);
     }
-    private void decryptDirect(String jweContent, String plainContent) throws Exception {
-        SecretKey key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, "AES");
+    private void decryptDirect(SecretKey key, String jweContent, String plainContent) throws Exception {
         DirectKeyJweDecryptor decryptor = new DirectKeyJweDecryptor(key);
         String decryptedText = decryptor.decrypt(jweContent).getContentText();
         assertEquals(decryptedText, plainContent);
+    }
+    private SecretKey createSecretKey(boolean createIfException) throws Exception {
+        SecretKey key = null;
+        if (Cipher.getMaxAllowedKeyLength("AES") > 128) { 
+            key = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY, "AES");
+        } else if (createIfException) {
+            key = CryptoUtils.createSecretKeySpec(CryptoUtils.generateSecureRandomBytes(128 / 8), "AES");
+        }
+        return key;
     }
 }
 

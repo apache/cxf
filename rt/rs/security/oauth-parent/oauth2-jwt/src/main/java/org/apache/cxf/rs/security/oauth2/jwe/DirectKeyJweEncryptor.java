@@ -24,7 +24,8 @@ import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 
 public class DirectKeyJweEncryptor extends AbstractJweEncryptor {
     public DirectKeyJweEncryptor(SecretKey cek, byte[] iv) {
-        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm())), cek.getEncoded(), iv);
+        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
+                                                cek.getEncoded().length * 8)), cek.getEncoded(), iv);
     }
     public DirectKeyJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv) {
         super(headers, cek, iv);

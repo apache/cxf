@@ -60,6 +60,8 @@ public final class JwtConstants {
     public static final String RSA_OAEP_256_ALGO = "RSA-OAEP-256";
     public static final String RSA_1_5_ALGO = "RSA1_5";
     
+    public static final String A128GCM_ALGO = "A128GCM";
+    public static final String A192GCM_ALGO = "A192GCM";
     public static final String A256GCM_ALGO = "A256GCM";
     
     private JwtConstants() {

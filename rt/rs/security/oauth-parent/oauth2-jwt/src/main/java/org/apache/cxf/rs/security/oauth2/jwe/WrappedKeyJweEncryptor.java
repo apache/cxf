@@ -48,8 +48,10 @@ public class WrappedKeyJweEncryptor extends AbstractJweEncryptor {
     protected byte[] getContentEncryptionKey() {
         byte[] theCek = super.getContentEncryptionKey();
         if (theCek == null) {
-            String algo = getContentEncryptionAlgo();
-            theCek = CryptoUtils.getSecretKey(algo, Algorithm.valueOf(algo).getKeySizeBits()).getEncoded();
+            String algoJava = getContentEncryptionAlgoJava();
+            String algoJwt = getContentEncryptionAlgoJwt();
+            theCek = CryptoUtils.getSecretKey(Algorithm.stripAlgoProperties(algoJava), 
+                Algorithm.valueOf(algoJwt).getKeySizeBits()).getEncoded();
         }
         return theCek;
     }
@@ -58,7 +60,7 @@ public class WrappedKeyJweEncryptor extends AbstractJweEncryptor {
         if (!wrap) {
             return CryptoUtils.encryptBytes(theCek, cekEncryptionKey, secretKeyProperties);
         } else {
-            return CryptoUtils.wrapSecretKey(theCek, getContentEncryptionAlgo(), cekEncryptionKey, 
+            return CryptoUtils.wrapSecretKey(theCek, getContentEncryptionAlgoJava(), cekEncryptionKey, 
                                              secretKeyProperties.getKeyAlgo());
         }
     }

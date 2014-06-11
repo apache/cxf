@@ -39,7 +39,9 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
     private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
     
     protected AbstractJweEncryptor(SecretKey cek, byte[] iv) {
-        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm())), cek.getEncoded(), iv);
+        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
+                                                cek.getEncoded().length * 8)),
+                                                cek.getEncoded(), iv);
     }
     protected AbstractJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv) {
         this.headers = headers;
@@ -75,7 +77,10 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
     
     protected abstract byte[] getEncryptedContentEncryptionKey(byte[] theCek);
     
-    protected String getContentEncryptionAlgo() {
+    protected String getContentEncryptionAlgoJwt() {
+        return headers.getContentEncryptionAlgorithm();
+    }
+    protected String getContentEncryptionAlgoJava() {
         return Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
     }
     
