@@ -179,6 +179,8 @@ public class Java2WADLMojo extends AbstractMojo {
      */
     private String outputFileExtension;
     
+    private ClassLoader resourceClassLoader;
+    
     public void execute() throws MojoExecutionException {
         List<Class<?>> resourceClasses = loadResourceClasses();
         initClassResourceInfoList(resourceClasses);
@@ -282,19 +284,21 @@ public class Java2WADLMojo extends AbstractMojo {
     
     
     private ClassLoader getClassLoader() throws MojoExecutionException {
-        try {
-            List<?> runtimeClasspathElements = project.getRuntimeClasspathElements();
-            URL[] runtimeUrls = new URL[runtimeClasspathElements.size()];
-            for (int i = 0; i < runtimeClasspathElements.size(); i++) {
-                String element = (String)runtimeClasspathElements.get(i);
-                runtimeUrls[i] = new File(element).toURI().toURL();
+        if (resourceClassLoader == null) {
+            try {
+                List<?> runtimeClasspathElements = project.getRuntimeClasspathElements();
+                URL[] runtimeUrls = new URL[runtimeClasspathElements.size()];
+                for (int i = 0; i < runtimeClasspathElements.size(); i++) {
+                    String element = (String)runtimeClasspathElements.get(i);
+                    runtimeUrls[i] = new File(element).toURI().toURL();
+                }
+                resourceClassLoader = new URLClassLoader(runtimeUrls, Thread.currentThread()
+                    .getContextClassLoader());
+            } catch (Exception e) {
+                throw new MojoExecutionException(e.getMessage(), e);
             }
-            URLClassLoader newLoader = new URLClassLoader(runtimeUrls, Thread.currentThread()
-                .getContextClassLoader());
-            return newLoader;
-        } catch (Exception e) {
-            throw new MojoExecutionException(e.getMessage(), e);
         }
+        return resourceClassLoader;
     }
     private List<Class<?>> loadResourceClasses() throws MojoExecutionException {
         List<Class<?>> resourceClasses = new ArrayList<Class<?>>(classResourceNames.size());
