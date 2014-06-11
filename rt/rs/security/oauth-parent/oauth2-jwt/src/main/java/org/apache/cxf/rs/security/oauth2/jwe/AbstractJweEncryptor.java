@@ -81,7 +81,7 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         return headers.getContentEncryptionAlgorithm();
     }
     protected String getContentEncryptionAlgoJava() {
-        return Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
+        return Algorithm.toJavaName(getContentEncryptionAlgoJwt());
     }
     
     protected int getAuthTagLen() {
