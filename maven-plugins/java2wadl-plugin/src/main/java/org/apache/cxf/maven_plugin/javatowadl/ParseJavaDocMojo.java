@@ -106,6 +106,16 @@ public class ParseJavaDocMojo extends AbstractJavadocMojo {
      * @readonly
      */
     private List<ArtifactRepository> remoteRepositories;
+    
+    
+    /**
+     * Directory into which assembled {@link JavadocOptions} instances will be written before they
+     * are added to javadoc resources bundles.
+     * @parameter expression="${project.build.directory}/javadoc-bundle-options"
+     * @required
+     * @readonly
+     */
+    private File javadocOptionsDir;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -123,6 +133,10 @@ public class ParseJavaDocMojo extends AbstractJavadocMojo {
             f = AbstractJavadocMojo.class.getDeclaredField("stylesheet");
             f.setAccessible(true);
             f.set(this, "stylesheet");
+            
+            f = AbstractJavadocMojo.class.getDeclaredField("javadocOptionsDir");
+            f.setAccessible(true);
+            f.set(this, javadocOptionsDir);
 
             f = AbstractJavadocMojo.class.getDeclaredField("docletArtifact");
             f.setAccessible(true);
