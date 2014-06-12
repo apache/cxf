@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -242,12 +243,16 @@ public class Extension {
             notFound = true;
             if (!optional) {
                 throw ex;
+            } else {
+                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)ex);
             }
         } catch (InvocationTargetException ex) {
             notFound = true;
             if (!optional) {
                 throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), 
                                              ex.getCause());
+            } else {
+                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)ex);
             }
         } catch (NoSuchMethodException ex) {
             notFound = true;
@@ -261,11 +266,15 @@ public class Extension {
             if (!optional) {
                 throw new ExtensionException(new Message("PROBLEM_FINDING_CONSTRUCTOR", LOG,
                                                          cls.getName(), a), ex);
+            } else {
+                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)ex);
             }
         } catch (Throwable e) {
             notFound = true;
             if (!optional) {
                 throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), e);
+            } else {
+                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)e);
             }
         }
         return obj;
