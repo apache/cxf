@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
@@ -36,7 +37,28 @@ import io.netty.channel.nio.NioEventLoopGroup;
 
 public class NettyHttpConduitFactory implements HTTPConduitFactory {
 
+    //CXF specific
+    public static final String USE_POLICY = "org.apache.cxf.transport.http.netty.usePolicy";
+    
+    public static enum UseAsyncPolicy {
+        ALWAYS, ASYNC_ONLY, NEVER
+    };
+    
+    UseAsyncPolicy policy;
     public NettyHttpConduitFactory() {
+        Object st = SystemPropertyAction.getPropertyOrNull(USE_POLICY);
+        if (st instanceof UseAsyncPolicy) {
+            policy = (UseAsyncPolicy)st;
+        } else if (st instanceof String) {
+            policy = UseAsyncPolicy.valueOf((String)st);
+        } else {
+            //policy = UseAsyncPolicy.ALWAYS;
+            policy = UseAsyncPolicy.ASYNC_ONLY;
+        }        
+    }
+    
+    public UseAsyncPolicy getUseAsyncPolicy() {
+        return policy;
     }
 
     @Override

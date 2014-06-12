@@ -92,6 +92,9 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
     
     // Using Netty API directly
     protected void setupConnection(Message message, URI uri, HTTPClientPolicy csPolicy) throws IOException {
+        
+        
+        
         // need to do some clean up work on the URI address
         String uriString = uri.toString();
         if (uriString.startsWith("netty://")) {
@@ -105,6 +108,45 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         if (!"http".equals(s) && !"https".equals(s)) {
             throw new MalformedURLException("unknown protocol: " + s);
         }
+        
+        Object o = message.getContextualProperty(USE_ASYNC);
+        if (o == null) {
+            o = factory.getUseAsyncPolicy();
+        }
+        if (o instanceof NettyHttpConduitFactory.UseAsyncPolicy) {
+            switch ((NettyHttpConduitFactory.UseAsyncPolicy)o) {
+            case ALWAYS:
+                o = true;
+                break;
+            case NEVER:
+                o = false;
+                break;
+            case ASYNC_ONLY:
+            default:
+                o = !message.getExchange().isSynchronous();
+                break;
+            }
+            
+        }
+        // check tlsClientParameters from message header
+        TLSClientParameters clientParameters = message.get(TLSClientParameters.class);
+        if (clientParameters == null) {
+            clientParameters = tlsClientParameters;
+        }
+        if (uri.getScheme().equals("https") 
+            && clientParameters != null
+            && clientParameters.getSSLSocketFactory() != null) {
+            //if they configured in an SSLSocketFactory, we cannot do anything
+            //with it as the NIO based transport cannot use socket created from
+            //the SSLSocketFactory.
+            o = false;
+        }
+        if (!MessageUtils.isTrue(o)) {
+            message.put(USE_ASYNC, Boolean.FALSE);
+            super.setupConnection(message, uri, csPolicy);
+            return;
+        }
+        message.put(USE_ASYNC, Boolean.TRUE);
 
         if (StringUtils.isEmpty(uri.getPath())) {
             //hc needs to have the path be "/"
@@ -134,20 +176,22 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                                               boolean isChunking,
                                               int chunkThreshold) throws IOException {
 
-        NettyHttpClientRequest entity = message.get(NettyHttpClientRequest.class);
-        NettyWrappedOutputStream out = new NettyWrappedOutputStream(message,
-                needToCacheRequest,
-                isChunking,
-                chunkThreshold,
-                getConduitName(),
-                entity.getUri());
-        entity.createRequest(out.getOutBuffer());
-        // TODO need to check how to set the Chunked feature
-        //request.getRequest().setChunked(true);
-        entity.getRequest().headers().set(Message.CONTENT_TYPE, (String)message.get(Message.CONTENT_TYPE));
-        return out;
+        if (Boolean.TRUE.equals(message.get(USE_ASYNC))) {
 
-
+            NettyHttpClientRequest entity = message.get(NettyHttpClientRequest.class);
+            NettyWrappedOutputStream out = new NettyWrappedOutputStream(message,
+                    needToCacheRequest,
+                    isChunking,
+                    chunkThreshold,
+                    getConduitName(),
+                    entity.getUri());
+            entity.createRequest(out.getOutBuffer());
+            // TODO need to check how to set the Chunked feature
+            //request.getRequest().setChunked(true);
+            entity.getRequest().headers().set(Message.CONTENT_TYPE, (String)message.get(Message.CONTENT_TYPE));
+            return out;
+        }
+        return super.createOutputStream(message, needToCacheRequest, isChunking, chunkThreshold);
     }
 
     public class NettyWrappedOutputStream extends WrappedOutputStream {
