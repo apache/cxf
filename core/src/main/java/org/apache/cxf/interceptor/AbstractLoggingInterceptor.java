@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
@@ -50,7 +51,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Logger.
  */
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+    public static final int DEFAULT_LIMIT = 48 * 1024;
     protected static final String BINARY_CONTENT_MESSAGE = "--- Binary Content ---";
     private static final List<String> BINARY_CONTENT_MEDIA_TYPES;
     static {
@@ -61,7 +62,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         BINARY_CONTENT_MEDIA_TYPES.add("image/gif");
     }
     
-    protected int limit = 48 * 1024;
+    protected int limit = DEFAULT_LIMIT;
     protected long threshold = -1;
     protected PrintWriter writer;
     protected boolean prettyLogging;
@@ -160,9 +161,19 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
             xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
             InputStream in = cos.getInputStream();
-            StaxUtils.copy(new StreamSource(in), xwriter);
-            xwriter.close();
-            in.close();
+            try {
+                StaxUtils.copy(new StreamSource(in), xwriter);
+            } catch (XMLStreamException xse) {
+                //ignore
+            } finally {
+                try {
+                    xwriter.flush();
+                    xwriter.close();
+                } catch (XMLStreamException xse2) {
+                    //ignore
+                }
+                in.close();
+            }
             
             String result = swriter.toString();
             if (result.length() < limit || limit == -1) {
@@ -177,7 +188,6 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             } else {
                 cos.writeCacheTo(builder, encoding, limit);
             }
-
         }
     }
     protected void writePayload(StringBuilder builder, 

@@ -25,6 +25,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
+
 /**
  * Enables message Logging
  */
@@ -35,7 +37,7 @@ public @interface Logging {
     /**
      * The size limit at which messages are truncated in the log 
      */
-    int limit() default 65536;
+    int limit() default AbstractLoggingInterceptor.DEFAULT_LIMIT;
  
     /**
      * the locations where the messages are logged.   The default is

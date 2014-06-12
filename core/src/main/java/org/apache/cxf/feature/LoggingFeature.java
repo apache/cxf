@@ -21,6 +21,7 @@ package org.apache.cxf.feature;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -42,7 +43,7 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
  */
 @NoJSR250Annotations
 public class LoggingFeature extends AbstractFeature {
-    private static final int DEFAULT_LIMIT = 64 * 1024;
+    private static final int DEFAULT_LIMIT = AbstractLoggingInterceptor.DEFAULT_LIMIT;
     private static final LoggingInInterceptor IN = new LoggingInInterceptor(DEFAULT_LIMIT);
     private static final LoggingOutInterceptor OUT = new LoggingOutInterceptor(DEFAULT_LIMIT);
     
