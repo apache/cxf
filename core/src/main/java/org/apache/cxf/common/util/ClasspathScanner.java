@@ -92,12 +92,21 @@ public class ClasspathScanner {
     public static Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClasses(
         Collection< String > basePackages, List<Class< ? extends Annotation > > annotations) 
         throws IOException, ClassNotFoundException {
-        return HELPER.findClassesInternal(basePackages, annotations);
+        return findClasses(basePackages, annotations, null);
         
+    }
+
+    public static Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClasses(
+        Collection< String > basePackages, 
+        List<Class< ? extends Annotation > > annotations,
+        ClassLoader loader) throws IOException, ClassNotFoundException {
+        return HELPER.findClassesInternal(basePackages, annotations, loader);
     }
     
     protected Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClassesInternal(
-        Collection< String > basePackages, List<Class< ? extends Annotation > > annotations) 
+        Collection< String > basePackages, 
+        List<Class< ? extends Annotation > > annotations,
+        ClassLoader loader) 
         throws IOException, ClassNotFoundException {
         return Collections.emptyMap();
     }
@@ -123,9 +132,14 @@ public class ClasspathScanner {
      */
     public static List<URL> findResources(Collection<String> basePackages, String extension) 
         throws IOException {
-        return HELPER.findResourcesInternal(basePackages, extension);
+        return findResources(basePackages, extension, null);
     }
     
+    public static List<URL> findResources(Collection<String> basePackages, String extension,
+                                          ClassLoader loader) 
+        throws IOException {
+        return HELPER.findResourcesInternal(basePackages, extension, loader);
+    }
     
     public static Set<String> parsePackages(final String packagesAsCsv) {        
         final String[] values = StringUtils.split(packagesAsCsv, ",");
@@ -144,7 +158,9 @@ public class ClasspathScanner {
         return basePackages;
     }
     
-    protected List<URL> findResourcesInternal(Collection<String> basePackages, String extension) 
+    protected List<URL> findResourcesInternal(Collection<String> basePackages, 
+                                              String extension,
+                                              ClassLoader loader) 
         throws IOException {
         return Collections.emptyList();
     }
