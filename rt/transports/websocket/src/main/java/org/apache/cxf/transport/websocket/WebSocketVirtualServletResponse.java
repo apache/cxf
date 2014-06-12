@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.websocket;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
@@ -41,25 +42,17 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
     private static final Logger LOG = LogUtils.getL7dLogger(WebSocketVirtualServletResponse.class);
     private WebSocketServletHolder webSocketHolder;
     private Map<String, String> responseHeaders;
-    private boolean flushed;
+    private ServletOutputStream outputStream;
 
     public WebSocketVirtualServletResponse(WebSocketServletHolder websocket) {
         this.webSocketHolder = websocket;
         this.responseHeaders = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        this.outputStream = createOutputStream();
     }
 
     @Override
     public void flushBuffer() throws IOException {
         LOG.log(Level.INFO, "flushBuffer()");
-        if (!flushed) {
-            //REVISIT this mechanism to determine if the headers have been flushed
-            if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
-                byte[] data = WebSocketUtils.buildResponse(responseHeaders, null, 0, 0);
-                webSocketHolder.write(data, 0, data.length);
-                responseHeaders.put(WebSocketUtils.FLUSHED_KEY, "true");
-            }
-            flushed = true;
-        }
     }
 
     @Override
@@ -88,42 +81,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
-        return new ServletOutputStream() {
-
-            @Override
-            public void write(int b) throws IOException {
-                byte[] data = new byte[1];
-                data[0] = (byte)b;
-                write(data, 0, 1);
-            }
-
-            @Override
-            public void write(byte[] data) throws IOException {
-                write(data, 0, data.length);
-            }
-            
-            @Override
-            public void write(byte[] data, int offset, int length) throws IOException {
-                if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
-                    data = WebSocketUtils.buildResponse(responseHeaders, data, offset, length);
-                    responseHeaders.put(WebSocketUtils.FLUSHED_KEY, "true");
-                } else {
-                    data = WebSocketUtils.buildResponse(data, offset, length);
-                }
-                webSocketHolder.write(data, 0, data.length);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
-                    byte[] data = WebSocketUtils.buildResponse(responseHeaders, null, 0, 0);
-                    webSocketHolder.write(data, 0, data.length);
-                    responseHeaders.put(WebSocketUtils.FLUSHED_KEY, "true");
-                }
-                super.close();
-            }
-            
-        };
+        return outputStream;
     }
 
     @Override
@@ -346,5 +304,60 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
         responseHeaders.put(WebSocketUtils.SM_KEY, sm);
+    }
+
+    private ServletOutputStream createOutputStream() {
+        return new ServletOutputStream() {
+            //REVISIT
+            // This output buffering is needed as the server side websocket does
+            // not support the fragment transmission mode when sending back a large data.
+            // And this buffering is only used for the response for the initial service innovation.
+            // For the subsequently pushed data to the socket are sent back
+            // unbuffered as individual websocket messages.
+            // the things to consider :
+            // - provide a size limit if we are use this buffering
+            // - add a chunking mode in the cxf websocket's binding.
+            private InternalByteArrayOutputStream buffer = new InternalByteArrayOutputStream();
+
+            @Override
+            public void write(int b) throws IOException {
+                byte[] data = new byte[1];
+                data[0] = (byte)b;
+                write(data, 0, 1);
+            }
+
+            @Override
+            public void write(byte[] data) throws IOException {
+                write(data, 0, data.length);
+            }
+
+            @Override
+            public void write(byte[] data, int offset, int length) throws IOException {
+                if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
+                    // buffer the data until it gets flushed
+                    buffer.write(data, offset, length);
+                } else {
+                    // unbuffered write to the socket
+                    data = WebSocketUtils.buildResponse(data, offset, length);
+                    webSocketHolder.write(data, 0, data.length);
+                }
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
+                    byte[] data = WebSocketUtils.buildResponse(responseHeaders, buffer.getBytes(), 0, buffer.size());
+                    webSocketHolder.write(data, 0, data.length);
+                    responseHeaders.put(WebSocketUtils.FLUSHED_KEY, "true");
+                }
+                super.close();
+            }
+        };
+    }
+
+    private static class InternalByteArrayOutputStream extends ByteArrayOutputStream {
+        public byte[] getBytes() {
+            return buf;
+        }
     }
 }

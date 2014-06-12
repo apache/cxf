@@ -408,6 +408,10 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         LOG.log(Level.INFO, "getPathTranslated");
         String path = getPathInfo();
         String opathtrans = webSocketHolder.getPathTranslated();
+        // some container may choose not to return this value
+        if (opathtrans == null) {
+            return null;
+        }
         String opathinfo = webSocketHolder.getPathInfo();
         int pos = opathtrans.indexOf(opathinfo);
         //REVISIT may cache this value in requstHeaders?

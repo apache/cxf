@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -298,7 +299,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
                     }
                 }
                 if (response == null) {
-                    throw new IOException("timeout");
+                    throw new SocketTimeoutException("Read timed out while invoking " + entity.getUri());
                 }
             }
             return response;

@@ -202,6 +202,7 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             properties.put("locale", request.getLocale());
             properties.put("locales", request.getLocales());
             properties.put("remoteHost", request.getRemoteHost());
+            properties.put("remotePort", request.getRemotePort());
             properties.put("remoteAddr", request.getRemoteAddr());
             properties.put("serverName", request.getServerName());
             properties.put("serverPort", request.getServerPort());

@@ -23,8 +23,8 @@ package org.apache.cxf.transport.websocket;
  * 
  */
 public final class WebSocketConstants {
-    public static final String DEFAULT_REQUEST_ID_KEY = "requestId";
-    public static final String DEFAULT_RESPONSE_ID_KEY = "responseId";
+    public static final String DEFAULT_REQUEST_ID_KEY = "Request-Id";
+    public static final String DEFAULT_RESPONSE_ID_KEY = "Response-Id";
 
     private WebSocketConstants() {
     }
