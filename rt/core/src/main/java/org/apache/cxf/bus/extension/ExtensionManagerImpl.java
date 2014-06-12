@@ -188,7 +188,9 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                     if (loader != l) {
                         e.classloader = l;
                     }
-                    all.put(e.getName(), e);
+                    if (!all.containsKey(e.getName())) {
+                        all.put(e.getName(), e);
+                    }
                 }
             } finally {
                 try {
@@ -327,15 +329,29 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     }
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
         List<T> ret = new LinkedList<T>();
-        for (Extension ex : all.values()) {
-            synchronized (ex) {
-                Class<?> cls = ex.getClassObject(loader);
+        Extension ext = all.get(type.getName());
+        if (ext != null) {
+            synchronized (ext) {
+                Class<?> cls = ext.getClassObject(loader);
                 if (cls != null && type.isAssignableFrom(cls)) {
-                    if (ex.getLoadedObject() == null) {
-                        loadAndRegister(ex);
+                    if (ext.getLoadedObject() == null) {
+                        loadAndRegister(ext);
                     }
-                    ret.add(type.cast(ex.getLoadedObject()));
+                    ret.add(type.cast(ext.getLoadedObject()));
                 }                
+            }
+        }
+        for (Extension ex : all.values()) {
+            if (ex != ext) {
+                synchronized (ex) {
+                    Class<?> cls = ex.getClassObject(loader);
+                    if (cls != null && type.isAssignableFrom(cls)) {
+                        if (ex.getLoadedObject() == null) {
+                            loadAndRegister(ex);
+                        }
+                        ret.add(type.cast(ex.getLoadedObject()));
+                    }                
+                }
             }
         }
         return ret;
