@@ -153,7 +153,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         if (st instanceof UseAsyncPolicy) {
             policy = (UseAsyncPolicy)st;
         } else if (st instanceof String) {
-            policy = UseAsyncPolicy.valueOf((String)st);
+            policy = UseAsyncPolicy.valueOf(((String)st).toUpperCase());
         } else {
             //policy = UseAsyncPolicy.ALWAYS;
             policy = UseAsyncPolicy.ASYNC_ONLY;
