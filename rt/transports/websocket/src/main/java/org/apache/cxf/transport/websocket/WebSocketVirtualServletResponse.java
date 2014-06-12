@@ -307,16 +307,16 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
     }
 
     private ServletOutputStream createOutputStream() {
+        //REVISIT
+        // This output buffering is needed as the server side websocket does
+        // not support the fragment transmission mode when sending back a large data.
+        // And this buffering is only used for the response for the initial service innovation.
+        // For the subsequently pushed data to the socket are sent back
+        // unbuffered as individual websocket messages.
+        // the things to consider :
+        // - provide a size limit if we are use this buffering
+        // - add a chunking mode in the cxf websocket's binding.
         return new ServletOutputStream() {
-            //REVISIT
-            // This output buffering is needed as the server side websocket does
-            // not support the fragment transmission mode when sending back a large data.
-            // And this buffering is only used for the response for the initial service innovation.
-            // For the subsequently pushed data to the socket are sent back
-            // unbuffered as individual websocket messages.
-            // the things to consider :
-            // - provide a size limit if we are use this buffering
-            // - add a chunking mode in the cxf websocket's binding.
             private InternalByteArrayOutputStream buffer = new InternalByteArrayOutputStream();
 
             @Override
