@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
@@ -62,6 +63,17 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
     protected boolean isRequestor(Message message) {
         return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
+    protected boolean shouldBuffer(Message message) {
+        Object en = message.getContextualProperty(OUT_BUFFERING);
+        boolean allowBuffer = true;
+        boolean buffer = false;
+        if (en != null) {
+            buffer = Boolean.TRUE.equals(en) || "true".equals(en);
+            allowBuffer = !(Boolean.FALSE.equals(en) || "false".equals(en));
+        }
+        // need to cache the events in case validation fails or buffering is enabled
+        return buffer || (allowBuffer && shouldValidate(message) && !isRequestor(message));
+    }
     
     protected void writeParts(Message message, Exchange exchange, 
                               BindingOperationInfo operation, MessageContentsList objs, 
@@ -75,22 +87,17 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         // configure endpoint and operation level schema validation
         setOperationSchemaValidation(operation.getOperationInfo(), message);
         
-        Object en = message.getContextualProperty(OUT_BUFFERING);
-        boolean allowBuffer = true;
-        boolean buffer = false;
-        if (en != null) {
-            buffer = Boolean.TRUE.equals(en) || "true".equals(en);
-            allowBuffer = !(Boolean.FALSE.equals(en) || "false".equals(en));
-        }
         // need to cache the events in case validation fails or buffering is enabled
-        if (buffer || (allowBuffer && shouldValidate(message) && !isRequestor(message))) {
-            cache = new CachingXmlEventWriter();
-            try {
-                cache.setNamespaceContext(origXmlWriter.getNamespaceContext());
-            } catch (XMLStreamException e) {
-                //ignorable, will just get extra namespace decls
+        if (shouldBuffer(message)) {
+            if (!(xmlWriter instanceof CachingXmlEventWriter)) {
+                cache = new CachingXmlEventWriter();
+                try {
+                    cache.setNamespaceContext(origXmlWriter.getNamespaceContext());
+                } catch (XMLStreamException e) {
+                    //ignorable, will just get extra namespace decls
+                }
+                xmlWriter = cache;
             }
-            xmlWriter = cache;
             out = null;
         }
         
@@ -119,8 +126,25 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
             
             for (MessagePartInfo part : parts) {
                 if (objs.hasValue(part)) {
+                    NamespaceContext c = null;
+                    if (!part.isElement()
+                        && xmlWriter instanceof CachingXmlEventWriter) {
+                        try {
+                            c = xmlWriter.getNamespaceContext();
+                            xmlWriter.setNamespaceContext(new CachingXmlEventWriter.NSContext(null));
+                        } catch (XMLStreamException e) {
+                            //ignore
+                        }
+                    }
                     Object o = objs.get(part);
                     dataWriter.write(o, part, xmlWriter);
+                    if (c != null) {
+                        try {
+                            xmlWriter.setNamespaceContext(c);
+                        } catch (XMLStreamException e) {
+                            //ignore
+                        }
+                    }
                 }
             }
         }

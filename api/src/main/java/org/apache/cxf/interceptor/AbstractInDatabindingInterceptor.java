@@ -135,7 +135,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
      * @param reader
      * @see #setDataReaderValidation(Service, Message, DataReader)
      */
-    private void setOperationSchemaValidation(OperationInfo opInfo, Message message) {
+    protected void setOperationSchemaValidation(OperationInfo opInfo, Message message) {
         if (opInfo != null) {
             SchemaValidationType validationType = 
                 (SchemaValidationType) opInfo.getProperty(Message.SCHEMA_VALIDATION_ENABLED);
