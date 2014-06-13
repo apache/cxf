@@ -1,6 +1,8 @@
 origin/master
 A core api
 A core rt/core
+A rt/wsdl rt/core
+A rt/wsdl api
 A rt/rs/description rt/frontend/jaxrs
 A rt/frontend/simple/src/main/java/org/apache/cxf/endpoint/dynamic rt/databinding/jaxb/src/main/java/org/apache/cxf/endpoint/dynamic/
 A core/src/main/java/org/apache/cxf/ws/addressing/EndpointReferenceUtils api/src/main/java/org/apache/cxf/wsdl/EndpointReferenceUtils
