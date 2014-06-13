@@ -21,22 +21,19 @@ package org.apache.cxf.rs.security.oauth2.jws;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.rs.security.oauth2.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
-import org.apache.cxf.rs.security.oauth2.jwt.JwtToken;
-import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenJson;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersReader;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReader;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 public class JwsCompactConsumer {
-    private JwtTokenReader reader = new JwtTokenReaderWriter();
+    private JwtHeadersReader reader = new JwtTokenReaderWriter();
     private String encodedSequence;
     private String encodedSignature;
     private String headersJson;
-    private String claimsJson;
-    private JwtToken token;
+    private String jwsPayload;
     private JwsSignatureProperties props;
     public JwsCompactConsumer(String encodedJws) {
         this(encodedJws, null, null);
@@ -47,7 +44,7 @@ public class JwsCompactConsumer {
     public JwsCompactConsumer(String encodedJws, JwtTokenReader r) {
         this(encodedJws, null, r);
     }
-    public JwsCompactConsumer(String encodedJws, JwsSignatureProperties props, JwtTokenReader r) {
+    public JwsCompactConsumer(String encodedJws, JwsSignatureProperties props, JwtHeadersReader r) {
         if (r != null) {
             this.reader = r;
         }
@@ -63,12 +60,11 @@ public class JwsCompactConsumer {
             encodedSignature = parts[2];
         }
         headersJson = decodeToString(parts[0]);
-        claimsJson = decodeToString(parts[1]);
-        
+        jwsPayload = decodeToString(parts[1]);
         encodedSequence = parts[0] + "." + parts[1];
         
     }
-    public String getUnsignedEncodedToken() {
+    public String getUnsignedEncodedPayload() {
         return encodedSequence;
     }
     public String getEncodedSignature() {
@@ -77,30 +73,18 @@ public class JwsCompactConsumer {
     public String getDecodedJsonHeaders() {
         return headersJson;
     }
-    public String getDecodedJsonClaims() {
-        return claimsJson;
-    }
-    public JwtTokenJson getDecodedJsonToken() {
-        return new JwtTokenJson(getDecodedJsonHeaders(), getDecodedJsonClaims());
+    public String getDecodedJwsPayload() {
+        return jwsPayload;
     }
     public byte[] getDecodedSignature() {
         return encodedSignature.isEmpty() ? new byte[]{} : decode(encodedSignature);
     }
     public JwtHeaders getJwtHeaders() {
-        return getJwtToken().getHeaders();
-    }
-    public JwtClaims getJwtClaims() {
-        return getJwtToken().getClaims();
-    }
-    public JwtToken getJwtToken() {
-        if (token == null) {
-            token = reader.fromJson(new JwtTokenJson(headersJson, claimsJson));
-        }
-        return token;
+        return getReader().fromJsonHeaders(headersJson);
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         enforceJweSignatureProperties();
-        if (!validator.verify(getJwtHeaders(), getUnsignedEncodedToken(), getDecodedSignature())) {
+        if (!validator.verify(getJwtHeaders(), getUnsignedEncodedPayload(), getDecodedSignature())) {
             throw new SecurityException();
         }
         return true;
@@ -118,7 +102,9 @@ public class JwsCompactConsumer {
         }
         
     }
-    
+    protected JwtHeadersReader getReader() {
+        return reader;
+    }
     private static byte[] decode(String encoded) {
         try {
             return Base64UrlUtility.decode(encoded);

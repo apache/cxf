@@ -26,7 +26,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oauth2.jws.JwsCompactConsumer;
+import org.apache.cxf.rs.security.oauth2.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReader;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -57,10 +57,10 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
         try {
-            JwsCompactConsumer jwsReader = getJwsReader(assertion);
+            JwsJwtCompactConsumer jwsReader = getJwsReader(assertion);
             JwtToken jwtToken = jwsReader.getJwtToken();
             super.validateSignature(jwtToken.getHeaders(),
-                                    jwsReader.getUnsignedEncodedToken(), 
+                                    jwsReader.getUnsignedEncodedPayload(), 
                                     jwsReader.getDecodedSignature());
             
                    
@@ -79,8 +79,8 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
         
     }
 
-    protected JwsCompactConsumer getJwsReader(String assertion) {
-        return new JwsCompactConsumer(assertion, jwtReader);
+    protected JwsJwtCompactConsumer getJwsReader(String assertion) {
+        return new JwsJwtCompactConsumer(assertion, jwtReader);
     }
     
     public void setJwtReader(JwtTokenReader tokenReader) {

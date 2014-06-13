@@ -38,8 +38,8 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.rs.security.oauth2.jws.JwsCompactConsumer;
-import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
+import org.apache.cxf.rs.security.oauth2.jws.JwsJwtCompactConsumer;
+import org.apache.cxf.rs.security.oauth2.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProperties;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureVerifier;
@@ -71,7 +71,7 @@ public class JwsMessageBodyProvider implements
         if (theSigVerifier == null) {
             throw new SecurityException();
         }
-        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(is), 
+        JwsJwtCompactConsumer p = new JwsJwtCompactConsumer(IOUtils.readStringFromStream(is), 
                                                       sigProperties);
         p.verifySignatureWith(theSigVerifier);
         return p.getJwtToken();
@@ -96,9 +96,9 @@ public class JwsMessageBodyProvider implements
         if (theSigProvider == null) {
             throw new SecurityException();
         }
-        JwsCompactProducer p = new JwsCompactProducer(token);
+        JwsJwtCompactProducer p = new JwsJwtCompactProducer(token);
         p.signWith(theSigProvider);
-        IOUtils.copy(new ByteArrayInputStream(p.getSignedEncodedToken().getBytes("UTF-8")), os);
+        IOUtils.copy(new ByteArrayInputStream(p.getSignedEncodedJws().getBytes("UTF-8")), os);
     }
 
     

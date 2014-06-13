@@ -88,7 +88,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         JwsCompactProducer jws = initSpecJwtTokenWriter(headers);
         jws.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY));
         
-        assertEquals(ENCODED_TOKEN_SIGNED_BY_MAC, jws.getSignedEncodedToken());
+        assertEquals(ENCODED_TOKEN_SIGNED_BY_MAC, jws.getSignedEncodedJws());
         
     }
     
@@ -104,10 +104,10 @@ public class JwsCompactReaderWriterTest extends Assert {
         claims.setExpiryTime(1300819380);
         claims.setClaim("http://claims.example.com/member", true);
         
-        JwsCompactProducer writer = new JwsCompactProducer(headers, claims);
-        String signed = writer.getSignedEncodedToken();
+        JwsCompactProducer writer = new JwsJwtCompactProducer(headers, claims);
+        String signed = writer.getSignedEncodedJws();
         
-        JwsCompactConsumer reader = new JwsCompactConsumer(signed);
+        JwsJwtCompactConsumer reader = new JwsJwtCompactConsumer(signed);
         assertEquals(0, reader.getDecodedSignature().length);
         
         JwtToken token = reader.getJwtToken();
@@ -116,7 +116,7 @@ public class JwsCompactReaderWriterTest extends Assert {
 
     @Test
     public void testReadJwsSignedByMacSpecExample() throws Exception {
-        JwsCompactConsumer jws = new JwsCompactConsumer(ENCODED_TOKEN_SIGNED_BY_MAC);
+        JwsJwtCompactConsumer jws = new JwsJwtCompactConsumer(ENCODED_TOKEN_SIGNED_BY_MAC);
         assertTrue(jws.verifySignatureWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY)));
         JwtToken token = jws.getJwtToken();
         JwtHeaders headers = token.getHeaders();
@@ -154,15 +154,15 @@ public class JwsCompactReaderWriterTest extends Assert {
         claims.setClaim("http://example.com/is_root", Boolean.TRUE);
         
         JwtToken token = new JwtToken(headers, claims);
-        JwsCompactProducer jws = new JwsCompactProducer(token, getWriter());
+        JwsCompactProducer jws = new JwsJwtCompactProducer(token, getWriter());
         jws.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY));
         
-        assertEquals(ENCODED_TOKEN_WITH_JSON_KEY_SIGNED_BY_MAC, jws.getSignedEncodedToken());
+        assertEquals(ENCODED_TOKEN_WITH_JSON_KEY_SIGNED_BY_MAC, jws.getSignedEncodedJws());
     }
     
     @Test
     public void testReadJwsWithJwkSignedByMac() throws Exception {
-        JwsCompactConsumer jws = new JwsCompactConsumer(ENCODED_TOKEN_WITH_JSON_KEY_SIGNED_BY_MAC);
+        JwsJwtCompactConsumer jws = new JwsJwtCompactConsumer(ENCODED_TOKEN_WITH_JSON_KEY_SIGNED_BY_MAC);
         assertTrue(jws.verifySignatureWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY)));
         JwtToken token = jws.getJwtToken();
         JwtHeaders headers = token.getHeaders();
@@ -193,12 +193,12 @@ public class JwsCompactReaderWriterTest extends Assert {
         PrivateKey key = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
         jws.signWith(new PrivateKeyJwsSignatureProvider(key));
         
-        assertEquals(ENCODED_TOKEN_SIGNED_BY_PRIVATE_KEY, jws.getSignedEncodedToken());
+        assertEquals(ENCODED_TOKEN_SIGNED_BY_PRIVATE_KEY, jws.getSignedEncodedJws());
     }
     
     @Test
     public void testReadJwsSignedByPrivateKey() throws Exception {
-        JwsCompactConsumer jws = new JwsCompactConsumer(ENCODED_TOKEN_SIGNED_BY_PRIVATE_KEY);
+        JwsJwtCompactConsumer jws = new JwsJwtCompactConsumer(ENCODED_TOKEN_SIGNED_BY_PRIVATE_KEY);
         RSAPublicKey key = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
         assertTrue(jws.verifySignatureWith(new PublicKeyJwsSignatureVerifier(key)));
         JwtToken token = jws.getJwtToken();
@@ -215,7 +215,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         claims.setClaim("http://example.com/is_root", Boolean.TRUE);
         
         JwtToken token = new JwtToken(headers, claims);
-        return new JwsCompactProducer(token, getWriter());
+        return new JwsJwtCompactProducer(token, getWriter());
     }
 
     
