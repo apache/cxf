@@ -207,12 +207,14 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             Class<?> cls = null;
             if (null != e.getInterfaceName() && !"".equals(e.getInterfaceName())) {
                 cls = e.loadInterface(loader);
+            }  else {
+                cls = e.getClassObject(loader);
             }
     
             if (null != activated && null != cls && null != activated.get(cls)) {
                 return;
             }
-     
+            
             Object obj = e.load(loader, bus);
             if (obj == null) {
                 return;
