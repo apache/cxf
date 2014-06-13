@@ -63,7 +63,7 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
 
     private Certificate loadCert() throws Exception {
         InputStream is = this.getClass().getResourceAsStream("/org/apache/cxf/systest/http/resources/Truststore.jks");
-        return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit");
+        return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
     }
 
     
