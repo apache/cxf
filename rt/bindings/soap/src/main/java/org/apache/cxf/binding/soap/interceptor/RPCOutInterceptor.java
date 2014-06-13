@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
 import org.apache.cxf.common.logging.LogUtils;
@@ -35,6 +36,7 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.staxutils.CachingXmlEventWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 
 public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
@@ -46,6 +48,7 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
 
 
     public void handleMessage(Message message) {
+        XMLStreamWriter origXmlWriter = null;
         try {
             NSStack nsStack = new NSStack();
             nsStack.push();
@@ -56,7 +59,19 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
             assert operation.getName() != null;
 
             XMLStreamWriter xmlWriter = getXMLStreamWriter(message);
-
+            CachingXmlEventWriter cache = null;
+            // need to cache the events in case validation fails or buffering is enabled
+            if (shouldBuffer(message)) {
+                origXmlWriter = xmlWriter;
+                cache = new CachingXmlEventWriter();
+                try {
+                    cache.setNamespaceContext(xmlWriter.getNamespaceContext());
+                } catch (XMLStreamException e) {
+                    //ignorable, will just get extra namespace decls
+                }
+                message.setContent(XMLStreamWriter.class, cache);
+                xmlWriter = cache;
+            }
 
             List<MessagePartInfo> parts = null;
 
@@ -97,9 +112,24 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
             writeParts(message, message.getExchange(), operation, objs, parts);
 
             // Finishing the writing.
-            xmlWriter.writeEndElement();            
+            xmlWriter.writeEndElement();
+            
+            
+            if (cache != null) {
+                try {
+                    for (XMLEvent event : cache.getEvents()) {
+                        StaxUtils.writeEvent(event, origXmlWriter);
+                    }
+                } catch (XMLStreamException e) {
+                    throw new Fault(e);
+                }
+            }
         } catch (XMLStreamException e) {
             throw new Fault(e);
+        } finally {
+            if (origXmlWriter != null) {
+                message.setContent(XMLStreamWriter.class, origXmlWriter);
+            }
         }
     }
 

@@ -233,7 +233,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
                                             Collections.EMPTY_SET.iterator()));
     }
     
-    private static class NSContext implements NamespaceContext {
+    public static class NSContext implements NamespaceContext {
         NamespaceContext parent;
         Map<String, String> map = new HashMap<String, String>();
         

@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxws.schemavalidation;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.feature.validation.DefaultSchemaValidationTypeProvider;
 import org.apache.cxf.feature.validation.SchemaValidationFeature;
 import org.apache.cxf.frontend.ClientProxy;
@@ -39,7 +41,6 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.testutil.common.TestUtil;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -55,6 +56,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
     private static List<Server> serverList = new ArrayList<Server>();
     private static PersonServiceAnnotated annotatedClient;
     private static PersonService client;
+    private static PersonServiceRPC rpcClient;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -69,10 +71,13 @@ public class JavaFirstSchemaValidationTest extends Assert {
 
         createServer(PersonService.class, new PersonServiceImpl(), feature);
 
-        createServer(PersonServiceAnnotated.class, new PersonServiceAnnotatedImpl(), null);
+        createServer(PersonServiceAnnotated.class, new PersonServiceAnnotatedImpl());
+
+        createServer(PersonServiceRPC.class, new PersonServiceRPCImpl(), feature, new LoggingFeature());
 
         annotatedClient = createClient(PersonServiceAnnotated.class);
         client = createClient(PersonService.class);
+        rpcClient = createClient(PersonServiceRPC.class);
     }
 
     @AfterClass
@@ -85,7 +90,27 @@ public class JavaFirstSchemaValidationTest extends Assert {
     static String getAddress(Class<?> sei) {
         return "http://localhost:" + PORT + "/" + sei.getSimpleName();
     }
+    
 
+    @Test
+    public void testRPCLit() throws Exception { 
+        Person person = new Person();
+        person.setFirstName("Foo");
+        person.setLastName("Bar");
+        //this should work
+        rpcClient.saveValidateOut(person);
+        
+        try {
+            person.setFirstName(null);
+            rpcClient.saveValidateOut(person);
+        } catch (SOAPFaultException sfe) {
+            // verify its server side and a schema validation
+            assertTrue(sfe.getMessage().contains("Marshalling Error"));
+            assertTrue(sfe.getMessage().contains("lastName"));
+        }            
+    }
+
+    
     // so this is the default, we are inheriting from the service level SchemaValidation annotation
     // which is set to BOTH
     @Test
@@ -261,12 +286,12 @@ public class JavaFirstSchemaValidationTest extends Assert {
         return newClient;
     }
 
-    public static Server createServer(Class<?> serviceInterface, Object serviceImpl, Feature feature)
+    public static Server createServer(Class<?> serviceInterface, Object serviceImpl, Feature ... features)
         throws IOException {
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(serviceImpl.getClass());
-        if (feature != null) {
-            svrFactory.getFeatures().add(feature);
+        if (features != null) {
+            svrFactory.getFeatures().addAll(Arrays.asList(features));
         }
         svrFactory.setAddress(getAddress(serviceInterface));
         svrFactory.setServiceBean(serviceImpl);
