@@ -87,7 +87,7 @@ public class AegisJSONProviderTest extends Assert {
         AbstractAegisProvider.clearContexts();
         if (setNsMap) {
             Map<String, String> namespaceMap = new HashMap<String, String>();
-            namespaceMap.put("http://fortest.jaxrs.cxf.apache.org", "ns1");
+            namespaceMap.put("http://resources.jaxrs.cxf.apache.org", "ns1");
             namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
             p.setNamespaceMap(namespaceMap);
         }
