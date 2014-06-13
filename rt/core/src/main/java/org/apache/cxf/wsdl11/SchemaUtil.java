@@ -125,7 +125,7 @@ public final class SchemaUtil {
                         }
                         String systemId = def.getDocumentBaseURI() + "#types" + schemaCount;
                         if (def.getDocumentBaseURI() != null
-                            && def.getDocumentBaseURI().toUpperCase().endsWith(".xsd")
+                            && def.getDocumentBaseURI().toUpperCase().endsWith(".XSD")
                             && def.getTargetNamespace() == null
                             && obj instanceof Schema 
                             && ((Schema)obj).getDocumentBaseURI().equals(def.getDocumentBaseURI())) {
