@@ -43,7 +43,7 @@ public class Extension {
     protected boolean deferred;
     protected Collection<String> namespaces = new ArrayList<String>();
     protected Object args[];
-    protected Object obj;
+    protected volatile Object obj;
     protected boolean optional;
     protected boolean notFound;
     
@@ -197,6 +197,9 @@ public class Extension {
         return clazz;
     }
     public Object load(ClassLoader cl, Bus b) {
+        if (obj != null) {
+            return obj;
+        }
         Class<?> cls = getClassObject(cl);
         try {
             if (notFound) {
