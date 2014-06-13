@@ -221,7 +221,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         UserSubject userSubject = createUserSubject(securityContext);
         
         // Make sure the session is valid
-        String sessionToken = params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
+        String sessionTokenParamName = params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN_PARAM_NAME);
+        if (sessionTokenParamName == null) {
+            sessionTokenParamName = OAuthConstants.SESSION_AUTHENTICITY_TOKEN;
+        }
+        String sessionToken = params.getFirst(sessionTokenParamName);
         if (!compareRequestAndSessionTokens(sessionToken, params, userSubject)) {
             throw ExceptionUtils.toBadRequestException(null, null);     
         }

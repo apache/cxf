@@ -88,6 +88,7 @@ public final class OAuthConstants {
     public static final String AUTHORIZATION_CODE_VALUE = "code";
     public static final String CODE_RESPONSE_TYPE = "code";
     public static final String SESSION_AUTHENTICITY_TOKEN = "session_authenticity_token";
+    public static final String SESSION_AUTHENTICITY_TOKEN_PARAM_NAME = "session_authenticity_token_param_name";
     public static final String AUTHORIZATION_DECISION_KEY = "oauthDecision";
     public static final String AUTHORIZATION_DECISION_ALLOW = "allow";
     public static final String AUTHORIZATION_DECISION_DENY = "deny";
