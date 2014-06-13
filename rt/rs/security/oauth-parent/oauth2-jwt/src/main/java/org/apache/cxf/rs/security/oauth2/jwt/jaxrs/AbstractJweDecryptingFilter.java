@@ -27,6 +27,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.oauth2.jwe.JweCryptoProperties;
 import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptor;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
@@ -39,6 +40,7 @@ public class AbstractJweDecryptingFilter {
     private static final String RSSEC_KEY_PSWD_PROVIDER = "org.apache.rs.security.crypto.private.provider";
     
     private JweDecryptor decryptor;
+    private JweCryptoProperties cryptoProperties;
     protected byte[] decrypt(InputStream is) throws IOException {
         JweDecryptor theDecryptor = getInitializedDecryptor();
         if (theDecryptor == null) {
@@ -70,7 +72,11 @@ public class AbstractJweDecryptingFilter {
         PrivateKeyPasswordProvider cb = (PrivateKeyPasswordProvider)m.getContextualProperty(RSSEC_KEY_PSWD_PROVIDER);
         Bus bus = (Bus)m.getExchange().get(Endpoint.class).get(Bus.class.getName());
         PrivateKey pk = CryptoUtils.loadPrivateKey(propLoc, bus, cb);
-        return new WrappedKeyJweDecryptor(pk);
+        return new WrappedKeyJweDecryptor(pk, cryptoProperties);
+    }
+
+    public void setCryptoProperties(JweCryptoProperties cryptoProperties) {
+        this.cryptoProperties = cryptoProperties;
     }
 
 }

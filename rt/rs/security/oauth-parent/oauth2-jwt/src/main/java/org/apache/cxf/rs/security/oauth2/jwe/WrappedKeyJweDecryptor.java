@@ -33,6 +33,9 @@ public class WrappedKeyJweDecryptor extends AbstractJweDecryptor {
     public WrappedKeyJweDecryptor(Key cekDecryptionKey, boolean unwrap) {    
         this(cekDecryptionKey, unwrap, null);
     }
+    public WrappedKeyJweDecryptor(Key cekDecryptionKey, JweCryptoProperties props) {
+        this(cekDecryptionKey, true, props);
+    }
     public WrappedKeyJweDecryptor(Key cekDecryptionKey, boolean unwrap,
                                   JweCryptoProperties props) {    
         super(props);

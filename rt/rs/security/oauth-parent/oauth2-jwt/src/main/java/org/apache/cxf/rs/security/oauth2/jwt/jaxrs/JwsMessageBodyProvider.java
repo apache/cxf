@@ -40,6 +40,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
+import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProperties;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.jws.PrivateKeyJwsSignatureProvider;
@@ -53,6 +54,7 @@ public class JwsMessageBodyProvider implements
     private static final String RSSEC_SIGNATURE_PROPS = "rs-security.signature.properties";
     private static final String RSSEC_KEY_PSWD_PROVIDER = "org.apache.rs.security.crypto.private.provider";
     
+    private JwsSignatureProperties sigProperties;
     private JwsSignatureProvider sigProvider;
     private JwsSignatureVerifier sigVerifier;
     
@@ -69,7 +71,8 @@ public class JwsMessageBodyProvider implements
         if (theSigVerifier == null) {
             throw new SecurityException();
         }
-        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(is));
+        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(is), 
+                                                      sigProperties);
         p.verifySignatureWith(theSigVerifier);
         return p.getJwtToken();
     }
@@ -143,5 +146,9 @@ public class JwsMessageBodyProvider implements
         Bus bus = (Bus)m.getExchange().get(Endpoint.class).get(Bus.class.getName());
         PublicKey pk = CryptoUtils.loadPublicKey(propLoc, bus);
         return new PublicKeyJwsSignatureVerifier(pk);
+    }
+
+    public void setSigProperties(JwsSignatureProperties sigProperties) {
+        this.sigProperties = sigProperties;
     }
 }
