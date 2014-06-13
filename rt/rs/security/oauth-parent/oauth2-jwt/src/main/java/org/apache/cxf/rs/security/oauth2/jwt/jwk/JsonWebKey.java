@@ -36,6 +36,7 @@ public class JsonWebKey extends AbstractJwtObject {
     public static final String X509_URL = JwtConstants.HEADER_X509_URL;
     public static final String X509_CHAIN = JwtConstants.HEADER_X509_CHAIN;
     public static final String X509_THUMBPRINT = JwtConstants.HEADER_X509_THUMBPRINT;
+    public static final String X509_THUMBPRINT_SHA256 = JwtConstants.HEADER_X509_THUMBPRINT_SHA256;
     
     public static final String KEY_TYPE_OCTET = "oct";
     public static final String KEY_TYPE_RSA = "RSA";

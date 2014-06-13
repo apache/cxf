@@ -23,16 +23,19 @@ import java.io.OutputStream;
 
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
+    private boolean contentTypeRequired;
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         OutputStream actualOs = ctx.getOutputStream();
@@ -40,9 +43,18 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
         ctx.setOutputStream(cos);
         ctx.proceed();
         
-        JwsCompactProducer p = new JwsCompactProducer(new JwtHeaders(Algorithm.SHA256withRSA.getJwtName()),
-                                                      new String(cos.getBytes(), "UTF-8"));
+        JwtHeaders headers = new JwtHeaders(Algorithm.SHA256withRSA.getJwtName());
+        if (contentTypeRequired) {
+            MediaType mt = ctx.getMediaType();
+            if (mt != null) {
+                headers.setContentType(JAXRSUtils.mediaTypeToString(mt));
+            }
+        }
+        JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), "UTF-8"));
         writeJws(p, actualOs);
+    }
+    public void setContentTypeRequired(boolean contentTypeRequired) {
+        this.contentTypeRequired = contentTypeRequired;
     }
         
 }

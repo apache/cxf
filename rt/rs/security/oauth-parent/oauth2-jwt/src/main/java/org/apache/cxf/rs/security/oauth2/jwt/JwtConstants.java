@@ -29,6 +29,7 @@ public final class JwtConstants {
     public static final String HEADER_X509_URL = "x5u";
     public static final String HEADER_X509_CHAIN = "x5c";
     public static final String HEADER_X509_THUMBPRINT = "x5t";
+    public static final String HEADER_X509_THUMBPRINT_SHA256 = "x5t#S256";
     public static final String HEADER_JSON_WEB_KEY = "jwk";
     public static final String HEADER_JSON_WEB_KEY_SET = "jku";
     
