@@ -34,6 +34,7 @@ public class AbstractJwsReaderProvider {
     
     private JwsSignatureVerifier sigVerifier;
     private JwsSignatureProperties sigProperties;
+    private String defaultMediaType;
     
     public void setSigVerifier(JwsSignatureVerifier sigVerifier) {
         this.sigVerifier = sigVerifier;
@@ -63,6 +64,14 @@ public class AbstractJwsReaderProvider {
         Bus bus = (Bus)m.getExchange().get(Endpoint.class).get(Bus.class.getName());
         PublicKey pk = CryptoUtils.loadPublicKey(propLoc, bus);
         return new PublicKeyJwsSignatureVerifier(pk);
+    }
+
+    public String getDefaultMediaType() {
+        return defaultMediaType;
+    }
+
+    public void setDefaultMediaType(String defaultMediaType) {
+        this.defaultMediaType = defaultMediaType;
     }
     
     

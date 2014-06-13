@@ -23,13 +23,15 @@ public final class JwtUtils {
         
     }
     
-    public static String checkContentType(String contentType) {
+    public static String checkContentType(String contentType, String defaultType) {
         if (contentType != null) {
             int paramIndex = contentType.indexOf(';');
             String typeWithoutParams = paramIndex == -1 ? contentType : contentType.substring(0, paramIndex);
             if (typeWithoutParams.indexOf('/') == -1) {
                 contentType = "application/" + contentType;
             }
+        } else {
+            contentType = defaultType;
         }
         return contentType;
     }

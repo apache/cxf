@@ -44,7 +44,7 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         
-        String ct = JwtUtils.checkContentType(p.getJwtHeaders().getContentType());
+        String ct = JwtUtils.checkContentType(p.getJwtHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
             context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
