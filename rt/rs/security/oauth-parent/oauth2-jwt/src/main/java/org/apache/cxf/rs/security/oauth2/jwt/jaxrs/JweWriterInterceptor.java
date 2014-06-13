@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.PublicKey;
 
+import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
@@ -39,6 +40,7 @@ import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryptor;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
+@Priority(Priorities.JWE_WRITE_PRIORITY)
 public class JweWriterInterceptor implements WriterInterceptor {
     private static final String RSSEC_ENCRYPTION_PROPS = "rs-security.encryption.properties";
     private JweEncryptor encryptor;
@@ -51,13 +53,9 @@ public class JweWriterInterceptor implements WriterInterceptor {
         ctx.proceed();
         
         JweEncryptor theEncryptor = getInitializedEncryptor();
-        if (theEncryptor == null) {
-            throw new SecurityException();
-        }
         String jweContent = theEncryptor.encrypt(cos.getBytes());
         IOUtils.copy(new ByteArrayInputStream(jweContent.getBytes("UTF-8")), actualOs);
         actualOs.flush();
-        // TODO: figure out what to do with the content type
     }
     
     protected JweEncryptor getInitializedEncryptor() {
@@ -66,11 +64,11 @@ public class JweWriterInterceptor implements WriterInterceptor {
         } 
         Message m = JAXRSUtils.getCurrentMessage();
         if (m == null) {
-            return null;
+            throw new SecurityException();
         }
         String propLoc = (String)m.getContextualProperty(RSSEC_ENCRYPTION_PROPS);
         if (propLoc == null) {
-            return null;
+            throw new SecurityException();
         }
         Bus bus = (Bus)m.getExchange().get(Endpoint.class).get(Bus.class.getName());
         PublicKey pk = CryptoUtils.loadPublicKey(propLoc, bus);

@@ -18,20 +18,14 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import javax.annotation.Priority;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
-
-@PreMatching
-@Priority(Priorities.JWE_SERVER_READ_PRIORITY)
-public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
-    @Override
-    public void filter(ContainerRequestContext context) throws IOException {
-        context.setEntityStream(new ByteArrayInputStream(
-            decrypt(context.getEntityStream())));
+public final class Priorities {
+    public static final int JWE_SERVER_READ_PRIORITY = 1000;
+    public static final int JWE_WRITE_PRIORITY = 1001;
+    public static final int JWE_CLIENT_READ_PRIORITY = 1001;
+    public static final int JWS_SERVER_READ_PRIORITY = 1001;
+    public static final int JWS_WRITE_PRIORITY = 1000;
+    public static final int JWS_CLIENT_READ_PRIORITY = 1000;
+    private Priorities() {
+        
     }
 }

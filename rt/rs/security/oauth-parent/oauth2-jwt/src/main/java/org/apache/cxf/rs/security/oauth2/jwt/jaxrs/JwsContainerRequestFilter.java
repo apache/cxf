@@ -26,12 +26,28 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.rs.security.oauth2.jws.JwsCompactConsumer;
+import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureVerifier;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtUtils;
+
 @PreMatching
-@Priority(Priorities.JWE_SERVER_READ_PRIORITY)
-public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
+@Priority(Priorities.JWS_SERVER_READ_PRIORITY)
+public class JwsContainerRequestFilter extends AbstractJwsReaderProvider implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        context.setEntityStream(new ByteArrayInputStream(
-            decrypt(context.getEntityStream())));
+        
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
+        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(context.getEntityStream()), 
+                                                      getSigProperties());
+        p.verifySignatureWith(theSigVerifier);
+        byte[] bytes = p.getDecodedJwsPayloadBytes();
+        context.setEntityStream(new ByteArrayInputStream(bytes));
+        
+        String ct = JwtUtils.checkContentType(p.getJwtHeaders().getContentType());
+        if (ct != null) {
+            context.getHeaders().putSingle("Content-Type", ct);
+            context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
+        }
     }
 }

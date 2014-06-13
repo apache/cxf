@@ -16,22 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
+package org.apache.cxf.rs.security.oauth2.jwt;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import javax.annotation.Priority;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
-
-@PreMatching
-@Priority(Priorities.JWE_SERVER_READ_PRIORITY)
-public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
-    @Override
-    public void filter(ContainerRequestContext context) throws IOException {
-        context.setEntityStream(new ByteArrayInputStream(
-            decrypt(context.getEntityStream())));
+public final class JwtUtils {
+    private JwtUtils() {
+        
+    }
+    
+    public static String checkContentType(String contentType) {
+        if (contentType != null) {
+            int paramIndex = contentType.indexOf(';');
+            String typeWithoutParams = paramIndex == -1 ? contentType : contentType.substring(0, paramIndex);
+            if (typeWithoutParams.indexOf('/') == -1) {
+                contentType = "application/" + contentType;
+            }
+        }
+        return contentType;
     }
 }

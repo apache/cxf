@@ -76,6 +76,13 @@ public class JwsCompactConsumer {
     public String getDecodedJwsPayload() {
         return jwsPayload;
     }
+    public byte[] getDecodedJwsPayloadBytes() {
+        try {
+            return jwsPayload.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new SecurityException(ex);
+        }
+    }
     public byte[] getDecodedSignature() {
         return encodedSignature.isEmpty() ? new byte[]{} : decode(encodedSignature);
     }

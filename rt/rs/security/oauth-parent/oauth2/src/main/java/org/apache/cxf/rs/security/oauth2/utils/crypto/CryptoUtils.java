@@ -128,6 +128,9 @@ public final class CryptoUtils {
         }    
     }
     
+    public static Certificate loadCertificate(InputStream storeLocation, char[] storePassword, String alias) {
+        return loadCertificate(storeLocation, storePassword, alias, null);    
+    }
     public static Certificate loadCertificate(InputStream storeLocation, char[] storePassword, String alias,
                                               String storeType) {
         try {
