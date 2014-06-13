@@ -36,6 +36,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
@@ -44,10 +45,12 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 
@@ -55,7 +58,12 @@ import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
  * Encryption helpers
  */
 public final class CryptoUtils {
-    
+    private static final String RSSEC_KEY_STORE_TYPE = "org.apache.rs.security.crypto.keystore.type";
+    private static final String RSSEC_KEY_STORE_PSWD = "org.apache.rs.security.crypto.keystore.password";
+    private static final String RSSEC_KEY_PSWD = "org.apache.rs.security.crypto.private.password";
+    private static final String RSSEC_KEY_STORE_ALIAS = "org.apache.rs.security.crypto.keystore.alias";
+    private static final String RSSEC_KEY_STORE_FILE = "org.apache.rs.security.crypto.keystore.file";
+        
     private static final Logger LOG = LogUtils.getL7dLogger(CryptoUtils.class);
     
     private CryptoUtils() {
@@ -120,27 +128,76 @@ public final class CryptoUtils {
         }    
     }
     
-    public static Certificate loadCertificate(InputStream storeLocation, char[] storePassword, String alias) {
+    public static Certificate loadCertificate(InputStream storeLocation, char[] storePassword, String alias,
+                                              String storeType) {
         try {
-            KeyStore keyStore = loadKeyStore(storeLocation, storePassword);
+            KeyStore keyStore = loadKeyStore(storeLocation, storePassword, storeType);
             return keyStore.getCertificate(alias);
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
     }
     
-    public static PublicKey loadPublicKey(InputStream storeLocation, char[] storePassword, String alias) {
+    public static PublicKey loadPublicKey(InputStream storeLocation, char[] storePassword, String alias,
+                                          String storeType) {
         try {
-            return loadCertificate(storeLocation, storePassword, alias).getPublicKey();
+            return loadCertificate(storeLocation, storePassword, alias, storeType).getPublicKey();
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
     }
-    
-    public static PrivateKey loadPrivateKey(InputStream storeLocation, char[] storePassword, 
-                                          char[] keyPassword, String alias) {
+    public static Certificate loadCertificate(String propertiesLocation, Bus bus) {
         try {
-            KeyStore keyStore = loadKeyStore(storeLocation, storePassword);
+            Properties props = loadProperties(propertiesLocation, bus);
+            String keyStoreType = props.getProperty(RSSEC_KEY_STORE_TYPE);
+            String keyStoreLoc = props.getProperty(RSSEC_KEY_STORE_FILE);
+            String keyStorePswd = props.getProperty(RSSEC_KEY_STORE_PSWD);
+            String alias = props.getProperty(RSSEC_KEY_STORE_ALIAS);
+            InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
+            return loadCertificate(is, keyStorePswd.toCharArray(), alias, keyStoreType);
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }    
+    }
+    public static PublicKey loadPublicKey(String propertiesLocation, Bus bus) {
+        try {
+            return loadCertificate(propertiesLocation, bus).getPublicKey();
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }    
+    }
+    public static PrivateKey loadPrivateKey(String propertiesLocation, Bus bus, 
+                                            PrivateKeyPasswordProvider provider) {
+        try {
+            
+            Properties props = loadProperties(propertiesLocation, bus);
+            String keyStoreType = props.getProperty(RSSEC_KEY_STORE_TYPE);
+            String keyStoreLoc = props.getProperty(RSSEC_KEY_STORE_FILE);
+            String keyStorePswd = props.getProperty(RSSEC_KEY_STORE_PSWD);
+            String keyPswd = props.getProperty(RSSEC_KEY_PSWD);
+            String alias = props.getProperty(RSSEC_KEY_STORE_ALIAS);
+            InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
+            char[] keyPswdChars = provider != null ? provider.getPassword(props) 
+                : keyPswd != null ? keyPswd.toCharArray() : null;    
+            return loadPrivateKey(is, keyStorePswd.toCharArray(), keyPswdChars, alias, keyStoreType);
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }    
+    }
+    private static Properties loadProperties(String propertiesLocation, Bus bus) throws Exception {
+        Properties props = new Properties();
+        InputStream is = ResourceUtils.getResourceStream(propertiesLocation, bus);
+        props.load(is);
+        return props;
+    }
+    
+    public static PrivateKey loadPrivateKey(InputStream storeLocation, 
+                                            char[] storePassword, 
+                                            char[] keyPassword, 
+                                            String alias,
+                                            String storeType) {
+        try {
+            KeyStore keyStore = loadKeyStore(storeLocation, storePassword, storeType);
             KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
                 keyStore.getEntry(alias, new KeyStore.PasswordProtection(keyPassword));
             return pkEntry.getPrivateKey();
@@ -150,8 +207,9 @@ public final class CryptoUtils {
     }
     
     
-    private static KeyStore loadKeyStore(InputStream storeLocation, char[] storePassword) throws Exception {
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+    private static KeyStore loadKeyStore(InputStream storeLocation, char[] storePassword, String type) 
+        throws Exception {
+        KeyStore ks = KeyStore.getInstance(type == null ? KeyStore.getDefaultType() : type);
         ks.load(storeLocation, storePassword);
         return ks;
     }

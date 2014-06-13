@@ -79,7 +79,7 @@ public class JweCompactReaderWriterTest extends Assert {
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
         String jweContent = encryptContent(specPlainText, true);
         
-        decrypt(jweContent, specPlainText);
+        decrypt(jweContent, specPlainText, true);
     }
     @Test
     public void testDirectKeyEncryptDecrypt() throws Exception {
@@ -93,7 +93,7 @@ public class JweCompactReaderWriterTest extends Assert {
     @Test
     public void testEncryptDecryptJwsToken() throws Exception {
         String jweContent = encryptContent(JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC, false);
-        decrypt(jweContent, JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC);
+        decrypt(jweContent, JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC, false);
     }
     
     private String encryptContent(String content, boolean createIfException) throws Exception {
@@ -116,9 +116,9 @@ public class JweCompactReaderWriterTest extends Assert {
         DirectKeyJweEncryptor encryptor = new DirectKeyJweEncryptor(key, INIT_VECTOR);
         return encryptor.encryptText(content);
     }
-    private void decrypt(String jweContent, String plainContent) throws Exception {
+    private void decrypt(String jweContent, String plainContent, boolean unwrap) throws Exception {
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
-        RSAJweDecryptor decryptor = new RSAJweDecryptor(privateKey);
+        RSAJweDecryptor decryptor = new RSAJweDecryptor(privateKey, unwrap);
         String decryptedText = decryptor.decrypt(jweContent).getContentText();
         assertEquals(decryptedText, plainContent);
     }

@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -31,16 +33,26 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureVerifier;
+import org.apache.cxf.rs.security.oauth2.jws.PrivateKeyJwsSignatureProvider;
+import org.apache.cxf.rs.security.oauth2.jws.PublicKeyJwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtToken;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.PrivateKeyPasswordProvider;
 
 public class JwsMessageBodyProvider implements 
     MessageBodyWriter<JwtToken>, MessageBodyReader<JwtToken> {
-
+    private static final String RSSEC_SIGNATURE_PROPS = "rs-security.signature.properties";
+    private static final String RSSEC_KEY_PSWD_PROVIDER = "org.apache.rs.security.crypto.private.provider";
+    
     private JwsSignatureProvider sigProvider;
     private JwsSignatureVerifier sigVerifier;
     
@@ -53,8 +65,12 @@ public class JwsMessageBodyProvider implements
     public JwtToken readFrom(Class<JwtToken> cls, Type t, Annotation[] anns, MediaType mt,
                              MultivaluedMap<String, String> headers, InputStream is) throws IOException,
         WebApplicationException {
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
+        if (theSigVerifier == null) {
+            throw new SecurityException();
+        }
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(is));
-        p.verifySignatureWith(sigVerifier);
+        p.verifySignatureWith(theSigVerifier);
         return p.getJwtToken();
     }
 
@@ -72,8 +88,13 @@ public class JwsMessageBodyProvider implements
     public void writeTo(JwtToken token, Class<?> cls, Type type, Annotation[] anns, MediaType mt,
                         MultivaluedMap<String, Object> headers, OutputStream os) throws IOException,
         WebApplicationException {
+        
+        JwsSignatureProvider theSigProvider = getInitializedSigProvider();
+        if (theSigProvider == null) {
+            throw new SecurityException();
+        }
         JwsCompactProducer p = new JwsCompactProducer(token);
-        p.signWith(sigProvider);
+        p.signWith(theSigProvider);
         IOUtils.copy(new ByteArrayInputStream(p.getSignedEncodedToken().getBytes("UTF-8")), os);
     }
 
@@ -87,4 +108,40 @@ public class JwsMessageBodyProvider implements
         this.sigVerifier = sigVerifier;
     }
 
+    protected JwsSignatureProvider getInitializedSigProvider() {
+        if (sigProvider != null) {
+            return sigProvider;    
+        } 
+        Message m = JAXRSUtils.getCurrentMessage();
+        if (m == null) {
+            return null;
+        }
+        String propLoc = (String)m.getContextualProperty(RSSEC_SIGNATURE_PROPS);
+        if (propLoc == null) {
+            return null;
+        }
+        
+        PrivateKeyPasswordProvider cb = (PrivateKeyPasswordProvider)m.getContextualProperty(RSSEC_KEY_PSWD_PROVIDER);
+        Bus bus = (Bus)m.getExchange().get(Endpoint.class).get(Bus.class.getName());
+        PrivateKey pk = CryptoUtils.loadPrivateKey(propLoc, bus, cb);
+        return new PrivateKeyJwsSignatureProvider(pk);
+    }
+    
+    protected JwsSignatureVerifier getInitializedSigVerifier() {
+        if (sigVerifier != null) {
+            return sigVerifier;    
+        } 
+        Message m = JAXRSUtils.getCurrentMessage();
+        if (m == null) {
+            return null;
+        }
+        String propLoc = (String)m.getContextualProperty(RSSEC_SIGNATURE_PROPS);
+        if (propLoc == null) {
+            return null;
+        }
+        
+        Bus bus = (Bus)m.getExchange().get(Endpoint.class).get(Bus.class.getName());
+        PublicKey pk = CryptoUtils.loadPublicKey(propLoc, bus);
+        return new PublicKeyJwsSignatureVerifier(pk);
+    }
 }

@@ -16,25 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.jwe;
+package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
-import java.security.interfaces.RSAPrivateKey;
+import java.util.Properties;
 
-
-public class RSAJweDecryptor extends WrappedKeyJweDecryptor {
-    
-    public RSAJweDecryptor(RSAPrivateKey privateKey) {    
-        this(privateKey, true);
-    }
-    public RSAJweDecryptor(RSAPrivateKey privateKey, boolean unwrap) {    
-        this(privateKey, unwrap, null);
-    }
-    public RSAJweDecryptor(RSAPrivateKey privateKey, boolean unwrap,
-                           JweCryptoProperties props) {    
-        super(privateKey, unwrap, props);
-    }
-    
-    protected int getKeyCipherBlockSize() {
-        return ((RSAPrivateKey)getCekDecryptionKey()).getModulus().toByteArray().length;
-    }
+public interface PrivateKeyPasswordProvider {
+    char[] getPassword(Properties storeProperties); 
 }
