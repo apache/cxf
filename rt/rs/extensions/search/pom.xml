@@ -71,6 +71,22 @@
 		    <optional>true</optional>
 		</dependency>
         <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers</artifactId>
+            <optional>true</optional>
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.apache.poi</groupId>
+            		<artifactId>poi-ooxml</artifactId>            	
+            	</exclusion>       
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
             <version>${cxf.lucene.version}</version>
@@ -92,6 +108,13 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${hibernate.em.version}</version>
             <scope>test</scope>
+            <!-- Conflicts with Apache Tika dependencies -->
+            <exclusions>
+            	<exclusion>
+            		<groupId>xml-apis</groupId>
+	                <artifactId>xml-apis</artifactId>            	
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>hsqldb</groupId>
