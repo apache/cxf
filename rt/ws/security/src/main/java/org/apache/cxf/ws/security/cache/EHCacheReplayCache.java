@@ -129,9 +129,15 @@ public class EHCacheReplayCache implements ReplayCache, Closeable, BusLifeCycleL
 
     public synchronized void close() {
         if (cacheManager != null) {
+            // this step is especially important for global shared cache manager
+            if (cache != null) {
+                cacheManager.removeCache(cache.getName());
+            }
+            
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
             cacheManager = null;
             cache = null;
+            
             if (bus != null) {
                 bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
             }
