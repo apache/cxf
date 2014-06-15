@@ -33,6 +33,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.ws.security.cache.EHCacheUtils;
 import org.apache.wss4j.common.cache.EHCacheManagerHolder;
 
 /**
@@ -54,11 +55,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         if (bus != null) {
             b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
         }
-        String confName = "";
-        if (bus != null) {
-            confName = bus.getId();
-        }
-        cacheManager = EHCacheManagerHolder.getCacheManager(confName, configFileURL);
+        cacheManager = EHCacheUtils.getCacheManager(bus, configFileURL);
         // Cannot overflow to disk as SecurityToken Elements can't be serialized
         @SuppressWarnings("deprecation")
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager)
@@ -125,6 +122,11 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
 
     public void close() {
         if (cacheManager != null) {
+            // this step is especially important for global shared cache manager
+            if (cache != null) {
+                cacheManager.removeCache(cache.getName());
+            }
+            
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
             cacheManager = null;
             cache = null;

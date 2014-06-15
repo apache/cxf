@@ -49,6 +49,7 @@ import org.apache.cxf.management.annotation.ManagedOperation;
 import org.apache.cxf.management.annotation.ManagedResource;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.sts.IdentityMapper;
+import org.apache.cxf.ws.security.cache.EHCacheUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.cache.EHCacheManagerHolder;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
@@ -95,9 +96,9 @@ public class EHCacheIdentityCache
         }
 
         if (configFileURL != null) {
-            cacheManager = EHCacheManagerHolder.getCacheManager(bus.getId(), configFileURL);
+            cacheManager = EHCacheUtils.getCacheManager(bus, configFileURL);
         } else {
-            cacheManager = EHCacheManagerHolder.getCacheManager(bus.getId(), getDefaultConfigFileURL());
+            cacheManager = EHCacheUtils.getCacheManager(bus, getDefaultConfigFileURL());
         }
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
         
@@ -230,6 +231,11 @@ public class EHCacheIdentityCache
     
     public void close() {
         if (cacheManager != null) {
+            // this step is especially important for global shared cache manager
+            if (cache != null) {
+                cacheManager.removeCache(cache.getName());
+            }
+            
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
             cacheManager = null;
             cache = null;

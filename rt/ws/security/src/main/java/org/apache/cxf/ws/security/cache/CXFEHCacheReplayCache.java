@@ -24,7 +24,6 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
-import org.apache.wss4j.common.cache.EHCacheManagerHolder;
 import org.apache.wss4j.common.cache.EHCacheReplayCache;
 
 /**
@@ -32,11 +31,10 @@ import org.apache.wss4j.common.cache.EHCacheReplayCache;
  * the cache is shutdown correctly.
  */
 public class CXFEHCacheReplayCache extends EHCacheReplayCache implements BusLifeCycleListener {
-    
     private Bus bus;
     
     public CXFEHCacheReplayCache(String key, Bus bus, URL configFileURL) {
-        super(key, EHCacheManagerHolder.getCacheManager(bus.getId(), configFileURL));
+        super(key, EHCacheUtils.getCacheManager(bus, configFileURL));
         this.bus = bus;
         if (bus != null) {
             bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
@@ -45,7 +43,13 @@ public class CXFEHCacheReplayCache extends EHCacheReplayCache implements BusLife
     
     @Override
     public void close() {
+        // TODO - this code can be removed when WSS4J is updated to do it as part WSS-503
+        if (cacheManager != null && cache != null) {
+            cacheManager.removeCache(cache.getName());
+        }
+        
         super.close();
+        
         if (bus != null) {
             bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
         }
