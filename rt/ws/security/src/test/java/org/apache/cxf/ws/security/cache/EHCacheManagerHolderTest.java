@@ -21,18 +21,15 @@ package org.apache.cxf.ws.security.cache;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Status;
-
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * 
- */
 public class EHCacheManagerHolderTest extends Assert {
-
     @Test
     public void testCreateCacheManager() {
         Configuration conf = 
@@ -53,6 +50,45 @@ public class EHCacheManagerHolderTest extends Assert {
         
         manager2.shutdown();
         assertEquals(Status.STATUS_SHUTDOWN, manager2.getStatus());
+    }
+    
+    @Test
+    public void testUseGlobalManager() {
+        Bus bus = BusFactory.getThreadDefaultBus();
         
+        Configuration conf = 
+                ConfigurationFactory.parseConfiguration(
+                        EHCacheManagerHolder.class.getResource("/cxf-test-ehcache.xml"));
+        conf.setName("myGlobalConfig");
+        
+        EHCacheManagerHolder.createCacheManager(conf);
+        
+        CacheManager manager = EHCacheManagerHolder.getCacheManager(bus, 
+                EHCacheManagerHolder.class.getResource("/cxf-test-ehcache.xml"));
+        
+        assertFalse(manager.getName().equals("myGlobalConfig"));
+        EHCacheManagerHolder.releaseCacheManger(manager);
+        assertEquals(Status.STATUS_SHUTDOWN, manager.getStatus());
+        
+        bus.setProperty(EHCacheManagerHolder.GLOBAL_EHCACHE_MANAGER_NAME, "myGlobalConfig");
+        
+        manager = EHCacheManagerHolder.getCacheManager(bus, 
+                EHCacheManagerHolder.class.getResource("/cxf-test-ehcache.xml"));
+        
+        assertEquals("myGlobalConfig", manager.getName());
+        EHCacheManagerHolder.releaseCacheManger(manager);
+        assertEquals(Status.STATUS_ALIVE, manager.getStatus());
+        
+        manager.shutdown();
+        assertEquals(Status.STATUS_SHUTDOWN, manager.getStatus());
+        
+        bus.setProperty(EHCacheManagerHolder.GLOBAL_EHCACHE_MANAGER_NAME, "myGlobalConfigXXX");
+        
+        manager = EHCacheManagerHolder.getCacheManager(bus, 
+                EHCacheManagerHolder.class.getResource("/cxf-test-ehcache.xml"));
+        
+        assertFalse(manager.getName().equals("myGlobalConfig"));
+        EHCacheManagerHolder.releaseCacheManger(manager);
+        assertEquals(Status.STATUS_SHUTDOWN, manager.getStatus());
     }
 }
