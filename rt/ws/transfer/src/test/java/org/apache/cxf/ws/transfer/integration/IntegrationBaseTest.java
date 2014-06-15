@@ -50,12 +50,6 @@ public class IntegrationBaseTest {
     
     protected Bus bus;
     
-    protected Server resourceFactory;
-    
-    protected Server resourceRemote;
-    
-    protected ResourceManager manager;
-    
     protected LoggingInInterceptor logInInterceptor;
     
     protected LoggingOutInterceptor logOutInterceptor;
@@ -75,7 +69,7 @@ public class IntegrationBaseTest {
         bus = null;
     }
     
-    protected void createLocalResourceFactory() {
+    protected Server createLocalResourceFactory(ResourceManager manager) {
         ResourceFactoryImpl implementor = new ResourceFactoryImpl();
         implementor.setResourceResolver(new SimpleResourceResolver(RESOURCE_ADDRESS, manager));
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
@@ -83,10 +77,10 @@ public class IntegrationBaseTest {
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_FACTORY_ADDRESS);
         factory.setServiceBean(implementor);
-        resourceFactory = factory.create();
+        return factory.create();
     }
     
-    protected void createRemoteResourceFactory() {
+    protected Server createRemoteResourceFactory() {
         ResourceFactoryImpl implementor = new ResourceFactoryImpl();
         implementor.setResourceResolver(new SimpleResourceResolver(RESOURCE_REMOTE_ADDRESS, null));
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
@@ -94,10 +88,10 @@ public class IntegrationBaseTest {
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_FACTORY_ADDRESS);
         factory.setServiceBean(implementor);
-        resourceFactory = factory.create();
+        return factory.create();
     }
     
-    protected void createRemoteResource() {
+    protected Server createRemoteResource(ResourceManager manager) {
         ResourceRemote implementor = new ResourceRemote();
         implementor.setManager(manager);
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
@@ -105,6 +99,6 @@ public class IntegrationBaseTest {
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_REMOTE_MANAGER_ADDRESS);
         factory.setServiceBean(implementor);
-        resourceRemote = factory.create();
+        return factory.create();
     }
 }

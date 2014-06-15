@@ -22,6 +22,7 @@ package org.apache.cxf.ws.transfer.integration;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.cxf.endpoint.Server;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -91,13 +92,13 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
     @Test
     public void createLocalResourceTest() {
         ReferenceParametersType refParams = createReferenceParameters();
-        manager = EasyMock.createMock(ResourceManager.class);
+        ResourceManager manager = EasyMock.createMock(ResourceManager.class);
         EasyMock.expect(manager.create(EasyMock.isA(Representation.class)))
                 .andReturn(refParams);
         EasyMock.expectLastCall().once();
         EasyMock.replay(manager);
         
-        createLocalResourceFactory();
+        Server localResourceFactory = createLocalResourceFactory(manager);
         ResourceFactory client = createClient();
         
         Create createRequest = new Create();
@@ -115,20 +116,20 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         Assert.assertEquals(2, ((Element) response.getRepresentation().getAny()).getChildNodes().getLength());
         
         EasyMock.verify(manager);
-        resourceFactory.destroy();
+        localResourceFactory.destroy();
     }
     
     @Test
     public void createRemoteResourceTest() {
         ReferenceParametersType refParams = createReferenceParameters();
-        manager = EasyMock.createMock(ResourceManager.class);
+        ResourceManager manager = EasyMock.createMock(ResourceManager.class);
         EasyMock.expect(manager.create(EasyMock.isA(Representation.class)))
                 .andReturn(refParams);
         EasyMock.expectLastCall().once();
         EasyMock.replay(manager);
         
-        createRemoteResourceFactory();
-        createRemoteResource();
+        Server remoteResourceFactory = createRemoteResourceFactory();
+        Server remoteResource = createRemoteResource(manager);
         ResourceFactory client = createClient();
         
         Create createRequest = new Create();
@@ -146,6 +147,7 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         Assert.assertEquals(2, ((Element) response.getRepresentation().getAny()).getChildNodes().getLength());
         
         EasyMock.verify(manager);
-        resourceFactory.destroy();
+        remoteResourceFactory.destroy();
+        remoteResource.destroy();
     }
 }
