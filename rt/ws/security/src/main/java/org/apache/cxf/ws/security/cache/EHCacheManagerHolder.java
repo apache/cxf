@@ -40,9 +40,12 @@ import org.apache.cxf.resource.ResourceManager;
  * We need to reference count the EHCacheManager things
  */
 public final class EHCacheManagerHolder {
+    public static final String GLOBAL_EHCACHE_MANAGER_NAME = 
+            "ws-security.global.ehcachemanager";
+    
     private static final ConcurrentHashMap<String, AtomicInteger> COUNTS 
         = new ConcurrentHashMap<String, AtomicInteger>(8, 0.75f, 2);
-
+    
     private static Method cacheManagerCreateMethodNoArg;
     private static Method createMethodURLArg;
     private static Method cacheManagerCreateMethodConfigurationArg;
@@ -91,30 +94,50 @@ public final class EHCacheManagerHolder {
     
     public static CacheManager getCacheManager(Bus bus, URL configFileURL) {
         CacheManager cacheManager = null;
-        if (configFileURL == null) {
-            //using the default
-            cacheManager = findDefaultCacheManager(bus);
+        
+        String globalCacheManagerName = getGlobalCacheManagerName(bus);
+        if (globalCacheManagerName != null) {
+            cacheManager = CacheManager.getCacheManager(globalCacheManagerName);
         }
+        
+        // notice for a global cache manager, we skip the count stuff which
+        // means the release cache manager method below is a no op, as the
+        // COUNT will not have been initialised.
         if (cacheManager == null) {
             if (configFileURL == null) {
-                cacheManager = createCacheManager();
-            } else {
-                cacheManager = createCacheManager(configFileURL);
+                //using the default
+                cacheManager = findDefaultCacheManager(bus);
             }
-        }
-        AtomicInteger a = COUNTS.get(cacheManager.getName());
-        if (a == null) {
-            COUNTS.putIfAbsent(cacheManager.getName(), new AtomicInteger());
-            a = COUNTS.get(cacheManager.getName());
-        }
-        if (a.incrementAndGet() == 1) {
-            //System.out.println("Create!! " + cacheManager.getName());
+            
+            if (cacheManager == null) {
+                if (configFileURL == null) {
+                    cacheManager = createCacheManager();
+                } else {
+                    cacheManager = createCacheManager(configFileURL);
+                }
+            }
+            
+            AtomicInteger a = COUNTS.get(cacheManager.getName());
+            if (a == null) {
+                COUNTS.putIfAbsent(cacheManager.getName(), new AtomicInteger());
+                a = COUNTS.get(cacheManager.getName());
+            }
+            if (a.incrementAndGet() == 1) {
+                //System.out.println("Create!! " + cacheManager.getName());
+            }
         }
         return cacheManager;
     }
-    
-    private static CacheManager findDefaultCacheManager(Bus bus) {
 
+    private static String getGlobalCacheManagerName(Bus bus) {
+        if (bus != null) {
+            return (String) bus.getProperty(GLOBAL_EHCACHE_MANAGER_NAME);
+        } else {
+            return null;
+        }
+    }
+
+    private static CacheManager findDefaultCacheManager(Bus bus) {
         String defaultConfigFile = "cxf-ehcache.xml";
         URL configFileURL = null;
         if (bus != null) {
