@@ -172,6 +172,7 @@
         <property name="relationships" ref="relationships" />
         <property name="samlRealmCodec" ref="samlRealmCodec" />
     </bean>
+<<<<<<< HEAD
 
     <jaxws:endpoint id="transportSTS" implementor="#transportSTSProviderBean"
         address="https://localhost:30101/SecurityTokenService/Transport"
@@ -179,11 +180,15 @@
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port"
                 depends-on="ClientAuthHttpsSettings">
+=======
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS" implementor="#transportSTSProviderBean" address="https://localhost:30101/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/issuer/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port" depends-on="ClientAuthHttpsSettings">
+>>>>>>> ad4e3dd... Adding a SOAP 1.1 test with WS-MEX
         <jaxws:properties>
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
         </jaxws:properties>
     </jaxws:endpoint>
+<<<<<<< HEAD
     
     
     <jaxws:endpoint id="transportSTS-realmB" implementor="#transportSTSProviderBean2"
@@ -201,6 +206,15 @@
 
     <httpj:engine-factory id="ClientAuthHttpsSettings"
         bus="cxf">
+=======
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTSSoap12" implementor="#transportSTSProviderBean" address="https://localhost:30101/SecurityTokenService/TransportSoap12" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/issuer/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Soap12_Port" depends-on="ClientAuthHttpsSettings">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
+    <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
+>>>>>>> ad4e3dd... Adding a SOAP 1.1 test with WS-MEX
         <httpj:engine port="30101">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">

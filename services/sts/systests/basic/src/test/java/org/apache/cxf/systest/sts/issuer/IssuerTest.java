@@ -135,6 +135,30 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
     }
+    
+    // Test getting the STS details via WS-MEX + SOAP 1.2
+    @org.junit.Test
+    public void testSAML2MEXSoap12() throws Exception {
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = IssuerTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = IssuerTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Soap12Port");
+        DoubleItPortType transportSaml2Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml2Port, PORT);
+
+        doubleIt(transportSaml2Port, 25);
+
+        ((java.io.Closeable)transportSaml2Port).close();
+        bus.shutdown(true);
+    }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);

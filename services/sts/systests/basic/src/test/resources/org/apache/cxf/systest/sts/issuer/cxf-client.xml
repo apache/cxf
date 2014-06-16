@@ -55,6 +55,7 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
                    </property>
                 </bean>
             </entry>
+<<<<<<< HEAD
        </jaxws:properties>
    </jaxws:client>
    
@@ -80,5 +81,38 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
       </http:tlsClientParameters>
    </http:conduit>
    
+=======
+        </jaxws:properties>
+    </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML2Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="ws-security.sts.token.username" value="myclientkey"/>
+            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
+            <entry key="ws-security.sts.token.usecert" value="true"/>
+        </jaxws:properties>
+    </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML2Soap12Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="ws-security.sts.token.username" value="myclientkey"/>
+            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
+            <entry key="ws-security.sts.token.usecert" value="true"/>
+            <entry key="ws-security.sts.client-soap12-binding" value="true"/>
+        </jaxws:properties>
+    </jaxws:client>
+    <http:conduit name="https://localhost.*">
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:keyManagers keyPassword="ckpass">
+                <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+            </sec:keyManagers>
+            <sec:trustManagers>
+                <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>
+>>>>>>> ad4e3dd... Adding a SOAP 1.1 test with WS-MEX
 </beans>
 
