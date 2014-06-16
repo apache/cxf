@@ -65,7 +65,7 @@ public class JMSEndpoint {
      */
     private String conduitIdSelectorPrefix;
     private DeliveryModeType deliveryMode;
-    private String clientID;
+    private String durableSubscriptionClientId;
     private String durableSubscriptionName;
     private String jndiConnectionFactoryName = "ConnectionFactory";
     private String jndiInitialContextFactory;
@@ -349,12 +349,12 @@ public class JMSEndpoint {
         this.password = password;
     }
 
-    public String getClientID() {
-        return clientID;
+    public String getDurableSubscriptionClientId() {
+        return durableSubscriptionClientId;
     }
 
-    public void setClientID(String clientID) {
-        this.clientID = clientID;
+    public void setDurableSubscriptionClientId(String durableSubscriptionClientId) {
+        this.durableSubscriptionClientId = durableSubscriptionClientId;
     }
 
     public String getDurableSubscriptionName() {
