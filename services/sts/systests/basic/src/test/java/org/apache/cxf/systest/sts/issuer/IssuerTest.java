@@ -139,6 +139,10 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     // Test getting the STS details via WS-MEX + SOAP 1.2
     @org.junit.Test
     public void testSAML2MEXSoap12() throws Exception {
+
+        if (!standalone) {
+            return;
+        }
         
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
