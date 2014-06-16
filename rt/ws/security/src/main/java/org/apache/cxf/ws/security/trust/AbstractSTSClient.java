@@ -537,8 +537,6 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                         }
                         
                         EndpointInfo ei = service.getEndpointInfo(endpointName);
-<<<<<<< HEAD
-=======
                         if (ei == null && anonymousAddress.equals(location)
                             && !services.isEmpty() && !services.get(0).getEndpoints().isEmpty()) {
                             serviceName = services.get(0).getName();
@@ -549,7 +547,6 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                         if (location != null && !anonymousAddress.equals(location)) {
                             ei.setAddress(location);
                         }
->>>>>>> da25b2a... [CXF-5807] - Fix STSClient configuration when Issuer EPR has an "anonymous" address
                         Endpoint endpoint = new EndpointImpl(bus, service, ei);
                         client = new ClientImpl(bus, endpoint);
                     }
