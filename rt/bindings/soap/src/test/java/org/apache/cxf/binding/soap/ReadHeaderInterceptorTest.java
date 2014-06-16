@@ -96,6 +96,24 @@ public class ReadHeaderInterceptorTest extends TestBase {
         }
     }
 
+
+    @Test
+    public void testBadSOAPEnvelopeName() throws Exception {
+        soapMessage = TestUtil.createEmptySoapMessage(Soap12.getInstance(), chain);
+        InputStream in = getClass().getResourceAsStream("test-bad-envname.xml");
+        assertNotNull(in);
+        ByteArrayDataSource bads = new ByteArrayDataSource(in, "test/xml");
+        soapMessage.setContent(InputStream.class, bads.getInputStream());
+
+        ReadHeadersInterceptor r = new ReadHeadersInterceptor(BusFactory.getDefaultBus());
+        try {
+            r.handleMessage(soapMessage);
+            fail("Did not throw exception");
+        } catch (SoapFault f) {
+            assertEquals(Soap11.getInstance().getSender(), f.getFaultCode());
+        }
+    }
+
     @Test
     public void testNoClosingEnvTage() throws Exception {
         assertTrue(testNoClosingEnvTag(Boolean.TRUE));
