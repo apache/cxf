@@ -263,6 +263,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         private Future<Boolean> connectionFuture;
 
         private Object sessionLock = new Object();
+        private boolean closed;
         
         public AsyncWrappedOutputStream(Message message,
                                         boolean needToCacheRequest, 
@@ -393,7 +394,11 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         
         @Override
         public void close() throws IOException {
-            if (!chunking && wrappedStream != null) {
+            if (closed) {
+                return;
+            }
+            closed = true;
+            if (!chunking && wrappedStream instanceof CachedOutputStream) {
                 CachedOutputStream out = (CachedOutputStream)wrappedStream;
                 this.basicEntity.setContentLength(out.size());
                 wrappedStream = null;
