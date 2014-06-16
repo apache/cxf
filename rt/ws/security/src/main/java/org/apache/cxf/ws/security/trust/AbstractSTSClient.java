@@ -519,17 +519,33 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                         Service service = factory.create();
                         service.setDataBinding(dataBinding);
                         
+                        // Get the endpoint + service names by matching the 'location' to the
+                        // address in the WSDL. If the 'location' is 'anonymous' then just fall
+                        // back to the first service + endpoint name in the WSDL, if the endpoint
+                        // name is not defined in the Metadata
+                        List<ServiceInfo> services = service.getServiceInfos();
+                        String anonymousAddress = "http://www.w3.org/2005/08/addressing/anonymous";
                         
-                        for (ServiceInfo serv : service.getServiceInfos()) {
-                            for (EndpointInfo ei : serv.getEndpoints()) {
-                                if (ei.getAddress().equals(location)) {
-                                    endpointName = ei.getName();
-                                    serviceName = serv.getName();
+                        if (!anonymousAddress.equals(location)) {
+                            for (ServiceInfo serv : services) {
+                                for (EndpointInfo ei : serv.getEndpoints()) {
+                                    if (ei.getAddress().equals(location)) {
+                                        endpointName = ei.getName();
+                                        serviceName = serv.getName();
+                                    }
                                 }
                             }
                         }
+                        
                         EndpointInfo ei = service.getEndpointInfo(endpointName);
-                        if (location != null) {
+                        if (ei == null && anonymousAddress.equals(location)
+                            && !services.isEmpty() && !services.get(0).getEndpoints().isEmpty()) {
+                            serviceName = services.get(0).getName();
+                            endpointName = services.get(0).getEndpoints().iterator().next().getName();
+                            ei = service.getEndpointInfo(endpointName);
+                        }
+                        
+                        if (location != null && !anonymousAddress.equals(location)) {
                             ei.setAddress(location);
                         }
                         Endpoint endpoint = new EndpointImpl(bus, service, ei);

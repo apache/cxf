@@ -248,7 +248,8 @@
                                 <sp:RequireInternalReference/>
                             </wsp:Policy>
                             <sp:Issuer>
-                                <wsaw:Address>https://localhost:30101/SecurityTokenService/TransportSoap12</wsaw:Address>
+                                <!--<wsaw:Address>https://localhost:30101/SecurityTokenService/TransportSoap12</wsaw:Address>-->
+                                <wsaw:Address>http://www.w3.org/2005/08/addressing/anonymous</wsaw:Address>
                                 <wsaw:Metadata>
                                     <wsx:Metadata>
                                         <wsx:MetadataSection>
