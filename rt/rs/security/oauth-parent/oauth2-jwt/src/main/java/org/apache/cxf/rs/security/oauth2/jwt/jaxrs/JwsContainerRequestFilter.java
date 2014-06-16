@@ -43,11 +43,11 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
         p.verifySignatureWith(theSigVerifier);
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
+        context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
         
         String ct = JwtUtils.checkContentType(p.getJwtHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
-            context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
         }
     }
 }

@@ -110,11 +110,11 @@ public class JweCompactReaderWriterTest extends Assert {
                                                         key, 
                                                         jwtKeyName, 
                                                         INIT_VECTOR);
-        return encryptor.encryptText(content);
+        return encryptor.encryptText(content, null);
     }
     private String encryptContentDirect(SecretKey key, String content) throws Exception {
         DirectKeyJweEncryptor encryptor = new DirectKeyJweEncryptor(key, INIT_VECTOR);
-        return encryptor.encryptText(content);
+        return encryptor.encryptText(content, null);
     }
     private void decrypt(String jweContent, String plainContent, boolean unwrap) throws Exception {
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);

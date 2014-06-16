@@ -20,6 +20,6 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 
 
 public interface JweEncryptor {
-    String encrypt(byte[] jweContent);
-    String encryptText(String jweContent);
+    String encrypt(byte[] jweContent, String contentType);
+    String encryptText(String jweContent, String contentType);
 }

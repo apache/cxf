@@ -29,6 +29,9 @@ public class JwsJwtCompactProducer extends JwsCompactProducer {
     public JwsJwtCompactProducer(JwtToken token) {
         this(token, null);
     }
+    public JwsJwtCompactProducer(JwtClaims claims) {
+        this(new JwtToken(null, claims), null);
+    }
     public JwsJwtCompactProducer(JwtHeaders headers, JwtClaims claims) {
         this(headers, claims, null);
     }

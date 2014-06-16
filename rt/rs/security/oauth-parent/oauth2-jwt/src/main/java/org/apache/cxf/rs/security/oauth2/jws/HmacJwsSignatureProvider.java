@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.oauth2.jws;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
@@ -26,12 +28,19 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
 
-public class HmacJwsSignatureProvider implements JwsSignatureProvider, JwsSignatureVerifier {
+public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider implements JwsSignatureVerifier {
+    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
+        Arrays.asList(Algorithm.HmacSHA256.getJwtName(),
+                      Algorithm.HmacSHA384.getJwtName(),
+                      Algorithm.HmacSHA512.getJwtName())); 
     private byte[] key;
+    
     public HmacJwsSignatureProvider(byte[] key) {
+        super(SUPPORTED_ALGORITHMS, Algorithm.HmacSHA256.getJwtName());
         this.key = key;
     }
     public HmacJwsSignatureProvider(String encodedKey) {
+        super(SUPPORTED_ALGORITHMS, Algorithm.HmacSHA256.getJwtName());
         try {
             this.key = Base64UrlUtility.decode(encodedKey);
         } catch (Base64Exception ex) {
@@ -41,6 +50,7 @@ public class HmacJwsSignatureProvider implements JwsSignatureProvider, JwsSignat
     
     @Override
     public byte[] sign(JwtHeaders headers, String unsignedText) {
+        checkAlgorithm(headers.getAlgorithm());
         return computeMac(headers, unsignedText);
     }
     

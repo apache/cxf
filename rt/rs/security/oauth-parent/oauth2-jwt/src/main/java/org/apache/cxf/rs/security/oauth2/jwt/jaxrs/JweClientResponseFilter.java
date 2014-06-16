@@ -26,13 +26,21 @@ import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 
+import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptionOutput;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtUtils;
+
 @Priority(Priorities.JWE_CLIENT_READ_PRIORITY)
 public class JweClientResponseFilter extends AbstractJweDecryptingFilter implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        res.setEntityStream(new ByteArrayInputStream(
-            decrypt(res.getEntityStream())));
-        
+        JweDecryptionOutput out = decrypt(res.getEntityStream());
+        byte[] bytes = out.getContent();
+        res.setEntityStream(new ByteArrayInputStream(bytes));
+        res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
+        String ct = JwtUtils.checkContentType(out.getHeaders().getContentType(), getDefaultMediaType());
+        if (ct != null) {
+            res.getHeaders().putSingle("Content-Type", ct);
+        }
     }
 
 }

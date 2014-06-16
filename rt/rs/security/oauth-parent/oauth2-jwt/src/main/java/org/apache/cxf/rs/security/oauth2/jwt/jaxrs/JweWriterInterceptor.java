@@ -25,6 +25,7 @@ import java.security.PublicKey;
 
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
@@ -44,7 +45,8 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 public class JweWriterInterceptor implements WriterInterceptor {
     private static final String RSSEC_ENCRYPTION_PROPS = "rs-security.encryption.properties";
     private JweEncryptor encryptor;
-
+    private boolean contentTypeRequired = true;
+    
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         OutputStream actualOs = ctx.getOutputStream();
@@ -53,7 +55,14 @@ public class JweWriterInterceptor implements WriterInterceptor {
         ctx.proceed();
         
         JweEncryptor theEncryptor = getInitializedEncryptor();
-        String jweContent = theEncryptor.encrypt(cos.getBytes());
+        String ctString = null;
+        if (contentTypeRequired) {
+            MediaType mt = ctx.getMediaType();
+            if (mt != null) {
+                ctString = JAXRSUtils.mediaTypeToString(mt);
+            }
+        }
+        String jweContent = theEncryptor.encrypt(cos.getBytes(), ctString);
         IOUtils.copy(new ByteArrayInputStream(jweContent.getBytes("UTF-8")), actualOs);
         actualOs.flush();
     }

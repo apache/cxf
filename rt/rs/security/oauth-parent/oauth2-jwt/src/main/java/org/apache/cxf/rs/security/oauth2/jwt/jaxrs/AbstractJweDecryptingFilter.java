@@ -41,14 +41,15 @@ public class AbstractJweDecryptingFilter {
     
     private JweDecryptor decryptor;
     private JweCryptoProperties cryptoProperties;
-    protected byte[] decrypt(InputStream is) throws IOException {
+    private String defaultMediaType;
+    protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
         JweDecryptor theDecryptor = getInitializedDecryptor();
         if (theDecryptor == null) {
             throw new SecurityException();
         }
         JweDecryptionOutput out = theDecryptor.decrypt(new String(IOUtils.readBytesFromStream(is), "UTF-8"));
         validateHeaders(out.getHeaders());
-        return out.getContent();
+        return out;
     }
 
     protected void validateHeaders(JweHeaders headers) {
@@ -77,6 +78,14 @@ public class AbstractJweDecryptingFilter {
 
     public void setCryptoProperties(JweCryptoProperties cryptoProperties) {
         this.cryptoProperties = cryptoProperties;
+    }
+
+    public String getDefaultMediaType() {
+        return defaultMediaType;
+    }
+
+    public void setDefaultMediaType(String defaultMediaType) {
+        this.defaultMediaType = defaultMediaType;
     }
 
 }

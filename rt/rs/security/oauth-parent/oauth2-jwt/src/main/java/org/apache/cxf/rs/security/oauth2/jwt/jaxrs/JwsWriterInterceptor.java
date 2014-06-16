@@ -30,12 +30,11 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
-    private boolean contentTypeRequired;
+    private boolean contentTypeRequired = true;
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         OutputStream actualOs = ctx.getOutputStream();
@@ -43,7 +42,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
         ctx.setOutputStream(cos);
         ctx.proceed();
         
-        JwtHeaders headers = new JwtHeaders(Algorithm.SHA256withRSA.getJwtName());
+        JwtHeaders headers = new JwtHeaders();
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
             if (mt != null) {

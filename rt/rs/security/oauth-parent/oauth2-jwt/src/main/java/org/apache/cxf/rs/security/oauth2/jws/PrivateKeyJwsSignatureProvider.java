@@ -21,12 +21,19 @@ package org.apache.cxf.rs.security.oauth2.jws;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
-public class PrivateKeyJwsSignatureProvider implements JwsSignatureProvider {
+public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider {
+    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
+        Arrays.asList(Algorithm.SHA256withRSA.getJwtName(),
+                      Algorithm.SHA384withRSA.getJwtName(),
+                      Algorithm.SHA512withRSA.getJwtName())); 
     private PrivateKey key;
     private SecureRandom random; 
     private AlgorithmParameterSpec signatureSpec;
@@ -38,6 +45,7 @@ public class PrivateKeyJwsSignatureProvider implements JwsSignatureProvider {
         this(key, null, spec);
     }
     public PrivateKeyJwsSignatureProvider(PrivateKey key, SecureRandom random, AlgorithmParameterSpec spec) {
+        super(SUPPORTED_ALGORITHMS, Algorithm.SHA256withRSA.getJwtName());
         this.key = key;
         this.random = random;
         this.signatureSpec = spec;
@@ -46,6 +54,7 @@ public class PrivateKeyJwsSignatureProvider implements JwsSignatureProvider {
     
     @Override
     public byte[] sign(JwtHeaders headers, String unsignedText) {
+        checkAlgorithm(headers.getAlgorithm());
         try {
             return CryptoUtils.signData(unsignedText.getBytes("UTF-8"), 
                                         key, 

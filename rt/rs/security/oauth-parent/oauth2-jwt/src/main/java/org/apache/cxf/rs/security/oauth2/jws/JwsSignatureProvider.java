@@ -21,5 +21,6 @@ package org.apache.cxf.rs.security.oauth2.jws;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 
 public interface JwsSignatureProvider {
+    void prepareHeaders(JwtHeaders headers);
     byte[] sign(JwtHeaders headers, String unsignedText);
 }

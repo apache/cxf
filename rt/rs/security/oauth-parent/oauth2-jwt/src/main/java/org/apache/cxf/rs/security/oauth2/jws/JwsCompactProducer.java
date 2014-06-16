@@ -32,8 +32,11 @@ public class JwsCompactProducer {
     private String signature;
     private String plainRep;
     
-    public JwsCompactProducer(JwtHeaders headers, String payload) {
-        this(headers, null, payload);
+    public JwsCompactProducer(String plainJwsPayload) {
+        this(null, null, plainJwsPayload);
+    }
+    public JwsCompactProducer(JwtHeaders headers, String plainJwsPayload) {
+        this(headers, null, plainJwsPayload);
     }
     public JwsCompactProducer(JwtHeaders headers, JwtHeadersWriter w, String plainJwsPayload) {
         this.headers = headers;
@@ -42,10 +45,16 @@ public class JwsCompactProducer {
         }
         this.plainJwsPayload = plainJwsPayload;
     }
-    
+    public JwtHeaders getHeaders() {
+        if (headers == null) {
+            headers = new JwtHeaders();
+        }
+        return headers;
+    }
     public String getUnsignedEncodedJws() {
+        checkAlgorithm();
         if (plainRep == null) {
-            plainRep = Base64UrlUtility.encode(writer.headersToJson(headers)) 
+            plainRep = Base64UrlUtility.encode(writer.headersToJson(getHeaders())) 
                 + "." 
                 + Base64UrlUtility.encode(plainJwsPayload);
         }
@@ -53,26 +62,42 @@ public class JwsCompactProducer {
     }
     
     public String getSignedEncodedJws() {
+        checkAlgorithm();
         boolean noSignature = StringUtils.isEmpty(signature);
         if (noSignature && !isPlainText()) {
             throw new IllegalStateException("Signature is not available");
         }
         return getUnsignedEncodedJws() + "." + (noSignature ? "" : signature);
     }
-    public void signWith(JwsSignatureProvider signer) { 
-        setSignatureOctets(signer.sign(headers, getUnsignedEncodedJws()));
+    
+    public String signWith(JwsSignatureProvider signer) { 
+        signer.prepareHeaders(getHeaders());
+        signWith(signer.sign(getHeaders(), getUnsignedEncodedJws()));
+        return getSignedEncodedJws();
     }
     
-    public void setSignatureText(String sig) {
-        setEncodedSignature(Base64UrlUtility.encode(sig));
+    public String signWith(String signatureText) {
+        setEncodedSignature(Base64UrlUtility.encode(signatureText));
+        return getSignedEncodedJws();
     }
-    public void setSignatureOctets(byte[] bytes) {
-        setEncodedSignature(Base64UrlUtility.encode(bytes));
+    
+    public String signWith(byte[] signatureOctets) {
+        setEncodedSignature(Base64UrlUtility.encode(signatureOctets));
+        return getSignedEncodedJws();
     }
+    
     private void setEncodedSignature(String sig) {
         this.signature = sig;
     }
     private boolean isPlainText() {
-        return JwtConstants.PLAIN_TEXT_ALGO.equals(headers.getAlgorithm());
+        return JwtConstants.PLAIN_TEXT_ALGO.equals(getAlgorithm());
+    }
+    private String getAlgorithm() {
+        return getHeaders().getAlgorithm();
+    }
+    private void checkAlgorithm() {
+        if (getAlgorithm() == null) {
+            throw new IllegalStateException("Algorithm header is not set");
+        }
     }
 }

@@ -90,7 +90,7 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
     protected JweHeaders getJweHeaders() {
         return headers;
     }
-    public String encrypt(byte[] content) {
+    public String encrypt(byte[] content, String contentType) {
         byte[] theCek = getContentEncryptionKey();
         String contentEncryptionAlgoJavaName = Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
@@ -107,6 +107,9 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
             keyProps);
         
         byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey(theCek);
+        if (contentType != null) {
+            headers.setContentType(contentType);
+        }
         JweCompactProducer producer = new JweCompactProducer(headers, 
                                              jweContentEncryptionKey,
                                              theIv,
@@ -115,9 +118,9 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         return producer.getJweContent();
     }
     
-    public String encryptText(String text) {
+    public String encryptText(String text, String contentType) {
         try {
-            return encrypt(text.getBytes("UTF-8"));
+            return encrypt(text.getBytes("UTF-8"), contentType);
         } catch (UnsupportedEncodingException ex) {
             throw new SecurityException(ex);
         }

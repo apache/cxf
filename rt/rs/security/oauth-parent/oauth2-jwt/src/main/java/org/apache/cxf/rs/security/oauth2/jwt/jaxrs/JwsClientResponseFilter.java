@@ -41,10 +41,10 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
         p.verifySignatureWith(theSigVerifier);
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));
+        res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
         String ct = JwtUtils.checkContentType(p.getJwtHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             res.getHeaders().putSingle("Content-Type", ct);
-            res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
         }
     }
 
