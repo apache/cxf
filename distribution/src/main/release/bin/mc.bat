@@ -41,7 +41,7 @@ rem @endlocal
 goto end
 
 :no_java_home
-echo ERROR: Set JAVA_HOME to the path where the J2SE 5.0 (JDK5.0) is installed
+echo ERROR: Set JAVA_HOME to the path where the J2SE 6.0 (JDK6.0) is installed
 goto end 
 
 :no_cxf_jar
