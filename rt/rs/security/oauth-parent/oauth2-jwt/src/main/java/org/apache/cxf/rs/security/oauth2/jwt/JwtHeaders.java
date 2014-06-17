@@ -104,6 +104,14 @@ public class JwtHeaders extends AbstractJwtObject {
         return (String)getHeader(JwtConstants.HEADER_X509_THUMBPRINT);
     }
     
+    public void setX509ThumbprintSHA256(String x509Thumbprint) {
+        super.setValue(JwtConstants.HEADER_X509_THUMBPRINT_SHA256, x509Thumbprint);
+    }
+    
+    public String getX509ThumbprintSHA256() {
+        return (String)super.getValue(JwtConstants.HEADER_X509_THUMBPRINT_SHA256);
+    }
+    
     public void setCritical(List<String> crit) {
         setHeader(JwtConstants.HEADER_CRITICAL, crit);
     }

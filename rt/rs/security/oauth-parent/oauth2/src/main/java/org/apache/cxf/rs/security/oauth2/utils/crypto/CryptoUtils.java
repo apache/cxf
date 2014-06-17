@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyStore;
+import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -53,6 +54,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
+import org.apache.cxf.security.SecurityContext;
 
 
 /**
@@ -64,6 +66,7 @@ public final class CryptoUtils {
     public static final String RSSEC_KEY_PSWD = "rs.security.key.password";
     public static final String RSSEC_KEY_STORE_ALIAS = "rs.security.keystore.alias";
     public static final String RSSEC_KEY_STORE_FILE = "rs.security.keystore.file";
+    public static final String RSSEC_PRINCIPAL_NAME = "rs.security.principal.name";
     public static final String RSSEC_SIG_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
     public static final String RSSEC_DECRYPT_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
         
@@ -220,6 +223,15 @@ public final class CryptoUtils {
         KeyStore keyStore = CryptoUtils.loadPersistKeyStore(m, props);
         PrivateKeyPasswordProvider cb = 
             (PrivateKeyPasswordProvider)m.getContextualProperty(passwordProviderProp);
+        if (cb != null && m.getExchange().getInMessage() != null) {
+            SecurityContext sc = m.getExchange().getInMessage().get(SecurityContext.class);
+            if (sc != null) {
+                Principal p = sc.getUserPrincipal();
+                if (p != null) {
+                    props.setProperty(RSSEC_PRINCIPAL_NAME, p.getName());
+                }
+            }
+        }
         return CryptoUtils.loadPrivateKey(keyStore, props, bus, cb);
     }
     public static KeyStore loadPersistKeyStore(Message m, Properties props) {

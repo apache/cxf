@@ -122,6 +122,14 @@ public class JsonWebKey extends AbstractJwtObject {
         return (String)super.getValue(X509_THUMBPRINT);
     }
     
+    public void setX509ThumbprintSHA256(String x509Thumbprint) {
+        super.setValue(X509_THUMBPRINT_SHA256, x509Thumbprint);
+    }
+    
+    public String getX509ThumbprintSHA256() {
+        return (String)super.getValue(X509_THUMBPRINT_SHA256);
+    }
+    
     public JsonWebKey setProperty(String name, Object value) {
         super.setValue(name, value);
         return this;
