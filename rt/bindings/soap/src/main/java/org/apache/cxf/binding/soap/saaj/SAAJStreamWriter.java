@@ -156,9 +156,9 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
             try {
                 Element el = null;
                 if (StringUtils.isEmpty(pfx) && StringUtils.isEmpty(ns)) {
-                    el = ((SOAPElement)cur).addChildElement(new QName(local));
+                    el = ((SOAPElement)cur).addChildElement(local, "", "");
                 } else {
-                    el = ((SOAPElement)cur).addChildElement(new QName(ns, local, pfx == null ? "" : pfx));
+                    el = ((SOAPElement)cur).addChildElement(local, pfx == null ? "" : pfx, ns);
                 }
                 cur.removeChild(el);
                 return el;
