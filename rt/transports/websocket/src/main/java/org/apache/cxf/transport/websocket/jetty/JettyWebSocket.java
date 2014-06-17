@@ -102,25 +102,31 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         invokeService(data, offset, length);
     }
     
-    private void invokeService(byte[] data, int offset, int length) {
-        HttpServletRequest request = null;
-        HttpServletResponse response = null;
-        try {
-            response = createServletResponse();
-            request = createServletRequest(data, offset, length);
-            if (manager != null) {
-                String reqid = request.getHeader(requestIdKey);
-                if (reqid != null) {
-                    response.setHeader(responseIdKey, reqid);
+    private void invokeService(final byte[] data, final int offset, final int length) {
+        // need to invoke the service asynchronously if the websocket's onMessage is synchronously blocked
+        manager.getExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                HttpServletRequest request = null;
+                HttpServletResponse response = null;
+                try {
+                    response = createServletResponse();
+                    request = createServletRequest(data, offset, length);
+                    if (manager != null) {
+                        String reqid = request.getHeader(requestIdKey);
+                        if (reqid != null) {
+                            response.setHeader(responseIdKey, reqid);
+                        }
+                        manager.service(request, response);
+                    }
+                } catch (InvalidPathException ex) { 
+                    reportErrorStatus(response, 400);
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Failed to invoke service", e);
+                    reportErrorStatus(response, 500);
                 }
-                manager.service(request, response);
             }
-        } catch (InvalidPathException ex) { 
-            reportErrorStatus(response, 400);
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "Failed to invoke service", e);
-            reportErrorStatus(response, 500);
-        }
+        });
     }
     
     // may want to move this error reporting code to WebSocketServletHolder

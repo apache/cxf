@@ -213,7 +213,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
 
         @Override
         protected void handleResponseAsync() throws IOException {
-            // TODO Auto-generated method stub
+            handleResponseOnWorkqueue(true, false);
         }
 
         @Override

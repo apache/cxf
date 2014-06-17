@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.websocket.jetty;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
+import org.apache.cxf.workqueue.OneShotAsyncExecutor;
 import org.eclipse.jetty.websocket.WebSocketFactory;
 import org.eclipse.jetty.websocket.WebSocketFactory.Acceptor;
 
@@ -40,12 +42,18 @@ public class JettyWebSocketManager {
     private WebSocketFactory webSocketFactory;
     private AbstractHTTPDestination destination;
     private ServletContext servletContext;
+    private Executor executor;
 
     public void init(AbstractHTTPDestination dest) {
         this.destination = dest;
 
         //TODO customize websocket factory configuration options when using the destination.
         webSocketFactory = new WebSocketFactory((Acceptor)dest, 8192);
+
+        //FIXME get the bus's executor for async service invocation to decouple
+        // the service invocation from websocket's onMessage call which is synchronously
+        // blocked.
+        executor = OneShotAsyncExecutor.getInstance();
     }
 
     void setServletContext(ServletContext servletContext) {
@@ -73,9 +81,13 @@ public class JettyWebSocketManager {
         return false;
     }
 
-    public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if (destination != null) {
             ((WebSocketDestinationService)destination).invokeInternal(null, servletContext, request, response);
         }
+    }
+    
+    Executor getExecutor() {
+        return executor;
     }
 }

@@ -22,12 +22,15 @@ package org.apache.cxf.systest.jaxws.websocket;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Response;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -40,6 +43,7 @@ import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.NoSuchCodeLitFault;
 import org.apache.hello_world_soap_http.SOAPService;
+import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -246,6 +250,138 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
             assertEquals("Hello BJ2", s);
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
+        }
+    }
+
+    @Test
+    public void testAsyncPollingCall() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(wsdl);
+        
+        SOAPService service = new SOAPService(wsdl, serviceName);
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        updateGreeterAddress(greeter, PORT);
+
+        long before = System.currentTimeMillis();
+
+        long delay = 3000;
+        Response<GreetMeLaterResponse> r1 = greeter.greetMeLaterAsync(delay);
+        Response<GreetMeLaterResponse> r2 = greeter.greetMeLaterAsync(delay);
+
+        long after = System.currentTimeMillis();
+
+        assertTrue("Duration of calls exceeded " + (2 * delay) + " ms", after - before < (2 * delay));
+
+        // first time round, responses should not be available yet
+        assertFalse("Response already available.", r1.isDone());
+        assertFalse("Response already available.", r2.isDone());
+
+        // after three seconds responses should be available
+        long waited = 0;
+        while (waited < (delay + 1000)) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ex) {
+               // ignore
+            }
+            if (r1.isDone() && r2.isDone()) {
+                break;
+            }
+            waited += 500;
+        }
+        assertTrue("Response is  not available.", r1.isDone());
+        assertTrue("Response is  not available.", r2.isDone());
+    }
+
+    @Test
+    public void testAsyncSynchronousPolling() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(wsdl);
+        
+        SOAPService service = new SOAPService(wsdl, serviceName);
+        assertNotNull(service);
+        
+        final String expectedString = new String("Hello, finally!");
+          
+        class Poller extends Thread {
+            Response<GreetMeLaterResponse> response;
+            int tid;
+            
+            Poller(Response<GreetMeLaterResponse> r, int t) {
+                response = r;
+                tid = t;
+            }
+            public void run() {
+                if (tid % 2 > 0) {
+                    while (!response.isDone()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                            // ignore
+                        }
+                    }
+                }
+                GreetMeLaterResponse reply = null;
+                try {
+                    reply = response.get();
+                } catch (Exception ex) {
+                    fail("Poller " + tid + " failed with " + ex);
+                }
+                assertNotNull("Poller " + tid + ": no response received from service", reply);
+                String s = reply.getResponseType();
+                assertEquals(expectedString, s);
+            }
+        }
+        
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        updateGreeterAddress(greeter, PORT);
+        long before = System.currentTimeMillis();
+
+        
+        long delay = 3000;
+        
+        Response<GreetMeLaterResponse> response = greeter.greetMeLaterAsync(delay);
+        long after = System.currentTimeMillis();
+
+        assertTrue("Duration of calls exceeded " + delay + " ms", after - before < delay);
+
+        // first time round, responses should not be available yet
+        assertFalse("Response already available.", response.isDone());
+
+        
+        Poller[] pollers = new Poller[4];
+        for (int i = 0; i < pollers.length; i++) {
+            pollers[i] = new Poller(response, i);
+        }
+        for (Poller p : pollers) {
+            p.start();
+        }
+        
+        for (Poller p : pollers) {
+            p.join();
+        }
+        
+           
+    }
+
+    static class MyHandler implements AsyncHandler<GreetMeLaterResponse> {
+        static int invocationCount;
+        private String replyBuffer;
+        
+        public void handleResponse(Response<GreetMeLaterResponse> response) {
+            invocationCount++;
+            try {
+                GreetMeLaterResponse reply = response.get();
+                replyBuffer = reply.getResponseType();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            } catch (ExecutionException ex) {
+                ex.printStackTrace();
+            }
+        }
+        
+        String getReplyBuffer() {
+            return replyBuffer;
         }
     }
 
