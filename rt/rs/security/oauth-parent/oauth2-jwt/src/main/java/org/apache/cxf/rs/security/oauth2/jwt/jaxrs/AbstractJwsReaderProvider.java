@@ -18,11 +18,13 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 
+import java.security.KeyStore;
 import java.security.PublicKey;
+import java.util.Properties;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProperties;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureVerifier;
@@ -30,7 +32,7 @@ import org.apache.cxf.rs.security.oauth2.jws.PublicKeyJwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJwsReaderProvider {
-    private static final String RSSEC_SIGNATURE_PROPS = "rs-security.signature.properties";
+    private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.in.properties";
     
     private JwsSignatureVerifier sigVerifier;
     private JwsSignatureProperties sigProperties;
@@ -54,16 +56,28 @@ public class AbstractJwsReaderProvider {
         } 
         Message m = JAXRSUtils.getCurrentMessage();
         if (m == null) {
-            return null;
+            throw new SecurityException();
         }
         String propLoc = (String)m.getContextualProperty(RSSEC_SIGNATURE_PROPS);
         if (propLoc == null) {
-            return null;
+            throw new SecurityException();
         }
-        
-        Bus bus = (Bus)m.getExchange().get(Endpoint.class).get(Bus.class.getName());
-        PublicKey pk = CryptoUtils.loadPublicKey(propLoc, bus);
-        return new PublicKeyJwsSignatureVerifier(pk);
+        Bus bus = m.getExchange().getBus();
+        try {
+            Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            PublicKey pk = null;
+            KeyStore keyStore = (KeyStore)m.getExchange().get(props.get(CryptoUtils.RSSEC_KEY_STORE_FILE));
+            if (keyStore == null) {
+                keyStore = CryptoUtils.loadKeyStore(props, bus);
+                m.getExchange().put((String)props.get(CryptoUtils.RSSEC_KEY_STORE_FILE), keyStore);
+            }
+            pk = CryptoUtils.loadPublicKey(keyStore, props);
+            return new PublicKeyJwsSignatureVerifier(pk);
+        } catch (SecurityException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
     }
 
     public String getDefaultMediaType() {

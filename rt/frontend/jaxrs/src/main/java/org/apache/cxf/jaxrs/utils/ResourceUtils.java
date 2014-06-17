@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -502,6 +503,13 @@ public final class ResourceUtils {
             }
         }
         return null;
+    }
+    
+    public static Properties loadProperties(String propertiesLocation, Bus bus) throws Exception {
+        Properties props = new Properties();
+        InputStream is = getResourceStream(propertiesLocation, bus);
+        props.load(is);
+        return props;
     }
     
     public static List<UserResource> getUserResources(String loc) {

@@ -45,7 +45,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
         this(key, null, spec);
     }
     public PrivateKeyJwsSignatureProvider(PrivateKey key, SecureRandom random, AlgorithmParameterSpec spec) {
-        super(SUPPORTED_ALGORITHMS, Algorithm.SHA256withRSA.getJwtName());
+        super(SUPPORTED_ALGORITHMS);
         this.key = key;
         this.random = random;
         this.signatureSpec = spec;

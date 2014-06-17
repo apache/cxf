@@ -16,16 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
+package org.apache.cxf.systest.jaxrs.security.jwt;
 
-public final class Priorities {
-    public static final int JWE_SERVER_READ_PRIORITY = 1000;
-    public static final int JWE_WRITE_PRIORITY = 1000;
-    public static final int JWE_CLIENT_READ_PRIORITY = 1001;
-    public static final int JWS_SERVER_READ_PRIORITY = 1001;
-    public static final int JWS_WRITE_PRIORITY = 1001;
-    public static final int JWS_CLIENT_READ_PRIORITY = 1000;
-    private Priorities() {
-        
+import java.util.Properties;
+
+import org.apache.cxf.rs.security.oauth2.utils.crypto.PrivateKeyPasswordProvider;
+
+public class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvider {
+
+    @Override
+    public char[] getPassword(Properties storeProperties) {
+        return "password".toCharArray();
     }
+    
 }
+

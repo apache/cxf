@@ -16,16 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 
-public final class Priorities {
-    public static final int JWE_SERVER_READ_PRIORITY = 1000;
-    public static final int JWE_WRITE_PRIORITY = 1000;
-    public static final int JWE_CLIENT_READ_PRIORITY = 1001;
-    public static final int JWS_SERVER_READ_PRIORITY = 1001;
-    public static final int JWS_WRITE_PRIORITY = 1001;
-    public static final int JWS_CLIENT_READ_PRIORITY = 1000;
-    private Priorities() {
-        
+package org.apache.cxf.systest.jaxrs.security.jwt;
+
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+@Path("/bookstore")
+public class BookStore {
+    
+    public BookStore() {
     }
+    
+    @POST
+    @Path("/books")
+    @Produces("text/plain")
+    @Consumes("text/plain")
+    public String echoText(String text) {
+        return text;
+    }
+    
 }
+
+

@@ -26,9 +26,8 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     private Set<String> supportedAlgorithms;
     private String defaultJwtAlgorithm;
     
-    public AbstractJwsSignatureProvider(Set<String> supportedAlgorithms, String algo) {
+    public AbstractJwsSignatureProvider(Set<String> supportedAlgorithms) {
         this.supportedAlgorithms = supportedAlgorithms;
-        this.defaultJwtAlgorithm = algo;
     }
     @Override
     public void prepareHeaders(JwtHeaders headers) {

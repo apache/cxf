@@ -21,12 +21,14 @@ package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.util.Properties;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
@@ -35,8 +37,8 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.PrivateKeyPasswordProvider;
 
 public class AbstractJwsWriterProvider {
-    private static final String RSSEC_SIGNATURE_PROPS = "rs-security.signature.properties";
-    private static final String RSSEC_KEY_PSWD_PROVIDER = "org.apache.rs.security.crypto.private.provider";
+    private static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
+    private static final String JSON_WEB_SIGNATURE_ALGO_PROP = "rs.security.jws.content.signature.algorithm";
     
     private JwsSignatureProvider sigProvider;
     
@@ -53,18 +55,33 @@ public class AbstractJwsWriterProvider {
         if (m == null) {
             throw new SecurityException();
         }
-        String propLoc = (String)m.getContextualProperty(RSSEC_SIGNATURE_PROPS);
+        String propLoc = (String)m.getContextualProperty(RSSEC_SIGNATURE_OUT_PROPS);
         if (propLoc == null) {
             throw new SecurityException();
         }
-        
-        PrivateKeyPasswordProvider cb = (PrivateKeyPasswordProvider)m.getContextualProperty(RSSEC_KEY_PSWD_PROVIDER);
-        Bus bus = (Bus)m.getExchange().get(Endpoint.class).get(Bus.class.getName());
-        PrivateKey pk = CryptoUtils.loadPrivateKey(propLoc, bus, cb);
-        return new PrivateKeyJwsSignatureProvider(pk);
+        try {
+            Bus bus = m.getExchange().getBus();
+            Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            PrivateKey pk = null;
+            KeyStore keyStore = (KeyStore)m.getExchange().get(props.get(CryptoUtils.RSSEC_KEY_STORE_FILE));
+            if (keyStore == null) {
+                keyStore = CryptoUtils.loadKeyStore(props, bus);
+                m.getExchange().put((String)props.get(CryptoUtils.RSSEC_KEY_STORE_FILE), keyStore);
+            }
+            PrivateKeyPasswordProvider cb = 
+                (PrivateKeyPasswordProvider)m.getContextualProperty(CryptoUtils.RSSEC_KEY_PSWD_PROVIDER);
+            pk = CryptoUtils.loadPrivateKey(keyStore, props, bus, cb);
+            PrivateKeyJwsSignatureProvider provider = new PrivateKeyJwsSignatureProvider(pk);
+            provider.setDefaultJwtAlgorithm(props.getProperty(JSON_WEB_SIGNATURE_ALGO_PROP));
+            return provider;
+        } catch (SecurityException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
     }
     
-    public void writeJws(JwsCompactProducer p, OutputStream os) throws IOException {
+    protected void writeJws(JwsCompactProducer p, OutputStream os) throws IOException {
         JwsSignatureProvider theSigProvider = getInitializedSigProvider();
         p.signWith(theSigProvider);
         IOUtils.copy(new ByteArrayInputStream(p.getSignedEncodedJws().getBytes("UTF-8")), os);

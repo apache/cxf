@@ -91,10 +91,16 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         return headers;
     }
     public String encrypt(byte[] content, String contentType) {
+        JweHeaders theHeaders = headers;
+        if (contentType != null) {
+            theHeaders = new JweHeaders(theHeaders.asMap());
+            theHeaders.setContentType(contentType);
+        }
+        
         byte[] theCek = getContentEncryptionKey();
-        String contentEncryptionAlgoJavaName = Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
+        String contentEncryptionAlgoJavaName = Algorithm.toJavaName(theHeaders.getContentEncryptionAlgorithm());
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
-        byte[] additionalEncryptionParam = headers.toCipherAdditionalAuthData(writer);
+        byte[] additionalEncryptionParam = theHeaders.toCipherAdditionalAuthData(writer);
         keyProps.setAdditionalData(additionalEncryptionParam);
         
         byte[] theIv = getContentEncryptionCipherInitVector();
@@ -107,10 +113,7 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
             keyProps);
         
         byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey(theCek);
-        if (contentType != null) {
-            headers.setContentType(contentType);
-        }
-        JweCompactProducer producer = new JweCompactProducer(headers, 
+        JweCompactProducer producer = new JweCompactProducer(theHeaders, 
                                              jweContentEncryptionKey,
                                              theIv,
                                              cipherText,

@@ -36,11 +36,11 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider imple
     private byte[] key;
     
     public HmacJwsSignatureProvider(byte[] key) {
-        super(SUPPORTED_ALGORITHMS, Algorithm.HmacSHA256.getJwtName());
+        super(SUPPORTED_ALGORITHMS);
         this.key = key;
     }
     public HmacJwsSignatureProvider(String encodedKey) {
-        super(SUPPORTED_ALGORITHMS, Algorithm.HmacSHA256.getJwtName());
+        super(SUPPORTED_ALGORITHMS);
         try {
             this.key = Base64UrlUtility.decode(encodedKey);
         } catch (Base64Exception ex) {

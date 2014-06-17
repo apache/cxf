@@ -20,12 +20,14 @@ package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.util.Properties;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.jwe.JweCryptoProperties;
 import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptionOutput;
@@ -36,17 +38,13 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.PrivateKeyPasswordProvider;
 
 public class AbstractJweDecryptingFilter {
-    private static final String RSSEC_ENCRYPTION_PROPS = "rs-security.encryption.properties";
-    private static final String RSSEC_KEY_PSWD_PROVIDER = "org.apache.rs.security.crypto.private.provider";
+    private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
     
     private JweDecryptor decryptor;
     private JweCryptoProperties cryptoProperties;
     private String defaultMediaType;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
         JweDecryptor theDecryptor = getInitializedDecryptor();
-        if (theDecryptor == null) {
-            throw new SecurityException();
-        }
         JweDecryptionOutput out = theDecryptor.decrypt(new String(IOUtils.readBytesFromStream(is), "UTF-8"));
         validateHeaders(out.getHeaders());
         return out;
@@ -64,16 +62,31 @@ public class AbstractJweDecryptingFilter {
         } 
         Message m = JAXRSUtils.getCurrentMessage();
         if (m == null) {
-            return null;
+            throw new SecurityException();
         }
-        String propLoc = (String)m.getContextualProperty(RSSEC_ENCRYPTION_PROPS);
+        String propLoc = (String)m.getContextualProperty(RSSEC_ENCRYPTION_IN_PROPS);
         if (propLoc == null) {
-            return null;
+            throw new SecurityException();
         }
-        PrivateKeyPasswordProvider cb = (PrivateKeyPasswordProvider)m.getContextualProperty(RSSEC_KEY_PSWD_PROVIDER);
-        Bus bus = (Bus)m.getExchange().get(Endpoint.class).get(Bus.class.getName());
-        PrivateKey pk = CryptoUtils.loadPrivateKey(propLoc, bus, cb);
-        return new WrappedKeyJweDecryptor(pk, cryptoProperties);
+        try {
+            Bus bus = m.getExchange().getBus();
+            Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            PrivateKey pk = null;
+            KeyStore keyStore = (KeyStore)m.getExchange().get(props.get(CryptoUtils.RSSEC_KEY_STORE_FILE));
+            if (keyStore == null) {
+                keyStore = CryptoUtils.loadKeyStore(props, bus);
+                m.getExchange().put((String)props.get(CryptoUtils.RSSEC_KEY_STORE_FILE), keyStore);
+            }
+            PrivateKeyPasswordProvider cb = 
+                (PrivateKeyPasswordProvider)m.getContextualProperty(CryptoUtils.RSSEC_KEY_PSWD_PROVIDER);
+            pk = CryptoUtils.loadPrivateKey(keyStore, props, bus, cb);
+            
+            return new WrappedKeyJweDecryptor(pk, cryptoProperties);
+        } catch (SecurityException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
     }
 
     public void setCryptoProperties(JweCryptoProperties cryptoProperties) {
