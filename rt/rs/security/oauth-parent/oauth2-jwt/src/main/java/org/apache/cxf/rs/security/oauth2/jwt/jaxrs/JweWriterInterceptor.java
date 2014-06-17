@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.KeyStore;
 import java.security.PublicKey;
 import java.util.Properties;
 
@@ -47,6 +46,7 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 public class JweWriterInterceptor implements WriterInterceptor {
     private static final String JSON_WEB_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
     private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";
+    private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
     private JweEncryptor encryptor;
     private boolean contentTypeRequired = true;
     
@@ -75,9 +75,6 @@ public class JweWriterInterceptor implements WriterInterceptor {
             return encryptor;    
         } 
         Message m = JAXRSUtils.getCurrentMessage();
-        if (m == null) {
-            throw new SecurityException();
-        }
         String propLoc = (String)m.getContextualProperty(JSON_WEB_ENCRYPTION_OUT_PROPS);
         if (propLoc == null) {
             throw new SecurityException();
@@ -85,16 +82,15 @@ public class JweWriterInterceptor implements WriterInterceptor {
         Bus bus = m.getExchange().getBus();
         try {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
-            PublicKey pk = null;
-            KeyStore keyStore = (KeyStore)m.getExchange().get(props.get(CryptoUtils.RSSEC_KEY_STORE_FILE));
-            if (keyStore == null) {
-                keyStore = CryptoUtils.loadKeyStore(props, bus);
-                m.getExchange().put((String)props.get(CryptoUtils.RSSEC_KEY_STORE_FILE), keyStore);
+            PublicKey pk = CryptoUtils.loadPublicKey(m, props);
+            JweHeaders headers = new JweHeaders(Algorithm.RSA_OAEP.getJwtName(),
+                                                props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP));
+            String compression = props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP);
+            if (compression != null) {
+                headers.setZipAlgorithm(compression);
             }
-            pk = CryptoUtils.loadPublicKey(keyStore, props);
-            return new WrappedKeyJweEncryptor(new JweHeaders(Algorithm.RSA_OAEP.getJwtName(),
-                                                             props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP)), 
-                                              pk);
+            
+            return new WrappedKeyJweEncryptor(headers, pk);
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {

@@ -91,8 +91,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.getProperties(true).put("rs.security.signature.out.properties", CLIENT_JWEJWS_PROPERTIES);
         bean.getProperties(true).put("rs.security.encryption.in.properties", CLIENT_JWEJWS_PROPERTIES);
         bean.getProperties(true).put("rs.security.signature.in.properties", SERVER_JWEJWS_PROPERTIES);
-        bean.getProperties(true).put("rs.security.crypto.key.password.provider", 
-                                     new PrivateKeyPasswordProviderImpl());
+        PrivateKeyPasswordProvider provider = new PrivateKeyPasswordProviderImpl();
+        bean.getProperties(true).put("rs.security.signature.key.password.provider", provider);
+        bean.getProperties(true).put("rs.security.decryption.key.password.provider", provider);
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
         assertEquals("book", text);

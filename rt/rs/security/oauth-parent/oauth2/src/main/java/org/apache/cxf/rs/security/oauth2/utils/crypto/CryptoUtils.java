@@ -51,6 +51,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 
@@ -58,12 +59,13 @@ import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
  * Encryption helpers
  */
 public final class CryptoUtils {
-    public static final String RSSEC_KEY_STORE_TYPE = "rs.security.crypto.keystore.type";
-    public static final String RSSEC_KEY_STORE_PSWD = "rs.security.crypto.keystore.password";
-    public static final String RSSEC_KEY_PSWD = "rs.security.crypto.key.password";
-    public static final String RSSEC_KEY_STORE_ALIAS = "rs.security.crypto.keystore.alias";
-    public static final String RSSEC_KEY_STORE_FILE = "rs.security.crypto.keystore.file";
-    public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.crypto.key.password.provider";
+    public static final String RSSEC_KEY_STORE_TYPE = "rs.security.keystore.type";
+    public static final String RSSEC_KEY_STORE_PSWD = "rs.security.keystore.password";
+    public static final String RSSEC_KEY_PSWD = "rs.security.key.password";
+    public static final String RSSEC_KEY_STORE_ALIAS = "rs.security.keystore.alias";
+    public static final String RSSEC_KEY_STORE_FILE = "rs.security.keystore.file";
+    public static final String RSSEC_SIG_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
+    public static final String RSSEC_DECRYPT_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
         
     private static final Logger LOG = LogUtils.getL7dLogger(CryptoUtils.class);
     
@@ -131,12 +133,8 @@ public final class CryptoUtils {
     
     public static Certificate loadCertificate(InputStream storeLocation, char[] storePassword, String alias,
                                               String storeType) {
-        try {
-            KeyStore keyStore = loadKeyStore(storeLocation, storePassword, storeType);
-            return loadCertificate(keyStore, alias);
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }
+        KeyStore keyStore = loadKeyStore(storeLocation, storePassword, storeType);
+        return loadCertificate(keyStore, alias);
     }
     public static Certificate loadCertificate(KeyStore keyStore, String alias) {
         try {
@@ -145,86 +143,52 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    public static Certificate loadCertificate(KeyStore keyStore, Properties props) {
-        try {
-            return loadCertificate(keyStore, props.getProperty(RSSEC_KEY_STORE_ALIAS));
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }
-    }
-    public static Certificate loadCertificate(Properties props, Bus bus) {
-        try {
-            KeyStore keyStore = loadKeyStore(props, bus);
-            String alias = props.getProperty(RSSEC_KEY_STORE_ALIAS);
-            return loadCertificate(keyStore, alias);
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }    
-    }
     public static PublicKey loadPublicKey(InputStream storeLocation, char[] storePassword, String alias,
                                           String storeType) {
-        try {
-            return loadCertificate(storeLocation, storePassword, alias, storeType).getPublicKey();
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }
+        return loadCertificate(storeLocation, storePassword, alias, storeType).getPublicKey();
     }
     public static PublicKey loadPublicKey(KeyStore keyStore, String alias) {
+        return loadCertificate(keyStore, alias).getPublicKey();
+    }
+    public static PublicKey loadPublicKey(Message m, Properties props) {
+        KeyStore keyStore = CryptoUtils.loadPersistKeyStore(m, props);
+        return CryptoUtils.loadPublicKey(keyStore, props.getProperty(RSSEC_KEY_STORE_ALIAS));
+    }
+    public static PublicKey loadPublicKey(Message m, String keyStoreLocProp) {
+        String propLoc = (String)m.getContextualProperty(keyStoreLocProp);
+        if (propLoc == null) {
+            throw new SecurityException();
+        }
+        Bus bus = m.getExchange().getBus();
         try {
-            return loadCertificate(keyStore, alias).getPublicKey();
-        } catch (Exception ex) { 
+            Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            return CryptoUtils.loadPublicKey(m, props);
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
-    }
-    public static PublicKey loadPublicKey(KeyStore keyStore, Properties props) {
-        try {
-            return loadCertificate(keyStore, props).getPublicKey();
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }
-    }
-    public static PublicKey loadPublicKey(Properties props, Bus bus) {
-        try {
-            return loadCertificate(props, bus).getPublicKey();
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }    
     }
     public static PrivateKey loadPrivateKey(Properties props, Bus bus, PrivateKeyPasswordProvider provider) {
-        try {
-            KeyStore keyStore = loadKeyStore(props, bus);
-            return loadPrivateKey(keyStore, props, bus, provider);
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }    
+        KeyStore keyStore = loadKeyStore(props, bus);
+        return loadPrivateKey(keyStore, props, bus, provider);
     }
     public static PrivateKey loadPrivateKey(KeyStore keyStore, 
                                             Properties props, 
                                             Bus bus, 
                                             PrivateKeyPasswordProvider provider) {
-        try {
-            String keyPswd = props.getProperty(RSSEC_KEY_PSWD);
-            String alias = props.getProperty(RSSEC_KEY_STORE_ALIAS);
-            char[] keyPswdChars = provider != null ? provider.getPassword(props) 
-                : keyPswd != null ? keyPswd.toCharArray() : null;    
-            return loadPrivateKey(keyStore, keyPswdChars, alias);
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }    
+        
+        String keyPswd = props.getProperty(RSSEC_KEY_PSWD);
+        String alias = props.getProperty(RSSEC_KEY_STORE_ALIAS);
+        char[] keyPswdChars = provider != null ? provider.getPassword(props) 
+            : keyPswd != null ? keyPswd.toCharArray() : null;    
+        return loadPrivateKey(keyStore, keyPswdChars, alias);
     }
     public static PrivateKey loadPrivateKey(InputStream storeLocation, 
                                             char[] storePassword, 
                                             char[] keyPassword, 
                                             String alias,
                                             String storeType) {
-        try {
-            KeyStore keyStore = loadKeyStore(storeLocation, storePassword, storeType);
-            KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
-                keyStore.getEntry(alias, new KeyStore.PasswordProtection(keyPassword));
-            return pkEntry.getPrivateKey();
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }
+        KeyStore keyStore = loadKeyStore(storeLocation, storePassword, storeType);
+        return loadPrivateKey(keyStore, keyPassword, alias);
     }
     
     public static PrivateKey loadPrivateKey(KeyStore keyStore,
@@ -238,20 +202,54 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
-    public static KeyStore loadKeyStore(Properties props, Bus bus) throws Exception {
+    public static PrivateKey loadPrivateKey(Message m, String keyStoreLocProp, String passwordProviderProp) {
+        String propLoc = (String)m.getContextualProperty(keyStoreLocProp);
+        if (propLoc == null) {
+            throw new SecurityException();
+        }
+        Bus bus = m.getExchange().getBus();
+        try {
+            Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            return CryptoUtils.loadPrivateKey(m, props, passwordProviderProp);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    public static PrivateKey loadPrivateKey(Message m, Properties props, String passwordProviderProp) {
+        Bus bus = m.getExchange().getBus();
+        KeyStore keyStore = CryptoUtils.loadPersistKeyStore(m, props);
+        PrivateKeyPasswordProvider cb = 
+            (PrivateKeyPasswordProvider)m.getContextualProperty(passwordProviderProp);
+        return CryptoUtils.loadPrivateKey(keyStore, props, bus, cb);
+    }
+    public static KeyStore loadPersistKeyStore(Message m, Properties props) {
+        KeyStore keyStore = (KeyStore)m.getExchange().get(props.get(CryptoUtils.RSSEC_KEY_STORE_FILE));
+        if (keyStore == null) {
+            keyStore = CryptoUtils.loadKeyStore(props, m.getExchange().getBus());
+            m.getExchange().put((String)props.get(CryptoUtils.RSSEC_KEY_STORE_FILE), keyStore);
+        }
+        return keyStore;
+    }
+    public static KeyStore loadKeyStore(Properties props, Bus bus) {
         String keyStoreType = props.getProperty(RSSEC_KEY_STORE_TYPE);
         String keyStoreLoc = props.getProperty(RSSEC_KEY_STORE_FILE);
         String keyStorePswd = props.getProperty(RSSEC_KEY_STORE_PSWD);
-        InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
-        return loadKeyStore(is, keyStorePswd.toCharArray(), keyStoreType);
+        try {
+            InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
+            return loadKeyStore(is, keyStorePswd.toCharArray(), keyStoreType);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
     }
     
-    public static KeyStore loadKeyStore(InputStream storeLocation, char[] storePassword, String type) 
-        throws Exception {
-        KeyStore ks = KeyStore.getInstance(type == null ? KeyStore.getDefaultType() : type);
-        ks.load(storeLocation, storePassword);
-        return ks;
+    public static KeyStore loadKeyStore(InputStream storeLocation, char[] storePassword, String type) {
+        try {
+            KeyStore ks = KeyStore.getInstance(type == null ? KeyStore.getDefaultType() : type);
+            ks.load(storeLocation, storePassword);
+            return ks;
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
     }
     
     public static RSAPrivateKey getRSAPrivateKey(String encodedModulus,
