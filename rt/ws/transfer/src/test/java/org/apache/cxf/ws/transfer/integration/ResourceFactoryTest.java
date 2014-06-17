@@ -22,9 +22,9 @@ package org.apache.cxf.ws.transfer.integration;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.cxf.endpoint.Server;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Create;
@@ -64,19 +64,12 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
     }
     
     private Element createXMLRepresentation() {
-        try {
-            DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = df.newDocumentBuilder();
-            Document doc = db.newDocument();
-            Element root = doc.createElement("root");
-            Element child1 = doc.createElement("child1");
-            Element child2 = doc.createElement("child2");
-            root.appendChild(child1);
-            root.appendChild(child2);
-            return root;
-        } catch (ParserConfigurationException ex) {
-            throw new RuntimeException(ex);
-        }
+        Element root = document.createElement("root");
+        Element child1 = document.createElement("child1");
+        Element child2 = document.createElement("child2");
+        root.appendChild(child1);
+        root.appendChild(child2);
+        return root;
     }
     
     private ResourceFactory createClient() {
@@ -105,7 +98,10 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         Representation representation = new Representation();
         representation.setAny(createXMLRepresentation());
         createRequest.setRepresentation(representation);
+        
         CreateResponse response = client.create(createRequest);
+        EasyMock.verify(manager);
+        
         Assert.assertEquals("ResourceAddress is other than expected.", RESOURCE_ADDRESS,
                 response.getResourceCreated().getAddress().getValue());
         Element refParamEl = (Element) response.getResourceCreated().getReferenceParameters().getAny().get(0);
@@ -115,7 +111,6 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         Assert.assertEquals("root", ((Element) response.getRepresentation().getAny()).getLocalName());
         Assert.assertEquals(2, ((Element) response.getRepresentation().getAny()).getChildNodes().getLength());
         
-        EasyMock.verify(manager);
         localResourceFactory.destroy();
     }
     
@@ -136,7 +131,10 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         Representation representation = new Representation();
         representation.setAny(createXMLRepresentation());
         createRequest.setRepresentation(representation);
+        
         CreateResponse response = client.create(createRequest);
+        EasyMock.verify(manager);
+        
         Assert.assertEquals("ResourceAddress is other than expected.", RESOURCE_REMOTE_ADDRESS,
                 response.getResourceCreated().getAddress().getValue());
         Element refParamEl = (Element) response.getResourceCreated().getReferenceParameters().getAny().get(0);
@@ -146,7 +144,6 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         Assert.assertEquals("root", ((Element) response.getRepresentation().getAny()).getLocalName());
         Assert.assertEquals(2, ((Element) response.getRepresentation().getAny()).getChildNodes().getLength());
         
-        EasyMock.verify(manager);
         remoteResourceFactory.destroy();
         remoteResource.destroy();
     }

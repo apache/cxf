@@ -20,6 +20,10 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import java.io.PrintWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
@@ -27,6 +31,8 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
+import org.apache.cxf.ws.transfer.resource.Resource;
+import org.apache.cxf.ws.transfer.resource.ResourceLocal;
 import org.apache.cxf.ws.transfer.resource.ResourceRemote;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactoryImpl;
@@ -48,19 +54,30 @@ public class IntegrationBaseTest {
     
     public static final String RESOURCE_REMOTE_MANAGER_ADDRESS = "local://ResourceRemote_factory";
     
+    public static final String RESOURCE_LOCAL_ADDRESS = "local://ResourceLocal";
+    
     protected Bus bus;
     
     protected LoggingInInterceptor logInInterceptor;
     
     protected LoggingOutInterceptor logOutInterceptor;
     
+    protected DocumentBuilderFactory documentBuilderFactory;
+    
+    protected DocumentBuilder documentBuilder;
+    
+    protected Document document;
+    
     @Before
-    public void before() {
+    public void before() throws ParserConfigurationException {
         bus = BusFactory.getDefaultBus();
         logInInterceptor = new LoggingInInterceptor(new PrintWriter(System.out));
         logInInterceptor.setPrettyLogging(true);
         logOutInterceptor = new LoggingOutInterceptor(new PrintWriter(System.out));
         logOutInterceptor.setPrettyLogging(true);
+        documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        document = documentBuilder.newDocument();
     }
     
     @After
@@ -98,6 +115,17 @@ public class IntegrationBaseTest {
         factory.setBus(bus);
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_REMOTE_MANAGER_ADDRESS);
+        factory.setServiceBean(implementor);
+        return factory.create();
+    }
+    
+    protected Server createLocalResource(ResourceManager manager) {
+        ResourceLocal implementor = new ResourceLocal();
+        implementor.setManager(manager);
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
+        factory.setServiceClass(Resource.class);
+        factory.setAddress(RESOURCE_LOCAL_ADDRESS);
         factory.setServiceBean(implementor);
         return factory.create();
     }
