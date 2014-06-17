@@ -22,6 +22,7 @@ package org.apache.cxf.ws.transfer.resource;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.ws.WebServiceContext;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Delete;
 import org.apache.cxf.ws.transfer.DeleteResponse;
@@ -41,11 +42,11 @@ import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelp
 public class ResourceLocal implements Resource {
     
     @javax.annotation.Resource
-    WebServiceContext context;
+    protected WebServiceContext context;
     
-    ResourceManager manager;
+    protected ResourceManager manager;
     
-    List<ResourceValidator> validators;
+    protected List<ResourceValidator> validators;
 
     public ResourceManager getManager() {
         return manager;
@@ -68,8 +69,9 @@ public class ResourceLocal implements Resource {
     
     @Override
     public GetResponse get(Get body) {
-        ReferenceParametersType refParams =
-                (ReferenceParametersType) context.getMessageContext().get(TransferConstants.REF_PARAMS_CONTEXT_KEY);
+        ReferenceParametersType refParams = (ReferenceParametersType) ((WrappedMessageContext) context
+                .getMessageContext()).getWrappedMessage()
+                .getContextualProperty(TransferConstants.REF_PARAMS_CONTEXT_KEY);
         GetResponse response = new GetResponse();
         response.setRepresentation(manager.get(refParams));
         return response;
@@ -77,8 +79,9 @@ public class ResourceLocal implements Resource {
 
     @Override
     public DeleteResponse delete(Delete body) {
-        ReferenceParametersType refParams =
-                (ReferenceParametersType) context.getMessageContext().get(TransferConstants.REF_PARAMS_CONTEXT_KEY);
+        ReferenceParametersType refParams = (ReferenceParametersType) ((WrappedMessageContext) context
+                .getMessageContext()).getWrappedMessage()
+                .getContextualProperty(TransferConstants.REF_PARAMS_CONTEXT_KEY);
         DeleteResponse response = new DeleteResponse();
         manager.delete(refParams);
         return response;
