@@ -103,7 +103,7 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
     }
     
     private void invokeService(final byte[] data, final int offset, final int length) {
-        // need to invoke the service asynchronously if the websocket's onMessage is synchronously blocked
+        // invoke the service asynchronously as the jetty websocket's onMessage is synchronously blocked
         manager.getExecutor().execute(new Runnable() {
             @Override
             public void run() {

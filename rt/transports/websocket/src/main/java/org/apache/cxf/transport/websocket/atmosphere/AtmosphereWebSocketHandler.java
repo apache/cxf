@@ -97,6 +97,7 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     
     protected List<AtmosphereRequest> invokeService(WebSocket webSocket,  InputStream stream) {
         LOG.info("invokeService(WebSocket, InputStream)");
+        // invoke the service directly as atmosphere's onMessage is not synchronously blocked
         HttpServletRequest request = null;
         HttpServletResponse response = null;        
         try {
