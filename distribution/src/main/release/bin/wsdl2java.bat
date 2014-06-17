@@ -48,7 +48,7 @@ echo ERROR: Unable to find cxf-manifest.jar in %cxf_home/lib
 goto end
 
 :no_java_home
-echo ERROR: Set JAVA_HOME to the path where the JDK (5.0 or higher) is installed
+echo ERROR: Set JAVA_HOME to the path where the JDK (6.0 or higher) is installed
 goto end 
 
 :set_cxf_home
