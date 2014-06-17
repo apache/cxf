@@ -79,7 +79,8 @@ public class ReferenceParameterParsingHandler implements SOAPHandler<SOAPMessage
                         for (int j = 0; j < refElementChildren.getLength(); j++) {
                             refParams.getAny().add(refElementChildren.item(j));
                         }
-                    } else if (childEl.hasAttribute(refAttrName) && "true".equals(childEl.getAttribute(refAttrName))) {
+                    } else if (childEl.hasAttributeNS(refElementNamespace, refAttrName)
+                            && "true".equals(childEl.getAttributeNS(refElementNamespace, refAttrName))) {
                         refParams.getAny().add(childEl);
                     }
                 }
