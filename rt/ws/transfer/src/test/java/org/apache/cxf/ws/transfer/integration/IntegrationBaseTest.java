@@ -38,7 +38,9 @@ import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactoryImpl;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.SimpleResourceResolver;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 /**
  *
@@ -56,21 +58,20 @@ public class IntegrationBaseTest {
     
     public static final String RESOURCE_LOCAL_ADDRESS = "local://ResourceLocal";
     
+    protected static LoggingInInterceptor logInInterceptor;
+    
+    protected static LoggingOutInterceptor logOutInterceptor;
+    
+    protected static DocumentBuilderFactory documentBuilderFactory;
+    
+    protected static DocumentBuilder documentBuilder;
+    
+    protected static Document document;
+    
     protected Bus bus;
     
-    protected LoggingInInterceptor logInInterceptor;
-    
-    protected LoggingOutInterceptor logOutInterceptor;
-    
-    protected DocumentBuilderFactory documentBuilderFactory;
-    
-    protected DocumentBuilder documentBuilder;
-    
-    protected Document document;
-    
-    @Before
-    public void before() throws ParserConfigurationException {
-        bus = BusFactory.getDefaultBus();
+    @BeforeClass
+    public static void beforeClass() throws ParserConfigurationException {
         logInInterceptor = new LoggingInInterceptor(new PrintWriter(System.out));
         logInInterceptor.setPrettyLogging(true);
         logOutInterceptor = new LoggingOutInterceptor(new PrintWriter(System.out));
@@ -78,6 +79,20 @@ public class IntegrationBaseTest {
         documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilder = documentBuilderFactory.newDocumentBuilder();
         document = documentBuilder.newDocument();
+    }
+    
+    @AfterClass
+    public static void afterClass() {
+        logInInterceptor = null;
+        logOutInterceptor = null;
+        documentBuilderFactory = null;
+        documentBuilder = null;
+        document = null;
+    }
+    
+    @Before
+    public void before() {
+        bus = BusFactory.getDefaultBus();
     }
     
     @After
