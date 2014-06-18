@@ -124,8 +124,10 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                 SOAPMessage soapMessage = factory.createMessage();
 
                 SOAPPart soapPart = soapMessage.getSOAPPart();
-                
-                XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
+                XMLStreamWriter origWriter = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
+                if (origWriter == null) {
+                    origWriter = message.getContent(XMLStreamWriter.class);
+                }
                 message.put(ORIGINAL_XML_WRITER, origWriter);
                 W3CDOMStreamWriter writer = new SAAJStreamWriter(soapPart);
                 // Replace stax writer with DomStreamWriter
