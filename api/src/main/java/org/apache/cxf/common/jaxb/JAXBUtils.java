@@ -68,6 +68,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelper.ClassWriter;
 import org.apache.cxf.common.util.ASMHelper.FieldVisitor;
@@ -1008,17 +1009,32 @@ public final class JAXBUtils {
         className += postFix;
         Class<?> cls = helper.findClass(className, JAXBUtils.class);
         if (cls == null) {
-            ClassWriter cw = helper.createClassWriter();
-            if (cw == null) {
-                return null;
+            try {
+                ClassWriter cw = helper.createClassWriter();
+                if (cw != null) { 
+                    cls = createNamespaceWrapperInternal(helper, cw, postFix, mcls);
+                }
+            } catch (RuntimeException ex) {
+                // continue
             }
-            cls = createNamespaceWrapperInternal(helper, cw, postFix, mcls);
         }
-        try {
-            return cls.getConstructor(Map.class).newInstance(map);
-        } catch (Exception e) {
-            return null;
+        if (cls == null
+            && (mcls.getName().contains(".internal.") || mcls.getName().contains("com.sun"))) {
+            try {
+                cls = ClassLoaderUtils.loadClass("org.apache.cxf.common.jaxb.NamespaceMapper", 
+                                                 JAXBUtils.class);
+            } catch (ClassNotFoundException ex2) {
+                // ignore
+            }
         }
+        if (cls != null) {
+            try {
+                return cls.getConstructor(Map.class).newInstance(map);
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+        return null;
     }
     /*
     // This is the "prototype" for the ASM generated class below

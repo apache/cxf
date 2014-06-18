@@ -487,6 +487,9 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         XMLStreamWriter writer = createWriter(actualObject, actualClass, genericType, enc, 
                                               actualOs, isCollection);
+        if (namespaceMap.size() > 1 || namespaceMap.size() == 1 && !namespaceMap.containsKey(JSONUtils.XSI_URI)) {
+            setNamespaceMapper(ms, namespaceMap);
+        }
         ms.marshal(actualObject, writer);
         writer.close();
         if (os != actualOs) {
@@ -597,9 +600,6 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         
         Marshaller ms = createMarshaller(actualObject, actualClass, genericType, enc);
-        if (!namespaceMap.isEmpty()) {
-            setNamespaceMapper(ms, namespaceMap);
-        }
         marshal(ms, actualObject, actualClass, genericType, enc, os, false);
     }
     
