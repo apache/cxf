@@ -31,14 +31,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
-import org.apache.cxf.workqueue.OneShotAsyncExecutor;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.eclipse.jetty.websocket.WebSocketFactory;
 import org.eclipse.jetty.websocket.WebSocketFactory.Acceptor;
 
 /**
- * 
+ * This class is used to provide the common functionality used by
+ * the two jetty websocket destination classes: JettyWebSocketDestination and JettyWebSocketServletDestination.
  */
-public class JettyWebSocketManager {
+class JettyWebSocketManager {
     private WebSocketFactory webSocketFactory;
     private AbstractHTTPDestination destination;
     private ServletContext servletContext;
@@ -50,10 +51,9 @@ public class JettyWebSocketManager {
         //TODO customize websocket factory configuration options when using the destination.
         webSocketFactory = new WebSocketFactory((Acceptor)dest, 8192);
 
-        //FIXME get the bus's executor for async service invocation to decouple
-        // the service invocation from websocket's onMessage call which is synchronously
-        // blocked.
-        executor = OneShotAsyncExecutor.getInstance();
+        // the executor for decoupling the service invocation from websocket's onMessage call which is
+        // synchronously blocked
+        executor = dest.getBus().getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
 
     void setServletContext(ServletContext servletContext) {

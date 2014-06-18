@@ -306,6 +306,28 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         }
     }
     
+    @Test
+    public void testCallsInParallel() throws Exception {
+        String address = "ws://localhost:" + getPort() + "/websocket/web/bookstore";
+
+        WebSocketTestClient wsclient = new WebSocketTestClient(address);
+        wsclient.connect();
+        try {
+            // call the GET service that takes a long time to response
+            wsclient.reset(2);
+            wsclient.sendTextMessage(
+                "GET /websocket/web/bookstore/hold/3000");
+            wsclient.sendTextMessage(
+                "GET /websocket/web/bookstore/hold/3000");
+            // each call takes 3 seconds but executed in parallel, so waiting 4 secs is sufficient
+            assertTrue("response expected", wsclient.await(4));
+            List<WebSocketTestClient.Response> received = wsclient.getReceivedResponses();
+            assertEquals(2, received.size());
+        } finally {
+            wsclient.close();
+        }
+    }
+
     protected String getPort() {
         return PORT;
     }

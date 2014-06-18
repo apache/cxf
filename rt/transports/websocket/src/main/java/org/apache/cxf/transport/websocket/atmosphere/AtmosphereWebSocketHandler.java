@@ -55,7 +55,7 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketHandler.class);
 
     protected AtmosphereWebSocketServletDestination destination;
-    
+
     //REVISIT make these keys configurable
     private String requestIdKey = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
     private String responseIdKey = WebSocketConstants.DEFAULT_RESPONSE_ID_KEY;
@@ -95,29 +95,34 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
         return invokeService(webSocket, new ByteArrayInputStream(data, offset, length));
     }
     
-    protected List<AtmosphereRequest> invokeService(WebSocket webSocket,  InputStream stream) {
+    protected List<AtmosphereRequest> invokeService(final WebSocket webSocket,  final InputStream stream) {
         LOG.info("invokeService(WebSocket, InputStream)");
-        // invoke the service directly as atmosphere's onMessage is not synchronously blocked
-        HttpServletRequest request = null;
-        HttpServletResponse response = null;        
-        try {
-            WebSocketServletHolder webSocketHolder = new AtmosphereWebSocketServletHolder(webSocket);
-            response = createServletResponse(webSocketHolder);
-            request = createServletRequest(webSocketHolder, stream);
-            if (destination != null) {
-                String reqid = request.getHeader(requestIdKey);
-                if (reqid != null) {
-                    response.setHeader(responseIdKey, reqid);
+        // invoke the service directly as onMessage is synchronously blocked (in jetty)
+        destination.getExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                HttpServletRequest request = null;
+                HttpServletResponse response = null;
+                try {
+                    WebSocketServletHolder webSocketHolder = new AtmosphereWebSocketServletHolder(webSocket);
+                    response = createServletResponse(webSocketHolder);
+                    request = createServletRequest(webSocketHolder, stream);
+                    if (destination != null) {
+                        String reqid = request.getHeader(requestIdKey);
+                        if (reqid != null) {
+                            response.setHeader(responseIdKey, reqid);
+                        }
+                        ((WebSocketDestinationService)destination).invokeInternal(null,
+                            webSocket.resource().getRequest().getServletContext(),
+                            request, response);
+                    }
+                } catch (InvalidPathException ex) {
+                    reportErrorStatus(response, 400);
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Failed to invoke service", e);
                 }
-                ((WebSocketDestinationService)destination).invokeInternal(null, 
-                    webSocket.resource().getRequest().getServletContext(),
-                    request, response);
             }
-        } catch (InvalidPathException ex) { 
-            reportErrorStatus(response, 400);
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "Failed to invoke service", e);
-        }
+        });
         return null;
     }
 

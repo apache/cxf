@@ -24,6 +24,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.workqueue.AutomaticWorkQueue;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -45,9 +49,31 @@ public class JettyWebSocketManagerTest extends Assert {
     @Test
     public void testServiceUsingJettyDestination() throws Exception {
         JettyWebSocketManager jwsm = new JettyWebSocketManager();
-        
+
         JettyWebSocketDestination dest = control.createMock(JettyWebSocketDestination.class);
-                
+        setupDestination(dest);
+
+        HttpServletRequest request = control.createMock(HttpServletRequest.class);
+        HttpServletResponse response = control.createMock(HttpServletResponse.class);
+        
+        dest.invokeInternal(EasyMock.isNull(ServletConfig.class), EasyMock.anyObject(ServletContext.class), 
+                    EasyMock.eq(request), EasyMock.eq(response));
+        EasyMock.expectLastCall();
+        
+        control.replay();
+        jwsm.init(dest);
+
+        jwsm.service(request, response);
+        control.verify();
+    }
+
+    @Test
+    public void testServiceUsingServletDestination() throws Exception {
+        JettyWebSocketManager jwsm = new JettyWebSocketManager();
+        
+        JettyWebSocketServletDestination dest = control.createMock(JettyWebSocketServletDestination.class);
+        setupDestination(dest);
+
         HttpServletRequest request = control.createMock(HttpServletRequest.class);
         HttpServletResponse response = control.createMock(HttpServletResponse.class);
         
@@ -61,22 +87,40 @@ public class JettyWebSocketManagerTest extends Assert {
         control.verify();
     }
 
-    @Test
-    public void testServiceUsingServletDestination() throws Exception {
-        JettyWebSocketManager jwsm = new JettyWebSocketManager();
-        
-        JettyWebSocketServletDestination dest = control.createMock(JettyWebSocketServletDestination.class);
-                
-        HttpServletRequest request = control.createMock(HttpServletRequest.class);
-        HttpServletResponse response = control.createMock(HttpServletResponse.class);
-        
-        dest.invokeInternal(EasyMock.isNull(ServletConfig.class), EasyMock.anyObject(ServletContext.class), 
-                    EasyMock.eq(request), EasyMock.eq(response));
-        EasyMock.expectLastCall();
-        control.replay();
-        jwsm.init(dest);
-        
-        jwsm.service(request, response);
-        control.verify();
+
+    private void setupDestination(AbstractHTTPDestination dest) {
+        Bus bus = control.createMock(Bus.class);
+        WorkQueueManager wqm = control.createMock(WorkQueueManager.class);
+
+        EasyMock.expect(dest.getBus()).andReturn(bus);
+        EasyMock.expect(bus.getExtension(WorkQueueManager.class)).andReturn(wqm);
+        EasyMock.expect(wqm.getAutomaticWorkQueue()).andReturn(
+            new AutomaticWorkQueue() {
+                @Override
+                public void execute(Runnable work, long timeout) {
+                }
+
+                @Override
+                public void schedule(Runnable work, long delay) {
+                }
+
+                @Override
+                public void execute(Runnable command) {
+                }
+
+                @Override
+                public String getName() {
+                    return null;
+                }
+
+                @Override
+                public void shutdown(boolean processRemainingWorkItems) {
+                }
+
+                @Override
+                public boolean isShutdown() {
+                    return false;
+                }
+            });
     }
 }

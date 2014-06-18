@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs.websocket;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -123,6 +124,18 @@ public class BookStoreWebSocket {
         };
     }
     
+    @GET
+    @Path("/hold/{t}")
+    @Produces("text/plain")
+    public String hold(@PathParam("t") long t) {
+        Date from = new Date();
+        try {
+            Thread.sleep(t);
+        } catch (InterruptedException e) {
+            // ignore
+        }
+        return "Held from " + from + " for " + t + " ms";
+    }
 }
 
 

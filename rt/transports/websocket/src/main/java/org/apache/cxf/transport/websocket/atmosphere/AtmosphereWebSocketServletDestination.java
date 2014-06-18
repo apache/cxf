@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -32,6 +33,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereRequest;
@@ -45,6 +47,7 @@ import org.atmosphere.websocket.WebSocketProtocol;
 public class AtmosphereWebSocketServletDestination extends ServletDestination implements
     WebSocketDestinationService {
     private AtmosphereFramework framework;
+    private Executor executor;
 
     public AtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei, 
                                                  String path) throws IOException {
@@ -62,6 +65,10 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
         if (wsp instanceof AtmosphereWebSocketHandler) {
             ((AtmosphereWebSocketHandler)wsp).setDestination(this);
         }
+
+        // the executor for decoupling the service invocation from websocket's onMessage call which is
+        // synchronously blocked
+        executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
 
     @Override
@@ -84,4 +91,7 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
         super.invoke(config, context, req, resp);
     }
 
+    Executor getExecutor() {
+        return executor;
+    }
 }
