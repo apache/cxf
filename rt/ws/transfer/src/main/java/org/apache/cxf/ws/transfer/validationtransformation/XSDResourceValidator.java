@@ -47,7 +47,7 @@ public class XSDResourceValidator implements ResourceValidator {
             Schema schema = schemaFactory.newSchema(xsd);
             this.validator = schema.newValidator();
         } catch (SAXException ex) {
-            throw new IllegalArgumentException("Error occured during creating the Schema.", ex);
+            throw new IllegalArgumentException("Error occured during creating the Validator.", ex);
         }
     }
     
