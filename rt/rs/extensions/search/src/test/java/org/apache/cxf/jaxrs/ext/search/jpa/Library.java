@@ -18,14 +18,20 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Library {
     @Id
     private int id;
     private String address;
+    @OneToMany
+    private List<Book> books = new LinkedList<Book>(); 
     
     public int getId() {
         return id;
@@ -41,5 +47,13 @@ public class Library {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
     }
 }
