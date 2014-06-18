@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<handler-chains xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee javaee_web_services_1_2.xsd">
+    <handler-chain>
+        <handler>
+            <handler-name>Dummy</handler-name>
+            <handler-class>org.apache.cxf.systest.ws.policy.handler.DummyHandler</handler-class>
+        </handler>
+    </handler-chain>
+</handler-chains>
