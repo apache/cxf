@@ -31,11 +31,21 @@
             <action class="org.apache.cxf.karaf.commands.StartEndpointCommand">
                 <property name="controller" ref="cxfController"/>
             </action>
+            <completers>
+                <ref component-id="busCompleter" />
+                <ref component-id="stoppedEndpointCompleter" />
+                <null/>
+            </completers>
         </command>
         <command name="cxf/stop-endpoint">
             <action class="org.apache.cxf.karaf.commands.StopEndpointCommand">
                 <property name="controller" ref="cxfController"/>
             </action>
+            <completers>
+                <ref component-id="busCompleter" />
+                <ref component-id="startedEndpointCompleter" />
+                <null/>
+            </completers>
         </command>
     </command-bundle>
     <reference id="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"/>
@@ -43,4 +53,16 @@
         <property name="bundleContext" ref="blueprintBundleContext"/>
         <property name="configAdmin" ref="configAdmin"/>
     </bean>
+    <bean id="busCompleter" class="org.apache.cxf.karaf.commands.completers.BusCompleter">
+        <property name="controller" ref="cxfController" />
+    </bean>
+
+    <bean id="stoppedEndpointCompleter" class="org.apache.cxf.karaf.commands.completers.StoppedEndpointCompleter">
+        <property name="controller" ref="cxfController" />
+    </bean>
+
+    <bean id="startedEndpointCompleter" class="org.apache.cxf.karaf.commands.completers.StartedEndpointCompleter">
+        <property name="controller" ref="cxfController" />
+    </bean>
+
 </blueprint>
