@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.transfer.manager;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +38,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Representation;
@@ -48,11 +50,15 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownResource;
  */
 public class MemoryResourceManager implements ResourceManager {
     
-    protected static final String REF_NAMESPACE = "http://www.cxf.apache.org/MemoryResourceManager";
+    public static final String REF_NAMESPACE = "http://www.cxf.apache.org/MemoryResourceManager";
     
-    protected static final String REF_LOCAL_NAME = "UUID";
+    public static final String REF_LOCAL_NAME = "UUID";
 
     protected static Transformer transformer;
+
+    protected static DocumentBuilderFactory documentBuilderFactory;
+    
+    protected static DocumentBuilder documentBuilder;
     
     protected static Document document;
     
@@ -69,11 +75,12 @@ public class MemoryResourceManager implements ResourceManager {
                         "Exception occurred during creation of the Transformer instance.", ex);
             }
         }
-        if (document == null) {
+        if (documentBuilderFactory == null) {
             try {
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                document = db.newDocument();
+                documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                documentBuilderFactory.setNamespaceAware(true);
+                documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                document = documentBuilder.newDocument();
             } catch (ParserConfigurationException ex) {
                 throw new IllegalArgumentException("Exception occured during creation of the Document instance.", ex);
             }
@@ -85,17 +92,18 @@ public class MemoryResourceManager implements ResourceManager {
     public Representation get(ReferenceParametersType ref) {
         try {
             String uuid = getUUID(ref);
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
             if (!storage.containsKey(uuid)) {
                 throw new UnknownResource();
             }
-            Document doc = db.parse(storage.get(uuid));
-            Representation representation = new Representation();
-            representation.setAny(doc.getDocumentElement());
-            return representation;
-        } catch (ParserConfigurationException ex) {
-            throw new RuntimeException(ex);
+            String resource = storage.get(uuid);
+            if (resource.isEmpty()) {
+                return new Representation();
+            } else {
+                Document doc = documentBuilder.parse(new InputSource(new StringReader(storage.get(uuid))));
+                Representation representation = new Representation();
+                representation.setAny(doc.getDocumentElement());
+                return representation;
+            }
         } catch (SAXException ex) {
             throw new RuntimeException(ex);
         } catch (IOException ex) {
