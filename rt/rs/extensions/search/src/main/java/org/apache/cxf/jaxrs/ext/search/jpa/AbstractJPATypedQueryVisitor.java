@@ -31,6 +31,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
@@ -259,26 +260,55 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         if (name.contains(".")) {
             String pre = name.substring(0, name.indexOf('.'));
             String post = name.substring(name.indexOf('.') + 1);
-            return getPath(getNextPath(element, pre, cv, null), 
-                           post, 
-                           cv,
-                           collSize);
+            final Path<?> nextPath = getNextPath(element, pre, post, cv, null);
+            return getPath(nextPath, post, cv, collSize);
         } else {
-            return getNextPath(element, name, cv, collSize);
+            return getNextPath(element, name, null, cv, collSize);
         }
     }
 
-    private Path<?> getNextPath(Path<?> element, String name, ClassValue cv, CollectionCheckInfo collSize) {
-        if (collSize == null
-            && (cv.isCollection(name) || isJoinProperty(name)) && (element == root || element instanceof Join)) {
-            return element == root ? root.join(name) : ((Join<?, ?>)element).join(name);
+    private Path<?> getNextPath(Path<?> element, String name, String postName, 
+        ClassValue cv, CollectionCheckInfo collSize) {
+        final boolean isCollectionOrJoin = collSize == null
+            && (cv.isCollection(name) || isJoinProperty(name) || existingCollectionInPostName(cv, postName)) 
+            && (element == root || element instanceof Join);
+        if (isCollectionOrJoin) {
+            final Path<?> path = getExistingJoinProperty((From<?, ?>)element, name);
+            if (path != null) {
+                return path;
+            } else {
+                return element == root ? root.join(name) : ((Join<?, ?>)element).join(name);
+            }
         } else {
-            return element.get(name);
+            return element.get(name);                
         }
     }
     
     private boolean isJoinProperty(String prop) {
         return joinProperties == null ? false : joinProperties.contains(prop);
     }
-    
+ 
+    private Path<?> getExistingJoinProperty(From<?, ?> element, String prop) {
+        final Set<?> joins = element.getJoins();
+        for (Object object : joins) {
+            Join<?, ?> join = (Join<?, ?>) object;
+            if (join.getAttribute().getName().equals(prop)) {
+                return join;
+            }
+        }
+        return null;
+    } 
+   
+    private boolean existingCollectionInPostName(ClassValue cv, String postName) {
+        if (postName != null) {
+            final String[] splitName = postName.split("\\.");
+            for (String name : splitName) {
+                if (cv.isCollection(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

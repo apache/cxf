@@ -98,7 +98,6 @@ public class JPATypedQueryVisitorTest extends Assert {
             b1.setLibrary(lib);
             b1.getAuthors().add("John");
             em.persist(b1);
-            assertTrue(em.contains(b1));
             
             BookReview br2 = new BookReview();
             br2.setId(2);
@@ -120,7 +119,6 @@ public class JPATypedQueryVisitorTest extends Assert {
             b2.setLibrary(lib);
             b2.getAuthors().add("John");
             em.persist(b2);
-            assertTrue(em.contains(b2));
             
             BookReview br3 = new BookReview();
             br3.setId(3);
@@ -141,7 +139,10 @@ public class JPATypedQueryVisitorTest extends Assert {
             b3.setOwnerInfo(info3);
             b3.setLibrary(lib);
             em.persist(b3);
-            assertTrue(em.contains(b3));
+
+            lib.getBooks().add(b1);
+            lib.getBooks().add(b2);
+            lib.getBooks().add(b3); 
             
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -191,6 +192,12 @@ public class JPATypedQueryVisitorTest extends Assert {
         assertTrue(10 == books.get(0).getId() && "num10".equals(books.get(0).getBookTitle()));
     }
     
+    @Test
+    public void testGetLibraryBook() throws Exception {
+        List<Book> books = queryBooks("library.books.bookTitle==num10");
+        assertEquals(3, books.size());
+    }
+
     @Test
     public void testQueryCollection() throws Exception {
         List<Book> books = 
