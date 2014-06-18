@@ -55,8 +55,8 @@ import org.codehaus.jettison.mapped.TypeConverter;
 
 public final class JSONUtils {
 
-    private static final String XSI_PREFIX = "xsi";
-    private static final String XSI_URI = WSDLConstants.NS_SCHEMA_XSI; 
+    public static final String XSI_PREFIX = "xsi";
+    public static final String XSI_URI = WSDLConstants.NS_SCHEMA_XSI; 
     
     private JSONUtils() {
     }
