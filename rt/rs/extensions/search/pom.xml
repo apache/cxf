@@ -79,6 +79,7 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
             <optional>true</optional>
+            <scope>test</scope>
             <exclusions>
             	<exclusion>
             		<groupId>org.apache.poi</groupId>
