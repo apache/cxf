@@ -20,22 +20,23 @@
 package org.apache.cxf.ws.transfer.shared.faults;
 
 import javax.xml.namespace.QName;
-import org.w3c.dom.Element;
-import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.ws.transfer.shared.TransferTools;
+import org.apache.cxf.ws.transfer.shared.TransferConstants;
 
 /**
- * The parent for all WS-Transfer-specific faults.
+ *
+ * @author erich
  */
-public abstract class WSTransferFault extends SoapFault {
-
-    public WSTransferFault(String reason, String detail, QName faultCode) {
-        super(reason, faultCode);
-        if (detail != null) {
-            Element detailEl = TransferTools.createElement("detail");
-            detailEl.setTextContent(detail);
-            setDetail(detailEl);
-        }
+public class PutDenied extends WSTransferFault {
+    
+    private static final String SUBCODE = "UnknownDialect";
+    
+    private static final String REASON = "The specified Dialect IRI is not known.";
+    
+    private static final String DETAIL = "The unknown IRI if specified";
+    
+    public PutDenied() {
+        super(REASON, DETAIL,
+             new QName(TransferConstants.TRANSFER_2011_03_NAMESPACE, SUBCODE));
     }
     
 }
