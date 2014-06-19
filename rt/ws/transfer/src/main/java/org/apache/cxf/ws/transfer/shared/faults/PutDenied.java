@@ -32,7 +32,8 @@ public class PutDenied extends WSTransferFault {
     
     private static final String REASON = "One or more elements or attributes cannot be updated.";
     
-    private static final String DETAIL = "An OPTIONAL list of the QNames of the elements or attributes that are not allowed to be updated.";
+    private static final String DETAIL =
+            "An OPTIONAL list of the QNames of the elements or attributes that are not allowed to be updated.";
     
     public PutDenied() {
         super(REASON, DETAIL,
