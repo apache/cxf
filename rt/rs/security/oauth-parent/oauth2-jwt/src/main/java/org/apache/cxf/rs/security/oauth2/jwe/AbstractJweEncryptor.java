@@ -114,6 +114,7 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         
         byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey(theCek);
         JweCompactProducer producer = new JweCompactProducer(theHeaders, 
+                                             writer,                
                                              jweContentEncryptionKey,
                                              theIv,
                                              cipherText,
