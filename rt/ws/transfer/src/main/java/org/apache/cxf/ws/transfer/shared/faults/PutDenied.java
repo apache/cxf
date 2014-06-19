@@ -28,11 +28,11 @@ import org.apache.cxf.ws.transfer.shared.TransferConstants;
  */
 public class PutDenied extends WSTransferFault {
     
-    private static final String SUBCODE = "UnknownDialect";
+    private static final String SUBCODE = "UpdateDenied";
     
-    private static final String REASON = "The specified Dialect IRI is not known.";
+    private static final String REASON = "One or more elements or attributes cannot be updated.";
     
-    private static final String DETAIL = "The unknown IRI if specified";
+    private static final String DETAIL = "An OPTIONAL list of the QNames of the elements or attributes that are not allowed to be updated.";
     
     public PutDenied() {
         super(REASON, DETAIL,
