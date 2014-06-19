@@ -45,9 +45,10 @@ import org.junit.Before;
 
 public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
 
-    protected EntityManager em;
-    
     private EntityManagerFactory emFactory;
+
+    private EntityManager em;
+
     private Connection connection;
 
     protected abstract SearchConditionParser<Book> getParser();
