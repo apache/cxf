@@ -29,7 +29,6 @@ import javax.persistence.Tuple;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JPATypedQueryVisitorFiqlTest extends AbstractJPATypedQueryVisitorTest {
@@ -57,11 +56,9 @@ public class JPATypedQueryVisitorFiqlTest extends AbstractJPATypedQueryVisitorTe
     
 
     @Test
-    @Ignore
     public void testGetLibraryBook() throws Exception {
         List<Book> books = queryBooks("library.books.bookTitle==num10");
-        assertEquals(1, books.size());
-        assertTrue(10 == books.get(0).getId() && "num10".equals(books.get(0).getBookTitle()));
+        assertEquals(3, books.size());
     }
     
     @Test
