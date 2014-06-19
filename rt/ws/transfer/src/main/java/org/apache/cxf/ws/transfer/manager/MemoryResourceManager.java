@@ -50,7 +50,7 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownResource;
  */
 public class MemoryResourceManager implements ResourceManager {
     
-    public static final String REF_NAMESPACE = "http://www.cxf.apache.org/MemoryResourceManager";
+    public static final String REF_NAMESPACE = "http://cxf.apache.org/rt/ws/transfer/MemoryResourceManager";
     
     public static final String REF_LOCAL_NAME = "UUID";
 
