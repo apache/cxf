@@ -323,7 +323,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     }
     
     private boolean existingCollectionInPostName(ClassValue cv, String postName) {
-        if (postName != null) {
+        if (postName != null && postName.indexOf('.') != -1) {
             final String[] splitName = postName.split("\\.");
             for (String name : splitName) {
                 if (cv.isCollection(name)) {
