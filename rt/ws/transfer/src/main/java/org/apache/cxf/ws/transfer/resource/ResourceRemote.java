@@ -34,7 +34,7 @@ public class ResourceRemote extends ResourceLocal implements ResourceFactory {
 
     @Override
     public CreateResponse create(Create body) {
-        ValidAndTransformHelper.validationAndTransformation(getValidators(), body.getRepresentation());
+        ValidAndTransformHelper.validationAndTransformation(getValidators(), body.getRepresentation(), null);
         ReferenceParametersType refParams = getManager().create(body.getRepresentation());
         CreateResponse response = new CreateResponse();
         response.setResourceCreated(new EndpointReferenceType());

@@ -73,7 +73,7 @@ public class XSLTResourceTransformerTest {
         Representation representation = loadRepresentation(
                 getClass().getResourceAsStream("/xml/xsltresourcetransformer/representation.xml"));
         
-        transformer.transform(representation);
+        transformer.transform(representation, null);
         
         Element representationEl = (Element) representation.getAny();
         Assert.assertEquals("Expected root element with name \"person\".", "person",

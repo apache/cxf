@@ -92,7 +92,8 @@ public class ResourceLocal implements Resource {
         ReferenceParametersType refParams = (ReferenceParametersType) ((WrappedMessageContext) context
                 .getMessageContext()).getWrappedMessage()
                 .getContextualProperty(TransferConstants.REF_PARAMS_CONTEXT_KEY);
-        ValidAndTransformHelper.validationAndTransformation(validators, body.getRepresentation());
+        ValidAndTransformHelper.validationAndTransformation(
+                validators, body.getRepresentation(), manager.get(refParams));
         manager.put(refParams, body.getRepresentation());
         PutResponse response = new PutResponse();
         response.setRepresentation(body.getRepresentation());

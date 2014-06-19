@@ -26,5 +26,5 @@ import org.apache.cxf.ws.transfer.Representation;
  */
 public interface ResourceTransformer {
     
-    void transform(Representation representation);
+    void transform(Representation newRepresentation, Representation oldRepresentation);
 }

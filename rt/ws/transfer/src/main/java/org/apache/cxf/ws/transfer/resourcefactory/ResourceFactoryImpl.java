@@ -46,7 +46,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
     
     @Override
     public CreateResponse create(Create body) {
-        ValidAndTransformHelper.validationAndTransformation(validators, body.getRepresentation());
+        ValidAndTransformHelper.validationAndTransformation(validators, body.getRepresentation(), null);
         ResourceReference resourceReference = resourceResolver.resolve(body);
         if (resourceReference.getResourceManager() != null) {
             return createLocally(body, resourceReference);

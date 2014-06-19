@@ -33,13 +33,16 @@ public final class ValidAndTransformHelper {
         
     }
     
-    public static void validationAndTransformation(List<ResourceValidator> validators, Representation representation) {
+    public static void validationAndTransformation(
+            List<ResourceValidator> validators,
+            Representation newRepresentation,
+            Representation oldRepresentation) {
         if (validators != null && !validators.isEmpty()) {
             for (ResourceValidator validator : validators) {
-                ValidatorResult valResult = validator.validate(representation);
+                ValidatorResult valResult = validator.validate(newRepresentation);
                 if (valResult.isValidate()) {
                     if (valResult.getTransformer() != null) {
-                        valResult.getTransformer().transform(representation);
+                        valResult.getTransformer().transform(newRepresentation, oldRepresentation);
                     }
                     return;
                 }

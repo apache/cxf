@@ -59,12 +59,12 @@ public class XSLTResourceTransformer implements ResourceTransformer {
     }
 
     @Override
-    public void transform(Representation representation) {
+    public void transform(Representation newRepresentation, Representation oldRepresentation) {
         try {
             Document result = documentBuilder.newDocument();
-            transformer.transform(new DOMSource((Node) representation.getAny()),
+            transformer.transform(new DOMSource((Node) newRepresentation.getAny()),
                     new DOMResult((Node) result));
-            representation.setAny(result.getDocumentElement());
+            newRepresentation.setAny(result.getDocumentElement());
         } catch (TransformerException ex) {
             throw new RuntimeException("Error occured during transformation.", ex);
         }

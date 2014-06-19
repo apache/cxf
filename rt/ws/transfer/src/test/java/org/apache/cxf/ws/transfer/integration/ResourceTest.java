@@ -102,6 +102,8 @@ public class ResourceTest extends IntegrationBaseTest {
     @Test
     public void putRequestTest() {
         ResourceManager manager = EasyMock.createMock(ResourceManager.class);
+        EasyMock.expect(manager.get(EasyMock.isA(ReferenceParametersType.class))).andReturn(new Representation());
+        EasyMock.expectLastCall().once();
         manager.put(EasyMock.isA(ReferenceParametersType.class), EasyMock.isA(Representation.class));
         EasyMock.expectLastCall().once();
         EasyMock.replay(manager);
