@@ -28,9 +28,9 @@ import org.apache.cxf.ws.transfer.shared.TransferConstants;
  */
 public class InvalidRepresentation extends WSTransferFault {
     
-    private static final String SUBCODE = "UnknownDialect";
+    private static final String SUBCODE = "InvalidRepresentation";
     
-    private static final String REASON = "The specified Dialect IRI is not known.";
+    private static final String REASON = "The supplied representation is invalid";
     
     public InvalidRepresentation() {
         super(REASON, null,
