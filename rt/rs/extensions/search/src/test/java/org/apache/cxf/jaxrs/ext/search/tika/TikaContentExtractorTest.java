@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.jaxrs.ext.search.tika;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -40,6 +38,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.apache.tika.parser.pdf.PDFParser;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -75,6 +74,8 @@ public class TikaContentExtractorTest extends Assert {
         assertEquals(1, getHits("ct==tika").length);
         assertEquals(1, getHits("ct==incubation").length);
         assertEquals(0, getHits("ct==toolsuite").length);
+        // meta-data
+        assertEquals(1, getHits("Author==Bertrand*").length);
     }
 
     @Test
@@ -99,17 +100,6 @@ public class TikaContentExtractorTest extends Assert {
     @Test
     public void testExtractionFromNullInputStreamFails() {
         assertNull("Document should be null, it is encrypted", extractor.extract((InputStream)null));        
-    }
-
-    @Test
-    public void testExtractionFromNullFileFails() throws FileNotFoundException {
-        assertNull("Document should be null, it is encrypted", extractor.extract((File)null));        
-    }
-    
-    @Test(expected = FileNotFoundException.class)
-    public void testExtractionFromNonExistingFileFails() throws FileNotFoundException {
-        assertNull("Document should be null, it is encrypted", 
-            extractor.extract(new File("a.txt")));        
     }
 
     private ScoreDoc[] getHits(final String expression) throws IOException {
