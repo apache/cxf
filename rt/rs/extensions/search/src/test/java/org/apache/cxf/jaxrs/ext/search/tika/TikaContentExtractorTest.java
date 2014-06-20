@@ -18,7 +18,10 @@
  */
 package org.apache.cxf.jaxrs.ext.search.tika;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
@@ -72,6 +75,41 @@ public class TikaContentExtractorTest extends Assert {
         assertEquals(1, getHits("ct==tika").length);
         assertEquals(1, getHits("ct==incubation").length);
         assertEquals(0, getHits("ct==toolsuite").length);
+    }
+
+    @Test
+    public void testExtractionFromTextFileUsingPdfParserFails() {        
+        assertNull("Document should be null, it is not a PDF", 
+            extractor.extract(getClass().getResourceAsStream("/files/testTXT.txt")));        
+    }
+
+    @Test
+    public void testExtractionFromRtfFileUsingPdfParserWithoutMediaTypeValidationFails() {
+        final TikaContentExtractor another = new TikaContentExtractor(new PDFParser(), false);
+        assertNull("Document should be null, it is not a PDF", 
+            another.extract(getClass().getResourceAsStream("/files/testRTF.rtf")));        
+    }
+
+    @Test
+    public void testExtractionFromEncryptedPdfFails() {
+        assertNull("Document should be null, it is encrypted", 
+            extractor.extract(getClass().getResourceAsStream("/files/testPDF.Encrypted.pdf")));        
+    }
+    
+    @Test
+    public void testExtractionFromNullInputStreamFails() {
+        assertNull("Document should be null, it is encrypted", extractor.extract((InputStream)null));        
+    }
+
+    @Test
+    public void testExtractionFromNullFileFails() throws FileNotFoundException {
+        assertNull("Document should be null, it is encrypted", extractor.extract((File)null));        
+    }
+    
+    @Test(expected = FileNotFoundException.class)
+    public void testExtractionFromNonExistingFileFails() throws FileNotFoundException {
+        assertNull("Document should be null, it is encrypted", 
+            extractor.extract(new File("a.txt")));        
     }
 
     private ScoreDoc[] getHits(final String expression) throws IOException {

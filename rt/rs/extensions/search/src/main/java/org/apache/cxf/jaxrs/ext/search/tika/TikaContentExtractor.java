@@ -27,8 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.xml.sax.SAXException;
-
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
@@ -79,6 +79,10 @@ public class TikaContentExtractor {
      * @return the extracted document or null if extraction is not possible or was unsuccessful
      */
     public Document extract(final InputStream in) {
+        if (in == null) {
+            return null;
+        }
+        
         try {
             final Metadata metadata = new Metadata();            
             final ParseContext context = new ParseContext();
@@ -95,7 +99,11 @@ public class TikaContentExtractor {
             parser.parse(in, handler, metadata, context);
             
             final Document document = new Document();
-            document.add(new Field("contents", handler.toString(), TextField.TYPE_STORED));
+            final String content = handler.toString();
+            
+            if (!StringUtils.isEmpty(content)) {
+                document.add(new Field("contents", content, TextField.TYPE_STORED));
+            }
             
             for (final String property: metadata.names()) {
                 document.add(new StringField(property, metadata.get(property), Store.YES));
@@ -121,8 +129,11 @@ public class TikaContentExtractor {
      * @return the extracted document or null if extraction is not possible or was unsuccessful
      */    
     public Document extract(final File file) throws FileNotFoundException  {
-        InputStream in = null;
+        if (file == null) {
+            return null;
+        }
         
+        InputStream in = null;        
         try {
             in = new FileInputStream(file);
             return extract(in);
