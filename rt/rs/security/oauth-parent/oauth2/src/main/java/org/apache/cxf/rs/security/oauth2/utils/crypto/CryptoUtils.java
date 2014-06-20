@@ -497,9 +497,17 @@ public final class CryptoUtils {
                                             String wrappedKeyAlgo,
                                             Key unwrapperKey,
                                             KeyProperties keyProps)  throws SecurityException {
+        return (SecretKey)unwrapKey(wrappedBytes, wrappedKeyAlgo, unwrapperKey, keyProps, Cipher.SECRET_KEY);    
+    }
+    
+    public static Key unwrapKey(byte[] wrappedBytes,
+                                            String wrappedKeyAlgo,
+                                            Key unwrapperKey,
+                                            KeyProperties keyProps,
+                                            int wrappedKeyType)  throws SecurityException {
         try {
             Cipher c = initCipher(unwrapperKey, keyProps, Cipher.UNWRAP_MODE);
-            return (SecretKey)c.unwrap(wrappedBytes, wrappedKeyAlgo, Cipher.SECRET_KEY);
+            return c.unwrap(wrappedBytes, wrappedKeyAlgo, wrappedKeyType);
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }    
@@ -523,9 +531,12 @@ public final class CryptoUtils {
                 if (blockSize == -1) {
                     blockSize = secretKey instanceof PublicKey ? 117 : 128;
                 }
+                boolean updateRequired = keyProps != null && keyProps.getAdditionalData() != null;
                 int offset = 0;
                 for (; offset + blockSize < bytes.length; offset += blockSize) {
-                    result = addToResult(result, c.doFinal(bytes, offset, blockSize));
+                    byte[] next = !updateRequired ? c.doFinal(bytes, offset, blockSize) 
+                        : c.update(bytes, offset, blockSize);
+                    result = addToResult(result, next);
                 }
                 if (offset < bytes.length) {
                     result = addToResult(result, c.doFinal(bytes, offset, bytes.length - offset));
@@ -574,10 +585,16 @@ public final class CryptoUtils {
     }
     
     private static byte[] addToResult(byte[] prefix, byte[] suffix) {
-        byte[] result = new byte[prefix.length + suffix.length];
-        System.arraycopy(prefix, 0, result, 0, prefix.length);
-        System.arraycopy(suffix, 0, result, prefix.length, suffix.length);
-        return result;
+        if (suffix == null || suffix.length == 0) {
+            return prefix;    
+        } else if (prefix.length == 0) {
+            return suffix;
+        } else {
+            byte[] result = new byte[prefix.length + suffix.length];
+            System.arraycopy(prefix, 0, result, 0, prefix.length);
+            System.arraycopy(suffix, 0, result, prefix.length, suffix.length);
+            return result;
+        }
     }
     
     public static SecretKey decodeSecretKey(String encodedSecretKey) throws SecurityException {
