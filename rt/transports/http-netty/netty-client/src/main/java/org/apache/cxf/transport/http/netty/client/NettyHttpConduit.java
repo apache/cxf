@@ -113,6 +113,9 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         if (o == null) {
             o = factory.getUseAsyncPolicy();
         }
+        if (o instanceof String) {
+            o = NettyHttpConduitFactory.UseAsyncPolicy.valueOf(o.toString().toUpperCase());
+        }
         if (o instanceof NettyHttpConduitFactory.UseAsyncPolicy) {
             switch ((NettyHttpConduitFactory.UseAsyncPolicy)o) {
             case ALWAYS:
