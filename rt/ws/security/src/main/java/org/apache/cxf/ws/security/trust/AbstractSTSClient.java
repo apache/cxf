@@ -36,6 +36,9 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.wsdl.Definition;
+import javax.wsdl.Types;
+import javax.wsdl.extensions.ExtensibilityElement;
+import javax.wsdl.extensions.schema.Schema;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -507,49 +510,69 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                 proxyFac.setAddress(mexLoc);
                 MetadataExchange exc = proxyFac.create(MetadataExchange.class);
                 Metadata metadata = exc.get2004();
+                
+                Definition definition = null;
+                List<Schema> schemas = new ArrayList<Schema>();
+                // Parse the MetadataSections into WSDL definition + associated schemas
                 for (MetadataSection s : metadata.getMetadataSection()) {
                     if ("http://schemas.xmlsoap.org/wsdl/".equals(s.getDialect())) {
-                        //got the wsdl...
-                        Definition definition = bus.getExtension(WSDLManager.class)
-                            .getDefinition((Element)s.getAny());
-                        WSDLServiceFactory factory = new WSDLServiceFactory(bus, definition);
-                        SourceDataBinding dataBinding = new SourceDataBinding();
-                        factory.setDataBinding(dataBinding);
-                        Service service = factory.create();
-                        service.setDataBinding(dataBinding);
-                        
-                        // Get the endpoint + service names by matching the 'location' to the
-                        // address in the WSDL. If the 'location' is 'anonymous' then just fall
-                        // back to the first service + endpoint name in the WSDL, if the endpoint
-                        // name is not defined in the Metadata
-                        List<ServiceInfo> services = service.getServiceInfos();
-                        String anonymousAddress = "http://www.w3.org/2005/08/addressing/anonymous";
-                        
-                        if (!anonymousAddress.equals(location)) {
-                            for (ServiceInfo serv : services) {
-                                for (EndpointInfo ei : serv.getEndpoints()) {
-                                    if (ei.getAddress().equals(location)) {
-                                        endpointName = ei.getName();
-                                        serviceName = serv.getName();
-                                    }
+                        definition = 
+                            bus.getExtension(WSDLManager.class).getDefinition((Element)s.getAny());
+                    } else if ("http://www.w3.org/2001/XMLSchema".equals(s.getDialect())) {
+                        Element schemaElement = (Element)s.getAny();
+                        QName schemaName = 
+                            new QName(schemaElement.getNamespaceURI(), schemaElement.getLocalName());
+                        WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
+                        ExtensibilityElement
+                            exElement = wsdlManager.getExtensionRegistry().createExtension(Types.class, schemaName);
+                        ((Schema)exElement).setElement(schemaElement);
+                        schemas.add((Schema)exElement);
+                    }
+                }
+                
+                if (definition != null) {
+                    // Add any extra schemas to the WSDL definition
+                    for (Schema schema : schemas) {
+                        definition.getTypes().addExtensibilityElement(schema);
+                    }
+                    
+                    WSDLServiceFactory factory = new WSDLServiceFactory(bus, definition);
+                    SourceDataBinding dataBinding = new SourceDataBinding();
+                    factory.setDataBinding(dataBinding);
+                    Service service = factory.create();
+                    service.setDataBinding(dataBinding);
+
+                    // Get the endpoint + service names by matching the 'location' to the
+                    // address in the WSDL. If the 'location' is 'anonymous' then just fall
+                    // back to the first service + endpoint name in the WSDL, if the endpoint
+                    // name is not defined in the Metadata
+                    List<ServiceInfo> services = service.getServiceInfos();
+                    String anonymousAddress = "http://www.w3.org/2005/08/addressing/anonymous";
+
+                    if (!anonymousAddress.equals(location)) {
+                        for (ServiceInfo serv : services) {
+                            for (EndpointInfo ei : serv.getEndpoints()) {
+                                if (ei.getAddress().equals(location)) {
+                                    endpointName = ei.getName();
+                                    serviceName = serv.getName();
                                 }
                             }
                         }
-                        
-                        EndpointInfo ei = service.getEndpointInfo(endpointName);
-                        if (ei == null && anonymousAddress.equals(location)
-                            && !services.isEmpty() && !services.get(0).getEndpoints().isEmpty()) {
-                            serviceName = services.get(0).getName();
-                            endpointName = services.get(0).getEndpoints().iterator().next().getName();
-                            ei = service.getEndpointInfo(endpointName);
-                        }
-                        
-                        if (location != null && !anonymousAddress.equals(location)) {
-                            ei.setAddress(location);
-                        }
-                        Endpoint endpoint = new EndpointImpl(bus, service, ei);
-                        client = new ClientImpl(bus, endpoint);
                     }
+
+                    EndpointInfo ei = service.getEndpointInfo(endpointName);
+                    if (ei == null && anonymousAddress.equals(location)
+                        && !services.isEmpty() && !services.get(0).getEndpoints().isEmpty()) {
+                        serviceName = services.get(0).getName();
+                        endpointName = services.get(0).getEndpoints().iterator().next().getName();
+                        ei = service.getEndpointInfo(endpointName);
+                    }
+
+                    if (location != null && !anonymousAddress.equals(location)) {
+                        ei.setAddress(location);
+                    }
+                    Endpoint endpoint = new EndpointImpl(bus, service, ei);
+                    client = new ClientImpl(bus, endpoint);
                 }
             } catch (Exception ex) {
                 //TODO
