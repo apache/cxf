@@ -37,6 +37,7 @@ import org.apache.cxf.ws.transfer.resource.ResourceRemote;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactoryImpl;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.SimpleResourceResolver;
+import org.apache.cxf.ws.transfer.shared.TransferConstants;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -54,7 +55,8 @@ public class IntegrationBaseTest {
     
     public static final String RESOURCE_REMOTE_ADDRESS = "local://ResourceRemote";
     
-    public static final String RESOURCE_REMOTE_MANAGER_ADDRESS = "local://ResourceRemote_factory";
+    public static final String RESOURCE_REMOTE_MANAGER_ADDRESS = "local://ResourceRemote"
+            + TransferConstants.RESOURCE_REMOTE_SUFFIX;
     
     public static final String RESOURCE_LOCAL_ADDRESS = "local://ResourceLocal";
     
