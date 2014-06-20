@@ -138,6 +138,9 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         if (o == null) {
             o = factory.getUseAsyncPolicy();
         }
+        if (o instanceof String) {
+            o = UseAsyncPolicy.valueOf(o.toString().toUpperCase());
+        }
         if (o instanceof UseAsyncPolicy) {
             switch ((UseAsyncPolicy)o) {
             case ALWAYS:
