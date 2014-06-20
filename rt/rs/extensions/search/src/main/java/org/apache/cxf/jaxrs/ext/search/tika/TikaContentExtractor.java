@@ -119,11 +119,10 @@ public class TikaContentExtractor {
                 }
             }
             
-            final ToTextContentHandler handler = new ToTextContentHandler();
+            final ToTextContentHandler handler = extractContent 
+                ? new ToTextContentHandler() : new IgnoreContentHandler();
             parser.parse(in, handler, metadata, context);
-            // TODO: use a content handler which will ignore parser content events 
-            String content = extractContent ? handler.toString() : ""; 
-            return new TikaContent(content, metadata);
+            return new TikaContent(handler.toString(), metadata);
         } catch (final IOException ex) {
             LOG.log(Level.WARNING, "Unable to extract media type from input stream", ex);
         } catch (final SAXException ex) {
@@ -149,4 +148,20 @@ public class TikaContentExtractor {
         }
     }
     
+    private static class IgnoreContentHandler extends ToTextContentHandler {
+        @Override
+        public void characters(char[] ch, int start, int length) throws SAXException {
+            // Complete
+        }
+        @Override
+        public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+            // Complete
+        }
+        @Override
+        public String toString() {
+            return "";
+        }
+
+
+    }
 }
