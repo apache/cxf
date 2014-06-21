@@ -43,11 +43,6 @@ public class CXFEHCacheReplayCache extends EHCacheReplayCache implements BusLife
     
     @Override
     public void close() {
-        // TODO - this code can be removed when WSS4J is updated to do it as part WSS-503
-        if (cacheManager != null && cache != null) {
-            cacheManager.removeCache(cache.getName());
-        }
-        
         super.close();
         
         if (bus != null) {
