@@ -115,10 +115,10 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             if (isPartialResponse && rmpsOut.getAcks() != null && rmpsOut.getAcks().size() > 0) {
                 setAction(maps, constants.getSequenceAckAction());
                 msg.remove(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE);
+                isAck = true;
             }
         } 
-        if (isAck || constants.getSequenceAckAction().equals(action)
-            || (constants.getTerminateSequenceAction().equals(action)
+        if (isAck || (constants.getTerminateSequenceAction().equals(action)
                 && RM10Constants.NAMESPACE_URI.equals(rmNamespace))) {
             maps.setReplyTo(RMUtils.createNoneReference());
         }

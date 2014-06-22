@@ -439,10 +439,13 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         assertEquals(0, inRecorder.getInboundMessages().size());
 
         // allow resends to kick in
-        // await multiple of 3 resends to avoid shutting down server
-        // in the course of retransmission - this is harmless but pollutes test output
+        // first duplicate received will trigger acknowledgement
+        awaitMessages(1, 1, 3000);
         
-        awaitMessages(3, 0, 7500);
+        mf.reset(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
+        mf.verifyMessages(1, true);
+        mf.verifyMessages(1, false);
+        mf.verifyAcknowledgements(new boolean[] {true}, false);
         
     }
     
@@ -764,17 +767,16 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         greeter.greetMe("one");
         try {
             greeter.greetMe("two");
-            fail("Expected fault.");
+            fail("Expected timeout.");
         } catch (WebServiceException ex) {
-            SoapFault sf = (SoapFault)ex.getCause();
-            assertEquals("Unexpected fault code.", Soap11.getInstance().getReceiver(), sf.getFaultCode());
-            assertNull("Unexpected sub code.", sf.getSubCode());
-            assertTrue("Unexpected reason.", sf.getReason().endsWith("has already been delivered."));
+            assertTrue("Unexpected exception cause", ex.getCause() instanceof IOException);
+            IOException ie = (IOException)ex.getCause();
+            assertTrue("Unexpected IOException message", ie.getMessage().startsWith("Timed out"));
         }
         
         // wait for resend to occur 
         
-        awaitMessages(3, 3, 5000);
+        awaitMessages(4, 3, 5000);
          
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -782,30 +784,30 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // Expected outbound:
         // CreateSequence 
         // + two requests
+        // + acknowledgement
        
-        String[] expectedActions = new String[3];
+        String[] expectedActions = new String[4];
         expectedActions[0] = RM10Constants.CREATE_SEQUENCE_ACTION;        
-        for (int i = 1; i < expectedActions.length; i++) {
-            expectedActions[i] = GREETME_ACTION;
-        }
+        expectedActions[1] = GREETME_ACTION;
+        expectedActions[2] = GREETME_ACTION;
+        expectedActions[3] = RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION;
         mf.verifyActions(expectedActions, true);
-        mf.verifyMessageNumbers(new String[] {null, "1", "1"}, true);
-        mf.verifyLastMessage(new boolean[3], true);
-        mf.verifyAcknowledgements(new boolean[3], true);
+        mf.verifyMessageNumbers(new String[] {null, "1", "1", null}, true);
+        mf.verifyLastMessage(new boolean[expectedActions.length], true);
+        mf.verifyAcknowledgements(new boolean[] {false, false, false, true}, true);
  
         // Expected inbound:
         // createSequenceResponse
         // + 1 response without acknowledgement
-        // + 1 fault
+        // + 1 acknowledgement/last message
         
         mf.verifyMessages(3, false);
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
                                         GREETME_RESPONSE_ACTION, 
-                                        RM10_GENERIC_FAULT_ACTION};
+                                        RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION};
         mf.verifyActions(expectedActions, false);
         mf.verifyMessageNumbers(new String[] {null, "1", null}, false);
-        mf.verifyAcknowledgements(new boolean[3] , false);
-        
+        mf.verifyAcknowledgements(new boolean[] {false, false, true}, false);
     }
     
     @Test

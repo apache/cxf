@@ -59,6 +59,7 @@ public class DestinationSequence extends AbstractSequence {
     private String correlationID;
     private volatile long inProcessNumber;
     private volatile long highNumberCompleted;
+    private long nextInOrder;
     private List<Continuation> continuations = new LinkedList<Continuation>();
     private Set<Long> deliveringMessageNumbers = new HashSet<Long>();
     
@@ -223,23 +224,21 @@ public class DestinationSequence extends AbstractSequence {
     }
     
     /**
-     * Ensures that the delivery assurance is honored, e.g. by throwing an 
-     * exception if the message had already been delivered and the delivery
-     * assurance is AtMostOnce.
+     * Ensures that the delivery assurance is honored.
      * If the delivery assurance includes either AtLeastOnce or ExactlyOnce, combined with InOrder, this
      * queues out-of-order messages for processing after the missing messages have been received.
      * 
      * @param mn message number
      * @return <code>true</code> if message processing to continue, <code>false</code> if to be dropped
-     * @throws RMException if message had already been acknowledged
      */
-    boolean applyDeliveryAssurance(long mn, Message message) throws RMException {
+    boolean applyDeliveryAssurance(long mn, Message message) {
         Continuation cont = getContinuation(message);
         RMConfiguration config = destination.getReliableEndpoint().getConfiguration();
         DeliveryAssurance da = config.getDeliveryAssurance();
         boolean canSkip = da != DeliveryAssurance.AT_LEAST_ONCE && da != DeliveryAssurance.EXACTLY_ONCE;
         boolean robust = false;
         boolean robustDelivering = false;
+        boolean inOrder = mn - nextInOrder == 1;
         if (message != null) {
             robust = MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
             if (robust) {
@@ -250,22 +249,30 @@ public class DestinationSequence extends AbstractSequence {
         if (robust && !robustDelivering) {
             // no check performed if in robust and not in delivering
             removeDeliveringMessageNumber(mn);
+            if (inOrder) {
+                nextInOrder++;
+            }
             return true;
+        }
+        if (inOrder) {
+            nextInOrder++;
+        } else {
+            
+            // message out of order, schedule acknowledgement to update sender
+            scheduleImmediateAcknowledgement();
+            if (nextInOrder < mn) {
+                nextInOrder = mn + 1;
+            }
         }
         if (cont != null && config.isInOrder() && !cont.isNew()) {
             return waitInQueue(mn, canSkip, message, cont);
         }
         if ((da == DeliveryAssurance.EXACTLY_ONCE || da == DeliveryAssurance.AT_MOST_ONCE) 
-            && (isAcknowledged(mn) 
-                || (robustDelivering && deliveringMessageNumbers.contains(mn)))) {            
-            
-            // acknowledge at first opportunity following duplicate message
-            scheduleImmediateAcknowledgement();
+            && (isAcknowledged(mn) || (robustDelivering && deliveringMessageNumbers.contains(mn)))) {
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                 "MESSAGE_ALREADY_DELIVERED_EXC", LOG, mn, getIdentifier().getValue());
             LOG.log(Level.INFO, msg.toString());
-            throw new RMException(msg);
-            
+            return false;
         } 
         if (robustDelivering) {
             deliveringMessageNumbers.add(mn);

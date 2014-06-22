@@ -484,13 +484,7 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(r.getLower()).andReturn(new Long(5));
         EasyMock.expect(r.getUpper()).andReturn(new Long(15));
         control.replay();     
-        try {
-            ds.applyDeliveryAssurance(mn, null);
-            fail("Expected Fault not thrown.");
-        } catch (RMException ex) {
-            assertEquals("MESSAGE_ALREADY_DELIVERED_EXC", ex.getCode());
-        }
-          
+        ds.applyDeliveryAssurance(mn, null);
         control.verify();
 
     }

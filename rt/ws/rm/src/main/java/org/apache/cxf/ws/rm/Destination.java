@@ -126,16 +126,24 @@ public class Destination extends AbstractEndpoint {
             } else {
                 try {
                     message.getInterceptorChain().abort();
-                    Conduit conduit = message.getExchange().getDestination()
-                        .getBackChannel(message);
+                    if (seq.sendAcknowledgement()) {
+                        ackImmediately(seq, message);
+                    }
+                    Exchange exchange = message.getExchange();
+                    Conduit conduit = exchange.getDestination().getBackChannel(message);
                     if (conduit != null) {
                         //for a one-way, the back channel could be
                         //null if it knows it cannot send anything.
-                        Message partial = createMessage(message.getExchange());
-                        partial.remove(Message.CONTENT_TYPE);
-                        partial.setExchange(message.getExchange());
-                        conduit.prepare(partial);
-                        conduit.close(partial);
+                        if (seq.sendAcknowledgement()) {
+                            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
+                            InternalContextUtils.rebaseResponse(null, maps, message);
+                        } else {
+                            Message response = createMessage(exchange);
+                            response.setExchange(exchange);
+                            response.remove(Message.CONTENT_TYPE);
+                            conduit.prepare(response);
+                            conduit.close(response);
+                        }
                     }
                 } catch (IOException e) {
                     LOG.log(Level.SEVERE, e.getMessage());

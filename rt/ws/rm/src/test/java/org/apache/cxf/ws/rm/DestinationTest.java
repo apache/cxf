@@ -19,8 +19,10 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.rm.persistence.RMStore;
@@ -96,7 +98,7 @@ public class DestinationTest extends Assert {
     }
     
     @Test
-    public void testAcknowledgeNoSequence() throws SequenceFault, RMException {
+    public void testAcknowledgeNoSequence() throws SequenceFault, RMException, IOException {
         Message message = setupMessage();
         RMProperties rmps = control.createMock(RMProperties.class);
         EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);
@@ -106,7 +108,7 @@ public class DestinationTest extends Assert {
     }
     
     @Test
-    public void testAcknowledgeUnknownSequence() throws RMException {
+    public void testAcknowledgeUnknownSequence() throws RMException, IOException {
         Message message = setupMessage();
         RMProperties rmps = control.createMock(RMProperties.class);
         EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);
@@ -129,7 +131,7 @@ public class DestinationTest extends Assert {
     
     @Test
     public void testAcknowledgeAlreadyAcknowledgedMessage() throws SequenceFault, RMException, 
-    NoSuchMethodException {
+    NoSuchMethodException, IOException {
         
         Method m1 = Destination.class.getDeclaredMethod("getSequence", new Class[] {Identifier.class});
         destination = EasyMock.createMockBuilder(Destination.class)
@@ -145,17 +147,12 @@ public class DestinationTest extends Assert {
         EasyMock.expect(destination.getSequence(id)).andReturn(ds);
         long nr = 10;
         EasyMock.expect(st.getMessageNumber()).andReturn(nr);  
-        RMException ex = new RMException(new RuntimeException("already acknowledged"));
         ds.applyDeliveryAssurance(nr, message);
-        EasyMock.expectLastCall().andThrow(ex);
+        EasyMock.expectLastCall().andReturn(false);
+        InterceptorChain ic = control.createMock(InterceptorChain.class);
+        EasyMock.expect(message.getInterceptorChain()).andReturn(ic);
         control.replay();
-        try {
-            destination.acknowledge(message); 
-            fail("Expected RMEcception not thrown.");
-        } catch (RMException e) {
-            assertSame(ex, e);
-        }
-        
+        destination.acknowledge(message); 
     }
     
 /*    @Test
@@ -218,12 +215,15 @@ public class DestinationTest extends Assert {
         destination.acknowledge(message);   
     }   */
     
-    private Message setupMessage() {
+    private Message setupMessage() throws IOException {
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(exchange.getOutMessage()).andReturn(null);
-        EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null);
+        org.apache.cxf.transport.Destination tdest = control.createMock(org.apache.cxf.transport.Destination.class);
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        EasyMock.expect(exchange.getOutMessage()).andReturn(null).anyTimes();
+        EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null).anyTimes();
+        EasyMock.expect(exchange.getDestination()).andReturn(tdest).anyTimes();
+        EasyMock.expect(tdest.getBackChannel(message)).andReturn(null).anyTimes();
         return message;
     }
 }
