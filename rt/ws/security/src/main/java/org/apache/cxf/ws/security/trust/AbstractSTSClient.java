@@ -568,6 +568,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                         endpointName = services.get(0).getEndpoints().iterator().next().getName();
                         ei = service.getEndpointInfo(endpointName);
                     }
+                    
+                    if (ei == null) {
+                        throw new TrustException(LOG, "ADDRESS_NOT_MATCHED", location);
+                    }
 
                     if (location != null && !anonymousAddress.equals(location)) {
                         ei.setAddress(location);
@@ -576,8 +580,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                     client = new ClientImpl(bus, endpoint);
                 }
             } catch (Exception ex) {
-                //TODO
-                ex.printStackTrace();
+                throw new TrustException(LOG, "WS_MEX_ERROR", ex);
             }
         }
     }
