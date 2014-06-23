@@ -491,6 +491,8 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         if (location != null) {
             location = location.trim();
         }
+        LOG.fine("EPR address: " + location);
+        
         final QName sName = EndpointReferenceUtils.getServiceName(ref, bus);
         if (sName != null) {
             serviceName = sName;
@@ -498,12 +500,15 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             if (epName != null) {
                 endpointName = epName;
             }
+            LOG.fine("EPR endpoint: " + serviceName + " " + endpointName);
         }
         final String wsdlLoc = EndpointReferenceUtils.getWSDLLocation(ref);
         if (wsdlLoc != null) {
             wsdlLocation = wsdlLoc;
         }
+        
         String mexLoc = findMEXLocation(ref, useEPRWSAAddrAsMEXLocation);
+        LOG.fine("WS-MEX location: " + mexLoc);
         if (mexLoc != null) {
             try {
                 JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
@@ -556,6 +561,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                                 if (ei.getAddress().equals(location)) {
                                     endpointName = ei.getName();
                                     serviceName = serv.getName();
+                                    LOG.fine("Matched endpoint to location");
                                 }
                             }
                         }
@@ -564,6 +570,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                     EndpointInfo ei = service.getEndpointInfo(endpointName);
                     if (ei == null && anonymousAddress.equals(location)
                         && !services.isEmpty() && !services.get(0).getEndpoints().isEmpty()) {
+                        LOG.fine("Anonymous location so taking first endpoint");
                         serviceName = services.get(0).getName();
                         endpointName = services.get(0).getEndpoints().iterator().next().getName();
                         ei = service.getEndpointInfo(endpointName);
@@ -658,7 +665,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         for (BindingOperationInfo boi : bi.getOperations()) {
             SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
             String soapAction = soi != null ? soi.getAction() : null;
-            Object o  = boi.getOperationInfo().getInput()
+            Object o = boi.getOperationInfo().getInput()
                     .getExtensionAttribute(new QName("http://www.w3.org/2007/05/addressing/metadata",
                                                      "Action"));
             if (o instanceof QName) {
