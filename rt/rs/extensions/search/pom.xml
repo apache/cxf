@@ -76,6 +76,69 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+           <groupId>org.apache.hbase</groupId>
+           <artifactId>hbase-client</artifactId>
+           <version>0.98.3-hadoop2</version>
+           <optional>true</optional>
+           <scope>provided</scope>
+           <exclusions>
+                <exclusion>
+            	   <groupId>io.netty</groupId>
+            	   <artifactId>netty</artifactId>            	
+            	</exclusion>
+                <exclusion>
+            	   <groupId>com.sun.jersey</groupId>
+            	   <artifactId>jersey-server</artifactId>            	
+            	</exclusion>
+                <exclusion>
+            	   <groupId>com.sun.jersey</groupId>
+            	   <artifactId>jersey-core</artifactId>            	
+            	</exclusion>
+                <exclusion>
+            	   <groupId>com.sun.jersey</groupId>
+            	   <artifactId>jersey-json</artifactId>            	
+            	</exclusion>
+                <exclusion>
+            	   <groupId>com.sun.jersey.contribs</groupId>
+            	   <artifactId>jersey-guice</artifactId>            	
+            	</exclusion>
+                <exclusion>
+            	   <groupId>com.google.inject</groupId>
+            	   <artifactId>guice</artifactId>            	
+            	</exclusion>
+                <exclusion>
+            	   <groupId>com.google.inject.extensions</groupId>
+            	   <artifactId>guice-servlet</artifactId>            	
+            	</exclusion>    
+                <exclusion>
+            	   <groupId>org.mortbay.jetty</groupId>
+            	   <artifactId>jetty</artifactId>            	
+            	</exclusion>
+                <exclusion>
+            	   <groupId>org.mortbay.jetty</groupId>
+            	   <artifactId>jetty-util</artifactId>            	
+            	</exclusion>
+                <exclusion>
+            	   <groupId>commons-httpclient</groupId>
+            	   <artifactId>commons-httpclient</artifactId>            	
+            	</exclusion>
+                <!--
+                <exclusion>
+            	   <groupId>org.codehaus.jackson</groupId>
+            	   <artifactId>jackson-mapper-asl</artifactId>            	
+            	</exclusion>
+                --> 
+           </exclusions>
+        </dependency>
+<!--
+        <dependency>
+           <groupId>io.netty</groupId>
+           <artifactId>netty</artifactId>
+           <version>3.9.1.Final</version>
+           <scope>test</scope>
+        </dependency> 
+-->
+        <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
             <scope>test</scope>
