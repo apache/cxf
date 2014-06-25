@@ -65,6 +65,10 @@ public final class PropertiesLoaderUtils {
                                                Logger logger, Level level, String msg)
         throws IOException {
         Properties properties = new Properties();
+        //set default class loader if neccessary
+        if (classLoader == null) {
+            classLoader = PropertiesLoaderUtils.class.getClassLoader();
+        }
         Enumeration<URL> urls = classLoader.getResources(resourceName);
 
         while (urls.hasMoreElements()) {
