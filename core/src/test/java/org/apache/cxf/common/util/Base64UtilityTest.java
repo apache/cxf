@@ -41,7 +41,7 @@ public class Base64UtilityTest extends Assert {
     }
     
     @Test
-    public void testEncodeMulltipleChunks() throws Exception {
+    public void testEncodeMultipleChunks() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         byte[] bytes = text.getBytes("UTF-8");
         // multiple of 3 octets
