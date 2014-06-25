@@ -232,7 +232,7 @@ public final class Base64Utility {
         // If not a multiple of 3 octets then a final padded 4 char
         // slot is needed.
         //
-        if ((l - o) % 3 == 0) {
+        if (l % 3 == 0) {
             out = new char[l / 3 * 4];
         } else {
             out = new char[l / 3 * 4 + 4];
@@ -240,7 +240,7 @@ public final class Base64Utility {
 
         int rindex = o;
         int windex = 0;
-        int rest = l - o;
+        int rest = l;
 
         while (rest >= 3) {
             int i = ((id[rindex] & 0xff) << 16)
