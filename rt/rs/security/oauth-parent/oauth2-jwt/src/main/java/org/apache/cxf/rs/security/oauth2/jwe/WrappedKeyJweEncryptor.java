@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.jwe;
 
 import java.security.Key;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
@@ -28,6 +29,7 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 public class WrappedKeyJweEncryptor extends AbstractJweEncryptor {
     private Key cekEncryptionKey;
     private boolean wrap;
+    private AtomicInteger providedCekUsageCount;
     public WrappedKeyJweEncryptor(JweHeaders headers, Key cekEncryptionKey) {
         this(headers, cekEncryptionKey, null, null);
     }
@@ -44,6 +46,9 @@ public class WrappedKeyJweEncryptor extends AbstractJweEncryptor {
         super(headers, cek, iv, authTagLen, writer);
         this.cekEncryptionKey = cekEncryptionKey;
         this.wrap = wrap;
+        if (cek != null) {
+            providedCekUsageCount = new AtomicInteger();
+        }
     }
     protected byte[] getContentEncryptionKey() {
         byte[] theCek = super.getContentEncryptionKey();
@@ -52,6 +57,8 @@ public class WrappedKeyJweEncryptor extends AbstractJweEncryptor {
             String algoJwt = getContentEncryptionAlgoJwt();
             theCek = CryptoUtils.getSecretKey(Algorithm.stripAlgoProperties(algoJava), 
                 Algorithm.valueOf(algoJwt).getKeySizeBits()).getEncoded();
+        } else if (providedCekUsageCount.addAndGet(1) > 1) {
+            throw new SecurityException();
         }
         return theCek;
     }

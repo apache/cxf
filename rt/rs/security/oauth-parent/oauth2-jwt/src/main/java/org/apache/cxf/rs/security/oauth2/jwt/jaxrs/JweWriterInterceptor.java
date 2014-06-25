@@ -37,7 +37,9 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptor;
+import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptorWorkerState;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
+import org.apache.cxf.rs.security.oauth2.jwe.JweOutputStream;
 import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryptor;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
@@ -49,15 +51,13 @@ public class JweWriterInterceptor implements WriterInterceptor {
     private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
     private JweEncryptor encryptor;
     private boolean contentTypeRequired = true;
-    
+    private boolean useJweOutputStream;
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         OutputStream actualOs = ctx.getOutputStream();
-        CachedOutputStream cos = new CachedOutputStream(); 
-        ctx.setOutputStream(cos);
-        ctx.proceed();
         
         JweEncryptor theEncryptor = getInitializedEncryptor();
+        
         String ctString = null;
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
@@ -65,9 +65,22 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 ctString = JAXRSUtils.mediaTypeToString(mt);
             }
         }
-        String jweContent = theEncryptor.encrypt(cos.getBytes(), ctString);
-        IOUtils.copy(new ByteArrayInputStream(jweContent.getBytes("UTF-8")), actualOs);
-        actualOs.flush();
+        
+        
+        if (useJweOutputStream) {
+            JweEncryptorWorkerState state = theEncryptor.newWorkerState(ctString);
+            JweOutputStream jweStream = new JweOutputStream(actualOs, state); 
+            ctx.setOutputStream(jweStream);
+            ctx.proceed();
+            jweStream.flush();
+        } else {
+            CachedOutputStream cos = new CachedOutputStream(); 
+            ctx.setOutputStream(cos);
+            ctx.proceed();
+            String jweContent = theEncryptor.encrypt(cos.getBytes(), ctString);
+            IOUtils.copy(new ByteArrayInputStream(jweContent.getBytes("UTF-8")), actualOs);
+            actualOs.flush();
+        }
     }
     
     protected JweEncryptor getInitializedEncryptor() {
@@ -96,6 +109,10 @@ public class JweWriterInterceptor implements WriterInterceptor {
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
+    }
+
+    public void setUseJweOutputStream(boolean useJweOutputStream) {
+        this.useJweOutputStream = useJweOutputStream;
     }
     
 }
