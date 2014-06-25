@@ -68,6 +68,11 @@ public class WSDLAddressRewriteTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testWithEquivalentAddress() throws Exception {
+        String version = System.getProperty("java.version");
+        if (version.startsWith("1.8")) {
+            // Just skip the test as "127.0.0.1" doesn't work in JDK8
+            return;
+        }
         Endpoint endpoint = null;
         try {
             endpoint = publishEndpoint(false);
