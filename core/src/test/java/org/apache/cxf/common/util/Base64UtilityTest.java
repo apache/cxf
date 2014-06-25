@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 
 import org.apache.cxf.helpers.IOUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,6 +38,26 @@ public class Base64UtilityTest extends Assert {
         for (int x = 0; x < b1.length; x++) {
             assertEquals(b1[x], b2[x]);
         }
+    }
+    
+    @Test
+    public void testEncodeMultipleChunks() throws Exception {
+        final String text = "The true sign of intelligence is not knowledge but imagination.";
+        byte[] bytes = text.getBytes("UTF-8");
+        // multiple of 3 octets
+        assertEquals(63, bytes.length);
+        String s1 = new String(Base64Utility.encodeChunk(bytes, 0, bytes.length));
+        
+        StringBuilder sb = new StringBuilder();
+        int off = 0;
+        for (; off + 21 < bytes.length; off += 21) {
+            sb.append(Base64Utility.encodeChunk(bytes, off, 21));
+        }
+        if (off < bytes.length) {
+            sb.append(Base64Utility.encodeChunk(bytes, off, bytes.length - off));
+        }
+        String s2 = sb.toString();
+        assertEquals(s1, s2);
     }
     
     @Test

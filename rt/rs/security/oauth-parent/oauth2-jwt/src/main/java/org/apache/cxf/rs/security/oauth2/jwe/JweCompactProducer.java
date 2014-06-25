@@ -25,9 +25,7 @@ import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 
 public class JweCompactProducer {
-    private String encodedHeaders;
-    private String encodedContentEncryptionKey;
-    private String encodedInitVector;
+    private StringBuilder jweContentBuilder;
     private String encodedEncryptedContent;
     private String encodedAuthTag;
     public JweCompactProducer(JweHeaders headers,
@@ -44,10 +42,12 @@ public class JweCompactProducer {
                        byte[] encryptedContentEncryptionKey,
                        byte[] cipherInitVector,
                        byte[] encryptedContentNoTag,
-                       byte[] authenticationTag) {    
+                       byte[] authenticationTag) {
+        jweContentBuilder = startJweContent(new StringBuilder(), headers, writer, 
+                                   encryptedContentEncryptionKey, cipherInitVector);
         this.encodedEncryptedContent = Base64UrlUtility.encode(encryptedContentNoTag);
         this.encodedAuthTag = Base64UrlUtility.encode(authenticationTag);
-        finalizeInit(headers, writer, encryptedContentEncryptionKey, cipherInitVector);
+        
     }
     
     public JweCompactProducer(JweHeaders headers,
@@ -63,7 +63,9 @@ public class JweCompactProducer {
                        byte[] encryptedContentEncryptionKey,
                        byte[] cipherInitVector,
                        byte[] encryptedContentWithTag,
-                       int authTagLengthBits) {    
+                       int authTagLengthBits) {
+        jweContentBuilder = startJweContent(new StringBuilder(), headers, writer,
+                                   encryptedContentEncryptionKey, cipherInitVector);
         this.encodedEncryptedContent = Base64UrlUtility.encodeChunk(
             encryptedContentWithTag, 
             0, 
@@ -71,29 +73,36 @@ public class JweCompactProducer {
         this.encodedAuthTag = Base64UrlUtility.encodeChunk(
             encryptedContentWithTag, 
             encryptedContentWithTag.length - authTagLengthBits / 8, 
-            encryptedContentWithTag.length);
-        finalizeInit(headers, writer, encryptedContentEncryptionKey, cipherInitVector);
+            authTagLengthBits / 8);
+        
     }
-    
-    private void finalizeInit(JweHeaders headers,
-                              JwtHeadersWriter writer, 
-                              byte[] encryptedContentEncryptionKey,
-                              byte[] cipherInitVector) {
+    public static String startJweContent(JweHeaders headers,
+                                                JwtHeadersWriter writer, 
+                                                byte[] encryptedContentEncryptionKey,
+                                                byte[] cipherInitVector) {
+        return startJweContent(new StringBuilder(), 
+                               headers, writer, encryptedContentEncryptionKey, cipherInitVector).toString();       
+    }
+    public static StringBuilder startJweContent(StringBuilder sb,
+                                        JweHeaders headers,
+                                        JwtHeadersWriter writer, 
+                                        byte[] encryptedContentEncryptionKey,
+                                        byte[] cipherInitVector) {
         writer = writer == null ? new JwtTokenReaderWriter() : writer;
-        this.encodedHeaders = Base64UrlUtility.encode(writer.headersToJson(headers));
-        this.encodedContentEncryptionKey = Base64UrlUtility.encode(encryptedContentEncryptionKey);
-        this.encodedInitVector = Base64UrlUtility.encode(cipherInitVector);
+        String encodedHeaders = Base64UrlUtility.encode(writer.headersToJson(headers));
+        String encodedContentEncryptionKey = Base64UrlUtility.encode(encryptedContentEncryptionKey);
+        String encodedInitVector = Base64UrlUtility.encode(cipherInitVector);
+        sb.append(encodedHeaders)
+            .append('.')
+            .append(encodedContentEncryptionKey == null ? "" : encodedContentEncryptionKey)
+            .append('.')
+            .append(encodedInitVector == null ? "" : encodedInitVector)
+            .append('.');
+        return sb;
     }
     
     public String getJweContent() {
-        StringBuilder sb = new StringBuilder();
-        return sb.append(encodedHeaders)
-                 .append('.')
-                 .append(encodedContentEncryptionKey == null ? "" : encodedContentEncryptionKey)
-                 .append('.')
-                 .append(encodedInitVector == null ? "" : encodedInitVector)
-                 .append('.')
-                 .append(encodedEncryptedContent)
+        return jweContentBuilder.append(encodedEncryptedContent)
                  .append('.')
                  .append(encodedAuthTag)
                  .toString();

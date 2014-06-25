@@ -82,7 +82,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
         List<Object> providers = new LinkedList<Object>();
-        providers.add(new JweWriterInterceptor());
+        JweWriterInterceptor jweWriter = new JweWriterInterceptor();
+        jweWriter.setUseJweOutputStream(true);
+        providers.add(jweWriter);
         providers.add(new JweClientResponseFilter());
         providers.add(new JwsWriterInterceptor());
         providers.add(new JwsClientResponseFilter());

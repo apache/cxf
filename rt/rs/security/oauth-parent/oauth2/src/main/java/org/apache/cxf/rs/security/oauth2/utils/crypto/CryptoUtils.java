@@ -474,7 +474,7 @@ public final class CryptoUtils {
                              new KeyProperties(wrapperKeyAlgo));
     }
     
-    public static byte[] wrapSecretKey(SecretKey secretKey,
+    public static byte[] wrapSecretKey(Key secretKey,
                                        Key wrapperKey,
                                        KeyProperties keyProps)  throws SecurityException {
         try {
@@ -533,13 +533,15 @@ public final class CryptoUtils {
                 }
                 boolean updateRequired = keyProps != null && keyProps.getAdditionalData() != null;
                 int offset = 0;
-                for (; offset + blockSize < bytes.length; offset += blockSize) {
+                for (; offset + blockSize <= bytes.length; offset += blockSize) {
                     byte[] next = !updateRequired ? c.doFinal(bytes, offset, blockSize) 
                         : c.update(bytes, offset, blockSize);
                     result = addToResult(result, next);
                 }
                 if (offset < bytes.length) {
                     result = addToResult(result, c.doFinal(bytes, offset, bytes.length - offset));
+                } else {
+                    result = addToResult(result, c.doFinal());
                 }
             }
             if (compressionSupported && mode == Cipher.DECRYPT_MODE) {

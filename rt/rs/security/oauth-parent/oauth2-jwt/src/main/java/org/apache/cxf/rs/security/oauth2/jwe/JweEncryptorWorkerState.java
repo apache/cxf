@@ -18,8 +18,26 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import javax.crypto.Cipher;
 
-public interface JweEncryptor {
-    String encrypt(byte[] jweContent, String contentType);
-    JweEncryptorWorkerState newWorkerState(String contentType);
+public class JweEncryptorWorkerState {
+    private String jweContentStart;
+    private Cipher encryptingCipher;
+    private int authTagLengthBits;
+    
+    public JweEncryptorWorkerState(String jweContentStart, Cipher encryptingCipher, int authTagLengthBits) {
+        this.jweContentStart = jweContentStart;
+        this.encryptingCipher = encryptingCipher;
+        this.authTagLengthBits = authTagLengthBits;
+    }
+    public Cipher getEncryptingCipher() {
+        return encryptingCipher;
+    }
+    public int getAuthTagLengthBits() {
+        return authTagLengthBits;
+    }
+    public String getJweContentStart() {
+        return jweContentStart;
+    }
+    
 }

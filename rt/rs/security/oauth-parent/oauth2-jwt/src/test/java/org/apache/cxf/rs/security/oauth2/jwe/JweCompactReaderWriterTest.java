@@ -73,7 +73,7 @@ public class JweCompactReaderWriterTest extends Assert {
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
         Security.removeProvider(BouncyCastleProvider.class.getName());    
     }
-    
+        
     @Test
     public void testEncryptDecryptSpecExample() throws Exception {
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
@@ -110,11 +110,11 @@ public class JweCompactReaderWriterTest extends Assert {
                                                         key, 
                                                         jwtKeyName, 
                                                         INIT_VECTOR);
-        return encryptor.encryptText(content, null);
+        return encryptor.encrypt(content.getBytes("UTF-8"), null);
     }
     private String encryptContentDirect(SecretKey key, String content) throws Exception {
         DirectKeyJweEncryptor encryptor = new DirectKeyJweEncryptor(key, INIT_VECTOR);
-        return encryptor.encryptText(content, null);
+        return encryptor.encrypt(content.getBytes("UTF-8"), null);
     }
     private void decrypt(String jweContent, String plainContent, boolean unwrap) throws Exception {
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);

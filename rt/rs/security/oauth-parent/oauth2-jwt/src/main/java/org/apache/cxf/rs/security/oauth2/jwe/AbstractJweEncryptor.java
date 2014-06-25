@@ -18,9 +18,10 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.io.UnsupportedEncodingException;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
@@ -36,6 +37,7 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
     private JwtHeadersWriter writer = new JwtTokenReaderWriter();
     private byte[] cek;
     private byte[] iv;
+    private AtomicInteger providedIvUsageCount;
     private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
     
     protected AbstractJweEncryptor(SecretKey cek, byte[] iv) {
@@ -47,6 +49,9 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         this.headers = headers;
         this.cek = cek;
         this.iv = iv;
+        if (iv != null && iv.length > 0) {
+            providedIvUsageCount = new AtomicInteger();
+        }
     }
     protected AbstractJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
         this(headers, cek, iv);
@@ -68,7 +73,13 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
     }
     
     protected byte[] getContentEncryptionCipherInitVector() {
-        return iv == null ? CryptoUtils.generateSecureRandomBytes(DEFAULT_IV_SIZE) : iv;
+        if (iv == null) {
+            return CryptoUtils.generateSecureRandomBytes(DEFAULT_IV_SIZE);
+        } else if (iv.length > 0 && providedIvUsageCount.addAndGet(1) > 1) {
+            throw new SecurityException();
+        } else {
+            return iv;
+        }
     }
     
     protected byte[] getContentEncryptionKey() {
@@ -91,6 +102,35 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         return headers;
     }
     public String encrypt(byte[] content, String contentType) {
+        JweEncryptorInternalState state = getInternalState(contentType);
+        
+        byte[] cipherText = CryptoUtils.encryptBytes(
+            content, 
+            state.secretKey,
+            state.keyProps);
+        
+        
+        JweCompactProducer producer = new JweCompactProducer(state.theHeaders, 
+                                             writer,                
+                                             state.jweContentEncryptionKey,
+                                             state.theIv,
+                                             cipherText,
+                                             getAuthTagLen());
+        return producer.getJweContent();
+    }
+    
+    public JweEncryptorWorkerState newWorkerState(String contentType) {
+        JweEncryptorInternalState state = getInternalState(contentType);
+        String jweStart = JweCompactProducer.startJweContent(state.theHeaders, 
+                                           writer, 
+                                           state.jweContentEncryptionKey, 
+                                           state.theIv);
+        Cipher c = CryptoUtils.initCipher(state.secretKey, state.keyProps, 
+                                          Cipher.ENCRYPT_MODE);
+        return new JweEncryptorWorkerState(jweStart, c, getAuthTagLen());
+    }
+    
+    private JweEncryptorInternalState getInternalState(String contentType) {
         JweHeaders theHeaders = headers;
         if (contentType != null) {
             theHeaders = new JweHeaders(theHeaders.asMap());
@@ -106,29 +146,22 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         byte[] theIv = getContentEncryptionCipherInitVector();
         AlgorithmParameterSpec specParams = getContentEncryptionCipherSpec(theIv);
         keyProps.setAlgoSpec(specParams);
-        
-        byte[] cipherText = CryptoUtils.encryptBytes(
-            content, 
-            CryptoUtils.createSecretKeySpec(theCek, contentEncryptionAlgoJavaName),
-            keyProps);
-        
         byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey(theCek);
-        JweCompactProducer producer = new JweCompactProducer(theHeaders, 
-                                             writer,                
-                                             jweContentEncryptionKey,
-                                             theIv,
-                                             cipherText,
-                                             getAuthTagLen());
-        return producer.getJweContent();
+        JweEncryptorInternalState state = new JweEncryptorInternalState();
+        state.theHeaders = theHeaders;
+        state.jweContentEncryptionKey = jweContentEncryptionKey;
+        state.keyProps = keyProps;
+        state.secretKey = CryptoUtils.createSecretKeySpec(theCek, 
+                                        contentEncryptionAlgoJavaName);
+        state.theIv = theIv;
+        return state;
     }
     
-    public String encryptText(String text, String contentType) {
-        try {
-            return encrypt(text.getBytes("UTF-8"), contentType);
-        } catch (UnsupportedEncodingException ex) {
-            throw new SecurityException(ex);
-        }
+    private static class JweEncryptorInternalState {
+        JweHeaders theHeaders;
+        byte[] jweContentEncryptionKey;
+        byte[] theIv;
+        KeyProperties keyProps;
+        SecretKey secretKey;
     }
-    
-    
 }
