@@ -533,7 +533,7 @@ public final class CryptoUtils {
                 }
                 boolean updateRequired = keyProps != null && keyProps.getAdditionalData() != null;
                 int offset = 0;
-                for (; offset + blockSize <= bytes.length; offset += blockSize) {
+                for (; offset + blockSize < bytes.length; offset += blockSize) {
                     byte[] next = !updateRequired ? c.doFinal(bytes, offset, blockSize) 
                         : c.update(bytes, offset, blockSize);
                     result = addToResult(result, next);
