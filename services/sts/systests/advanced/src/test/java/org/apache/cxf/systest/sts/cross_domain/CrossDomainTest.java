@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systest.sts.cross_domain;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
@@ -27,16 +29,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * In this test, a CXF client checks to see that the location defined on its STSClient is different
- * from that configured in the Issuer of the IssuedToken policy supplied in the WSDL of the
- * service provider. It obtains a SAML Token from the configured STS first, and then sends it in
- * the security header to the second STS. The returned token is then sent to the service provider.
- * This illustrates cross-domain SSO: https://issues.apache.org/jira/browse/CXF-3520
+ * Some tests that illustrate how CXF clients can get tokens from different STS instances for 
+ * service invocations.
  */
 public class CrossDomainTest extends AbstractBusClientServerTestBase {
     
@@ -48,6 +46,9 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
 
     private static final String PORT = allocatePort(Server.class);
     
+    // These tests require port numbers in the WSDLs and so we can't easily do variable substitution
+    private static boolean portFree = true;
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -56,18 +57,30 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(Server.class, true)
         );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-        assertTrue(
-                "Server failed to launch",
-                // run the server in the same process
-                // set this to false to fork
-                launchServer(STSServer2.class, true)
-        );
+        try {
+            ServerSocket sock = new ServerSocket(30101);
+            sock.close();
+            
+            assertTrue(
+                       "Server failed to launch",
+                       // run the server in the same process
+                       // set this to false to fork
+                       launchServer(STSServer.class, true)
+            );
+            
+            sock = new ServerSocket(30102);
+            sock.close();
+            
+            assertTrue(
+                       "Server failed to launch",
+                       // run the server in the same process
+                       // set this to false to fork
+                       launchServer(STSServer2.class, true)
+            );
+        } catch (IOException ex) {
+            portFree = false;
+            // portFree is set to false + the test won't run
+        }
     }
     
     @org.junit.AfterClass
@@ -76,6 +89,11 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
 
+    //  In this test, a CXF client checks to see that the location defined on its STSClient is different
+    // from that configured in the Issuer of the IssuedToken policy supplied in the WSDL of the
+    // service provider. It obtains a SAML Token from the configured STS first, and then sends it in
+    // the security header to the second STS. The returned token is then sent to the service provider.
+    // This illustrates cross-domain SSO: https://issues.apache.org/jira/browse/CXF-3520
     @org.junit.Test
     @org.junit.Ignore
     public void testCrossDomain() throws Exception {
@@ -100,7 +118,39 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // The Service references STS "b". The WSDL of STS "b" has an IssuedToken that references STS "a".
+    // So the client gets the WSDL of "b" via WS-MEX, which in turn has an IssuedToken policy.
+    // The client has a configured STSClient for this + uses it to get a token from "a", and in
+    // turn to use the returned token to get a token from "b", to access the service.
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testCrossDomainMEX() throws Exception {
+        
+        if (!portFree) {
+            return;
+        }
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CrossDomainTest.class.getResource("cxf-client.xml");
 
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = CrossDomainTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItCrossDomainMEXPort");
+        DoubleItPortType transportPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportPort, PORT);
+
+        // Transport port
+        doubleIt(transportPort, 25);
+        
+        ((java.io.Closeable)transportPort).close();
+        bus.shutdown(true);
+    }
+    
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2 , resp);

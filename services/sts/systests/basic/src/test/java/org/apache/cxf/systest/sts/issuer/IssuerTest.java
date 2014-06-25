@@ -42,6 +42,9 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
 
     private static final String PORT = allocatePort(Server.class);
     
+    // These tests require port numbers in the WSDLs and so we can't easily do variable substitution
+    private static boolean portFree = true;
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -62,7 +65,8 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
                        launchServer(STSServer.class, true)
             );
         } catch (IOException ex) {
-            // standalone is set to false + the test won't run
+            portFree = false;
+            // portFree is set to false + the test won't run
         }
     }
     
@@ -77,6 +81,10 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     // Policy. Useful if you want a simple way to avoid hardcoding the STS host/port in the client.
     @org.junit.Test
     public void testSAML1Issuer() throws Exception {
+        
+        if (!portFree) {
+            return;
+        }
         
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
@@ -102,6 +110,10 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAML2MEX() throws Exception {
         
+        if (!portFree) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
 
@@ -125,6 +137,10 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     // Test getting the STS details via WS-MEX + SOAP 1.2
     @org.junit.Test
     public void testSAML2MEXSoap12() throws Exception {
+        
+        if (!portFree) {
+            return;
+        }
         
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
