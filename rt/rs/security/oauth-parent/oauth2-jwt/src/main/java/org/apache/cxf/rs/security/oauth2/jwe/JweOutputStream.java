@@ -34,12 +34,11 @@ public class JweOutputStream extends FilterOutputStream {
     private byte[] lastRawDataChunk;
     private byte[] lastEncryptedDataChunk;
     private boolean flushed;
-    public JweOutputStream(OutputStream out, JweEncryptorWorkerState state) throws IOException {
+    public JweOutputStream(OutputStream out, Cipher encryptingCipher, int authTagLengthBits) {
         super(out);
-        this.encryptingCipher = state.getEncryptingCipher();
+        this.encryptingCipher = encryptingCipher;
         this.blockSize = encryptingCipher.getBlockSize(); 
-        this.authTagLengthBits = state.getAuthTagLengthBits();
-        out.write(state.getJweContentStart().getBytes("UTF-8"));
+        this.authTagLengthBits = authTagLengthBits;
     }
 
     @Override

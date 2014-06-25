@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -119,7 +121,8 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         return producer.getJweContent();
     }
     
-    public JweEncryptorWorkerState newWorkerState(String contentType) {
+    @Override
+    public JweOutputStream createJweStream(OutputStream os, String contentType) {
         JweEncryptorInternalState state = getInternalState(contentType);
         String jweStart = JweCompactProducer.startJweContent(state.theHeaders, 
                                            writer, 
@@ -127,7 +130,12 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
                                            state.theIv);
         Cipher c = CryptoUtils.initCipher(state.secretKey, state.keyProps, 
                                           Cipher.ENCRYPT_MODE);
-        return new JweEncryptorWorkerState(jweStart, c, getAuthTagLen());
+        try {
+            os.write(jweStart.getBytes("UTF-8"));
+        } catch (IOException ex) {
+            throw new SecurityException(ex);
+        }
+        return new JweOutputStream(os, c, getAuthTagLen());
     }
     
     private JweEncryptorInternalState getInternalState(String contentType) {
