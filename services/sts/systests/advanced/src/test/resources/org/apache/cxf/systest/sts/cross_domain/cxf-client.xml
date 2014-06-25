@@ -36,6 +36,7 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+<<<<<<< HEAD
     
    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItCrossDomainPort" 
                  createdFromAPI="true">
@@ -75,5 +76,62 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
       </http:tlsClientParameters>
    </http:conduit>
    
+=======
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItCrossDomainPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.sts.client">
+                <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                    <constructor-arg ref="cxf"/>
+                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServer.2}/SecurityTokenService/a?wsdl"/>
+                    <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                    <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+                    <property name="properties">
+                        <map>
+                            <entry key="ws-security.username" value="alice"/>
+                            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
+                            <entry key="ws-security.sts.token.usecert" value="true"/>
+                        </map>
+                    </property>
+                </bean>
+            </entry>
+        </jaxws:properties>
+    </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItCrossDomainMEXPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.sts.client">
+                <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                    <constructor-arg ref="cxf"/>
+                    <property name="wsdlLocation" value="https://localhost:30101/SecurityTokenService/a?wsdl"/>
+                    <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                    <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+                    <property name="properties">
+                        <map>
+                            <entry key="ws-security.username" value="alice"/>
+                            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
+                            <entry key="ws-security.sts.token.usecert" value="true"/>
+                        </map>
+                    </property>
+                    <property name="enableAppliesTo" value="false"/>
+                </bean>
+            </entry>
+        </jaxws:properties>
+    </jaxws:client>
+    
+    <http:conduit name="https://localhost:.*">
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:keyManagers keyPassword="ckpass">
+                <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+            </sec:keyManagers>
+            <sec:trustManagers>
+                <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>
+>>>>>>> dae6111... Adding another @Ignore'd cross domain test
 </beans>
 

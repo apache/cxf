@@ -42,7 +42,12 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
 
     private static final String PORT = allocatePort(Server.class);
     
+<<<<<<< HEAD
     private static boolean standalone;
+=======
+    // These tests require port numbers in the WSDLs and so we can't easily do variable substitution
+    private static boolean portFree = true;
+>>>>>>> dae6111... Adding another @Ignore'd cross domain test
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -68,7 +73,8 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
                 );
             }
         } catch (IOException ex) {
-            // standalone is set to false + the test won't run
+            portFree = false;
+            // portFree is set to false + the test won't run
         }
     }
     
@@ -84,10 +90,17 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAML1Issuer() throws Exception {
         
+<<<<<<< HEAD
         if (!standalone) {
             return;
         }
 
+=======
+        if (!portFree) {
+            return;
+        }
+        
+>>>>>>> dae6111... Adding another @Ignore'd cross domain test
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
 
@@ -112,10 +125,17 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAML2MEX() throws Exception {
         
+<<<<<<< HEAD
         if (!standalone) {
             return;
         }
 
+=======
+        if (!portFree) {
+            return;
+        }
+        
+>>>>>>> dae6111... Adding another @Ignore'd cross domain test
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
 
@@ -141,6 +161,10 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     public void testSAML2MEXSoap12() throws Exception {
 
         if (!standalone) {
+            return;
+        }
+        
+        if (!portFree) {
             return;
         }
         

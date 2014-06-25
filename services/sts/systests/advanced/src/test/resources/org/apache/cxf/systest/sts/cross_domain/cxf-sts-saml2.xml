@@ -53,6 +53,7 @@
 	    <property name="issueOperation" ref="transportIssueDelegate" />
 	    <property name="validateOperation" ref="transportValidateDelegate" />
     </bean>
+<<<<<<< HEAD
 
 	<bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
 		<property name="tokenProviders" ref="transportTokenProviders" />
@@ -133,5 +134,67 @@
 		</httpj:engine>
 	</httpj:engine-factory>
    
+=======
+    <bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+        <property name="tokenProviders" ref="transportTokenProviders"/>
+        <property name="services" ref="transportService"/>
+        <property name="stsProperties" ref="transportSTSProperties"/>
+    </bean>
+    <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+        <property name="tokenProviders" ref="transportTokenProviders"/>
+        <property name="tokenValidators" ref="transportTokenValidators"/>
+        <property name="stsProperties" ref="transportSTSProperties"/>
+    </bean>
+    <util:list id="transportTokenProviders">
+        <ref bean="transportSAMLProvider"/>
+    </util:list>
+    <util:list id="transportTokenValidators">
+        <ref bean="transportSAMLValidator"/>
+    </util:list>
+    <bean id="transportSAMLProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+        </bean>
+    <bean id="transportSAMLValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+        </bean>
+    <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
+        <property name="endpoints" ref="transportEndpoints"/>
+    </bean>
+    <util:list id="transportEndpoints">
+        <value>https://localhost:(\d)*/doubleit/services/doubleit.*
+                </value>
+    </util:list>
+    <bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
+        <property name="signatureUsername" value="mystskey"/>
+        <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+        <property name="issuer" value="b-issuer"/>
+    </bean>
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="BSTS" implementor="#transportSTSProviderBean" address="https://localhost:30102/SecurityTokenService/b" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/cross_domain/sts-b.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_STSB_Port">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
+        <httpj:engine port="30102">
+            <httpj:tlsServerParameters>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
+                </sec:trustManagers>
+                <sec:keyManagers keyPassword="stskpass">
+                    <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
+                </sec:keyManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_EXPORT_.*</sec:include>
+                    <sec:include>.*_EXPORT1024_.*</sec:include>
+                    <sec:include>.*_WITH_DES_.*</sec:include>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:include>.*_WITH_NULL_.*</sec:include>
+                    <sec:exclude>.*_DH_anon_.*</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="true" required="true"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+>>>>>>> dae6111... Adding another @Ignore'd cross domain test
 </beans>
 
