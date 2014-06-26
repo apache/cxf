@@ -64,7 +64,6 @@ import static org.ops4j.pax.exam.CoreOptions.when;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 
 /**
  * 
@@ -113,7 +112,6 @@ public class CXFOSGiTestSupport {
                              .name("Apache Karaf")
                              .useDeployFolder(false)
                              .unpackDirectory(new File("target/paxexam/")),
-                         keepRuntimeFolder(),
                          features(cxfUrl, "cxf-core", "cxf-jaxws"),
                          systemProperty("java.awt.headless").value("true"),
                          when(localRepo != null)
