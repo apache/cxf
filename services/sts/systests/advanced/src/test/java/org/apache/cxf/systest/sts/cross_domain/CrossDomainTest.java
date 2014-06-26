@@ -33,16 +33,8 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
-<<<<<<< HEAD
- * In this test, a CXF client checks to see that the location defined on it's STSClient is different
- * from that configured in the Issuer of the IssuedToken policy supplied in the WSDL of the
- * service provider. It obtains a SAML Token from the configured STS first, and then sends it in
- * the security header to the second STS. The returned token is then sent to the service provider.
- * This illustrates cross-domain SSO: https://issues.apache.org/jira/browse/CXF-3520
-=======
  * Some tests that illustrate how CXF clients can get tokens from different STS instances for 
  * service invocations.
->>>>>>> dae6111... Adding another @Ignore'd cross domain test
  */
 public class CrossDomainTest extends AbstractBusClientServerTestBase {
     
