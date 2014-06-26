@@ -89,7 +89,7 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
 
-    //  In this test, a CXF client checks to see that the location defined on its STSClient is different
+    // In this test, a CXF client checks to see that the location defined on its STSClient is different
     // from that configured in the Issuer of the IssuedToken policy supplied in the WSDL of the
     // service provider. It obtains a SAML Token from the configured STS first, and then sends it in
     // the security header to the second STS. The returned token is then sent to the service provider.
@@ -123,7 +123,6 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
     // The client has a configured STSClient for this + uses it to get a token from "a", and in
     // turn to use the returned token to get a token from "b", to access the service.
     @org.junit.Test
-    @org.junit.Ignore
     public void testCrossDomainMEX() throws Exception {
         
         if (!portFree) {

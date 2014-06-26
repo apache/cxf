@@ -435,6 +435,16 @@ public final class SecurityConstants {
         "ws-security.sts.disable-wsmex-call-using-epr-address";
     
     /**
+     * Whether to prefer to use WS-MEX over a STSClient's location/wsdlLocation properties
+     * when making an STS RequestSecurityToken call. This can be set to true for the scenario
+     * of making a WS-MEX call to an initial STS, and using the returned token to make another
+     * call to an STS (which is configured using the STSClient configuration). Default is 
+     * "false".
+     */
+    public static final String PREFER_WSMEX_OVER_STS_CLIENT_CONFIG = 
+        "ws-security.sts.prefer-wsmex";
+    
+    /**
      * Switch STS client to send Soap 1.2 messages
      */
     public static final String STS_CLIENT_SOAP12_BINDING =
@@ -546,8 +556,14 @@ public final class SecurityConstants {
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
+<<<<<<< HEAD
             ASYMMETRIC_SIGNATURE_ALGORITHM, ENABLE_SAML_ONE_TIME_USE_CACHE, SAML_ONE_TIME_USE_CACHE_INSTANCE,
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT
+=======
+            ASYMMETRIC_SIGNATURE_ALGORITHM, PASSWORD_ENCRYPTOR_INSTANCE, ENABLE_SAML_ONE_TIME_USE_CACHE,
+            SAML_ONE_TIME_USE_CACHE_INSTANCE, ENABLE_STREAMING_SECURITY, RETURN_SECURITY_ERROR,
+            CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG
+>>>>>>> 417d938... Adding support for a cross-domain STS test
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

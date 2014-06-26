@@ -21,6 +21,8 @@ package org.apache.cxf.ws.security.trust;
 
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactory;
@@ -30,6 +32,7 @@ import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.Service;
@@ -88,6 +91,7 @@ public final class STSUtils {
     }
     
     public static STSClient getClient(Message message, String type, IssuedToken itok) {
+<<<<<<< HEAD
         STSClient client = (STSClient)message
             .getContextualProperty(SecurityConstants.STS_CLIENT);
         if (client == null) {
@@ -113,9 +117,118 @@ public final class STSUtils {
                 !Boolean.valueOf((String)message.getContextualProperty(
                     SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
             client.configureViaEPR(epr, useEPRWSAAddrAsMEXLocation);
+=======
+        // Find out first if we have an EPR to get the STS Address (possibly via WS-MEX)
+        if (itok != null && itok.getIssuer() != null && message != null) {
+            EndpointReferenceType epr = null;
+            try {
+                epr = VersionTransformer.parseEndpointReference(itok.getIssuer());
+            } catch (JAXBException e) {
+                throw new IllegalArgumentException(e);
+            }
+            
+            String mexLocation = findMEXLocation(epr);
+            // Configure via WS-MEX
+            if (mexLocation != null
+                && MessageUtils.getContextualBoolean(message, 
+                                                     SecurityConstants.PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
+                                                     false)) {
+                // WS-MEX call. So now either get the WS-MEX specific STSClient or else create one
+                STSClient client = (STSClient)message
+                    .getContextualProperty(SecurityConstants.STS_CLIENT + ".wsmex");
+                if (client == null) {
+                    client = createSTSClient(message, type);
+                }
+                client.configureViaEPR(epr, false);
+                return client;
+            } else if (configureViaEPR(message, type, epr)) {
+                // Only use WS-MEX here if the pre-configured STSClient has no location/wsdllocation
+                boolean useEPRWSAAddrAsMEXLocation = 
+                    !Boolean.valueOf((String)message.getContextualProperty(
+                        SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
+                
+                STSClient client = (STSClient)message
+                    .getContextualProperty(SecurityConstants.STS_CLIENT);
+                if (client == null) {
+                    client = createSTSClient(message, type);
+                }
+                client.configureViaEPR(epr, useEPRWSAAddrAsMEXLocation);
+                return client;
+            }
         }
+        
+        // Not a WS-MEX call
+        STSClient client = (STSClient)message
+            .getContextualProperty(SecurityConstants.STS_CLIENT);
+        if (client == null) {
+            client = createSTSClient(message, type);
+        }
+        
         return client;
     }
+        
+    public static boolean configureViaEPR(Message message, String type, EndpointReferenceType epr) {
+        STSClient client = (STSClient)message
+            .getContextualProperty(SecurityConstants.STS_CLIENT);
+        if (epr != null && client == null) {
+            return true;
+        } else if (epr != null && client != null && client.getLocation() == null && client.getWsdlLocation() == null) {
+            return true;
+        }
+            
+        return false;
+    }
+    
+    private static STSClient createSTSClient(Message message, String type) {
+        if (type == null) {
+            type = "";
+        } else {
+            type = "." + type + "-client";
+        }
+        STSClient client = new STSClient(message.getExchange().get(Bus.class));
+        Endpoint ep = message.getExchange().get(Endpoint.class);
+        client.setEndpointName(ep.getEndpointInfo().getName().toString() + type);
+        client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
+        if (MessageUtils.getContextualBoolean(message, SecurityConstants.STS_CLIENT_SOAP12_BINDING, false)) {
+            client.setSoap12();
+>>>>>>> 417d938... Adding support for a cross-domain STS test
+        }
+        
+        return client;
+    }
+    
+    public static String findMEXLocation(EndpointReferenceType ref) {
+        if (ref.getMetadata() != null && ref.getMetadata().getAny() != null) {
+            for (Object any : ref.getMetadata().getAny()) {
+                if (any instanceof Element) {
+                    String addr = findMEXLocation((Element)any);
+                    if (addr != null) {
+                        return addr;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    public static String findMEXLocation(Element ref) {
+        Element el = DOMUtils.getFirstElement(ref);
+        while (el != null) {
+            if (el.getLocalName().equals("Address")
+                && VersionTransformer.isSupported(el.getNamespaceURI())
+                && "MetadataReference".equals(ref.getLocalName())) {
+                return DOMUtils.getContent(el);
+            } else {
+                String ad = findMEXLocation(el);
+                if (ad != null) {
+                    return ad;
+                }
+            }
+            el = DOMUtils.getNextElement(el);
+        }
+        return null;
+    }
+    
     public static Endpoint createSTSEndpoint(Bus bus, 
                                              String namespace,
                                              String transportId,
