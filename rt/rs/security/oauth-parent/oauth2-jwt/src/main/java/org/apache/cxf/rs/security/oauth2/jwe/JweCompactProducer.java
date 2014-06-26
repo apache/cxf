@@ -19,6 +19,9 @@
 
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
@@ -99,6 +102,22 @@ public class JweCompactProducer {
             .append(encodedInitVector == null ? "" : encodedInitVector)
             .append('.');
         return sb;
+    }
+    
+    public static void startJweContent(OutputStream os,
+                                       JweHeaders headers,
+                                       JwtHeadersWriter writer, 
+                                       byte[] encryptedContentEncryptionKey,
+                                       byte[] cipherInitVector) throws IOException {
+        writer = writer == null ? new JwtTokenReaderWriter() : writer;
+        byte[] jsonBytes = writer.headersToJson(headers).getBytes("UTF-8");
+        Base64UrlUtility.encodeAndStream(jsonBytes, 0, jsonBytes.length, os);
+        os.write('.');
+        Base64UrlUtility.encodeAndStream(encryptedContentEncryptionKey, 0, 
+                                         encryptedContentEncryptionKey.length, os);
+        os.write('.');
+        Base64UrlUtility.encodeAndStream(cipherInitVector, 0, cipherInitVector.length, os);
+        os.write('.');         
     }
     
     public String getJweContent() {

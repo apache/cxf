@@ -124,14 +124,14 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
     @Override
     public JweOutputStream createJweStream(OutputStream os, String contentType) {
         JweEncryptorInternalState state = getInternalState(contentType);
-        String jweStart = JweCompactProducer.startJweContent(state.theHeaders, 
-                                           writer, 
-                                           state.jweContentEncryptionKey, 
-                                           state.theIv);
         Cipher c = CryptoUtils.initCipher(state.secretKey, state.keyProps, 
                                           Cipher.ENCRYPT_MODE);
         try {
-            os.write(jweStart.getBytes("UTF-8"));
+            JweCompactProducer.startJweContent(os,
+                                               state.theHeaders, 
+                                               writer, 
+                                               state.jweContentEncryptionKey, 
+                                               state.theIv);
         } catch (IOException ex) {
             throw new SecurityException(ex);
         }

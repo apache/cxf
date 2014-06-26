@@ -87,18 +87,13 @@ public class JweOutputStream extends FilterOutputStream {
             theChunk = encryptedChunk;
         }
         int rem = finalWrite ? 0 : lenToEncode % 3; 
-        encodeAndWriteFinally(theChunk, off, lenToEncode - rem);
+        Base64UrlUtility.encodeAndStream(theChunk, off, lenToEncode - rem, out);
         
         if (rem > 0) {
             lastEncryptedDataChunk = newArray(theChunk, lenToEncode - rem, rem);
         } else {
             lastEncryptedDataChunk = null;
         }
-    }
-    private void encodeAndWriteFinally(byte[] chunk, int off, int len) throws IOException {
-        String encoded = Base64UrlUtility.encodeChunk(chunk, off, len);
-        byte[] encodedBytes = encoded.getBytes("UTF-8");
-        out.write(encodedBytes, 0, encodedBytes.length);
     }
     
     @Override

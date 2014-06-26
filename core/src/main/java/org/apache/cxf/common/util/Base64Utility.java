@@ -28,6 +28,9 @@ package org.apache.cxf.common.util;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
@@ -66,7 +69,9 @@ public final class Base64Utility {
         '8', '9', '+', '/'
     };
 
-    // base 64 wadding
+    private static final char[] BCS_URL_SAFE = Arrays.copyOf(BCS, BCS.length);
+    
+    // base 64 padding
     private static final char PAD = '=';
 
     // size of base 64 decode table
@@ -80,7 +85,9 @@ public final class Base64Utility {
     private static final int PAD_SIZE4 = 2;
     private static final int PAD_SIZE8 = 3;
     
-    // class static intializer for building decode table
+    private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
+    
+    // class static initializer for building decode table
     static {
         for (int i = 0;  i < BDTSIZE;  i++) {
             BDT[i] = Byte.MAX_VALUE;
@@ -89,12 +96,17 @@ public final class Base64Utility {
         for (int i = 0;  i < BCS.length;  i++) {
             BDT[BCS[i]] = (byte)i;
         }
+        
+        BCS_URL_SAFE[62] = '-';
+        BCS_URL_SAFE[63] = '_';
     }
     
     
     private Base64Utility() {
         //utility class, never constructed
     }
+    
+    
     
     /**
      * The <code>decode_chunk</code> routine decodes a chunk of data
@@ -173,6 +185,26 @@ public final class Base64Utility {
     }
 
     public static byte[] decode(String id) throws Base64Exception {
+        return decode(id, false);
+    }
+    
+    public static byte[] decode(String id, boolean urlSafe) throws Base64Exception {
+        if (urlSafe) {
+            //TODO: optimize further
+            id = id.replace("-", "+").replace('_', '/');
+            switch (id.length() % 4) {
+            case 0: 
+                break; 
+            case 2: 
+                id += "=="; 
+                break; 
+            case 3: 
+                id += "="; 
+                break; 
+            default: 
+                throw new Base64Exception(new Message("BASE64_RUNTIME_EXCEPTION", LOG));
+            }
+        }
         try {
             char[] cd = id.toCharArray();
             return decodeChunk(cd, 0, cd.length);
@@ -214,6 +246,10 @@ public final class Base64Utility {
     // Returns base64 representation of specified byte array.
     //
     public static String encode(byte[] id) {
+        return encode(id, false);
+    }
+    
+    public static String encode(byte[] id, boolean urlSafe) {
         char[] cd = encodeChunk(id, 0, id.length);
         return new String(cd, 0, cd.length);
     }
@@ -223,6 +259,13 @@ public final class Base64Utility {
     public static char[] encodeChunk(byte[] id,
                                      int o,
                                      int l) {
+        return encodeChunk(id, o, l, false);
+    }
+    
+    public static char[] encodeChunk(byte[] id,
+                                     int o,
+                                     int l,
+                                     boolean urlSafe) {
         if (l <= 0) {
             return null;
         }
@@ -235,42 +278,111 @@ public final class Base64Utility {
         if (l % 3 == 0) {
             out = new char[l / 3 * 4];
         } else {
-            out = new char[l / 3 * 4 + 4];
+            int finalLen = !urlSafe ? 4 : l % 3 == 1 ? 2 : 3;
+            out = new char[l / 3 * 4 + finalLen];
         }
 
         int rindex = o;
         int windex = 0;
         int rest = l;
 
+        final char[] base64Table = urlSafe ? BCS_URL_SAFE : BCS;
         while (rest >= 3) {
             int i = ((id[rindex] & 0xff) << 16)
                     + ((id[rindex + 1] & 0xff) << 8)
                     + (id[rindex + 2] & 0xff);
 
-            out[windex++] = BCS[i >> 18];
-            out[windex++] = BCS[(i >> 12) & 0x3f];
-            out[windex++] = BCS[(i >> 6) & 0x3f];
-            out[windex++] = BCS[i & 0x3f];
+            out[windex++] = base64Table[i >> 18];
+            out[windex++] = base64Table[(i >> 12) & 0x3f];
+            out[windex++] = base64Table[(i >> 6) & 0x3f];
+            out[windex++] = base64Table[i & 0x3f];
             rindex += 3;
             rest -= 3;
         }
 
         if (rest == 1) {
             int i = id[rindex] & 0xff;
-            out[windex++] = BCS[i >> 2];
-            out[windex++] = BCS[(i << 4) & 0x3f];
-            out[windex++] = PAD;
-            out[windex++] = PAD;
+            out[windex++] = base64Table[i >> 2];
+            out[windex++] = base64Table[(i << 4) & 0x3f];
+            if (!urlSafe) {
+                out[windex++] = PAD;
+                out[windex++] = PAD;
+            }
         } else if (rest == 2) {
             int i = ((id[rindex] & 0xff) << 8) + (id[rindex + 1] & 0xff);
-            out[windex++] = BCS[i >> 10];
-            out[windex++] = BCS[(i >> 4) & 0x3f];
-            out[windex++] = BCS[(i << 2) & 0x3f];
-            out[windex++] = PAD;
+            out[windex++] = base64Table[i >> 10];
+            out[windex++] = base64Table[(i >> 4) & 0x3f];
+            out[windex++] = base64Table[(i << 2) & 0x3f];
+            if (!urlSafe) {
+                out[windex++] = PAD;
+            }
         }
         return out;
     }
+    
+    public static void encodeAndStream(byte[] id,
+                                       int o,
+                                       int l,
+                                       OutputStream os) throws IOException {
+        encodeAndStream(id, o, l, false, os);
+    }
+    
+    public static void encodeAndStream(byte[] id,
+                                           int o,
+                                           int l,
+                                           boolean urlSafe,
+                                           OutputStream os) throws IOException {
+        if (l <= 0) {
+            return;
+        }
 
+        int rindex = o;
+        int rest = l;
+        final char[] base64Table = urlSafe ? BCS_URL_SAFE : BCS;
+        
+        char[] chunk = new char[4];
+        while (rest >= 3) {
+            int i = ((id[rindex] & 0xff) << 16)
+                    + ((id[rindex + 1] & 0xff) << 8)
+                    + (id[rindex + 2] & 0xff);
+            chunk[0] = base64Table[i >> 18]; 
+            chunk[1] = base64Table[(i >> 12) & 0x3f];
+            chunk[2] = base64Table[(i >> 6) & 0x3f];
+            chunk[3] = base64Table[i & 0x3f];
+            writeCharArrayToStream(chunk, 4, os);
+            rindex += 3;
+            rest -= 3;
+        }
+        if (rest == 0) {
+            return;
+        }
+        if (rest == 1) {
+            int i = id[rindex] & 0xff;
+            chunk[0] = base64Table[i >> 2];
+            chunk[1] = base64Table[(i << 4) & 0x3f];
+            if (!urlSafe) {
+                chunk[2] = PAD;
+                chunk[3] = PAD;
+            }
+        } else if (rest == 2) {
+            int i = ((id[rindex] & 0xff) << 8) + (id[rindex + 1] & 0xff);
+            chunk[0] = base64Table[i >> 10];
+            chunk[1] = base64Table[(i >> 4) & 0x3f];
+            chunk[2] = base64Table[(i << 2) & 0x3f];
+            if (!urlSafe) {
+                chunk[3] = PAD;
+            }
+        }
+        int finalLenToWrite = !urlSafe ? 4 : rest == 1 ? 2 : 3;
+        writeCharArrayToStream(chunk, finalLenToWrite, os);
+    }
+
+    private static void writeCharArrayToStream(char[] chunk, int len, OutputStream os) throws IOException {
+        // may be we can just cast to byte when creating chunk[] earlier on
+        byte[] bytes = CHARSET_UTF8.encode(CharBuffer.wrap(chunk, 0, len)).array();
+        os.write(bytes);
+    }
+    
     //
     // Outputs base64 representation of the specified byte array 
     // to a byte stream.
@@ -285,8 +397,7 @@ public final class Base64Utility {
             throw new Base64Exception(new Message("BASE64_ENCODE_IOEXCEPTION", LOG), e);
         }
     }
-
-
+    
     // Outputs base64 representation of the specified byte 
     // array to a character stream.
     //
@@ -300,8 +411,6 @@ public final class Base64Utility {
             throw new Base64Exception(new Message("BASE64_ENCODE_WRITER_IOEXCEPTION", LOG), e);
         }
     }
-
-
     //---- Private static methods --------------------------------------
 
     /**

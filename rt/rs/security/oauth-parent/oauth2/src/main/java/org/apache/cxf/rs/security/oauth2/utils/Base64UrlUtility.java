@@ -27,37 +27,21 @@ package org.apache.cxf.rs.security.oauth2.utils;
  *                  
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 
 
 public final class Base64UrlUtility {
-    private static final Logger LOG = LogUtils.getL7dLogger(Base64UrlUtility.class);
-    
     private Base64UrlUtility() {
         //utility class, never constructed
     }
     
     public static byte[] decode(String encoded) throws Base64Exception {
-        encoded = encoded.replace("-", "+").replace('_', '/');
-        switch (encoded.length() % 4) {
-        case 0: 
-            break; 
-        case 2: 
-            encoded += "=="; 
-            break; 
-        case 3: 
-            encoded += "="; 
-            break; 
-        default: 
-            throw new Base64Exception(new Message("BASE64_RUNTIME_EXCEPTION", LOG));
-        }
-        return Base64Utility.decode(encoded);
+        return Base64Utility.decode(encoded, true);
     }
 
     public static String encode(String str) {
@@ -73,14 +57,18 @@ public final class Base64UrlUtility {
     }
 
     public static String encodeChunk(byte[] id, int offset, int length) {
-        char[] chunk = Base64Utility.encodeChunk(id, offset, length);
+        char[] chunk = Base64Utility.encodeChunk(id, offset, length, true);
         if (chunk != null) {
-            String encoded = new String(chunk);
-            return encoded.replace("+", "-").replace('/', '_').replace("=", "");
+            return new String(chunk);
         } else {
             return null;
         }
     }
      
-
+    public static void encodeAndStream(byte[] id,
+                                       int o,
+                                       int l,
+                                       OutputStream os) throws IOException {
+        Base64Utility.encodeAndStream(id, o, l, true, os);
+    }
 }

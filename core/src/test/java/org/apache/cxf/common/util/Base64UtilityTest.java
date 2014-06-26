@@ -61,6 +61,16 @@ public class Base64UtilityTest extends Assert {
     }
     
     @Test
+    public void testEncodeAndStream() throws Exception {
+        final String text = "The true sign of intelligence is not knowledge but imagination.";
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        byte[] bytes = text.getBytes("UTF-8");
+        Base64Utility.encodeAndStream(bytes, 0, bytes.length, bos);
+        String decodedText = new String(Base64Utility.decode(bos.toString()));
+        assertEquals(decodedText, text);
+    }
+    
+    @Test
     public void testEncodeDecodeChunk() throws Exception {
         byte bytes[] = new byte[100];
         for (int x = 0; x < bytes.length; x++) {
