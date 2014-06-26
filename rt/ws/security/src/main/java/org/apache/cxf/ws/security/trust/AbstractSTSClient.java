@@ -559,11 +559,13 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             EndpointInfo ei = service.getEndpointInfo(endpointName);
             Endpoint endpoint = new EndpointImpl(bus, service, ei);
             client = new ClientImpl(bus, endpoint);
-        } else {
+        } else if (location != null) {
             Endpoint endpoint = STSUtils.createSTSEndpoint(bus, namespace, null, location, soapVersion,
                                                            policy, endpointName);
 
             client = new ClientImpl(bus, endpoint);
+        } else {
+            throw new TrustException(LOG, "NO_LOCATION");
         }
         
         client.getInFaultInterceptors().addAll(inFault);
