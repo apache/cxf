@@ -48,6 +48,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.neethi.Policy;
@@ -91,42 +92,9 @@ public final class STSUtils {
     }
     
     public static STSClient getClient(Message message, String type, IssuedToken itok) {
-<<<<<<< HEAD
-        STSClient client = (STSClient)message
-            .getContextualProperty(SecurityConstants.STS_CLIENT);
-        if (client == null) {
-            if (type == null) {
-                type = "";
-            } else {
-                type = "." + type + "-client";
-            }
-            client = new STSClient(message.getExchange().get(Bus.class));
-            Endpoint ep = message.getExchange().get(Endpoint.class);
-            client.setEndpointName(ep.getEndpointInfo().getName().toString() + type);
-            client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
-            if (MessageUtils.getContextualBoolean(message, SecurityConstants.STS_CLIENT_SOAP12_BINDING, false)) {
-                client.setSoap12();
-            }
-        }
-        
-        if (client.getLocation() == null && client.getWsdlLocation() == null 
-            && itok != null && itok.getIssuerEpr() != null) {
-            EndpointReferenceType epr = itok.getIssuerEpr();
-            //configure via mex
-            boolean useEPRWSAAddrAsMEXLocation = 
-                !Boolean.valueOf((String)message.getContextualProperty(
-                    SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
-            client.configureViaEPR(epr, useEPRWSAAddrAsMEXLocation);
-=======
         // Find out first if we have an EPR to get the STS Address (possibly via WS-MEX)
-        if (itok != null && itok.getIssuer() != null && message != null) {
-            EndpointReferenceType epr = null;
-            try {
-                epr = VersionTransformer.parseEndpointReference(itok.getIssuer());
-            } catch (JAXBException e) {
-                throw new IllegalArgumentException(e);
-            }
-            
+        if (itok != null && itok.getIssuerEpr() != null && message != null) {
+            EndpointReferenceType epr = itok.getIssuerEpr();
             String mexLocation = findMEXLocation(epr);
             // Configure via WS-MEX
             if (mexLocation != null
@@ -191,7 +159,6 @@ public final class STSUtils {
         client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
         if (MessageUtils.getContextualBoolean(message, SecurityConstants.STS_CLIENT_SOAP12_BINDING, false)) {
             client.setSoap12();
->>>>>>> 417d938... Adding support for a cross-domain STS test
         }
         
         return client;
