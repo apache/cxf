@@ -19,11 +19,13 @@
 package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.IOException;
+import java.sql.Date;
 
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.lucene.LuceneQueryVisitor;
+import org.apache.cxf.jaxrs.ext.search.tika.TikaLuceneContentExtractor.DocumentMetadata;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -37,7 +39,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.apache.tika.parser.pdf.PDFParser;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,6 +78,21 @@ public class TikaLuceneContentExtractorTest extends Assert {
         assertEquals(1, getHits("Author==Bertrand*").length);
     }
 
+    @Test
+    public void testExtractedTextContentMatchesTypesAndSearchCriteria() throws Exception {
+        final DocumentMetadata documentMetadata = new DocumentMetadata("contents")
+            .withField("modified", Date.class);
+        
+        final Document document = extractor.extract(
+            getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
+        assertNotNull("Document should not be null", document);
+        
+        writer.addDocument(document);
+        writer.commit();
+
+        assertEquals(1, getHits("modified==2007-09-15T09:02:31Z").length);
+    }
+    
     private ScoreDoc[] getHits(final String expression) throws IOException {
         IndexReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);        

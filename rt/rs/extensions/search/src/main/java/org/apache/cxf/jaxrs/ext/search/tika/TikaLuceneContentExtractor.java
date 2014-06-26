@@ -19,19 +19,72 @@
 package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.InputStream;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.FloatField;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.Parser;
 
 public class TikaLuceneContentExtractor {
+    private final DocumentMetadata defaultDocumentMetadata;    
     private final TikaContentExtractor extractor;
-    private final String contentFieldName;
+    
+    public static class DocumentMetadata {
+        private final Map< String, Class< ? > > fieldTypes = 
+            new LinkedHashMap< String, Class< ? > >();
+        private final String contentFieldName;
+        
+        public DocumentMetadata(final String contentFieldName) {
+            this.contentFieldName = contentFieldName;
+        }
+        
+        public DocumentMetadata withField(final String name, final Class< ? > type) {
+            fieldTypes.put(name, type);
+            return this;
+        }
+        
+        public String getContentFieldName() {
+            return contentFieldName;
+        }
+        
+        private Field contentField(final String content) {
+            return new TextField(contentFieldName, content, Store.YES);
+        }
+        
+        private Field field(final String name, final String value) {
+            final Class< ? > type = fieldTypes.get(name);
+            
+            if (type != null) {
+                if (Number.class.isAssignableFrom(type)) {
+                    if (Double.class.isAssignableFrom(type)) {
+                        return new DoubleField(name, Double.valueOf(value), Store.YES);
+                    } else if (Float.class.isAssignableFrom(type)) {
+                        return new FloatField(name, Float.valueOf(value), Store.YES);
+                    } else if (Long.class.isAssignableFrom(type)) {
+                        return new LongField(name, Long.valueOf(value), Store.YES);
+                    } else if (Integer.class.isAssignableFrom(type)) {
+                        return new IntField(name, Integer.valueOf(value), Store.YES);
+                    }
+                } else if (Date.class.isAssignableFrom(type)) {
+                    return new StringField(name, value, Store.YES);
+                }                
+            }
+            
+            return new StringField(name, value, Store.YES);
+        }
+    }
+    
     
     /**
      * Create new Tika-based content extractor using the provided parser instance.  
@@ -65,7 +118,7 @@ public class TikaLuceneContentExtractor {
     public TikaLuceneContentExtractor(final Parser parser, final boolean validateMediaType, 
                                 final String contentFieldName) {
         extractor = new TikaContentExtractor(parser, validateMediaType);
-        this.contentFieldName = contentFieldName;
+        defaultDocumentMetadata = new DocumentMetadata(contentFieldName);
     }
     
     /**
@@ -76,7 +129,20 @@ public class TikaLuceneContentExtractor {
      * @return the extracted document or null if extraction is not possible or was unsuccessful
      */
     public Document extract(final InputStream in) {
-        return extractAll(in, true, true);
+        return extractAll(in, defaultDocumentMetadata, true, true);
+    }
+    
+    /**
+     * Extract the content and metadata from the input stream using DocumentMetadata descriptor to
+     * create a document with strongly typed fields. Depending on media type validation,
+     * the detector could be run against input stream in order to ensure that parser supports this
+     * type of content. 
+     * @param in input stream to extract the content and metadata from  
+     * @param metadata document descriptor with field names and their types
+     * @return the extracted document or null if extraction is not possible or was unsuccessful
+     */
+    public Document extract(final InputStream in, final DocumentMetadata metadata) {
+        return extractAll(in, metadata, true, true);
     }
     
     /**
@@ -87,7 +153,7 @@ public class TikaLuceneContentExtractor {
      * @return the extracted document or null if extraction is not possible or was unsuccessful
      */
     public Document extractContent(final InputStream in) {
-        return extractAll(in, true, false);
+        return extractAll(in, defaultDocumentMetadata, true, false);
     }
     
     /**
@@ -98,10 +164,11 @@ public class TikaLuceneContentExtractor {
      * @return the extracted document or null if extraction is not possible or was unsuccessful
      */
     public Document extractMetadata(final InputStream in) {
-        return extractAll(in, false, true);
+        return extractAll(in, defaultDocumentMetadata, false, true);
     }
     
-    private Document extractAll(final InputStream in, boolean extractContent, boolean extractMetadata) {
+    private Document extractAll(final InputStream in, final DocumentMetadata documentMetadata, 
+            boolean extractContent, boolean extractMetadata) {
         
         TikaContent content = extractor.extractAll(in, extractContent);
         
@@ -110,12 +177,13 @@ public class TikaLuceneContentExtractor {
         }
         final Document document = new Document();
         if (content.getContent() != null) {
-            document.add(new Field(contentFieldName, content.getContent(), TextField.TYPE_STORED));
+            document.add(documentMetadata.contentField(content.getContent()));
         } 
+        
         if (extractMetadata) {
             Metadata metadata = content.getMetadata();
             for (final String property: metadata.names()) {
-                document.add(new StringField(property, metadata.get(property), Store.YES));
+                document.add(documentMetadata.field(property, metadata.get(property)));
             }
         }
         
