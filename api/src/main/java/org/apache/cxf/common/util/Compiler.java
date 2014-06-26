@@ -85,9 +85,6 @@ public class Compiler {
     }
     
     protected void addArgs(List<String> list) {
-        if (verbose) {
-            list.add("-verbose");
-        }
         if (!StringUtils.isEmpty(encoding)) {
             list.add("-encoding");
             list.add(encoding);
