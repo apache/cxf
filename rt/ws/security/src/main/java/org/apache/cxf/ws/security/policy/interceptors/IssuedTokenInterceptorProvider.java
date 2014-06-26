@@ -558,9 +558,6 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     return;
                 }
                 
-                for (AssertionInfo ai : ais) {
-                    ai.setAsserted(true);
-                }
                 IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
                 assertIssuedToken(itok, aim);
                 
@@ -569,7 +566,11 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     List<WSHandlerResult> results = 
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null && results.size() > 0) {
-                        parseHandlerResults(results.get(0), message, aim);
+                        parseHandlerResults(results.get(0), message, ais);
+                    }
+                } else {
+                    for (AssertionInfo ai : ais) {
+                        ai.setAsserted(true);
                     }
                 }
             }
@@ -578,15 +579,13 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         private void parseHandlerResults(
             WSHandlerResult rResult,
             Message message,
-            AssertionInfoMap aim
+            Collection<AssertionInfo> issuedAis
         ) {
             List<WSSecurityEngineResult> signedResults = 
                 WSSecurityUtil.fetchAllActionResults(rResult.getResults(), WSConstants.SIGN);
             
             IssuedTokenPolicyValidator issuedValidator = 
                 new IssuedTokenPolicyValidator(signedResults, message);
-            Collection<AssertionInfo> issuedAis = 
-                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
 
             for (SamlAssertionWrapper assertionWrapper : findSamlTokenResults(rResult.getResults())) {
                 boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);
