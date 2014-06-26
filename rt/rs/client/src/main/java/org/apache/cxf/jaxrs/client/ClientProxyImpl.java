@@ -478,16 +478,18 @@ public class ClientProxyImpl extends AbstractClient implements
         Map<String, BeanPair> values = new HashMap<String, BeanPair>();
         
         for (Method m : bean.getClass().getMethods()) {
-            Annotation annotation = m.getAnnotation(annClass);
-            if (annotation != null) {
-                try {
-                    String propertyName = m.getName().substring(3);
-                    Method getter = bean.getClass().getMethod("get" + propertyName, new Class[]{});
-                    Object value = getter.invoke(bean, new Object[]{});
-                    String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
-                    values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
-                } catch (Throwable t) {
-                    // ignore
+            if (m.getName().startsWith("set")) {
+                Annotation annotation = m.getAnnotation(annClass);
+                if (annotation != null) {
+                    try {
+                        String propertyName = m.getName().substring(3);
+                        Method getter = bean.getClass().getMethod("get" + propertyName, new Class[]{});
+                        Object value = getter.invoke(bean, new Object[]{});
+                        String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
+                        values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
+                    } catch (Throwable t) {
+                        // ignore
+                    }
                 }
             }
         }
