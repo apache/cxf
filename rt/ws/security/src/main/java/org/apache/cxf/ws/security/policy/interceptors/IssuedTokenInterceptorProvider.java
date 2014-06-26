@@ -498,23 +498,13 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (ais == null) {
                     return;
                 }
-<<<<<<< HEAD
-=======
                 
-                IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
-                assertIssuedToken(itok, aim);
-                
->>>>>>> 60bad6d... Fixing problem with IssuedToken policy validation
                 if (!isRequestor(message)) {
                     message.getExchange().remove(SecurityConstants.TOKEN);
                     List<WSHandlerResult> results = 
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null && results.size() > 0) {
                         parseHandlerResults(results.get(0), message, ais);
-                    }
-                } else {
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
                     }
                 } else {
                     //client side should be checked on the way out
@@ -537,10 +527,6 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             
             IssuedTokenPolicyValidator issuedValidator = 
                 new IssuedTokenPolicyValidator(signedResults, message);
-<<<<<<< HEAD
-            Collection<AssertionInfo> issuedAis = aim.get(SP12Constants.ISSUED_TOKEN);
-=======
->>>>>>> 60bad6d... Fixing problem with IssuedToken policy validation
 
             for (AssertionWrapper assertionWrapper : findSamlTokenResults(rResult.getResults())) {
                 boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);
