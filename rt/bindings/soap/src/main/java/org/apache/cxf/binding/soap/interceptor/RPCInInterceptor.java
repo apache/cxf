@@ -164,8 +164,9 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                     && partItr.hasNext()) {
                     part = partItr.next();
                 }
-                
-                if (!qn.equals(part.getConcreteName())) {
+
+                // only check the localpart as explained above
+                if (!qn.getLocalPart().equals(part.getConcreteName().getLocalPart())) {
                     throw new Fault(
                                     new org.apache.cxf.common.i18n.Message(
                                                                            "UNKNOWN_RPC_LIT_PART",
