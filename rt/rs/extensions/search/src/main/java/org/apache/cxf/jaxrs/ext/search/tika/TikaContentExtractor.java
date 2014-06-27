@@ -20,6 +20,8 @@ package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +30,7 @@ import org.xml.sax.SAXException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.detect.Detector;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
@@ -38,9 +41,8 @@ import org.apache.tika.sax.ToTextContentHandler;
 public class TikaContentExtractor {
     private static final Logger LOG = LogUtils.getL7dLogger(TikaContentExtractor.class);
     
-    private final Parser parser;
-    private final DefaultDetector detector;
-    private final boolean validateMediaType;
+    private final List<Parser> parsers;
+    private final Detector detector;
     
     /**
      * Create new Tika-based content extractor using the provided parser instance.  
@@ -51,17 +53,32 @@ public class TikaContentExtractor {
     }
     
     /**
+     * Create new Tika-based content extractor using the provided parser instances.  
+     * @param parsers parser instances
+     */
+    public TikaContentExtractor(final List<Parser> parsers) {
+        this(parsers, new DefaultDetector());
+    }
+    
+    /**
+     * Create new Tika-based content extractor using the provided parser instances.  
+     * @param parsers parser instances
+     */
+    public TikaContentExtractor(final List<Parser> parsers, Detector detector) {
+        this.parsers = parsers;
+        this.detector = detector;
+    }
+    
+    /**
      * Create new Tika-based content extractor using the provided parser instance and
-     * optional media type validation. If validation is enabled, the implementation 
+     * optional media type validation. If validation is enabled, the implementation parser
      * will try to detect the media type of the input and validate it against media types
      * supported by the parser.
      * @param parser parser instance
-     * @param validateMediaType enabled or disable media type validation
+     * @param validateMediaType enabled or disable media type validationparser
      */
     public TikaContentExtractor(final Parser parser, final boolean validateMediaType) {
-        this.parser = parser;
-        this.validateMediaType = validateMediaType;
-        this.detector = validateMediaType ? new DefaultDetector() : null;
+        this(Collections.singletonList(parser), validateMediaType ? new DefaultDetector() : null);
     }
     
     /**
@@ -111,18 +128,28 @@ public class TikaContentExtractor {
             final Metadata metadata = new Metadata();            
             final ParseContext context = new ParseContext();
             
-            // Try to validate that input stream media type is supported by the parser 
-            if (validateMediaType) {
-                final MediaType mediaType = detector.detect(in, metadata);
-                if (mediaType == null || !parser.getSupportedTypes(context).contains(mediaType)) {
-                    return null;
+            // Try to validate that input stream media type is supported by the parser
+            MediaType mediaType = null;
+            Parser parser = null;
+            for (Parser p : parsers) {
+                if (detector != null) {
+                    mediaType = detector.detect(in, metadata);
+                    if (mediaType != null && p.getSupportedTypes(context).contains(mediaType)) {
+                        parser = p;
+                        break;
+                    }
+                } else {
+                    parser = p;
                 }
+            }
+            if (parser == null) {
+                return null;
             }
             
             final ToTextContentHandler handler = extractContent 
                 ? new ToTextContentHandler() : new IgnoreContentHandler();
             parser.parse(in, handler, metadata, context);
-            return new TikaContent(handler.toString(), metadata);
+            return new TikaContent(handler.toString(), metadata, mediaType);
         } catch (final IOException ex) {
             LOG.log(Level.WARNING, "Unable to extract media type from input stream", ex);
         } catch (final SAXException ex) {
@@ -136,15 +163,20 @@ public class TikaContentExtractor {
     public static class TikaContent {
         private String content;
         private Metadata metadata;
-        public TikaContent(String content, Metadata metadata) {
+        private MediaType mediaType;
+        public TikaContent(String content, Metadata metadata, MediaType mediaType) {
             this.content = content;
             this.metadata = metadata;
+            this.mediaType = mediaType;
         }
         public String getContent() {
             return content;
         }
         public Metadata getMetadata() {
             return metadata;
+        }
+        public MediaType getMediaType() {
+            return mediaType;
         }
     }
     

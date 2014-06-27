@@ -25,7 +25,6 @@ import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.lucene.LuceneQueryVisitor;
-import org.apache.cxf.jaxrs.ext.search.tika.TikaLuceneContentExtractor.DocumentMetadata;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -39,6 +38,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.apache.tika.parser.pdf.PDFParser;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -80,7 +80,7 @@ public class TikaLuceneContentExtractorTest extends Assert {
 
     @Test
     public void testExtractedTextContentMatchesTypesAndSearchCriteria() throws Exception {
-        final DocumentMetadata documentMetadata = new DocumentMetadata("contents")
+        final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
             .withField("modified", Date.class);
         
         final Document document = extractor.extract(

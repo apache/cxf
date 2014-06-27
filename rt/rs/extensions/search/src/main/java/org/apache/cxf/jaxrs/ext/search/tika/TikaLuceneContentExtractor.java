@@ -20,8 +20,6 @@ package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.InputStream;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
 import org.apache.lucene.document.Document;
@@ -37,54 +35,8 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.Parser;
 
 public class TikaLuceneContentExtractor {
-    private final DocumentMetadata defaultDocumentMetadata;    
+    private final LuceneDocumentMetadata defaultDocumentMetadata;    
     private final TikaContentExtractor extractor;
-    
-    public static class DocumentMetadata {
-        private final Map< String, Class< ? > > fieldTypes = 
-            new LinkedHashMap< String, Class< ? > >();
-        private final String contentFieldName;
-        
-        public DocumentMetadata(final String contentFieldName) {
-            this.contentFieldName = contentFieldName;
-        }
-        
-        public DocumentMetadata withField(final String name, final Class< ? > type) {
-            fieldTypes.put(name, type);
-            return this;
-        }
-        
-        public String getContentFieldName() {
-            return contentFieldName;
-        }
-        
-        private Field contentField(final String content) {
-            return new TextField(contentFieldName, content, Store.YES);
-        }
-        
-        private Field field(final String name, final String value) {
-            final Class< ? > type = fieldTypes.get(name);
-            
-            if (type != null) {
-                if (Number.class.isAssignableFrom(type)) {
-                    if (Double.class.isAssignableFrom(type)) {
-                        return new DoubleField(name, Double.valueOf(value), Store.YES);
-                    } else if (Float.class.isAssignableFrom(type)) {
-                        return new FloatField(name, Float.valueOf(value), Store.YES);
-                    } else if (Long.class.isAssignableFrom(type)) {
-                        return new LongField(name, Long.valueOf(value), Store.YES);
-                    } else if (Integer.class.isAssignableFrom(type)) {
-                        return new IntField(name, Integer.valueOf(value), Store.YES);
-                    }
-                } else if (Date.class.isAssignableFrom(type)) {
-                    return new StringField(name, value, Store.YES);
-                }                
-            }
-            
-            return new StringField(name, value, Store.YES);
-        }
-    }
-    
     
     /**
      * Create new Tika-based content extractor using the provided parser instance.  
@@ -97,13 +49,13 @@ public class TikaLuceneContentExtractor {
     /**
      * Create new Tika-based content extractor using the provided parser instance and
      * optional media type validation. If validation is enabled, the implementation 
-     * will try to detect the media type of the input and validate it against media types
+     * will try to detect the media type of the input and validate it against media typesthis.contentFieldName
      * supported by the parser.
      * @param parser parser instance
      * @param validateMediaType enabled or disable media type validation
      */
     public TikaLuceneContentExtractor(final Parser parser, final boolean validateMediaType) {
-        this(parser, validateMediaType, "contents");
+        this(parser, validateMediaType, new LuceneDocumentMetadata());
     }
     
     /**
@@ -111,14 +63,28 @@ public class TikaLuceneContentExtractor {
      * optional media type validation. If validation is enabled, the implementation 
      * will try to detect the media type of the input and validate it against media types
      * supported by the parser.
-     * @param parser parser instance
-     * @param validateMediaType enabled or disable media type validation
-     * @param contentFieldName name of the content field, default is "contents"
+     * @param parser parser instancethis.contentFieldName
+     * @param documentMetadata documentMetadata
      */
-    public TikaLuceneContentExtractor(final Parser parser, final boolean validateMediaType, 
-                                final String contentFieldName) {
-        extractor = new TikaContentExtractor(parser, validateMediaType);
-        defaultDocumentMetadata = new DocumentMetadata(contentFieldName);
+    public TikaLuceneContentExtractor(final Parser parser, 
+                                      final LuceneDocumentMetadata documentMetadata) {
+        this(parser, false, new LuceneDocumentMetadata());
+    }
+    
+    /**
+     * Create new Tika-based content extractor using the provided parser instance and
+     * optional media type validation. If validation is enabled, the implementation 
+     * will try to detect the media type of the input and validate it against media types
+     * supported by the parser.
+     * @param parser parser instancethis.contentFieldName
+     * @param validateMediaType enabled or disable media type validation
+     * @param documentMetadata documentMetadata
+     */
+    public TikaLuceneContentExtractor(final Parser parser, 
+                                      final boolean validateMediaType, 
+                                      final LuceneDocumentMetadata documentMetadata) {
+        this.extractor = new TikaContentExtractor(parser, validateMediaType);
+        this.defaultDocumentMetadata = documentMetadata;
     }
     
     /**
@@ -129,20 +95,19 @@ public class TikaLuceneContentExtractor {
      * @return the extracted document or null if extraction is not possible or was unsuccessful
      */
     public Document extract(final InputStream in) {
-        return extractAll(in, defaultDocumentMetadata, true, true);
+        return extractAll(in, null, true, true);
     }
     
     /**
-     * Extract the content and metadata from the input stream using DocumentMetadata descriptor to
-     * create a document with strongly typed fields. Depending on media type validation,
+     * Extract the content and metadata from the input stream. Depending on media type validation,
      * the detector could be run against input stream in order to ensure that parser supports this
      * type of content. 
      * @param in input stream to extract the content and metadata from  
-     * @param metadata document descriptor with field names and their types
+     * @param documentMetadata documentMetadata
      * @return the extracted document or null if extraction is not possible or was unsuccessful
      */
-    public Document extract(final InputStream in, final DocumentMetadata metadata) {
-        return extractAll(in, metadata, true, true);
+    public Document extract(final InputStream in, final LuceneDocumentMetadata documentMetadata) {
+        return extractAll(in, documentMetadata, true, true);
     }
     
     /**
@@ -153,7 +118,7 @@ public class TikaLuceneContentExtractor {
      * @return the extracted document or null if extraction is not possible or was unsuccessful
      */
     public Document extractContent(final InputStream in) {
-        return extractAll(in, defaultDocumentMetadata, true, false);
+        return extractAll(in, null, true, false);
     }
     
     /**
@@ -164,11 +129,25 @@ public class TikaLuceneContentExtractor {
      * @return the extracted document or null if extraction is not possible or was unsuccessful
      */
     public Document extractMetadata(final InputStream in) {
-        return extractAll(in, defaultDocumentMetadata, false, true);
+        return extractAll(in, null, false, true);
     }
     
-    private Document extractAll(final InputStream in, final DocumentMetadata documentMetadata, 
-            boolean extractContent, boolean extractMetadata) {
+    /**
+     * Extract the metadata only from the input stream. Depending on media type validation,
+     * the detector could be run against input stream in order to ensure that parser supports this
+     * type of content. 
+     * @param in input stream to extract the metadata from
+     * @param documentMetadata documentMetadata  
+     * @return the extracted document or null if extraction is not possible or was unsuccessful
+     */
+    public Document extractMetadata(final InputStream in, final LuceneDocumentMetadata documentMetadata) {
+        return extractAll(in, documentMetadata, false, true);
+    }
+    
+    private Document extractAll(final InputStream in, 
+                                LuceneDocumentMetadata documentMetadata, 
+                                boolean extractContent, 
+                                boolean extractMetadata) {
         
         TikaContent content = extractor.extractAll(in, extractContent);
         
@@ -176,18 +155,49 @@ public class TikaLuceneContentExtractor {
             return null;
         }
         final Document document = new Document();
+        
+        if (documentMetadata == null) { 
+            documentMetadata = defaultDocumentMetadata;
+        }
         if (content.getContent() != null) {
-            document.add(documentMetadata.contentField(content.getContent()));
+            document.add(getContentField(documentMetadata, content.getContent()));
         } 
         
         if (extractMetadata) {
             Metadata metadata = content.getMetadata();
             for (final String property: metadata.names()) {
-                document.add(documentMetadata.field(property, metadata.get(property)));
+                document.add(getField(documentMetadata, property, metadata.get(property)));
             }
         }
         
         return document;
         
+    }
+    
+    private static Field getContentField(final LuceneDocumentMetadata documentMetadata, final String content) {
+        return new TextField(documentMetadata.getContentFieldName(), content, Store.YES);
+    }
+    
+    private static Field getField(final LuceneDocumentMetadata documentMetadata, 
+                                  final String name, final String value) { 
+        final Class< ? > type = documentMetadata.getFieldType(name);
+        
+        if (type != null) {
+            if (Number.class.isAssignableFrom(type)) {
+                if (Double.class.isAssignableFrom(type)) {
+                    return new DoubleField(name, Double.valueOf(value), Store.YES);
+                } else if (Float.class.isAssignableFrom(type)) {
+                    return new FloatField(name, Float.valueOf(value), Store.YES);
+                } else if (Long.class.isAssignableFrom(type)) {
+                    return new LongField(name, Long.valueOf(value), Store.YES);
+                } else if (Integer.class.isAssignableFrom(type)) {
+                    return new IntField(name, Integer.valueOf(value), Store.YES);
+                }
+            } else if (Date.class.isAssignableFrom(type)) {
+                return new StringField(name, value, Store.YES);
+            }                
+        }
+        
+        return new StringField(name, value, Store.YES);
     }
 }
