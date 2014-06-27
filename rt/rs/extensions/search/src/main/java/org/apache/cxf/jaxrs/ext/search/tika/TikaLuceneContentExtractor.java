@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
 import org.apache.lucene.document.Document;
@@ -84,6 +85,21 @@ public class TikaLuceneContentExtractor {
                                       final boolean validateMediaType, 
                                       final LuceneDocumentMetadata documentMetadata) {
         this.extractor = new TikaContentExtractor(parser, validateMediaType);
+        this.defaultDocumentMetadata = documentMetadata;
+    }
+    
+    /**
+     * Create new Tika-based content extractor using the provided parser instance and
+     * optional media type validation. If validation is enabled, the implementation 
+     * will try to detect the media type of the input and validate it against media types
+     * supported by the parser.
+     * @param parser parser instancethis.contentFieldName
+     * @param validateMediaType enabled or disable media type validation
+     * @param documentMetadata documentMetadata
+     */
+    public TikaLuceneContentExtractor(final List<Parser> parsers, 
+                                      final LuceneDocumentMetadata documentMetadata) {
+        this.extractor = new TikaContentExtractor(parsers);
         this.defaultDocumentMetadata = documentMetadata;
     }
     
