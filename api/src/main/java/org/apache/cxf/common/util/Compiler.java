@@ -34,7 +34,7 @@ import org.apache.cxf.helpers.FileUtils;
 
 public class Compiler {
     private long maxMemory = Runtime.getRuntime().maxMemory();
-    private boolean verbose;
+//    private boolean verbose;
     private String target;
     private String outputDir;
     private String classPath;
@@ -49,7 +49,7 @@ public class Compiler {
         maxMemory = l;
     }
     public void setVerbose(boolean b) {
-        verbose = b;
+//        verbose = b;
     }
     public void setTarget(String s) {
         target = s;
