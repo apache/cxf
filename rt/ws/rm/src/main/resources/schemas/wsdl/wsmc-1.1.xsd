@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright(C) OASIS(R) 1993-2008. All Rights Reserved.
+     OASIS trademark, IPR and other policies apply.  -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsmc="http://docs.oasis-open.org/ws-rx/wsmc/200702" targetNamespace="http://docs.oasis-open.org/ws-rx/wsmc/200702" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/>
+  <!-- Protocol Elements -->
+  <xs:complexType name="MessagePendingType">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="pending" type="xs:boolean"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:element name="MessagePending" type="wsmc:MessagePendingType"/>
+  <xs:element name="Address">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:anyURI">
+          <xs:anyAttribute namespace="##other" processContents="lax"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="MakeConnectionType">
+    <xs:sequence>
+      <xs:element ref="wsmc:Address" minOccurs="0" maxOccurs="1"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:element name="MakeConnection" type="wsmc:MakeConnectionType"/>
+  <xs:element name="UnsupportedElement">
+    <xs:simpleType>
+      <xs:restriction base="xs:QName"/>
+    </xs:simpleType>
+  </xs:element>
+</xs:schema>

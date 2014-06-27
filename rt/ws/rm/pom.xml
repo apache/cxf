@@ -171,6 +171,14 @@
                                     </deleteDirs>
                                 </xsdOption>
                                 <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/wsmc-1.1.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/wsmc-1.1.xjb</bindingFile>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <deleteDirs>
+                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/ws/addressing</deleteDir>
+                                    </deleteDirs>
+                                </xsdOption>
+                                <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/configuration/wsrm-manager-types.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/configuration/wsrm-policy.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>

@@ -25,6 +25,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
+import org.apache.cxf.ws.rm.RM10Constants;
+import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMCaptureOutInterceptor;
 import org.apache.cxf.ws.rm.RMDeliveryInterceptor;
 import org.apache.cxf.ws.rm.RMInInterceptor;
@@ -45,9 +47,10 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
 
     static {
         Collection<QName> types = new ArrayList<QName>();
-        types.add(new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"));
-        types.add(new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"));
-        types.add(new QName("http://ws-i.org/profiles/rsp/1.0/", "Conformant"));
+        types.add(RM10Constants.WSRMP_RMASSERTION_QNAME);
+        types.add(RM11Constants.WSRMP_RMASSERTION_QNAME);
+        types.add(MC11AssertionBuilder.MCSUPPORTED_QNAME);
+        types.add(RSPAssertionBuilder.CONFORMANT_QNAME);
         ASSERTION_TYPES = types;
     }
 
