@@ -19,7 +19,9 @@
 package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.IOException;
-import java.sql.Date;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
@@ -38,7 +40,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.apache.tika.parser.pdf.PDFParser;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -90,15 +91,22 @@ public class TikaLuceneContentExtractorTest extends Assert {
         writer.addDocument(document);
         writer.commit();
 
-        assertEquals(1, getHits("modified==2007-09-15T09:02:31Z").length);
+        assertEquals(1, getHits("modified=gt=2007-09-14T09:02:31", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("modified=gt=2007-09-16T09:02:31", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("modified=lt=2007-09-01T09:02:31", documentMetadata.getFieldTypes()).length);
     }
     
     private ScoreDoc[] getHits(final String expression) throws IOException {
+        return getHits(expression, new HashMap<String, Class<?>>());
+    }
+    
+    private ScoreDoc[] getHits(final String expression, final Map< String, Class<?> > fieldTypes) throws IOException {
         IndexReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);        
 
         try {
             LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
+            visitor.setPrimitiveFieldTypeMap(fieldTypes);
             visitor.visit(parser.parse(expression));
     
             ScoreDoc[] hits = searcher.search(visitor.getQuery(), null, 1000).scoreDocs;

@@ -47,9 +47,12 @@ public class LuceneDocumentMetadata {
     public String getContentFieldName() {
         return contentFieldName;
     }
+    
     public Class<?> getFieldType(String name) {
         return fieldTypes.get(name);
     }
     
-    
+    public Map<String, Class<?>> getFieldTypes() {
+        return fieldTypes;
+    }    
 }

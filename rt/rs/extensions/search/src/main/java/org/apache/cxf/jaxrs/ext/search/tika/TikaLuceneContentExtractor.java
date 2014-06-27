@@ -22,7 +22,12 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
+
+
+import org.apache.lucene.document.DateTools;
+import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
@@ -210,10 +215,20 @@ public class TikaLuceneContentExtractor {
                     return new IntField(name, Integer.valueOf(value), Store.YES);
                 }
             } else if (Date.class.isAssignableFrom(type)) {
-                return new StringField(name, value, Store.YES);
+                final Date date = SearchUtils.timestampFromString(value);                
+                Field field = null;
+                
+                if (date != null) {
+                    field = new StringField(name, DateTools.dateToString(date, Resolution.MILLISECOND), 
+                        Store.YES);
+                } else {
+                    field = new StringField(name, value, Store.YES); 
+                }
+                
+                return field;
             }                
         }
         
         return new StringField(name, value, Store.YES);
-    }
+    }    
 }

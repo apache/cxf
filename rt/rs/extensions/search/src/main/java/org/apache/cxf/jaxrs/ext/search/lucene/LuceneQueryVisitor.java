@@ -28,6 +28,7 @@ import java.util.Stack;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.visitor.AbstractSearchConditionVisitor;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
@@ -38,6 +39,7 @@ import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 
 public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Query> {
@@ -200,17 +202,16 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         } else if (Date.class.isAssignableFrom(cls)) {
             // This code has not been tested - most likely needs to be fixed  
             // Resolution should be configurable ?
-            String luceneDateValue = DateTools.dateToString((Date)value, Resolution.MILLISECOND);
-            String expression = null;
+            final Date date = SearchUtils.timestampFromString(value.toString());           
+            final String luceneDateValue = (date != null) 
+                ? DateTools.dateToString(date, Resolution.MILLISECOND) : value.toString();
+                
             if (type == ConditionType.LESS_THAN) {
-                // what is the base date here ?
-                expression = "[" + ""
-                    + " TO " + luceneDateValue + "]";    
+                return TermRangeQuery.newStringRange(name, "", luceneDateValue, true, false);
             } else {
-                expression = "[" + luceneDateValue + " TO " 
-                    + DateTools.dateToString(new Date(), Resolution.MILLISECOND) + "]";
+                return TermRangeQuery.newStringRange(name, luceneDateValue, 
+                    DateTools.dateToString(new Date(), Resolution.MILLISECOND), true, false);
             }
-            return parseExpression(name, expression);
         } else {
             return null;
         }
@@ -228,11 +229,5 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         }
         
         return booleanQuery;
-    }
-    
-    protected Query parseExpression(String fieldName, String expression) {
-        //QueryParser parser = new QueryParser(Version.LUCENE_40, name, analyzer);
-        // return parse.parse(expression);
-        return null;
-    }
+    }    
 }

@@ -18,10 +18,15 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 
 public final class SearchUtils {
@@ -31,6 +36,8 @@ public final class SearchUtils {
     public static final String LAX_PROPERTY_MATCH = "search.lax.property.match";
     public static final String BEAN_PROPERTY_MAP = "search.bean.property.map";
     public static final String SEARCH_VISITOR_PROPERTY = "search.visitor";
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(SearchUtils.class);
     
     private SearchUtils() {
         
@@ -141,4 +148,27 @@ public final class SearchUtils {
         }
         return op;
     }
+    
+    public static Date timestampFromString(final String value) {
+        Date date = timestampFromString(value, "yyyy-MM-dd'T'HH:mm:ssZ");
+        
+        if (date == null) {
+            date = timestampFromString(value, "yyyy-MM-dd'T'HH:mm:ss");
+        }
+        
+        return date;
+    }
+    
+    private  static Date timestampFromString(final String value, final String format) {
+        try {
+            final SimpleDateFormat formatter = new SimpleDateFormat(format); 
+            return formatter.parse(value); 
+        } catch (final ParseException ex) {
+            LOG.log(Level.WARNING, "Unable to parse date using format specification: " + format, ex);
+            return null;
+        }                 
+    }
+    
+    
+
 }
