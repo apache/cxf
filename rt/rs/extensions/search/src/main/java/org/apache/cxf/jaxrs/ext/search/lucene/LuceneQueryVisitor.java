@@ -183,8 +183,11 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         return fieldName;
     }
     
-    private Query createRangeQuery(Class<?> cls, String name, Object value,
-                                   ConditionType type) {
+    private Query createRangeQuery(Class<?> cls, String name, Object value, ConditionType type) {
+        
+        boolean minInclusive = type == ConditionType.GREATER_OR_EQUALS || type == ConditionType.EQUALS;
+        boolean maxInclusive = type == ConditionType.LESS_OR_EQUALS || type == ConditionType.EQUALS;
+        
         if (String.class.isAssignableFrom(cls) || Number.class.isAssignableFrom(cls)) {
             // If needed, long and double can be supported too
             // Also, perhaps Strings may optionally be compared with string comparators 
@@ -192,10 +195,6 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             Integer min = type == ConditionType.LESS_THAN || type == ConditionType.LESS_OR_EQUALS ? null : intValue;
             Integer max = type == ConditionType.GREATER_THAN || type == ConditionType.GREATER_OR_EQUALS 
                 ? null : intValue;
-            boolean minInclusive = 
-                type == ConditionType.GREATER_OR_EQUALS || type == ConditionType.EQUALS;
-            boolean maxInclusive =
-                type == ConditionType.LESS_OR_EQUALS || type == ConditionType.EQUALS;
             Query query = NumericRangeQuery.newIntRange(name, min, max, 
                                                         minInclusive, maxInclusive);
             return query;
@@ -206,11 +205,11 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             final String luceneDateValue = (date != null) 
                 ? DateTools.dateToString(date, Resolution.MILLISECOND) : value.toString();
                 
-            if (type == ConditionType.LESS_THAN) {
-                return TermRangeQuery.newStringRange(name, "", luceneDateValue, true, false);
+            if (type == ConditionType.LESS_THAN || type == ConditionType.LESS_OR_EQUALS) {
+                return TermRangeQuery.newStringRange(name, "", luceneDateValue, minInclusive, maxInclusive);
             } else {
                 return TermRangeQuery.newStringRange(name, luceneDateValue, 
-                    DateTools.dateToString(new Date(), Resolution.MILLISECOND), true, false);
+                    DateTools.dateToString(new Date(), Resolution.MILLISECOND), minInclusive, maxInclusive);
             }
         } else {
             return null;
