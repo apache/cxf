@@ -90,24 +90,32 @@ public class CachingTest extends AbstractBusClientServerTestBase {
             );
         assertNotNull(tokenStore);
         // We expect 1 token
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 1);
+        assertEquals(1, tokenStore.getTokenIdentifiers().size());
+        
+        
         
         // Second invocation
-        port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        DoubleItPortType port2 = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port2, test.getPort());
         
-        port.doubleIt(35);
+        port2.doubleIt(35);
 
-        client = ClientProxy.getClient(port);
+        client = ClientProxy.getClient(port2);
         tokenStore = 
             (TokenStore)client.getEndpoint().getEndpointInfo().getProperty(
                 SecurityConstants.TOKEN_STORE_CACHE_INSTANCE
             );
+
         assertNotNull(tokenStore);
         // There should now be 2 tokens as both proxies share the same TokenStore
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 2);
+        assertEquals(2, tokenStore.getTokenIdentifiers().size());
         
         ((java.io.Closeable)port).close();
+        //port2 is still holding onto the cache, thus, this should still be 4
+        assertEquals(4, tokenStore.getTokenIdentifiers().size());       
+        ((java.io.Closeable)port2).close();
+        //port2 is now closed, this should be null
+        assertNull(tokenStore.getTokenIdentifiers());       
         bus.shutdown(true);
     }
     
@@ -146,31 +154,33 @@ public class CachingTest extends AbstractBusClientServerTestBase {
             );
         assertNotNull(tokenStore);
         // We expect 1 token
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 1);
+        assertEquals(1, tokenStore.getTokenIdentifiers().size());
+        
         
         // Second invocation
-        port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        DoubleItPortType port2 = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port2, test.getPort());
         
-        ((BindingProvider)port).getRequestContext().put(
+        ((BindingProvider)port2).getRequestContext().put(
             SecurityConstants.CACHE_IDENTIFIER, "proxy2"
         );
-        ((BindingProvider)port).getRequestContext().put(
+        ((BindingProvider)port2).getRequestContext().put(
             SecurityConstants.CACHE_CONFIG_FILE, "client/per-proxy-cache.xml"
         );
         
-        port.doubleIt(35);
+        port2.doubleIt(35);
 
-        client = ClientProxy.getClient(port);
+        client = ClientProxy.getClient(port2);
         tokenStore = 
             (TokenStore)client.getEndpoint().getEndpointInfo().getProperty(
                 SecurityConstants.TOKEN_STORE_CACHE_INSTANCE
             );
         assertNotNull(tokenStore);
         // We expect 1 token
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 1);
+        assertEquals(1, tokenStore.getTokenIdentifiers().size());
         
         ((java.io.Closeable)port).close();
+        ((java.io.Closeable)port2).close();
         bus.shutdown(true);
     }
     
