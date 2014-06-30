@@ -208,10 +208,9 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
             // this step is especially important for global shared cache manager
             if (cache != null) {
                 synchronized (cache) {
-                    if (cache instanceof RefCountCache) {
-                        if (((RefCountCache)cache).decrementAndGet() == 0) {
-                            cacheManager.removeCache(cache.getName());
-                        }
+                    if (cache instanceof RefCountCache
+                        && ((RefCountCache)cache).decrementAndGet() == 0) {
+                        cacheManager.removeCache(cache.getName());
                     }
                 }                
             }
