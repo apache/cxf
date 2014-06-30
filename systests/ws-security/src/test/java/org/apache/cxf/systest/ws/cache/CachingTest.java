@@ -113,28 +113,35 @@ public class CachingTest extends AbstractBusClientServerTestBase {
             );
         assertNotNull(tokenStore);
         // We expect two tokens as the identifier + SHA-1 are cached
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 2);
+        assertEquals(2, tokenStore.getTokenIdentifiers().size());
+        
         
         // Second invocation
-        port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        DoubleItPortType port2 = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port2, test.getPort());
         
         if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
+            SecurityTestUtil.enableStreaming(port2);
         }
         
-        port.doubleIt(35);
+        port2.doubleIt(35);
 
-        client = ClientProxy.getClient(port);
+        client = ClientProxy.getClient(port2);
         tokenStore = 
             (TokenStore)client.getEndpoint().getEndpointInfo().getProperty(
                 SecurityConstants.TOKEN_STORE_CACHE_INSTANCE
             );
+
         assertNotNull(tokenStore);
         // There should now be 4 tokens as both proxies share the same TokenStore
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 4);
+        assertEquals(4, tokenStore.getTokenIdentifiers().size());
         
         ((java.io.Closeable)port).close();
+        //port2 is still holding onto the cache, thus, this should still be 4
+        assertEquals(4, tokenStore.getTokenIdentifiers().size());       
+        ((java.io.Closeable)port2).close();
+        //port2 is now closed, this should be null
+        assertNull(tokenStore.getTokenIdentifiers());       
         bus.shutdown(true);
     }
     
@@ -177,35 +184,36 @@ public class CachingTest extends AbstractBusClientServerTestBase {
             );
         assertNotNull(tokenStore);
         // We expect two tokens as the identifier + SHA-1 are cached
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 2);
+        assertEquals(2, tokenStore.getTokenIdentifiers().size());
         
         // Second invocation
-        port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        DoubleItPortType port2 = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port2, test.getPort());
         
-        ((BindingProvider)port).getRequestContext().put(
+        ((BindingProvider)port2).getRequestContext().put(
             SecurityConstants.CACHE_IDENTIFIER, "proxy2"
         );
-        ((BindingProvider)port).getRequestContext().put(
+        ((BindingProvider)port2).getRequestContext().put(
             SecurityConstants.CACHE_CONFIG_FILE, "per-proxy-cache.xml"
         );
         
         if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
+            SecurityTestUtil.enableStreaming(port2);
         }
         
-        port.doubleIt(35);
+        port2.doubleIt(35);
 
-        client = ClientProxy.getClient(port);
+        client = ClientProxy.getClient(port2);
         tokenStore = 
             (TokenStore)client.getEndpoint().getEndpointInfo().getProperty(
                 SecurityConstants.TOKEN_STORE_CACHE_INSTANCE
             );
         assertNotNull(tokenStore);
         // We expect two tokens as the identifier + SHA-1 are cached
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 2);
+        assertEquals(2, tokenStore.getTokenIdentifiers().size());
         
         ((java.io.Closeable)port).close();
+        ((java.io.Closeable)port2).close();
         bus.shutdown(true);
     }
     
