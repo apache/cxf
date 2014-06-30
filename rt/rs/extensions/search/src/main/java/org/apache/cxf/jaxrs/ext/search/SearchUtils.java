@@ -30,6 +30,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 
 public final class SearchUtils {
+    public static final String TIMESTAMP_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String TIMESTAMP = "yyyy-MM-dd'T'HH:mm:ssZ";
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String DATE_FORMAT_PROPERTY = "search.date-format";
     public static final String TIMEZONE_SUPPORT_PROPERTY = "search.timezone.support";
@@ -150,10 +152,14 @@ public final class SearchUtils {
     }
     
     public static Date timestampFromString(final String value) {
-        Date date = timestampFromString(value, "yyyy-MM-dd'T'HH:mm:ssZ");
+        Date date = timestampFromString(value, TIMESTAMP);
         
         if (date == null) {
-            date = timestampFromString(value, "yyyy-MM-dd'T'HH:mm:ss");
+            date = timestampFromString(value, TIMESTAMP_WITH_TIMEZONE);
+        }
+        
+        if (date == null) {
+            date = timestampFromString(value, DEFAULT_DATE_FORMAT);
         }
         
         return date;

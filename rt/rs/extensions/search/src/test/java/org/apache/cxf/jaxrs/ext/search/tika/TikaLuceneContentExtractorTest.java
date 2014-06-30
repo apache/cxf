@@ -80,7 +80,7 @@ public class TikaLuceneContentExtractorTest extends Assert {
     }
 
     @Test
-    public void testExtractedTextContentMatchesTypesAndSearchCriteria() throws Exception {
+    public void testExtractedTextContentMatchesTypesAndDateSearchCriteria() throws Exception {
         final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
             .withField("modified", Date.class);
         
@@ -92,6 +92,12 @@ public class TikaLuceneContentExtractorTest extends Assert {
         writer.commit();
 
         assertEquals(1, getHits("modified=gt=2007-09-14T09:02:31", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("modified=le=2007-09-15T09:02:31", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("modified=ge=2007-09-15", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("modified==2007-09-15", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("modified==2007-09-16", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("modified=gt=2007-09-16", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("modified=lt=2007-09-15", documentMetadata.getFieldTypes()).length);
         assertEquals(0, getHits("modified=gt=2007-09-16T09:02:31", documentMetadata.getFieldTypes()).length);
         assertEquals(0, getHits("modified=lt=2007-09-01T09:02:31", documentMetadata.getFieldTypes()).length);
     }
