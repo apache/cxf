@@ -96,7 +96,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         
         // Second invocation
         DoubleItPortType port2 = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port2, test.getPort());
+        updateAddressPort(port2, PORT);
         
         port2.doubleIt(35);
 
@@ -159,7 +159,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         
         // Second invocation
         DoubleItPortType port2 = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port2, test.getPort());
+        updateAddressPort(port2, PORT);
         
         ((BindingProvider)port2).getRequestContext().put(
             SecurityConstants.CACHE_IDENTIFIER, "proxy2"
