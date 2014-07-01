@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +132,7 @@ public final class ProviderFactory {
     private List<ProviderInfo<ContextProvider<?>>> contextProviders = 
         new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
     
-    private ParamConverterProvider newParamConverter;
+    private Set<ParamConverterProvider> newParamConverters;
     private LegacyParamConverterProvider legacyParamConverter; 
     
     private List<ProviderInfo<MessageBodyReader<?>>> jaxbReaders = 
@@ -385,14 +386,20 @@ public final class ProviderFactory {
     
     public <T> ParamConverter<T> createParameterHandler(Class<T> paramType, Annotation[] anns) {
         
-        if (newParamConverter != null) {
+        if (newParamConverters != null) {
             anns = anns != null ? anns : new Annotation[]{};
-            return newParamConverter.getConverter(paramType, paramType, anns);
+            
+            for (ParamConverterProvider newParamConverter : newParamConverters) {
+                ParamConverter<T> converter = newParamConverter.getConverter(paramType, paramType, anns);
+                if (converter != null) {
+                    return converter;
+                }
+            }
         } else if (legacyParamConverter != null) {
             return legacyParamConverter.getConverter(paramType, null, null);
-        } else {
-            return null;
-        }
+        } 
+        return null;
+        
     }
         
     @SuppressWarnings("unchecked")
@@ -811,7 +818,10 @@ public final class ProviderFactory {
             }
             
             if (ParamConverterProvider.class.isAssignableFrom(oClass)) {
-                newParamConverter = (ParamConverterProvider)o;
+                if (newParamConverters == null) {
+                    newParamConverters = new LinkedHashSet<ParamConverterProvider>();
+                }
+                newParamConverters.add((ParamConverterProvider)o);
             }
             
             if (ParameterHandler.class.isAssignableFrom(oClass)) {
