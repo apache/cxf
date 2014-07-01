@@ -19,28 +19,33 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Provider
 public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
-    
+    protected static final Logger LOG = LogUtils.getL7dLogger(DataSourceProvider.class);
     private boolean useDataSourceContentType;
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -51,7 +56,17 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
                                MediaType type, 
                                MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
-        DataSource ds = new InputStreamDataSource(is, type.toString());
+        
+        DataSource ds = null;
+        if (cls == FileDataSource.class) { 
+            File file = new BinaryDataProvider<File>().readFrom(File.class, File.class, annotations, type, headers, is);
+            ds = new FileDataSource(file);    
+        } else if (cls == DataSource.class || cls == DataHandler.class) {
+            ds = new InputStreamDataSource(is, type.toString());
+        } else {
+            LOG.warning("Unsupported DataSource class: " + cls.getName());
+            throw ExceptionUtils.toWebApplicationException(null, null);
+        }
         return cls.cast(DataSource.class.isAssignableFrom(cls) ? ds : new DataHandler(ds));
     }
 
