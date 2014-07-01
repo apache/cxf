@@ -212,7 +212,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 String messageType = jmsConfig.getMessageType();
                 Destination destination = rtd;
                 String replyToAddress = jmsConfig.getReplyToDestination();
-                if (rtd == null && replyToAddress != null) {
+                if (replyToAddress != null) {
                     destination = JMSFactory.resolveOrCreateDestination(jmsTemplate, replyToAddress,
                                                                         jmsConfig.isPubSubDomain());
                 }
