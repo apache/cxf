@@ -24,9 +24,11 @@ import java.io.InputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
 /**
@@ -52,14 +54,22 @@ public final class PersistenceUtils {
     
     public SequenceAcknowledgement deserialiseAcknowledgment(InputStream is) {
         Object obj = null;
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
         try {
-            obj = getContext().createUnmarshaller().unmarshal(is);
+            obj = getContext().createUnmarshaller().unmarshal(reader);
             if (obj instanceof JAXBElement<?>) {
                 JAXBElement<?> el = (JAXBElement<?>)obj;
                 obj = el.getValue();
             }
         } catch (JAXBException ex) {
             throw new RMStoreException(ex);
+        } finally {
+            try {
+                StaxUtils.close(reader);
+                is.close();
+            } catch (Throwable t) {
+                //ignore, just cleaning up
+            }
         }
         return (SequenceAcknowledgement)obj;
     }
