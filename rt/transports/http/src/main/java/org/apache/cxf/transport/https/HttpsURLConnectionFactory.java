@@ -173,6 +173,8 @@ public class HttpsURLConnectionFactory {
             // from the policy.
             socketFactory = new SSLSocketFactoryWrapper(ctx.getSocketFactory(), cipherSuites,
                                                         tlsClientParameters.getSecureSocketProtocol());
+            //recalc the hashcode since somet of the above MAY have changed the tlsClientParameters 
+            lastTlsHash = tlsClientParameters.hashCode();
         } else {
            // ssl socket factory already initialized, reuse it to benefit of keep alive
         }
@@ -260,7 +262,8 @@ public class HttpsURLConnectionFactory {
                                                KeyManager[] keyManagers) throws GeneralSecurityException {
         if (tlsClientParameters.getCertAlias() != null) {
             for (int idx = 0; idx < keyManagers.length; idx++) {
-                if (keyManagers[idx] instanceof X509KeyManager) {
+                if (keyManagers[idx] instanceof X509KeyManager
+                    && !(keyManagers[idx] instanceof AliasedX509ExtendedKeyManager)) {
                     try {
                         keyManagers[idx] = new AliasedX509ExtendedKeyManager(
                             tlsClientParameters.getCertAlias(), (X509KeyManager)keyManagers[idx]);
