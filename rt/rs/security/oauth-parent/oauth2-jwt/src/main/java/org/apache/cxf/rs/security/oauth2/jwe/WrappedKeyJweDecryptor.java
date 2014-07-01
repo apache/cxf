@@ -42,14 +42,15 @@ public class WrappedKeyJweDecryptor extends AbstractJweDecryptor {
         this.cekDecryptionKey = cekDecryptionKey;
         this.unwrap = unwrap;
     }
-    protected byte[] getContentEncryptionKey() {
-        KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm());
+    protected byte[] getContentEncryptionKey(JweCompactConsumer consumer) {
+        KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm(consumer));
         if (!unwrap) {
             keyProps.setBlockSize(getKeyCipherBlockSize());
-            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(), getCekDecryptionKey(), keyProps);
+            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(consumer), 
+                                            getCekDecryptionKey(), keyProps);
         } else {
-            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(), 
-                                               getContentEncryptionAlgorithm(), 
+            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(consumer), 
+                                               getContentEncryptionAlgorithm(consumer), 
                                                getCekDecryptionKey(), 
                                                keyProps).getEncoded();
         }
@@ -60,7 +61,7 @@ public class WrappedKeyJweDecryptor extends AbstractJweDecryptor {
     protected int getKeyCipherBlockSize() {
         return -1;
     }
-    protected String getKeyEncryptionAlgorithm() {
-        return Algorithm.toJavaName(getHeaders().getKeyEncryptionAlgorithm());
+    protected String getKeyEncryptionAlgorithm(JweCompactConsumer consumer) {
+        return Algorithm.toJavaName(consumer.getJweHeaders().getKeyEncryptionAlgorithm());
     }
 }
