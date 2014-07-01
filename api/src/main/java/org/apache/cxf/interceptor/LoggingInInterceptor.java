@@ -171,7 +171,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getMessage().append("\nMessage (saved to tmp file):\n");
                 buffer.getMessage().append("Filename: " + writer.getTempFile().getAbsolutePath() + "\n");
             }
-            if (writer.size() > limit) {
+            if (writer.size() > limit && limit != -1) {
                 buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
             }
             writer.writeCacheTo(buffer.getPayload(), limit);
@@ -193,7 +193,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
 
             //only copy up to the limit since that's all we need to log
             //we can stream the rest
-            IOUtils.copyAtLeast(bis, bos, limit);
+            IOUtils.copyAtLeast(bis, bos, limit == -1 ? Integer.MAX_VALUE : limit);
             bos.flush();
             bis = new SequenceInputStream(bos.getInputStream(), bis);
             
@@ -209,7 +209,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getMessage().append("\nMessage (saved to tmp file):\n");
                 buffer.getMessage().append("Filename: " + bos.getTempFile().getAbsolutePath() + "\n");
             }
-            if (bos.size() > limit) {
+            if (bos.size() > limit && limit != -1) {
                 buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
             }
             writePayload(buffer.getPayload(), bos, encoding, ct); 

@@ -142,6 +142,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         int count;
         Logger logger; //NOPMD
         Message message;
+        final int lim;
         
         public LogWriter(Logger logger, Message message, Writer writer) {
             super(writer);
@@ -150,32 +151,33 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             if (!(writer instanceof StringWriter)) {
                 out2 = new StringWriter();
             }
+            lim = limit == -1 ? Integer.MAX_VALUE : limit;
         }
         public void write(int c) throws IOException {
             super.write(c);
-            if (out2 != null && count < limit) {
+            if (out2 != null && count < lim) {
                 out2.write(c);
             }
             count++;
         }
         public void write(char[] cbuf, int off, int len) throws IOException {
             super.write(cbuf, off, len);
-            if (out2 != null && count < limit) {
+            if (out2 != null && count < lim) {
                 out2.write(cbuf, off, len);
             }
             count += len;
         }
         public void write(String str, int off, int len) throws IOException {
             super.write(str, off, len);
-            if (out2 != null && count < limit) {
+            if (out2 != null && count < lim) {
                 out2.write(str, off, len);
             }
             count += len;
         }
         public void close() throws IOException {
             LoggingMessage buffer = setupBuffer(message);
-            if (count >= limit) {
-                buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+            if (count >= lim) {
+                buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
             }
             StringWriter w2 = out2;
             if (w2 == null) {
@@ -202,11 +204,13 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         private final Message message;
         private final OutputStream origStream;
         private final Logger logger; //NOPMD
+        private final int lim;
         
         public LoggingCallback(final Logger logger, final Message msg, final OutputStream os) {
             this.logger = logger;
             this.message = msg;
             this.origStream = os;
+            this.lim = limit == -1 ? Integer.MAX_VALUE : limit;
         }
 
         public void onFlush(CachedOutputStream cos) {  
@@ -225,14 +229,14 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             
             if (cos.getTempFile() == null) {
                 //buffer.append("Outbound Message:\n");
-                if (cos.size() >= limit) {
-                    buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+                if (cos.size() >= lim) {
+                    buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
                 }
             } else {
                 buffer.getMessage().append("Outbound Message (saved to tmp file):\n");
                 buffer.getMessage().append("Filename: " + cos.getTempFile().getAbsolutePath() + "\n");
-                if (cos.size() >= limit) {
-                    buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+                if (cos.size() >= lim) {
+                    buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
                 }
             }
             try {
