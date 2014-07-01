@@ -22,11 +22,13 @@ package org.apache.cxf.ws.security.tokenstore;
 import java.io.Closeable;
 import java.net.URL;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.Status;
 import net.sf.ehcache.config.CacheConfiguration;
 
 import org.apache.cxf.Bus;
@@ -41,7 +43,6 @@ import org.apache.wss4j.common.cache.EHCacheManagerHolder;
  * and the max TTL is 12 hours.
  */
 public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleListener {
-
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     
@@ -61,11 +62,32 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager)
             .overflowToDisk(false); //tokens not writable
         
-        Ehcache newCache = new Cache(cc);
+        Cache newCache = new RefCountCache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
+        synchronized (cache) {
+            if (cache.getStatus() != Status.STATUS_ALIVE) {
+                cache = cacheManager.addCacheIfAbsent(newCache);
+            }
+            if (cache instanceof RefCountCache) {
+                ((RefCountCache)cache).incrementAndGet();
+            }
+        }
         
         // Set the TimeToLive value from the CacheConfiguration
         ttl = cc.getTimeToLiveSeconds();
+    }
+    
+    private static class RefCountCache extends Cache {
+        AtomicInteger count = new AtomicInteger();
+        public RefCountCache(CacheConfiguration cc) {
+            super(cc);
+        }
+        public int incrementAndGet() {
+            return count.incrementAndGet();
+        }
+        public int decrementAndGet() {
+            return count.decrementAndGet();
+        }
     }
     
     /**
@@ -93,17 +115,23 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
     }
     
     public void remove(String identifier) {
-        if (!StringUtils.isEmpty(identifier) && cache.isKeyInCache(identifier)) {
+        if (cache != null && !StringUtils.isEmpty(identifier) && cache.isKeyInCache(identifier)) {
             cache.remove(identifier);
         }
     }
 
     @SuppressWarnings("unchecked")
     public Collection<String> getTokenIdentifiers() {
+        if (cache == null) {
+            return null;
+        }
         return cache.getKeysWithExpiryCheck();
     }
     
     public SecurityToken getToken(String identifier) {
+        if (cache == null) {
+            return null;
+        }
         Element element = cache.get(identifier);
         if (element != null && !cache.isExpired(element)) {
             return (SecurityToken)element.getObjectValue();
@@ -124,7 +152,12 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         if (cacheManager != null) {
             // this step is especially important for global shared cache manager
             if (cache != null) {
-                cacheManager.removeCache(cache.getName());
+                synchronized (cache) {
+                    if (cache instanceof RefCountCache
+                        && ((RefCountCache)cache).decrementAndGet() == 0) {
+                        cacheManager.removeCache(cache.getName());
+                    }
+                }                
             }
             
             EHCacheManagerHolder.releaseCacheManger(cacheManager);

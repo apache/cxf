@@ -24,8 +24,6 @@ import java.io.InputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
@@ -38,9 +36,6 @@ public final class PersistenceUtils {
     
     private static PersistenceUtils instance;
     private JAXBContext context;
-    private Unmarshaller unmarshaller;
-    private Marshaller marshaller;
-    
 
     /**
      * Prevents instantiation.
@@ -58,7 +53,7 @@ public final class PersistenceUtils {
     public SequenceAcknowledgement deserialiseAcknowledgment(InputStream is) {
         Object obj = null;
         try {
-            obj = getUnmarshaller().unmarshal(is);
+            obj = getContext().createUnmarshaller().unmarshal(is);
             if (obj instanceof JAXBElement<?>) {
                 JAXBElement<?> el = (JAXBElement<?>)obj;
                 obj = el.getValue();
@@ -72,7 +67,7 @@ public final class PersistenceUtils {
     public InputStream serialiseAcknowledgment(SequenceAcknowledgement ack) {
         LoadingByteArrayOutputStream bos = new LoadingByteArrayOutputStream(); 
         try {
-            getMarshaller().marshal(ack, bos);
+            getContext().createMarshaller().marshal(ack, bos);
         } catch (JAXBException ex) {
             throw new RMStoreException(ex);
         }
@@ -86,19 +81,5 @@ public final class PersistenceUtils {
                 getClass().getClassLoader()); 
         }
         return context;
-    }
-      
-    private Unmarshaller getUnmarshaller() throws JAXBException {
-        if (null == unmarshaller) {
-            unmarshaller = getContext().createUnmarshaller();
-        }
-        return unmarshaller;
-    }
-    
-    private Marshaller getMarshaller() throws JAXBException {
-        if (null == marshaller) {
-            marshaller = getContext().createMarshaller();
-        }
-        return marshaller;
     }
 }
