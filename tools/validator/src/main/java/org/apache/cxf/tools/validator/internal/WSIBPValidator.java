@@ -19,7 +19,6 @@
 
 package org.apache.cxf.tools.validator.internal;
 
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,21 +54,21 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
     }
 
     public boolean isValid() {
+        boolean valid = true;
         for (Method m : getClass().getMethods()) {
-            if (m.getName().startsWith("check") || m.getModifiers() == Member.PUBLIC) {
+            if (m.getName().startsWith("check") && m.getGenericReturnType() == boolean.class
+                    && m.getGenericParameterTypes().length == 0) {
                 try {
-                    Boolean res = (Boolean)m.invoke(this, new Object[] {});
-                    if (!res.booleanValue()) {
-                        return false;
+                    Boolean res = (Boolean) m.invoke(this);
+                    if (!res) {
+                        valid = false;
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     throw new ToolException(e);
                 }
             }
         }
-        return true;
-
+        return valid;
     }
 
     private boolean checkR2716(final BindingOperation bop) {

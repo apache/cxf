@@ -248,6 +248,19 @@ public final class SOAPBindingUtil {
         return null;
     }
 
+    public static List<SoapHeader> getBindingInputSOAPHeaders(BindingOperation bop) {
+        List<SoapHeader> headers = new ArrayList<SoapHeader>();
+        BindingInput bindingInput = bop.getBindingInput();
+        if (bindingInput != null) {
+            for (Object obj : bindingInput.getExtensibilityElements()) {
+                if (isSOAPHeader(obj)) {
+                    headers.add(getProxy(SoapHeader.class, obj));
+                }
+            }
+        }
+        return headers;
+    }
+
     public static SoapHeader getBindingOutputSOAPHeader(BindingOperation bop) {
         BindingOutput bindingOutput = bop.getBindingOutput();
         if (bindingOutput != null) {
@@ -259,6 +272,19 @@ public final class SOAPBindingUtil {
         }
 
         return null;
+    }
+
+    public static List<SoapHeader> getBindingOutputSOAPHeaders(BindingOperation bop) {
+        List<SoapHeader> headers = new ArrayList<SoapHeader>();
+        BindingOutput bindingOutput = bop.getBindingOutput();
+        if (bindingOutput != null) {
+            for (Object obj : bindingOutput.getExtensibilityElements()) {
+                if (isSOAPHeader(obj)) {
+                    headers.add(getProxy(SoapHeader.class, obj));
+                }
+            }
+        }
+        return headers;
     }
 
     public static SoapBinding getSoapBinding(List<ExtensibilityElement> exts) {
