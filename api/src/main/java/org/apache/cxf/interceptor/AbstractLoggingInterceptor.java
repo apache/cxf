@@ -20,6 +20,7 @@ package org.apache.cxf.interceptor;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -30,20 +31,20 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
+import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * A simple logging handler which outputs the bytes of the message to the
@@ -155,13 +156,24 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         // Just transform the XML message when the cos has content
         if (isPrettyLogging() && (contentType != null && contentType.indexOf("xml") >= 0 
             && contentType.toLowerCase().indexOf("multipart/related") < 0) && cos.size() > 0) {
-            Transformer serializer = XMLUtils.newTransformer(2);
-            // Setup indenting to "pretty print"
-            serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-            serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
             StringWriter swriter = new StringWriter();
-            serializer.transform(new StreamSource(cos.getInputStream()), new StreamResult(swriter));
+            XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
+            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
+            InputStream in = cos.getInputStream();
+            try {
+                StaxUtils.copy(new StreamSource(in), xwriter);
+            } catch (XMLStreamException xse) {
+                //ignore
+            } finally {
+                try {
+                    xwriter.flush();
+                    xwriter.close();
+                } catch (XMLStreamException xse2) {
+                    //ignore
+                }
+                in.close();
+            }
             String result = swriter.toString();
             if (result.length() < limit || limit == -1) {
                 builder.append(swriter.toString());
@@ -187,14 +199,13 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             && contentType != null 
             && contentType.indexOf("xml") >= 0 
             && stringWriter.getBuffer().length() > 0) {
-            Transformer serializer = XMLUtils.newTransformer(2);
-            // Setup indenting to "pretty print"
-            serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-            serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
+            
             StringWriter swriter = new StringWriter();
-            serializer.transform(new StreamSource(new StringReader(stringWriter.getBuffer().toString())),
-                                 new StreamResult(swriter));
+            XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
+            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
+            StaxUtils.copy(new StreamSource(new StringReader(stringWriter.getBuffer().toString())), xwriter);
+            xwriter.close();
+
             String result = swriter.toString();
             if (result.length() < limit || limit == -1) {
                 builder.append(swriter.toString());
