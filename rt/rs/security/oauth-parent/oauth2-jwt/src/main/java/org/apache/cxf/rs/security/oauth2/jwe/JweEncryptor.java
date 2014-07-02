@@ -23,5 +23,5 @@ import java.io.OutputStream;
 
 public interface JweEncryptor {
     String encrypt(byte[] jweContent, String contentType);
-    JweOutputStream createJweStream(OutputStream os, String contentType);
+    OutputStream createJweStream(OutputStream os, String contentType);
 }

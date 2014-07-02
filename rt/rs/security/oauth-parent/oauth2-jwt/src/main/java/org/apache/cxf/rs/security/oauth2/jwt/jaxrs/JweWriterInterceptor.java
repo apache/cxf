@@ -38,7 +38,6 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptor;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
-import org.apache.cxf.rs.security.oauth2.jwe.JweOutputStream;
 import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryptor;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
@@ -67,7 +66,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
         
         
         if (useJweOutputStream) {
-            JweOutputStream jweStream = theEncryptor.createJweStream(actualOs, ctString);
+            OutputStream jweStream = theEncryptor.createJweStream(actualOs, ctString);
             ctx.setOutputStream(jweStream);
             ctx.proceed();
             jweStream.flush();
