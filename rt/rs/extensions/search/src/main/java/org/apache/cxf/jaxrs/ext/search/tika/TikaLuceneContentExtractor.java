@@ -24,8 +24,6 @@ import java.util.List;
 
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
-
-
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.document.Document;
@@ -215,7 +213,7 @@ public class TikaLuceneContentExtractor {
                     return new IntField(name, Integer.valueOf(value), Store.YES);
                 }
             } else if (Date.class.isAssignableFrom(type)) {
-                final Date date = SearchUtils.timestampFromString(value);                
+                final Date date = SearchUtils.dateFromStringWithDefaultFormats(value);                
                 Field field = null;
                 
                 if (date != null) {

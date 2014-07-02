@@ -28,10 +28,12 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class SearchUtils {
     public static final String TIMESTAMP_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
-    public static final String TIMESTAMP = "yyyy-MM-dd'T'HH:mm:ssZ";
+    public static final String TIMESTAMP_WITH_TIMEZONE_Z = "yyyy-MM-dd'T'HH:mm:ssZ";
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String DATE_FORMAT_PROPERTY = "search.date-format";
     public static final String TIMEZONE_SUPPORT_PROPERTY = "search.timezone.support";
@@ -45,8 +47,27 @@ public final class SearchUtils {
         
     }
     
+    public static SimpleDateFormat getContextualDateFormat() {
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        if (m != null) {
+            return getDateFormat((String)m.getContextualProperty(DATE_FORMAT_PROPERTY));
+        } else {
+            return new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+        }
+    }
+    
+    public static Date dateFromStringWithContextProperties(String value) {
+        try {
+            return getContextualDateFormat().parse(value);
+        } catch (ParseException ex) {
+            return dateFromStringWithDefaultFormats(value);
+        }
+    }
+    
     public static SimpleDateFormat getDateFormat(Map<String, String> properties) {
-        String dfProperty = properties.get(DATE_FORMAT_PROPERTY);
+        return getDateFormat(properties.get(DATE_FORMAT_PROPERTY));
+    }
+    public static SimpleDateFormat getDateFormat(String dfProperty) {
         return new SimpleDateFormat(dfProperty == null ? DEFAULT_DATE_FORMAT : dfProperty);    
     }
     
@@ -151,26 +172,26 @@ public final class SearchUtils {
         return op;
     }
     
-    public static Date timestampFromString(final String value) {
-        Date date = timestampFromString(value, TIMESTAMP);
+    public static Date dateFromStringWithDefaultFormats(String value) {
+        value = value.replaceAll("Z$", "+0000");
+        Date date = timestampFromString(new SimpleDateFormat(TIMESTAMP_WITH_TIMEZONE_Z), value);
         
         if (date == null) {
-            date = timestampFromString(value, TIMESTAMP_WITH_TIMEZONE);
+            date = timestampFromString(new SimpleDateFormat(TIMESTAMP_WITH_TIMEZONE), value);
         }
         
         if (date == null) {
-            date = timestampFromString(value, DEFAULT_DATE_FORMAT);
+            date = timestampFromString(getContextualDateFormat(), value);
         }
-        
+                
         return date;
     }
     
-    private  static Date timestampFromString(final String value, final String format) {
+    private  static Date timestampFromString(final SimpleDateFormat formatter, final String value) {
         try {
-            final SimpleDateFormat formatter = new SimpleDateFormat(format); 
             return formatter.parse(value); 
         } catch (final ParseException ex) {
-            LOG.log(Level.WARNING, "Unable to parse date using format specification: " + format, ex);
+            LOG.log(Level.FINE, "Unable to parse date using format specification: " + formatter.toPattern(), ex);
             return null;
         }                 
     }

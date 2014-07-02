@@ -207,7 +207,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         } else if (Date.class.isAssignableFrom(cls)) {
             // This code has not been tested - most likely needs to be fixed  
             // Resolution should be configurable ?
-            final Date date = SearchUtils.timestampFromString(value.toString());           
+            final Date date = SearchUtils.dateFromStringWithContextProperties(value.toString());           
             final String luceneDateValue = (date != null) 
                 ? DateTools.dateToString(date, Resolution.MILLISECOND) : value.toString();
                 

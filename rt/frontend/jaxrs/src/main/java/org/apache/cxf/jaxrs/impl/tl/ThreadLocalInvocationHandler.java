@@ -32,8 +32,17 @@ public class ThreadLocalInvocationHandler<T> extends AbstractThreadLocalProxy<T>
             target = this;    
         } else {
             target = get();
+            if (target == null) {
+                if (m.getName().endsWith("toString")) {
+                    return null;
+                }
+                Class<?> contextCls = m.getDeclaringClass();
+                throw new NullPointerException(
+                                               contextCls.getName()
+                                                   + " context class has not been injected."
+                                                   + " Check if ContextProvider supporting this class is registered");
+            }
         }
         return m.invoke(target, args);
     }
-
 }
