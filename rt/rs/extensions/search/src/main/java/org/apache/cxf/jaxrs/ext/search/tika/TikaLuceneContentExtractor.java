@@ -211,7 +211,7 @@ public class TikaLuceneContentExtractor {
                     return new FloatField(name, Float.valueOf(value), Store.YES);
                 } else if (Long.class.isAssignableFrom(type)) {
                     return new LongField(name, Long.valueOf(value), Store.YES);
-                } else if (Integer.class.isAssignableFrom(type)) {
+                } else if (Integer.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
                     return new IntField(name, Integer.valueOf(value), Store.YES);
                 }
             } else if (Date.class.isAssignableFrom(type)) {

@@ -191,12 +191,18 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         if (String.class.isAssignableFrom(cls) || Number.class.isAssignableFrom(cls)) {
             // If needed, long and double can be supported too
             // Also, perhaps Strings may optionally be compared with string comparators 
-            Integer intValue = Integer.valueOf(value.toString());
-            Integer min = type == ConditionType.LESS_THAN || type == ConditionType.LESS_OR_EQUALS ? null : intValue;
-            Integer max = type == ConditionType.GREATER_THAN || type == ConditionType.GREATER_OR_EQUALS 
-                ? null : intValue;
-            Query query = NumericRangeQuery.newIntRange(name, min, max, 
-                                                        minInclusive, maxInclusive);
+            Query query = null;
+            
+            if (Double.class.isAssignableFrom(cls)) {
+                query = createDoubleRangeQuery(name, value, type, minInclusive, maxInclusive);
+            } else if (Float.class.isAssignableFrom(cls)) {
+                query = createFloatRangeQuery(name, value, type, minInclusive, maxInclusive);
+            } else if (Long.class.isAssignableFrom(cls)) {
+                query = createLongRangeQuery(name, value, type, minInclusive, maxInclusive);
+            } else {
+                query = createIntRangeQuery(name, value, type, minInclusive, maxInclusive);
+            }
+        
             return query;
         } else if (Date.class.isAssignableFrom(cls)) {
             // This code has not been tested - most likely needs to be fixed  
@@ -214,6 +220,47 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         } else {
             return null;
         }
+    }
+
+    private Query createIntRangeQuery(final String name, final Object value,
+            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {        
+        final Integer intValue = Integer.valueOf(value.toString());        
+        
+        return NumericRangeQuery.newIntRange(name, getMin(type, intValue), 
+            getMax(type, intValue),  minInclusive, maxInclusive);        
+    }
+    
+    private Query createLongRangeQuery(final String name, final Object value,
+            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {        
+        final Long longValue = Long.valueOf(value.toString());        
+        
+        return NumericRangeQuery.newLongRange(name, getMin(type, longValue), 
+            getMax(type, longValue),  minInclusive, maxInclusive);        
+    }
+    
+    private Query createDoubleRangeQuery(final String name, final Object value,
+            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {        
+        final Double doubleValue = Double.valueOf(value.toString());        
+        
+        return NumericRangeQuery.newDoubleRange(name, getMin(type, doubleValue), 
+            getMax(type, doubleValue),  minInclusive, maxInclusive);        
+    }
+    
+    private Query createFloatRangeQuery(final String name, final Object value,
+            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {        
+        final Float floatValue = Float.valueOf(value.toString());        
+        
+        return NumericRangeQuery.newFloatRange(name, getMin(type, floatValue), 
+            getMax(type, floatValue),  minInclusive, maxInclusive);        
+    }
+
+    private< N > N getMax(final ConditionType type, final N value) {
+        return type == ConditionType.GREATER_THAN || type == ConditionType.GREATER_OR_EQUALS 
+            ? null : value;
+    }
+
+    private< N > N getMin(final ConditionType type, final N value) {
+        return type == ConditionType.LESS_THAN || type == ConditionType.LESS_OR_EQUALS ? null : value;
     }
     
     private Query createCompositeQuery(List<Query> queries, boolean orCondition) {

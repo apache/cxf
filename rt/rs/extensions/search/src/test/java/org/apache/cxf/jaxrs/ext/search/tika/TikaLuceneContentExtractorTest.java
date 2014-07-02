@@ -102,6 +102,101 @@ public class TikaLuceneContentExtractorTest extends Assert {
         assertEquals(0, getHits("modified=lt=2007-09-01T09:02:31", documentMetadata.getFieldTypes()).length);
     }
     
+    @Test
+    public void testExtractedTextContentMatchesTypesAndIntegerSearchCriteria() throws Exception {
+        final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
+            .withField("xmpTPg:NPages", Integer.class);
+        
+        final Document document = extractor.extract(
+            getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
+        assertNotNull("Document should not be null", document);
+        
+        writer.addDocument(document);
+        writer.commit();
+
+        assertEquals(1, getHits("xmpTPg:NPages=gt=0", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages==1", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages=ge=1", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=gt=1", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=lt=1", documentMetadata.getFieldTypes()).length);
+    }
+    
+    @Test
+    public void testExtractedTextContentMatchesTypesAndByteSearchCriteria() throws Exception {
+        final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
+            .withField("xmpTPg:NPages", Byte.class);
+        
+        final Document document = extractor.extract(
+            getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
+        assertNotNull("Document should not be null", document);
+        
+        writer.addDocument(document);
+        writer.commit();
+
+        assertEquals(1, getHits("xmpTPg:NPages=gt=0", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages==1", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages=ge=1", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=gt=1", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=lt=1", documentMetadata.getFieldTypes()).length);
+    }
+    
+    @Test
+    public void testExtractedTextContentMatchesTypesAndLongSearchCriteria() throws Exception {
+        final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
+            .withField("xmpTPg:NPages", Long.class);
+        
+        final Document document = extractor.extract(
+            getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
+        assertNotNull("Document should not be null", document);
+        
+        writer.addDocument(document);
+        writer.commit();
+
+        assertEquals(1, getHits("xmpTPg:NPages=gt=0", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages==1", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages=ge=1", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=gt=1", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=lt=1", documentMetadata.getFieldTypes()).length);
+    }
+    
+    @Test
+    public void testExtractedTextContentMatchesTypesAndDoubleSearchCriteria() throws Exception {
+        final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
+            .withField("xmpTPg:NPages", Double.class);
+        
+        final Document document = extractor.extract(
+            getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
+        assertNotNull("Document should not be null", document);
+        
+        writer.addDocument(document);
+        writer.commit();
+
+        assertEquals(1, getHits("xmpTPg:NPages=gt=0.0", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages==1.0", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages=ge=1.0", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=gt=1.0", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=lt=1.0", documentMetadata.getFieldTypes()).length);
+    }
+    
+    @Test
+    public void testExtractedTextContentMatchesTypesAndFloatSearchCriteria() throws Exception {
+        final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
+            .withField("xmpTPg:NPages", Float.class);
+        
+        final Document document = extractor.extract(
+            getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
+        assertNotNull("Document should not be null", document);
+        
+        writer.addDocument(document);
+        writer.commit();
+
+        assertEquals(1, getHits("xmpTPg:NPages=gt=0.0", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages==1.0", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("xmpTPg:NPages=ge=1.0", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=gt=1.0", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("xmpTPg:NPages=lt=1.0", documentMetadata.getFieldTypes()).length);
+    }
+    
     private ScoreDoc[] getHits(final String expression) throws IOException {
         return getHits(expression, new HashMap<String, Class<?>>());
     }
