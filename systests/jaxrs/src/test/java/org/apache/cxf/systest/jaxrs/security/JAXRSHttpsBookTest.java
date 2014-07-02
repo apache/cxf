@@ -33,11 +33,11 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
-
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookHttpsServer.PORT;
@@ -52,6 +52,8 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client4.xml";
     private static final String CLIENT_CONFIG_FILE5 =
         "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client5.xml";
+    private static final String CLIENT_CONFIG_FILE_OLD =
+        "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client_old.xml";
     @BeforeClass
     public static void startServers() throws Exception {
         createStaticBus("org/apache/cxf/systest/jaxrs/security/jaxrs-https-server.xml");
@@ -111,6 +113,28 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     public void testGetBook123WebClientFromSpringWildcard() throws Exception {
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE5});
+        Object bean = ctx.getBean("bookService.proxyFactory");
+        assertNotNull(bean);
+        JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean) bean;
+        
+        WebClient wc = (WebClient)cfb.create();
+        assertEquals("https://localhost:" + PORT, wc.getBaseURI().toString());
+        
+        wc.accept("application/xml");
+        wc.path("bookstore/securebooks/123");
+        TheBook b = wc.get(TheBook.class);
+        
+        assertEquals(b.getId(), 123);
+        b = wc.get(TheBook.class);
+        assertEquals(b.getId(), 123);
+        ctx.close();
+    }
+    
+    @Test
+    @Ignore("Works in the studio only if local jaxrs.xsd is updated to have jaxrs:client")
+    public void testGetBook123WebClientFromSpringWildcardOldJaxrsClient() throws Exception {
+        ClassPathXmlApplicationContext ctx =
+            new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE_OLD});
         Object bean = ctx.getBean("bookService.proxyFactory");
         assertNotNull(bean);
         JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean) bean;

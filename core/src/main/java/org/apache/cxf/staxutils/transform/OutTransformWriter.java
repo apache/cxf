@@ -56,6 +56,11 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private DelegatingNamespaceContext namespaceContext;
 
     public OutTransformWriter(XMLStreamWriter writer, 
+                              Map<String, String> outMap) {
+        this(writer, outMap, null, null, null, false, null);
+    }
+    
+    public OutTransformWriter(XMLStreamWriter writer, 
                               Map<String, String> outMap,
                               Map<String, String> append,
                               List<String> dropEls,
