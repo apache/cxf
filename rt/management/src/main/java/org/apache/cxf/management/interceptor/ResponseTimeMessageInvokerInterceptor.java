@@ -31,26 +31,38 @@ import org.apache.cxf.phase.Phase;
  * handler by the binging interceptor  
  * */
 public class ResponseTimeMessageInvokerInterceptor extends AbstractMessageResponseTimeInterceptor {
-    
+
     public ResponseTimeMessageInvokerInterceptor() {
         super(Phase.INVOKE);
         // this interceptor should be add before the serviceInvokerInterceptor
         addBefore(ServiceInvokerInterceptor.class.getName());
     }
-    
+
     public void handleMessage(Message message) throws Fault {
-        Exchange ex = message.getExchange();
-        if (ex.isOneWay() && !isClient(message)) {
-            setOneWayMessage(ex);
-        }
+        message.getInterceptorChain().add(new ResponseTimeMessageInvokerEndingInteceptor());
+
     }
-    
+
     @Override
     public void handleFault(Message message) {
         Exchange ex = message.getExchange();
         ex.put(FaultMode.class, message.get(FaultMode.class));
         if (ex.isOneWay() && !isClient(message)) {
             endHandlingMessage(ex);
+        }
+    }
+
+    class ResponseTimeMessageInvokerEndingInteceptor extends AbstractMessageResponseTimeInterceptor {
+        public ResponseTimeMessageInvokerEndingInteceptor() {
+            super(Phase.INVOKE);
+            addAfter(ServiceInvokerInterceptor.class.getName());
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            Exchange ex = message.getExchange();
+            if (ex.isOneWay() && !isClient(message)) {
+                setOneWayMessage(ex);
+            }
         }
     }
 }

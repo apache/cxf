@@ -20,14 +20,16 @@
 package org.apache.cxf.management.interceptor;
 
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
-
 import org.apache.cxf.message.Message;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
 public class ResponseTimeMessageInvokerInterceptorTest extends AbstractMessageResponseTestBase {
 
-    private ResponseTimeMessageInvokerInterceptor rtmii = new ResponseTimeMessageInvokerInterceptor();
+    private ResponseTimeMessageInvokerInterceptor invokerInterceptor = 
+        new ResponseTimeMessageInvokerInterceptor();
+    private ResponseTimeMessageInvokerInterceptor.ResponseTimeMessageInvokerEndingInteceptor rtmii = 
+        invokerInterceptor.new ResponseTimeMessageInvokerEndingInteceptor();
     
     @Test
     public void testServerOneWayMessageIn() {
