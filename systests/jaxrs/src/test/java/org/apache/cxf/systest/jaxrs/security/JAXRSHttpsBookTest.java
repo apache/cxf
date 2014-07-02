@@ -33,11 +33,12 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookHttpsServer.PORT;
