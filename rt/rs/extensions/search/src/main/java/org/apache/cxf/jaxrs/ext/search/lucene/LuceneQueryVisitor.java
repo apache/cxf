@@ -44,7 +44,6 @@ import org.apache.lucene.search.WildcardQuery;
 
 public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Query> {
 
-    //private Analyzer analyzer;
     private String contentsFieldName;
     private Map<String, String> contentsFieldMap;
     private Stack<List<Query>> queryStack = new Stack<List<Query>>();
@@ -92,10 +91,6 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             queryStack.peek().add(createCompositeQuery(queries, orCondition));
         }    
     }
-
-    //public void setAnalyzer(Analyzer a) {
-    //    this.analyzer = a;
-    //}
     
     public Query getQuery() {
         List<Query> queries = queryStack.peek();
@@ -189,8 +184,6 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         boolean maxInclusive = type == ConditionType.LESS_OR_EQUALS || type == ConditionType.EQUALS;
         
         if (String.class.isAssignableFrom(cls) || Number.class.isAssignableFrom(cls)) {
-            // If needed, long and double can be supported too
-            // Also, perhaps Strings may optionally be compared with string comparators 
             Query query = null;
             
             if (Double.class.isAssignableFrom(cls)) {
@@ -205,8 +198,6 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         
             return query;
         } else if (Date.class.isAssignableFrom(cls)) {
-            // This code has not been tested - most likely needs to be fixed  
-            // Resolution should be configurable ?
             final Date date = SearchUtils.dateFromStringWithContextProperties(value.toString());           
             final String luceneDateValue = (date != null) 
                 ? DateTools.dateToString(date, Resolution.MILLISECOND) : value.toString();
