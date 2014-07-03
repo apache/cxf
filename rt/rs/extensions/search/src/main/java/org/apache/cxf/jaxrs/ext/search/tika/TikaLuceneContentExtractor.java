@@ -168,7 +168,7 @@ public class TikaLuceneContentExtractor {
                                 boolean extractContent, 
                                 boolean extractMetadata) {
         
-        TikaContent content = extractor.extractAll(in, extractContent);
+        TikaContent content = extractor.extract(in, extractContent);
         
         if (content == null) {
             return null;

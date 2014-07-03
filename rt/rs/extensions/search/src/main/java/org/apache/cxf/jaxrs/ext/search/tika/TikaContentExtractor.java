@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -86,10 +87,10 @@ public class TikaContentExtractor {
      * the detector could be run against input stream in order to ensure that parser supports this
      * type of content. 
      * @param in input stream to extract the content and metadata from  
-     * @return the extracted document or null if extraction is not possible or was unsuccessful
+     * @return the extracted content or null if extraction is not possible or was unsuccessful
      */
     public TikaContent extract(final InputStream in) {
-        return extractAll(in, true);
+        return extract(in, true);
     }
     
     /**
@@ -97,10 +98,10 @@ public class TikaContentExtractor {
      * the detector could be run against input stream in order to ensure that parser supports this
      * type of content. 
      * @param in input stream to extract the metadata from  
-     * @return the extracted document or null if extraction is not possible or was unsuccessful
+     * @return the extracted content or null if extraction is not possible or was unsuccessful
      */
     public TikaContent extractMetadata(final InputStream in) {
-        return extractAll(in, false);
+        return extract(in, false);
     }
     
     /**
@@ -108,26 +109,50 @@ public class TikaContentExtractor {
      * the detector could be run against input stream in order to ensure that parser supports this
      * type of content. 
      * @param in input stream to extract the metadata from  
-     * @return the extracted document or null if extraction is not possible or was unsuccessful
+     * @return the extracted metadata converted to SearchBean or null if extraction is not possible 
+     *         or was unsuccessful
      */
     public SearchBean extractMetadataToSearchBean(final InputStream in) {
-        Metadata metadata = extractMetadata(in).getMetadata();
+        TikaContent tc = extractMetadata(in);
+        if (tc == null) {
+            return null;
+        }
+        Metadata metadata = tc.getMetadata();
         SearchBean bean = new SearchBean();
         for (final String property: metadata.names()) {
             bean.set(property, metadata.get(property));
         }
         return bean;
     }
-    
-    TikaContent extractAll(final InputStream in, boolean extractContent) {
+    /**
+     * Extract the content and metadata from the input stream. Depending on media type validation,
+     * the detector could be run against input stream in order to ensure that parser supports this
+     * type of content. 
+     * @param in input stream to extract the metadata from 
+     * @param handler custom ContentHandler 
+     * @return the extracted metadata converted to SearchBean or null if extraction is not possible 
+     *         or was unsuccessful
+     */
+    public TikaContent extract(final InputStream in, final ContentHandler handler) {
+        return extract(in, handler, null);
+    }
+    /**
+     * Extract the content and metadata from the input stream. Depending on media type validation,
+     * the detector could be run against input stream in order to ensure that parser supports this
+     * type of content. 
+     * @param in input stream to extract the metadata from 
+     * @param handler custom ContentHandler
+     * @param context custom context 
+     * @return the extracted metadata converted to SearchBean or null if extraction is not possible 
+     *         or was unsuccessful
+     */
+    public TikaContent extract(final InputStream in, final ContentHandler handler, ParseContext context) {
         if (in == null) {
             return null;
         }
         
         try {
             final Metadata metadata = new Metadata();            
-            final ParseContext context = new ParseContext();
-            
             // Try to validate that input stream media type is supported by the parser
             MediaType mediaType = null;
             Parser parser = null;
@@ -145,11 +170,11 @@ public class TikaContentExtractor {
             if (parser == null) {
                 return null;
             }
-            
-            final ToTextContentHandler handler = extractContent 
-                ? new ToTextContentHandler() : new IgnoreContentHandler();
+            if (context == null) {
+                context = new ParseContext();
+            }
             parser.parse(in, handler, metadata, context);
-            return new TikaContent(handler.toString(), metadata, mediaType);
+            return new TikaContent(handler, metadata, mediaType);
         } catch (final IOException ex) {
             LOG.log(Level.WARNING, "Unable to extract media type from input stream", ex);
         } catch (final SAXException ex) {
@@ -160,21 +185,44 @@ public class TikaContentExtractor {
      
         return null;
     }
+    
+    TikaContent extract(final InputStream in, boolean extractContent) {
+        final ToTextContentHandler handler = extractContent 
+            ? new ToTextContentHandler() : new IgnoreContentHandler();
+        return extract(in, handler, null);
+    }
+    
+    /**
+     * Extracted content, metadata and media type container
+     */
     public static class TikaContent {
-        private String content;
+        private ContentHandler contentHandler;
         private Metadata metadata;
         private MediaType mediaType;
-        public TikaContent(String content, Metadata metadata, MediaType mediaType) {
-            this.content = content;
+        public TikaContent(ContentHandler contentHandler, Metadata metadata, MediaType mediaType) {
+            this.contentHandler = contentHandler;
             this.metadata = metadata;
             this.mediaType = mediaType;
         }
+        /**
+         * Return the content cached by ContentHandler 
+         * @return the content, may be empty or null if a custom non-caching ContentHandler was used
+         *         to parse the content  
+         */
         public String getContent() {
-            return content;
+            return contentHandler.toString();
         }
+        /**
+         * Return the metadata
+         * @return the metadata
+         */
         public Metadata getMetadata() {
             return metadata;
         }
+        /**
+         * Return the detected media type of the content
+         * @return the media type, null if no auto-detection was done
+         */
         public MediaType getMediaType() {
             return mediaType;
         }
