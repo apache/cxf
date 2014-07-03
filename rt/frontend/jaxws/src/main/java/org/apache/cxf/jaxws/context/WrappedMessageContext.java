@@ -21,6 +21,7 @@ package org.apache.cxf.jaxws.context;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -365,6 +366,10 @@ public class WrappedMessageContext implements MessageContext {
         if (attachments instanceof WrappedAttachments) {
             dataHandlers = ((WrappedAttachments) attachments).getAttachments();
         } else {
+            if (attachments == null) {
+                attachments = new ArrayList<Attachment>();
+                mc.put(Message.ATTACHMENTS, attachments);
+            }
             dataHandlers = AttachmentUtil.getDHMap(attachments);
             mc.put(propertyName, 
                    dataHandlers);

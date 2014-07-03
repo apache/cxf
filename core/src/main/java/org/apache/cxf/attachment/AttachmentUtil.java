@@ -28,10 +28,13 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -243,20 +246,77 @@ public final class AttachmentUtil {
         return buffer.toString();
     }
 
-    public static Map<String, DataHandler> getDHMap(Collection<Attachment> attachments) {
+    public static Map<String, DataHandler> getDHMap(final Collection<Attachment> attachments) {
         Map<String, DataHandler> dataHandlers = null;
         if (attachments != null) {
             if (attachments instanceof LazyAttachmentCollection) {
                 dataHandlers = ((LazyAttachmentCollection)attachments).createDataHandlerMap();
             } else {
-                //preserve the order of iteration
-                dataHandlers = new LinkedHashMap<String, DataHandler>();
-                for (Attachment attachment : attachments) {
-                    dataHandlers.put(attachment.getId(), attachment.getDataHandler());
-                }
+                dataHandlers = new DHMap(attachments);
             }
         }
         return dataHandlers == null ? new LinkedHashMap<String, DataHandler>() : dataHandlers;
+    }
+    
+    static class DHMap extends AbstractMap<String, DataHandler> {
+        final Collection<Attachment> list;
+        public DHMap(Collection<Attachment> l) {
+            list = l;
+        }
+        public Set<Map.Entry<String, DataHandler>> entrySet() {
+            return new AbstractSet<Map.Entry<String, DataHandler>>() {
+                @Override
+                public Iterator<Map.Entry<String, DataHandler>> iterator() {
+                    final Iterator<Attachment> it = list.iterator();
+                    return new Iterator<Map.Entry<String, DataHandler>>() {
+                        public boolean hasNext() {
+                            return it.hasNext();
+                        }
+                        public java.util.Map.Entry<String, DataHandler> next() {
+                            final Attachment a = it.next();
+                            return new Map.Entry<String, DataHandler>() {
+                                @Override
+                                public String getKey() {
+                                    return a.getId();
+                                }
+
+                                @Override
+                                public DataHandler getValue() {
+                                    return a.getDataHandler();
+                                }
+
+                                @Override
+                                public DataHandler setValue(DataHandler value) {
+                                    return null;
+                                }
+                            };
+                        }
+                        public void remove() {
+                            it.remove();
+                        }
+                    };
+                }
+
+                @Override
+                public int size() {
+                    return list.size();
+                }
+            };
+        }
+        public DataHandler put(String key, DataHandler value) {
+            Iterator<Attachment> i = list.iterator();
+            DataHandler ret = null;
+            while (i.hasNext()) {
+                Attachment a = i.next();
+                if (a.getId().equals(key)) {
+                    i.remove();
+                    ret = a.getDataHandler();
+                    break;
+                }
+            }
+            list.add(new AttachmentImpl(key, value));
+            return ret;
+        }        
     }
     
     public static String cleanContentId(String id) {

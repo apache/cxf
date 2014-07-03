@@ -22,15 +22,12 @@ package org.apache.cxf.jaxws;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import javax.activation.DataHandler;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Response;
@@ -39,7 +36,6 @@ import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.annotations.UseAsyncMethod;
-import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.continuations.Continuation;
@@ -49,7 +45,6 @@ import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
-import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
@@ -337,20 +332,6 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
                     heads.remove("Content-Type");
                 }
             }
-            Map<String, DataHandler> dataHandlers  
-                = CastUtils.cast((Map<?, ?>)out.get(MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS));
-            if (dataHandlers != null && !dataHandlers.isEmpty()) {
-                Collection<Attachment> attachments = out.getAttachments();
-                if (attachments == null) {
-                    attachments = new ArrayList<Attachment>();
-                    out.setAttachments(attachments);
-                }
-                for (Map.Entry<String, DataHandler> entry : dataHandlers.entrySet()) {
-                    Attachment att = new AttachmentImpl(entry.getKey(), entry.getValue());
-                    attachments.add(att);
-                }
-            }
-            out.remove(MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS);
         }
     }
 
