@@ -59,6 +59,7 @@ import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.ServiceModelUtil;
@@ -239,7 +240,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         if (!started && client.isAdHoc()) {
             Bus b = BusFactory.getAndSetThreadDefaultBus(bus);
             try {
-                udpEndpoint = Endpoint.create(new WSDiscoveryProvider());
+                udpEndpoint = new EndpointImpl(bus, new WSDiscoveryProvider());
                 Map<String, Object> props = new HashMap<String, Object>();
                 props.put("jaxws.provider.interpretNullAsOneway", "true");
                 udpEndpoint.setProperties(props);
