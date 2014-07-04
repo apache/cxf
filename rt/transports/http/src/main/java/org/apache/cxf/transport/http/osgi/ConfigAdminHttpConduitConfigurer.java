@@ -113,6 +113,8 @@ class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPCon
         if (pid == null) {
             return;
         }
+        deleted(pid);
+
         String url = (String)properties.get("url");
         String name = (String)properties.get("name");
         Matcher matcher = url == null ? null : Pattern.compile(url).matcher("");
