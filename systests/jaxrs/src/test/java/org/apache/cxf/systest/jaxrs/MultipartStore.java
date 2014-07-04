@@ -186,6 +186,18 @@ public class MultipartStore {
             return "nobody home";
         }
     }
+    @POST
+    @Path("/books/testnullparts")
+    @Consumes("multipart/form-data")
+    @Produces("text/plain")
+    public String testNullParts(@Multipart(value = "someid") String value,
+                                @Multipart(value = "someid2", required = false) String value2) {
+        if (value2 != null) {
+            return value + value2;
+        } else {
+            return "nobody home2";
+        }
+    }
     
     @POST
     @Path("/books/testnullpartprimitive")
