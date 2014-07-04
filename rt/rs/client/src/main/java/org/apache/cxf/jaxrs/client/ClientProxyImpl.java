@@ -567,7 +567,10 @@ public class ClientProxyImpl extends AbstractClient implements
         for (Parameter p : fm) {
             Multipart part = getMultipart(ori, p.getIndex());
             if (part != null) {
-                atts.add(new Attachment(part.value(), part.type(), params[p.getIndex()]));
+                Object partObject = params[p.getIndex()];
+                if (partObject != null) {
+                    atts.add(new Attachment(part.value(), part.type(), partObject));
+                }
             }
         }
         return atts;        

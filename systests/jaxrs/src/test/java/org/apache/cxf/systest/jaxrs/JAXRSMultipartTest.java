@@ -307,6 +307,13 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testNullPartProxy() throws Exception {
+        MultipartStore store = 
+            JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
+        assertEquals("nobody home2", store.testNullParts("value1", null));
+    }
+    
+    @Test
     public void testUseProxyToAddBookAndSimpleParts() throws Exception {
         MultipartStore store = 
             JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
