@@ -19,13 +19,14 @@
 package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.cxf.jaxrs.ext.search.SearchUtils;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
+
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
-import org.apache.lucene.document.DateTools;
-import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
@@ -197,28 +198,61 @@ public class TikaLuceneContentExtractor {
         return new TextField(documentMetadata.getContentFieldName(), content, Store.YES);
     }
     
+    @SuppressWarnings("unchecked")
+    private static< T > T getValue(final Class< T > type, final ParamConverterProvider provider, 
+            final String value) {
+        
+        if (String.class.isAssignableFrom(type)) {
+            return (T)value;
+        }
+        
+        if (provider != null) {        
+            final ParamConverter< T > converter = provider.getConverter(type, null, new Annotation[0]);
+            if (converter != null) {
+                return converter.fromString(value);
+            }
+        }
+               
+        throw new IllegalArgumentException(String.format(
+                "Unable to convert string '%s' to instance of class '%s': no appropriate converter provided",
+                value, type.getName()));        
+    }
+    
+    private static< T > String getString(final Class< T > type, final ParamConverterProvider provider, 
+            final T value) {
+        
+        if (provider != null) {        
+            final ParamConverter< T > converter = provider.getConverter(type, null, new Annotation[0]);
+            if (converter != null) {
+                return converter.toString(value);
+            }
+        }
+               
+        return value == null ? null : value.toString();         
+    }
+    
     private static Field getField(final LuceneDocumentMetadata documentMetadata, 
                                   final String name, final String value) { 
         final Class< ? > type = documentMetadata.getFieldType(name);
+        final ParamConverterProvider provider = documentMetadata.getFieldTypeConverter();
         
         if (type != null) {
             if (Number.class.isAssignableFrom(type)) {
                 if (Double.class.isAssignableFrom(type)) {
-                    return new DoubleField(name, Double.valueOf(value), Store.YES);
+                    return new DoubleField(name, getValue(Double.class, provider, value), Store.YES);
                 } else if (Float.class.isAssignableFrom(type)) {
-                    return new FloatField(name, Float.valueOf(value), Store.YES);
+                    return new FloatField(name, getValue(Float.class, provider, value), Store.YES);
                 } else if (Long.class.isAssignableFrom(type)) {
-                    return new LongField(name, Long.valueOf(value), Store.YES);
+                    return new LongField(name, getValue(Long.class, provider, value), Store.YES);
                 } else if (Integer.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
-                    return new IntField(name, Integer.valueOf(value), Store.YES);
+                    return new IntField(name, getValue(Integer.class, provider, value), Store.YES);
                 }
             } else if (Date.class.isAssignableFrom(type)) {
-                final Date date = SearchUtils.dateFromStringWithDefaultFormats(value);                
+                final Date date = getValue(Date.class, provider, value);                
                 Field field = null;
                 
                 if (date != null) {
-                    field = new StringField(name, DateTools.dateToString(date, Resolution.MILLISECOND), 
-                        Store.YES);
+                    field = new StringField(name, getString(Date.class, provider, date), Store.YES);
                 } else {
                     field = new StringField(name, value, Store.YES); 
                 }

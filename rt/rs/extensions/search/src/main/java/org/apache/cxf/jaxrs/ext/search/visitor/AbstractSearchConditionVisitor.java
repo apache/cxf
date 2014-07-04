@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.ext.ParamConverterProvider;
+
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
@@ -37,6 +39,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     private Map<String, String> fieldMap;
     private Map<String, Class<?>> primitiveFieldTypeMap;
     private PropertyValidator<Object> validator;
+    private ParamConverterProvider converterProvider;
     private boolean wildcardStringMatch;
     
     protected AbstractSearchConditionVisitor(Map<String, String> fieldMap) {
@@ -177,5 +180,13 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
 
     public void setWildcardStringMatch(boolean wildcardStringMatch) {
         this.wildcardStringMatch = wildcardStringMatch;
+    }
+    
+    public void setFieldTypeConverter(final ParamConverterProvider provider) {
+        this.converterProvider = provider;
+    }
+    
+    public ParamConverterProvider getFieldTypeConverter() {
+        return converterProvider;
     }
 }

@@ -21,9 +21,14 @@ package org.apache.cxf.jaxrs.ext.search.tika;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.ws.rs.ext.ParamConverterProvider;
+
+import org.apache.cxf.jaxrs.ext.search.DefaultParamConverterProvider;
+
 public class LuceneDocumentMetadata {
     private final Map< String, Class< ? > > fieldTypes;
     private final String contentFieldName;
+    private ParamConverterProvider converterProvider = new DefaultParamConverterProvider();
     
     public LuceneDocumentMetadata() {
         this("contents");
@@ -44,6 +49,11 @@ public class LuceneDocumentMetadata {
         return this;
     }
     
+    public LuceneDocumentMetadata withFieldTypeConverter(final ParamConverterProvider provider) {
+        this.converterProvider = provider;
+        return this;
+    }
+    
     public String getContentFieldName() {
         return contentFieldName;
     }
@@ -55,4 +65,8 @@ public class LuceneDocumentMetadata {
     public Map<String, Class<?>> getFieldTypes() {
         return fieldTypes;
     }    
+    
+    public ParamConverterProvider getFieldTypeConverter() {
+        return converterProvider;
+    }
 }
