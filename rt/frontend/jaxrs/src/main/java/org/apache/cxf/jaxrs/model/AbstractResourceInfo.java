@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 
 import javax.annotation.Resource;
 import javax.ws.rs.core.Application;
@@ -170,7 +170,7 @@ public abstract class AbstractResourceInfo {
             property = bus.getProperty(prop);
             if (property == null) {
                 Map<Class<?>, Map<T, ThreadLocalProxy<?>>> map
-                    = new ConcurrentHashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2);
+                    = Collections.synchronizedMap(new WeakHashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2));
                 bus.setProperty(prop, map);
                 property = map;
             }
