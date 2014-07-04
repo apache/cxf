@@ -69,6 +69,8 @@ import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 /**
  * This is a collection of utility methods for use in negotiation exchanges such as WS-SecureConversation 
@@ -237,6 +239,18 @@ final class NegotiationUtils {
         List<WSHandlerResult> results = 
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         if (results == null) {
+            // Try Streaming results
+            @SuppressWarnings("unchecked")
+            final List<SecurityEvent> incomingEventList = 
+                (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
+            if (incomingEventList != null) {
+                for (SecurityEvent incomingEvent : incomingEventList) {
+                    if (WSSecurityEventConstants.SecurityContextToken 
+                        == incomingEvent.getSecurityEventType()) {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
         
