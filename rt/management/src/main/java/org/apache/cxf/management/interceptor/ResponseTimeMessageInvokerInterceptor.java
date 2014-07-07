@@ -39,16 +39,21 @@ public class ResponseTimeMessageInvokerInterceptor extends AbstractMessageRespon
     }
 
     public void handleMessage(Message message) throws Fault {
-        message.getInterceptorChain().add(new ResponseTimeMessageInvokerEndingInteceptor());
+        Exchange ex = message.getExchange();
+        if (Boolean.TRUE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"))) {
+            message.getInterceptorChain().add(new ResponseTimeMessageInvokerEndingInteceptor());
+        }
 
     }
 
     @Override
     public void handleFault(Message message) {
         Exchange ex = message.getExchange();
-        ex.put(FaultMode.class, message.get(FaultMode.class));
-        if (ex.isOneWay() && !isClient(message)) {
-            endHandlingMessage(ex);
+        if (ex.get("org.apache.cxf.management.counter.enabled") != null) {
+            ex.put(FaultMode.class, message.get(FaultMode.class));
+            if (ex.isOneWay() && !isClient(message)) {
+                endHandlingMessage(ex);
+            }
         }
     }
 
