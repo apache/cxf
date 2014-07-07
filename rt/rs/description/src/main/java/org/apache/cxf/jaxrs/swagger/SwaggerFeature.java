@@ -26,7 +26,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 
 public class SwaggerFeature extends AbstractFeature {
     
@@ -50,7 +50,8 @@ public class SwaggerFeature extends AbstractFeature {
         List<Object> providers = new ArrayList<Object>();
         providers.add(new com.wordnik.swagger.jaxrs.listing.ResourceListingProvider());
         providers.add(new com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider());
-        ((ProviderFactory)bus.getProperty(ProviderFactory.class.getName())).setUserProviders(providers);
+        ((ServerProviderFactory)server.getEndpoint().get(
+                ServerProviderFactory.class.getName())).setUserProviders(providers);
         com.wordnik.swagger.jaxrs.config.BeanConfig beanConfig = new com.wordnik.swagger.jaxrs.config.BeanConfig();
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setVersion(getVersion());
