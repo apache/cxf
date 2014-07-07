@@ -228,7 +228,7 @@ public class PolicyAnnotationTest extends Assert {
                         + "wsp:PolicyReference[@URI='#TestImplNoInterfaceServiceSoapBindingBindingPolicy']", wsdl)
                         .getLength());
             final EndpointPolicy policy = bus.getExtension(PolicyEngine.class)
-                    .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null, null);
+                    .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null);
             assertNotNull(policy);
         } finally {
             bus.shutdown(true);
@@ -271,7 +271,7 @@ public class PolicyAnnotationTest extends Assert {
                     + "wsp:PolicyReference[@URI='#TestImplWithPoliciesNoInterfaceServiceSoapBindingBindingPolicy']",
                             wsdl).getLength());
             final EndpointPolicy policy = bus.getExtension(PolicyEngine.class)
-                    .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null, null);
+                    .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null);
             assertNotNull(policy);
         } finally {
             bus.shutdown(true);
