@@ -552,6 +552,49 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         assertTrue(Arrays.equals(image1, image2));
     }
     
+    @Test
+    public void testAddBookJsonImageStream() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/jsonimagestream";
+        WebClient client = WebClient.create(address);
+        WebClient.getConfig(client).getOutInterceptors().add(new LoggingOutInterceptor());
+        WebClient.getConfig(client).getInInterceptors().add(new LoggingInInterceptor());
+        client.type("multipart/mixed").accept("multipart/mixed");
+       
+        Book json = new Book("json", 1L);
+        InputStream is1 = 
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
+        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        
+        headers = new MetadataMap<String, String>();
+        headers.putSingle("Content-Type", "application/json");
+        headers.putSingle("Content-ID", "thejson");
+        headers.putSingle("Content-Transfer-Encoding", "customjson");
+        Attachment attJson = new Attachment(headers, json);
+        
+        headers = new MetadataMap<String, String>();
+        headers.putSingle("Content-Type", "application/octet-stream");
+        headers.putSingle("Content-ID", "theimage");
+        headers.putSingle("Content-Transfer-Encoding", "customstream");
+        Attachment attIs = new Attachment(headers, is1);
+        
+        objects.put(MediaType.APPLICATION_JSON, attJson);
+        objects.put(MediaType.APPLICATION_OCTET_STREAM, attIs);
+        
+        Collection<? extends Attachment> coll = client.postAndGetCollection(objects, Attachment.class);
+        List<Attachment> result = new ArrayList<Attachment>(coll);
+        assertEquals(2, result.size());
+        Book json2 = readJSONBookFromInputStream(result.get(0).getDataHandler().getInputStream());
+        assertEquals("json", json2.getName());
+        assertEquals(1L, json2.getId());
+        InputStream is2 = result.get(1).getDataHandler().getInputStream();
+        byte[] image1 = IOUtils.readBytesFromStream(
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
+        byte[] image2 = IOUtils.readBytesFromStream(is2);
+        assertTrue(Arrays.equals(image1, image2));
+    }
+    
     private Map<String, String> doTestAddBookJaxbJsonImageWebClient(String multipartType) throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxbjsonimage";
         WebClient client = WebClient.create(address);

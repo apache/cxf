@@ -22,9 +22,11 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
@@ -34,6 +36,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -76,6 +79,27 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
             Collections.singletonList(new JacksonJsonProvider()));
         SuperBook book = proxy.getSuperBookJson();
         assertEquals(999L, book.getId());
+    }
+    
+    @Test
+    public void testMultipart() throws Exception {
+        
+        String endpointAddress = "http://localhost:" + PORT + "/webapp/multipart";
+        MultipartStore proxy = JAXRSClientFactory.create(endpointAddress, MultipartStore.class, 
+            Collections.singletonList(new JacksonJsonProvider()));
+        Book json = new Book("json", 1L);
+        InputStream is1 =  getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
+        
+        Map<String, Object> attachments = proxy.addBookJsonImageStream(json, is1); 
+        assertEquals(2, attachments.size());
+        Book json2 = ((Attachment)attachments.get("application/json")).getObject(Book.class);
+        assertEquals("json", json2.getName());
+        assertEquals(1L, json2.getId());
+        InputStream is2 = ((Attachment)attachments.get("application/octet-stream")).getObject(InputStream.class);
+        byte[] image1 = IOUtils.readBytesFromStream(
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
+        byte[] image2 = IOUtils.readBytesFromStream(is2);
+        assertTrue(Arrays.equals(image1, image2));
     }
     
     @Test

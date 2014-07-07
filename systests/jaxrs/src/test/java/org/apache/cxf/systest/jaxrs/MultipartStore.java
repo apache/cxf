@@ -244,6 +244,20 @@ public class MultipartStore {
         
     }
     
+    @POST
+    @Path("/books/jsonimagestream")
+    @Consumes("multipart/mixed")
+    @Produces("multipart/mixed")
+    public Map<String, Object> addBookJsonImageStream(
+        @Multipart(value = "thejson", type = "application/json") Book json, 
+        @Multipart("theimage") InputStream image) throws Exception {
+        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        objects.put("application/json", json);
+        objects.put("application/octet-stream", image);
+        return objects;
+        
+    }
+    
     @GET
     @Path("/books/jaxbjsonimage/read")
     @Produces("multipart/mixed")
