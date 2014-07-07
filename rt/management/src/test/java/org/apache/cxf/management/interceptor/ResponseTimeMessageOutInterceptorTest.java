@@ -37,16 +37,10 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
-        EasyMock.expect(exchange.getOutMessage()).andReturn(message);
-        EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
-        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
-        mhtr.setFaultMode(null);
-        EasyMock.expectLastCall();
-        mhtr.endHandling();
-        EasyMock.expectLastCall();              
-         
-        EasyMock.replay(mhtr);
-        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);        
+
+        EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
+        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);         
+        EasyMock.replay(mhtr);      
         EasyMock.replay(exchange);
         EasyMock.replay(message);
         
@@ -55,8 +49,6 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         EasyMock.verify(bus);
         EasyMock.verify(exchange);
         EasyMock.verify(mhtr);
-        EasyMock.verify(cRepository);
-        
     }
 
     @Test
@@ -86,19 +78,13 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(message.get(FaultMode.class)).andReturn(faultMode).anyTimes();
-        EasyMock.expect(exchange.getOutMessage()).andReturn(message);
-        exchange.put(FaultMode.class, faultMode);
+        EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
         EasyMock.expectLastCall();
-        EasyMock.expect(exchange.isOneWay()).andReturn(false);
         EasyMock.expect(exchange.get(FaultMode.class)).andReturn(faultMode).anyTimes();
-        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
-        mhtr.setFaultMode(faultMode);
-        EasyMock.expectLastCall();
-        mhtr.endHandling();
-        EasyMock.expectLastCall();              
+        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);          
         
         EasyMock.replay(mhtr);
-        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);        
+        //EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);        
         EasyMock.replay(exchange);
         EasyMock.replay(message);
         
@@ -107,8 +93,6 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         EasyMock.verify(bus);
         EasyMock.verify(exchange);
         EasyMock.verify(mhtr);
-        EasyMock.verify(cRepository);
-        
     }
 
     @Test
@@ -116,21 +100,18 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         //need to increase the counter and is a client
         setupCounterRepository(true, true);
         setupExchangeForMessage();
+        setupOperationForMessage();
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes(); 
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
         EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
-        //MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
-        //mhtr.setOneWay(true);
-        //EasyMock.expectLastCall();
-         
-        //EasyMock.replay(mhtr);
         EasyMock.expect(exchange.isOneWay()).andReturn(true).anyTimes();
         MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
-        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr).anyTimes();        
+        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr).anyTimes();
+        EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
         InterceptorChain chain = EasyMock.createMock(InterceptorChain.class);
-        EasyMock.expect(message.getInterceptorChain()).andReturn(chain);
+        //EasyMock.expect(message.getInterceptorChain()).andReturn(chain);
         chain.add(EasyMock.isA(ResponseTimeMessageOutInterceptor.EndingInterceptor.class));
         EasyMock.expectLastCall();
         EasyMock.replay(exchange);
@@ -142,19 +123,13 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         EasyMock.verify(message);
         EasyMock.verify(bus);
         EasyMock.verify(exchange);
-        //EasyMock.verify(mhtr);
-        EasyMock.verify(cRepository);
     }
     
     @Test
     public void testClientMessageOut() {
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE);
         EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(exchange.isOneWay()).andReturn(false);
-        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(null);     
-        exchange.put(EasyMock.eq(MessageHandlingTimeRecorder.class), 
-                     EasyMock.isA(MessageHandlingTimeRecorder.class));
+        EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
         EasyMock.replay(exchange);
         EasyMock.replay(message);
         rtmoi.handleMessage(message);        

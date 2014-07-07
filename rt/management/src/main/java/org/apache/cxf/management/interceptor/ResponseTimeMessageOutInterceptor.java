@@ -19,6 +19,7 @@
 package org.apache.cxf.management.interceptor;
 
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.MessageSenderInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
@@ -29,37 +30,46 @@ public class ResponseTimeMessageOutInterceptor extends AbstractMessageResponseTi
     private EndingInterceptor ending = new EndingInterceptor(); 
 
     public ResponseTimeMessageOutInterceptor() {
-        super(Phase.SEND);
+        super(Phase.PREPARE_SEND_ENDING);
+        addBefore(MessageSenderInterceptor.MessageSenderEndingInterceptor.class.getName());
     }
     
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
-        if (Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE))) {
-            return;
-        }
-        if (isClient(message)) {
-            if (ex.isOneWay()) {
-                message.getInterceptorChain().add(ending);
-            } 
-            beginHandlingMessage(ex);
-        } else { // the message is handled by server
-            endHandlingMessage(ex);
+        if (Boolean.TRUE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"))) {
+            if (ex.get(Exception.class) != null) {
+                endHandlingMessage(ex);
+                return;
+            }
+            if (Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE))) {
+                return;
+            }
+            if (isClient(message)) {
+                if (ex.isOneWay()) {
+                    message.getInterceptorChain().add(ending);
+                }
+                beginHandlingMessage(ex);
+            } else { // the message is handled by server
+                endHandlingMessage(ex);
+            }
         }
     }
     
     @Override
     public void handleFault(Message message) {
         Exchange ex = message.getExchange();
-        if (ex.isOneWay()) {
-            // do nothing, done by the ResponseTimeInvokerInterceptor
-        } else {
-            FaultMode faultMode = message.get(FaultMode.class);
-            if (faultMode == null) {
-                // client side exceptions don't have FaultMode set un the message properties (as of 2.1.4)
-                faultMode = FaultMode.RUNTIME_FAULT;
+        if (ex.get("org.apache.cxf.management.counter.enabled") != null) {
+            if (ex.isOneWay()) {
+                // do nothing, done by the ResponseTimeInvokerInterceptor
+            } else {
+                FaultMode faultMode = message.get(FaultMode.class);
+                if (faultMode == null) {
+                    // client side exceptions don't have FaultMode set un the message properties (as of 2.1.4)
+                    faultMode = FaultMode.RUNTIME_FAULT;
+                }
+                ex.put(FaultMode.class, faultMode);
+                endHandlingMessage(ex);
             }
-            ex.put(FaultMode.class, faultMode);
-            endHandlingMessage(ex);
         }
     }
 

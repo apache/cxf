@@ -37,6 +37,7 @@ public class CounterRepositoryTest extends Assert {
     private CounterRepository cr;
     private List<Interceptor<? extends Message>> inlist = new ArrayList<Interceptor<? extends Message>>();
     private List<Interceptor<? extends Message>> outlist = new ArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> faultlist = new ArrayList<Interceptor<? extends Message>>();
     //private InstrumentationManager im;
     private ObjectName serviceCounter;
     private ObjectName operationCounter;
@@ -51,6 +52,7 @@ public class CounterRepositoryTest extends Assert {
         bus = EasyMock.createMock(Bus.class);
         EasyMock.expect(bus.getInInterceptors()).andReturn(inlist).anyTimes();
         EasyMock.expect(bus.getOutInterceptors()).andReturn(outlist).anyTimes();
+        EasyMock.expect(bus.getOutFaultInterceptors()).andReturn(faultlist).anyTimes();
         bus.getExtension(InstrumentationManager.class);
         EasyMock.expectLastCall().andReturn(null).anyTimes();
 
@@ -113,7 +115,7 @@ public class CounterRepositoryTest extends Assert {
         EasyMock.expect(mhtr1.getHandlingTime()).andReturn((long)1000).anyTimes();
         EasyMock.expect(mhtr1.getFaultMode()).andReturn(null).anyTimes();
         EasyMock.replay(mhtr1);
-        cr.createCounter(operationCounter, mhtr1);
+        cr.createCounter(operationCounter);
         cr.increaseCounter(serviceCounter, mhtr1);
         cr.increaseCounter(operationCounter, mhtr1);
         ResponseTimeCounter opCounter = (ResponseTimeCounter) cr.getCounter(operationCounter);

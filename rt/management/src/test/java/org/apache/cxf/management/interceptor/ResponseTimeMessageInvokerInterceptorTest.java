@@ -36,6 +36,7 @@ public class ResponseTimeMessageInvokerInterceptorTest extends AbstractMessageRe
         // need to increase the counter and is not a client
         setupCounterRepository(true, false);
         setupExchangeForMessage();
+        setupOperationForMessage();
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
@@ -56,6 +57,5 @@ public class ResponseTimeMessageInvokerInterceptorTest extends AbstractMessageRe
         EasyMock.verify(bus);
         EasyMock.verify(exchange);
         EasyMock.verify(mhtr);
-        EasyMock.verify(cRepository);
     }
 }

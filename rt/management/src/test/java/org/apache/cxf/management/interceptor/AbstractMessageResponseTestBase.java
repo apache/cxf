@@ -88,15 +88,16 @@ public class AbstractMessageResponseTestBase extends Assert {
         }
         BusFactory.setDefaultBus(bus);      
         bus.getExtension(CounterRepository.class);
-        EasyMock.expectLastCall().andReturn(cRepository);
+        EasyMock.expectLastCall().andReturn(cRepository).anyTimes();
         if (increase) {
-            EasyMock.expect(bus.getId()).andReturn(Bus.DEFAULT_BUS_ID);
+            EasyMock.expect(bus.getId()).andReturn(Bus.DEFAULT_BUS_ID).anyTimes();
             cRepository.increaseCounter(EasyMock.eq(serviceCounterOName),
                 EasyMock.isA(MessageHandlingTimeRecorder.class));
             EasyMock.expectLastCall();
             cRepository.increaseCounter(EasyMock.eq(operationCounterOName), 
                 EasyMock.isA(MessageHandlingTimeRecorder.class));
-            EasyMock.expectLastCall(); 
+            EasyMock.expectLastCall();
+            EasyMock.expect(cRepository.getCounter(EasyMock.isA(ObjectName.class))).andReturn(null);
             EasyMock.replay(cRepository);
         }
         
@@ -105,21 +106,27 @@ public class AbstractMessageResponseTestBase extends Assert {
     }
     
     protected void setupExchangeForMessage() {
-        EasyMock.expect(exchange.get(Bus.class)).andReturn(bus);
+        EasyMock.expect(exchange.get(Bus.class)).andReturn(bus).anyTimes();
        
         Service service = EasyMock.createMock(Service.class);
-        EasyMock.expect(service.getName()).andReturn(SERVICE_NAME);        
-        EasyMock.expect(exchange.get(Service.class)).andReturn(service);
+        EasyMock.expect(service.getName()).andReturn(SERVICE_NAME).anyTimes();        
+        EasyMock.expect(exchange.get(Service.class)).andReturn(service).anyTimes();
         EasyMock.replay(service);
         
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
         EndpointInfo endpointInfo = EasyMock.createMock(EndpointInfo.class);
-        EasyMock.expect(endpointInfo.getName()).andReturn(PORT_NAME);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo);
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint);
+        EasyMock.expect(endpointInfo.getName()).andReturn(PORT_NAME).anyTimes();
+        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
+        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint).anyTimes();
         EasyMock.replay(endpointInfo);
         EasyMock.replay(endpoint);
-        setupOperationForMessage();
+        
+        
+        //EasyMock.expect(exchange.getBus()).andReturn(bus);
+        EasyMock.expect(exchange.get("org.apache.cxf.management.service.counter.name")).andReturn(null).anyTimes();
+        
+            
+        
     }
       
     protected void setupOperationForMessage() {
