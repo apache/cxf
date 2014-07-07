@@ -766,8 +766,9 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         
         greeter.greetMe("one");
         try {
-            greeter.greetMe("two");
-            fail("Expected timeout.");
+            ((BindingProvider)greeter).getRequestContext().put("cxf.synchronous.timeout", 5000);
+            String s = greeter.greetMe("two");
+            fail("Expected timeout. Received response: " + s);
         } catch (WebServiceException ex) {
             assertTrue("Unexpected exception cause", ex.getCause() instanceof IOException);
             IOException ie = (IOException)ex.getCause();
