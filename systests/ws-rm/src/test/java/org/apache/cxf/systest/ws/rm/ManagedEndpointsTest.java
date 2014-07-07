@@ -299,13 +299,25 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
                        new Object[]{sseqId}, ONESTRING_SIGNATURE);
         verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L}, true);
 
-        // 7 sec retry interval + 5 sec
-        LOG.info("waiting for 12 secs for the retry to complete ...");
-        Thread.sleep(12000);
+        // 3 sec retry interval
+        LOG.info("waiting for 3 secs for the retry to complete ...");
+        Thread.sleep(3000);
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
                        new Object[]{true}, ONEBOOLEAN_SIGNATURE);
-        assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
+        assertTrue(o instanceof Integer);
+        int count = 0;
+        while (((Integer)o).intValue() > 0) {
+            Thread.sleep(200);
+            count++;
+            if (count > 20) {
+                fail("Failed to empty the resend queue");
+            }
+            o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                           new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+            assertTrue(o instanceof Integer);
+        }
+        assertTrue("No queued message " + o, o instanceof Integer && 0 == ((Integer)o).intValue());
         assertEquals(2L, listener.lastAcknowledgement);
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
@@ -380,9 +392,9 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         LOG.info("suspended the source queue: " + sseqId);
         
 
-        // 7 sec retry interval + 3 sec
-        LOG.info("waiting for 10 secs for the retry (suspended)...");
-        Thread.sleep(10000);
+        // 3 sec retry interval + 1 sec
+        LOG.info("waiting for 4 secs for the retry (suspended)...");
+        Thread.sleep(4000);
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
                        new Object[]{true}, ONEBOOLEAN_SIGNATURE);
@@ -392,11 +404,22 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
                    new Object[]{sseqId}, ONESTRING_SIGNATURE);
         LOG.info("resumed the source queue: " + sseqId);
         
-        LOG.info("waiting for 15 secs for the retry (resumed)...");
-        Thread.sleep(15000);
-
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
                        new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        int count = 0;
+        assertTrue(o instanceof Integer);
+        while (((Integer)o).intValue() > 0) {
+            Thread.sleep(200);
+            count++;
+            if (count > 100) {
+                //up to 20 seconds to do the resend, should be within 3 or 4 
+                fail("Failed to empty the resend queue");
+            }
+            o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                           new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+            assertTrue(o instanceof Integer);
+        }
+        
         assertTrue("No queued messages", o instanceof Integer && 0 == ((Integer)o).intValue());
     }
     

@@ -101,15 +101,17 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
-        String[] callArgs = new String[] {"one", "two", "three", "four"};
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(1000));
+        String[] callArgs = new String[] {"one", "two", "three", "four", "five", "six",
+                                          "seven", "eight", "nine"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
         
-        awaitMessages(callArgs.length + 2, 3000, 60000);
+        awaitMessages(callArgs.length, 1, 3000);
+        
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
-        assertTrue("Too few messages", callArgs.length <= actualArgs.size());
+        int checkCount = 0;
         for (int i = 0; i < callArgs.length; i++) {
             boolean match = false;
             for (int j = 0; j < actualArgs.size(); j++) {
@@ -119,10 +121,15 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                 }
             }
             if (!match) {
-                fail("No match for request " + callArgs[i]);
+                if (checkCount > 20) {
+                    fail("No match for request " + callArgs[i]);
+                }
+                checkCount++;
+                awaitMessages(callArgs.length, 1, 250);
+                i--;
             }
         }
-        
+        assertTrue("Too few messages " + actualArgs.size(), callArgs.length <= actualArgs.size());
     }
 
     @Test    
@@ -146,7 +153,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             greeter.greetMeOneWay(callArgs[i]);
         }
         
-        awaitMessages(callArgs.length, 3000, 60000);
+        awaitMessages(callArgs.length, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         assertTrue("Too many messages", callArgs.length >= actualArgs.size());
         for (int i = 0; i < actualArgs.size() - 1; i++) {
@@ -180,7 +187,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             greeter.greetMeOneWay(callArgs[i]);
         }
         
-        awaitMessages(callArgs.length, 3000, 60000);
+        awaitMessages(callArgs.length, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         assertEquals("Wrong message count", callArgs.length, actualArgs.size());
         for (int i = 0; i < callArgs.length; i++) {
@@ -219,7 +226,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             greeter.greetMeOneWay(callArgs[i]);
         }
         
-        awaitMessages(callArgs.length - 2, 3000, 60000);
+        awaitMessages(callArgs.length - 2, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         int argNum = 0;
         for (String actual : actualArgs) {
@@ -251,7 +258,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             greeter.greetMeOneWay(callArgs[i]);
         }
         
-        awaitMessages(callArgs.length - 2, 3000, 60000);
+        awaitMessages(callArgs.length - 2, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         assertTrue("Too many messages", callArgs.length >= actualArgs.size());
         int argNum = 0;
@@ -284,7 +291,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             greeter.greetMeOneWay(callArgs[i]);
         }
         
-        awaitMessages(callArgs.length, 3000, 60000);
+        awaitMessages(callArgs.length, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         assertEquals("Wrong number of messages", callArgs.length, actualArgs.size());
         int argNum = 0;

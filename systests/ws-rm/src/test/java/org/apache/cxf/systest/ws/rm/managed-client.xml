@@ -24,7 +24,7 @@
             <wsa:addressing/>
             <wsrm-mgr:reliableMessaging>
                 <wsrm-policy:RMAssertion>
-                    <wsrm-policy:BaseRetransmissionInterval Milliseconds="7000"/>
+                    <wsrm-policy:BaseRetransmissionInterval Milliseconds="3000"/>
                     <wsrm-policy:AcknowledgementInterval Milliseconds="0"/>
                 </wsrm-policy:RMAssertion>
                 <wsrm-mgr:destinationPolicy>
