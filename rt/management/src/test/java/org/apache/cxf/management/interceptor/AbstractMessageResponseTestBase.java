@@ -124,9 +124,6 @@ public class AbstractMessageResponseTestBase extends Assert {
         
         //EasyMock.expect(exchange.getBus()).andReturn(bus);
         EasyMock.expect(exchange.get("org.apache.cxf.management.service.counter.name")).andReturn(null).anyTimes();
-        
-            
-        
     }
       
     protected void setupOperationForMessage() {

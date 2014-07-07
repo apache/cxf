@@ -42,7 +42,6 @@ public class ResponseTimeMessageInInterceptorTest extends AbstractMessageRespons
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();
         EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
-        EasyMock.expect(exchange.put("org.apache.cxf.management.counter.enabled", true)).andReturn(true);
         
         EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
         EasyMock.expect(exchange.isOneWay()).andReturn(false);
@@ -128,7 +127,6 @@ public class ResponseTimeMessageInInterceptorTest extends AbstractMessageRespons
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
-        EasyMock.expect(exchange.put("org.apache.cxf.management.counter.enabled", true)).andReturn(true);
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
         MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         mhtr.beginHandling();
@@ -155,7 +153,6 @@ public class ResponseTimeMessageInInterceptorTest extends AbstractMessageRespons
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
-        EasyMock.expect(exchange.put("org.apache.cxf.management.counter.enabled", true)).andReturn(true); 
         EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(null);
         exchange.put(EasyMock.eq(MessageHandlingTimeRecorder.class), 
                      EasyMock.isA(MessageHandlingTimeRecorder.class));
