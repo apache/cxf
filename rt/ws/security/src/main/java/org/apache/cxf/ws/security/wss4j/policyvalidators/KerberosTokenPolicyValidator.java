@@ -52,6 +52,8 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
         Collection<AssertionInfo> krbAis = getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
         if (!krbAis.isEmpty()) {
             parsePolicies(aim, krbAis, kerberosToken);
+            
+            assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
         }
         
         return true;

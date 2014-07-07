@@ -690,33 +690,53 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             // stuff we can default to asserted and un-assert if a condition isn't met
             assertPolicy(aim, SPConstants.KEY_VALUE_TOKEN);
             assertPolicy(aim, SPConstants.RSA_KEY_VALUE);
-            assertPolicy(aim, SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE);
-            assertPolicy(aim, SPConstants.REQUIRE_THUMBPRINT_REFERENCE);
-            assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
-            assertPolicy(aim, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE);
-            assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
             
             // WSS10
-            assertPolicy(aim, SPConstants.WSS10);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
+            ais = getAllAssertionsByLocalname(aim, SPConstants.WSS10);
+            if (!ais.isEmpty()) {
+                for (AssertionInfo ai : ais) {
+                    ai.setAsserted(true);
+                }
+                assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER);
+                assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL);
+                assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
+                assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
+            }
             
             // Trust 1.0
-            assertPolicy(aim, SPConstants.TRUST_10);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE);
-            assertPolicy(aim, SPConstants.REQUIRE_CLIENT_ENTROPY);
-            assertPolicy(aim, SPConstants.REQUIRE_SERVER_ENTROPY);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_ISSUED_TOKENS);
+            ais = getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
+            boolean trust10Asserted = false;
+            if (!ais.isEmpty()) {
+                for (AssertionInfo ai : ais) {
+                    ai.setAsserted(true);
+                }
+                assertPolicy(aim, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE);
+                assertPolicy(aim, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE);
+                assertPolicy(aim, SPConstants.REQUIRE_CLIENT_ENTROPY);
+                assertPolicy(aim, SPConstants.REQUIRE_SERVER_ENTROPY);
+                assertPolicy(aim, SPConstants.MUST_SUPPORT_ISSUED_TOKENS);
+                trust10Asserted = true;
+            }
             
             // Trust 1.3
-            assertPolicy(aim, SPConstants.TRUST_13);
-            assertPolicy(aim, SP12Constants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION);
-            assertPolicy(aim, SP12Constants.REQUIRE_APPLIES_TO);
-            assertPolicy(aim, SP13Constants.SCOPE_POLICY_15);
-            assertPolicy(aim, SP13Constants.MUST_SUPPORT_INTERACTIVE_CHALLENGE);
+            ais = getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
+            if (!ais.isEmpty()) {
+                for (AssertionInfo ai : ais) {
+                    ai.setAsserted(true);
+                }
+                assertPolicy(aim, SP12Constants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION);
+                assertPolicy(aim, SP12Constants.REQUIRE_APPLIES_TO);
+                assertPolicy(aim, SP13Constants.SCOPE_POLICY_15);
+                assertPolicy(aim, SP13Constants.MUST_SUPPORT_INTERACTIVE_CHALLENGE);
+                
+                if (!trust10Asserted) {
+                    assertPolicy(aim, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE);
+                    assertPolicy(aim, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE);
+                    assertPolicy(aim, SPConstants.REQUIRE_CLIENT_ENTROPY);
+                    assertPolicy(aim, SPConstants.REQUIRE_SERVER_ENTROPY);
+                    assertPolicy(aim, SPConstants.MUST_SUPPORT_ISSUED_TOKENS);
+                }
+            }
             
             message.put(WSHandlerConstants.ACTION, action.trim());
         }

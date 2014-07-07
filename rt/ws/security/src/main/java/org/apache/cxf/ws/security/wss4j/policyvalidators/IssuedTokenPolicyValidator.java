@@ -24,18 +24,18 @@ import java.util.Collection;
 import java.util.List;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.IssuedToken;
-
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -105,6 +105,11 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 continue;
             }
         }
+        
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
+        assertPolicy(aim, SPConstants.REQUIRE_EXTERNAL_REFERENCE);
+        
         return true;
     }
     
@@ -136,6 +141,11 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 return false;
             }
         }
+        
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
+        assertPolicy(aim, SPConstants.REQUIRE_EXTERNAL_REFERENCE);
+        
         return true;
     }
     

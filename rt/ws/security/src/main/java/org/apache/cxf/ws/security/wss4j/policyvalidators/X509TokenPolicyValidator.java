@@ -67,6 +67,11 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
             assertPolicy(aim, SPConstants.WSS_X509_V1_TOKEN11);
             assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN10);
             assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN11);
+            
+            assertPolicy(aim, SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE);
+            assertPolicy(aim, SPConstants.REQUIRE_THUMBPRINT_REFERENCE);
+            assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
+            assertPolicy(aim, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE);
         }
         
         return true;

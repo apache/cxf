@@ -63,6 +63,8 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
         Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
         if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, results, signedResults);
+            
+            assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
         }
         
         return true;

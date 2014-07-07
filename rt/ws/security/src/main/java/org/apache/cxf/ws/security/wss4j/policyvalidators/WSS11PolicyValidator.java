@@ -54,6 +54,12 @@ public class WSS11PolicyValidator
             assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_THUMBPRINT);
             assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY);
             assertPolicy(aim, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION);
+            
+            // WSS 1.0
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER);
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL);
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
         }
         
         return true;
