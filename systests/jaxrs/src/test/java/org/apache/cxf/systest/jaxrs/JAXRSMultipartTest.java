@@ -471,6 +471,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         assertNotNull(params.get("start"));
     }
     
+   
     private Map<String, String> doTestAddBookJaxbJsonImageWebClient(String multipartType) throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxbjsonimage";
         WebClient client = WebClient.create(address);

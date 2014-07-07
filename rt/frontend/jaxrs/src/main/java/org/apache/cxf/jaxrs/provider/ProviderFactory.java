@@ -668,16 +668,10 @@ public final class ProviderFactory {
         if (availableMimeTypes.size() == 0) {
             return false;
         }
-        boolean injected = false;
         if (this != SHARED_FACTORY || !isJaxbBasedProvider(ep)) {
             injectContextValues(pi, m);
-            injected = true;
         }
-        boolean matches = ep.isReadable(type, genericType, annotations, mediaType);
-        if (!matches && injected) {
-            pi.clearThreadLocalProxies();
-        }
-        return matches;
+        return ep.isReadable(type, genericType, annotations, mediaType);
     }
         
     /**
@@ -729,17 +723,11 @@ public final class ProviderFactory {
         if (availableMimeTypes.size() == 0) {
             return false;
         }
-        boolean injected = false;
         if ((this != SHARED_FACTORY || !isJaxbBasedProvider(ep))
             && m.get(ACTIVE_JAXRS_PROVIDER_KEY) != ep) {
             injectContextValues(pi, m);
-            injected = true;
         }
-        boolean matches = ep.isWriteable(type, genericType, annotations, mediaType);
-        if (!matches && injected) {
-            pi.clearThreadLocalProxies();
-        }
-        return matches;
+        return ep.isWriteable(type, genericType, annotations, mediaType);
     }
     
     List<ProviderInfo<MessageBodyReader<?>>> getMessageReaders() {
