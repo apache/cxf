@@ -19,10 +19,12 @@
 
 package org.apache.cxf.jaxws.ws;
 
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.jws.WebMethod;
 
 import javax.jws.WebService;
 import javax.wsdl.Definition;
@@ -30,7 +32,6 @@ import javax.wsdl.xml.WSDLWriter;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.annotations.Policies;
@@ -45,7 +46,6 @@ import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.neethi.Constants;
-
 import org.junit.Assert;
 
 
@@ -120,6 +120,7 @@ public class PolicyAnnotationTest extends Assert {
             bus.shutdown(true);
         }
     }
+
     @org.junit.Test
     public void testAnnotationsInterfaceAsClass() throws Exception {
         Bus bus = BusFactory.getDefaultBus();
@@ -180,12 +181,98 @@ public class PolicyAnnotationTest extends Assert {
                          xpu.getValueList("/wsdl:definitions/wsdl:binding/wsdl:operation/"
                                               + "wsp:PolicyReference[@URI='#echoIntBindingOpPolicy']", wsdl)
                              .getLength());
-            
+
         } finally {
             bus.shutdown(true);
         }
     }
-    
+
+    @org.junit.Test
+    public void testAnnotationImplNoInterface() throws Exception {
+        Bus bus = BusFactory.getDefaultBus();
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
+        factory.setServiceBean(new TestImplNoInterface());
+        factory.setStart(false);
+        List<String> tp = Arrays.asList("http://schemas.xmlsoap.org/soap/http", "http://schemas.xmlsoap.org/wsdl/http/",
+                "http://schemas.xmlsoap.org/wsdl/soap/http", "http://www.w3.org/2003/05/soap/bindings/HTTP/",
+                "http://cxf.apache.org/transports/http/configuration", "http://cxf.apache.org/bindings/xformat");
+
+        LocalTransportFactory f = new LocalTransportFactory();
+        f.getUriPrefixes().add("http");
+        f.setTransportIds(tp);
+
+        Server s = factory.create();
+
+        try {
+            ServiceWSDLBuilder builder = new ServiceWSDLBuilder(bus, s.getEndpoint().getService().getServiceInfos());
+            Definition def = builder.build();
+            WSDLWriter wsdlWriter = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter();
+            def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
+            Element wsdl = wsdlWriter.getDocument(def).getDocumentElement();
+
+            Map<String, String> ns = new HashMap<String, String>();
+            ns.put("wsdl", WSDLConstants.NS_WSDL11);
+            ns.put("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
+            ns.put("wsp", Constants.URI_POLICY_13_NS);
+            XPathUtils xpu = new XPathUtils(ns);
+            
+            // org.apache.cxf.helpers.XMLUtils.printDOM(wsdl);
+            assertEquals(1,
+                    xpu.getValueList("/wsdl:definitions/wsdl:binding/"
+                        + "wsp:PolicyReference[@URI='#TestImplNoInterfaceServiceSoapBindingBindingPolicy']", wsdl)
+                        .getLength());
+            final EndpointPolicy policy = bus.getExtension(PolicyEngine.class)
+                    .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null, null);
+            assertNotNull(policy);
+        } finally {
+            bus.shutdown(true);
+        }
+    }
+
+    @org.junit.Test
+    public void testAnnotationImplNoInterfacePolicies() throws Exception {
+        Bus bus = BusFactory.getDefaultBus();
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
+        factory.setServiceBean(new TestImplWithPoliciesNoInterface());
+        factory.setStart(false);
+        List<String> tp = Arrays.asList("http://schemas.xmlsoap.org/soap/http", "http://schemas.xmlsoap.org/wsdl/http/",
+                "http://schemas.xmlsoap.org/wsdl/soap/http", "http://www.w3.org/2003/05/soap/bindings/HTTP/",
+                "http://cxf.apache.org/transports/http/configuration", "http://cxf.apache.org/bindings/xformat");
+
+        LocalTransportFactory f = new LocalTransportFactory();
+        f.getUriPrefixes().add("http");
+        f.setTransportIds(tp);
+
+        Server s = factory.create();
+
+        try {
+            ServiceWSDLBuilder builder = new ServiceWSDLBuilder(bus, s.getEndpoint().getService().getServiceInfos());
+            Definition def = builder.build();
+            WSDLWriter wsdlWriter = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter();
+            def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
+            Element wsdl = wsdlWriter.getDocument(def).getDocumentElement();
+
+            Map<String, String> ns = new HashMap<String, String>();
+            ns.put("wsdl", WSDLConstants.NS_WSDL11);
+            ns.put("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
+            ns.put("wsp", Constants.URI_POLICY_13_NS);
+            XPathUtils xpu = new XPathUtils(ns);
+            
+            // org.apache.cxf.helpers.XMLUtils.printDOM(wsdl);
+            assertEquals(1,
+                    xpu.getValueList("/wsdl:definitions/wsdl:binding/"
+                    + "wsp:PolicyReference[@URI='#TestImplWithPoliciesNoInterfaceServiceSoapBindingBindingPolicy']",
+                            wsdl).getLength());
+            final EndpointPolicy policy = bus.getExtension(PolicyEngine.class)
+                    .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null, null);
+            assertNotNull(policy);
+        } finally {
+            bus.shutdown(true);
+        }
+    }
+
     private void check(XPathUtils xpu, Element wsdl, String path, String uri) {
         assertTrue(uri + " not found",
                    xpu.isExist("/wsdl:definitions/wsp:Policy[@wsu:Id='" + uri + "']",
@@ -197,7 +284,6 @@ public class PolicyAnnotationTest extends Assert {
                xpu.isExist(path + "/wsp:PolicyReference[@URI='#" + uri + "']",
                           wsdl,
                           XPathConstants.NODE));
-        
     }
     
     @Policies({
@@ -234,6 +320,27 @@ public class PolicyAnnotationTest extends Assert {
     )
     @WebService(endpointInterface = "org.apache.cxf.jaxws.ws.PolicyAnnotationTest$TestInterface")
     public static class TestImpl implements TestInterface {
+        public int echoInt(int i) {
+            return i;
+        }
+    }
+
+    @WebService()
+    @Policy(placement = Policy.Placement.BINDING, uri = "annotationpolicies/TestImplPolicy.xml")
+    public static class TestImplNoInterface {
+        @WebMethod
+        public int echoInt(int i) {
+            return i;
+        }
+    }
+
+    @WebService()
+    @Policies({
+        @Policy(placement = Policy.Placement.BINDING, uri = "annotationpolicies/TestImplPolicy.xml")
+     }
+    )
+    public static class TestImplWithPoliciesNoInterface {
+        @WebMethod
         public int echoInt(int i) {
             return i;
         }

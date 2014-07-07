@@ -90,7 +90,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             Endpoint ep = (Endpoint)args[1];
             if (ep.getEndpointInfo().getInterface() != null) {
                 addPolicies(factory, ep, cls);
-                
+            
                 // this will allow us to support annotations in Implementations, but only for
                 // class level annotations.  Method level annotations are not currently supported
                 // for implementations.  The call has been moved here so that the ServiceInfo
@@ -362,7 +362,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                            Class<?> cls,
                            String defName) {
         Element el = addPolicy(service, p, cls, defName);
-        if (el != null) {
+        if (el != null && !isExistsPolicyReference(place.getExtensors().get(), getPolicyRefURI(el))) {
             UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
             uee.setElement(el);
             uee.setRequired(true);
@@ -394,7 +394,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
 
             // if not already added to service add it, otherwise ignore 
             // and just create the policy reference.
-            if (!isExistsPolicy(service, uri)) {
+            if (!isExistsPolicy(service.getDescription().getExtensors().get(), uri)) {
                 UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
                 uee.setElement(element);
                 uee.setRequired(true);
@@ -417,14 +417,29 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         return element.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                      PolicyConstants.WSU_ID_ATTR_NAME);
     }
-    
-    private boolean isExistsPolicy(ServiceInfo service, String uri) {
-        Object exts[] = service.getDescription().getExtensors().get();
+    private String getPolicyRefURI(Element element) {
+        return element.getAttributeNS(null, "URI");
+    }
+    private boolean isExistsPolicy(Object exts[], String uri) {
         exts = exts == null ? new Object[0] : exts;
         for (Object o : exts) {
             if (o instanceof UnknownExtensibilityElement) {
                 UnknownExtensibilityElement uee = (UnknownExtensibilityElement)o;
                 String uri2 = getPolicyId(uee.getElement());
+                if (uri.equals(uri2)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    private boolean isExistsPolicyReference(Object exts[], String uri) {
+        exts = exts == null ? new Object[0] : exts;
+        for (Object o : exts) {
+            if (o instanceof UnknownExtensibilityElement) {
+                UnknownExtensibilityElement uee = (UnknownExtensibilityElement)o;
+                String uri2 = getPolicyRefURI(uee.getElement());
                 if (uri.equals(uri2)) {
                     return true;
                 }
