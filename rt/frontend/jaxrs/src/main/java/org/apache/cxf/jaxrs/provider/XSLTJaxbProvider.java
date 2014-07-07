@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -403,14 +404,15 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     
     protected Templates createTemplates(String loc) {
         try {
-            InputStream is = ResourceUtils.getResourceStream(loc, this.getBus());
-            if (is == null) {
+            URL urlStream = ResourceUtils.getResourceURL(loc, this.getBus());
+            if (urlStream == null) {
                 return null;
             }
             
             Reader r = new BufferedReader(
-                           new InputStreamReader(is, "UTF-8"));
+                           new InputStreamReader(urlStream.openStream(), "UTF-8"));
             Source source = new StreamSource(r);
+            source.setSystemId(urlStream.toExternalForm());
             if (factory == null) {
                 factory = (SAXTransformerFactory)TransformerFactory.newInstance();
                 if (uriResolver != null) {
