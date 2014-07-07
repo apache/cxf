@@ -33,6 +33,8 @@ public interface ResponseTimeCounterMBean {
     Number getAvgResponseTime();
     Number getMaxResponseTime();
     Number getMinResponseTime();   
-    Number getTotalHandlingTime();
+    Number getTotalHandlingTime();   
     void reset();
+    void enable(boolean value);
+    boolean isEnabled();
 }

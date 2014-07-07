@@ -36,12 +36,16 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
     private long totalHandlingTime;    
     private long maxHandlingTime;
     private long minHandlingTime = Integer.MAX_VALUE;
+    private boolean enabled = true;
     
     public ResponseTimeCounter(ObjectName on) {
         objectName = on;     
     }
     
     public void  increase(MessageHandlingTimeRecorder mhtr) {
+        if (!enabled) {
+            return;
+        }
         invocations.getAndIncrement();
         FaultMode faultMode = mhtr.getFaultMode();
         if (null == faultMode) {
@@ -80,7 +84,7 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
         if (maxHandlingTime < handlingTime) {
             maxHandlingTime = handlingTime;
         }
-        if (minHandlingTime > handlingTime) {
+        if (minHandlingTime == 0 | minHandlingTime > handlingTime) {
             minHandlingTime = handlingTime;
         }
     }
@@ -138,6 +142,17 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
     
     public Number getTotalHandlingTime() {        
         return totalHandlingTime;
+    }
+
+    @Override
+    public void enable(boolean value) {
+        enabled = value;
+        
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }  
 
 }
