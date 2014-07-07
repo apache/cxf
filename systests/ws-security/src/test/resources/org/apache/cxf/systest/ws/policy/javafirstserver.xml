@@ -59,7 +59,7 @@
     <p:externalAttachment location="classpath:java_first_policies/UsernamePasswordAttachment.xml"/>
     <p:externalAttachment location="classpath:java_first_policies/SslUsernamePasswordAttachment.xml"/>
     <!-- register a policy attachment appliesto checker! -->
-    <bean id="uridomainexpressionbuilder" class="org.apache.cxf.systest.ws.policy.URIDomainExpressionBuilder"/>
+    <bean id="uridomainexpressionbuilder" class="org.apache.cxf.systest.ws.policy.JavaFirstURIDomainExpressionBuilder"/>
     <bean id="org.apache.cxf.systest.ws.policy.JavaFirstPolicyService" class="org.apache.cxf.systest.ws.policy.JavaFirstPolicyServiceImpl"/>
     <bean id="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService" class="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyServiceImpl"/>
     <bean id="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService2" class="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyServiceImpl"/>

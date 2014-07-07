@@ -27,10 +27,10 @@ import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.policy.attachment.external.DomainExpression;
 
-public class UriDomainExpression implements DomainExpression {
+public class JavaFirstUriDomainExpression implements DomainExpression {
     private final String url;
     
-    public UriDomainExpression(final String url) {
+    public JavaFirstUriDomainExpression(final String url) {
         this.url = url;
     }
 

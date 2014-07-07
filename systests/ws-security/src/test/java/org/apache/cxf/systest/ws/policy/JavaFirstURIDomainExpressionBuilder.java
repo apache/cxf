@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.ws.policy.attachment.external.DomainExpression;
 import org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilder;
 
-public class URIDomainExpressionBuilder implements DomainExpressionBuilder {
+public class JavaFirstURIDomainExpressionBuilder implements DomainExpressionBuilder {
     private static final Collection<QName> SUPPORTED_TYPES = Collections.unmodifiableList(
              Arrays.asList(new QName[] {
                  new QName("http://www.w3.org/ns/ws-policy", "URI"),
@@ -35,7 +35,7 @@ public class URIDomainExpressionBuilder implements DomainExpressionBuilder {
 
     @Override
     public DomainExpression build(Element paramElement) {
-        return new UriDomainExpression(paramElement.getTextContent());
+        return new JavaFirstUriDomainExpression(paramElement.getTextContent());
     }
 
     @Override

@@ -1,0 +1,1 @@
+org.apache.cxf.systest.ws.policy.UriDomainFactoryBeanListener::true
