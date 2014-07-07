@@ -19,6 +19,7 @@
 
 package org.apache.cxf.management.interceptor;
 
+import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
@@ -28,29 +29,35 @@ import org.apache.cxf.phase.Phase;
 public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTimeInterceptor {
     
     public ResponseTimeMessageInInterceptor() {
-        super(Phase.POST_LOGICAL);
+        super(Phase.RECEIVE);
+        addBefore(AttachmentInInterceptor.class.getName());
     }
     
-    public void handleMessage(Message message) throws Fault {
-        
-        Exchange ex = message.getExchange();        
-        if (isClient(message)) {
-            if (!ex.isOneWay()) {
-                endHandlingMessage(ex);
+    public void handleMessage(Message message) throws Fault {        
+        Exchange ex = message.getExchange();
+        //if serviceCounter is disabled , all responseTimeInterceptors will be skipped
+        Boolean forceDisabled = Boolean.FALSE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"));
+        if (isServiceCounterEnabled(ex) && !forceDisabled) {           
+            ex.put("org.apache.cxf.management.counter.enabled", true);
+            if (isClient(message)) {
+                if (!ex.isOneWay()) {
+                    endHandlingMessage(ex);
+                }
+            } else {
+                beginHandlingMessage(ex);
             }
-        } else {            
-            beginHandlingMessage(ex);            
         }
     }    
     
     @Override
-    public void handleFault(Message message) {
+    public void handleFault(Message message) {     
         Exchange ex = message.getExchange();
-        FaultMode mode = message.get(FaultMode.class);
-        if (mode == null) {
-            mode = FaultMode.RUNTIME_FAULT;
+        if (Boolean.TRUE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"))) {
+            FaultMode mode = message.get(FaultMode.class);
+            if (mode == null) {
+                mode = FaultMode.UNCHECKED_APPLICATION_FAULT;
+            }
+            ex.put(FaultMode.class, mode);
         }
-        ex.put(FaultMode.class, mode);
-        endHandlingMessage(ex);
     }
 }

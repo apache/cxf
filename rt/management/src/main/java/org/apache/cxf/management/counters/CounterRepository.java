@@ -76,6 +76,7 @@ public class CounterRepository {
         bus.getInInterceptors().add(in);
         bus.getInInterceptors().add(invoker);
         bus.getOutInterceptors().add(out);
+        bus.getOutFaultInterceptors().add(out);
         bus.setExtension(this, CounterRepository.class); 
         
         //create CounterRepositroyMoniter to writer the counter log
@@ -91,7 +92,7 @@ public class CounterRepository {
                 // check if the counter has been created during the locked time
                 counter = getCounter(on);
                 if (counter == null) {
-                    counter = createCounter(on, mhtr);
+                    counter = createCounter(on);
                     counters.put(on, counter);
                 }
             } finally {
@@ -109,7 +110,7 @@ public class CounterRepository {
         return counters.get(on);
     }
     
-    public Counter createCounter(ObjectName on, MessageHandlingTimeRecorder mhtr) {
+    public Counter createCounter(ObjectName on) {
         Counter counter = null;
         counter = new ResponseTimeCounter(on);
         InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
