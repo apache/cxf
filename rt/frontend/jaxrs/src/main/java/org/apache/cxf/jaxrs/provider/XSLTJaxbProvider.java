@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -177,7 +178,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                 }
                 t = createTemplates(path);
                 if (t == null) {
-                    createTemplates(ClassLoaderUtils.getResourceAsStream(ann.value(), cls));
+                    createTemplates(ClassLoaderUtils.getResource(ann.value(), cls));
                 }
                 if (t != null) {
                     annotationTemplates.putIfAbsent(ann.value(), t);
@@ -479,22 +480,23 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     
     protected Templates createTemplates(String loc) {
         try {
-            return createTemplates(ResourceUtils.getResourceStream(loc, this.getBus()));
+            return createTemplates(ResourceUtils.getResourceURL(loc, this.getBus()));
         } catch (Exception ex) {
             LOG.warning("No template can be created : " + ex.getMessage());
         }
         return null;
     }
     
-    protected Templates createTemplates(InputStream is) {
+    protected Templates createTemplates(URL urlStream) {
         try {
-            if (is == null) {
+            if (urlStream == null) {
                 return null;
             }
             
             Reader r = new BufferedReader(
-                           new InputStreamReader(is, "UTF-8"));
+                           new InputStreamReader(urlStream.openStream(), "UTF-8"));
             Source source = new StreamSource(r);
+            source.setSystemId(urlStream.toExternalForm());
             if (factory == null) {
                 factory = (SAXTransformerFactory)TransformerFactory.newInstance();
                 if (uriResolver != null) {
