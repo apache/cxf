@@ -18,24 +18,20 @@
  */
 package com.example.customerservice.client;
 
-
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public final class CustomerServiceSpringClient {
+/**
+ * Starter that initializes the spring context, fetches our test client and then shuts down spring 
+ */
+public class CustomerServiceSpringClient {
 
-    private CustomerServiceSpringClient() {
-    }
-
-    public static void main(String args[]) throws Exception {
-        // Initialize the spring context and fetch our test client
+    public static void main(String args[]) throws Exception {      
         ClassPathXmlApplicationContext context 
             = new ClassPathXmlApplicationContext(new String[] {"classpath:client-applicationContext.xml"});
         CustomerServiceTester client = (CustomerServiceTester)context.getBean("tester");
         
         client.testCustomerService();
-        context.stop();
-        context.destroy();
-        //System.exit(0);
+
+        context.close();
     }
 }

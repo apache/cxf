@@ -1,10 +1,10 @@
 JMS Spring Config Demo
 ======================
 
-This is basically the wsdl first demo adapted to the JMS transport. It uses the JMS config feature so 
-the JMS transport can be added to any existing service without changing the wsdl (leaving the wsdl:service
-section disregarded.)  While the service is deployed on Tomcat, no http traffic is used to connect 
-with the web service, instead the JMS transport is used.
+This is basically the wsdl first demo adapted to the JMS transport. It uses the JMS spec configuration as well as
+the ConnectionFactoryFeature to show how to add the JMS transport to any existing service without changing the wsdl
+ (leaving the wsdl:service section disregarded.)  When using the war variant the service is deployed on Tomcat
+ but only uses it as a runtime the http part of tomcat is not used.
 
 The Demo consist of three parts:
 

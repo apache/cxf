@@ -26,9 +26,7 @@ public class Server {
 
     protected Server() throws Exception {
         System.out.println("Starting Server");
-        Object implementor = new GreeterJMSImpl();
-        String address = "http://cxf.apache.org/transports/jms";
-        ep = Endpoint.publish(address, implementor);
+        ep = Endpoint.publish(null, new GreeterJMSImpl());
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {

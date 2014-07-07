@@ -20,16 +20,16 @@ package com.example.customerservice.server;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+/**
+ * Starter that initializes the spring context and so also creates the service endpoint.
+ */
 public class CustomerServiceSpringServer {
     
-    protected CustomerServiceSpringServer() {
+    public static void main(String args[]) throws Exception {
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("server-applicationContext.xml");
+        System.out.println("Server started. Press any key to shut down.");
+        System.in.read();
+        ctx.close();
     }
 
-    public static void main(String args[]) throws Exception {
-        ClassPathXmlApplicationContext ctx 
-            = new ClassPathXmlApplicationContext("server-applicationContext.xml");
-        System.in.read();
-        ctx.stop();
-        ctx.destroy();
-    }
 }

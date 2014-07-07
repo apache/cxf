@@ -19,7 +19,13 @@
 
 package demo.jms_greeter.server;
 
+import java.util.Collections;
+
+import javax.jms.ConnectionFactory;
 import javax.xml.ws.Endpoint;
+
+import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 
 public class Server {
     Endpoint ep;
@@ -27,14 +33,25 @@ public class Server {
     protected Server() throws Exception {
         System.out.println("Starting Server");
         Object implementor = new GreeterJMSImpl();
-        String address = "http://cxf.apache.org/transports/jms";
-        ep = Endpoint.publish(address, implementor);
-
+        ep = Endpoint.publish(null, implementor);
+        
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 shutdown();
             }
         });
+    }
+
+    /**
+     * If you prefer to define the ConnectionFactory directly instead of using a JNDI look.
+    // You can inject is like this:
+     * @param impl
+     * @param cf
+     */
+    protected void publishEndpoint(Object impl, ConnectionFactory cf) {
+    	EndpointImpl ep = (EndpointImpl)Endpoint.create(impl);
+    	ep.setFeatures(Collections.singletonList(new ConnectionFactoryFeature(cf)));
+    	ep.publish();
     }
 
     public void shutdown() {

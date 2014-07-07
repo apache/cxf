@@ -14,21 +14,42 @@
         the specific language governing permissions and limitations under the
         License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-    <bean id="jmsConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
-        <property name="targetConnectionFactory">
-            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-                <property name="brokerURL" value="tcp://localhost:61616"/>
-            </bean>
-        </property>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd         
+		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<!-- Make sure to use ConnectionPooling to achieve a good performance.
+		 Do not forget the destroy-method as else the JVM will hang on shutdown -->
+	<bean id="jmsConnectionFactory" class="org.apache.activemq.jms.pool.PooledConnectionFactory" destroy-method="stop">
+		<property name="connectionFactory">
+    		<bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    			<property name="brokerURL" value="tcp://localhost:61616"/>
+    		</bean>
+    	</property>
     </bean>
-    <bean id="jmsConfig" class="org.apache.cxf.transport.jms.JMSConfiguration" p:connectionFactory-ref="jmsConnectionFactory" p:targetDestination="test.queue"/>
-    <jaxws:client id="customerService" address="jms://" serviceClass="com.example.customerservice.CustomerService">
+    
+    <jaxws:client 
+    	id="customerService" 
+    	address="jms:queue:test.queue" 
+    	serviceClass="com.example.customerservice.CustomerService">
         <jaxws:features>
             <bean class="org.apache.cxf.feature.LoggingFeature"/>
-            <bean class="org.apache.cxf.transport.jms.JMSConfigFeature" p:jmsConfig-ref="jmsConfig"/>
+            
+            <!-- We use the feature to inject the ConnectionFactory. This approach also allows to publish
+            	a java first service as we need no jms config in the wsdl.
+            	Alternatively the ConnectionFactory can also be looked up using jndi like shown in the jms_queue example -->
+            <bean class="org.apache.cxf.transport.jms.ConnectionFactoryFeature">
+            	<constructor-arg ref="jmsConnectionFactory"/>
+            </bean>
         </jaxws:features>
     </jaxws:client>
+
     <bean id="tester" class="com.example.customerservice.client.CustomerServiceTester">
         <property name="customerService" ref="customerService"/>
     </bean>

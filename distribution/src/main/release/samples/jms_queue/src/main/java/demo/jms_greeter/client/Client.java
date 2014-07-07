@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 import org.apache.cxf.jms_greeter.JMSGreeterService;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
@@ -54,6 +55,10 @@ public final class Client {
 
         JMSGreeterService service = new JMSGreeterService(wsdl.toURI().toURL(), SERVICE_NAME);
         JMSGreeterPortType greeter = (JMSGreeterPortType)service.getPort(PORT_NAME, JMSGreeterPortType.class);
+
+        // If you prefer to define the ConnectionFactory directly instead of using a JNDI look.
+        // You can inject is like this:
+        //service.getPort(PORT_NAME, JMSGreeterPortType.class, new ConnectionFactoryFeature(cf));
 
         System.out.println("Invoking sayHi...");
         System.out.println("server responded with: " + greeter.sayHi());
