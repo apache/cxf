@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<student xmlns="http://university.edu/student">
+    <name>John</name>
+    <surname>Smith</surname>
+    <birthdate>
+        <day>14</day>
+        <month>3</month>
+        <year>1994</year>
+    </birthdate>
+    <address>Street 21</address>
+</student>
