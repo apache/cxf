@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -319,6 +320,32 @@ public class ClassResourceInfo extends BeanResourceInfo {
             if (f.getAnnotation(BeanParam.class) != null) {
                 BeanParamInfo bpi = new BeanParamInfo(f.getType(), getBus());
                 factory.addBeanParamInfo(bpi);
+            }
+        }
+    }
+    
+    @Override
+    public void clearThreadLocalProxies() {
+        super.clearThreadLocalProxies();
+        if (!injectedSubInstances.isEmpty()) {
+            for (ClassResourceInfo sub : subResources.values()) {
+                if (sub != this) {
+                    sub.clearThreadLocalProxies();
+                }
+            }
+        }
+    }
+    
+    public void injectContexts(Object resourceObject, OperationResourceInfo ori, Message inMessage) {
+        final boolean contextsAvailable = contextsAvailable();
+        final boolean paramsAvailable = paramsAvailable();
+        if (contextsAvailable || paramsAvailable) {
+            Object realResourceObject = ClassHelper.getRealObject(resourceObject);
+            if (paramsAvailable) {
+                JAXRSUtils.injectParameters(ori, this, realResourceObject, inMessage);
+            }
+            if (contextsAvailable) {
+                InjectionUtils.injectContexts(realResourceObject, this, inMessage);
             }
         }
     }

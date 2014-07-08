@@ -50,6 +50,7 @@ public class ResourceContextImpl implements ResourceContext {
     private <T> T doInitResource(Class<?> cls, T resource) {
         ClassResourceInfo sub = cri.getSubResource(subClass, cls, resource, true, m);
         sub.initBeanParamInfo(ServerProviderFactory.getInstance(m));
+        sub.injectContexts(resource, m.getExchange().get(OperationResourceInfo.class), m);
         return resource;
     }
 }

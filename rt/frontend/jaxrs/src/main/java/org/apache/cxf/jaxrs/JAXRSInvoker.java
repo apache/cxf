@@ -155,19 +155,8 @@ public class JAXRSInvoker extends AbstractInvoker {
         final ClassResourceInfo cri = ori.getClassResourceInfo();
         final Message inMessage = exchange.getInMessage();
         final ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(inMessage);
-
-        final boolean contextsAvailable = cri.contextsAvailable();
-        final boolean paramsAvailable = cri.paramsAvailable();
-        if (contextsAvailable || paramsAvailable) {
-            Object realResourceObject = ClassHelper.getRealObject(resourceObject);
-            if (paramsAvailable) {
-                JAXRSUtils.injectParameters(ori, realResourceObject, inMessage);
-            }
-            if (contextsAvailable) {
-                InjectionUtils.injectContexts(realResourceObject, cri, inMessage);
-            }
-        }
         if (cri.isRoot()) {
+            cri.injectContexts(resourceObject, ori, inMessage);
             ProviderInfo<Application> appProvider = providerFactory.getApplicationProvider();
             if (appProvider != null) {
                 InjectionUtils.injectContexts(appProvider.getProvider(),

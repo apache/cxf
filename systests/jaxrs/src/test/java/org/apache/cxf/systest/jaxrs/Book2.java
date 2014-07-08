@@ -85,6 +85,10 @@ public class Book2 {
         return this;
     }
     
+    public void checkContext() {
+        uriInfo.getQueryParameters();
+    }
+    
     @GET
     @Path("rc/bean")
     @Produces("application/xml")

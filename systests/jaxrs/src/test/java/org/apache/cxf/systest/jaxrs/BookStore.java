@@ -1132,7 +1132,9 @@ public class BookStore {
     
     @Path("/booksubresource/context")
     public Book2 getBookSubResourceRC() {
-        return resourceContext.getResource(Book2.class);
+        Book2 book = resourceContext.getResource(Book2.class);
+        book.checkContext();
+        return book;
     }
     
     @Path("/booksubresource/instance/context")
