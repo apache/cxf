@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.ws.rs.ext.ParamConverterProvider;
 
+import org.apache.cxf.jaxrs.ext.search.DefaultParamConverterProvider;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
@@ -44,6 +45,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     
     protected AbstractSearchConditionVisitor(Map<String, String> fieldMap) {
         this.fieldMap = fieldMap;
+        this.converterProvider = new DefaultParamConverterProvider();
     }
     
     protected String getRealPropertyName(String name) {

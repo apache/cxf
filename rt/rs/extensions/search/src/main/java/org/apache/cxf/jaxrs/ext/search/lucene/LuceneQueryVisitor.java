@@ -28,7 +28,6 @@ import java.util.Stack;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
-import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.visitor.AbstractSearchConditionVisitor;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
@@ -42,13 +41,16 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 
+import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getString;
+import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getValue;
+
 public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Query> {
 
     private String contentsFieldName;
     private Map<String, String> contentsFieldMap;
     private Stack<List<Query>> queryStack = new Stack<List<Query>>();
     public LuceneQueryVisitor() {
-        this(Collections.<String, String>emptyMap());
+        this(Collections.<String, String>emptyMap());        
     }
     
     public LuceneQueryVisitor(String contentsFieldAlias, String contentsFieldName) {
@@ -198,9 +200,8 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         
             return query;
         } else if (Date.class.isAssignableFrom(cls)) {
-            final Date date = SearchUtils.dateFromStringWithContextProperties(value.toString());           
-            final String luceneDateValue = (date != null) 
-                ? DateTools.dateToString(date, Resolution.MILLISECOND) : value.toString();
+            final Date date = getValue(Date.class, getFieldTypeConverter(), value.toString());           
+            final String luceneDateValue = getString(Date.class, getFieldTypeConverter(), date);
                 
             if (type == ConditionType.LESS_THAN || type == ConditionType.LESS_OR_EQUALS) {
                 return TermRangeQuery.newStringRange(name, "", luceneDateValue, minInclusive, maxInclusive);

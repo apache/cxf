@@ -19,11 +19,9 @@
 package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.util.Date;
 import java.util.List;
 
-import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
@@ -38,6 +36,9 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.Parser;
+
+import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getString;
+import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getValue;
 
 public class TikaLuceneContentExtractor {
     private final LuceneDocumentMetadata defaultDocumentMetadata;    
@@ -198,38 +199,6 @@ public class TikaLuceneContentExtractor {
         return new TextField(documentMetadata.getContentFieldName(), content, Store.YES);
     }
     
-    @SuppressWarnings("unchecked")
-    private static< T > T getValue(final Class< T > type, final ParamConverterProvider provider, 
-            final String value) {
-        
-        if (String.class.isAssignableFrom(type)) {
-            return (T)value;
-        }
-        
-        if (provider != null) {        
-            final ParamConverter< T > converter = provider.getConverter(type, null, new Annotation[0]);
-            if (converter != null) {
-                return converter.fromString(value);
-            }
-        }
-               
-        throw new IllegalArgumentException(String.format(
-                "Unable to convert string '%s' to instance of class '%s': no appropriate converter provided",
-                value, type.getName()));        
-    }
-    
-    private static< T > String getString(final Class< T > type, final ParamConverterProvider provider, 
-            final T value) {
-        
-        if (provider != null) {        
-            final ParamConverter< T > converter = provider.getConverter(type, null, new Annotation[0]);
-            if (converter != null) {
-                return converter.toString(value);
-            }
-        }
-               
-        return value == null ? null : value.toString();         
-    }
     
     private static Field getField(final LuceneDocumentMetadata documentMetadata, 
                                   final String name, final String value) { 
