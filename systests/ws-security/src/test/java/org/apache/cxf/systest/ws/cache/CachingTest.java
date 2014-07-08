@@ -111,8 +111,8 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         assertEquals(2, tokenStore.getTokenIdentifiers().size());
         
         ((java.io.Closeable)port).close();
-        //port2 is still holding onto the cache, thus, this should still be 4
-        assertEquals(4, tokenStore.getTokenIdentifiers().size());       
+        //port2 is still holding onto the cache, thus, this should still be 2
+        assertEquals(2, tokenStore.getTokenIdentifiers().size());
         ((java.io.Closeable)port2).close();
         //port2 is now closed, this should be null
         assertNull(tokenStore.getTokenIdentifiers());       
