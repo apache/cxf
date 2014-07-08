@@ -69,6 +69,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.PrimitiveUtils;
+import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -972,7 +973,10 @@ public final class InjectionUtils {
             proxy = createThreadLocalServletApiContext(type.getName());  
         }
         if (proxy == null) {
-            return (ThreadLocalProxy<T>)Proxy.newProxyInstance(type.getClassLoader(),
+            ProxyClassLoader loader = new ProxyClassLoader(Proxy.class.getClassLoader());
+            loader.addLoader(type.getClassLoader());
+            loader.addLoader(ThreadLocalProxy.class.getClassLoader());
+            return (ThreadLocalProxy<T>)Proxy.newProxyInstance(loader,
                                    new Class[] {type, ThreadLocalProxy.class },
                                    new ThreadLocalInvocationHandler<T>());
         }
