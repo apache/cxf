@@ -38,20 +38,23 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
 
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAuthorizingInInterceptor.class);
     private static final String ALL_ROLES = "*";
-    
+    private boolean allowAnonymousUsers = true;
     
     public AbstractAuthorizingInInterceptor() {
         super(Phase.PRE_INVOKE);
     }
     
     public void handleMessage(Message message) throws Fault {
+        Method method = getTargetMethod(message);
         SecurityContext sc = message.get(SecurityContext.class);
         if (sc != null && sc.getUserPrincipal() != null) {
-            Method method = getTargetMethod(message);
             if (authorize(sc, method)) {
                 return;
             }
+        } else if (!isMethodProtected(method) && isAllowAnonymousUsers()) {
+            return;
         }
+        
         
         throw new AccessDeniedException("Unauthorized");
     }
@@ -87,6 +90,9 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         }
         return false;
     }
+    protected boolean isMethodProtected(Method method) {
+        return !getExpectedRoles(method).isEmpty() || !getDenyRoles(method).isEmpty();
+    }
     
     protected boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
         
@@ -117,6 +123,14 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
      */
     protected List<String> getDenyRoles(Method method) {
         return Collections.emptyList();
+    }
+
+    public boolean isAllowAnonymousUsers() {
+        return allowAnonymousUsers;
+    }
+
+    public void setAllowAnonymousUsers(boolean allowAnonymousUsers) {
+        this.allowAnonymousUsers = allowAnonymousUsers;
     }
     
 }
