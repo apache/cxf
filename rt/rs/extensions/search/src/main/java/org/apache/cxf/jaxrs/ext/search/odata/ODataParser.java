@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.ext.search.AbstractSearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.AndSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
@@ -165,8 +166,12 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
             if (property.typeInfo.getWrappedTypeClass().isAssignableFrom(value.typeClass)) {
                 typedValue = value.value;
             } else { // Property type and value type are not compatible and convert / cast are required
+                String valueStr = value.literal;
+                if (isDecodeQueryValues()) {
+                    valueStr = UrlUtils.urlDecode(valueStr);
+                }
                 typedValue = parseType(property.propertyName, null, null, property.propertyName, 
-                    property.typeInfo, value.literal);
+                    property.typeInfo, valueStr);
             }
             
             final CollectionCheckInfo checkInfo = property.typeInfo.getCollectionCheckInfo();

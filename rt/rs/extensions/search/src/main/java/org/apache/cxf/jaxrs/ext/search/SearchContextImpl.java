@@ -47,6 +47,7 @@ public class SearchContextImpl implements SearchContext {
     private static final String USE_PLAIN_QUERY_PARAMETERS = "search.use.plain.queries";
     private static final String USE_ALL_QUERY_COMPONENT = "search.use.all.query.component";
     private static final String BLOCK_SEARCH_EXCEPTION = "search.block.search.exception";
+    private static final String KEEP_QUERY_ENCODED = "search.keep.query.encoded";
     private static final Logger LOG = LogUtils.getL7dLogger(SearchContextImpl.class);
     private Message message;
     
@@ -115,8 +116,10 @@ public class SearchContextImpl implements SearchContext {
             if (MessageUtils.isTrue(message.getContextualProperty(USE_ALL_QUERY_COMPONENT))) {
                 return queryStr;
             }
+            boolean encoded = PropertyUtils.isTrue(getKeepEncodedProperty());
+            
             MultivaluedMap<String, String> params = 
-                JAXRSUtils.getStructuredParams(queryStr, "&", true, false);
+                JAXRSUtils.getStructuredParams(queryStr, "&", !encoded, false);
             String customQueryParamName = (String)message.getContextualProperty(CUSTOM_SEARCH_QUERY_PARAM_NAME);
             if (customQueryParamName != null) {
                 return params.getFirst(customQueryParamName);
@@ -143,6 +146,10 @@ public class SearchContextImpl implements SearchContext {
             list.add(getOrCondition(builder, entry));
         }
         return builder.and(list).query();
+    }
+    
+    private String getKeepEncodedProperty() {
+        return (String)message.getContextualProperty(KEEP_QUERY_ENCODED);
     }
     
     private CompleteCondition getOrCondition(SearchConditionBuilder builder,

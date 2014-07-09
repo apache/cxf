@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.ext.search.AbstractSearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.AndSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
@@ -272,6 +273,9 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     
     private TypeInfoObject parseType(String originalName, String setter, String value) throws SearchParseException {
         TypeInfo typeInfo = getTypeInfo(setter, value);
+        if (isDecodeQueryValues()) {
+            value = UrlUtils.urlDecode(value);
+        }
         Object object = parseType(originalName, null, null, setter, typeInfo, value);
         return new TypeInfoObject(object, typeInfo);
     }

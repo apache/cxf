@@ -40,6 +40,7 @@ public final class SearchUtils {
     public static final String LAX_PROPERTY_MATCH = "search.lax.property.match";
     public static final String BEAN_PROPERTY_MAP = "search.bean.property.map";
     public static final String SEARCH_VISITOR_PROPERTY = "search.visitor";
+    public static final String DECODE_QUERY_VALUES = "search.decode.values";
     
     private static final Logger LOG = LogUtils.getL7dLogger(SearchUtils.class);
     
@@ -63,7 +64,6 @@ public final class SearchUtils {
     }
 
     
-    //new SimpleDateFormat(DEFAULT_DATE_FORMAT);
     public static Date dateFromStringWithContextProperties(String value) {
         try {            
             final SimpleDateFormat format = getContextualDateFormat();

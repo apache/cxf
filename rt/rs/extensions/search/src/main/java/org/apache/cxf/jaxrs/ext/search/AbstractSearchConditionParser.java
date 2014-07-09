@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheck;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
@@ -66,6 +67,10 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
     protected String getActualSetterName(String setter) {
         String beanPropertyName = beanPropertiesMap == null ? null : beanPropertiesMap.get(setter);
         return beanPropertyName != null ? beanPropertyName : setter;
+    }
+    
+    protected Boolean isDecodeQueryValues() {
+        return PropertyUtils.isTrue(contextProperties.get(SearchUtils.DECODE_QUERY_VALUES));
     }
     
     protected TypeInfo getTypeInfo(String setter, String value) 
