@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public class OAuthAuthorizationData implements Serializable {
     private String applicationWebUri;
     private String applicationDescription;
     private String applicationLogoUri;
-    private String applicationCertificate;
+    private List<String> applicationCertificates = new LinkedList<String>();
     private Map<String, String> extraApplicationProperties = new HashMap<String, String>();
     
     private List<? extends Permission> permissions;
@@ -263,12 +264,12 @@ public class OAuthAuthorizationData implements Serializable {
         this.audience = audience;
     }
 
-    public String getApplicationCertificate() {
-        return applicationCertificate;
+    public List<String> getApplicationCertificates() {
+        return applicationCertificates;
     }
 
-    public void setApplicationCertificate(String applicationCertificate) {
-        this.applicationCertificate = applicationCertificate;
+    public void setApplicationCertificates(List<String> applicationCertificates) {
+        this.applicationCertificates = applicationCertificates;
     }
 
 }

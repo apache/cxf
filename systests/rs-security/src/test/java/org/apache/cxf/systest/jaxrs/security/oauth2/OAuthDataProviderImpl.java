@@ -20,6 +20,7 @@ package org.apache.cxf.systest.jaxrs.security.oauth2;
 
 import java.io.InputStream;
 import java.security.cert.Certificate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
                                     null,
                                     null);
         client2.getAllowedGrantTypes().add("custom_grant");
-        client2.setApplicationCertificate(encodedCert);
+        client2.setApplicationCertificates(Collections.singletonList(encodedCert));
         clients.put(client2.getClientId(), client2);
     }
 

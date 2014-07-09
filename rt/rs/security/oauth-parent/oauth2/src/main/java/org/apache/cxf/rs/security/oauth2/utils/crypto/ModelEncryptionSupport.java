@@ -328,7 +328,7 @@ public final class ModelEncryptionSupport {
                               getStringPart(parts[3]), getStringPart(parts[4]));
         c.setApplicationDescription(getStringPart(parts[5]));
         c.setApplicationLogoUri(getStringPart(parts[6]));
-        c.setApplicationLogoUri(getStringPart(parts[7]));
+        c.setApplicationCertificates(parseSimpleList(parts[7]));
         c.setAllowedGrantTypes(parseSimpleList(parts[8]));
         c.setRegisteredScopes(parseSimpleList(parts[9]));
         c.setRedirectUris(parseSimpleList(parts[10]));
@@ -360,8 +360,8 @@ public final class ModelEncryptionSupport {
         // 6: app logo URI
         state.append(tokenizeString(client.getApplicationLogoUri()));
         state.append(SEP);
-        // 7: app certificate
-        state.append(tokenizeString(client.getApplicationCertificate()));
+        // 7: app certificates
+        state.append(client.getApplicationCertificates());
         state.append(SEP);
         // 8: grants
         state.append(client.getAllowedGrantTypes().toString());

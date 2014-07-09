@@ -23,6 +23,7 @@ import java.security.Principal;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 import javax.ws.rs.core.MediaType;
@@ -77,9 +78,9 @@ public class AbstractTokenService extends AbstractOAuthService {
                 client = getClientFromBasicAuthScheme();
             }
         }
-        if (client != null && client.getApplicationCertificate() != null) {
+        if (client != null && !client.getApplicationCertificates().isEmpty()) {
             // Validate the client application certificates
-            compareTlsCertificates(getTlsSessionInfo(), client.getApplicationCertificate());
+            compareTlsCertificates(getTlsSessionInfo(), client.getApplicationCertificates());
         }
         if (client == null) {
             reportInvalidClient();
@@ -151,18 +152,24 @@ public class AbstractTokenService extends AbstractOAuthService {
         return null;
     }
     
-    protected void compareTlsCertificates(TLSSessionInfo tlsInfo, String base64EncodedCert) {
+    protected void compareTlsCertificates(TLSSessionInfo tlsInfo, 
+                                          List<String> base64EncodedCerts) {
         if (tlsInfo != null) {
             Certificate[] clientCerts = tlsInfo.getPeerCertificates();
-            try {
-                X509Certificate cert = (X509Certificate)clientCerts[0];
-                byte[] encodedKey = cert.getEncoded();
-                byte[] clientKey = Base64Utility.decode(base64EncodedCert);
-                if (Arrays.equals(encodedKey, clientKey)) {
+            if (clientCerts.length == base64EncodedCerts.size()) {
+                try {
+                    for (int i = 0; i < clientCerts.length; i++) {
+                        X509Certificate x509Cert = (X509Certificate)clientCerts[i];
+                        byte[] encodedKey = x509Cert.getEncoded();
+                        byte[] clientKey = Base64Utility.decode(base64EncodedCerts.get(i));
+                        if (!Arrays.equals(encodedKey, clientKey)) {
+                            reportInvalidClient();
+                        }
+                    }
                     return;
-                }
-            } catch (Exception ex) {
-                // throw exception later
+                } catch (Exception ex) {
+                    // throw exception later
+                }    
             }
         }
         reportInvalidClient();

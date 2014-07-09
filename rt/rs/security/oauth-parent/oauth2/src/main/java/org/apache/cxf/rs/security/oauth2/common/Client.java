@@ -38,7 +38,7 @@ public class Client implements Serializable {
     private String applicationDescription;
     private String applicationWebUri;
     private String applicationLogoUri;
-    private String applicationCertificate;
+    private List<String> applicationCertificates = new LinkedList<String>();
     private List<String> redirectUris = new LinkedList<String>();
     
     private boolean isConfidential;
@@ -283,16 +283,16 @@ public class Client implements Serializable {
         this.registeredAudiences = registeredAudiences;
     }
 
-    public String getApplicationCertificate() {
-        return applicationCertificate;
+    public List<String> getApplicationCertificates() {
+        return applicationCertificates;
     }
 
     /*
-     * Set the optional Base64 encoded Application Public X509 Certificate
+     * Set the Base64 encoded Application Public X509 Certificate
      * It can be used in combination with the clientSecret property to support 
      * Basic or other password-aware authentication on top of 2-way TLS.
      */
-    public void setApplicationCertificate(String applicationCertificate) {
-        this.applicationCertificate = applicationCertificate;
+    public void setApplicationCertificates(List<String> applicationCertificates) {
+        this.applicationCertificates = applicationCertificates;
     }
 }
