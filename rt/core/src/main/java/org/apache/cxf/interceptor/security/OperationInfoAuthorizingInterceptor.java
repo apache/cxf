@@ -39,13 +39,15 @@ public class OperationInfoAuthorizingInterceptor extends SimpleAuthorizingInterc
 
     @Override
     public void handleMessage(Message message) throws Fault {
+        OperationInfo opinfo = getTargetOperationInfo(message);
         SecurityContext sc = message.get(SecurityContext.class);
         if (sc != null && sc.getUserPrincipal() != null) {
-            OperationInfo opinfo = getTargetOperationInfo(message);
-            if (opinfo != null && opinfo.getName() != null
+            if (opinfo.getName() != null
                 && authorize(sc, opinfo.getName().getLocalPart())) {
                 return;
             }
+        } else if (!isMethodProtected(opinfo.getName().getLocalPart()) && isAllowAnonymousUsers()) {
+            return;
         }
         
         throw new AccessDeniedException("Unauthorized");
@@ -70,7 +72,10 @@ public class OperationInfoAuthorizingInterceptor extends SimpleAuthorizingInterc
 
     protected OperationInfo getTargetOperationInfo(Message message) {
         BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
-        return bop != null ? bop.getOperationInfo() : null;
+        if (bop != null) {
+            return bop.getOperationInfo();
+        }
+        throw new AccessDeniedException("OperationInfo is not available : Unauthorized");
     }
 
     protected List<String> getExpectedRoles(String key) {
@@ -83,5 +88,9 @@ public class OperationInfoAuthorizingInterceptor extends SimpleAuthorizingInterc
 
     protected List<String> getDenyRoles(String key) {
         return Collections.emptyList();    
+    }
+    
+    protected boolean isMethodProtected(String key) {
+        return !getExpectedRoles(key).isEmpty() || !getDenyRoles(key).isEmpty();
     }
 }

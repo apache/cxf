@@ -84,13 +84,31 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
     @Test(expected = AccessDeniedException.class)
     public void testNoSecurityContext() {
         message.put(SecurityContext.class, null);
-        createSimpleAuthorizingInterceptor().handleMessage(message);
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor();
+        in.setAllowAnonymousUsers(false);
+        in.handleMessage(message);
+    }
+    
+    @Test(expected = AccessDeniedException.class)
+    public void testNoSecurityContextAnonymousUserRoles() {
+        message.put(SecurityContext.class, null);
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor();
+        in.setMethodRolesMap(Collections.singletonMap("echo", "role1 testRole"));
+        in.handleMessage(message);
+    }
+    @Test
+    public void testNoSecurityContextAnonymousUserUnprotectedMethod() {
+        message.put(SecurityContext.class, null);
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor();
+        in.handleMessage(message);
     }
     
     @Test(expected = AccessDeniedException.class)
     public void testIncompleteSecurityContext() {
         message.put(SecurityContext.class, new IncompleteSecurityContext());
-        createSimpleAuthorizingInterceptor().handleMessage(message);    
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor();
+        in.setAllowAnonymousUsers(false);
+        in.handleMessage(message);
     }
     
     @Test
