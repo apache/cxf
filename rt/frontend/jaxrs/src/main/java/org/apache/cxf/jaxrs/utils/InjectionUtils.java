@@ -907,7 +907,8 @@ public final class InjectionUtils {
             } else {
                 if (paramType.isPrimitive()) {
                     paramValues = Collections.singletonList(
-                        boolean.class == paramType ? "false" : "0");
+                        boolean.class == paramType ? "false" 
+                            : char.class == paramType ? Character.toString('\u0000') : "0");
                 } else if (InjectionUtils.isSupportedCollectionOrArray(paramType)) {
                     paramValues = Collections.emptyList();
                 } else {
