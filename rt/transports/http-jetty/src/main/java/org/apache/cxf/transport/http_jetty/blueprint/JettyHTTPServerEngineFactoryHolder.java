@@ -26,11 +26,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.jaxb.JAXBContextCache;
@@ -47,6 +49,8 @@ import org.apache.cxf.transports.http_jetty.configuration.JettyHTTPServerEngineF
 import org.apache.cxf.transports.http_jetty.configuration.TLSServerParametersIdentifiedType;
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersIdentifiedType;
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersType;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 
 public class JettyHTTPServerEngineFactoryHolder {
 
@@ -54,6 +58,10 @@ public class JettyHTTPServerEngineFactoryHolder {
 
     private String parsedElement;
     private JettyHTTPServerEngineFactory factory;
+    
+    private Map<String, Connector> connectorMap;
+    
+    private Map<String, List<Handler>> handlersMap;
 
     private JAXBContext jaxbContext;
     private Set<Class<?>> jaxbClasses;
@@ -111,13 +119,30 @@ public class JettyHTTPServerEngineFactoryHolder {
             List<JettyHTTPServerEngine> engineList = new ArrayList<JettyHTTPServerEngine>();
             for (JettyHTTPServerEngineConfigType engine : config.getEngine()) {
                 JettyHTTPServerEngine eng = new JettyHTTPServerEngine();
-                //eng.setConnector(engine.getConnector());
+                if (engine.getConnector() != null && connectorMap != null) {
+                    // we need to setup the Connector from the connectorMap
+                    Connector connector = connectorMap.get(engine.getPort().toString());
+                    if (connector != null) {
+                        eng.setConnector(connector);
+                    } else {
+                        throw new RuntimeException("Could not find the connector instance for engine with port"
+                            + engine.getPort().toString());
+                    }
+                }
+                if (engine.getHandlers() != null && handlersMap != null) {
+                    List<Handler> handlers = handlersMap.get(engine.getPort().toString());
+                    if (handlers != null) {
+                        eng.setHandlers(handlers);
+                    } else {
+                        throw new RuntimeException("Could not find the handlers instance for engine with port"
+                            + engine.getPort().toString());
+                    }
+                }
 
                 if (engine.isContinuationsEnabled() != null) {
                     eng.setContinuationsEnabled(engine.isContinuationsEnabled());
                 }
-                // eng.setHandlers(engine.getHandlers());
-
+ 
                 if (engine.getHost() != null && !StringUtils.isEmpty(engine.getHost())) {
                     eng.setHost(engine.getHost());
                 }
@@ -179,6 +204,14 @@ public class JettyHTTPServerEngineFactoryHolder {
 
     public void setParsedElement(String parsedElement) {
         this.parsedElement = parsedElement;
+    }
+    
+    public void setConnectorMap(Map<String, Connector> connectorMap) {
+        this.connectorMap = connectorMap;
+    }
+    
+    public void setHandlersMap(Map<String, List<Handler>> handlersMap) {
+        this.handlersMap = handlersMap;
     }
 
     protected Object getJaxbObject(Element parent, Class<?> c) {
