@@ -36,9 +36,10 @@ public class StudentPutResourceTransformer implements ResourceTransformer {
     
     public static final String UID_NAME = "uid";
     
+    @Override
     public void transform(Representation newRepresentation, Representation oldRepresentation) {
         ResourceTransformer transformer = new XSLTResourceTransformer(new StreamSource(
-                getClass().getResourceAsStream("/xml/xslt/studentPut.xsl")));
+                getClass().getResourceAsStream("/xslt/studentPut.xsl")));
         transformer.transform(newRepresentation, null);
         
         Element newRepresentationEl = (Element) newRepresentation.getAny();

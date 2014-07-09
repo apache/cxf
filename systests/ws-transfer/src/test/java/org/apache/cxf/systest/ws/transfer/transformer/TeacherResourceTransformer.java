@@ -39,7 +39,7 @@ public class TeacherResourceTransformer implements ResourceTransformer {
     @Override
     public void transform(Representation newRepresentation, Representation oldRepresentation) {
         ResourceTransformer transformer = new XSLTResourceTransformer(new StreamSource(
-                getClass().getResourceAsStream("/xml/xslt/teacherDefaultValues.xsl")));
+                getClass().getResourceAsStream("/xslt/teacherDefaultValues.xsl")));
         transformer.transform(newRepresentation, null);
         
         if (oldRepresentation != null) {
