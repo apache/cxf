@@ -29,7 +29,10 @@ import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.staxutils.SysPropExpandingStreamReader;
+import org.apache.cxf.staxutils.XMLStreamReaderWrapper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -105,5 +108,30 @@ public class WSDLManagerImplTest extends Assert {
         Definition def = builder.getDefinition(wsdlUrl);
         java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream(); 
         builder.getWSDLFactory().newWSDLWriter().writeWSDL(def, bos);
+    }
+    
+    @Test
+    public void testXMLStreamReaderWrapper() throws Exception {
+        final String testProp = System.setProperty("org.apache.cxf.test.wsdl11.port", "99999");
+        try {
+            String wsdlUrl = getClass().getResource("hello_world_wrap.wsdl").toString();
+            WSDLManagerImpl builder = new WSDLManagerImpl();
+            builder.setXMLStreamReaderWrapper(new XMLStreamReaderWrapper() {
+                @Override
+                public XMLStreamReader wrap(XMLStreamReader reader) {
+                    return new SysPropExpandingStreamReader(reader);
+                }
+            });
+            Definition def = builder.getDefinition(wsdlUrl);
+            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream(); 
+            builder.getWSDLFactory().newWSDLWriter().writeWSDL(def, bos);
+            assertTrue(bos.toString().contains("http://localhost:99999/SoapContext/SoapPort"));
+        } finally {
+            if (testProp != null) {
+                System.setProperty("org.apache.cxf.test.wsdl11.port", testProp);
+            } else {
+                System.clearProperty("org.apache.cxf.test.wsdl11.port");
+            }
+        }
     }
 }

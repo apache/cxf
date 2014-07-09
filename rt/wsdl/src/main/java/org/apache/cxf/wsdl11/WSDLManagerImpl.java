@@ -49,6 +49,9 @@ import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.service.model.ServiceSchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.DelegatingXMLStreamReader;
+import org.apache.cxf.staxutils.SysPropExpandingStreamReader;
+import org.apache.cxf.staxutils.XMLStreamReaderWrapper;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLExtensionLoader;
 import org.apache.cxf.wsdl.WSDLManager;
@@ -71,6 +74,8 @@ public class WSDLManagerImpl implements WSDLManager {
     private boolean disableSchemaCache;
     
     private Bus bus;
+    
+    private XMLStreamReaderWrapper xmlStreamReaderWrapper;
 
     public WSDLManagerImpl() throws BusException {
         this(null);
@@ -130,6 +135,9 @@ public class WSDLManagerImpl implements WSDLManager {
         }
     }
     
+    protected Bus getBus() {
+        return bus;
+    }
 
     /*
      * (non-Javadoc)
@@ -153,7 +161,11 @@ public class WSDLManagerImpl implements WSDLManager {
                 return definitionsMap.get(url);
             }
         }
-        return loadDefinition(url);
+        Definition def = loadDefinition(url);
+        synchronized (definitionsMap) {
+            definitionsMap.put(url, def);
+        }
+        return def;
     }
 
     public Definition getDefinition(Element el) throws WSDLException {
@@ -179,7 +191,7 @@ public class WSDLManagerImpl implements WSDLManager {
         }
     }
 
-    private Definition loadDefinition(String url) throws WSDLException {
+    protected Definition loadDefinition(String url) throws WSDLException {
         WSDLReader reader = factory.newWSDLReader();
         reader.setFeature("javax.wsdl.verbose", false);
         reader.setFeature("javax.wsdl.importDocuments", true);
@@ -195,6 +207,9 @@ public class WSDLManagerImpl implements WSDLManager {
             XMLStreamReader xmlReader = null;
             try {
                 xmlReader = StaxUtils.createXMLStreamReader(src);
+                if (xmlStreamReaderWrapper != null) {
+                    xmlReader = xmlStreamReaderWrapper.wrap(xmlReader);
+                }
                 doc = StaxUtils.read(xmlReader, true);
                 if (src.getSystemId() != null) {
                     try {
@@ -217,10 +232,11 @@ public class WSDLManagerImpl implements WSDLManager {
             def = reader.readWSDL(wsdlLocator);
         }
         
-        synchronized (definitionsMap) {
-            definitionsMap.put(url, def);
-        }
         return def;
+    }
+    
+    public void setXMLStreamReaderWrapper(XMLStreamReaderWrapper wrapper) {
+        this.xmlStreamReaderWrapper = wrapper;
     }
 
     private void addExtensionAttributeTypes(ExtensionRegistry extreg) {
