@@ -36,7 +36,8 @@ import java.util.regex.Pattern;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-
+import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.ext.search.AndSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.Beanspector;
 import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
@@ -313,6 +314,9 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
             TypeInfo typeInfo = 
                 beanspector != null ? beanspector.getAccessorTypeInfo(name) 
                     : new TypeInfo(String.class, String.class);
+            if (isDecodeQueryValues()) {
+                value = UrlUtils.urlDecode(value);
+            } 
             Object object = parseType(originalName, null, null, setter, typeInfo, value);
             return new TypeInfoObject(object, typeInfo);
         } catch (Exception e) {
@@ -550,7 +554,11 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
             return Character.toUpperCase(name.charAt(0)) + name.substring(1);
         }
     }
-    
+ 
+    protected Boolean isDecodeQueryValues() {
+        return PropertyUtils.isTrue(contextProperties.get(SearchUtils.DECODE_QUERY_VALUES));
+    }
+   
     // node of abstract syntax tree
     private interface ASTNode<T> {
         SearchCondition<T> build() throws SearchParseException;
