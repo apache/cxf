@@ -20,6 +20,7 @@
 
 package org.apache.cxf.systest.ws.transfer;
 
+import java.io.PrintWriter;
 import javax.xml.transform.stream.StreamSource;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -71,18 +72,35 @@ public final class TestUtils {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory.class);
         factory.setAddress(RESOURCE_FACTORY_URL);
+        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
+        loggingIn.setPrettyLogging(true);
+        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
+        loggingOut.setPrettyLogging(true);
+        factory.getInInterceptors().add(loggingIn);
+        factory.getOutInterceptors().add(loggingOut);
+        factory.getInFaultInterceptors().add(loggingIn);
+        factory.getOutFaultInterceptors().add(loggingOut);
         return (ResourceFactory) factory.create();
     }
     
-    protected static Resource createResourceClient(String address, EndpointReferenceType ref) {
+    protected static Resource createResourceClient(EndpointReferenceType ref) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Resource.class);
         factory.setAddress(ref.getAddress().getValue());
         factory.getHandlers().add(new ReferenceParameterAddingHandler(ref.getReferenceParameters()));
+        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
+        loggingIn.setPrettyLogging(true);
+        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
+        loggingOut.setPrettyLogging(true);
+        factory.getInInterceptors().add(loggingIn);
+        factory.getOutInterceptors().add(loggingOut);
+        factory.getInFaultInterceptors().add(loggingIn);
+        factory.getOutFaultInterceptors().add(loggingOut);
         return (Resource) factory.create();
     }
     
     protected static void createStudentsServers() {
+        UIDManager.reset();
         ResourceManager studentsResourceManager = new MemoryResourceManager();
         resourceFactoryServer = createResourceFactory(studentsResourceManager);
         studentsResourceServer = createStudentsResource(studentsResourceManager);

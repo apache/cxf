@@ -37,4 +37,8 @@ public final class UIDManager {
         return UID.getAndIncrement();
     }
     
+    public static void reset() {
+        UID.set(1);
+    }
+    
 }
