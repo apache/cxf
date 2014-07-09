@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.transfer;
 
+import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.apache.cxf.ws.transfer.Create;
@@ -63,5 +64,44 @@ public class CreateStudentTest {
         
         Assert.assertEquals(TestUtils.RESOURCE_STUDENTS_URL,
             response.getResourceCreated().getAddress().getValue());
+    }
+
+    @Test
+    public void createStudentPartialTest() {
+        Document createStudentPartialXML = TransferTools.parse(
+            new InputSource(getClass().getResourceAsStream("/xml/createStudentPartial.xml")));
+        Create request = new Create();
+        request.setRepresentation(new Representation());
+        request.getRepresentation().setAny(createStudentPartialXML.getDocumentElement());
+        
+        ResourceFactory rf = TestUtils.createResourceFactoryClient();
+        CreateResponse response = rf.create(request);
+        
+        Assert.assertEquals(TestUtils.RESOURCE_STUDENTS_URL,
+            response.getResourceCreated().getAddress().getValue());
+    }
+    
+    @Test(expected = SOAPFaultException.class)
+    public void createStudentWrongTest() {
+        Document createStudentWrongXML = TransferTools.parse(
+            new InputSource(getClass().getResourceAsStream("/xml/createStudentWrong.xml")));
+        Create request = new Create();
+        request.setRepresentation(new Representation());
+        request.getRepresentation().setAny(createStudentWrongXML.getDocumentElement());
+        
+        ResourceFactory rf = TestUtils.createResourceFactoryClient();
+        rf.create(request);
+    }
+    
+    @Test(expected = SOAPFaultException.class)
+    public void createRandomTest() {
+        Document randomXML = TransferTools.parse(
+            new InputSource(getClass().getResourceAsStream("/xml/random.xml")));
+        Create request = new Create();
+        request.setRepresentation(new Representation());
+        request.getRepresentation().setAny(randomXML.getDocumentElement());
+        
+        ResourceFactory rf = TestUtils.createResourceFactoryClient();
+        rf.create(request);
     }
 }
