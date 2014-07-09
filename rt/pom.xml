@@ -60,6 +60,7 @@
         <module>ws/rm</module>
         <module>ws/mex</module>
         <module>ws/eventing</module>
+        <module>ws/transfer</module>
         <module>rs/client</module>
         <module>rs/http-sci</module>
         <module>rs/description</module>
