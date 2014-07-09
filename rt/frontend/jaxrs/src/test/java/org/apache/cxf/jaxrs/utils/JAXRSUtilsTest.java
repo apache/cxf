@@ -1312,12 +1312,12 @@ public class JAXRSUtilsTest extends Assert {
     @Test
     public void testMultipleQueryParameters() throws Exception {
         Class<?>[] argType = {String.class, String.class, Long.class, 
-                              Boolean.TYPE, String.class};
+                              Boolean.TYPE, char.class, String.class};
         Method m = Customer.class.getMethod("testMultipleQuery", argType);
         MessageImpl messageImpl = new MessageImpl();
         
         messageImpl.put(Message.QUERY_STRING, 
-                        "query=first&query2=second&query3=3&query4=true&query5");
+                        "query=first&query2=second&query3=3&query4=true&query6");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
                                                                new ClassResourceInfo(Customer.class)), 
                                                            null, messageImpl);
@@ -1329,8 +1329,10 @@ public class JAXRSUtilsTest extends Assert {
                      new Long(3), params.get(2));
         assertEquals("Fourth Query Parameter of multiple was not matched correctly", 
                      Boolean.TRUE, params.get(3));
-        assertEquals("Fourth Query Parameter of multiple was not matched correctly", 
-                     "", params.get(4));
+        assertEquals("Fifth Query Parameter of multiple was not matched correctly", 
+                     '\u0000', params.get(4));
+        assertEquals("Six Query Parameter of multiple was not matched correctly", 
+                     "", params.get(5));
     }
     
     @SuppressWarnings("unchecked")
