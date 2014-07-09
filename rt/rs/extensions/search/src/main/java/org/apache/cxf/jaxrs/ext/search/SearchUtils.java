@@ -49,19 +49,32 @@ public final class SearchUtils {
     
     public static SimpleDateFormat getContextualDateFormat() {
         Message m = PhaseInterceptorChain.getCurrentMessage();
+        
         if (m != null) {
             return getDateFormat((String)m.getContextualProperty(DATE_FORMAT_PROPERTY));
-        } else {
-            return new SimpleDateFormat(DEFAULT_DATE_FORMAT);
-        }
+        } 
+          
+        return null;        
     }
     
+    public static SimpleDateFormat getContextualDateFormatOrDefault(final String pattern) {
+        final SimpleDateFormat format = getContextualDateFormat();
+        return format != null ? format : new SimpleDateFormat(pattern);        
+    }
+
+    
+    //new SimpleDateFormat(DEFAULT_DATE_FORMAT);
     public static Date dateFromStringWithContextProperties(String value) {
-        try {
-            return getContextualDateFormat().parse(value);
+        try {            
+            final SimpleDateFormat format = getContextualDateFormat();
+            if (format != null) {
+                return format.parse(value);
+            }            
         } catch (ParseException ex) {
-            return dateFromStringWithDefaultFormats(value);
+            LOG.log(Level.FINE, "Unable to parse date using contextual date format specification", ex);
         }
+        
+        return dateFromStringWithDefaultFormats(value);
     }
     
     public static SimpleDateFormat getDateFormat(Map<String, String> properties) {
@@ -181,7 +194,7 @@ public final class SearchUtils {
         }
         
         if (date == null) {
-            date = timestampFromString(getContextualDateFormat(), value);
+            date = timestampFromString(getContextualDateFormatOrDefault(DEFAULT_DATE_FORMAT), value);
         }
                 
         return date;
