@@ -77,7 +77,7 @@ public class MessageContextImpl implements MessageContext {
                 return createAttachments(key.toString());
             } catch (CacheSizeExceededException e) {
                 m.getExchange().put("cxf.io.cacheinput", Boolean.FALSE);
-                throw new WebApplicationException(413);
+                throw new WebApplicationException(e, 413);
             }
         }
         if (keyValue.equals("WRITE-" + Message.ATTACHMENTS)) {
