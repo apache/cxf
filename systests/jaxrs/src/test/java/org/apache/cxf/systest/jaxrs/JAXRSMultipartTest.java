@@ -22,7 +22,9 @@ package org.apache.cxf.systest.jaxrs;
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +52,7 @@ import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -138,6 +141,60 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public void testBookAsMessageContextAttachments() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/attachments";
         doAddBook(address, "attachmentData", 200);               
+    }
+    
+    
+    int countTempFiles() {
+        File file = FileUtils.getDefaultTempDir();
+        File files[] = file.listFiles();
+        if (files == null) {
+            return 0;
+        }
+        int count = 0;
+        for (File f : files) {
+            if (f.isFile()) {
+                count++;
+            }
+        }
+        return count;
+    }
+    @Test
+    public void testBookAsMassiveAttachment() throws Exception {
+        //CXF-5842
+        int orig = countTempFiles();
+        String address = "http://localhost:" + PORT + "/bookstore/books/attachments";
+        InputStream is = 
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/attachmentData");
+        //create a stream that sticks a bunch of data for the attachement to cause the
+        //server to buffer the attachment to disk.
+        PushbackInputStream buf = new PushbackInputStream(is, 1024 * 20) {
+            int bcount = -1;
+            @Override
+            public int read(byte b[], int offset, int len) throws IOException {
+                if (bcount >= 0 && bcount < 1024 * 50) {
+                    for (int x = 0; x < len; x++) {
+                        b[offset + x] = (byte)x;
+                    }
+                    bcount += len;
+                    return len;
+                }
+                int i = super.read(b, offset, len);
+                for (int x = 0; x < i - 5; x++) {
+                    if (b[x + offset] == '*'
+                        && b[x + offset + 1] == '*'
+                        && b[x + offset + 2] == 'D'
+                        && b[x + offset + 3] == '*'
+                        && b[x + offset + 4] == '*') {
+                        super.unread(b, x + offset + 5, i - x - 5);
+                        i = x;
+                        bcount = 0;
+                    }
+                }
+                return i;
+            }
+        };
+        doAddBook("multipart/related", address, buf, 413);               
+        assertEquals(orig, countTempFiles());
     }
     
     @Test
@@ -888,13 +945,19 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
 
     private void doAddBook(String type, String address, String resourceName, int status) throws Exception {
+        InputStream is = 
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/" + resourceName);
+        doAddBook(type, address, is, status);
+    }
+    private void doAddBook(String type, String address, InputStream is, int status) throws Exception {
+
         PostMethod post = new PostMethod(address);
         
         String ct = type + "; type=\"text/xml\"; " + "start=\"rootPart\"; "
             + "boundary=\"----=_Part_4_701508.1145579811786\"";
         post.setRequestHeader("Content-Type", ct);
-        InputStream is = 
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/" + resourceName);
+        
+        
         RequestEntity entity = new InputStreamRequestEntity(is);
         post.setRequestEntity(entity);
         HttpClient httpclient = new HttpClient();

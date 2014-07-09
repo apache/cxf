@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import javax.activation.DataSource;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CacheSizeExceededException;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 
@@ -49,12 +50,27 @@ public class AttachmentDataSource implements DataSource {
         if (cache == null) {
             cache = new CachedOutputStream();
             AttachmentUtil.setStreamedAttachmentProperties(message, cache);
-            IOUtils.copy(ins, cache);
-            cache.lockOutputStream();  
-            ins.close();
-            ins = null;
-            if (delegate != null) {
-                delegate.setInputStream(cache.getInputStream());
+            try {
+                IOUtils.copy(ins, cache);
+                cache.lockOutputStream();
+                if (delegate != null) {
+                    delegate.setInputStream(cache.getInputStream());
+                }
+            } catch (CacheSizeExceededException cee) {
+                cache.close();
+                cache = null;
+                throw cee;
+            } catch (IOException cee) {
+                cache.close();
+                cache = null;
+                throw cee;
+            } finally {
+                try {
+                    ins.close();                
+                } catch (Exception ex) {
+                    //ignore
+                }
+                ins = null;
             }
         }
     }
