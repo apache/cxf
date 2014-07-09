@@ -18,22 +18,24 @@
  */
 package org.apache.cxf.transport.http_jetty.blueprint;
 
-import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.reflect.MapEntryImpl;
+import org.apache.aries.blueprint.reflect.MapMetadataImpl;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.MapEntry;
 import org.osgi.service.blueprint.reflect.Metadata;
+import org.osgi.service.blueprint.reflect.ValueMetadata;
 
 public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionParser {
 
@@ -67,27 +69,63 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
         }
         ef.setRuntimeClass(JettyHTTPServerEngineFactoryHolder.class);
 
+        // setup the ConnectorMap and HandlersMap property for the JettyHTTPServerEngineFactoryHolder
+
         try {
 
-            TransformerFactory transfac = TransformerFactory.newInstance();
-            Transformer trans = transfac.newTransformer();
-            trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "YES");
-            //trans.setOutputProperty(OutputKeys.INDENT, "yes");
-
             // Print the DOM node
-
-            StringWriter sw = new StringWriter();
-            StreamResult result = new StreamResult(sw);
-            DOMSource source = new DOMSource(element);
-            trans.transform(source, result);
-            String xmlString = sw.toString();
+            String xmlString = StaxUtils.toString(element);
             ef.addProperty("parsedElement", createValue(context, xmlString));
             ef.setInitMethod("init");
             ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
             ef.setDestroyMethod("destroy");
+            // setup the EngineConnector
+            ef.addProperty("connectorMap", parseEngineConnector(element, ef, context));
+            ef.addProperty("handlersMap", parseEngineHandlers(element, ef, context));
             return ef;
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
         }
+    }
+
+    protected Metadata parseEngineConnector(Element element, ComponentMetadata enclosingComponent,
+                                            ParserContext context) {
+        List<MapEntry> entries = new ArrayList<MapEntry>();
+        // create an empty map first
+        List<Element> engines = DOMUtils
+            .getChildrenWithName(element, HTTPJettyTransportNamespaceHandler.JETTY_TRANSPORT, "engine");
+        for (Element engine : engines) {
+            String port = engine.getAttribute("port");
+            ValueMetadata keyValue = createValue(context, port);
+            Element connector = DOMUtils
+                .getFirstChildWithName(engine, HTTPJettyTransportNamespaceHandler.JETTY_TRANSPORT,
+                                       "connector");
+            if (connector != null) {
+                Element first = DOMUtils.getFirstElement(connector);
+                Metadata valValue = context.parseElement(Metadata.class, enclosingComponent, first);
+                entries.add(new MapEntryImpl(keyValue, valValue));
+            }
+        }
+
+        return new MapMetadataImpl("java.lang.String", "org.eclipse.jetty.server.Connector", entries);
+    }
+
+    protected Metadata parseEngineHandlers(Element element, ComponentMetadata enclosingComponent,
+                                           ParserContext context) {
+        List<MapEntry> entries = new ArrayList<MapEntry>();
+        List<Element> engines = DOMUtils
+            .getChildrenWithName(element, HTTPJettyTransportNamespaceHandler.JETTY_TRANSPORT, "engine");
+        for (Element engine : engines) {
+            String port = engine.getAttribute("port");
+            ValueMetadata keyValue = createValue(context, port);
+            Element handlers = DOMUtils
+                .getFirstChildWithName(engine, HTTPJettyTransportNamespaceHandler.JETTY_TRANSPORT,
+                                       "handlers");
+            if (handlers != null) {
+                Metadata valValue = parseListData(context, enclosingComponent, handlers);
+                entries.add(new MapEntryImpl(keyValue, valValue));
+            }
+        }
+        return new MapMetadataImpl("java.lang.String", "java.util.List", entries);
     }
 }
