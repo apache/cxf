@@ -34,6 +34,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public abstract class CachedStreamTestBase extends Assert {
+    // use two typical ciphers for testing
+    private static final String[] CIPHER_LIST = {"RC4", "AES/CTR/NoPadding"};
+
     protected abstract void reloadDefaultProperties();
     protected abstract Object createCache();
     protected abstract Object createCache(long threshold);
@@ -88,7 +91,13 @@ public abstract class CachedStreamTestBase extends Assert {
     @Test
     public void testEncryptAndDecryptWithDeleteOnClose() throws IOException {
         // need a 8-bit cipher so that all bytes are flushed when the stream is flushed.
-        Object cache = createCache(4, "RC4");
+        for (String cipher: CIPHER_LIST) {
+            verifyEncryptAndDecryptWithDeleteOnClose(cipher);
+        }
+    }
+    
+    private void verifyEncryptAndDecryptWithDeleteOnClose(String cipher) throws IOException {
+        Object cache = createCache(4, cipher);
         final String text = "Hello Secret World!";
         File tmpfile = getTmpFile(text, cache);
         assertNotNull(tmpfile);
@@ -111,8 +120,14 @@ public abstract class CachedStreamTestBase extends Assert {
 
     @Test
     public void testEncryptAndDecryptWithDeleteOnInClose() throws IOException {
+        for (String cipher: CIPHER_LIST) {
+            verifyEncryptAndDecryptWithDeleteOnInClose(cipher);
+        }
+    }
+
+    private void verifyEncryptAndDecryptWithDeleteOnInClose(String cipher) throws IOException {
         // need a 8-bit cipher so that all bytes are flushed when the stream is flushed.
-        Object cache = createCache(4, "RC4");
+        Object cache = createCache(4, cipher);
         final String text = "Hello Secret World!";
         File tmpfile = getTmpFile(text, cache);
         assertNotNull(tmpfile);
@@ -133,8 +148,14 @@ public abstract class CachedStreamTestBase extends Assert {
 
     @Test
     public void testEncryptAndDecryptPartially() throws IOException {
+        for (String cipher: CIPHER_LIST) {
+            verifyEncryptAndDecryptPartially(cipher);
+        }
+    }
+
+    private void verifyEncryptAndDecryptPartially(String cipher) throws IOException {
         // need a 8-bit cipher so that all bytes are flushed when the stream is flushed.
-        Object cache = createCache(4, "RC4");
+        Object cache = createCache(4, cipher);
         final String text = "Hello Secret World!";
         File tmpfile = getTmpFile(text, cache);
         assertNotNull(tmpfile);
