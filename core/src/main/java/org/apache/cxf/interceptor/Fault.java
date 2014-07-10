@@ -23,16 +23,13 @@ import java.net.HttpURLConnection;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.security.auth.login.LoginException;
 import javax.xml.namespace.QName;
-
-import org.w3c.dom.Element;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.interceptor.security.AccessDeniedException;
-import org.apache.cxf.interceptor.security.AuthenticationException;
+
+import org.w3c.dom.Element;
 
 /**
  * A Fault that occurs during invocation processing.
@@ -58,7 +55,6 @@ public class Fault extends UncheckedException {
         super(message, throwable);
         this.messageString = message.toString();
         code = FAULT_CODE_SERVER;
-        determineStatusCode(throwable);
     }
     
     public Fault(Message message) {
@@ -94,14 +90,12 @@ public class Fault extends UncheckedException {
             messageString = t == null ? null : t.getMessage();
         }
         code = FAULT_CODE_SERVER;
-        determineStatusCode(t);
     }
     
     public Fault(Message message, Throwable throwable, QName fc) {
         super(message, throwable);
         this.messageString = message.toString();
         code = fc;
-        determineStatusCode(throwable);
     }
     
     public Fault(Message message, QName fc) {
@@ -118,16 +112,6 @@ public class Fault extends UncheckedException {
             messageString = t == null ? null : t.getMessage();
         }
         code = fc;
-        determineStatusCode(t);
-    }
-
-    private void determineStatusCode(Throwable throwable) {
-        if (throwable instanceof AuthenticationException || throwable instanceof LoginException) {
-            statusCode = HttpURLConnection.HTTP_UNAUTHORIZED;
-        }
-        if (throwable instanceof AccessDeniedException) {
-            statusCode = HttpURLConnection.HTTP_FORBIDDEN;
-        }
     }
 
     public String getMessage() {
