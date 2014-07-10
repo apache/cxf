@@ -32,8 +32,9 @@ import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 
 /**
- *
- * @author erich
+ * Handler for parsing reference parameter from the incoming SOAP messages.
+ * 
+ * @author Erich Duda
  */
 public class ReferenceParameterParsingHandler implements SOAPHandler<SOAPMessageContext> {
 

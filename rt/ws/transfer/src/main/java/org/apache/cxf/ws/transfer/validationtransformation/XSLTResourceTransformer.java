@@ -34,8 +34,9 @@ import org.w3c.dom.Node;
 import org.apache.cxf.ws.transfer.Representation;
 
 /**
- *
- * @author erich
+ * Implementation of the ResourceTransformer for the XSL transformation.
+ * 
+ * @author Erich Duda
  */
 public class XSLTResourceTransformer implements ResourceTransformer {
     

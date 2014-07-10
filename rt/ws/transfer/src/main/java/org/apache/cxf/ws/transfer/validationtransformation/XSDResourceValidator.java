@@ -31,8 +31,9 @@ import org.xml.sax.SAXException;
 import org.apache.cxf.ws.transfer.Representation;
 
 /**
- *
- * @author erich
+ * Implementation of the ResourceValidator interface for Schema validation.
+ * 
+ * @author Erich Duda
  */
 public class XSDResourceValidator implements ResourceValidator {
 

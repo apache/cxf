@@ -36,8 +36,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- *
- * @author erich
+ * Helper class for common methods needed in project.
+ * 
+ * @author Erich Duda
  */
 public final class TransferTools {
     
@@ -51,14 +52,30 @@ public final class TransferTools {
         
     }
     
+    /**
+     * Creates new DOM Element.
+     * @param name Name of Element.
+     * @return DOM Element
+     */
     public static Element createElement(String name) {
         return getDocument().createElement(name);
     }
     
+    /**
+     * Creates new DOM Element with specified namespace.
+     * @param namespace Namespace of Element.
+     * @param name Name of Element
+     * @return DOM Element
+     */
     public static Element createElementNS(String namespace, String name) {
         return getDocument().createElementNS(namespace, name);
     }
     
+    /**
+     * Parse XML document from input and returns Document.
+     * @param source
+     * @return 
+     */
     public static Document parse(InputSource source) {
         try {
             return getDocumentBuilder().parse(source);
@@ -69,6 +86,11 @@ public final class TransferTools {
         }
     }
     
+    /**
+     * Transforms DOM Document to its String representation.
+     * @param source
+     * @param result 
+     */
     public static void transform(Source source, Result result) {
         try {
             getTransformer().transform(source, result);
@@ -85,7 +107,7 @@ public final class TransferTools {
                 documentBuilder = dbf.newDocumentBuilder();
             } catch (ParserConfigurationException ex) {
                 throw new IllegalArgumentException(
-                        "Exception occured during creating of DocumentBulder instance", ex);
+                        "Exception occured during creating of DocumentBuilder instance", ex);
             }
         }
         return documentBuilder;

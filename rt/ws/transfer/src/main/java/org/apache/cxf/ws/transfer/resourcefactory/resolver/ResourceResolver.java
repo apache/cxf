@@ -23,9 +23,19 @@ import org.apache.cxf.ws.transfer.Create;
 
 /**
  * The interface for resolving, where the Resource will be created.
+ * 
+ * @author Erich Duda
  */
 public interface ResourceResolver {
     
+    /**
+     * Method for resolving, where the Resource will be created.
+     * @param body SOAP body
+     * @return ResourceReference object. If the Resource should be created locally,
+     * so the ResourceReference object must contain address and reference to the 
+     * ResourceManager object. Otherwise the ResourceReference must contain only
+     * the address to the ResourceRemote endpoint.
+     */
     ResourceReference resolve(Create body);
     
 }

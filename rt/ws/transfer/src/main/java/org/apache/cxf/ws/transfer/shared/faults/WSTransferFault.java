@@ -26,6 +26,8 @@ import org.apache.cxf.ws.transfer.shared.TransferTools;
 
 /**
  * The parent for all WS-Transfer-specific faults.
+ * 
+ * @author Erich Duda
  */
 public abstract class WSTransferFault extends SoapFault {
 

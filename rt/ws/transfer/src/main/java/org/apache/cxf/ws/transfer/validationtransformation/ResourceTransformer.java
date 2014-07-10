@@ -23,6 +23,8 @@ import org.apache.cxf.ws.transfer.Representation;
 
 /**
  * The interface for a Transformer objects.
+ * 
+ * @author Erich Duda
  */
 public interface ResourceTransformer {
     

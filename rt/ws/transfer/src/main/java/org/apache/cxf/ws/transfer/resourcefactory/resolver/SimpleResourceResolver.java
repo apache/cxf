@@ -23,7 +23,7 @@ import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 
 /**
- * The simple ResourceResolver, which has always returned a predefined resource
+ * The simple ResourceResolver, which always returns a predefined resource
  * location.
  */
 public class SimpleResourceResolver implements ResourceResolver {

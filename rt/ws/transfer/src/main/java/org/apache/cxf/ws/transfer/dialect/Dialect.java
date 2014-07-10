@@ -23,9 +23,17 @@ import org.apache.cxf.ws.transfer.Representation;
 
 /**
  * The interface for a Dialect objects.
+ * 
+ * @author Erich Duda
  */
 public interface Dialect {
     
+    /**
+     * Method for processing incoming SOAP message by Dialect extension.
+     * @param body SOAP body
+     * @param representation XML representation stored in the ResourceManager,
+     * null if there is no such representation
+     */
     void process(Object body, Representation representation);
     
 }

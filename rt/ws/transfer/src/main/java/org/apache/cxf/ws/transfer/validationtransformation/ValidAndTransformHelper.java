@@ -24,8 +24,9 @@ import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.shared.faults.InvalidRepresentation;
 
 /**
- *
- * @author erich
+ * Helper class for validation and transformation.
+ * 
+ * @author Erich Duda
  */
 public final class ValidAndTransformHelper {
     
@@ -33,6 +34,12 @@ public final class ValidAndTransformHelper {
         
     }
     
+    /**
+     * Validation and transformation process.
+     * @param validators List of validators.
+     * @param newRepresentation Incoming representation.
+     * @param oldRepresentation Representation stored in the ResourceManager.
+     */
     public static void validationAndTransformation(
             List<ResourceValidator> validators,
             Representation newRepresentation,

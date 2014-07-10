@@ -24,11 +24,14 @@ import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.CreateResponse;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
+import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
 
 /**
- *
- * @author erich
+ * Implementation of the Resource interface for resources, which are created remotely.
+ * @see ResourceResolver
+ * 
+ * @author Erich Duda
  */
 public class ResourceRemote extends ResourceLocal implements ResourceFactory {
 

@@ -23,8 +23,9 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 
 /**
- *
- * @author erich
+ * Definition of the PutDenied SOAPFault.
+ * 
+ * @author Erich Duda
  */
 public class PutDenied extends WSTransferFault {
     

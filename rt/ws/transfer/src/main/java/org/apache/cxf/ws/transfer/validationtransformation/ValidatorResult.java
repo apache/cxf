@@ -21,6 +21,8 @@ package org.apache.cxf.ws.transfer.validationtransformation;
 
 /**
  * This class represents the result from the ResourceValidator.
+ * 
+ * @author Erich Duda
  */
 public class ValidatorResult {
     

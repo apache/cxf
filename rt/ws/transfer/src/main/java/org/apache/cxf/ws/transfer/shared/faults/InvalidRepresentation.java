@@ -23,8 +23,9 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 
 /**
- *
- * @author erich
+ * Definition of the InvalidRepresentation SOAPFault.
+ * 
+ * @author Erich Duda
  */
 public class InvalidRepresentation extends WSTransferFault {
     

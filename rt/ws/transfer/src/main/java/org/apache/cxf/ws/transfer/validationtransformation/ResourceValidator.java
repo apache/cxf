@@ -22,7 +22,9 @@ package org.apache.cxf.ws.transfer.validationtransformation;
 import org.apache.cxf.ws.transfer.Representation;
 
 /**
- * The interface for a Validator objects.
+ * The interface for Validator objects.
+ * 
+ * @author Erich Duda
  */
 public interface ResourceValidator {
     
