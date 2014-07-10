@@ -303,6 +303,17 @@ public final class CryptoUtils {
     public static byte[] signData(byte[] data, PrivateKey key, String signAlgo, SecureRandom random,
                            AlgorithmParameterSpec params) {
         try {
+            Signature s = getSignature(key, signAlgo, random, params);
+            s.update(data);
+            return s.sign();
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    
+    public static Signature getSignature(PrivateKey key, String signAlgo, SecureRandom random,
+                                  AlgorithmParameterSpec params) {
+        try {
             Signature s = Signature.getInstance(signAlgo);
             if (random == null) {
                 s.initSign(key);
@@ -312,8 +323,7 @@ public final class CryptoUtils {
             if (params != null) {
                 s.setParameter(params);
             }
-            s.update(data);
-            return s.sign();
+            return s;
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }

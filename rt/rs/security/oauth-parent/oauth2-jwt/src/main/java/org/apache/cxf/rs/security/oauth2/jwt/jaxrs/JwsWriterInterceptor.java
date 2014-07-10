@@ -30,30 +30,47 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
+import org.apache.cxf.rs.security.oauth2.jws.JwsOutputStream;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
     private boolean contentTypeRequired = true;
+    private boolean useJwsOutputStream;
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         OutputStream actualOs = ctx.getOutputStream();
-        CachedOutputStream cos = new CachedOutputStream(); 
-        ctx.setOutputStream(cos);
-        ctx.proceed();
-        
-        JwtHeaders headers = new JwtHeaders();
+        String ctString = null;
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
             if (mt != null) {
-                headers.setContentType(JAXRSUtils.mediaTypeToString(mt));
+                ctString = JAXRSUtils.mediaTypeToString(mt);
             }
         }
-        JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), "UTF-8"));
-        writeJws(p, actualOs);
+        if (useJwsOutputStream) {
+            JwsOutputStream cos = getInitializedSigProvider().createJwsStream(actualOs, ctString);
+            ctx.setOutputStream(cos);
+            ctx.proceed();
+            cos.flush();
+        } else {
+            CachedOutputStream cos = new CachedOutputStream(); 
+            ctx.setOutputStream(cos);
+            ctx.proceed();
+            
+            JwtHeaders headers = new JwtHeaders();
+            if (ctString != null) {
+                headers.setContentType(ctString);
+            }
+            JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), "UTF-8"));
+            writeJws(p, actualOs);
+        }
     }
     public void setContentTypeRequired(boolean contentTypeRequired) {
         this.contentTypeRequired = contentTypeRequired;
+    }
+    
+    public void setUseJwsOutputStream(boolean useJwsOutputStream) {
+        this.useJwsOutputStream = useJwsOutputStream;
     }
         
 }

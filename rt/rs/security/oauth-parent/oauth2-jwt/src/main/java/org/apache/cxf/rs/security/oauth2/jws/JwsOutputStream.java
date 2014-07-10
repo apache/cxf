@@ -16,29 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.jwe;
+package org.apache.cxf.rs.security.oauth2.jws;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-import javax.crypto.Cipher;
-
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
-public class JweOutputStream extends FilterOutputStream {
-    private Cipher encryptingCipher;
-    private int blockSize;
-    private int authTagLengthBits;
-    private byte[] lastRawDataChunk;
-    private byte[] lastEncryptedDataChunk;
+public class JwsOutputStream extends FilterOutputStream {
+    private byte[] lastNonEncodedDataChunk;
     private boolean flushed;
-    public JweOutputStream(OutputStream out, Cipher encryptingCipher, int authTagLengthBits) {
+    private JwsSignatureProviderWorker signature;
+    public JwsOutputStream(OutputStream out, JwsSignatureProviderWorker signature) {
         super(out);
-        this.encryptingCipher = encryptingCipher;
-        this.blockSize = encryptingCipher.getBlockSize(); 
-        this.authTagLengthBits = authTagLengthBits;
+        this.signature = signature;
     }
 
     @Override
@@ -49,35 +42,16 @@ public class JweOutputStream extends FilterOutputStream {
     
     @Override
     public void write(byte b[], int off, int len) throws IOException {
-        if (lastRawDataChunk != null) {
-            int remaining = blockSize - lastRawDataChunk.length;
-            int lenToCopy = remaining < len ? remaining : len;
-            lastRawDataChunk = newArray(lastRawDataChunk, 0, lastRawDataChunk.length, b, off, lenToCopy);
-            off = off + lenToCopy;
-            len -= lenToCopy;
-            if (lastRawDataChunk.length < blockSize) {
-                return;
-            } else {
-                encryptAndWrite(lastRawDataChunk, 0, lastRawDataChunk.length);
-                lastRawDataChunk = null;
-            }
-        } 
-        int offset = 0;
-        for (; offset + blockSize <= len; offset += blockSize, off += blockSize) {
-            encryptAndWrite(b, off, blockSize);
+        try {
+            signature.update(b, off, len);
+        } catch (Throwable ex) {
+            throw new SecurityException();
         }
-        if (offset < len) {
-            lastRawDataChunk = newArray(b, off, len - offset);
-        }
-        
+        encodeAndWrite(b, off, len, false);
     }
     
-    private void encryptAndWrite(byte[] chunk, int off, int len) throws IOException {
-        byte[] encrypted = encryptingCipher.update(chunk, off, len);
-        encodeAndWrite(encrypted, 0, encrypted.length, false);
-    }
     private void encodeAndWrite(byte[] encryptedChunk, int off, int len, boolean finalWrite) throws IOException {
-        byte[] theChunk = lastEncryptedDataChunk;
+        byte[] theChunk = lastNonEncodedDataChunk;
         int lenToEncode = len;
         if (theChunk != null) {
             theChunk = newArray(theChunk, 0, theChunk.length, encryptedChunk, off, len);
@@ -90,9 +64,9 @@ public class JweOutputStream extends FilterOutputStream {
         Base64UrlUtility.encodeAndStream(theChunk, off, lenToEncode - rem, out);
         
         if (rem > 0) {
-            lastEncryptedDataChunk = newArray(theChunk, lenToEncode - rem, rem);
+            lastNonEncodedDataChunk = newArray(theChunk, lenToEncode - rem, rem);
         } else {
-            lastEncryptedDataChunk = null;
+            lastNonEncodedDataChunk = null;
         }
     }
     
@@ -102,12 +76,9 @@ public class JweOutputStream extends FilterOutputStream {
             return;
         }
         try {
-            byte[] finalBytes = lastRawDataChunk == null 
-                ? encryptingCipher.doFinal()
-                : encryptingCipher.doFinal(lastRawDataChunk, 0, lastRawDataChunk.length);
-            encodeAndWrite(finalBytes, 0, finalBytes.length - authTagLengthBits / 8, true);
-            out.write(new byte[]{'.'});
-            encodeAndWrite(finalBytes, finalBytes.length - authTagLengthBits / 8, authTagLengthBits / 8, true);
+            byte[] finalBytes = signature.sign();
+            out.write('.');
+            encodeAndWrite(finalBytes, 0, finalBytes.length, true);
         } catch (Exception ex) {
             throw new SecurityException();
         }

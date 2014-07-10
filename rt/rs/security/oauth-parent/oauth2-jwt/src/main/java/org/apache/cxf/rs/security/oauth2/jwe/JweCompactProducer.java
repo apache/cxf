@@ -112,12 +112,13 @@ public class JweCompactProducer {
         writer = writer == null ? new JwtTokenReaderWriter() : writer;
         byte[] jsonBytes = writer.headersToJson(headers).getBytes("UTF-8");
         Base64UrlUtility.encodeAndStream(jsonBytes, 0, jsonBytes.length, os);
-        os.write('.');
+        byte[] dotBytes = new byte[]{'.'};
+        os.write(dotBytes);
         Base64UrlUtility.encodeAndStream(encryptedContentEncryptionKey, 0, 
                                          encryptedContentEncryptionKey.length, os);
-        os.write('.');
+        os.write(dotBytes);
         Base64UrlUtility.encodeAndStream(cipherInitVector, 0, cipherInitVector.length, os);
-        os.write('.');         
+        os.write(dotBytes);         
     }
     
     public String getJweContent() {

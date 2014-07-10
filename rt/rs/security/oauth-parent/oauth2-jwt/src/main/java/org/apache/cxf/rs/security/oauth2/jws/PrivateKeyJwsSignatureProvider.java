@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.oauth2.jws;
 
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -51,10 +53,9 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
         this.signatureSpec = spec;
     }
     
-    
     @Override
     public byte[] sign(JwtHeaders headers, String unsignedText) {
-        checkAlgorithm(headers.getAlgorithm());
+        headers = prepareHeaders(headers);
         try {
             return CryptoUtils.signData(unsignedText.getBytes("UTF-8"), 
                                         key, 
@@ -64,6 +65,34 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
+    }
+    @Override
+    protected JwsSignatureProviderWorker createJwsSignatureWorker(JwtHeaders headers) {
+        final Signature s = CryptoUtils.getSignature(key, 
+                                                     Algorithm.toJavaName(headers.getAlgorithm()),
+                                                     random,
+                                                     signatureSpec);
+        return new JwsSignatureProviderWorker() {
+
+            @Override
+            public void update(byte[] src, int off, int len) {
+                try {
+                    s.update(src, off, len);
+                } catch (SignatureException ex) {
+                    throw new SecurityException();
+                }
+            }
+
+            @Override
+            public byte[] sign() {
+                try {
+                    return s.sign();
+                } catch (SignatureException ex) {
+                    throw new SecurityException();
+                }
+            }
+            
+        };
     }
     
 

@@ -18,12 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.jws;
 
-import java.io.OutputStream;
 
-import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
-
-public interface JwsSignatureProvider {
-    JwtHeaders prepareHeaders(JwtHeaders headers);
-    byte[] sign(JwtHeaders headers, String unsignedText);
-    JwsOutputStream createJwsStream(OutputStream os, String contentType);
+public interface JwsSignatureProviderWorker {
+    void update(byte[] src, int off, int len);
+    byte[] sign();
 }

@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.crypto.Mac;
+
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
@@ -50,7 +52,7 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider imple
     
     @Override
     public byte[] sign(JwtHeaders headers, String unsignedText) {
-        checkAlgorithm(headers.getAlgorithm());
+        headers = prepareHeaders(headers);
         return computeMac(headers, unsignedText);
     }
     
@@ -64,6 +66,23 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider imple
         return HmacUtils.computeHmac(key, 
                                      Algorithm.toJavaName(headers.getAlgorithm()), 
                                      text);
+    }
+    @Override
+    protected JwsSignatureProviderWorker createJwsSignatureWorker(JwtHeaders headers) {
+        final Mac mac = HmacUtils.getMac(Algorithm.toJavaName(headers.getAlgorithm()));
+        return new JwsSignatureProviderWorker() {
+
+            @Override
+            public void update(byte[] src, int off, int len) {
+                mac.update(src, off, len);
+            }
+
+            @Override
+            public byte[] sign() {
+                return mac.doFinal();
+            }
+            
+        };
     }
 
 }
