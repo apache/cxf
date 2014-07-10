@@ -32,6 +32,7 @@ import javax.crypto.spec.IvParameterSpec;
  */
 public class CipherPair {
     private String transformation;
+    private Cipher enccipher;
     private Key key;
     private byte[] ivp;
     
@@ -45,7 +46,6 @@ public class CipherPair {
         } else {
             a = transformation;
         }
-        Cipher enccipher = null;
         try {
             KeyGenerator keygen = KeyGenerator.getInstance(a);
             keygen.init(new SecureRandom());
@@ -64,13 +64,6 @@ public class CipherPair {
     }
     
     public Cipher getEncryptor() {
-        Cipher enccipher = null;
-        try {
-            enccipher = Cipher.getInstance(transformation);
-            enccipher.init(Cipher.ENCRYPT_MODE, key);
-        } catch (GeneralSecurityException e) {
-            // ignore
-        }
         return enccipher;
     }
     
