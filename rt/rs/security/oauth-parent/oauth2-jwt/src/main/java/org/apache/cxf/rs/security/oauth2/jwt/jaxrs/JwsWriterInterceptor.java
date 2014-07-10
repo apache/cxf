@@ -32,6 +32,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jws.JwsOutputStream;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
+import org.apache.cxf.rs.security.oauth2.utils.Base64UrlOutputStream;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
@@ -48,10 +49,12 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             }
         }
         if (useJwsOutputStream) {
-            JwsOutputStream cos = getInitializedSigProvider().createJwsStream(actualOs, ctString);
-            ctx.setOutputStream(cos);
+            JwsOutputStream jwsStream = getInitializedSigProvider().createJwsStream(actualOs, ctString);
+            Base64UrlOutputStream base64Stream = new Base64UrlOutputStream(jwsStream);
+            ctx.setOutputStream(base64Stream);
             ctx.proceed();
-            cos.flush();
+            base64Stream.flush();
+            jwsStream.flush();
         } else {
             CachedOutputStream cos = new CachedOutputStream(); 
             ctx.setOutputStream(cos);

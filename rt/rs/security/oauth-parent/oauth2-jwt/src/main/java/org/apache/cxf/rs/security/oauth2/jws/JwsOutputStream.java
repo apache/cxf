@@ -26,7 +26,6 @@ import java.nio.ByteBuffer;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 public class JwsOutputStream extends FilterOutputStream {
-    private byte[] lastNonEncodedDataChunk;
     private boolean flushed;
     private JwsSignatureProviderWorker signature;
     public JwsOutputStream(OutputStream out, JwsSignatureProviderWorker signature) {
@@ -47,29 +46,8 @@ public class JwsOutputStream extends FilterOutputStream {
         } catch (Throwable ex) {
             throw new SecurityException();
         }
-        encodeAndWrite(b, off, len, false);
+        out.write(b, off, len);
     }
-    
-    private void encodeAndWrite(byte[] encryptedChunk, int off, int len, boolean finalWrite) throws IOException {
-        byte[] theChunk = lastNonEncodedDataChunk;
-        int lenToEncode = len;
-        if (theChunk != null) {
-            theChunk = newArray(theChunk, 0, theChunk.length, encryptedChunk, off, len);
-            lenToEncode = theChunk.length;
-            off = 0;
-        } else {
-            theChunk = encryptedChunk;
-        }
-        int rem = finalWrite ? 0 : lenToEncode % 3; 
-        Base64UrlUtility.encodeAndStream(theChunk, off, lenToEncode - rem, out);
-        
-        if (rem > 0) {
-            lastNonEncodedDataChunk = newArray(theChunk, lenToEncode - rem, rem);
-        } else {
-            lastNonEncodedDataChunk = null;
-        }
-    }
-    
     @Override
     public void flush() throws IOException {
         if (flushed) {
@@ -77,22 +55,12 @@ public class JwsOutputStream extends FilterOutputStream {
         }
         try {
             byte[] finalBytes = signature.sign();
-            out.write('.');
-            encodeAndWrite(finalBytes, 0, finalBytes.length, true);
+            out.write(new byte[]{'.'});
+            Base64UrlUtility.encodeAndStream(finalBytes, 0, finalBytes.length, out);
         } catch (Exception ex) {
             throw new SecurityException();
         }
         flushed = true;
     }
-    private byte[] newArray(byte[] src, int srcPos, int srcLen) {
-        byte[] buf = new byte[srcLen];
-        System.arraycopy(src, srcPos, buf, 0, srcLen);
-        return buf;
-    }
-    private byte[] newArray(byte[] src, int srcPos, int srcLen, byte[] src2, int srcPos2, int srcLen2) {
-        byte[] buf = new byte[srcLen + srcLen2];
-        System.arraycopy(src, srcPos, buf, 0, srcLen);
-        System.arraycopy(src2, srcPos2, buf, srcLen, srcLen2);
-        return buf;
-    }
+    
 }

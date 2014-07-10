@@ -86,7 +86,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         jweWriter.setUseJweOutputStream(true);
         providers.add(jweWriter);
         providers.add(new JweClientResponseFilter());
-        providers.add(new JwsWriterInterceptor());
+        JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
+        jwsWriter.setUseJwsOutputStream(true);
+        providers.add(jwsWriter);
         providers.add(new JwsClientResponseFilter());
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.encryption.out.properties", SERVER_JWEJWS_PROPERTIES);

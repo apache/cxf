@@ -21,9 +21,9 @@ package org.apache.cxf.rs.security.oauth2.jws;
 import java.io.OutputStream;
 import java.util.Set;
 
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
+import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
     private Set<String> supportedAlgorithms;
@@ -48,20 +48,20 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     
     @Override
     public JwsOutputStream createJwsStream(OutputStream os, String contentType) {
-        JwtHeaders headers = new JwtHeaders();
+        JwtHeaders headers = prepareHeaders(null);
         if (contentType != null) {
             headers.setContentType(contentType);
         }
-        headers = prepareHeaders(headers);
         JwsSignatureProviderWorker worker = createJwsSignatureWorker(headers);
+        JwsOutputStream jwsStream = new JwsOutputStream(os, worker);
         try {
             byte[] headerBytes = new JwtTokenReaderWriter().headersToJson(headers).getBytes("UTF-8");
-            Base64Utility.encodeAndStream(headerBytes, 0, headerBytes.length, os);
-            os.write(new byte[]{'.'});
+            Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
+            jwsStream.write(new byte[]{'.'});
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
-        return new JwsOutputStream(os, worker);
+        return jwsStream;
     }
     
     protected abstract JwsSignatureProviderWorker createJwsSignatureWorker(JwtHeaders headers);
