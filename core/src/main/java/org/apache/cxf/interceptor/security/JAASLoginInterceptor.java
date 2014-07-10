@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.interceptor.security;
 
-import java.util.ResourceBundle;
+import java.security.PrivilegedAction;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
@@ -27,7 +27,6 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SecurityToken;
 import org.apache.cxf.common.security.TokenType;
@@ -42,8 +41,7 @@ import org.apache.cxf.security.SecurityContext;
 public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String ROLE_CLASSIFIER_PREFIX = "prefix";
     public static final String ROLE_CLASSIFIER_CLASS_NAME = "classname";
-    
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAASLoginInterceptor.class);
+
     private static final Logger LOG = LogUtils.getL7dLogger(JAASLoginInterceptor.class);
     
     private String contextName = "";
@@ -98,7 +96,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         this.reportFault = reportFault;
     }
     
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(final Message message) throws Fault {
 
         String name = null;
         String password = null;
@@ -116,20 +114,11 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
                 password = ut.getPassword();
             }
         }
-        
+
         if (name == null || password == null) {
-            org.apache.cxf.common.i18n.Message errorMsg = 
-                new org.apache.cxf.common.i18n.Message("NO_USER_PASSWORD", 
-                                                       BUNDLE, 
-                                                       name, password);
-            LOG.warning(errorMsg.toString());
-            if (reportFault) {
-                throw new SecurityException(errorMsg.toString());
-            } else {
-                throw new SecurityException();
-            }
+            throw new AuthenticationException("Authentication required but no user or password was supplied");
         }
-        
+
         try {
             CallbackHandler handler = getCallbackHandler(name, password);  
             LoginContext ctx = new LoginContext(getContextName(), null, handler, loginConfig);  
@@ -137,15 +126,26 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
             ctx.login();
             
             Subject subject = ctx.getSubject();
+            message.put(SecurityContext.class, createSecurityContext(name, subject));
             
-            message.put(SecurityContext.class, createSecurityContext(name, subject)); 
+            // Run the further chain in the context of this subject.
+            // This allows other code to retrieve the subject using pure JAAS
+            Subject.doAs(subject, new PrivilegedAction<Void>() {
+
+                @Override
+                public Void run() {
+                    message.getInterceptorChain().doIntercept(message);
+                    return null;
+                }
+            });
+
         } catch (LoginException ex) {
-            String errorMessage = "Unauthorized : " + ex.getMessage();
+            String errorMessage = "Authentication failed for user " + name + " : " + ex.getMessage();
             LOG.fine(errorMessage);
             if (reportFault) {
                 throw new AuthenticationException(errorMessage);
             } else {
-                throw new AuthenticationException();
+                throw new AuthenticationException("Authentication failed (details can be found in server log)");
             }
         }
     }

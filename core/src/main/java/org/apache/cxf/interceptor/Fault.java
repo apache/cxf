@@ -19,16 +19,17 @@
 
 package org.apache.cxf.interceptor;
 
+import java.net.HttpURLConnection;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
-
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 import org.apache.cxf.helpers.DOMUtils;
+
+import org.w3c.dom.Element;
 
 /**
  * A Fault that occurs during invocation processing.
@@ -38,9 +39,9 @@ public class Fault extends UncheckedException {
     public static final QName FAULT_CODE_SERVER = new QName("http://cxf.apache.org/faultcode", "server");
     public static final String STACKTRACE_NAMESPACE = "http://cxf.apache.org/fault";
     public static final String STACKTRACE = "stackTrace";
-    private static final int DEFAULT_HTTP_RESPONSE_CODE = 500;
+    private static final int DEFAULT_HTTP_RESPONSE_CODE = HttpURLConnection.HTTP_INTERNAL_ERROR;
     private static final long serialVersionUID = -1583932965031558864L;
-
+    
     private Element detail;
     private String messageString;
     private QName code;
@@ -111,7 +112,7 @@ public class Fault extends UncheckedException {
             messageString = t == null ? null : t.getMessage();
         }
         code = fc;
-    }    
+    }
 
     public String getMessage() {
         return messageString;
