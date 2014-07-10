@@ -20,13 +20,20 @@
 package org.apache.cxf.jaxrs.blueprint;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.staxutils.transform.OutTransformWriter;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
@@ -49,8 +56,11 @@ public class JAXRSBPNamespaceHandler implements NamespaceHandler {
         String s = element.getLocalName();
         if ("server".equals(s)) {
             return new JAXRSServerFactoryBeanDefinitionParser().parse(element, context);
-        } 
-        return null;
+        } else if ("client".equals(s)) {
+            return context.parseElement(Metadata.class, null, transformElement(element));
+        } else {
+            return null;
+        }
     }
 
     @SuppressWarnings("rawtypes")
@@ -61,7 +71,21 @@ public class JAXRSBPNamespaceHandler implements NamespaceHandler {
         return null;
     }
     
-
+    private Element transformElement(Element element) {
+        final Map<String, String> transformMap = 
+            Collections.singletonMap("{" + element.getNamespaceURI() + "}*", 
+                                     "{http://cxf.apache.org/blueprint/jaxrs-client}*");
+        
+        
+        W3CDOMStreamWriter domWriter = new W3CDOMStreamWriter();
+        OutTransformWriter transformWriter = new OutTransformWriter(domWriter, transformMap);
+        try {
+            StaxUtils.copy(element, transformWriter);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+        return domWriter.getDocument().getDocumentElement();
+    }
     public BlueprintContainer getBlueprintContainer() {
         return blueprintContainer;
     }
