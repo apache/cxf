@@ -344,18 +344,18 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         // if the addressing feature is enabled, set findDispatchOp to true
         if (!findDispatchOp) {
             // the feature list to be searched is the endpoint and the bus's lists
-            List<Feature> endpointFeatures 
+            List<AbstractFeature> endpointFeatures
                 = ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures();
-            List<Feature> allFeatures;
+            List<AbstractFeature> allFeatures;
             if (client.getBus().getFeatures() != null) {
-                allFeatures = new ArrayList<Feature>(endpointFeatures.size() 
+                allFeatures = new ArrayList<AbstractFeature>(endpointFeatures.size()
                     + client.getBus().getFeatures().size());
                 allFeatures.addAll(endpointFeatures);
                 allFeatures.addAll(client.getBus().getFeatures());
             } else {
                 allFeatures = endpointFeatures;
             }
-            for (Feature feature : allFeatures) {
+            for (AbstractFeature feature : allFeatures) {
                 if (feature instanceof WSAddressingFeature) {
                     findDispatchOp = true; 
                 }
