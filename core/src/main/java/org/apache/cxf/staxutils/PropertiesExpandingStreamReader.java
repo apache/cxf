@@ -18,22 +18,28 @@
  */
 package org.apache.cxf.staxutils;
 
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.util.StreamReaderDelegate;
 
 /**
- * A wrapper around XMLStreamReader that expands system property references in element and attribute values.
+ * A StreamReaderDelegate that expands property references in element and attribute values.
  * 
  */
-public class SysPropExpandingStreamReader extends DelegatingXMLStreamReader {
+public class PropertiesExpandingStreamReader extends StreamReaderDelegate {
 
     public static final String DELIMITER = "@";
     
-    public SysPropExpandingStreamReader(XMLStreamReader reader) {
+    private final Map<String, String> props;
+    
+    public PropertiesExpandingStreamReader(XMLStreamReader reader, Map<String, String> props) {
         super(reader);
+        this.props = props;
     }
 
-    protected String expandSystemProperty(String value) {
+    protected String expandProperty(String value) {
         if (isEmpty(value)) {
             return value;
         }
@@ -44,7 +50,7 @@ public class SysPropExpandingStreamReader extends DelegatingXMLStreamReader {
             if (endIndx > -1 && startIndx + 1 < endIndx) {
                 final String propName = value.substring(startIndx + 1, endIndx);
                 if (!isEmpty(propName)) {
-                    final String envValue = System.getProperty(propName);
+                    final String envValue = props.get(propName);
                     if (!isEmpty(envValue)) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(value.substring(0, startIndx));
@@ -73,21 +79,21 @@ public class SysPropExpandingStreamReader extends DelegatingXMLStreamReader {
 
     @Override
     public String getElementText() throws XMLStreamException {
-        return expandSystemProperty(super.getElementText());
+        return expandProperty(super.getElementText());
     }
 
     @Override
     public String getAttributeValue(String namespaceURI, String localName) {
-        return expandSystemProperty(super.getAttributeValue(namespaceURI, localName));
+        return expandProperty(super.getAttributeValue(namespaceURI, localName));
     }
 
     @Override
     public String getAttributeValue(int index) {
-        return expandSystemProperty(super.getAttributeValue(index));
+        return expandProperty(super.getAttributeValue(index));
     }
 
     @Override
     public String getText() {
-        return expandSystemProperty(super.getText());
+        return expandProperty(super.getText());
     }
 }
