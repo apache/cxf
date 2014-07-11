@@ -182,7 +182,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
                     //try and use the Action from the maps to find the operation
                     String action = maps.getAction().getValue();
                     if (action != null) {
-                        SoapActionInInterceptor.getAndSetOperation(message, action);
+                        boolean strict = MessageUtils.getContextualBoolean(message, 
+                                                                           "ws-addressing.strict.action.checking", 
+                                                                           false);
+                        SoapActionInInterceptor.getAndSetOperation(message, action, strict);
                     }
                 }
             }
