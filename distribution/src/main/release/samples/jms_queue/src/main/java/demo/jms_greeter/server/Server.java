@@ -49,9 +49,9 @@ public class Server {
      * @param cf
      */
     protected void publishEndpoint(Object impl, ConnectionFactory cf) {
-    	EndpointImpl ep = (EndpointImpl)Endpoint.create(impl);
-    	ep.setFeatures(Collections.singletonList(new ConnectionFactoryFeature(cf)));
-    	ep.publish();
+        ep = (EndpointImpl)Endpoint.create(impl);
+        ep.setFeatures(Collections.singletonList(new ConnectionFactoryFeature(cf)));
+        ep.publish();
     }
 
     public void shutdown() {

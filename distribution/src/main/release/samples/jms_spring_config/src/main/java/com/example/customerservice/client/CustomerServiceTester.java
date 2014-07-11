@@ -21,17 +21,19 @@ package com.example.customerservice.client;
 
 import java.util.List;
 
-import org.junit.Assert;
-
 import com.example.customerservice.Customer;
 import com.example.customerservice.CustomerService;
 import com.example.customerservice.NoSuchCustomerException;
+
+import org.junit.Assert;
+
 
 /**
  * Calls the CustomerService using the proxy created by CXF and does some assertions to make 
  * sure the calls work.
  * 
- * This also shows how typical user code on the client side could look like. Make sure to keep your business code
+ * This also shows how typical user code on the client side 
+ * could look like. Make sure to keep your business code
  * free from spring and cxf dependencies as far as possible.
  */
 public final class CustomerServiceTester {

@@ -23,7 +23,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * Starter that initializes the spring context, fetches our test client and then shuts down spring 
  */
-public class CustomerServiceSpringClient {
+public final class CustomerServiceSpringClient {
+    private CustomerServiceSpringClient() {
+    }
 
     public static void main(String args[]) throws Exception {      
         ClassPathXmlApplicationContext context 
