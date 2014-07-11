@@ -26,5 +26,5 @@ import javax.xml.stream.XMLStreamReader;
  */
 public interface XMLStreamReaderWrapper {
     
-    public XMLStreamReader wrap(XMLStreamReader reader);
+    XMLStreamReader wrap(XMLStreamReader reader);
 }

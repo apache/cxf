@@ -34,25 +34,28 @@ public class SysPropExpandingStreamReader extends DelegatingXMLStreamReader {
     }
 
     protected String expandSystemProperty(String value) {
-        if (!isEmpty(value)) {
-            final int startIndx = value.indexOf(DELIMITER);
-            if (startIndx > -1) {
-                final int endIndx = value.lastIndexOf(DELIMITER);
-                if (endIndx > -1 && startIndx + 1 < endIndx) {
-                    final String propName = value.substring(startIndx + 1, endIndx);
-                    if (!isEmpty(propName)) {
-                        final String envValue = System.getProperty(propName);
-                        if (!isEmpty(envValue)) {
-                            StringBuilder sb = new StringBuilder();
-                            sb.append(value.substring(0, startIndx));
-                            sb.append(envValue);
-                            sb.append(value.substring(endIndx + 1));
-                            value = sb.toString();
-                        }
+        if (isEmpty(value)) {
+            return value;
+        }
+        
+        final int startIndx = value.indexOf(DELIMITER);
+        if (startIndx > -1) {
+            final int endIndx = value.lastIndexOf(DELIMITER);
+            if (endIndx > -1 && startIndx + 1 < endIndx) {
+                final String propName = value.substring(startIndx + 1, endIndx);
+                if (!isEmpty(propName)) {
+                    final String envValue = System.getProperty(propName);
+                    if (!isEmpty(envValue)) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(value.substring(0, startIndx));
+                        sb.append(envValue);
+                        sb.append(value.substring(endIndx + 1));
+                        value = sb.toString();
                     }
                 }
             }
         }
+        
         return value;
     }
 

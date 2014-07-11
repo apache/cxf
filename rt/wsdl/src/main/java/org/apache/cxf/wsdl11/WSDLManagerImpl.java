@@ -41,6 +41,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.xml.sax.InputSource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -49,8 +50,6 @@ import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.service.model.ServiceSchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.staxutils.DelegatingXMLStreamReader;
-import org.apache.cxf.staxutils.SysPropExpandingStreamReader;
 import org.apache.cxf.staxutils.XMLStreamReaderWrapper;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLExtensionLoader;
