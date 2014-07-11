@@ -20,6 +20,7 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 
+import java.io.EOFException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
@@ -296,6 +297,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             try {
                 XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
                 if (xtw != null) {
+                    // Write body end
                     xtw.writeEndElement();            
                     // Write Envelope end element
                     xtw.writeEndElement();
@@ -304,9 +306,14 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                     xtw.flush();
                 }
             } catch (XMLStreamException e) {
-                SoapVersion soapVersion = message.getVersion();
-                throw new SoapFault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE), e,
-                                    soapVersion.getSender());
+                if (e.getCause() instanceof EOFException) {
+                    //Nothing we can do about this, some clients will close the connection early if 
+                    //they fully parse everything they need
+                } else {
+                    SoapVersion soapVersion = message.getVersion();
+                    throw new SoapFault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE), e,
+                                        soapVersion.getSender());
+                }
             }
         }
     }
