@@ -296,7 +296,6 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     
     @SuppressWarnings("unchecked")
     public T invoke(T obj, boolean isOneWay) {
-        StaxSource createdSource = null;
         checkError();        
         try {
             if (obj instanceof SOAPMessage) {
