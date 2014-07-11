@@ -53,6 +53,7 @@ import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.security.SecurityContext;
 
@@ -158,17 +159,26 @@ public final class CryptoUtils {
         return CryptoUtils.loadPublicKey(keyStore, props.getProperty(RSSEC_KEY_STORE_ALIAS));
     }
     public static PublicKey loadPublicKey(Message m, String keyStoreLocProp) {
-        String propLoc = (String)m.getContextualProperty(keyStoreLocProp);
-        if (propLoc == null) {
-            throw new SecurityException();
-        }
+        return loadPublicKey(m, keyStoreLocProp, null);
+    }
+    public static PublicKey loadPublicKey(Message m, String keyStoreLocPropPreferred, String keyStoreLocPropDefault) {
+        String keyStoreLoc = getMessageProperty(m, keyStoreLocPropPreferred, keyStoreLocPropDefault);
         Bus bus = m.getExchange().getBus();
         try {
-            Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            Properties props = ResourceUtils.loadProperties(keyStoreLoc, bus);
             return CryptoUtils.loadPublicKey(m, props);
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
+    }
+    private static String getMessageProperty(Message m, String keyStoreLocPropPreferred, 
+                                             String keyStoreLocPropDefault) {
+        String propLoc = 
+            (String)MessageUtils.getContextualProperty(m, keyStoreLocPropPreferred, keyStoreLocPropDefault);
+        if (propLoc == null) {
+            throw new SecurityException();
+        }
+        return propLoc;
     }
     public static PrivateKey loadPrivateKey(Properties props, Bus bus, PrivateKeyPasswordProvider provider) {
         KeyStore keyStore = loadKeyStore(props, bus);
@@ -206,13 +216,14 @@ public final class CryptoUtils {
         }
     }
     public static PrivateKey loadPrivateKey(Message m, String keyStoreLocProp, String passwordProviderProp) {
-        String propLoc = (String)m.getContextualProperty(keyStoreLocProp);
-        if (propLoc == null) {
-            throw new SecurityException();
-        }
+        return loadPrivateKey(m, keyStoreLocProp, null, passwordProviderProp);
+    }
+    public static PrivateKey loadPrivateKey(Message m, String keyStoreLocPropPreferred,
+                                            String keyStoreLocPropDefault, String passwordProviderProp) {
+        String keyStoreLoc = getMessageProperty(m, keyStoreLocPropPreferred, keyStoreLocPropDefault);
         Bus bus = m.getExchange().getBus();
         try {
-            Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            Properties props = ResourceUtils.loadProperties(keyStoreLoc, bus);
             return CryptoUtils.loadPrivateKey(m, props, passwordProviderProp);
         } catch (Exception ex) {
             throw new SecurityException(ex);

@@ -27,7 +27,8 @@ import org.apache.cxf.rs.security.oauth2.jws.PublicKeyJwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJwsReaderProvider {
-    private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.in.properties";
+    private static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
+    private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
     
     private JwsSignatureVerifier sigVerifier;
     private JwsSignatureProperties sigProperties;
@@ -51,6 +52,7 @@ public class AbstractJwsReaderProvider {
         } 
         try {
             PublicKey pk = CryptoUtils.loadPublicKey(JAXRSUtils.getCurrentMessage(), 
+                                                     RSSEC_SIGNATURE_IN_PROPS,
                                                      RSSEC_SIGNATURE_PROPS);
             return new PublicKeyJwsSignatureVerifier(pk);
         } catch (SecurityException ex) {

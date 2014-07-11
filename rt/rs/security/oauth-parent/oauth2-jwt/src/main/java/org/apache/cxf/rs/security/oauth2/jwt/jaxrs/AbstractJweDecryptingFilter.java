@@ -33,6 +33,7 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJweDecryptingFilter {
     private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
+    private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
         
     private JweDecryptor decryptor;
     private JweCryptoProperties cryptoProperties;
@@ -57,6 +58,7 @@ public class AbstractJweDecryptingFilter {
         try {
             PrivateKey pk = CryptoUtils.loadPrivateKey(JAXRSUtils.getCurrentMessage(), 
                                                        RSSEC_ENCRYPTION_IN_PROPS, 
+                                                       RSSEC_ENCRYPTION_PROPS,
                                                        CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER);
             return new WrappedKeyJweDecryptor(pk, cryptoProperties);
         } catch (SecurityException ex) {

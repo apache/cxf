@@ -36,6 +36,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptor;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
 import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryptor;
@@ -44,7 +45,8 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 @Priority(Priorities.JWE_WRITE_PRIORITY)
 public class JweWriterInterceptor implements WriterInterceptor {
-    private static final String JSON_WEB_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
+    private static final String JSON_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
+    private static final String JSON_ENCRYPTION_PROPS = "rs.security.encryption.properties";
     private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
     private JweEncryptor encryptor;
@@ -85,7 +87,8 @@ public class JweWriterInterceptor implements WriterInterceptor {
             return encryptor;    
         } 
         Message m = JAXRSUtils.getCurrentMessage();
-        String propLoc = (String)m.getContextualProperty(JSON_WEB_ENCRYPTION_OUT_PROPS);
+        String propLoc = 
+            (String)MessageUtils.getContextualProperty(m, JSON_ENCRYPTION_OUT_PROPS, JSON_ENCRYPTION_PROPS);
         if (propLoc == null) {
             throw new SecurityException();
         }

@@ -131,6 +131,14 @@ public final class MessageUtils {
         return defaultValue;
     }
     
+    public static Object getContextualProperty(Message m, String propPreferred, String propDefault) {
+        Object prop = m.getContextualProperty(propPreferred);
+        if (prop == null && propDefault != null) {
+            prop = (String)m.getContextualProperty(propDefault);
+        }
+        return prop;
+    }
+    
     /**
      * Returns true if the underlying content format is a W3C DOM or a SAAJ message.
      */
