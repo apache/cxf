@@ -33,6 +33,7 @@ import org.apache.cxf.common.security.TokenType;
 import org.apache.cxf.common.security.UsernameToken;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -49,6 +50,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     private String roleClassifier;
     private String roleClassifierType = ROLE_CLASSIFIER_PREFIX;
     private boolean reportFault;
+    private boolean useDoAs = true;
     
     
     public JAASLoginInterceptor() {
@@ -96,6 +98,10 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         this.reportFault = reportFault;
     }
     
+    public void setUseDoAs(boolean useDoAs) {
+        this.useDoAs = useDoAs;
+    }
+
     public void handleMessage(final Message message) throws Fault {
 
         String name = null;
@@ -130,14 +136,19 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
             
             // Run the further chain in the context of this subject.
             // This allows other code to retrieve the subject using pure JAAS
-            Subject.doAs(subject, new PrivilegedAction<Void>() {
+            if (useDoAs) {
+                Subject.doAs(subject, new PrivilegedAction<Void>() {
 
-                @Override
-                public Void run() {
-                    message.getInterceptorChain().doIntercept(message);
-                    return null;
-                }
-            });
+                    @Override
+                    public Void run() {
+                        InterceptorChain chain = message.getInterceptorChain();
+                        if (chain != null) {
+                            chain.doIntercept(message);
+                        }
+                        return null;
+                    }
+                });
+            }
 
         } catch (LoginException ex) {
             String errorMessage = "Authentication failed for user " + name + " : " + ex.getMessage();

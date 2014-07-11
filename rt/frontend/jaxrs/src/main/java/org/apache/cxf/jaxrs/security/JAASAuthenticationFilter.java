@@ -55,11 +55,16 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
     private String realmName;
     private boolean ignoreBasePath = true;
     
-    private JAASLoginInterceptor interceptor = new JAASLoginInterceptor() {
-        protected CallbackHandler getCallbackHandler(String name, String password) {
-            return JAASAuthenticationFilter.this.getCallbackHandler(name, password);
-        }    
-    };
+    private JAASLoginInterceptor interceptor;
+    
+    public JAASAuthenticationFilter() {
+        interceptor = new JAASLoginInterceptor() {
+            protected CallbackHandler getCallbackHandler(String name, String password) {
+                return JAASAuthenticationFilter.this.getCallbackHandler(name, password);
+            }    
+        };
+        interceptor.setUseDoAs(false);
+    }
     
     @Deprecated
     public void setRolePrefix(String name) {
