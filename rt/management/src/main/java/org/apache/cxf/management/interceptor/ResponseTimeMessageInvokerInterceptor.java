@@ -41,7 +41,7 @@ public class ResponseTimeMessageInvokerInterceptor extends AbstractMessageRespon
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
         Boolean forceDisabled = Boolean.FALSE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"));
-        if (isServiceCounterEnabled(ex) && !forceDisabled) {  
+        if (!forceDisabled && isServiceCounterEnabled(ex)) {  
             message.getInterceptorChain().add(new ResponseTimeMessageInvokerEndingInteceptor());
         }
 

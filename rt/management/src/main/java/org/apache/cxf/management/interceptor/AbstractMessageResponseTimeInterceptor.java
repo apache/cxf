@@ -171,7 +171,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
                 operationName = "\"" + escapePatternChars(nameProperty.toString()) + "\"";
             }
         }
-        StringBuffer buffer = new StringBuffer(sericeCounterName.toString());
+        StringBuilder buffer = new StringBuilder(sericeCounterName.toString());
         if (operationName != null) {
             buffer.append("," + ManagementConstants.OPERATION_NAME_PROP + "=" + operationName);
         }

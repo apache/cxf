@@ -84,7 +84,7 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
         if (maxHandlingTime < handlingTime) {
             maxHandlingTime = handlingTime;
         }
-        if (minHandlingTime == 0 | minHandlingTime > handlingTime) {
+        if (minHandlingTime == 0 || minHandlingTime > handlingTime) {
             minHandlingTime = handlingTime;
         }
     }

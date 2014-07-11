@@ -37,7 +37,7 @@ public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTim
         Exchange ex = message.getExchange();
         //if serviceCounter is disabled , all responseTimeInterceptors will be skipped
         Boolean forceDisabled = Boolean.FALSE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"));
-        if (isServiceCounterEnabled(ex) && !forceDisabled) {           
+        if (!forceDisabled && isServiceCounterEnabled(ex)) {           
             if (isClient(message)) {
                 if (!ex.isOneWay()) {
                     endHandlingMessage(ex);
