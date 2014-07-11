@@ -40,11 +40,13 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Source;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.EndpointReference;
+import javax.xml.ws.Holder;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
@@ -54,6 +56,7 @@ import javax.xml.ws.http.HTTPBinding;
 import javax.xml.ws.http.HTTPException;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -306,7 +309,6 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 getRequestContext().put("unwrap.jaxb.element", unwrapProperty);
             }
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
-            boolean findDispatchOp = Boolean.TRUE.equals(getRequestContext().get("find.dispatch.operation"));
             
             boolean hasOpName;
             if (opName == null) {
@@ -320,86 +322,11 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                     addInvokeOperation(opName, isOneWay);
                 }
             }
-            
-            //CXF-2836 : find the operation for the dispatched object
-            // if findDispatchOp is already true, skip the addressing feature lookup.
-            // if the addressing feature is enabled, set findDispatchOp to true
-            if (!findDispatchOp) {
-                // the feature list to be searched is the endpoint and the bus's lists
-                List<Feature> endpointFeatures 
-                    = ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures();
-                List<Feature> allFeatures;
-                if (client.getBus().getFeatures() != null) {
-                    allFeatures = new ArrayList<Feature>(endpointFeatures.size() 
-                        + client.getBus().getFeatures().size());
-                    allFeatures.addAll(endpointFeatures);
-                    allFeatures.addAll(client.getBus().getFeatures());
-                } else {
-                    allFeatures = endpointFeatures;
-                }
-                for (Feature feature : allFeatures) {
-                    if (feature instanceof WSAddressingFeature) {
-                        findDispatchOp = true; 
-                    }
-                }
-            }
-            Map<String, QName> payloadOPMap = createPayloadEleOpNameMap(
-                    client.getEndpoint().getBinding().getBindingInfo(), hasOpName);
-            if (findDispatchOp && !payloadOPMap.isEmpty()) {
-                QName payloadElementName = null;
-                if (obj instanceof javax.xml.transform.Source) {
-                    XMLStreamReader reader = null;
-                    try {
-                        reader = StaxUtils.createXMLStreamReader((javax.xml.transform.Source)obj);
-                        Document document = StaxUtils.read(reader);
-                        createdSource = new StaxSource(StaxUtils.createXMLStreamReader(document));
-                        payloadElementName = getPayloadElementName(document.getDocumentElement());
-                    } catch (Exception e) {                        
-                        // ignore, we are trying to get the operation name
-                    } finally {
-                        StaxUtils.close(reader);
-                    }
-                }
-                if (obj instanceof SOAPMessage) {
-                    payloadElementName = getPayloadElementName((SOAPMessage)obj);
-
-                }
-
-                if (this.context != null) {
-                    payloadElementName = getPayloadElementName(obj);
-                }
-
-                if (payloadElementName != null) {
-                    if (hasOpName) {
-                        // Verify the payload element against the given operation name.
-                        // This allows graceful handling of non-standard WSDL definitions
-                        // where different operations have the same payload element.
-                        QName expectedElementName = payloadOPMap.get(opName.toString());
-                        if (expectedElementName == null || !expectedElementName.toString().equals(
-                                payloadElementName.toString())) {
-                            // Verification of the provided operation name failed.
-                            // Resolve the operation name from the payload element.
-                            hasOpName = false;
-                            payloadOPMap = createPayloadEleOpNameMap(
-                                    client.getEndpoint().getBinding().getBindingInfo(), hasOpName);
-                        }
-                    }
-                    QName dispatchedOpName = null;
-                    if (!hasOpName) {
-                        dispatchedOpName = payloadOPMap.get(payloadElementName.toString());
-                    }
-                    if (null != dispatchedOpName) {
-                        BindingOperationInfo dbop = client.getEndpoint().getBinding().getBindingInfo()
-                            .getOperation(dispatchedOpName);
-                        if (dbop != null) {
-                            opName = dispatchedOpName;
-                        }
-                    }
-                }
-            } 
+            Holder<T> holder = new Holder<T>(obj);
+            opName = calculateOpName(holder, opName, hasOpName);
             
             Object ret[] = client.invokeWrapped(opName,
-                                                createdSource == null ? obj : createdSource);
+                                                holder.value);
             if (isOneWay || ret == null || ret.length == 0) {
                 return null;
             }
@@ -409,6 +336,92 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private QName calculateOpName(Holder<T> holder, QName opName, boolean hasOpName) throws XMLStreamException {
+        boolean findDispatchOp = Boolean.TRUE.equals(getRequestContext().get("find.dispatch.operation"));
+
+        //CXF-2836 : find the operation for the dispatched object
+        // if findDispatchOp is already true, skip the addressing feature lookup.
+        // if the addressing feature is enabled, set findDispatchOp to true
+        if (!findDispatchOp) {
+            // the feature list to be searched is the endpoint and the bus's lists
+            List<Feature> endpointFeatures 
+                = ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures();
+            List<Feature> allFeatures;
+            if (client.getBus().getFeatures() != null) {
+                allFeatures = new ArrayList<Feature>(endpointFeatures.size() 
+                    + client.getBus().getFeatures().size());
+                allFeatures.addAll(endpointFeatures);
+                allFeatures.addAll(client.getBus().getFeatures());
+            } else {
+                allFeatures = endpointFeatures;
+            }
+            for (Feature feature : allFeatures) {
+                if (feature instanceof WSAddressingFeature) {
+                    findDispatchOp = true; 
+                }
+            }
+        }
+        Source createdSource = null;
+        Map<String, QName> payloadOPMap = createPayloadEleOpNameMap(
+                client.getEndpoint().getBinding().getBindingInfo(), hasOpName);
+        if (findDispatchOp && !payloadOPMap.isEmpty()) {
+            QName payloadElementName = null;
+            if (holder.value instanceof javax.xml.transform.Source) {
+                XMLStreamReader reader = null;
+                try {
+                    reader = StaxUtils.createXMLStreamReader((javax.xml.transform.Source)holder.value);
+                    Document document = StaxUtils.read(reader);
+                    createdSource = new StaxSource(StaxUtils.createXMLStreamReader(document));
+                    payloadElementName = getPayloadElementName(document.getDocumentElement());
+                } catch (Exception e) {                        
+                    // ignore, we are trying to get the operation name
+                } finally {
+                    StaxUtils.close(reader);
+                }
+            }
+            if (holder.value instanceof SOAPMessage) {
+                payloadElementName = getPayloadElementName((SOAPMessage)holder.value);
+
+            }
+
+            if (this.context != null) {
+                payloadElementName = getPayloadElementName(holder.value);
+            }
+
+            if (payloadElementName != null) {
+                if (hasOpName) {
+                    // Verify the payload element against the given operation name.
+                    // This allows graceful handling of non-standard WSDL definitions
+                    // where different operations have the same payload element.
+                    QName expectedElementName = payloadOPMap.get(opName.toString());
+                    if (expectedElementName == null || !expectedElementName.toString().equals(
+                            payloadElementName.toString())) {
+                        // Verification of the provided operation name failed.
+                        // Resolve the operation name from the payload element.
+                        hasOpName = false;
+                        payloadOPMap = createPayloadEleOpNameMap(
+                                client.getEndpoint().getBinding().getBindingInfo(), hasOpName);
+                    }
+                }
+                QName dispatchedOpName = null;
+                if (!hasOpName) {
+                    dispatchedOpName = payloadOPMap.get(payloadElementName.toString());
+                }
+                if (null != dispatchedOpName) {
+                    BindingOperationInfo dbop = client.getEndpoint().getBinding().getBindingInfo()
+                        .getOperation(dispatchedOpName);
+                    if (dbop != null) {
+                        opName = dispatchedOpName;
+                    }
+                }
+            }
+        }
+        if (createdSource != null) {
+            holder.value = (T)createdSource;
+        }
+        return opName;
+    }
   
     public Future<?> invokeAsync(T obj, AsyncHandler<T> asyncHandler) {
         checkError();
@@ -417,11 +430,15 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         ClientCallback callback = new JaxwsClientCallback<T>(asyncHandler, this);
              
         Response<T> ret = new JaxwsResponseCallback<T>(callback);
-        try {
+        try {           
+            boolean hasOpName;
+            
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
             if (opName == null) {
+                hasOpName = false;
                 opName = INVOKE_QNAME;
             } else {
+                hasOpName = true;
                 BindingOperationInfo bop = client.getEndpoint().getBinding()
                     .getBindingInfo().getOperation(opName);
                 if (bop == null) {
@@ -429,9 +446,12 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 }
             }
 
+            Holder<T> holder = new Holder<T>(obj);
+            opName = calculateOpName(holder, opName, hasOpName);
+            
             client.invokeWrapped(callback, 
                                  opName,
-                                 obj);
+                                 holder.value);
             
             return ret;
         } catch (Exception ex) {
