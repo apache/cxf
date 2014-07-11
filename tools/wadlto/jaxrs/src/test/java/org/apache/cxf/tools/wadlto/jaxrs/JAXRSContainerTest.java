@@ -64,6 +64,31 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     }
     
     @Test    
+    public void testInheritParameters() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/test.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+            context.put(WadlToolConstants.CFG_INHERIT_PARAMS, "true");
+            
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+            assertEquals(1, files.size());
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
     public void testCodeGenInterfacesMultipleInXmlReps() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
