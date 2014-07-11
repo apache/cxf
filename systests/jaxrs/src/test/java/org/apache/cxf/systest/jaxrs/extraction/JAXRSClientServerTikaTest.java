@@ -1,0 +1,121 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.apache.cxf.systest.jaxrs.extraction;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.ext.search.SearchBean;
+import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
+import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.provider.MultipartProvider;
+import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.lucene.search.ScoreDoc;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(JAXRSClientServerTikaTest.class);
+    
+    @Ignore
+    public static class Server extends AbstractBusTestServerBase {        
+        protected void run() {
+            JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+            
+            final Map< String, Object > properties = new HashMap< String, Object >();        
+            properties.put("search.query.parameter.name", "$filter");
+            properties.put("search.parser", new FiqlParser< SearchBean >(SearchBean.class));
+            
+            sf.setResourceClasses(BookCatalog.class);
+            sf.setResourceProvider(BookCatalog.class, new SingletonResourceProvider(new BookCatalog()));
+            sf.setAddress("http://localhost:" + PORT + "/");
+            sf.setProperties(properties);
+            sf.setProvider(new MultipartProvider());
+            sf.setProvider(new SearchContextProvider());
+            sf.setProvider(new JacksonJsonProvider());
+            
+            sf.create();
+        }
+
+        public static void main(String[] args) {
+            try {
+                Server s = new Server();
+                s.start();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                System.exit(-1);
+            } finally {
+                System.out.println("done!");
+            }
+        }
+    }
+    
+    @BeforeClass
+    public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
+        //keep out of process due to stack traces testing failures
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        createStaticBus();
+    }
+    
+    @Test
+    public void testUploadIndexAndSearchPdfFile() {
+        final WebClient wc = createWebClient("/catalog").type(MediaType.MULTIPART_FORM_DATA);
+        
+        final ContentDisposition disposition = new ContentDisposition("attachment;filename=testPDF.pdf");
+        final Attachment attachment = new Attachment("root", 
+            getClass().getResourceAsStream("/files/testPDF.pdf"), disposition);
+        wc.post(new MultipartBody(attachment));
+        
+        final Collection<ScoreDoc> hits = search("modified=le=2007-09-15T09:02:31");        
+        assertEquals(hits.size(), 1);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Collection<ScoreDoc> search(final String expression) {
+        return (Collection<ScoreDoc>)createWebClient("/catalog")
+            .accept(MediaType.APPLICATION_JSON)
+            .query("$filter", expression)
+            .get(Collection.class);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private WebClient createWebClient(final String url) {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + url, 
+            Arrays.asList(new MultipartProvider(), new JacksonJsonProvider()));
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        return wc;
+    }
+}

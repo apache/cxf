@@ -423,6 +423,29 @@
             <version>${cxf.netty3.version}</version>
             <scope>test</scope>
         </dependency>
+         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${cxf.lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>${cxf.lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers</artifactId>
+            <scope>test</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.apache.poi</groupId>
+            		<artifactId>poi-ooxml</artifactId>            	
+            	</exclusion>       
+            </exclusions>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
