@@ -46,6 +46,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
     
     private static final Logger LOG = LogUtils.getL7dLogger(SoapActionInInterceptor.class);
     private static final String ALLOW_NON_MATCHING_TO_DEFAULT = "allowNonMatchingToDefaultSoapAction";
+    private static final String CALCULATED_WSA_ACTION = SoapActionInInterceptor.class.getName() + ".ACTION";
     
     public SoapActionInInterceptor() {
         super(Phase.READ);
@@ -110,6 +111,9 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
     }
     
     public static void getAndSetOperation(SoapMessage message, String action) {
+        getAndSetOperation(message, action, true);
+    }
+    public static void getAndSetOperation(SoapMessage message, String action, boolean strict) {
         if (StringUtils.isEmpty(action)) {
             return;
         }
@@ -133,11 +137,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                     }
                     bindingOp = boi;
                 }
-                Object o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME);
-                if (o == null) {
-                    o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME);
-                }
-                if (o != null && action.equals(o.toString())) {
+                if (matchWSAAction(boi, action)) {
                     if (bindingOp != null && bindingOp != boi) {
                         //more than one op with the same action, will need to parse normally
                         return;
@@ -148,44 +148,100 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         }
         
         if (bindingOp == null) {
-            //we didn't match the an operation, we'll try again later to make
-            //sure the incoming message did end up matching an operation.
-            //This could occur in some cases like WS-RM and WS-SecConv that will
-            //intercept the message with a new endpoint/operation
-            message.getInterceptorChain().add(new SoapActionInAttemptTwoInterceptor());
+            if (strict) {
+                //we didn't match the an operation, we'll try again later to make
+                //sure the incoming message did end up matching an operation.
+                //This could occur in some cases like WS-RM and WS-SecConv that will
+                //intercept the message with a new endpoint/operation
+                message.getInterceptorChain().add(new SoapActionInAttemptTwoInterceptor(action));
+            }
             return;
         }
         
         ex.put(BindingOperationInfo.class, bindingOp);
         ex.put(OperationInfo.class, bindingOp.getOperationInfo());
     }
+    private static boolean matchWSAAction(BindingOperationInfo boi, String action) {
+        Object o = getWSAAction(boi);
+        if (o != null) {
+            String oa = o.toString();
+            if (action.equals(oa)
+                || action.equals(oa + "Request")
+                || oa.equals(action + "Request")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private static String getWSAAction(BindingOperationInfo boi) {
+        Object o = boi.getOperationInfo().getInput().getProperty(CALCULATED_WSA_ACTION);
+        if (o == null) {
+            o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME);
+            if (o == null) {
+                o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME);
+            }
+            if (o == null) {
+                String start = getActionBaseUri(boi.getOperationInfo());
+                if (null == boi.getOperationInfo().getInputName()) {
+                    o = addPath(start, boi.getOperationInfo().getName().getLocalPart());
+                } else {
+                    o = addPath(start, boi.getOperationInfo().getInputName());
+                }
+            }
+            if (o != null) {
+                boi.getOperationInfo().getInput().setProperty(CALCULATED_WSA_ACTION, o);
+            }
+        }
+        return o == null ? null : o.toString();
+    }
+    private static String getActionBaseUri(final OperationInfo operation) {
+        String interfaceName = operation.getInterface().getName().getLocalPart();
+        return addPath(operation.getName().getNamespaceURI(), interfaceName);
+    }
+    private static String getDelimiter(String uri) {
+        if (uri.startsWith("urn")) {
+            return ":";
+        }
+        return "/";
+    }
+
+    private static String addPath(String uri, String path) {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(uri);
+        String delimiter = getDelimiter(uri);
+        if (!uri.endsWith(delimiter) && !path.startsWith(delimiter)) {
+            buffer.append(delimiter);
+        }
+        buffer.append(path);
+        return buffer.toString();
+    }
+
     
     public static class SoapActionInAttemptTwoInterceptor extends AbstractSoapInterceptor {
-        public SoapActionInAttemptTwoInterceptor() {
-            super(Phase.PRE_LOGICAL);
+        final String action;
+        public SoapActionInAttemptTwoInterceptor(String action) {
+            super(action, Phase.PRE_LOGICAL);
+            this.action = action;
         }
         public void handleMessage(SoapMessage message) throws Fault {
             BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
             if (boi == null) {
                 return;
             }
-            String action = getSoapAction(message);
             if (StringUtils.isEmpty(action)) {
                 return;
             }
             if (isActionMatch(message, boi, action)) {
                 return;
             }
-
-            Object o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME);
-            if (o == null) {
-                o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME);
-            }
-            if (o != null && action.equals(o.toString())) {
+            if (matchWSAAction(boi, action)) {
                 return;
             }
-            
-            throw new Fault("SOAP_ACTION_MISMATCH", LOG, null, action);
+            boolean synthetic = Boolean.TRUE.equals(boi.getProperty("operation.is.synthetic"));
+            if (!synthetic) {
+                throw new Fault("SOAP_ACTION_MISMATCH", LOG, null, action);
+            }
         }
     }
 

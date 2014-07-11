@@ -261,7 +261,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2Port");
        
         Dispatch<DOMSource> dispatch = 
-            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
+            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD, new AddressingFeature());
         updateAddressPort(dispatch, test.getPort());
         
         // Setup STSClient
