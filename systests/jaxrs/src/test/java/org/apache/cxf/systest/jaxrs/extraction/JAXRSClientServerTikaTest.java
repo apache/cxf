@@ -99,7 +99,7 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
             getClass().getResourceAsStream("/files/testPDF.pdf"), disposition);
         wc.post(new MultipartBody(attachment));
         
-        final Collection<ScoreDoc> hits = search("modified=le=2007-09-15T09:02:31");        
+        final Collection<ScoreDoc> hits = search("modified=le=2007-09-16");        
         assertEquals(hits.size(), 1);
     }
 
