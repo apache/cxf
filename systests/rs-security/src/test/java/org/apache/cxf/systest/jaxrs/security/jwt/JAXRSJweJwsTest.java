@@ -30,6 +30,8 @@ import javax.crypto.Cipher;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.rs.security.oauth2.jws.HmacJwsSignatureProvider;
+import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweClientResponseFilter;
 import org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweWriterInterceptor;
@@ -49,7 +51,8 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         "org/apache/cxf/systest/jaxrs/security/bob.rs.properties";
     private static final String SERVER_JWEJWS_PROPERTIES =
         "org/apache/cxf/systest/jaxrs/security/alice.rs.properties";
-    
+    private static final String ENCODED_MAC_KEY = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75"
+        + "aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow";
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
@@ -72,8 +75,20 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testJweJwsRsa() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwejws";
+    public void testJweRsaJwsRsa() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejwsrsa";
+        doTestJweJwsRsa(address, null);
+    }
+    @Test
+    public void testJweRsaJwsHMac() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejwshmac";
+        HmacJwsSignatureProvider hmacProvider = new HmacJwsSignatureProvider(ENCODED_MAC_KEY);
+        hmacProvider.setDefaultJwtAlgorithm(Algorithm.HmacSHA256.getJwtName());
+        doTestJweJwsRsa(address, hmacProvider);
+    }
+    
+    private void doTestJweJwsRsa(String address, 
+                                 JwsSignatureProvider jwsSigProvider) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -87,6 +102,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         providers.add(jweWriter);
         providers.add(new JweClientResponseFilter());
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
+        if (jwsSigProvider != null) {
+            jwsWriter.setSignatureProvider(jwsSigProvider);
+        }
         jwsWriter.setUseJwsOutputStream(true);
         providers.add(jwsWriter);
         providers.add(new JwsClientResponseFilter());

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.jws;
 
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,10 +37,15 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider imple
                       Algorithm.HmacSHA384.getJwtName(),
                       Algorithm.HmacSHA512.getJwtName())); 
     private byte[] key;
+    private AlgorithmParameterSpec hmacSpec;
     
     public HmacJwsSignatureProvider(byte[] key) {
+        this(key, null);
+    }
+    public HmacJwsSignatureProvider(byte[] key, AlgorithmParameterSpec spec) {
         super(SUPPORTED_ALGORITHMS);
         this.key = key;
+        this.hmacSpec = spec;
     }
     public HmacJwsSignatureProvider(String encodedKey) {
         super(SUPPORTED_ALGORITHMS);
@@ -49,6 +55,7 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider imple
             throw new SecurityException();
         }
     }
+    
     
     @Override
     public byte[] sign(JwtHeaders headers, String unsignedText) {
@@ -64,12 +71,14 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider imple
     
     private byte[] computeMac(JwtHeaders headers, String text) {
         return HmacUtils.computeHmac(key, 
-                                     Algorithm.toJavaName(headers.getAlgorithm()), 
+                                     Algorithm.toJavaName(headers.getAlgorithm()),
+                                     hmacSpec,
                                      text);
     }
     @Override
     protected JwsSignatureProviderWorker createJwsSignatureWorker(JwtHeaders headers) {
-        final Mac mac = HmacUtils.getMac(Algorithm.toJavaName(headers.getAlgorithm()));
+        final Mac mac = HmacUtils.getInitializedMac(key, Algorithm.toJavaName(headers.getAlgorithm()),
+                                                    hmacSpec);
         return new JwsSignatureProviderWorker() {
 
             @Override

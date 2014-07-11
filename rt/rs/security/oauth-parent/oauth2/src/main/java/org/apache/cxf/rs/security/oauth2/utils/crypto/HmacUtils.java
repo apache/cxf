@@ -78,8 +78,12 @@ public final class HmacUtils {
     }
     
     public static byte[] computeHmac(byte[] key, String macAlgoJavaName, String data) {
+        return computeHmac(key, macAlgoJavaName, null, data);
+    }
+    public static byte[] computeHmac(byte[] key, String macAlgoJavaName, AlgorithmParameterSpec spec, 
+                                     String data) {
         Mac mac = getMac(macAlgoJavaName);
-        return computeHmac(key, mac, data);
+        return computeHmac(new SecretKeySpec(key, mac.getAlgorithm()), mac, spec, data);
     }
     
     public static byte[] computeHmac(String key, Mac hmac, String data) {
@@ -100,13 +104,27 @@ public final class HmacUtils {
     }
     
     public static byte[] computeHmac(Key secretKey, Mac hmac, AlgorithmParameterSpec spec, String data) {
+        initMac(hmac, secretKey, spec);
+        return hmac.doFinal(data.getBytes());
+    }
+    
+    public static Mac getInitializedMac(byte[] key, String algo, AlgorithmParameterSpec spec) {
+        Mac hmac = getMac(algo);
+        initMac(hmac, key, spec);
+        return hmac;
+    }
+    
+    private static void initMac(Mac hmac, byte[] key, AlgorithmParameterSpec spec) {
+        initMac(hmac, new SecretKeySpec(key, hmac.getAlgorithm()), spec);
+        
+    }
+    private static void initMac(Mac hmac, Key secretKey, AlgorithmParameterSpec spec) {
         try {
             if (spec == null) {
                 hmac.init(secretKey);
             } else {
                 hmac.init(secretKey, spec);
             }
-            return hmac.doFinal(data.getBytes());
         } catch (InvalidKeyException e) {
             throw new OAuthServiceException(e);
         } catch (InvalidAlgorithmParameterException e) {

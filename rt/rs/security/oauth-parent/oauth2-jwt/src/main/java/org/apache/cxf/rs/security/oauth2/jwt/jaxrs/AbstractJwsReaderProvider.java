@@ -33,12 +33,12 @@ public class AbstractJwsReaderProvider {
     private JwsSignatureProperties sigProperties;
     private String defaultMediaType;
     
-    public void setSigVerifier(JwsSignatureVerifier sigVerifier) {
-        this.sigVerifier = sigVerifier;
+    public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
+        this.sigVerifier = signatureVerifier;
     }
 
-    public void setSigProperties(JwsSignatureProperties sigProperties) {
-        this.sigProperties = sigProperties;
+    public void setSignatureProperties(JwsSignatureProperties signatureProperties) {
+        this.sigProperties = signatureProperties;
     }
     
     public JwsSignatureProperties getSigProperties() {

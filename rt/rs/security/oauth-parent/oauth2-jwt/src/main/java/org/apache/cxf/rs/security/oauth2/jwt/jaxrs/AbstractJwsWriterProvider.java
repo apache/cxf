@@ -39,10 +39,9 @@ public class AbstractJwsWriterProvider {
     
     private JwsSignatureProvider sigProvider;
     
-    public void setSigProvider(JwsSignatureProvider sigProvider) {
-        this.sigProvider = sigProvider;
+    public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
+        this.sigProvider = signatureProvider;
     }
-
     
     protected JwsSignatureProvider getInitializedSigProvider() {
         if (sigProvider != null) {
