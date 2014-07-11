@@ -1,0 +1,26 @@
+<application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" >
+	<grammars />
+	<resources>
+		<resource id="Test" path="/repository">
+
+			<method name="GET" id="listRepositories">
+				<response>
+					<representation mediaType="application/json" />
+				</response>
+			</method>
+
+			<resource path="{name}">
+				<param name="name" style="template" type="xs:string"/>
+				<method name="PUT" id="createRepository" >
+					<request>
+					</request>
+					<response>
+					</response>
+				</method>
+				<method name="DELETE" id="deleteRepository">
+				</method>
+
+			</resource>
+		</resource>
+	</resources>
+</application>

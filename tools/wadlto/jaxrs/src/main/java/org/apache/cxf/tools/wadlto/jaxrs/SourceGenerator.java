@@ -815,7 +815,18 @@ public class SourceGenerator {
             }
             inParamElements.add(el);
         }
-        inParamElements.addAll(inheritedParams);
+        for (Element inherited : inheritedParams) {
+            boolean duplicate = false;
+            for (Element in : inParamElements) {
+                if (in.getLocalName().equals(inherited.getLocalName())) {    
+                    duplicate = true;
+                    break;
+                }
+            }
+            if (!duplicate) {
+                inParamElements.add(inherited);
+            }
+        }
         inheritedParams.addAll(newInheritedParams);
         return inParamElements;
     }
