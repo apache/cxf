@@ -169,6 +169,9 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
             
             try {
                 Class<?> exClass = faultWanted.getProperty(Class.class.getName(), Class.class);
+                if (exClass == null) {
+                    return;
+                }
                 if (e == null) { 
                     Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
                     e = constructor.newInstance(new Object[]{fault.getMessage()});
