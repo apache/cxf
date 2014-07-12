@@ -26,16 +26,9 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * Feature to do JAAS authentication with defaults for karaf integration
  */
 public class JAASAuthenticationFeature extends AbstractFeature {
-    public static final String ID = "jaas";
-    
     private String contextName = "karaf";
     private boolean reportFault;
 
-    @Override
-    public String getID() {
-        return ID;
-    }
-    
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         JAASLoginInterceptor jaasLoginInterceptor = new JAASLoginInterceptor();
