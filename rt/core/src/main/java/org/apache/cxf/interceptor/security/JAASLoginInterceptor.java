@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.interceptor.security;
 
-import java.util.ResourceBundle;
+import java.security.PrivilegedAction;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
@@ -27,24 +27,22 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SecurityToken;
 import org.apache.cxf.common.security.TokenType;
 import org.apache.cxf.common.security.UsernameToken;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 
 public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String ROLE_CLASSIFIER_PREFIX = "prefix";
     public static final String ROLE_CLASSIFIER_CLASS_NAME = "classname";
-    
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAASLoginInterceptor.class);
+
     private static final Logger LOG = LogUtils.getL7dLogger(JAASLoginInterceptor.class);
     
     private String contextName = "";
@@ -52,6 +50,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     private String roleClassifier;
     private String roleClassifierType = ROLE_CLASSIFIER_PREFIX;
     private boolean reportFault;
+    private boolean useDoAs = true;
     
     
     public JAASLoginInterceptor() {
@@ -99,7 +98,11 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         this.reportFault = reportFault;
     }
     
-    public void handleMessage(Message message) throws Fault {
+    public void setUseDoAs(boolean useDoAs) {
+        this.useDoAs = useDoAs;
+    }
+
+    public void handleMessage(final Message message) throws Fault {
 
         String name = null;
         String password = null;
@@ -117,38 +120,43 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
                 password = ut.getPassword();
             }
         }
-        
+
         if (name == null || password == null) {
-            org.apache.cxf.common.i18n.Message errorMsg = 
-                new org.apache.cxf.common.i18n.Message("NO_USER_PASSWORD", 
-                                                       BUNDLE, 
-                                                       name, password);
-            LOG.warning(errorMsg.toString());
-            if (reportFault) {
-                throw new SecurityException(errorMsg.toString());
-            } else {
-                throw new SecurityException();
-            }
+            throw new AuthenticationException("Authentication required but no user or password was supplied");
         }
-        
+
         try {
-            
-            
             CallbackHandler handler = getCallbackHandler(name, password);  
             LoginContext ctx = new LoginContext(getContextName(), null, handler, loginConfig);  
             
             ctx.login();
             
             Subject subject = ctx.getSubject();
+            message.put(SecurityContext.class, createSecurityContext(name, subject));
             
-            message.put(SecurityContext.class, createSecurityContext(subject)); 
+            // Run the further chain in the context of this subject.
+            // This allows other code to retrieve the subject using pure JAAS
+            if (useDoAs) {
+                Subject.doAs(subject, new PrivilegedAction<Void>() {
+
+                    @Override
+                    public Void run() {
+                        InterceptorChain chain = message.getInterceptorChain();
+                        if (chain != null) {
+                            chain.doIntercept(message);
+                        }
+                        return null;
+                    }
+                });
+            }
+
         } catch (LoginException ex) {
-            String errorMessage = "Unauthorized : " + ex.getMessage();
+            String errorMessage = "Authentication failed for user " + name + " : " + ex.getMessage();
             LOG.fine(errorMessage);
             if (reportFault) {
                 throw new AuthenticationException(errorMessage);
             } else {
-                throw new AuthenticationException();
+                throw new AuthenticationException("Authentication failed (details can be found in server log)");
             }
         }
     }
@@ -157,25 +165,11 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         return new NamePasswordCallbackHandler(name, password);
     }
     
-    protected SecurityContext createSecurityContext(Subject subject) {
+    protected SecurityContext createSecurityContext(String name, Subject subject) {
         if (getRoleClassifier() != null) {
             return new RolePrefixSecurityContextImpl(subject, getRoleClassifier(),
                                                      getRoleClassifierType());
         } else {
-            // Get username - this is a bit unwieldy but necessary to preserve the message signature
-            Message message = PhaseInterceptorChain.getCurrentMessage();
-            AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
-            String name = null;
-            if (policy != null) {
-                name = policy.getUserName();
-            } else {
-                // try the UsernameToken
-                SecurityToken token = message.get(SecurityToken.class);
-                if (token != null && token.getTokenType() == TokenType.UsernameToken) {
-                    UsernameToken ut = (UsernameToken)token;
-                    name = ut.getName();
-                }
-            }
             return new DefaultSecurityContext(name, subject);
         }
     }
