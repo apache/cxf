@@ -977,6 +977,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         BindingOperationInfo boi = findOperation("/RST/Renew");
 
         client.getRequestContext().putAll(ctx);
+        client.getRequestContext().remove(SecurityConstants.TOKEN_ID);
         if (isSecureConv) {
             client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, namespace + "/RST/SCT/Renew");
         } else {
@@ -1027,7 +1028,6 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         }
 
         writer.writeStartElement("wst", "RenewTarget", namespace);
-        client.getRequestContext().put(SecurityConstants.TOKEN, tok);
         StaxUtils.copy(tok.getToken(), writer);
         writer.writeEndElement();
         
