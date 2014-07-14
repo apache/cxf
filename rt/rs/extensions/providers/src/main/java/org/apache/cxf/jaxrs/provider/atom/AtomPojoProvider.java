@@ -125,9 +125,13 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     }
     
     protected void tryInjectMessageContext(Object handler) {
+        Method m = null;
         try {
-            Method m = handler.getClass().getMethod("setMessageContext",
-                                                    new Class[]{MessageContext.class});
+            m = handler.getClass().getMethod("setMessageContext", new Class[]{MessageContext.class});
+        } catch (Throwable t) {
+            return;
+        }
+        try {
             InjectionUtils.injectThroughMethod(handler, m, mc);
         } catch (Throwable t) {
             LOG.warning("Message context can not be injected into " + handler.getClass().getName() 
