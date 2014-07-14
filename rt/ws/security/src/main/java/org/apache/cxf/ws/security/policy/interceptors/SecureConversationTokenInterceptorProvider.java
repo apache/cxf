@@ -117,7 +117,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
             if (v == null) {
                 v = message.getContextualProperty(s);
             }
-            if (v != null) {
+            if (v != null && !s.equals(SecurityConstants.TOKEN) && !s.equals(SecurityConstants.TOKEN_ID)) {
                 ctx.put(s, v);
             }
         }
