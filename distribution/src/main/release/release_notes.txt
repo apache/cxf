@@ -41,7 +41,7 @@ with the specified versions, are installed on your system:
     * Apache Maven 2.2.1 or 3.x to build the samples
 
 
-3.  Integrating CXF Into You Application
+3.  Integrating CXF Into Your Application
 
 If you use Maven to build your application, you need merely add
 appropriate dependencies. See the pom.xml files in the samples.
@@ -142,7 +142,13 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
 ** Task
     * [CXF-5565] - update to opensaml 2.6.1
 
+8. Known issues
 
+If you are using AES encryption with GCM for symmetric encryption in
+XML/WS-Security, there is a problem if you are using BouncyCastle < 1.49 or
+1.50. To circumvent this either of the following steps can be taken:
 
+a) Upgrade to BouncyCastle 1.49 (or 1.51 when it gets released) OR
+b) Set the system property "org.apache.xml.security.cipher.gcm.useIvParameterSpec" to "true".
 
 
