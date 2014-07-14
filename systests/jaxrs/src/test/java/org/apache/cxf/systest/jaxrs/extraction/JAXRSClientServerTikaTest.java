@@ -43,8 +43,8 @@ import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.lucene.search.ScoreDoc;
-import org.junit.BeforeClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -121,8 +121,8 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
         wc.post(new MultipartBody(attachment));
         
         // Use user-defined date pattern
-        final Collection<ScoreDoc> custom = search("modified=le=2007/09/16");        
-        assertEquals(custom.size(), 1);
+        final Collection<ScoreDoc> hits = search("modified=le=2007/09/16");        
+        assertEquals(hits.size(), 1);
     }
 
     @SuppressWarnings("unchecked")
