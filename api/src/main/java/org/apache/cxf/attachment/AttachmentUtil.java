@@ -197,13 +197,7 @@ public final class AttachmentUtil {
         
         String name = ATT_UUID + "-" + String.valueOf(++counter);
         if (ns != null && (ns.length() > 0)) {
-            try {
-                URI uri = new URI(ns);
-                String host = uri.toURL().getHost();
-                cid = host;
-            } catch (Exception e) {
-                cid = ns;
-            }
+            cid = ns;
         }
         return URLEncoder.encode(name, "UTF-8") + "@" + URLEncoder.encode(cid, "UTF-8");
     }
