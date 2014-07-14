@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -112,6 +113,20 @@ public class BookCatalog {
         } finally {
             reader.close();
         }
+    }
+    
+    @DELETE
+    public Response delete() throws IOException {
+        final IndexWriter writer = new IndexWriter(directory, config);
+        
+        try {
+            writer.deleteAll();
+            writer.commit();
+        } finally {
+            writer.close();
+        }  
+        
+        return Response.ok().build();
     }
 }
 
