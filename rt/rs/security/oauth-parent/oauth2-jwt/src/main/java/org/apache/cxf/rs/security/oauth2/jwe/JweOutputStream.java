@@ -63,8 +63,9 @@ public class JweOutputStream extends FilterOutputStream {
             }
         } 
         int offset = 0;
-        for (; offset + blockSize <= len; offset += blockSize, off += blockSize) {
-            encryptAndWrite(b, off, blockSize);
+        int chunkSize = blockSize > len ? blockSize : blockSize * (len / blockSize);
+        for (; offset + chunkSize <= len; offset += chunkSize, off += chunkSize) {
+            encryptAndWrite(b, off, chunkSize);
         }
         if (offset < len) {
             lastRawDataChunk = newArray(b, off, len - offset);
