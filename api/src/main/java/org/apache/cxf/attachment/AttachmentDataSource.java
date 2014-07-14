@@ -47,7 +47,7 @@ public class AttachmentDataSource implements DataSource {
         return cache != null;
     }
     public void cache(Message message) throws IOException {
-        if (cache == null) {
+        if (cache == null && ins != null) {
             cache = new CachedOutputStream();
             AttachmentUtil.setStreamedAttachmentProperties(message, cache);
             try {
