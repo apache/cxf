@@ -413,6 +413,13 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                     if (dbop != null) {
                         opName = dispatchedOpName;
                     }
+                    
+                    BindingOperationInfo bop = client.getEndpoint().getBinding().getBindingInfo()
+                        .getOperation(opName);
+                    if (bop != null) {
+                        // set the actual binding operation object to this dispatch operation
+                        bop.setProperty("dispatchToOperation", dbop);
+                    }
                 }
             }
         }
