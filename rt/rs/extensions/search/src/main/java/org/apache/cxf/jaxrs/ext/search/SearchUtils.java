@@ -32,7 +32,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class SearchUtils {
-    public static final String TIMESTAMP_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String TIMESTAMP_NO_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String TIMESTAMP_WITH_TIMEZONE_Z = "yyyy-MM-dd'T'HH:mm:ssZ";
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String DATE_FORMAT_PROPERTY = "search.date-format";
@@ -190,7 +190,7 @@ public final class SearchUtils {
         Date date = timestampFromString(new SimpleDateFormat(TIMESTAMP_WITH_TIMEZONE_Z), value);
         
         if (date == null) {
-            date = timestampFromString(new SimpleDateFormat(TIMESTAMP_WITH_TIMEZONE), value);
+            date = timestampFromString(new SimpleDateFormat(TIMESTAMP_NO_TIMEZONE), value);
         }
         
         if (date == null) {
