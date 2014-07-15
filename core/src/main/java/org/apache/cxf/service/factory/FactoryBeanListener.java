@@ -115,7 +115,7 @@ public interface FactoryBeanListener {
         BINDING_CREATED, 
         
         /**
-         * Endpoint, Client
+         * Endpoint
          */
         PRE_CLIENT_CREATE, 
 
