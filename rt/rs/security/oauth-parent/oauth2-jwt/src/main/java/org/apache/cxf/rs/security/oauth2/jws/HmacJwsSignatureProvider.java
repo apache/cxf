@@ -56,13 +56,6 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider imple
         }
     }
     
-    
-    @Override
-    public byte[] sign(JwtHeaders headers, String unsignedText) {
-        headers = prepareHeaders(headers);
-        return computeMac(headers, unsignedText);
-    }
-    
     @Override
     public boolean verify(JwtHeaders headers, String unsignedText, byte[] signature) {
         byte[] expected = computeMac(headers, unsignedText);
@@ -75,11 +68,10 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider imple
                                      hmacSpec,
                                      text);
     }
-    @Override
-    protected JwsSignatureProviderWorker createJwsSignatureWorker(JwtHeaders headers) {
+    protected JwsSignature doCreateJwsSignature(JwtHeaders headers) {
         final Mac mac = HmacUtils.getInitializedMac(key, Algorithm.toJavaName(headers.getAlgorithm()),
                                                     hmacSpec);
-        return new JwsSignatureProviderWorker() {
+        return new JwsSignature() {
 
             @Override
             public void update(byte[] src, int off, int len) {

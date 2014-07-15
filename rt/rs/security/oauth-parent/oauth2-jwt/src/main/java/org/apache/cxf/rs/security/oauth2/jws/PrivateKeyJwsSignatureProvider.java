@@ -52,27 +52,12 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
         this.random = random;
         this.signatureSpec = spec;
     }
-    
-    @Override
-    public byte[] sign(JwtHeaders headers, String unsignedText) {
-        headers = prepareHeaders(headers);
-        try {
-            return CryptoUtils.signData(unsignedText.getBytes("UTF-8"), 
-                                        key, 
-                                        Algorithm.toJavaName(headers.getAlgorithm()),
-                                        random,
-                                        signatureSpec);
-        } catch (Exception ex) {
-            throw new SecurityException(ex);
-        }
-    }
-    @Override
-    protected JwsSignatureProviderWorker createJwsSignatureWorker(JwtHeaders headers) {
+    protected JwsSignature doCreateJwsSignature(JwtHeaders headers) {
         final Signature s = CryptoUtils.getSignature(key, 
                                                      Algorithm.toJavaName(headers.getAlgorithm()),
                                                      random,
                                                      signatureSpec);
-        return new JwsSignatureProviderWorker() {
+        return new JwsSignature() {
 
             @Override
             public void update(byte[] src, int off, int len) {

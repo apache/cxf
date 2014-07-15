@@ -26,22 +26,22 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
-public class WrappedKeyJweEncryptor extends AbstractJweEncryptor {
+public class WrappedKeyJweEncryption extends AbstractJweEncryption {
     private Key cekEncryptionKey;
     private boolean wrap;
     private AtomicInteger providedCekUsageCount;
-    public WrappedKeyJweEncryptor(JweHeaders headers, Key cekEncryptionKey) {
+    public WrappedKeyJweEncryption(JweHeaders headers, Key cekEncryptionKey) {
         this(headers, cekEncryptionKey, null, null);
     }
-    public WrappedKeyJweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv) {
+    public WrappedKeyJweEncryption(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv) {
         this(headers, cekEncryptionKey, cek, iv, DEFAULT_AUTH_TAG_LENGTH, true);
     }
-    public WrappedKeyJweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, 
+    public WrappedKeyJweEncryption(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, 
                                    int authTagLen, boolean wrap) {
         this(headers, cekEncryptionKey, cek, iv, authTagLen, wrap, null);
     }
     
-    public WrappedKeyJweEncryptor(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, int authTagLen, 
+    public WrappedKeyJweEncryption(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, int authTagLen, 
                                    boolean wrap, JwtHeadersWriter writer) {
         super(headers, cek, iv, authTagLen, writer);
         this.cekEncryptionKey = cekEncryptionKey;

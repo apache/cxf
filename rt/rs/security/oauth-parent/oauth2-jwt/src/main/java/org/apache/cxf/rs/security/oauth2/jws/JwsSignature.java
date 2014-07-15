@@ -16,24 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.jwe;
+package org.apache.cxf.rs.security.oauth2.jws;
 
-import javax.crypto.SecretKey;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
-
-public class DirectKeyJweEncryptor extends AbstractJweEncryptor {
-    public DirectKeyJweEncryptor(SecretKey cek, byte[] iv) {
-        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
-                                                cek.getEncoded().length * 8)), cek.getEncoded(), iv);
-    }
-    public DirectKeyJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv) {
-        super(headers, cek, iv);
-    }
-    public DirectKeyJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
-        super(headers, cek, iv, authTagLen);
-    }
-    protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
-        return new byte[0];
-    }
+public interface JwsSignature {
+    void update(byte[] src, int off, int len);
+    byte[] sign();
 }

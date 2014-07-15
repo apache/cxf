@@ -24,19 +24,19 @@ import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
-public class WrappedKeyJweDecryptor extends AbstractJweDecryptor {
+public class WrappedKeyJweDecryption extends AbstractJweDecryption {
     private Key cekDecryptionKey;
     private boolean unwrap;
-    public WrappedKeyJweDecryptor(Key cekDecryptionKey) {    
+    public WrappedKeyJweDecryption(Key cekDecryptionKey) {    
         this(cekDecryptionKey, true);
     }
-    public WrappedKeyJweDecryptor(Key cekDecryptionKey, boolean unwrap) {    
+    public WrappedKeyJweDecryption(Key cekDecryptionKey, boolean unwrap) {    
         this(cekDecryptionKey, unwrap, null);
     }
-    public WrappedKeyJweDecryptor(Key cekDecryptionKey, JweCryptoProperties props) {
+    public WrappedKeyJweDecryption(Key cekDecryptionKey, JweCryptoProperties props) {
         this(cekDecryptionKey, true, props);
     }
-    public WrappedKeyJweDecryptor(Key cekDecryptionKey, boolean unwrap,
+    public WrappedKeyJweDecryption(Key cekDecryptionKey, boolean unwrap,
                                   JweCryptoProperties props) {    
         super(props);
         this.cekDecryptionKey = cekDecryptionKey;

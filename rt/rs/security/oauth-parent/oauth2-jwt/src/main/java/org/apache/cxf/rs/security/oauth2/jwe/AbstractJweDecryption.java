@@ -23,9 +23,9 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
-public abstract class AbstractJweDecryptor implements JweDecryptor {
+public abstract class AbstractJweDecryption implements JweDecryption {
     private JweCryptoProperties props;
-    protected AbstractJweDecryptor(JweCryptoProperties props) {
+    protected AbstractJweDecryption(JweCryptoProperties props) {
         this.props = props;
     }
     
@@ -75,7 +75,7 @@ public abstract class AbstractJweDecryptor implements JweDecryptor {
         }
         @Override
         public byte[] getContentEncryptionKey(JweHeaders headers, byte[] encryptedKey) {
-            return AbstractJweDecryptor.this.getContentEncryptionKey(consumer);
+            return AbstractJweDecryption.this.getContentEncryptionKey(consumer);
         }
 
         @Override

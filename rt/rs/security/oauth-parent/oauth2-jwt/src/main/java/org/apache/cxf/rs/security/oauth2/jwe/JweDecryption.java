@@ -18,10 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.io.OutputStream;
 
-
-public interface JweEncryptor {
-    String encrypt(byte[] jweContent, String contentType);
-    OutputStream createJweStream(OutputStream os, String contentType);
+public interface JweDecryption {
+    JweDecryptionOutput decrypt(String jweContent);
 }
