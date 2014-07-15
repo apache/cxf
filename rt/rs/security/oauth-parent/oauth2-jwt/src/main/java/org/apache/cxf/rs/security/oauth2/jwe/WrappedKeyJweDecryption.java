@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 import java.security.Key;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersReader;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
@@ -38,7 +39,11 @@ public class WrappedKeyJweDecryption extends AbstractJweDecryption {
     }
     public WrappedKeyJweDecryption(Key cekDecryptionKey, boolean unwrap,
                                   JweCryptoProperties props) {    
-        super(props);
+        this(cekDecryptionKey, unwrap, props, null);
+    }
+    public WrappedKeyJweDecryption(Key cekDecryptionKey, boolean unwrap,
+                                   JweCryptoProperties props, JwtHeadersReader reader) {    
+        super(props, reader);
         this.cekDecryptionKey = cekDecryptionKey;
         this.unwrap = unwrap;
     }

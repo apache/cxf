@@ -20,17 +20,11 @@
 package org.apache.cxf.rs.security.oauth2.jwe;
 
 import java.io.UnsupportedEncodingException;
-import java.security.Key;
-import java.security.spec.AlgorithmParameterSpec;
 
 import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
-import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersReader;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 
 public class JweCompactConsumer {
@@ -41,12 +35,9 @@ public class JweCompactConsumer {
     private byte[] authTag;
     private JweHeaders jweHeaders;
     public JweCompactConsumer(String jweContent) {
-        this(jweContent, null);
+        this(jweContent, new JwtTokenReaderWriter());
     }
-    public JweCompactConsumer(String jweContent, JweCryptoProperties props) {
-        this(jweContent, props, new JwtTokenReaderWriter());
-    }
-    public JweCompactConsumer(String jweContent, JweCryptoProperties props, JwtHeadersReader reader) {
+    public JweCompactConsumer(String jweContent, JwtHeadersReader reader) {
         String[] parts = jweContent.split("\\.");
         if (parts.length != 5) {
             throw new SecurityException("5 JWE parts are expected");
@@ -62,15 +53,14 @@ public class JweCompactConsumer {
             System.arraycopy(cipherText, 0, encryptedContentWithTag, 0, cipherText.length);
             System.arraycopy(authTag, 0, encryptedContentWithTag, cipherText.length, authTag.length);
             jweHeaders = new JweHeaders(reader.fromJsonHeaders(headersJson).asMap());
-            enforceJweCryptoProperties(props);
         } catch (Base64Exception ex) {
             throw new SecurityException(ex);
         }
     }
     
-    private void enforceJweCryptoProperties(JweCryptoProperties props) {
-        if (props != null) {
-            //TODO: Validate
+    public void enforceJweCryptoProperties(JweCryptoProperties props) {
+        if (props != null) { 
+            //TODO
         }
     }
     
@@ -102,25 +92,12 @@ public class JweCompactConsumer {
         return encryptedContentWithTag;
     }
     
-    public byte[] getDecryptedContent(ContentEncryptionProvider provider) {
-        byte[] cek = provider.getContentEncryptionKey(getJweHeaders(), getEncryptedContentEncryptionKey());
-        KeyProperties keyProperties = new KeyProperties(
-            Algorithm.toJavaName(getJweHeaders().getContentEncryptionAlgorithm()));
-        keyProperties.setAdditionalData(getContentEncryptionCipherAAD());
-        
-        AlgorithmParameterSpec spec = provider.getContentEncryptionCipherSpec(getJweHeaders(),
-                                                         getEncryptionAuthenticationTag().length * 8,
-                                                         getContentDecryptionCipherInitVector());
-        keyProperties.setAlgoSpec(spec);
-        boolean compressionSupported = 
-            JwtConstants.DEFLATE_ZIP_ALGORITHM.equals(getJweHeaders().getZipAlgorithm());
-        keyProperties.setCompressionSupported(compressionSupported);
-        Key secretKey = CryptoUtils.createSecretKeySpec(cek, keyProperties.getKeyAlgo());
-        return CryptoUtils.decryptBytes(getEncryptedContentWithAuthTag(), secretKey, keyProperties);
+    public byte[] getDecryptedContent(JweDecryption decryption) {
+        return decryption.decrypt(this);
     }
-    public String getDecryptedContentText(ContentEncryptionProvider provider) {
+    public String getDecryptedContentText(JweDecryption decryption) {
         try {
-            return new String(getDecryptedContent(provider), "UTF-8");
+            return new String(getDecryptedContent(decryption), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             throw new SecurityException(ex);
         }

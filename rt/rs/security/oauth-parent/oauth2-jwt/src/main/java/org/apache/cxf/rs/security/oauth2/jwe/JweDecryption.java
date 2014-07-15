@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.oauth2.jwe;
 
 
+
 public interface JweDecryption {
     JweDecryptionOutput decrypt(String jweContent);
+    byte[] decrypt(JweCompactConsumer consumer);
 }

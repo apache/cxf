@@ -18,33 +18,55 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersReader;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public abstract class AbstractJweDecryption implements JweDecryption {
     private JweCryptoProperties props;
-    protected AbstractJweDecryption(JweCryptoProperties props) {
+    private JwtHeadersReader reader = new JwtTokenReaderWriter();
+    protected AbstractJweDecryption(JweCryptoProperties props, JwtHeadersReader thereader) {
         this.props = props;
+        if (thereader != null) {
+            reader = thereader;
+        }
     }
     
     protected abstract byte[] getContentEncryptionKey(JweCompactConsumer consumer);
     
     public JweDecryptionOutput decrypt(String content) {
-        JweCompactConsumer consumer = new JweCompactConsumer(content, props);
+        JweCompactConsumer consumer = new JweCompactConsumer(content, reader);
         return doDecrypt(consumer);
+    }
+    public byte[] decrypt(JweCompactConsumer consumer) {
+        return doDecrypt(consumer).getContent();
     }
     
     protected JweDecryptionOutput doDecrypt(JweCompactConsumer consumer) {
-        CeProvider ceProvider = new CeProvider(consumer);
-        byte[] bytes = consumer.getDecryptedContent(ceProvider);
+        consumer.enforceJweCryptoProperties(props);
+        byte[] cek = getContentEncryptionKey(consumer);
+        KeyProperties keyProperties = new KeyProperties(getContentEncryptionAlgorithm(consumer));
+        keyProperties.setAdditionalData(getContentEncryptionCipherAAD(consumer));
+        AlgorithmParameterSpec spec = getContentEncryptionCipherSpec(consumer);
+        keyProperties.setAlgoSpec(spec);
+        boolean compressionSupported = 
+            JwtConstants.DEFLATE_ZIP_ALGORITHM.equals(consumer.getJweHeaders().getZipAlgorithm());
+        keyProperties.setCompressionSupported(compressionSupported);
+        Key secretKey = CryptoUtils.createSecretKeySpec(cek, keyProperties.getKeyAlgo());
+        byte[] bytes = 
+            CryptoUtils.decryptBytes(getEncryptedContentWithAuthTag(consumer), secretKey, keyProperties);
         return new JweDecryptionOutput(consumer.getJweHeaders(), bytes);
     }
     protected byte[] getEncryptedContentEncryptionKey(JweCompactConsumer consumer) {
         return consumer.getEncryptedContentEncryptionKey();
     }
-    protected AlgorithmParameterSpec getContentDecryptionCipherSpec(JweCompactConsumer consumer) {
+    protected AlgorithmParameterSpec getContentEncryptionCipherSpec(JweCompactConsumer consumer) {
         return CryptoUtils.getContentEncryptionCipherSpec(getEncryptionAuthenticationTagLenBits(consumer), 
                                                    getContentEncryptionCipherInitVector(consumer));
     }
@@ -67,23 +89,5 @@ public abstract class AbstractJweDecryption implements JweDecryption {
         return getEncryptionAuthenticationTag(consumer).length * 8;
     }
     
-    protected class CeProvider implements ContentEncryptionProvider {
-
-        private JweCompactConsumer consumer;
-        public CeProvider(JweCompactConsumer consumer) {
-            this.consumer = consumer;
-        }
-        @Override
-        public byte[] getContentEncryptionKey(JweHeaders headers, byte[] encryptedKey) {
-            return AbstractJweDecryption.this.getContentEncryptionKey(consumer);
-        }
-
-        @Override
-        public AlgorithmParameterSpec getContentEncryptionCipherSpec(JweHeaders headers,
-                                                                     int authTagLength,
-                                                                     byte[] initVector) {
-            return getContentDecryptionCipherSpec(consumer);
-        }
-        
-    }
+    
 }
