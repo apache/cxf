@@ -157,6 +157,16 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                 }
     
                 Endpoint ep = createEndpoint();
+
+                getServiceFactory().sendEvent(FactoryBeanListener.Event.PRE_SERVER_CREATE, server, serviceBean,
+                                              serviceBean == null 
+                                              ? getServiceClass() == null 
+                                                  ? getServiceFactory().getServiceClass() 
+                                                  : getServiceClass()
+                                              : getServiceClass() == null
+                                                  ? ClassHelper.getRealClass(getServiceBean()) 
+                                                  : getServiceClass());
+
                 server = new ServerImpl(getBus(),
                                         ep,
                                         getDestinationFactory(),

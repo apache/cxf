@@ -97,6 +97,11 @@ public interface FactoryBeanListener {
         /**
          * Server, targetObject, Class
          */
+        PRE_SERVER_CREATE, 
+
+        /**
+         * Server, targetObject, Class
+         */
         SERVER_CREATED, 
         
         /**
@@ -109,6 +114,11 @@ public interface FactoryBeanListener {
          */
         BINDING_CREATED, 
         
+        /**
+         * Endpoint, Client
+         */
+        PRE_CLIENT_CREATE, 
+
         /**
          * Endpoint, Client
          */
