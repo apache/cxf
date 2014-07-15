@@ -123,7 +123,7 @@ public class CounterRepositoryTest extends Assert {
         
         assertEquals("The operation counter isn't increased", opCounter.getNumInvocations(), 1);
         assertEquals("The operation counter's AvgResponseTime is wrong ",
-                     opCounter.getAvgResponseTime(), 1000);
+                     opCounter.getAvgResponseTime(), (long)1000);
         assertEquals("The operation counter's MaxResponseTime is wrong ", 
                      opCounter.getMaxResponseTime(), (long)1000);
         assertEquals("The operation counter's MinResponseTime is wrong ", 
@@ -139,7 +139,7 @@ public class CounterRepositoryTest extends Assert {
         cr.increaseCounter(operationCounter, mhtr2);
         assertEquals("The operation counter isn't increased", opCounter.getNumInvocations(), 2);
         assertEquals("The operation counter's AvgResponseTime is wrong ",
-                     opCounter.getAvgResponseTime(), 1500);
+                     opCounter.getAvgResponseTime(), (long)1500);
         assertEquals("The operation counter's MaxResponseTime is wrong ",
                      opCounter.getMaxResponseTime(), (long)2000);
         assertEquals("The operation counter's MinResponseTime is wrong ",
