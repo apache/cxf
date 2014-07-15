@@ -156,6 +156,12 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             }
             
             Endpoint ep = createEndpoint();
+
+            getServiceFactory().sendEvent(FactoryBeanListener.Event.PRE_SERVER_CREATE,
+                                          server, 
+                                          null,
+                                          null);
+            
             server = new ServerImpl(getBus(), 
                                     ep, 
                                     getDestinationFactory(), 

@@ -205,6 +205,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         
         try {
             Endpoint ep = createEndpoint();
+            this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PRE_CLIENT_CREATE, ep);
             ClientState actualState = getActualState();
             WebClient client = actualState == null ? new WebClient(getAddress())
                 : new WebClient(actualState);
