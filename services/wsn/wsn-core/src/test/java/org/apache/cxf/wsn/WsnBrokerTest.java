@@ -36,7 +36,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsn.client.Consumer;
 import org.apache.cxf.wsn.client.CreatePullPoint;
 import org.apache.cxf.wsn.client.NotificationBroker;
