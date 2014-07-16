@@ -104,7 +104,7 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
         fact.setAddress("udp://localhost:" + PORT);
         Greeter g = fact.create(Greeter.class);
         StringBuilder b = new StringBuilder(100000);
-        for (int x = 0; x < 10000; x++) {
+        for (int x = 0; x < 6500; x++) {
             b.append("Hello ");
         }
         assertEquals("Hello " + b.toString(), g.greetMe(b.toString()));
