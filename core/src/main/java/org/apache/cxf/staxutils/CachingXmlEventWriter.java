@@ -146,8 +146,8 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
         addEvent(factory.createStartDocument());
     }
 
-    public void writeStartDocument(String arg0) throws XMLStreamException {
-        addEvent(factory.createStartDocument(arg0));        
+    public void writeStartDocument(String version) throws XMLStreamException {
+        addEvent(factory.createStartDocument(null, version));        
     }
 
     public void writeStartDocument(String arg0, String arg1) throws XMLStreamException {
