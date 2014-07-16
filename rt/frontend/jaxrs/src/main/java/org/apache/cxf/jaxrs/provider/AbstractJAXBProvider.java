@@ -82,6 +82,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.staxutils.DepthExceededStaxException;
 import org.apache.cxf.staxutils.DepthRestrictingStreamReader;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.DocumentDepthProperties;
@@ -731,8 +732,15 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         StringBuilder sb = handleExceptionStart(e);
         Throwable linked = e.getLinkedException();
         if (linked != null && linked.getMessage() != null) {
-            if (read && linked instanceof XMLStreamException && linked.getMessage().startsWith("Maximum Number")) {
-                throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413)); 
+            Throwable cause = linked;
+            while (read && cause != null) {
+                if (cause instanceof XMLStreamException && cause.getMessage().startsWith("Maximum Number")) {
+                    throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413)); 
+                }
+                if (cause instanceof DepthExceededStaxException) {
+                    throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413)); 
+                }
+                cause = cause.getCause();
             }
             sb.append(linked.getMessage()).append(". ");
         }
