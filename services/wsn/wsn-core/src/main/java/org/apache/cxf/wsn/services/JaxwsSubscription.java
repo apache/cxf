@@ -37,7 +37,11 @@ import org.oasis_open.docs.wsn.bw_2.UnacceptableInitialTerminationTimeFault;
 import org.oasis_open.docs.wsn.bw_2.UnrecognizedPolicyRequestFault;
 import org.oasis_open.docs.wsn.bw_2.UnsupportedPolicyRequestFault;
 
-@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.PausableSubscriptionManager")
+@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.PausableSubscriptionManager",
+targetNamespace = "http://cxf.apache.org/wsn/jaxws",
+serviceName = "PausableSubscriptionManagerService",
+portName = "PausableSubscriptionManagerPort"
+)
 public class JaxwsSubscription extends JmsSubscription {
 
     private NotificationConsumer consumer;

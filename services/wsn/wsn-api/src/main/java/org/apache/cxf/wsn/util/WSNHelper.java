@@ -18,8 +18,16 @@
  */
 package org.apache.cxf.wsn.util;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.Service;
@@ -76,6 +84,22 @@ public class WSNHelper {
             throw new UnsupportedOperationException("Pure JAX-WS does not support the extraClasses");
         }
         Endpoint endpoint = Endpoint.create(o);
+        URL wsdlLocation = WSNWSDLLocator.getWSDLUrl();
+        if (wsdlLocation != null) {
+            try {
+                if (endpoint.getProperties() == null) {
+                    endpoint.setProperties(new HashMap<String, Object>());
+                }
+                endpoint.getProperties().put("javax.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
+                List<Source> mt = new ArrayList<Source>();
+                StreamSource src = new StreamSource(wsdlLocation.openStream(), wsdlLocation.toExternalForm());
+                mt.add(src);
+                endpoint.setMetadata(mt);
+            } catch (IOException e) {
+                //ignore, no wsdl really needed
+            }
+        }
+        
         endpoint.publish(address);
         return endpoint;
     }

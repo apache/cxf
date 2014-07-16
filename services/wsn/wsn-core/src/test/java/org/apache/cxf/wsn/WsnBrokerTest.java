@@ -31,10 +31,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsn.client.Consumer;
 import org.apache.cxf.wsn.client.CreatePullPoint;
 import org.apache.cxf.wsn.client.NotificationBroker;
@@ -281,7 +283,9 @@ public abstract class WsnBrokerTest extends Assert {
                      WSNHelper.getInstance().getWSAAddress(message.getSubscriptionReference()));
         assertEquals(WSNHelper.getInstance().getWSAAddress(publisher.getEpr()),
                      WSNHelper.getInstance().getWSAAddress(message.getProducerReference()));
-        assertTrue(message.getMessage().getAny() instanceof CustomType);
+        assertNotNull(message.getMessage().getAny());
+        assertTrue(message.getMessage().getAny().getClass().getName(),
+                   message.getMessage().getAny() instanceof CustomType);
 
         subscription.unsubscribe();
         registration.destroy();

@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.wsn;
 
+import java.net.URL;
+
 import javax.management.ObjectName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
+
+import org.oasis_open.docs.wsn.bw_2.CreatePullPoint;
 
 public abstract class AbstractEndpoint implements EndpointMBean {
 
@@ -52,8 +56,11 @@ public abstract class AbstractEndpoint implements EndpointMBean {
         this.address = address;
     }
 
+    public final URL getWSDLLocation() {
+        return CreatePullPoint.class.getClassLoader().getResource("org/apache/cxf/wsn/wsdl/wsn.wsdl"); 
+    }
     public void register() throws EndpointRegistrationException {
-        endpoint = manager.register(getAddress(), this);
+        endpoint = manager.register(getAddress(), this, getWSDLLocation());
     }
 
     public void unregister() throws EndpointRegistrationException {

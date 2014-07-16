@@ -28,8 +28,8 @@ import org.apache.cxf.wsn.EndpointManager;
 import org.apache.cxf.wsn.jms.JmsCreatePullPoint;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.CreatePullPoint",
-            targetNamespace = "http://docs.oasis-open.org/wsn/bw-2",
-            serviceName = "CreatePullPoint",
+            targetNamespace = "http://cxf.apache.org/wsn/jaxws",
+            serviceName = "CreatePullPointService",
             portName = "CreatePullPointPort")
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class JaxwsCreatePullPoint extends JmsCreatePullPoint

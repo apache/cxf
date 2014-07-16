@@ -19,8 +19,10 @@
 
 package org.apache.cxf.wsn.services;
 
+import java.net.URL;
 import java.util.Dictionary;
 import java.util.Properties;
+
 import javax.management.MBeanServer;
 import javax.xml.ws.Endpoint;
 
@@ -57,10 +59,10 @@ public class OSGiJaxwsEndpointManager extends JaxwsEndpointManager {
         this.container = c;
     }
 
-    public Endpoint register(String address, Object service) throws EndpointRegistrationException {
+    public Endpoint register(String address, Object service, URL wsdlLocation) throws EndpointRegistrationException {
         Object o = setCXFBus();
         try {
-            return super.register(address, service);
+            return super.register(address, service, wsdlLocation);
         } finally {
             restoreCXFBus(o);
         }

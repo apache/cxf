@@ -39,8 +39,8 @@ import org.oasis_open.docs.wsn.bw_2.NotificationProducer;
 import org.oasis_open.docs.wsn.bw_2.SubscriptionManager;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.PublisherRegistrationManager",
-            targetNamespace = "http://docs.oasis-open.org/wsn/brw-2",
-            serviceName = "PublisherRegistrationManager",
+            targetNamespace = "http://cxf.apache.org/wsn/jaxws",
+            serviceName = "PublisherRegistrationManagerService",
             portName = "PublisherRegistrationManagerPort")
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class JaxwsPublisher extends JmsPublisher {

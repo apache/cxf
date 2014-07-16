@@ -26,6 +26,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.wsn.util.IdGenerator;
+import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.GetCurrentMessage;
 import org.oasis_open.docs.wsn.b_2.GetCurrentMessageResponse;
 import org.oasis_open.docs.wsn.b_2.InvalidFilterFaultType;
@@ -61,7 +62,11 @@ import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
  * Demand-based publisher.
  *
  */
-@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.NotificationProducer")
+@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.NotificationProducer",
+    targetNamespace = "http://cxf.apache.org/wsn/jaxws",
+    serviceName = "NotificationProducerService",
+    portName = "NotificationProducerPort"
+)
 public class Publisher implements NotificationProducer, Referencable {
     public static final String WSN_URI = "http://docs.oasis-open.org/wsn/b-2";
     public static final QName QNAME_TOPIC_EXPRESSION = new QName(WSN_URI, "TopicExpression");
@@ -82,8 +87,7 @@ public class Publisher implements NotificationProducer, Referencable {
         if (callback == null || address == null) {
             this.endpoint = null;
         } else {
-            this.endpoint = Endpoint.create(this);
-            this.endpoint.publish(address);
+            this.endpoint = WSNHelper.getInstance().publish(address, this);
         }
     }
 
@@ -155,7 +159,11 @@ public class Publisher implements NotificationProducer, Referencable {
         throw new NoCurrentMessageOnTopicFault("There is no current message on this topic.", fault);
     }
 
-    @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.SubscriptionManager")
+    @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.SubscriptionManager",
+        targetNamespace = "http://cxf.apache.org/wsn/jaxws",
+        serviceName = "SubscriptionManagerService",
+        portName = "SubscriptionManagerPort"
+        )
     protected class PublisherSubscription implements SubscriptionManager {
 
         private final String id;
@@ -165,8 +173,7 @@ public class Publisher implements NotificationProducer, Referencable {
         public PublisherSubscription(TopicExpressionType topic) {
             this.topic = topic;
             this.id = idGenerator.generateSanitizedId();
-            this.endpoint = Endpoint.create(this);
-            this.endpoint.publish(address + "/subscriptions/" + this.id);
+            this.endpoint = WSNHelper.getInstance().publish(address + "/subscriptions/" + this.id, this);
         }
 
         public W3CEndpointReference getEpr() {
