@@ -33,6 +33,32 @@ import org.junit.Test;
 public class JAXRSContainerTest extends ProcessorTestBase {
 
     @Test    
+    public void testNoTargetNamespace() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/resourceSchemaNoTargetNamespace.xml"));
+            context.put(WadlToolConstants.CFG_SCHEMA_PACKAGENAME, "=custom");
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+            
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            List<File> files = FileUtils.getFilesRecurse(output, ".+\\.class" + "$");
+            assertEquals(3, files.size());
+            assertTrue(checkContains(files, "application" + ".Resource.class"));
+            assertTrue(checkContains(files, "custom" + ".TestCompositeObject.class"));
+            assertTrue(checkContains(files, "custom" + ".ObjectFactory.class"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
     public void testCodeGenInterfaces() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
