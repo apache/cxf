@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -30,15 +29,18 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -104,28 +106,45 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         checkBookStoreInfo(resourceEls.get(0));
     }
     
+    private void assertValidType(XPathUtils xpu, String xpath, String type, Element el) {
+        String s = (String)xpu.getValue(xpath, el, XPathConstants.STRING);
+        assertNotNull(s);
+        assertTrue("Expected " + type + " but found " + s, s.endsWith(type));
+    }
+    private void assertValid(XPathUtils xpu, String xpath, Element el) {
+        assertNotNull(xpu.getValue(xpath, el, XPathConstants.NODE));
+    }
     @Test
     public void testPetStoreWadl() throws Exception {
         List<Element> resourceEls = getWadlResourcesInfo("http://localhost:" + PORT + "/webapp/pets",
             "http://localhost:" + PORT + "/webapp/pets/", 1);
         checkPetStoreInfo(resourceEls.get(0));
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(
-             (Element)resourceEls.get(0).getParentNode().getParentNode());
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        StaxUtils.copy(reader, bos);
-        String s = bos.toString();
-        assertTrue(s.contains("<xs:element name=\"elstatus\" type=\"petStoreStatusElement\"/>"));
-        assertTrue(s.contains("<xs:element name=\"status\" type=\"status\"/>"));
-        assertTrue(s.contains("<xs:element name=\"statusType\" type=\"statusType\"/>"));
-        assertTrue(s.contains(
-            "<xs:element name=\"statusImpl1\" substitutionGroup=\"statusType\" type=\"petStoreStatusImpl1\"/>"));
-        assertTrue(s.contains(
-            "<xs:element name=\"statusImpl2\" substitutionGroup=\"statusType\" type=\"petStoreStatusImpl2\"/>"));
-        assertTrue(s.contains("<xs:element name=\"statuses\""));
-        assertTrue(s.contains("element=\"prefix1:status\""));
-        assertTrue(s.contains("element=\"prefix1:elstatus\""));
-        assertTrue(s.contains("element=\"prefix1:statuses\""));
-        assertTrue(s.contains("element=\"prefix1:statusType\""));
+        
+        Element el = (Element)resourceEls.get(0).getParentNode().getParentNode();
+        Map<String, String> namespaces = new HashMap<String, String>();
+        namespaces.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        namespaces.put("ns", "http://pets");
+        namespaces.put("wadl", "http://wadl.dev.java.net/2009/02");
+        XPathUtils xpu = new XPathUtils(namespaces);
+        assertValidType(xpu, "//xsd:element[@name='elstatus']/@type", "petStoreStatusElement", el);
+        assertValidType(xpu, "//xsd:schema[@targetNamespace='http://pets']/xsd:element[@name='status']/@type", 
+                        "status", el);
+        assertValidType(xpu, "//xsd:element[@name='statusType']/@type",
+                        "statusType", el);
+        assertValidType(xpu, "//xsd:element[@name='statusImpl1']/@type",
+                        "petStoreStatusImpl1", el);
+        assertValidType(xpu, "//xsd:element[@name='statusImpl1']/@substitutionGroup",
+                        "statusType", el);
+        assertValidType(xpu, "//xsd:element[@name='statusImpl2']/@type",
+                        "petStoreStatusImpl2", el);
+        assertValidType(xpu, "//xsd:element[@name='statusImpl2']/@substitutionGroup",
+                        "statusType", el);
+
+        assertValid(xpu, "//wadl:representation[@element='prefix1:status']", el);
+        assertValid(xpu, "//wadl:representation[@element='prefix1:elstatus']", el);
+        assertValid(xpu, "//wadl:representation[@element='prefix1:statuses']", el);
+        assertValid(xpu, "//wadl:representation[@element='prefix1:statusType']", el);
+
     }
     
     @Test
