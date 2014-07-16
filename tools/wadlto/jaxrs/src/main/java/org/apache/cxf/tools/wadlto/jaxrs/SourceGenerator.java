@@ -401,7 +401,9 @@ public class SourceGenerator {
         for (SchemaInfo schemaEl : schemaElements) {
             populateElementTypeMap(app, schemaEl.getElement(), schemaEl.getSystemId(), elementTypeMap);
         }
-        return new GrammarInfo(nsMap, elementTypeMap);
+        boolean noTargetNamespace = schemaElements.size() == 1 
+            && schemaElements.get(0).getNamespaceURI().isEmpty();
+        return new GrammarInfo(nsMap, elementTypeMap, noTargetNamespace);
     }
     
     private void populateElementTypeMap(Application app, Element schemaEl, 
@@ -667,7 +669,7 @@ public class SourceGenerator {
         List<Element> requestEls = getWadlElements(methodEl, "request");
         Element firstRequestEl = requestEls.size() >= 1 ? requestEls.get(0) : null;
         List<Element> allRequestReps = getWadlElements(firstRequestEl, "representation");
-        List<Element> xmlRequestReps = getXmlReps(allRequestReps);
+        List<Element> xmlRequestReps = getXmlReps(allRequestReps, info.getGrammarInfo());
         
         final String methodNameLowerCase = methodEl.getAttribute("name").toLowerCase();
         String id = methodEl.getAttribute("id");
@@ -783,12 +785,14 @@ public class SourceGenerator {
             || methodNames.size() == 1 && "*".equals(methodNames.iterator().next());
     }
 
-    private List<Element> getXmlReps(List<Element> repElements) {
+    private List<Element> getXmlReps(List<Element> repElements, GrammarInfo gInfo) {
         Set<String> values = new HashSet<String>(repElements.size());
         List<Element> xmlReps = new ArrayList<Element>();
         for (Element el : repElements) {
             String value = el.getAttribute("element");
-            if (value.length() > 0 && value.contains(":") && !values.contains(value)) {
+            if (value.length() > 0 
+                && (value.contains(":") || gInfo.isSchemaWithoutTargetNamespace()) 
+                && !values.contains(value)) {
                 xmlReps.add(el);
                 values.add(value);
             }
@@ -911,7 +915,8 @@ public class SourceGenerator {
         }
         
         String elementName = responseRequired ? null : getElementRefName(
-                getActualRepElement(repElements, getXmlReps(repElements).get(0)), info, imports);
+                getActualRepElement(repElements, getXmlReps(repElements, info.getGrammarInfo()).get(0)), 
+                info, imports);
         if (elementName != null) {
             sbCode.append(elementName + " ");
         } else {
@@ -1203,9 +1208,9 @@ public class SourceGenerator {
         GrammarInfo gInfo = info.getGrammarInfo();
         if (gInfo != null) {
             String namespace = gInfo.getNsMap().get(prefix);
-            if (namespace != null) {
-                                
-                String packageName = getPackageFromNamespace(namespace);
+            if (namespace != null || prefix.isEmpty() && gInfo.isSchemaWithoutTargetNamespace()) {
+                String theNs = namespace != null ? namespace : "";                
+                String packageName = getPackageFromNamespace(theNs);
                 String clsName = getSchemaClassName(packageName, gInfo, actualValue, 
                                                     info.getTypeClassNames());
                 
@@ -1241,8 +1246,11 @@ public class SourceGenerator {
         
         if (elementRef.length() > 0) {
             String[] pair = elementRef.split(":");
-            if (pair.length == 2) {
-                return convertRefToClassName(pair[0], pair[1], null, info, imports);
+            if (pair.length == 2 
+                || pair.length == 1 && info.getGrammarInfo().isSchemaWithoutTargetNamespace()) {
+                String ns = pair.length == 1 ? "" : pair[0]; 
+                String name = pair.length == 1 ? pair[0] : pair[1];
+                return convertRefToClassName(ns, name, null, info, imports);
             }
         } else {
             // try mediaTypesMap first
@@ -1628,14 +1636,17 @@ public class SourceGenerator {
     private static class GrammarInfo {
         private Map<String, String> nsMap = new HashMap<String, String>();
         private Map<String, String> elementTypeMap = new HashMap<String, String>();
-        
+        private boolean noTargetNamespace;
         public GrammarInfo() {
             
         }
         
-        public GrammarInfo(Map<String, String> nsMap, Map<String, String> elementTypeMap) {
+        public GrammarInfo(Map<String, String> nsMap, 
+                           Map<String, String> elementTypeMap,
+                           boolean noTargetNamespace) {
             this.nsMap = nsMap;
-            this.elementTypeMap = elementTypeMap; 
+            this.elementTypeMap = elementTypeMap;
+            this.noTargetNamespace = noTargetNamespace;
         }
 
         public Map<String, String> getNsMap() {
@@ -1644,6 +1655,10 @@ public class SourceGenerator {
         
         public Map<String, String> getElementTypeMap() {
             return elementTypeMap;
+        }
+        
+        public boolean isSchemaWithoutTargetNamespace() {
+            return noTargetNamespace;
         }
     }
 
