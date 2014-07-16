@@ -75,7 +75,6 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
         if (aim != null && enableStax) {
             super.handleMessage(msg);
-            msg.getInterceptorChain().add(new PolicyStaxActionInInterceptor());
         }
     }
     
@@ -422,7 +421,9 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         if (attachments != null && !attachments.isEmpty()) {
             attachmentCount = attachments.size();
         }
-        return new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg), actor, attachmentCount);
+        return new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg), 
+                                  actor, attachmentCount,
+                                  new WSS4JPolicyAsserter(msg.get(AssertionInfoMap.class)));
     }
     
 }

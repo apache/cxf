@@ -49,7 +49,6 @@ import org.apache.cxf.ws.security.wss4j.KerberosTokenInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
-import org.apache.cxf.ws.security.wss4j.PolicyStaxActionInInterceptor;
 import org.apache.cxf.ws.security.wss4j.StaxSecurityContextInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
@@ -242,7 +241,6 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         
         public KerberosTokenStaxInInterceptor() {
             super(Phase.PRE_PROTOCOL);
-            addAfter(PolicyStaxActionInInterceptor.class.getName());
             getBefore().add(StaxSecurityContextInInterceptor.class.getName());
         }
 
