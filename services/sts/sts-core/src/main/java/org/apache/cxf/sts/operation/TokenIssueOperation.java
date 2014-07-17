@@ -149,46 +149,15 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             // Validate OnBehalfOf token if present
             if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
                 ReceivedToken validateTarget = providerParameters.getTokenRequirements().getOnBehalfOf();
-                TokenValidatorResponse tokenResponse = validateReceivedToken(
-                        context, realm, tokenRequirements, validateTarget);
-    
-                if (tokenResponse == null) {
-                    LOG.fine("No Token Validator has been found that can handle this token");
-                } else if (validateTarget.getState().equals(STATE.INVALID)) {
-                    throw new STSException("Incoming token is invalid", STSException.REQUEST_FAILED);
-                } else if (validateTarget.getState().equals(STATE.VALID)) {
-                    processValidToken(providerParameters, validateTarget, tokenResponse); 
-                } else {
-                    //[TODO] Add plugin for validation out-of-band
-                    // Example:
-                    // If the requestor is in the possession of a certificate (mutual ssl handshake)
-                    // the STS trusts the token sent in OnBehalfOf element
-                }
-                
-                Principal tokenPrincipal = null;
-                Set<Principal> tokenRoles = null;
-                
-                if (tokenResponse != null) {
-                    Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
-                    if (additionalProperties != null) {
-                        providerParameters.setAdditionalProperties(additionalProperties);
-                    }
-                    tokenPrincipal = tokenResponse.getPrincipal();
-                    tokenRoles = tokenResponse.getRoles();
-                }
-                
-                // See whether OnBehalfOf is allowed or not
-                performDelegationHandling(requestParser, context,
-                                    providerParameters.getTokenRequirements().getOnBehalfOf(),
-                                    tokenPrincipal, tokenRoles);
+                handleDelegationToken(validateTarget, providerParameters, context, 
+                                      realm, tokenRequirements, requestParser);
             }
             
             // See whether ActAs is allowed or not
-            // TODO Validate ActAs
             if (providerParameters.getTokenRequirements().getActAs() != null) {
-                performDelegationHandling(requestParser, context,
-                                    providerParameters.getTokenRequirements().getActAs(),
-                                    null, null);
+                ReceivedToken validateTarget = providerParameters.getTokenRequirements().getActAs();
+                handleDelegationToken(validateTarget, providerParameters, context, 
+                                      realm, tokenRequirements, requestParser);
             }
     
             // create token
@@ -243,6 +212,46 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             publishEvent(event);
             throw ex;
         }
+    }
+    
+    private void handleDelegationToken(
+        ReceivedToken validateTarget,
+        TokenProviderParameters providerParameters,
+        WebServiceContext context,
+        String realm,
+        TokenRequirements tokenRequirements,
+        RequestParser requestParser
+    ) {
+        TokenValidatorResponse tokenResponse = validateReceivedToken(
+                context, realm, tokenRequirements, validateTarget);
+
+        if (tokenResponse == null) {
+            LOG.fine("No Token Validator has been found that can handle this token");
+        } else if (validateTarget.getState().equals(STATE.INVALID)) {
+            throw new STSException("Incoming token is invalid", STSException.REQUEST_FAILED);
+        } else if (validateTarget.getState().equals(STATE.VALID)) {
+            processValidToken(providerParameters, validateTarget, tokenResponse); 
+        } else {
+            //[TODO] Add plugin for validation out-of-band
+            // Example:
+            // If the requestor is in the possession of a certificate (mutual ssl handshake)
+            // the STS trusts the token sent in OnBehalfOf element
+        }
+        
+        Principal tokenPrincipal = null;
+        Set<Principal> tokenRoles = null;
+        
+        if (tokenResponse != null) {
+            Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
+            if (additionalProperties != null) {
+                providerParameters.setAdditionalProperties(additionalProperties);
+            }
+            tokenPrincipal = tokenResponse.getPrincipal();
+            tokenRoles = tokenResponse.getRoles();
+        }
+        
+        // See whether OnBehalfOf/ActAs is allowed or not
+        performDelegationHandling(requestParser, context, validateTarget, tokenPrincipal, tokenRoles);
     }
 
     private RequestSecurityTokenResponseType createResponse(
