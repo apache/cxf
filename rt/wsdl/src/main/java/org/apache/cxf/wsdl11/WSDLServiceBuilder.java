@@ -792,32 +792,34 @@ public class WSDLServiceBuilder {
 
     private static boolean isWrappableSequence(XmlSchemaComplexType type, String namespaceURI,
                                                MessageInfo wrapper, boolean allowRefs) {
-        if (type.getParticle() instanceof XmlSchemaSequence) {
-            XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
-            return buildMessageParts(seq, namespaceURI, wrapper, allowRefs);
-        } else if (type.getParticle() == null) {
-            if (type.getContentModel() == null) {
+        if (!hasAttributes(type)) {
+            if (type.getParticle() instanceof XmlSchemaSequence) {
+                XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
+                return buildMessageParts(seq, namespaceURI, wrapper, allowRefs);
+            } else if (type.getParticle() == null) {
+                if (type.getContentModel() == null) {
+                    return true;
+                }
+                if (type.getContentModel().getContent() instanceof XmlSchemaComplexContentExtension) {
+                    XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)type
+                        .getContentModel().getContent();
+                    QName baseTypeName = extension.getBaseTypeName();
+                    ServiceInfo serviceInfo = wrapper.getOperation().getInterface().getService();
+                    XmlSchemaType schemaType = serviceInfo.getXmlSchemaCollection().getTypeByQName(baseTypeName);
+                    if (!(schemaType instanceof XmlSchemaComplexType)
+                        || !isWrappableSequence((XmlSchemaComplexType)schemaType, namespaceURI, wrapper,
+                                                allowRefs)) {
+                        return false;
+                    }
+                                 
+                    if (extension.getParticle() instanceof XmlSchemaSequence) {
+                        XmlSchemaSequence seq = (XmlSchemaSequence)extension.getParticle();
+                        return buildMessageParts(seq, namespaceURI, wrapper, allowRefs);
+                    }  
+                    
+                }
                 return true;
             }
-            if (type.getContentModel().getContent() instanceof XmlSchemaComplexContentExtension) {
-                XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)type
-                    .getContentModel().getContent();
-                QName baseTypeName = extension.getBaseTypeName();
-                ServiceInfo serviceInfo = wrapper.getOperation().getInterface().getService();
-                XmlSchemaType schemaType = serviceInfo.getXmlSchemaCollection().getTypeByQName(baseTypeName);
-                if (!(schemaType instanceof XmlSchemaComplexType)
-                    || !isWrappableSequence((XmlSchemaComplexType)schemaType, namespaceURI, wrapper,
-                                            allowRefs)) {
-                    return false;
-                }
-                             
-                if (extension.getParticle() instanceof XmlSchemaSequence) {
-                    XmlSchemaSequence seq = (XmlSchemaSequence)extension.getParticle();
-                    return buildMessageParts(seq, namespaceURI, wrapper, allowRefs);
-                }  
-                
-            }
-            return true;
         }
         return false;
     }
