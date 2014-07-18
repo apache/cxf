@@ -54,7 +54,7 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
         }
-        webappcontext.setContextPath("/");
+        webappcontext.setContextPath("/webapp");
 
         webappcontext.setWar(contextPath);
         HandlerCollection handlers = new HandlerCollection();
@@ -66,7 +66,7 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
     
     @Test
     public void testGetBookHTTP() throws Exception {
-        String address = "http://localhost:" + getPort() + "/http/web/bookstore/books/1";
+        String address = "http://localhost:" + getPort() + getContext() + "/http/web/bookstore/books/1";
         WebClient wc = WebClient.create(address);
         wc.accept("application/xml");
         Book book = wc.get(Book.class);
@@ -75,5 +75,9 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
     
     protected String getPort() {
         return PORT;
+    }
+    @Override
+    protected String getContext() {
+        return "/webapp";
     }
 }
