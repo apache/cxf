@@ -86,18 +86,23 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
         } catch (UnsupportedEncodingException e) {
             // will not happen
         }
-        return onMessage(webSocket, bdata, 0, bdata.length);
+        return invokeService(webSocket, new ByteArrayInputStream(bdata, 0, bdata.length));
     }
 
     /** {@inheritDoc}*/
     @Override
     public List<AtmosphereRequest> onMessage(WebSocket webSocket, byte[] data, int offset, int length) {
-        return invokeService(webSocket, new ByteArrayInputStream(data, offset, length));
+        final byte[] safedata = new byte[length];
+        System.arraycopy(data, offset, safedata, 0, length);
+        return invokeService(webSocket, new ByteArrayInputStream(safedata, 0, safedata.length));
     }
     
     protected List<AtmosphereRequest> invokeService(final WebSocket webSocket,  final InputStream stream) {
         LOG.info("invokeService(WebSocket, InputStream)");
         // invoke the service directly as onMessage is synchronously blocked (in jetty)
+        // make sure the byte array passed to this method is immutable, as the websocket framework
+        // may corrupt the byte array after this method is returned (i.e., before the data is returned in
+        // the executor's thread.
         destination.getExecutor().execute(new Runnable() {
             @Override
             public void run() {

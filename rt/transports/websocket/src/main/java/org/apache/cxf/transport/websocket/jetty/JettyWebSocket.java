@@ -99,11 +99,16 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         if (LOG.isLoggable(Level.INFO)) {
             LOG.log(Level.INFO, "onMessage({0}, {1}, {2})", new Object[]{data, offset, length});
         }
-        invokeService(data, offset, length);
+        final byte[] safedata = new byte[length];
+        System.arraycopy(data, offset, safedata, 0, length);
+        invokeService(safedata, 0, safedata.length);
     }
     
     private void invokeService(final byte[] data, final int offset, final int length) {
         // invoke the service asynchronously as the jetty websocket's onMessage is synchronously blocked
+        // make sure the byte array passed to this method is immutable, as the websocket framework
+        // may corrupt the byte array after this method is returned (i.e., before the data is returned in
+        // the executor's thread.
         manager.getExecutor().execute(new Runnable() {
             @Override
             public void run() {
