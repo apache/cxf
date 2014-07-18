@@ -48,7 +48,7 @@ public class DefaultParamConverterProvider implements ParamConverterProvider {
         
         @Override
         public String toString(final Date value) {
-            return DateTools.dateToString(value, Resolution.MILLISECOND);
+            return value != null ? DateTools.dateToString(value, Resolution.MILLISECOND) : null;
         }
     }
     

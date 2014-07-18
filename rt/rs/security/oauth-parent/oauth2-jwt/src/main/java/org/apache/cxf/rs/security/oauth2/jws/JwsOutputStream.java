@@ -27,8 +27,8 @@ import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 public class JwsOutputStream extends FilterOutputStream {
     private boolean flushed;
-    private JwsSignatureProviderWorker signature;
-    public JwsOutputStream(OutputStream out, JwsSignatureProviderWorker signature) {
+    private JwsSignature signature;
+    public JwsOutputStream(OutputStream out, JwsSignature signature) {
         super(out);
         this.signature = signature;
     }

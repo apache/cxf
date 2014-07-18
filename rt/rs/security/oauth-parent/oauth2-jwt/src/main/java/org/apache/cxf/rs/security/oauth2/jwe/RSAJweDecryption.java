@@ -21,15 +21,15 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 import java.security.interfaces.RSAPrivateKey;
 
 
-public class RSAJweDecryptor extends WrappedKeyJweDecryptor {
+public class RSAJweDecryption extends WrappedKeyJweDecryption {
     
-    public RSAJweDecryptor(RSAPrivateKey privateKey) {    
+    public RSAJweDecryption(RSAPrivateKey privateKey) {    
         this(privateKey, true);
     }
-    public RSAJweDecryptor(RSAPrivateKey privateKey, boolean unwrap) {    
+    public RSAJweDecryption(RSAPrivateKey privateKey, boolean unwrap) {    
         this(privateKey, unwrap, null);
     }
-    public RSAJweDecryptor(RSAPrivateKey privateKey, boolean unwrap,
+    public RSAJweDecryption(RSAPrivateKey privateKey, boolean unwrap,
                            JweCryptoProperties props) {    
         super(privateKey, unwrap, props);
     }

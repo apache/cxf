@@ -31,13 +31,18 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jws.JwsOutputStream;
+import org.apache.cxf.rs.security.oauth2.jws.JwsSignature;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlOutputStream;
+import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
     private boolean contentTypeRequired = true;
     private boolean useJwsOutputStream;
+    private JwtHeadersWriter writer = new JwtTokenReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         OutputStream actualOs = ctx.getOutputStream();
@@ -49,7 +54,16 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             }
         }
         if (useJwsOutputStream) {
-            JwsOutputStream jwsStream = getInitializedSigProvider().createJwsStream(actualOs, ctString);
+            JwtHeaders headers = new JwtHeaders();
+            JwsSignature jwsSignature = getInitializedSigProvider().createJwsSignature(headers);
+            if (ctString != null) {
+                headers.setContentType(ctString);
+            }
+            JwsOutputStream jwsStream = new JwsOutputStream(actualOs, jwsSignature);
+            byte[] headerBytes = writer.headersToJson(headers).getBytes("UTF-8");
+            Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
+            jwsStream.write(new byte[]{'.'});
+                        
             Base64UrlOutputStream base64Stream = new Base64UrlOutputStream(jwsStream);
             ctx.setOutputStream(base64Stream);
             ctx.proceed();
@@ -74,6 +88,9 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     
     public void setUseJwsOutputStream(boolean useJwsOutputStream) {
         this.useJwsOutputStream = useJwsOutputStream;
+    }
+    public void setWriter(JwtHeadersWriter writer) {
+        this.writer = writer;
     }
         
 }

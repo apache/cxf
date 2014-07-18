@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.ProcessingException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -158,7 +157,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             return Collections.emptyMap();
         }
         if (!str.startsWith("{") || !str.endsWith("}")) {
-            throw new ProcessingException("JSON Sequence is broken");
+            throw new IOException("JSON Sequence is broken");
         }
         Map<String, String> map = new LinkedHashMap<String, String>();
         

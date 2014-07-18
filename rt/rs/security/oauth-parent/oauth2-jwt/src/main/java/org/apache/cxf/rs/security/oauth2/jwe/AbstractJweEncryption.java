@@ -18,11 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.DeflaterOutputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -34,7 +31,7 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
-public abstract class AbstractJweEncryptor implements JweEncryptor {
+public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected static final int DEFAULT_IV_SIZE = 96;
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private JweHeaders headers;
@@ -44,12 +41,12 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
     private AtomicInteger providedIvUsageCount;
     private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
     
-    protected AbstractJweEncryptor(SecretKey cek, byte[] iv) {
+    protected AbstractJweEncryption(SecretKey cek, byte[] iv) {
         this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
                                                 cek.getEncoded().length * 8)),
                                                 cek.getEncoded(), iv);
     }
-    protected AbstractJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv) {
+    protected AbstractJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
         this.headers = headers;
         this.cek = cek;
         this.iv = iv;
@@ -57,14 +54,14 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
             providedIvUsageCount = new AtomicInteger();
         }
     }
-    protected AbstractJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
+    protected AbstractJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
         this(headers, cek, iv);
         this.authTagLen = authTagLen;
     }
-    protected AbstractJweEncryptor(JweHeaders headers) {
+    protected AbstractJweEncryption(JweHeaders headers) {
         this.headers = headers;
     }
-    protected AbstractJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen, 
+    protected AbstractJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen, 
                                    JwtHeadersWriter writer) {
         this(headers, cek, iv, authTagLen);
         if (writer != null) {
@@ -106,7 +103,7 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         return headers;
     }
     public String encrypt(byte[] content, String contentType) {
-        JweEncryptorInternalState state = getInternalState(contentType);
+        JweEncryptionInternal state = getInternalState(contentType);
         
         byte[] cipherText = CryptoUtils.encryptBytes(
             content, 
@@ -124,27 +121,15 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
     }
     
     @Override
-    public OutputStream createJweStream(OutputStream os, String contentType) {
-        JweEncryptorInternalState state = getInternalState(contentType);
+    public JweEncryption createJweEncryption(String contentType) {
+        JweEncryptionInternal state = getInternalState(contentType);
         Cipher c = CryptoUtils.initCipher(state.secretKey, state.keyProps, 
                                           Cipher.ENCRYPT_MODE);
-        try {
-            JweCompactProducer.startJweContent(os,
-                                               state.theHeaders, 
-                                               writer, 
-                                               state.jweContentEncryptionKey, 
-                                               state.theIv);
-        } catch (IOException ex) {
-            throw new SecurityException(ex);
-        }
-        OutputStream jweStream = new JweOutputStream(os, c, getAuthTagLen());
-        if (state.keyProps.isCompressionSupported()) {
-            jweStream = new DeflaterOutputStream(jweStream);
-        }
-        return jweStream;
+        return new JweEncryption(c, getAuthTagLen(), state.theHeaders, state.jweContentEncryptionKey, 
+                                state.theIv, state.keyProps.isCompressionSupported());
     }
     
-    private JweEncryptorInternalState getInternalState(String contentType) {
+    private JweEncryptionInternal getInternalState(String contentType) {
         JweHeaders theHeaders = headers;
         if (contentType != null) {
             theHeaders = new JweHeaders(theHeaders.asMap());
@@ -162,7 +147,7 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
         AlgorithmParameterSpec specParams = getContentEncryptionCipherSpec(theIv);
         keyProps.setAlgoSpec(specParams);
         byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey(theCek);
-        JweEncryptorInternalState state = new JweEncryptorInternalState();
+        JweEncryptionInternal state = new JweEncryptionInternal();
         state.theHeaders = theHeaders;
         state.jweContentEncryptionKey = jweContentEncryptionKey;
         state.keyProps = keyProps;
@@ -174,7 +159,7 @@ public abstract class AbstractJweEncryptor implements JweEncryptor {
     private boolean compressionRequired(JweHeaders theHeaders) {
         return JwtConstants.DEFLATE_ZIP_ALGORITHM.equals(theHeaders.getZipAlgorithm());
     }
-    private static class JweEncryptorInternalState {
+    private static class JweEncryptionInternal {
         JweHeaders theHeaders;
         byte[] jweContentEncryptionKey;
         byte[] theIv;

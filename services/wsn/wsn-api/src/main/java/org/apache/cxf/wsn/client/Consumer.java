@@ -33,7 +33,11 @@ import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.Notify;
 import org.oasis_open.docs.wsn.bw_2.NotificationConsumer;
 
-@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.NotificationConsumer")
+@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.NotificationConsumer",
+    targetNamespace = "http://cxf.apache.org/wsn/jaxws",
+    serviceName = "NotificationConsumerService",
+    portName = "NotificationConsumerPort"
+)
 public class Consumer implements NotificationConsumer, Referencable {
 
     public interface Callback {

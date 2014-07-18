@@ -25,21 +25,21 @@ import java.security.PrivateKey;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.jwe.JweCryptoProperties;
+import org.apache.cxf.rs.security.oauth2.jwe.JweDecryption;
 import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptionOutput;
-import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptor;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
-import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweDecryptor;
+import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweDecryption;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJweDecryptingFilter {
     private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
     private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
         
-    private JweDecryptor decryptor;
+    private JweDecryption decryption;
     private JweCryptoProperties cryptoProperties;
     private String defaultMediaType;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
-        JweDecryptor theDecryptor = getInitializedDecryptor();
+        JweDecryption theDecryptor = getInitializedDecryption();
         JweDecryptionOutput out = theDecryptor.decrypt(new String(IOUtils.readBytesFromStream(is), "UTF-8"));
         validateHeaders(out.getHeaders());
         return out;
@@ -48,19 +48,19 @@ public class AbstractJweDecryptingFilter {
     protected void validateHeaders(JweHeaders headers) {
         // complete
     }
-    public void setDecryptor(JweDecryptor decryptor) {
-        this.decryptor = decryptor;
+    public void setDecryption(JweDecryption decryptor) {
+        this.decryption = decryptor;
     }
-    protected JweDecryptor getInitializedDecryptor() {
-        if (decryptor != null) {
-            return decryptor;    
+    protected JweDecryption getInitializedDecryption() {
+        if (decryption != null) {
+            return decryption;    
         } 
         try {
             PrivateKey pk = CryptoUtils.loadPrivateKey(JAXRSUtils.getCurrentMessage(), 
                                                        RSSEC_ENCRYPTION_IN_PROPS, 
                                                        RSSEC_ENCRYPTION_PROPS,
                                                        CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER);
-            return new WrappedKeyJweDecryptor(pk, cryptoProperties);
+            return new WrappedKeyJweDecryption(pk, cryptoProperties);
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {

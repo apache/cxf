@@ -16,14 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.jwe;
+package org.apache.cxf.rs.security.oauth2.jws;
 
-import java.security.spec.AlgorithmParameterSpec;
 
-public interface ContentEncryptionProvider {
-    byte[] getContentEncryptionKey(JweHeaders headers, byte[] encryptedKey);
-    
-    AlgorithmParameterSpec getContentEncryptionCipherSpec(JweHeaders headers, 
-                                                          int authTagLength,
-                                                          byte[] initVector);
+public interface JwsSignature {
+    void update(byte[] src, int off, int len);
+    byte[] sign();
 }

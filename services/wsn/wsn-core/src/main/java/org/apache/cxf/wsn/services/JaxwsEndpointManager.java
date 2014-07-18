@@ -18,8 +18,16 @@
  */
 package org.apache.cxf.wsn.services;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.spi.Provider;
@@ -40,7 +48,9 @@ public class JaxwsEndpointManager implements EndpointManager {
     }
     
     
-    public Endpoint register(String address, Object service) throws EndpointRegistrationException {
+    public Endpoint register(String address, Object service, URL wsdlLocation)
+        throws EndpointRegistrationException {
+        
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             if (WSNHelper.getInstance().setClassLoader()) {
@@ -51,6 +61,20 @@ public class JaxwsEndpointManager implements EndpointManager {
                 bindingId = SOAPBinding.SOAP12HTTP_BINDING;
             }
             Endpoint endpoint = Endpoint.create(bindingId, service);
+            if (wsdlLocation != null) {
+                try {
+                    if (endpoint.getProperties() == null) {
+                        endpoint.setProperties(new HashMap<String, Object>());
+                    }
+                    endpoint.getProperties().put("javax.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
+                    List<Source> mt = new ArrayList<Source>();
+                    StreamSource src = new StreamSource(wsdlLocation.openStream(), wsdlLocation.toExternalForm());
+                    mt.add(src);
+                    endpoint.setMetadata(mt);
+                } catch (IOException e) {
+                    //ignore, no wsdl really needed
+                }
+            }
             endpoint.publish(address);
             
             try {

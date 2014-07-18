@@ -844,7 +844,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         Response r = wc.post(is);
         assertEquals(400, r.getStatus());
         String content = IOUtils.readStringFromStream((InputStream)r.getEntity());
-        assertTrue(content.contains("Invalid content was found starting with element 'id'"));
+        assertTrue(content, content.contains("Invalid content was found starting with element"));
     }
     
     private void doPost(String endpointAddress, int expectedStatus, String contentType,

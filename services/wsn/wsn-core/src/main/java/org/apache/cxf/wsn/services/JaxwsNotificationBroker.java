@@ -28,8 +28,8 @@ import org.apache.cxf.wsn.jms.JmsPublisher;
 import org.apache.cxf.wsn.jms.JmsSubscription;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.NotificationBroker",
-            targetNamespace = "http://docs.oasis-open.org/wsn/brw-2",
-            serviceName = "NotificationBroker",
+            targetNamespace = "http://cxf.apache.org/wsn/jaxws",
+            serviceName = "NotificationBrokerService",
             portName = "NotificationBrokerPort")
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class JaxwsNotificationBroker extends JmsNotificationBroker 

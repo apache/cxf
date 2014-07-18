@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.PublicKey;
 import java.util.Properties;
+import java.util.zip.DeflaterOutputStream;
 
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
@@ -37,10 +38,15 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptor;
+import org.apache.cxf.rs.security.oauth2.jwe.JweCompactProducer;
+import org.apache.cxf.rs.security.oauth2.jwe.JweEncryption;
+import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
-import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryptor;
+import org.apache.cxf.rs.security.oauth2.jwe.JweOutputStream;
+import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryption;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 @Priority(Priorities.JWE_WRITE_PRIORITY)
@@ -49,14 +55,15 @@ public class JweWriterInterceptor implements WriterInterceptor {
     private static final String JSON_ENCRYPTION_PROPS = "rs.security.encryption.properties";
     private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
-    private JweEncryptor encryptor;
+    private JweEncryptionProvider encryptionProvider;
     private boolean contentTypeRequired = true;
     private boolean useJweOutputStream;
+    private JwtHeadersWriter writer = new JwtTokenReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         OutputStream actualOs = ctx.getOutputStream();
         
-        JweEncryptor theEncryptor = getInitializedEncryptor();
+        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
         
         String ctString = null;
         if (contentTypeRequired) {
@@ -68,7 +75,22 @@ public class JweWriterInterceptor implements WriterInterceptor {
         
         
         if (useJweOutputStream) {
-            OutputStream jweStream = theEncryptor.createJweStream(actualOs, ctString);
+            JweEncryption encryption = theEncryptionProvider.createJweEncryption(ctString);
+            try {
+                JweCompactProducer.startJweContent(actualOs,
+                                                   encryption.getHeaders(), 
+                                                   writer, 
+                                                   encryption.getContentEncryptionKey(), 
+                                                   encryption.getIv());
+            } catch (IOException ex) {
+                throw new SecurityException(ex);
+            }
+            OutputStream jweStream = new JweOutputStream(actualOs, encryption.getCipher(), 
+                                                         encryption.getAuthTagLen());
+            if (encryption.isCompressionSupported()) {
+                jweStream = new DeflaterOutputStream(jweStream);
+            }
+            
             ctx.setOutputStream(jweStream);
             ctx.proceed();
             jweStream.flush();
@@ -76,15 +98,15 @@ public class JweWriterInterceptor implements WriterInterceptor {
             CachedOutputStream cos = new CachedOutputStream(); 
             ctx.setOutputStream(cos);
             ctx.proceed();
-            String jweContent = theEncryptor.encrypt(cos.getBytes(), ctString);
+            String jweContent = theEncryptionProvider.encrypt(cos.getBytes(), ctString);
             IOUtils.copy(new ByteArrayInputStream(jweContent.getBytes("UTF-8")), actualOs);
             actualOs.flush();
         }
     }
     
-    protected JweEncryptor getInitializedEncryptor() {
-        if (encryptor != null) {
-            return encryptor;    
+    protected JweEncryptionProvider getInitializedEncryptionProvider() {
+        if (encryptionProvider != null) {
+            return encryptionProvider;    
         } 
         Message m = JAXRSUtils.getCurrentMessage();
         String propLoc = 
@@ -103,7 +125,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 headers.setZipAlgorithm(compression);
             }
             
-            return new WrappedKeyJweEncryptor(headers, pk);
+            return new WrappedKeyJweEncryption(headers, pk);
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -113,6 +135,14 @@ public class JweWriterInterceptor implements WriterInterceptor {
 
     public void setUseJweOutputStream(boolean useJweOutputStream) {
         this.useJweOutputStream = useJweOutputStream;
+    }
+
+    public void setWriter(JwtHeadersWriter writer) {
+        this.writer = writer;
+    }
+
+    public void setEncryptionProvider(JweEncryptionProvider encryptionProvider) {
+        this.encryptionProvider = encryptionProvider;
     }
     
 }

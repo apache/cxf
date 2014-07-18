@@ -18,22 +18,9 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import javax.crypto.SecretKey;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 
-public class DirectKeyJweEncryptor extends AbstractJweEncryptor {
-    public DirectKeyJweEncryptor(SecretKey cek, byte[] iv) {
-        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
-                                                cek.getEncoded().length * 8)), cek.getEncoded(), iv);
-    }
-    public DirectKeyJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv) {
-        super(headers, cek, iv);
-    }
-    public DirectKeyJweEncryptor(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
-        super(headers, cek, iv, authTagLen);
-    }
-    protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
-        return new byte[0];
-    }
+public interface JweEncryptionProvider {
+    String encrypt(byte[] jweContent, String contentType);
+    JweEncryption createJweEncryption(String contentType);
 }

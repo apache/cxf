@@ -35,6 +35,7 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -42,6 +43,7 @@ import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.lucene.search.ScoreDoc;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -57,6 +59,7 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
             final Map< String, Object > properties = new HashMap< String, Object >();        
             properties.put("search.query.parameter.name", "$filter");
             properties.put("search.parser", new FiqlParser< SearchBean >(SearchBean.class));
+            properties.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy/MM/dd");
             
             sf.setResourceClasses(BookCatalog.class);
             sf.setResourceProvider(BookCatalog.class, new SingletonResourceProvider(new BookCatalog()));
@@ -90,6 +93,11 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
         createStaticBus();
     }
     
+    @Before
+    public void setUp() {
+        createWebClient("/catalog").delete();        
+    }
+    
     @Test
     public void testUploadIndexAndSearchPdfFile() {
         final WebClient wc = createWebClient("/catalog").type(MediaType.MULTIPART_FORM_DATA);
@@ -99,7 +107,21 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
             getClass().getResourceAsStream("/files/testPDF.pdf"), disposition);
         wc.post(new MultipartBody(attachment));
         
-        final Collection<ScoreDoc> hits = search("modified=le=2007-09-16");        
+        final Collection<ScoreDoc> hits = search("modified=le=2007-09-16T09:00:00");        
+        assertEquals(hits.size(), 1);
+    }
+    
+    @Test
+    public void testUploadIndexAndSearchPdfFileUsingUserDefinedDatePattern() {
+        final WebClient wc = createWebClient("/catalog").type(MediaType.MULTIPART_FORM_DATA);
+        
+        final ContentDisposition disposition = new ContentDisposition("attachment;filename=testPDF.pdf");
+        final Attachment attachment = new Attachment("root", 
+            getClass().getResourceAsStream("/files/testPDF.pdf"), disposition);
+        wc.post(new MultipartBody(attachment));
+        
+        // Use user-defined date pattern
+        final Collection<ScoreDoc> hits = search("modified=le=2007/09/16");        
         assertEquals(hits.size(), 1);
     }
 

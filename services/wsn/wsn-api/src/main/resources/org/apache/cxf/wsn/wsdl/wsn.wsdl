@@ -33,7 +33,7 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="NotificationConsumerService">
-        <wsdl:port name="Soap" binding="tns:NotificationConsumerSoap">
+        <wsdl:port name="NotificationConsumerPort" binding="tns:NotificationConsumerSoap">
             <soap:address location="http://cxf.apache.org/wsnotification"/>
         </wsdl:port>
     </wsdl:service>
@@ -99,7 +99,7 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="NotificationProducerService">
-        <wsdl:port name="Soap" binding="tns:NotificationProducerSoap">
+        <wsdl:port name="NotificationProducerPort" binding="tns:NotificationProducerSoap">
             <soap:address location="http://cxf.apache.org/wsnotification"/>
         </wsdl:port>
     </wsdl:service>
@@ -214,7 +214,7 @@
                  -->
     </wsdl:binding>
     <wsdl:service name="NotificationBrokerService">
-        <wsdl:port name="Soap" binding="tns:NotificationBrokerSoap">
+        <wsdl:port name="NotificationBrokerPort" binding="tns:NotificationBrokerSoap">
             <soap:address location="http://cxf.apache.org/wsnotification"/>
         </wsdl:port>
     </wsdl:service>
@@ -250,7 +250,7 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="SubscriptionManagerService">
-        <wsdl:port name="Soap" binding="tns:SubscriptionManagerSoap">
+        <wsdl:port name="SubscriptionManagerPort" binding="tns:SubscriptionManagerSoap">
             <soap:address location="http://cxf.apache.org/wsnotification"/>
         </wsdl:port>
     </wsdl:service>
@@ -315,7 +315,7 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="PausableSubscriptionManagerService">
-        <wsdl:port name="Soap" binding="tns:PausableSubscriptionManagerSoap">
+        <wsdl:port name="PausableSubscriptionManagerPort" binding="tns:PausableSubscriptionManagerSoap">
             <soap:address location="http://cxf.apache.org/wsnotification"/>
         </wsdl:port>
     </wsdl:service>
@@ -337,7 +337,7 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="PublisherRegistrationManagerService">
-        <wsdl:port name="Soap" binding="tns:PublisherRegistrationManagerSoap">
+        <wsdl:port name="PublisherRegistrationManagerPort" binding="tns:PublisherRegistrationManagerSoap">
             <soap:address location="http://cxf.apache.org/wsnotification"/>
         </wsdl:port>
     </wsdl:service>
@@ -356,7 +356,7 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="CreatePullPointService">
-        <wsdl:port name="Soap" binding="tns:CreatePullPointSoap">
+        <wsdl:port name="CreatePullPointPort" binding="tns:CreatePullPointSoap">
             <soap:address location="http://cxf.apache.org/wsnotification"/>
         </wsdl:port>
     </wsdl:service>
@@ -391,7 +391,7 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="PullPointService">
-        <wsdl:port name="Soap" binding="tns:PullPointSoap">
+        <wsdl:port name="PullPointPort" binding="tns:PullPointSoap">
             <soap:address location="http://cxf.apache.org/wsnotification"/>
         </wsdl:port>
     </wsdl:service>
@@ -416,7 +416,7 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="GetResourcePropertyService">
-        <wsdl:port name="Soap" binding="tns:GetResourcePropertySoap">
+        <wsdl:port name="GetResourcePropertyPort" binding="tns:GetResourcePropertySoap">
             <soap:address location="http://cxf.apache.org/wsnotification"/>
         </wsdl:port>
     </wsdl:service>

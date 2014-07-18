@@ -26,6 +26,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
@@ -76,7 +77,8 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
                        HttpServletResponse resp) throws IOException {
         if (Utils.webSocketEnabled(req)) {
             try {
-                framework.doCometSupport(AtmosphereRequest.wrap(req), AtmosphereResponse.wrap(resp));
+                framework.doCometSupport(AtmosphereRequest.wrap(new HttpServletRequestFilter(req)), 
+                                         AtmosphereResponse.wrap(resp));
             } catch (ServletException e) {
                 throw new IOException(e);
             }
@@ -93,5 +95,21 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
 
     Executor getExecutor() {
         return executor;
+    }
+    
+    private static class HttpServletRequestFilter extends HttpServletRequestWrapper {
+        private static final String TRANSPORT_ADDRESS 
+            = "org.apache.cxf.transport.endpoint.address";
+        private String transportAddress; 
+        public HttpServletRequestFilter(HttpServletRequest request) {
+            super(request);
+            transportAddress = (String)request.getAttribute(TRANSPORT_ADDRESS);
+        }
+        
+        @Override
+        public Object getAttribute(String name) {
+            return TRANSPORT_ADDRESS.equals(name) ? transportAddress : super.getAttribute(name);
+        }
+        
     }
 }

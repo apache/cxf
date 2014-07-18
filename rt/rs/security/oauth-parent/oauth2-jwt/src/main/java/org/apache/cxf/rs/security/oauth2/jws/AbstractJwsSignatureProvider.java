@@ -18,12 +18,9 @@
  */
 package org.apache.cxf.rs.security.oauth2.jws;
 
-import java.io.OutputStream;
 import java.util.Set;
 
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
-import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
-import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
     private Set<String> supportedAlgorithms;
@@ -32,8 +29,8 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     protected AbstractJwsSignatureProvider(Set<String> supportedAlgorithms) {
         this.supportedAlgorithms = supportedAlgorithms;
     }
-    @Override
-    public JwtHeaders prepareHeaders(JwtHeaders headers) {
+    
+    protected JwtHeaders prepareHeaders(JwtHeaders headers) {
         if (headers == null) {
             headers = new JwtHeaders();
         }
@@ -47,24 +44,11 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     }
     
     @Override
-    public JwsOutputStream createJwsStream(OutputStream os, String contentType) {
-        JwtHeaders headers = prepareHeaders(null);
-        if (contentType != null) {
-            headers.setContentType(contentType);
-        }
-        JwsSignatureProviderWorker worker = createJwsSignatureWorker(headers);
-        JwsOutputStream jwsStream = new JwsOutputStream(os, worker);
-        try {
-            byte[] headerBytes = new JwtTokenReaderWriter().headersToJson(headers).getBytes("UTF-8");
-            Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
-            jwsStream.write(new byte[]{'.'});
-        } catch (Exception ex) {
-            throw new SecurityException(ex);
-        }
-        return jwsStream;
+    public JwsSignature createJwsSignature(JwtHeaders headers) {
+        return doCreateJwsSignature(prepareHeaders(headers));
     }
     
-    protected abstract JwsSignatureProviderWorker createJwsSignatureWorker(JwtHeaders headers);
+    protected abstract JwsSignature doCreateJwsSignature(JwtHeaders headers);
     
     public void setDefaultJwtAlgorithm(String algo) {
         this.defaultJwtAlgorithm = algo;

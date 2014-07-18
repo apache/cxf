@@ -19,10 +19,16 @@
 
 package org.apache.cxf.wsn.util;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -52,7 +58,8 @@ public class CXFWSNHelper extends WSNHelper {
             jwfb.getClientFactoryBean().setWsdlURL(WSNWSDLLocator.getWSDLUrl().toExternalForm());
             jwfb.setServiceName(new QName("http://cxf.apache.org/wsn/jaxws", 
                                           serviceInterface.getSimpleName() + "Service"));
-            jwfb.setEndpointName(new QName("http://cxf.apache.org/wsn/jaxws", "Soap"));
+            jwfb.setEndpointName(new QName("http://cxf.apache.org/wsn/jaxws", 
+                                           serviceInterface.getSimpleName() + "Port"));
             jwfb.setAddress(address);
             if (extraClasses != null && extraClasses.length > 0) {
                 Map<String, Object> props = new HashMap<String, Object>();
@@ -70,6 +77,21 @@ public class CXFWSNHelper extends WSNHelper {
             Map<String, Object> props = new HashMap<String, Object>();
             props.put("jaxb.additionalContextClasses", extraClasses);
             endpoint.setProperties(props);
+        }
+        URL wsdlLocation = WSNWSDLLocator.getWSDLUrl();
+        if (wsdlLocation != null) {
+            try {
+                if (endpoint.getProperties() == null) {
+                    endpoint.setProperties(new HashMap<String, Object>());
+                }
+                endpoint.getProperties().put("javax.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
+                List<Source> mt = new ArrayList<Source>();
+                StreamSource src = new StreamSource(wsdlLocation.openStream(), wsdlLocation.toExternalForm());
+                mt.add(src);
+                endpoint.setMetadata(mt);
+            } catch (IOException e) {
+                //ignore, no wsdl really needed
+            }
         }
         endpoint.publish(address);
         return endpoint;

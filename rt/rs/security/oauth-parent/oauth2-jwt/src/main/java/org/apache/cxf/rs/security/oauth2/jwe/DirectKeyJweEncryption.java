@@ -18,23 +18,22 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 
-public class DirectKeyJweDecryptor extends AbstractJweDecryptor {
-    private byte[] contentDecryptionKey;
-    public DirectKeyJweDecryptor(Key contentDecryptionKey) {    
-        this(contentDecryptionKey, null);
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+
+public class DirectKeyJweEncryption extends AbstractJweEncryption {
+    public DirectKeyJweEncryption(SecretKey cek, byte[] iv) {
+        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
+                                                cek.getEncoded().length * 8)), cek.getEncoded(), iv);
     }
-    public DirectKeyJweDecryptor(Key contentDecryptionKey, JweCryptoProperties props) {    
-        super(props);
-        this.contentDecryptionKey = contentDecryptionKey.getEncoded();
+    public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
+        super(headers, cek, iv);
     }
-    @Override
-    protected byte[] getContentEncryptionKey(JweCompactConsumer consumer) {
-        byte[] encryptedCEK = getEncryptedContentEncryptionKey(consumer);
-        if (encryptedCEK != null && encryptedCEK.length > 0) {
-            throw new SecurityException();
-        }
-        return contentDecryptionKey;
+    public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
+        super(headers, cek, iv, authTagLen);
+    }
+    protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
+        return new byte[0];
     }
 }

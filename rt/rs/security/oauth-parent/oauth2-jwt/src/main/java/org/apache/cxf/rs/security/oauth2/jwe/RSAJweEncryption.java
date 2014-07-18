@@ -25,36 +25,36 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 
-public class RSAJweEncryptor extends WrappedKeyJweEncryptor {
-    public RSAJweEncryptor(RSAPublicKey publicKey, String contentEncryptionAlgo) {
+public class RSAJweEncryption extends WrappedKeyJweEncryption {
+    public RSAJweEncryption(RSAPublicKey publicKey, String contentEncryptionAlgo) {
         super(new JweHeaders(Algorithm.RSA_OAEP.getJwtName(),
                              contentEncryptionAlgo), publicKey);
     }
-    public RSAJweEncryptor(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv) {
+    public RSAJweEncryption(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv) {
         this(publicKey, headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH, true);
     }
-    public RSAJweEncryptor(RSAPublicKey publicKey, SecretKey secretKey, String secretKeyJwtAlgorithm,
+    public RSAJweEncryption(RSAPublicKey publicKey, SecretKey secretKey, String secretKeyJwtAlgorithm,
                            byte[] iv) {
         this(publicKey, 
              new JweHeaders(Algorithm.RSA_OAEP.getJwtName(), secretKeyJwtAlgorithm),
              secretKey != null ? secretKey.getEncoded() : null, iv, DEFAULT_AUTH_TAG_LENGTH, true);
     }
-    public RSAJweEncryptor(RSAPublicKey publicKey, SecretKey secretKey, byte[] iv) {
+    public RSAJweEncryption(RSAPublicKey publicKey, SecretKey secretKey, byte[] iv) {
         this(publicKey, secretKey, 
              Algorithm.toJwtName(secretKey.getAlgorithm(),
                                  secretKey.getEncoded().length * 8), iv);
     }
     
-    public RSAJweEncryptor(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv, 
+    public RSAJweEncryption(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv, 
                            int authTagLen, boolean wrap) {
         this(publicKey, headers, cek, iv, authTagLen, wrap, null);
     }
     
-    public RSAJweEncryptor(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv, 
+    public RSAJweEncryption(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv, 
                               JwtHeadersWriter writer) {
         this(publicKey, headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH, true, null);
     }
-    public RSAJweEncryptor(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv, 
+    public RSAJweEncryption(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv, 
                               int authTagLen, boolean wrap, JwtHeadersWriter writer) {
         super(headers, publicKey, cek, iv, authTagLen, wrap, writer);
     }
