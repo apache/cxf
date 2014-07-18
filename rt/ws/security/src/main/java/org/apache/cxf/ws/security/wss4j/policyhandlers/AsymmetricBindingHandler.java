@@ -521,10 +521,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setKeyEncAlgo(algType.getAsymmetricKeyWrap());
                     encr.prepare(saaj.getSOAPPart(), crypto);
                     
-                    if (encr.getBSTTokenId() != null) {
-                        encr.prependBSTElementToHeader(secHeader);
-                    }
-                    
                     Element encryptedKeyElement = encr.getEncryptedKeyElement();
                     List<Element> attachments = encr.getAttachmentEncryptedDataElements();
                     //Encrypt, get hold of the ref list and add it
@@ -549,6 +545,12 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                             }
                         }
                     }
+
+                    // Put BST before EncryptedKey element
+                    if (encr.getBSTTokenId() != null) {
+                        encr.prependBSTElementToHeader(secHeader);
+                    }
+
                     return encr;
                 } catch (WSSecurityException e) {
                     LOG.log(Level.FINE, e.getMessage(), e);
