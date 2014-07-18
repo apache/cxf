@@ -48,7 +48,7 @@ public class StartBodyInterceptor extends AbstractSoapInterceptor {
     /** {@inheritDoc}*/
     public void handleMessage(SoapMessage message) throws Fault {
         if (isGET(message)) {
-            LOG.fine("ReadHeadersInterceptor skipped in HTTP GET method");
+            LOG.fine("StartBodyInterceptor skipped in HTTP GET method");
             return;
         }
         XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
