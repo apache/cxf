@@ -144,6 +144,35 @@ public final class SSLUtils {
         return keystoreManagers;
     }
 
+    public static KeyManager[] getDefaultKeyStoreManagers(Logger log) {
+        String location = getKeystore(null, log);
+        String keyStorePassword = getKeystorePassword(null, log);
+        String keyPassword = getKeyPassword(null, log);
+        FileInputStream fis = null;
+        
+        try {
+            KeyManagerFactory kmf = 
+                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());  
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            
+            fis = new FileInputStream(location);
+            ks.load(fis, (keyStorePassword != null) ? keyStorePassword.toCharArray() : null);
+            kmf.init(ks, (keyPassword != null) ? keyPassword.toCharArray() : null);
+            return kmf.getKeyManagers();
+        } catch (Exception e) {
+            log.warning("Default key managers cannot be initialized: " + e.getMessage());
+            return null;
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    log.warning("Keystore stream cannot be closed: " + e.getMessage());
+                }
+            }
+        }
+    }
+
     public static KeyManager[] loadKeyStore(KeyManagerFactory kmf,
                                                KeyStore ks,
                                                ByteArrayInputStream bin,
