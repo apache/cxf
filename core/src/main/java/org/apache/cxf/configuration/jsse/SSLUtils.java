@@ -61,6 +61,8 @@ public final class SSLUtils {
     private static final String DEFAULT_TRUST_STORE_TYPE = "JKS";
     private static final String DEFAULT_SECURE_SOCKET_PROTOCOL = "TLSv1";
     private static final String CERTIFICATE_FACTORY_TYPE = "X.509";
+
+    private static final String HTTPS_CIPHER_SUITES = "https.cipherSuites";
     
     private static final boolean DEFAULT_REQUIRE_CLIENT_AUTHENTICATION = false;
     private static final boolean DEFAULT_WANT_CLIENT_AUTHENTICATION = true;
@@ -431,53 +433,60 @@ public final class SSLUtils {
         String[] cipherSuites = null;
         if (!(cipherSuitesList == null || cipherSuitesList.isEmpty())) {
             cipherSuites = getCiphersFromList(cipherSuitesList, log, exclude);
-        } else {
-            LogUtils.log(log, Level.FINE, "CIPHERSUITES_NOT_SET");
-            if (filters == null) {
-                LogUtils.log(log, Level.FINE, "CIPHERSUITE_FILTERS_NOT_SET");                
+            return cipherSuites;
+        }
+        if (!exclude) {
+            String jvmCipherSuites = System.getProperty(HTTPS_CIPHER_SUITES);
+            if (jvmCipherSuites != null) {
+                LogUtils.log(log, Level.FINE, "CIPHERSUITES_SYSTEM_PROPERTY_SET", jvmCipherSuites);
+                return jvmCipherSuites.split(",");
             }
-            List<String> filteredCipherSuites = new ArrayList<String>();
-            List<String> excludedCipherSuites = new ArrayList<String>();
-            List<Pattern> includes =
-                filters != null
+        }
+        LogUtils.log(log, Level.FINE, "CIPHERSUITES_NOT_SET");
+        if (filters == null) {
+            LogUtils.log(log, Level.FINE, "CIPHERSUITE_FILTERS_NOT_SET");
+        }
+        List<String> filteredCipherSuites = new ArrayList<String>();
+        List<String> excludedCipherSuites = new ArrayList<String>();
+        List<Pattern> includes =
+            filters != null
                 ? compileRegexPatterns(filters.getInclude(), true, log)
                 : compileRegexPatterns(DEFAULT_CIPHERSUITE_FILTERS_INCLUDE, true, log);
-            List<Pattern> excludes =
-                filters != null
+        List<Pattern> excludes =
+            filters != null
                 ? compileRegexPatterns(filters.getExclude(), false, log)
                 : compileRegexPatterns(DEFAULT_CIPHERSUITE_FILTERS_EXCLUDE, true, log);
-            for (int i = 0; i < supportedCipherSuites.length; i++) {
-                if (matchesOneOf(supportedCipherSuites[i], includes)
-                    && !matchesOneOf(supportedCipherSuites[i], excludes)) {
-                    LogUtils.log(log,
-                                 Level.FINE,
-                                 "CIPHERSUITE_INCLUDED",
-                                 supportedCipherSuites[i]);
-                    filteredCipherSuites.add(supportedCipherSuites[i]);
-                } else {
-                    LogUtils.log(log,
-                                 Level.FINE,
-                                 "CIPHERSUITE_EXCLUDED",
-                                 supportedCipherSuites[i]);
-                    excludedCipherSuites.add(supportedCipherSuites[i]);
-                }
-            }
-            LogUtils.log(log,
-                         Level.FINE,
-                         "CIPHERSUITES_FILTERED",
-                         filteredCipherSuites);
-            LogUtils.log(log,
-                         Level.FINE,
-                         "CIPHERSUITES_EXCLUDED",
-                         excludedCipherSuites);
-            if (exclude) {
-                cipherSuites = getCiphersFromList(excludedCipherSuites, log, exclude);
+        for (int i = 0; i < supportedCipherSuites.length; i++) {
+            if (matchesOneOf(supportedCipherSuites[i], includes)
+                && !matchesOneOf(supportedCipherSuites[i], excludes)) {
+                LogUtils.log(log,
+                             Level.FINE,
+                             "CIPHERSUITE_INCLUDED",
+                             supportedCipherSuites[i]);
+                filteredCipherSuites.add(supportedCipherSuites[i]);
             } else {
-                cipherSuites = getCiphersFromList(filteredCipherSuites, log, exclude);
+                LogUtils.log(log,
+                             Level.FINE,
+                             "CIPHERSUITE_EXCLUDED",
+                             supportedCipherSuites[i]);
+                excludedCipherSuites.add(supportedCipherSuites[i]);
             }
-        } 
+        }
+        LogUtils.log(log,
+                     Level.FINE,
+                     "CIPHERSUITES_FILTERED",
+                     filteredCipherSuites);
+        LogUtils.log(log,
+                     Level.FINE,
+                     "CIPHERSUITES_EXCLUDED",
+                     excludedCipherSuites);
+        if (exclude) {
+            cipherSuites = getCiphersFromList(excludedCipherSuites, log, exclude);
+        } else {
+            cipherSuites = getCiphersFromList(filteredCipherSuites, log, exclude);
+        }
         return cipherSuites;
-    }         
+    }
     
     private static List<Pattern> compileRegexPatterns(List<String> regexes,
                                                       boolean include,
