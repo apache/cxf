@@ -74,8 +74,8 @@ public class ASMHelper {
                 
                 //old versions don't have this, but we need it
                 Class<?> cls = ClassLoaderUtils.loadClass(c2.getPackage().getName() + ".MethodVisitor", c2);
-                cls.getMethod("visitFrame", Integer.TYPE, String.class,
-                              String.class, String.class);
+                cls.getMethod("visitFrame", Integer.TYPE, Integer.TYPE,
+                              Object[].class,  Integer.TYPE, Object[].class);
                 cwClass = c2;
             } catch (Throwable t) {
                 //ignore

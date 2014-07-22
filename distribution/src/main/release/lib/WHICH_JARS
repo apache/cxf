@@ -14,7 +14,7 @@ Some users may prefer to use axis2-saaj.jar rather than saaj-impl.jar. Both are
 supported.
 
 The following jars are required for all CXF usage:
-- cxf.jar
+- cxf-core.jar
 - geronimo-javamail.jar (Or the Sun equivalent) [6]
   (MAY be able to remove javamail if you don't use any MIME/MTOM/SAAJ type things)
 - jaxb-api.jar  [6]
@@ -40,6 +40,7 @@ For Java2WSDL and WSDL2Java:
 - velocity.jar
 - commons-collections.jar
 - commons-lang.jar
+- cxf-rt-wsdl.jar
 - cxf-xjc*.jar (optional, these are xjc extensions for providing enhanced
         JAXB code generation)
 
@@ -52,6 +53,15 @@ For JAX-WS support:
 - asm.jar (semi-optional, helps with performance of wrapper types and is 
         required when adding JAXB annotations onto the SEI methods and 
 	parameters.)
+- cxf-rt-ws-addr.jar
+- cxf-rt-ws-policy.jar
+- cxf-rt-frontend-simple.jar
+- cxf-rt-frontend-jaxws.jar
+- cxf-rt-bindings-xml.jar
+- cxf-rt-bindings-soap.jar
+- cxf-rt-databinding-jaxb.jar
+- cxf-rt-wsdl.jar
+- cxf-rt-transports-http.jar (or other transport jar)
 
 For XML Configuration support:
 - aopalliance.jar
@@ -66,22 +76,27 @@ For standalone HTTP support use Jetty:
 - geronimo-servlet.jar
 - jetty-*.jar
 - sl4j.jar & sl4j-jdk14.jar (optional - but improves logging)
+- cxf-rt-transports-http-jetty.jar
 
 For standalone HTTP support use Netty:
 - geronimo-servlet.jar
 - netty-*.jar
+- cxf-rt-transports-http-netty.jar
  
 For Aegis support:
 - jdom.jar (optional, if you want to map xsd:anyType to JDOM)
+- cxf-rt-databinding-aegis.jar
 
 For XmlBeans databinding support:
 - xmlbeans.jar
+- cxf-rt-databinding-xmlbeans.jar
 
 For WS-Security support:
 - wss4j-*.jar
 - xmlsec.jar
 - ehcache-core.jar
 - jasypt.jar
+- cxf-rt-ws-security.jar
 
 For SAML support in WS-Security
 - joda-time.jar 
@@ -99,13 +114,18 @@ For JAX-RS support:
 - javax.ws.rs-api.jar
 - jettison.jar (Needed for JSON services only)
 - oauth*.jar (Needed for OAuth support)
+- cxf-rt-frontend-jaxrs.jar
+- cxf-rt-rs-*.jar as needed
+
 
 For JMS transport
 - geronimo-jms.jar (Or the Sun equivalent)
 - geronimo-jta.jar (Or the Sun equivalent)
+- cxf-rt-transports-jms.jar
 
 For the UDP transport
 - mina-core.jar
+- cxf-rt-transports-udp.jar
 
 For the Async HTTP client transport
 - commons-codec.jar
@@ -113,6 +133,7 @@ For the Async HTTP client transport
 - httpcore.jar
 - httpclient.jar
 - httpcore-nio.jar
+- cxf-rt-transports-http-hc.jar
 
 For CORBA support:
 - antlr.jar
