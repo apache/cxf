@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
@@ -32,9 +33,16 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.cert.Certificate;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.ECPrivateKeySpec;
+import java.security.spec.ECPublicKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Properties;
@@ -284,7 +292,54 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-     
+    public static ECPrivateKey getECPrivateKey(String encodedPrivateKey) {
+        try {
+            return getECPrivateKey(Base64UrlUtility.decode(encodedPrivateKey));
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }
+    }
+    public static ECPrivateKey getECPrivateKey(byte[] privateKey) {
+        try {
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
+            ECGenParameterSpec kpgparams = new ECGenParameterSpec("secp256r1");
+            kpg.initialize(kpgparams);
+            ECParameterSpec params = ((ECPublicKey) kpg.generateKeyPair().getPublic()).getParams();
+
+            ECPrivateKeySpec keySpec = new ECPrivateKeySpec(
+                                           new BigInteger(1, privateKey), params);
+            KeyFactory kf = KeyFactory.getInstance("EC");
+            return (ECPrivateKey) kf.generatePrivate(keySpec);
+
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }    
+    }
+    public static ECPublicKey getECPublicKey(String encodedXPoint, String encodedYPoint) {
+        try {
+            return getECPublicKey(Base64UrlUtility.decode(encodedXPoint),
+                                  Base64UrlUtility.decode(encodedYPoint));
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }
+    }
+    public static ECPublicKey getECPublicKey(byte[] xPoint, byte[] yPoint) {
+        try {
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
+            ECGenParameterSpec kpgparams = new ECGenParameterSpec("secp256r1");
+            kpg.initialize(kpgparams);
+            ECParameterSpec params = ((ECPublicKey) kpg.generateKeyPair().getPublic()).getParams();
+
+            ECPoint ecPoint = new ECPoint(new BigInteger(1, xPoint),
+                                          new BigInteger(1, yPoint));
+            ECPublicKeySpec keySpec = new ECPublicKeySpec(ecPoint, params);
+            KeyFactory kf = KeyFactory.getInstance("EC");
+            return (ECPublicKey) kf.generatePublic(keySpec);
+
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }    
+    }
     public static AlgorithmParameterSpec getContentEncryptionCipherSpec(int authTagLength, byte[] iv) {
         // this can be overridden if needed
         if (authTagLength > 0) {

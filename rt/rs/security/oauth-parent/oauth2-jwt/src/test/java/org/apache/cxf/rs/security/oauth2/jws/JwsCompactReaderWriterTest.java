@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.oauth2.jws;
 
 import java.security.PrivateKey;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -82,6 +84,12 @@ public class JwsCompactReaderWriterTest extends Assert {
         + "hJ1phCnvWh6IeYI2w9QOYEUipUTI8np6LbgGY9Fs98rqVt5AXLIhWkWywlVmtVrB"
         + "p0igcN_IoypGlUPQGe77Rw";
      
+    private static final String EC_PRIVATE_KEY_ENCODED = 
+        "jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI";
+    private static final String EC_X_POINT_ENCODED = 
+        "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU";
+    private static final String EC_Y_POINT_ENCODED = 
+        "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0";
     @Test
     public void testWriteJwsSignedByMacSpecExample() throws Exception {
         JwtHeaders headers = new JwtHeaders(Algorithm.HmacSHA256.getJwtName());
@@ -186,7 +194,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     }
     
     @Test
-    public void testWriteReadJwsSignedByPrivateKey() throws Exception {
+    public void testWriteJwsSignedByPrivateKey() throws Exception {
         JwtHeaders headers = new JwtHeaders();
         headers.setAlgorithm(Algorithm.SHA256withRSA.getJwtName());
         JwsCompactProducer jws = initSpecJwtTokenWriter(headers);
@@ -194,6 +202,23 @@ public class JwsCompactReaderWriterTest extends Assert {
         jws.signWith(new PrivateKeyJwsSignatureProvider(key));
         
         assertEquals(ENCODED_TOKEN_SIGNED_BY_PRIVATE_KEY, jws.getSignedEncodedJws());
+    }
+    
+    @Test
+    public void testWriteReadJwsSignedByESPrivateKey() throws Exception {
+        JwtHeaders headers = new JwtHeaders();
+        headers.setAlgorithm(Algorithm.SHA256withECDSA.getJwtName());
+        JwsCompactProducer jws = initSpecJwtTokenWriter(headers);
+        ECPrivateKey privateKey = CryptoUtils.getECPrivateKey(EC_PRIVATE_KEY_ENCODED);
+        jws.signWith(new EcDsaJwsSignatureProvider(privateKey));
+        String signedJws = jws.getSignedEncodedJws();
+        ECPublicKey publicKey = CryptoUtils.getECPublicKey(EC_X_POINT_ENCODED, EC_Y_POINT_ENCODED);
+        JwsJwtCompactConsumer jwsConsumer = new JwsJwtCompactConsumer(signedJws);
+        assertTrue(jwsConsumer.verifySignatureWith(new PublicKeyJwsSignatureVerifier(publicKey)));
+        JwtToken token = jwsConsumer.getJwtToken();
+        JwtHeaders headersReceived = token.getHeaders();
+        assertEquals(Algorithm.SHA256withECDSA.getJwtName(), headersReceived.getAlgorithm());
+        validateSpecClaim(token.getClaims());
     }
     
     @Test

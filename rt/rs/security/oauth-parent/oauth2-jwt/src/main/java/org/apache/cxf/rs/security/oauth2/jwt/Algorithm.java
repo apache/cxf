@@ -35,6 +35,10 @@ public enum Algorithm {
     SHA384withRSA(JwtConstants.RS_SHA_384_ALGO, 384),
     SHA512withRSA(JwtConstants.RS_SHA_512_ALGO, 512),
     
+    SHA256withECDSA(JwtConstants.ES_SHA_256_ALGO, 256),
+    SHA384withECDSA(JwtConstants.ES_SHA_384_ALGO, 384),
+    SHA512withECDSA(JwtConstants.ES_SHA_512_ALGO, 512),
+    
     // Key Encryption
     RSA_OAEP(JwtConstants.RSA_OAEP_ALGO, "RSA/ECB/OAEPWithSHA-1AndMGF1Padding", -1),
     // Content Encryption
@@ -48,6 +52,9 @@ public enum Algorithm {
     public static final String RS_SHA_256_JAVA = "SHA256withRSA";
     public static final String RS_SHA_384_JAVA = "SHA384withRSA";
     public static final String RS_SHA_512_JAVA = "SHA512withRSA";
+    public static final String ES_SHA_256_JAVA = "SHA256withECDSA";
+    public static final String ES_SHA_384_JAVA = "SHA384withECDSA";
+    public static final String ES_SHA_512_JAVA = "SHA512withECDSA";
     public static final String RSA_OAEP_ALGO_JAVA = "RSA/ECB/OAEPWithSHA-1AndMGF1Padding";
     public static final String RSA_OAEP_256_ALGO_JAVA = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
     public static final String RSA_1_5_ALGO_JAVA = "RSA/ECB/PKCS1Padding";
@@ -64,6 +71,9 @@ public enum Algorithm {
         JAVA_TO_JWT_NAMES.put(RS_SHA_256_JAVA, JwtConstants.RS_SHA_256_ALGO);
         JAVA_TO_JWT_NAMES.put(RS_SHA_384_JAVA, JwtConstants.RS_SHA_384_ALGO);
         JAVA_TO_JWT_NAMES.put(RS_SHA_512_JAVA, JwtConstants.RS_SHA_512_ALGO);
+        JAVA_TO_JWT_NAMES.put(ES_SHA_256_JAVA, JwtConstants.ES_SHA_256_ALGO);
+        JAVA_TO_JWT_NAMES.put(ES_SHA_384_JAVA, JwtConstants.ES_SHA_384_ALGO);
+        JAVA_TO_JWT_NAMES.put(ES_SHA_512_JAVA, JwtConstants.ES_SHA_512_ALGO);
         JAVA_TO_JWT_NAMES.put(RSA_OAEP_ALGO_JAVA, JwtConstants.RSA_OAEP_ALGO);
         JAVA_TO_JWT_NAMES.put(RSA_OAEP_256_ALGO_JAVA, JwtConstants.RSA_OAEP_256_ALGO);
         JAVA_TO_JWT_NAMES.put(RSA_1_5_ALGO_JAVA, JwtConstants.RSA_1_5_ALGO);
@@ -74,6 +84,9 @@ public enum Algorithm {
         JWT_TO_JAVA_NAMES.put(JwtConstants.RS_SHA_256_ALGO, RS_SHA_256_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.RS_SHA_384_ALGO, RS_SHA_384_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.RS_SHA_512_ALGO, RS_SHA_512_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.ES_SHA_256_ALGO, ES_SHA_256_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.ES_SHA_384_ALGO, ES_SHA_384_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.ES_SHA_512_ALGO, ES_SHA_512_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_OAEP_ALGO, RSA_OAEP_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_OAEP_256_ALGO, RSA_OAEP_256_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_1_5_ALGO, RSA_1_5_ALGO_JAVA);

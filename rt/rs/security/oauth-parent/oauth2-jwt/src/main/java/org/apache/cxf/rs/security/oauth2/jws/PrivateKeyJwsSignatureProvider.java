@@ -46,8 +46,15 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
     public PrivateKeyJwsSignatureProvider(PrivateKey key, AlgorithmParameterSpec spec) {
         this(key, null, spec);
     }
-    public PrivateKeyJwsSignatureProvider(PrivateKey key, SecureRandom random, AlgorithmParameterSpec spec) {
-        super(SUPPORTED_ALGORITHMS);
+    public PrivateKeyJwsSignatureProvider(PrivateKey key, SecureRandom random, 
+                                          AlgorithmParameterSpec spec) {
+        this(key, random, spec, SUPPORTED_ALGORITHMS);
+    }
+    protected PrivateKeyJwsSignatureProvider(PrivateKey key, 
+                                             SecureRandom random, 
+                                             AlgorithmParameterSpec spec,
+                                             Set<String> supportedAlgorithms) {
+        super(supportedAlgorithms);
         this.key = key;
         this.random = random;
         this.signatureSpec = spec;
