@@ -31,7 +31,6 @@ import org.apache.cxf.ws.transfer.GetResponse;
 import org.apache.cxf.ws.transfer.Put;
 import org.apache.cxf.ws.transfer.PutResponse;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
-import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 import org.apache.cxf.ws.transfer.validationtransformation.ResourceValidator;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;

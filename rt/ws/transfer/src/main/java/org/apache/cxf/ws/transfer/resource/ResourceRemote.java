@@ -24,7 +24,6 @@ import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.CreateResponse;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
-import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
 
 /**
