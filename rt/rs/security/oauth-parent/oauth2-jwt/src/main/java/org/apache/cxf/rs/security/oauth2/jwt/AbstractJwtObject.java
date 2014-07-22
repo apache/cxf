@@ -45,9 +45,9 @@ public abstract class AbstractJwtObject {
         return new LinkedHashMap<String, Object>(values);
     }
     
-    protected Integer getIntDate(String name) {
+    protected Long getLongDate(String name) {
         Object object = getValue(name);
-        return object instanceof Integer ? (Integer)object : Integer.valueOf(object.toString());
+        return object instanceof Long ? (Long)object : Long.valueOf(object.toString());
     }
     
     public int hashCode() { 

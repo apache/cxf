@@ -100,8 +100,8 @@ public class JwsCompactReaderWriterTest extends Assert {
         claims.setIssuer("https://jwt-idp.example.com");
         claims.setSubject("mailto:mike@example.com");
         claims.setAudience("https://jwt-rp.example.net");
-        claims.setNotBefore(1300815780);
-        claims.setExpiryTime(1300819380);
+        claims.setNotBefore(1300815780L);
+        claims.setExpiryTime(1300819380L);
         claims.setClaim("http://claims.example.com/member", true);
         
         JwsCompactProducer writer = new JwsJwtCompactProducer(headers, claims);
@@ -150,7 +150,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("joe");
-        claims.setExpiryTime(1300819380);
+        claims.setExpiryTime(1300819380L);
         claims.setClaim("http://example.com/is_root", Boolean.TRUE);
         
         JwtToken token = new JwtToken(headers, claims);
@@ -181,7 +181,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     
     private void validateSpecClaim(JwtClaims claims) {
         assertEquals("joe", claims.getIssuer());
-        assertEquals(Integer.valueOf(1300819380), claims.getExpiryTime());
+        assertEquals(Long.valueOf(1300819380), claims.getExpiryTime());
         assertEquals(Boolean.TRUE, claims.getClaim("http://example.com/is_root"));
     }
     
@@ -211,7 +211,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("joe");
-        claims.setExpiryTime(1300819380);
+        claims.setExpiryTime(1300819380L);
         claims.setClaim("http://example.com/is_root", Boolean.TRUE);
         
         JwtToken token = new JwtToken(headers, claims);

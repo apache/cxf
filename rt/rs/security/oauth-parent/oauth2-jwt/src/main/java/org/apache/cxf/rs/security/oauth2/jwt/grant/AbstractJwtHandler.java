@@ -69,17 +69,17 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     protected void validateAudience(Client client, String audience) {
         //TODO
     }
-    protected void validateExpiryTime(Integer timestamp) {
+    protected void validateExpiryTime(Long timestamp) {
         if (timestamp != null) {
             //TODO
         }
     }
-    protected void validateNotBeforeTime(Integer timestamp) {
+    protected void validateNotBeforeTime(Long timestamp) {
         if (timestamp != null) {
             //TODO    
         }
     }
-    protected void validateIssuedAtTime(Integer timestamp) {
+    protected void validateIssuedAtTime(Long timestamp) {
         if (timestamp != null) {
             //TODO
         }

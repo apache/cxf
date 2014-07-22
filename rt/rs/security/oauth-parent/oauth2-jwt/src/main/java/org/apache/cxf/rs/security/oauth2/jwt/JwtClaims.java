@@ -57,28 +57,28 @@ public class JwtClaims extends AbstractJwtObject {
         return (String)getClaim(JwtConstants.CLAIM_AUDIENCE);
     }
     
-    public void setExpiryTime(Integer expiresIn) {
+    public void setExpiryTime(Long expiresIn) {
         setClaim(JwtConstants.CLAIM_EXPIRY, expiresIn);
     }
     
-    public Integer getExpiryTime() {
-        return getIntDate(JwtConstants.CLAIM_EXPIRY);
+    public Long getExpiryTime() {
+        return getLongDate(JwtConstants.CLAIM_EXPIRY);
     }
     
-    public void setNotBefore(Integer notBefore) {
+    public void setNotBefore(Long notBefore) {
         setClaim(JwtConstants.CLAIM_NOT_BEFORE, notBefore);
     }
     
-    public Integer getNotBefore() {
-        return getIntDate(JwtConstants.CLAIM_NOT_BEFORE);
+    public Long getNotBefore() {
+        return getLongDate(JwtConstants.CLAIM_NOT_BEFORE);
     }
     
-    public void setIssuedAt(Integer issuedAt) {
+    public void setIssuedAt(Long issuedAt) {
         setClaim(JwtConstants.CLAIM_ISSUED_AT, issuedAt);
     }
     
-    public Integer getIssuedAt() {
-        return getIntDate(JwtConstants.CLAIM_ISSUED_AT);
+    public Long getIssuedAt() {
+        return getLongDate(JwtConstants.CLAIM_ISSUED_AT);
     }
     
     public void setTokenId(String id) {

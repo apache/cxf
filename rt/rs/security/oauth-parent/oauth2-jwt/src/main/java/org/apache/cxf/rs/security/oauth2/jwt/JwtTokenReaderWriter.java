@@ -183,7 +183,7 @@ public class JwtTokenReaderWriter implements JwtTokenReader, JwtTokenWriter {
                 int commaIndex = getCommaIndex(json, sepIndex + j);
                 Object value = readPrimitiveValue(json, sepIndex + j, commaIndex);
                 if (DATE_PROPERTIES.contains(name)) {
-                    value = Integer.valueOf(value.toString());
+                    value = Long.valueOf(value.toString());
                 }
                 values.put(name, value);
                 i = commaIndex + 1;
