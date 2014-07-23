@@ -436,10 +436,9 @@ public final class SSLUtils {
             return cipherSuites;
         }
         if (!exclude) {
-            String jvmCipherSuites = System.getProperty(HTTPS_CIPHER_SUITES);
-            if (jvmCipherSuites != null) {
-                LogUtils.log(log, Level.FINE, "CIPHERSUITES_SYSTEM_PROPERTY_SET", jvmCipherSuites);
-                return jvmCipherSuites.split(",");
+            cipherSuites = getSystemCiphersuites(log);
+            if (cipherSuites != null) {
+                return cipherSuites;
             }
         }
         LogUtils.log(log, Level.FINE, "CIPHERSUITES_NOT_SET");
@@ -486,6 +485,17 @@ public final class SSLUtils {
             cipherSuites = getCiphersFromList(filteredCipherSuites, log, exclude);
         }
         return cipherSuites;
+    }
+
+    private static String[] getSystemCiphersuites(Logger log) {
+        String jvmCipherSuites = System.getProperty(HTTPS_CIPHER_SUITES);
+        if ((jvmCipherSuites != null) && (!jvmCipherSuites.isEmpty())) {
+            LogUtils.log(log, Level.FINE, "CIPHERSUITES_SYSTEM_PROPERTY_SET", jvmCipherSuites);
+            return jvmCipherSuites.split(",");
+        } else {
+            return null;
+        }
+        
     }
     
     private static List<Pattern> compileRegexPatterns(List<String> regexes,
