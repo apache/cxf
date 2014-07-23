@@ -23,7 +23,10 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.CreateResponse;
+import org.apache.cxf.ws.transfer.Representation;
+import org.apache.cxf.ws.transfer.dialect.Dialect;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
+import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
 
 /**
@@ -36,8 +39,19 @@ public class ResourceRemote extends ResourceLocal implements ResourceFactory {
 
     @Override
     public CreateResponse create(Create body) {
-        ValidAndTransformHelper.validationAndTransformation(getValidators(), body.getRepresentation(), null);
-        ReferenceParametersType refParams = getManager().create(body.getRepresentation());
+        Representation representation = body.getRepresentation();
+        if (body.getDialect() != null && !body.getDialect().isEmpty()) {
+            if (dialects.containsKey(body.getDialect())) {
+                Dialect dialect = dialects.get(body.getDialect());
+                representation = dialect.processCreate(body);
+            } else {
+                throw new UnknownDialect();
+            }
+        } else {
+            ValidAndTransformHelper.validationAndTransformation(
+                getValidators(), representation, null);
+        }
+        ReferenceParametersType refParams = getManager().create(representation);
         CreateResponse response = new CreateResponse();
         response.setResourceCreated(new EndpointReferenceType());
         response.getResourceCreated().setReferenceParameters(refParams);

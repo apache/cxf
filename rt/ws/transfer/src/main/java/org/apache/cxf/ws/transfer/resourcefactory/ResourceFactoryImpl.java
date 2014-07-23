@@ -21,6 +21,7 @@ package org.apache.cxf.ws.transfer.resourcefactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -29,9 +30,12 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.CreateResponse;
+import org.apache.cxf.ws.transfer.Representation;
+import org.apache.cxf.ws.transfer.dialect.Dialect;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceReference;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
+import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
 import org.apache.cxf.ws.transfer.validationtransformation.ResourceValidator;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
 
@@ -44,9 +48,13 @@ public class ResourceFactoryImpl implements ResourceFactory {
     
     protected List<ResourceValidator> validators;
     
+    protected Map<String, Dialect> dialects;
+    
     @Override
     public CreateResponse create(Create body) {
-        ValidAndTransformHelper.validationAndTransformation(validators, body.getRepresentation(), null);
+        if (body.getDialect() == null || body.getDialect().isEmpty()) {
+            ValidAndTransformHelper.validationAndTransformation(validators, body.getRepresentation(), null);
+        }
         ResourceReference resourceReference = resourceResolver.resolve(body);
         if (resourceReference.getResourceManager() != null) {
             return createLocally(body, resourceReference);
@@ -74,8 +82,40 @@ public class ResourceFactoryImpl implements ResourceFactory {
         this.validators = validators;
     }
     
+    /**
+     * Register Dialect object for URI.
+     * @param uri
+     * @param dialect 
+     */
+    public void registerDialect(String uri, Dialect dialect) {
+        if (dialects.containsKey(uri)) {
+            throw new IllegalArgumentException(String.format("URI \"%s\" is already registered", uri));
+        }
+        dialects.put(uri, dialect);
+    }
+    
+    /**
+     * Unregister dialect URI.
+     * @param uri 
+     */
+    public void unregisterDialect(String uri) {
+        if (!dialects.containsKey(uri)) {
+            throw new IllegalArgumentException(String.format("URI \"%s\" is not registered", uri));
+        }
+        dialects.remove(uri);
+    }
+    
     private CreateResponse createLocally(Create body, ResourceReference ref) {
-        ReferenceParametersType referenceParams = ref.getResourceManager().create(body.getRepresentation());
+        Representation representation = body.getRepresentation();
+        if (body.getDialect() != null && !body.getDialect().isEmpty()) {
+            if (dialects.containsKey(body.getDialect())) {
+                Dialect dialect = dialects.get(body.getDialect());
+                representation = dialect.processCreate(body);
+            } else {
+                throw new UnknownDialect();
+            }
+        }
+        ReferenceParametersType referenceParams = ref.getResourceManager().create(representation);
             
         CreateResponse response = new CreateResponse();
         response.setResourceCreated(new EndpointReferenceType());

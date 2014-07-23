@@ -20,7 +20,9 @@
 package org.apache.cxf.ws.transfer.resource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
@@ -30,8 +32,12 @@ import org.apache.cxf.ws.transfer.Get;
 import org.apache.cxf.ws.transfer.GetResponse;
 import org.apache.cxf.ws.transfer.Put;
 import org.apache.cxf.ws.transfer.PutResponse;
+import org.apache.cxf.ws.transfer.Representation;
+import org.apache.cxf.ws.transfer.dialect.Dialect;
+import org.apache.cxf.ws.transfer.dialect.FragmentDialect;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
+import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
 import org.apache.cxf.ws.transfer.validationtransformation.ResourceValidator;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
 
@@ -49,7 +55,14 @@ public class ResourceLocal implements Resource {
     protected ResourceManager manager;
     
     protected List<ResourceValidator> validators;
+    
+    protected Map<String, Dialect> dialects;
 
+    public ResourceLocal() {
+        dialects = new HashMap<String, Dialect>();
+        dialects.put("http://www.w3.org/2011/03/ws-fra", new FragmentDialect());
+    }
+    
     public ResourceManager getManager() {
         return manager;
     }
@@ -69,34 +82,96 @@ public class ResourceLocal implements Resource {
         this.validators = validators;
     }
     
+    /**
+     * Register Dialect object for URI.
+     * @param iri
+     * @param dialect 
+     */
+    public void registerDialect(String iri, Dialect dialect) {
+        if (dialects.containsKey(iri)) {
+            throw new IllegalArgumentException(String.format("IRI \"%s\" is already registered", iri));
+        }
+        dialects.put(iri, dialect);
+    }
+    
+    /**
+     * Unregister dialect URI.
+     * @param iri 
+     */
+    public void unregisterDialect(String iri) {
+        if (!dialects.containsKey(iri)) {
+            throw new IllegalArgumentException(String.format("IRI \"%s\" is not registered", iri));
+        }
+        dialects.remove(iri);
+    }
+    
     @Override
     public GetResponse get(Get body) {
+        // Getting reference paramaters
         ReferenceParametersType refParams = (ReferenceParametersType) ((WrappedMessageContext) context
                 .getMessageContext()).getWrappedMessage()
                 .getContextualProperty(TransferConstants.REF_PARAMS_CONTEXT_KEY);
         GetResponse response = new GetResponse();
-        response.setRepresentation(manager.get(refParams));
+        // Getting representation from the ResourceManager
+        Representation representation = manager.get(refParams);
+        // Dialect processing
+        if (body.getDialect() != null && !body.getDialect().isEmpty()) {
+            if (dialects.containsKey(body.getDialect())) {
+                Dialect dialect = dialects.get(body.getDialect());
+                representation = dialect.processGet(body, representation);
+            } else {
+                throw new UnknownDialect();
+            }
+        }
+        // Sending response
+        response.setRepresentation(representation);
         return response;
     }
 
     @Override
     public DeleteResponse delete(Delete body) {
+        // Getting reference paramaters
         ReferenceParametersType refParams = (ReferenceParametersType) ((WrappedMessageContext) context
                 .getMessageContext()).getWrappedMessage()
                 .getContextualProperty(TransferConstants.REF_PARAMS_CONTEXT_KEY);
-        DeleteResponse response = new DeleteResponse();
-        manager.delete(refParams);
-        return response;
+        // Dialect processing
+        if (body.getDialect() != null && !body.getDialect().isEmpty()) {
+            if (dialects.containsKey(body.getDialect())) {
+                Dialect dialect = dialects.get(body.getDialect());
+                Representation representation = dialect.processDelete(body, manager.get(refParams));
+                manager.put(refParams, representation);
+            } else {
+                throw new UnknownDialect();
+            }
+        } else {
+            manager.delete(refParams);
+        }
+        return new DeleteResponse();
     }
 
     @Override
     public PutResponse put(Put body) {
+        // Getting reference paramaters
         ReferenceParametersType refParams = (ReferenceParametersType) ((WrappedMessageContext) context
                 .getMessageContext()).getWrappedMessage()
                 .getContextualProperty(TransferConstants.REF_PARAMS_CONTEXT_KEY);
-        ValidAndTransformHelper.validationAndTransformation(
-                validators, body.getRepresentation(), manager.get(refParams));
-        manager.put(refParams, body.getRepresentation());
+        // Getting representation from the ResourceManager
+        Representation storedRepresentation = manager.get(refParams);
+        // Getting representation from the incoming SOAP message. This representation will be stored.
+        Representation putRepresentation = body.getRepresentation();
+        // Dialect processing
+        if (body.getDialect() != null && !body.getDialect().isEmpty()) {
+            if (dialects.containsKey(body.getDialect())) {
+                Dialect dialect = dialects.get(body.getDialect());
+                putRepresentation = dialect.processPut(body, storedRepresentation);
+            } else {
+                throw new UnknownDialect();
+            }
+        } else {
+            ValidAndTransformHelper.validationAndTransformation(
+                validators, putRepresentation, storedRepresentation);
+        }
+        manager.put(refParams, putRepresentation);
         PutResponse response = new PutResponse();
         response.setRepresentation(body.getRepresentation());
         return response;
