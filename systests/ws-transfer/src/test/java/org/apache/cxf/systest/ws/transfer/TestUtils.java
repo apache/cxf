@@ -146,12 +146,14 @@ public final class TestUtils {
         factory.setServiceBean(resourceFactory);
         factory.setAddress(RESOURCE_FACTORY_URL);
         // Logging Interceptors
-        LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
-        loggingInInterceptor.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
-        loggingOutInterceptor.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingInInterceptor);
-        factory.getOutInterceptors().add(loggingOutInterceptor);
+        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
+        loggingIn.setPrettyLogging(true);
+        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
+        loggingOut.setPrettyLogging(true);
+        factory.getInInterceptors().add(loggingIn);
+        factory.getOutInterceptors().add(loggingOut);
+        factory.getInFaultInterceptors().add(loggingIn);
+        factory.getOutFaultInterceptors().add(loggingOut);
         
         return factory.create();
     }
@@ -168,12 +170,14 @@ public final class TestUtils {
         factory.setServiceBean(resourceLocal);
         factory.setAddress(RESOURCE_STUDENTS_URL);
         // Logging Interceptors
-        LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
-        loggingInInterceptor.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
-        loggingOutInterceptor.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingInInterceptor);
-        factory.getOutInterceptors().add(loggingOutInterceptor);
+        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
+        loggingIn.setPrettyLogging(true);
+        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
+        loggingOut.setPrettyLogging(true);
+        factory.getInInterceptors().add(loggingIn);
+        factory.getOutInterceptors().add(loggingOut);
+        factory.getInFaultInterceptors().add(loggingIn);
+        factory.getOutFaultInterceptors().add(loggingOut);
         return factory.create();
     }
     
@@ -183,12 +187,14 @@ public final class TestUtils {
         factory.setServiceBean(resource);
         factory.setAddress(RESOURCE_TEACHERS_URL + TransferConstants.RESOURCE_REMOTE_SUFFIX);
         // Logging Interceptors
-        LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
-        loggingInInterceptor.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
-        loggingOutInterceptor.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingInInterceptor);
-        factory.getOutInterceptors().add(loggingOutInterceptor);
+        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
+        loggingIn.setPrettyLogging(true);
+        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
+        loggingOut.setPrettyLogging(true);
+        factory.getInInterceptors().add(loggingIn);
+        factory.getOutInterceptors().add(loggingOut);
+        factory.getInFaultInterceptors().add(loggingIn);
+        factory.getOutFaultInterceptors().add(loggingOut);
         return factory.create();
     }
     
@@ -198,12 +204,14 @@ public final class TestUtils {
         factory.setServiceBean(resource);
         factory.setAddress(RESOURCE_TEACHERS_URL);
         // Logging Interceptors
-        LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
-        loggingInInterceptor.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
-        loggingOutInterceptor.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingInInterceptor);
-        factory.getOutInterceptors().add(loggingOutInterceptor);
+        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
+        loggingIn.setPrettyLogging(true);
+        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
+        loggingOut.setPrettyLogging(true);
+        factory.getInInterceptors().add(loggingIn);
+        factory.getOutInterceptors().add(loggingOut);
+        factory.getInFaultInterceptors().add(loggingIn);
+        factory.getOutFaultInterceptors().add(loggingOut);
         return factory.create();
     }
     
