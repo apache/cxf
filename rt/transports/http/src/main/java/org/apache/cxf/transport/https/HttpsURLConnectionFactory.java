@@ -164,6 +164,9 @@ public class HttpsURLConnectionFactory {
             if (tlsClientParameters.getCertAlias() != null) {
                 getKeyManagersWithCertAlias(tlsClientParameters, keyManagers);
             }
+            if (keyManagers == null) {
+                keyManagers = SSLUtils.getDefaultKeyStoreManagers(LOG);
+            }
             ctx.init(keyManagers, tlsClientParameters.getTrustManagers(),
                      tlsClientParameters.getSecureRandom());
 
