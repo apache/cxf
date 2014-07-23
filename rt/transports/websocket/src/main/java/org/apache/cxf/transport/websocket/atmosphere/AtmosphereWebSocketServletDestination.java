@@ -52,7 +52,7 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
 
     public AtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei, 
                                                  String path) throws IOException {
-        super(bus, registry, ei, ei.toString());
+        super(bus, registry, ei, path);
         this.framework = new AtmosphereFramework(false, true);
 
         framework.setUseNativeImplementation(false);
