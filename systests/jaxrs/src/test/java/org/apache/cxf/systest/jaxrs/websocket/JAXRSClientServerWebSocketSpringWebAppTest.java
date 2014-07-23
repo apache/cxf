@@ -30,6 +30,7 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,9 +39,11 @@ import org.junit.Test;
  */
 public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServerWebSocketTest {
     private static final String PORT = BookServerWebSocket.PORT_WAR;
+    private static org.eclipse.jetty.server.Server server;
+
     @BeforeClass
     public static void startServers() throws Exception {
-        org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server();
+        server = new org.eclipse.jetty.server.Server();
 
         SelectChannelConnector connector = new SelectChannelConnector();
         connector.setPort(Integer.parseInt(BookServerWebSocket.PORT_WAR));
@@ -62,6 +65,12 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
         server.setHandler(handlers);
         server.start();
 
+    }
+    
+    @AfterClass
+    public static void stopServers() throws Exception {
+        server.stop();
+        server.destroy();
     }
     
     @Test

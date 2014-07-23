@@ -43,7 +43,7 @@ public class JettyWebSocketServletDestination extends ServletDestination impleme
 
     public JettyWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                             String path) throws IOException {
-        super(bus, registry, ei, ei.toString());
+        super(bus, registry, ei, path);
         webSocketManager = new JettyWebSocketManager();
         webSocketManager.init(this);
     }
