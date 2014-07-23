@@ -44,7 +44,7 @@
         <cxf.compiler.fork>false</cxf.compiler.fork>
         <cxf.build-utils.version>3.0.0</cxf.build-utils.version>
         <cxf.xjc-utils.version>3.0.1</cxf.xjc-utils.version>
-        <cxf.jdk.version>1.6</cxf.jdk.version>
+        <cxf.jdk.version>1.7</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
     </properties>
@@ -484,10 +484,10 @@
                     <version>2.9.1</version>
                     <configuration>
                         <attach>true</attach>
-                        <source>1.6</source>
+                        <source>1.7</source>
                         <quiet>true</quiet>
                         <bottom>Apache CXF</bottom>
-                        <javadocVersion>1.6</javadocVersion>
+                        <javadocVersion>1.7</javadocVersion>
                         <encoding>UTF-8</encoding>
                         <detectOfflineLinks>false</detectOfflineLinks>
                         <notimestamp>true</notimestamp>
@@ -509,8 +509,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.1</version>
                     <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
                         <maxmem>256M</maxmem>
                         <fork>${cxf.compiler.fork}</fork>
                         <encoding>UTF-8</encoding>
