@@ -34,10 +34,6 @@
         <maven.test.skip>true</maven.test.skip>
         <cxf.version>${project.version}</cxf.version>
         <cxf.checkstyle.extension>-corba</cxf.checkstyle.extension>
-        <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
-        <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
-        <cxf.jaxb.core.version>${cxf.jaxb22.core.version}</cxf.jaxb.core.version>
-        <cxf.jaxb.xjc.version>${cxf.jaxb22.xjc.version}</cxf.jaxb.xjc.version>
     </properties>
     <modules>
         <module>manifest</module>
@@ -457,7 +453,7 @@
                                 <artifactItem>
                                     <groupId>javax.xml.bind</groupId>
                                     <artifactId>jaxb-api</artifactId>
-                                    <version>${cxf.jaxb22.version}</version>
+                                    <version>${cxf.jaxb.version}</version>
                                     <outputDirectory>${project.build.directory}/libs/endorsed</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>

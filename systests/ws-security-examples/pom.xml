@@ -183,16 +183,6 @@
     </dependencies>
     <profiles>
         <profile>
-            <id>jaxws22</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                    <scope>compile</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>async</id>
             <dependencies>
                 <dependency>
