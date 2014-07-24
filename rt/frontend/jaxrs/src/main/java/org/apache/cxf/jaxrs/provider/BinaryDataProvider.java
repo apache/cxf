@@ -59,7 +59,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     
     private static final int BUFFER_SIZE = 4096;
     private boolean reportByteArraySize;
-    
+    private boolean closeResponseInputStream;
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return byte[].class.isAssignableFrom(type)
                || InputStream.class.isAssignableFrom(type)
@@ -161,7 +161,11 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
             Message inMessage = PhaseInterceptorChain.getCurrentMessage().getExchange().getInMessage();
             handleRangeRequest(is, os, new HttpHeadersImpl(inMessage), outHeaders);
         } else {
-            IOUtils.copyAndCloseInput(is, os);
+            if (closeResponseInputStream) {
+                IOUtils.copyAndCloseInput(is, os);
+            } else {
+                IOUtils.copy(is, os);
+            }
         }
     }
     
@@ -189,5 +193,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
 
     public void setReportByteArraySize(boolean report) {
         this.reportByteArraySize = report;
+    }
+
+    public void setCloseResponseInputStream(boolean closeResponseInputStream) {
+        this.closeResponseInputStream = closeResponseInputStream;
     }
 }
