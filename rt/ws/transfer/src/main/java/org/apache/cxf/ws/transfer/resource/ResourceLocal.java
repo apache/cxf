@@ -60,7 +60,6 @@ public class ResourceLocal implements Resource {
 
     public ResourceLocal() {
         dialects = new HashMap<String, Dialect>();
-        dialects.put("http://www.w3.org/2011/03/ws-fra", new FragmentDialect());
     }
     
     public ResourceManager getManager() {

@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.transfer.resourcefactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -49,6 +50,10 @@ public class ResourceFactoryImpl implements ResourceFactory {
     protected List<ResourceValidator> validators;
     
     protected Map<String, Dialect> dialects;
+    
+    public ResourceFactoryImpl() {
+        dialects = new HashMap<String, Dialect>();
+    }
     
     @Override
     public CreateResponse create(Create body) {
