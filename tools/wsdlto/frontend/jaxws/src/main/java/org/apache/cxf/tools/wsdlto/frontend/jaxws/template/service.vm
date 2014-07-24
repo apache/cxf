@@ -177,11 +177,6 @@ public class ${service.Name} extends ${serviceSuperclass} {
 #end 
     
 #if ($jaxws22 || $service-target == "cxf")
-#if ($jaxws22)
-    //This constructor requires JAX-WS API 2.2. You will need to endorse the 2.2
-    //API jar or re-run wsdl2java with "-frontend jaxws21" to generate JAX-WS 2.1
-    //compliant code instead.
-#end    
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
@@ -189,11 +184,6 @@ public class ${service.Name} extends ${serviceSuperclass} {
         super(WSDL_LOCATION, SERVICE, features);
     }
 
-#if ($jaxws22)
-    //This constructor requires JAX-WS API 2.2. You will need to endorse the 2.2
-    //API jar or re-run wsdl2java with "-frontend jaxws21" to generate JAX-WS 2.1
-    //compliant code instead.
-#end
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
@@ -201,11 +191,6 @@ public class ${service.Name} extends ${serviceSuperclass} {
         super(wsdlLocation, SERVICE, features);
     }
 
-#if ($jaxws22)
-    //This constructor requires JAX-WS API 2.2. You will need to endorse the 2.2
-    //API jar or re-run wsdl2java with "-frontend jaxws21" to generate JAX-WS 2.1
-    //compliant code instead.
-#end
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
