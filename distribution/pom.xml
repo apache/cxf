@@ -417,24 +417,6 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-javadoc</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/javadoc</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>cxf-core</artifactId>
-                                    <classifier>javadoc</classifier>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <!-- copy additional jars. These are jars we want included, but don't 
                                      really don't want them on the classpath in the normal case -->
                         <id>add-jars</id>
@@ -449,18 +431,6 @@
                                     <artifactId>cxf-integration-jca</artifactId>
                                     <version>${project.version}</version>
                                     <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>javax.xml.bind</groupId>
-                                    <artifactId>jaxb-api</artifactId>
-                                    <version>${cxf.jaxb.version}</version>
-                                    <outputDirectory>${project.build.directory}/libs/endorsed</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.geronimo.specs</groupId>
-                                    <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                                    <version>${cxf.specs.jaxws.api.version}</version>
-                                    <outputDirectory>${project.build.directory}/libs/endorsed</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
