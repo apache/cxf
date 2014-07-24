@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -46,7 +45,6 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -56,7 +54,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -78,8 +75,6 @@ public final class CryptoUtils {
     public static final String RSSEC_PRINCIPAL_NAME = "rs.security.principal.name";
     public static final String RSSEC_SIG_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
     public static final String RSSEC_DECRYPT_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
-        
-    private static final Logger LOG = LogUtils.getL7dLogger(CryptoUtils.class);
     
     private CryptoUtils() {
     }
@@ -649,13 +644,7 @@ public final class CryptoUtils {
                 }
             }
             if (keyProps != null && keyProps.getAdditionalData() != null) {
-                // TODO: call updateAAD directly after switching to Java7
-                try {
-                    Method m = Cipher.class.getMethod("updateAAD", new Class[]{byte[].class});
-                    m.invoke(c, new Object[]{keyProps.getAdditionalData()});
-                } catch (NoSuchMethodException ex) {
-                    LOG.fine(ex.getMessage());
-                }
+                c.updateAAD(keyProps.getAdditionalData());
             }
             return c;
         } catch (Exception ex) {
