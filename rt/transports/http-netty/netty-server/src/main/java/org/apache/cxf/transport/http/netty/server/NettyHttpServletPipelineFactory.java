@@ -47,14 +47,14 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
+import io.netty.util.concurrent.ImmediateEventExecutor;
 
 public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel> {
     private static final Logger LOG =
         LogUtils.getL7dLogger(NettyHttpServletPipelineFactory.class);
     
-    //TODO how to manage the allChannels
-    private final ChannelGroup allChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);;
+    //Holds the child channel
+    private final ChannelGroup allChannels = new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE);;
 
     private final HttpSessionWatchdog watchdog;
     
@@ -111,7 +111,7 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     }
     
     public void shutdown() {
-        allChannels.close();
+        allChannels.close().awaitUninterruptibly();
         watchdog.stopWatching();
         applicationExecutor.shutdownGracefully();
     }
