@@ -35,6 +35,7 @@ import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.ws.Binding;
+import javax.xml.ws.EndpointContext;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
@@ -61,6 +62,7 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.frontend.WSDLGetUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
@@ -72,6 +74,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http_jaxws_spi.JAXWSHttpSpiTransportFactory;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
@@ -122,6 +125,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     @SuppressWarnings("rawtypes")
     private List<Handler> handlers = new ModCountCopyOnWriteArrayList<Handler>();
+    private EndpointContext endpointContext;
     
     /**
      * Flag indicating internal state of this instance.  If true,
@@ -838,5 +842,19 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 .getName()).toString());
         }
     }
+    
+    public void setEndpointContext(EndpointContext ctxt) {
+        endpointContext = ctxt;
+    }
+    public EndpointContext getEndpointContext() {
+        return endpointContext;
+    }
+    public void publish(javax.xml.ws.spi.http.HttpContext context) {
+        ServerFactoryBean sf = getServerFactory();
+        if (sf.getDestinationFactory() == null) {
+            sf.setDestinationFactory(new JAXWSHttpSpiTransportFactory(context));
+        }
+        publish(context.getPath());
+    }    
 
 }

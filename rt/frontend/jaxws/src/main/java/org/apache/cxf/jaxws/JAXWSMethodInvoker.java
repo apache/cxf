@@ -42,6 +42,9 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
 
     public static final String COPY_SOAP_HEADERS_BY_FAULT = "org.apache.cxf.fault.copySoapHeaders";
 
+    javax.xml.ws.spi.Invoker invoker;
+
+    
     public JAXWSMethodInvoker(final Object bean) {
         super(new SingletonFactory(bean));
     }
@@ -49,7 +52,20 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
     public JAXWSMethodInvoker(Factory factory) {
         super(factory);
     }
+    public JAXWSMethodInvoker(javax.xml.ws.spi.Invoker i) {
+        super(null);
+        invoker = i;
+    }
      
+    @Override
+    protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,
+                                       Object[] paramArray) throws Exception {
+        if (invoker != null) {
+            return invoker.invoke(m, paramArray);
+        }
+        return super.performInvocation(exchange, serviceObject, m, paramArray);
+    }
+    
     @Override
     protected Object invoke(Exchange exchange, 
                             final Object serviceObject, Method m,

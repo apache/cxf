@@ -30,14 +30,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.bus.spring.Jsr250BeanPostProcessor;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -52,21 +50,7 @@ import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 
 
 public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
-    private static final Class<?> EP_CLASS;
-    static {
-        Class<?> cls = SpringEndpointImpl.class;
-        try {
-            if (ProviderImpl.isJaxWs22()) {
-                cls = ClassLoaderUtils
-                    .loadClass("org.apache.cxf.jaxws22.spring.JAXWS22SpringEndpointImpl", 
-                           EndpointDefinitionParser.class);
-            }
-        } catch (Throwable t) {
-            cls = SpringEndpointImpl.class;
-        }
-        EP_CLASS = cls;
-    }
-    
+    private static final Class<?> EP_CLASS = SpringEndpointImpl.class;
     
     private static final String IMPLEMENTOR = "implementor";
 

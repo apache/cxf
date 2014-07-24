@@ -24,6 +24,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -41,11 +42,13 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
+import javax.xml.ws.spi.Invoker;
 import javax.xml.ws.spi.ServiceDelegate;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -54,7 +57,10 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.EndpointUtils;
+import org.apache.cxf.jaxws.JAXWSMethodInvoker;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jaxws.ServiceImpl;
+import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -159,6 +165,33 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         ep.publish(address);
         return ep;
     }
+    
+    //new in 2.2
+    public Endpoint createEndpoint(String bindingId, Class<?> implementorClass,
+                                   Invoker invoker, WebServiceFeature ... features) {
+        if (EndpointUtils.isValidImplementor(implementorClass)) {
+            Bus bus = BusFactory.getThreadDefaultBus();
+            JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+            if (features != null) {
+                factory.getJaxWsServiceFactory().setWsFeatures(Arrays.asList(features));
+            }
+            if (invoker != null) {
+                factory.setInvoker(new JAXWSMethodInvoker(invoker));
+                try {
+                    invoker.inject(new WebServiceContextImpl());
+                } catch (Exception e) {
+                    throw new WebServiceException(new Message("ENDPOINT_CREATION_FAILED_MSG",
+                                                              LOG).toString(), e);
+                }
+            }
+            EndpointImpl ep = new EndpointImpl(bus, null, factory);
+            ep.setImplementorClass(implementorClass);
+            return ep;
+        } else {
+            throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
+        }
+    }
+    
 
     public W3CEndpointReference createW3CEndpointReference(String address, 
                                                            QName serviceName, 

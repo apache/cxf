@@ -19,25 +19,16 @@
 
 package org.apache.cxf.jaxws22;
 
-import java.lang.reflect.Method;
-
 import org.apache.cxf.jaxws.JAXWSMethodInvoker;
-import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.Invoker;
 
 /**
- * 
+ * @deprecated - functionality moved into superclass
  */
+@Deprecated
 public class JAXWS22Invoker extends JAXWSMethodInvoker implements Invoker {
-    javax.xml.ws.spi.Invoker invoker;
     
     public JAXWS22Invoker(javax.xml.ws.spi.Invoker inv) {
-        super(null);
-        invoker = inv;
-    }
-    @Override
-    protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,
-                                       Object[] paramArray) throws Exception {
-        return invoker.invoke(m, paramArray);
+        super(inv);
     }
 }
