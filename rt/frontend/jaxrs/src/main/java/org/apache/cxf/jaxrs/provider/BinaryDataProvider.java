@@ -59,7 +59,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     
     private static final int BUFFER_SIZE = 4096;
     private boolean reportByteArraySize;
-    private boolean closeResponseInputStream;
+    private boolean closeResponseInputStream = true;
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return byte[].class.isAssignableFrom(type)
                || InputStream.class.isAssignableFrom(type)
