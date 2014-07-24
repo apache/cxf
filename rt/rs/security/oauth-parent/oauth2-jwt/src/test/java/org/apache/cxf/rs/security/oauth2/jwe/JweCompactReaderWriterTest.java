@@ -18,16 +18,24 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactReaderWriterTest;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
+import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.AfterClass;
@@ -41,6 +49,21 @@ public class JweCompactReaderWriterTest extends Assert {
         115, 63, (byte)180, 3, (byte)255, 107, (byte)154, (byte)212, (byte)246,
         (byte)138, 7, 110, 91, 112, 46, 34, 105, 47, 
         (byte)130, (byte)203, 46, 122, (byte)234, 64, (byte)252};
+    
+    private static final byte[] CONTENT_ENCRYPTION_KEY_A3 = {
+        4, (byte)211, 31, (byte)197, 84, (byte)157, (byte)252, (byte)254, 11, 100, 
+        (byte)157, (byte)250, 63, (byte)170, 106, (byte)206, 107, 124, (byte)212, 
+        45, 111, 107, 9, (byte)219, (byte)200, (byte)177, 0, (byte)240, (byte)143, 
+        (byte)156, 44, (byte)207};
+    private static final byte[] INIT_VECTOR_A3 = {
+        3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104, 101};
+    private static final String KEY_ENCRYPTION_KEY_A3 = "GawgguFyGrWKav7AX4VKUg";
+    private static final String JWE_OUTPUT_A3 = 
+        "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0" 
+        + ".6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ" 
+        + ".AxY8DCtDaGlsbGljb3RoZQ" 
+        + ".KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY" 
+        + ".U0m_YmjN04DJvceFICbCVQ";
     private static final String RSA_MODULUS_ENCODED = "oahUIoWw0K0usKNuOR6H4wkf4oBUXHTxRvgb48E-BVvxkeDNjbC4he8rUW"
            + "cJoZmds2h7M70imEVhRU5djINXtqllXI4DFqcI1DgjT9LewND8MW2Krf3S"
            + "psk_ZkoFnilakGygTwpZ3uesH-PFABNIUYpOiN15dsQRkgr0vEhxN92i2a"
@@ -73,7 +96,56 @@ public class JweCompactReaderWriterTest extends Assert {
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
         Security.removeProvider(BouncyCastleProvider.class.getName());    
     }
+    
+    @Test
+    public void testEncryptDecryptA128CBCHS256() throws Exception {
+        final String specPlainText = "Live long and prosper.";
+        byte[] macKey = new byte[16];
+        System.arraycopy(CONTENT_ENCRYPTION_KEY_A3, 0, macKey, 0, 16);
+        byte[] encKey = new byte[16];
+        System.arraycopy(CONTENT_ENCRYPTION_KEY_A3, 16, encKey, 0, 16);
+        SecretKey secretEncKey = 
+            CryptoUtils.createSecretKeySpec(encKey, Algorithm.A128CBC_HS256.getJavaAlgoName());
+        KeyProperties keyProps = new KeyProperties(Algorithm.AES_CBC_ALGO_JAVA);
+        keyProps.setAlgoSpec(new IvParameterSpec(INIT_VECTOR_A3));
+        byte[] cipher = CryptoUtils.encryptBytes(specPlainText.getBytes("UTF-8"), secretEncKey, keyProps);
         
+        JweHeaders headers = new JweHeaders();
+        headers.setAlgorithm(Algorithm.A128KW.getJwtName());
+        headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
+        
+        SecretKey secretCompleteCek = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY_A3, 
+                                                                      Algorithm.A128CBC_HS256.getJavaAlgoName());
+        byte[] wrapperKeyBytes = Base64UrlUtility.decode(KEY_ENCRYPTION_KEY_A3);
+        SecretKey secretWrapperKey = 
+            CryptoUtils.createSecretKeySpec(wrapperKeyBytes, Algorithm.A128KW.getJavaAlgoName());
+        byte[] defaultAesWrapIv = new BigInteger("A6A6A6A6A6A6A6A6", 16).toByteArray();
+        KeyProperties wrapperkeyProps = new KeyProperties(Algorithm.A128KW.getJavaName());
+        keyProps.setAlgoSpec(new IvParameterSpec(defaultAesWrapIv));
+        byte[] encryptedCek = CryptoUtils.wrapSecretKey(secretCompleteCek, secretWrapperKey, wrapperkeyProps);
+        
+        byte[] aad = headers.toCipherAdditionalAuthData(new JwtTokenReaderWriter());
+        ByteBuffer buf = ByteBuffer.allocate(8);
+        byte[] al = buf.putInt(0).putInt(aad.length * 8).array();
+        
+        Mac mac = HmacUtils.getInitializedMac(macKey, Algorithm.HMAC_SHA_256_JAVA, null);
+        mac.update(aad);
+        mac.update(INIT_VECTOR_A3);
+        mac.update(cipher);
+        mac.update(al);
+        byte[] sig = mac.doFinal();
+        assertEquals(32, sig.length);
+        byte[] authTag = new byte[16];
+        System.arraycopy(sig, 0, authTag, 0, 16);
+        
+        JweCompactProducer p = new JweCompactProducer(headers,
+                                                      encryptedCek,
+                                                      INIT_VECTOR_A3,
+                                                      cipher,
+                                                      authTag);
+        assertEquals(JWE_OUTPUT_A3, p.getJweContent());
+    }
+    
     @Test
     public void testEncryptDecryptSpecExample() throws Exception {
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
@@ -81,6 +153,7 @@ public class JweCompactReaderWriterTest extends Assert {
         
         decrypt(jweContent, specPlainText, true);
     }
+    
     @Test
     public void testDirectKeyEncryptDecrypt() throws Exception {
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";

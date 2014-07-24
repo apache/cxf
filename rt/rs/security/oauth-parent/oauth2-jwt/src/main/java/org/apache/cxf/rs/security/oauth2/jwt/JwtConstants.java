@@ -60,10 +60,19 @@ public final class JwtConstants {
     public static final String ES_SHA_256_ALGO = "ES256";
     public static final String ES_SHA_384_ALGO = "ES384";
     public static final String ES_SHA_512_ALGO = "ES512";
+    
+    // Key Encryption
     public static final String RSA_OAEP_ALGO = "RSA-OAEP";
     public static final String RSA_OAEP_256_ALGO = "RSA-OAEP-256";
     public static final String RSA_1_5_ALGO = "RSA1_5";
+    public static final String A128KW_ALGO = "A128KW";
+    public static final String A192KW_ALGO = "A192KW";
+    public static final String A256KW_ALGO = "A256KW";
     
+    // Content Encryption
+    public static final String A128CBC_HS256_ALGO = "A128CBC-HS256";
+    public static final String A192CBC_HS354_ALGO = "A192CBC-HS354";
+    public static final String A256CBC_HS512_ALGO = "A256CBC-HS512";
     public static final String A128GCM_ALGO = "A128GCM";
     public static final String A192GCM_ALGO = "A192GCM";
     public static final String A256GCM_ALGO = "A256GCM";
