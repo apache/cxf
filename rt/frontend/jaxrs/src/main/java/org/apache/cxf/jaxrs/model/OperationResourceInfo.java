@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -233,6 +234,22 @@ public class OperationResourceInfo {
         }
         if (dv != null) {
             defaultParamValue = dv.value();
+        }
+    }
+    public Annotation[] getOutAnnotations() {
+        Annotation[] invokedAnns = methodToInvoke.getAnnotations();
+        if (methodToInvoke != annotatedMethod && annotatedMethod != null) {
+            Annotation[] superAnns = annotatedMethod.getAnnotations();
+            if (invokedAnns.length > 0) {
+                Annotation[] merged = new Annotation[superAnns.length + invokedAnns.length];
+                System.arraycopy(superAnns, 0, merged, 0, superAnns.length);
+                System.arraycopy(invokedAnns, 0, merged, superAnns.length, invokedAnns.length);
+                return merged;
+            } else {
+                return superAnns;
+            }
+        } else {
+            return invokedAnns;
         }
     }
 }

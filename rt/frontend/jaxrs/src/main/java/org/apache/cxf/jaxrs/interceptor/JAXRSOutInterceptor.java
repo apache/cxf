@@ -148,7 +148,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             ? ori.getAnnotatedMethod() : ori.getMethodToInvoke();
         
         Annotation[] annotations = null;
-        Annotation[] staticAnns = invoked != null ? invoked.getAnnotations() : new Annotation[]{};
+        Annotation[] staticAnns = ori != null ? ori.getOutAnnotations() : new Annotation[]{};
         Annotation[] responseAnns = response.getEntityAnnotations();
         if (responseAnns != null) {
             annotations = new Annotation[staticAnns.length + responseAnns.length];

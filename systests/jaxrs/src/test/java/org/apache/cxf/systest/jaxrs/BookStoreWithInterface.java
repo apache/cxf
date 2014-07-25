@@ -38,6 +38,8 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import org.apache.cxf.annotations.SchemaValidation;
+
 
 
 
@@ -59,6 +61,7 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
         return doGetBook(id);
     }
     
+    @SchemaValidation
     public Book getThatBook(Long id) throws BookNotFoundFault {
         checkPostConstruct();
         return doGetBook(id);
