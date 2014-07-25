@@ -34,17 +34,6 @@
         <cxf.jetty.version>8.1.14.v20131031</cxf.jetty.version>
         <cxf.netty3.version>3.8.0.Final</cxf.netty3.version>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <profiles>
         <profile>
             <id>server</id>

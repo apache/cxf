@@ -30,17 +30,6 @@
     <properties>
         <cxf.version>${project.version}</cxf.version>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <profiles>
         <profile>
             <id>wsn-server</id>
