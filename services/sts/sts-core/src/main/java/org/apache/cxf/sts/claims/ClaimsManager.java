@@ -335,9 +335,8 @@ public class ClaimsManager {
                         LOG.finest(" [" + value + "]");
                     }
                     c.addValue(value);
-                    collection.add(c);
-                    break;                    
                 }
+                collection.add(c);
             }
         }
         return collection;
@@ -374,9 +373,8 @@ public class ClaimsManager {
                         LOG.finest(" [" + value + "]");
                     }
                     c.addValue(value);
-                    collection.add(c);
-                    break;
                 }
+                collection.add(c);
             }
         }
         return collection;
