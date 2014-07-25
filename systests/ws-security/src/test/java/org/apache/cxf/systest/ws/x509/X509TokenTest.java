@@ -95,9 +95,9 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public static Collection<TestParam[]> data() {
        
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                               // {new TestParam(PORT, true)},
-                                                //{new TestParam(STAX_PORT, false)},
-                                               // {new TestParam(STAX_PORT, true)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
         });
     }
     
@@ -106,7 +106,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-/*
+
     @org.junit.Test
     public void testSymmetricErrorMessage() throws Exception {
 
@@ -362,7 +362,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
-    */
+    
     @org.junit.Test
     public void testSymmetricThumbprintEndorsing() throws Exception {
 
@@ -387,7 +387,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
-    /*
+    
     @org.junit.Test
     public void testSymmetricEndorsingEncrypted() throws Exception {
 
@@ -1379,5 +1379,5 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
-    */
+    
 }
