@@ -56,10 +56,6 @@
             <artifactId>xml-resolver</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>jaxb2-basics</artifactId>
             <version>0.6.4</version>

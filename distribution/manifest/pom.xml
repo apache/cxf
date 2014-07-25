@@ -378,7 +378,7 @@
                             <!-- Add entries for the stuff that needs to be endorsed on Java6, but not on java5 -->
                             <!-- Stick both versions of jaxb xjc/impl on classpath to make it easier to flip back and forth -->
                             <Class-Path>
-                          cxf-${project.version}.jar endorsed/jaxb-api-${cxf.jaxb.version}.jar endorsed/geronimo-jaxws_2.2_spec-${cxf.specs.jaxws.api.version}.jar jaxb-impl-${cxf.jaxb.impl.version}.jar jaxb-core-${cxf.jaxb.core.version}.jar
+                          cxf-${project.version}.jar endorsed/jaxb-api-${cxf.jaxb.version}.jar jaxb-impl-${cxf.jaxb.impl.version}.jar jaxb-core-${cxf.jaxb.core.version}.jar
                             </Class-Path>
                         </manifestEntries>
                     </archive>

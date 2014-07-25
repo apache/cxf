@@ -1406,11 +1406,6 @@
                 <version>1.0.1</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                <version>${cxf.specs.jaxws.api.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-broker</artifactId>
                 <version>${cxf.activemq.version}</version>
