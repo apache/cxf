@@ -822,7 +822,7 @@ public class SourceGenerator {
         for (Element inherited : inheritedParams) {
             boolean duplicate = false;
             for (Element in : inParamElements) {
-                if (in.getLocalName().equals(inherited.getLocalName())) {    
+                if (in.getAttribute("name").equals(inherited.getAttribute("name"))) {    
                     duplicate = true;
                     break;
                 }
