@@ -37,13 +37,6 @@
         <defaultGoal>install</defaultGoal>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -115,7 +108,6 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/target/generated-wsdl/wsdl/HelloWorld-corba.wsdl</wsdl>
-                                    <frontEnd>jaxws21</frontEnd>
                                     <packagenames>
                                         <package>cxf.common</package>
                                     </packagenames>

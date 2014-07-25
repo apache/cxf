@@ -35,17 +35,6 @@
     </properties>
     <build>
         <defaultGoal>install</defaultGoal>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -59,7 +48,6 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>src/main/resources/wsdl/bank.wsdl</wsdl>
-                                    <frontEnd>jaxws21</frontEnd>
                                     <packagenames>
                                         <package>bank.common</package>
                                     </packagenames>

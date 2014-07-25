@@ -73,7 +73,6 @@
                         </goals>
                         <configuration>
                             <fork>${cxf.codegenplugin.forkmode}</fork>
-                            <frontend>jaxws21</frontend>
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/model/xkms.wsdl</wsdl>

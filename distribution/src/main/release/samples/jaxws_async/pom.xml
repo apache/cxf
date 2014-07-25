@@ -35,13 +35,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>
@@ -53,7 +46,6 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/wsdl/hello_world_async.wsdl</wsdl>
-                                    <frontEnd>jaxws21</frontEnd>
                                     <extraargs>
                                         <extraarg>-b</extraarg>
                                         <extraarg>${basedir}/wsdl/async_binding.xml</extraarg>

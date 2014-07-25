@@ -63,13 +63,6 @@
                         <path>/${project.build.finalName}</path>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -85,7 +78,6 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>src/main/resources/CustomerService.wsdl</wsdl>
-                                    <frontEnd>jaxws21</frontEnd>
                                     <faultSerialVersionUID>1</faultSerialVersionUID>
                                     <bindingFiles>
                                         <bindingFile>src/main/resources/binding.xml</bindingFile>

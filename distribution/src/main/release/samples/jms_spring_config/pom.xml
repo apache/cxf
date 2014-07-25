@@ -30,7 +30,6 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.xjc-utils.version>2.6.0</cxf.xjc-utils.version>
         <cxf.release.base>${basedir}/../..</cxf.release.base>
         <wsdl.dir>${basedir}/src/main/config</wsdl.dir>
     </properties>
@@ -44,17 +43,6 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -68,7 +56,6 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${wsdl.dir}/CustomerService.wsdl</wsdl>
-                                    <frontEnd>jaxws21</frontEnd>
                                     <bindingFiles>
                                         <bindingFile>${wsdl.dir}/binding.xml</bindingFile>
                                     </bindingFiles>
@@ -169,7 +156,6 @@
         <dependency>
             <groupId>org.apache.cxf.xjc-utils</groupId>
             <artifactId>cxf-xjc-runtime</artifactId>
-            <version>${cxf.xjc-utils.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>

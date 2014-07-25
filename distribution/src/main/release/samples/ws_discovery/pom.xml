@@ -31,7 +31,6 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.xjc-utils.version>2.6.0</cxf.xjc-utils.version>
         <cxf.release.base>${basedir}/../..</cxf.release.base>
     </properties>
     <dependencies>
@@ -58,17 +57,6 @@
     </dependencies>
     <build>
         <defaultGoal>install</defaultGoal>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -81,7 +69,6 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <frontEnd>jaxws21</frontEnd>
                                     <wsdl>src/main/resources/org/apache/cxf/hello_world/discovery/hello_world.wsdl</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
