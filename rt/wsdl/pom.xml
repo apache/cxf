@@ -96,7 +96,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/test/resources/schemas/wsdl/test-conf.xsd</xsd>
                                     <bindingFile>${basedir}/src/test/resources/schemas/wsdl/test-conf.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/test/build-resources/catalog.cat</catalog>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/test/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>
