@@ -59,7 +59,12 @@
             <ref bean="sfactory2"/>
         </jaxrs:serviceFactories>
     </jaxrs:server>
-    <jaxrs:server id="bookservice5" address="/5" beanNames="bookstorePrototype bookstoreInterfacePrototype"/>
+    <jaxrs:server id="bookservice5" address="/5" 
+        beanNames="bookstorePrototype bookstoreInterfacePrototype">
+    	<jaxrs:providers>
+            <bean class="org.apache.cxf.systest.jaxrs.CustomJaxbElementProvider"/>
+         </jaxrs:providers>
+    </jaxrs:server>
     <jaxrs:server id="bookservice6" address="/6">
         <jaxrs:serviceFactories>
             <ref bean="sfactory5"/>
