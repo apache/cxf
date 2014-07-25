@@ -174,15 +174,18 @@ public class SAMLSSOResponseValidator {
         if (subject.getSubjectConfirmations() == null) {
             return false;
         }
+        
+        boolean foundBearerSubjectConf = false;
         // We need to find a Bearer Subject Confirmation method
         for (org.opensaml.saml2.core.SubjectConfirmation subjectConf 
             : subject.getSubjectConfirmations()) {
             if (SAML2Constants.CONF_BEARER.equals(subjectConf.getMethod())) {
+                foundBearerSubjectConf = true;
                 validateSubjectConfirmation(subjectConf.getSubjectConfirmationData(), id, postBinding);
             }
         }
         
-        return true;
+        return foundBearerSubjectConf;
     }
     
     /**
