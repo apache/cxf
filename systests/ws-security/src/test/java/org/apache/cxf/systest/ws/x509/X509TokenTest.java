@@ -70,25 +70,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         );
     }
     
-<<<<<<< HEAD
-=======
-    @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
-       
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                               // {new TestParam(PORT, true)},
-                                                //{new TestParam(STAX_PORT, false)},
-                                               // {new TestParam(STAX_PORT, true)},
-        });
-    }
-    
->>>>>>> 43c9a1c... Fixing a SAML SSO validation issue
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-/*
+
     @org.junit.Test
     public void testKeyIdentifier() throws Exception {
 
@@ -204,61 +191,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
-    */
-    @org.junit.Test
-<<<<<<< HEAD
-=======
-    public void testSymmetricThumbprintEndorsing() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricThumbprintEndorsingPort");
-        DoubleItPortType x509Port = 
-                service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(x509Port, test.getPort());
-        
-        if (!test.isStreaming()) {
-            x509Port.doubleIt(25);
-        }
-        
-        ((java.io.Closeable)x509Port).close();
-        bus.shutdown(true);
-    }
-    /*
-    @org.junit.Test
-    public void testSymmetricEndorsingEncrypted() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricEndorsingEncryptedPort");
-        DoubleItPortType x509Port = 
-                service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(x509Port, test.getPort());
-        
-        if (!test.isStreaming()) {
-            x509Port.doubleIt(25);
-        }
-        
-        ((java.io.Closeable)x509Port).close();
-        bus.shutdown(true);
-    }
     
     @org.junit.Test
->>>>>>> 43c9a1c... Fixing a SAML SSO validation issue
     public void testContentEncryptedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -964,5 +898,6 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    */
+    
 }
+
