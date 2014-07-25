@@ -809,11 +809,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-stax-api_1.0_spec</artifactId>
-                <version>1.0.1</version>
-            </dependency>
-            <dependency>
                 <groupId>org.codehaus.jettison</groupId>
                 <artifactId>jettison</artifactId>
                 <version>${cxf.jettison.version}</version>
