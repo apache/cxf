@@ -912,7 +912,6 @@
                                 <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
                                     <wsp:Policy>
                                         <sp:WssX509V3Token10/>
-                                        <sp:RequireDerivedKeys/>
                                         <sp:RequireThumbprintReference/>
                                     </wsp:Policy>
                                 </sp:X509Token>
@@ -924,7 +923,6 @@
                             </wsp:Policy>
                         </sp:Layout>
                         <sp:IncludeTimestamp/>
-                        <sp:EncryptSignature/>
                         <sp:OnlySignEntireHeadersAndBody/>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
