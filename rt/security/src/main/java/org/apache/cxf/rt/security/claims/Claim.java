@@ -33,7 +33,7 @@ import org.apache.cxf.common.logging.LogUtils;
 /**
  * This represents a Claim.
  */
-public class Claim implements Serializable {
+public class Claim implements Serializable, Cloneable {
     
     private static final long serialVersionUID = 5730726672368086795L;
 
@@ -42,6 +42,25 @@ public class Claim implements Serializable {
     private URI claimType;
     private boolean optional;
     private List<Object> values = new ArrayList<Object>(1);
+
+    public Claim() {
+    }
+    
+    /**
+     * Create a clone of the provided claim.
+     * 
+     * @param claim Claim to be cloned. Value cannot be null.
+     */
+    public Claim(Claim claim) {
+        if (claim == null) {
+            throw new IllegalArgumentException("Claim cannot be null");
+        }
+        if (claim.getClaimType() != null) {
+            claimType = URI.create(claim.getClaimType().toString());
+        }
+        optional = claim.isOptional();
+        values.addAll(claim.getValues());
+    }
 
     public URI getClaimType() {
         return claimType;
@@ -95,5 +114,76 @@ public class Claim implements Serializable {
             }
         }
         writer.writeEndElement();
+    }
+    
+    @Override
+    public Claim clone() {
+        try {
+            super.clone(); // Checkstyle requires this call
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return new Claim(this);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((claimType == null)
+            ? 0
+            : claimType.hashCode());
+        result = prime * result + (optional
+            ? 1231
+            : 1237);
+        result = prime * result + ((values == null)
+            ? 0
+            : values.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Claim)) {
+            return false;
+        }
+        Claim other = (Claim)obj;
+        if (claimType == null) {
+            if (other.claimType != null) {
+                return false;
+            }
+        } else if (!claimType.equals(other.claimType)) {
+            return false;
+        }
+        if (optional != other.optional) {
+            return false;
+        }
+        if (values == null) {
+            if (other.values != null) {
+                return false;
+            }
+        } else if (!values.equals(other.values)) {
+            return false;
+        }
+        return true;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Claim [values=");
+        builder.append(values);
+        builder.append(", claimType=");
+        builder.append(claimType);
+        builder.append(", optional=");
+        builder.append(optional);
+        builder.append("]");
+        return builder.toString();
     }
 }
