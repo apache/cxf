@@ -19,6 +19,7 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
+import java.security.Provider;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -48,6 +50,7 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ConfigurationConverter;
@@ -139,6 +142,20 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             
             newXmlStreamReader = 
                 inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListeners);
+            final Object provider = soapMessage.getExchange().get(Provider.class);
+            if (provider != null && ThreadLocalSecurityProvider.isInstalled()) {
+                newXmlStreamReader = new StreamReaderDelegate(newXmlStreamReader) {
+                    @Override
+                    public int next() throws XMLStreamException {
+                        try {
+                            ThreadLocalSecurityProvider.setProvider((Provider)provider);
+                            return super.next();
+                        } finally {
+                            ThreadLocalSecurityProvider.unsetProvider();
+                        }
+                    }
+                };
+            }
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
 
             // Warning: The exceptions which can occur here are not security relevant exceptions

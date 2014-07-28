@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.security.Provider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -142,7 +144,22 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             super();
         }
         
-        public void handleMessage(SoapMessage mc) throws Fault {
+        public void handleMessage(SoapMessage message) throws Fault {
+            Object provider = message.getExchange().get(Provider.class);
+            final boolean useCustomProvider = provider != null && ThreadLocalSecurityProvider.isInstalled();
+            try {
+                if (useCustomProvider) {
+                    ThreadLocalSecurityProvider.setProvider((Provider)provider);
+                }
+                handleMessageInternal(message);
+            } finally {
+                if (useCustomProvider) {
+                    ThreadLocalSecurityProvider.unsetProvider();
+                }
+            }
+        }
+        
+        private void handleMessageInternal(SoapMessage mc) throws Fault {
             
             boolean doDebug = LOG.isLoggable(Level.FINE);
     
