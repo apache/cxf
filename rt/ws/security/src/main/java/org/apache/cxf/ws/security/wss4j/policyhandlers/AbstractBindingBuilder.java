@@ -164,11 +164,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     protected Set<WSEncryptionPart> encryptedTokensList = new HashSet<WSEncryptionPart>();
 
-    protected List<SupportingToken> endEncSuppTokList;
-    protected List<SupportingToken> endSuppTokList;
-    protected List<SupportingToken> sgndEndEncSuppTokList;
-    protected List<SupportingToken> sgndEndSuppTokList;
-    
     protected List<byte[]> signatures = new ArrayList<byte[]>();
 
     protected Element bottomUpElement;
@@ -178,7 +173,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     private Element lastSupportingTokenElement;
     private Element lastDerivedKeyElement;
+    
     private List<AbstractSecurityAssertion> suppTokenParts = new ArrayList<AbstractSecurityAssertion>();
+    private List<SupportingToken> endSuppTokList;
+    private List<SupportingToken> sgndEndSuppTokList;
     
     public AbstractBindingBuilder(
                            WSSConfig config,
@@ -1048,6 +1046,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }            
         }
         
+        if (parts == null && elements == null && celements == null) {
+            return new ArrayList<WSEncryptionPart>();
+        }
+        
         List<WSEncryptionPart> signedParts = new ArrayList<WSEncryptionPart>();
         if (parts != null) {
             isBody = parts.isBody();
@@ -1116,6 +1118,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     }
                 }            
             }
+        }
+        
+        if (parts == null && elements == null) {
+            return new ArrayList<WSEncryptionPart>();
         }
         
         List<WSEncryptionPart> signedParts = new ArrayList<WSEncryptionPart>();
@@ -2054,13 +2060,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         
         Collection<AssertionInfo> endorsingEncryptedSuppTokens =
             getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        endEncSuppTokList 
-            = this.handleSupportingTokens(endorsingEncryptedSuppTokens, true);
+        endSuppTokList.addAll(this.handleSupportingTokens(endorsingEncryptedSuppTokens, true));
 
         Collection<AssertionInfo> sgndEndEncSuppTokens =
             getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        sgndEndEncSuppTokList 
-            = this.handleSupportingTokens(sgndEndEncSuppTokens, true);
+        sgndEndSuppTokList.addAll(this.handleSupportingTokens(sgndEndEncSuppTokens, true));
 
         Collection<AssertionInfo> supportingToks =
             getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
@@ -2074,7 +2078,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         addSignatureParts(sigSuppTokList, sigs);
         addSignatureParts(sgndEncSuppTokList, sigs);
         addSignatureParts(sgndEndSuppTokList, sigs);
-        addSignatureParts(sgndEndEncSuppTokList, sigs);
     }
     
     protected void doEndorse() {
@@ -2087,13 +2090,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             tokenProtect = ((SymmetricBinding)binding).isProtectTokens();
             sigProtect = ((SymmetricBinding)binding).isEncryptSignature();            
         }
-        // Adding the endorsing encrypted supporting tokens to endorsing supporting tokens
-        endSuppTokList.addAll(endEncSuppTokList);
         // Do endorsed signatures
         doEndorsedSignatures(endSuppTokList, tokenProtect, sigProtect);
 
-        //Adding the signed endorsed encrypted tokens to signed endorsed supporting tokens
-        sgndEndSuppTokList.addAll(sgndEndEncSuppTokList);
         // Do signed endorsing signatures
         doEndorsedSignatures(sgndEndSuppTokList, tokenProtect, sigProtect);
     } 
