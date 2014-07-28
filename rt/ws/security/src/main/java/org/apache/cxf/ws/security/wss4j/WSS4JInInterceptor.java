@@ -20,6 +20,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.security.Provider;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,6 +71,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
@@ -177,6 +179,21 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             return;
         }
         
+        Object provider = msg.getExchange().get(Provider.class);
+        final boolean useCustomProvider = provider != null && ThreadLocalSecurityProvider.isInstalled();
+        try {
+            if (useCustomProvider) {
+                ThreadLocalSecurityProvider.setProvider((Provider)provider);
+            }
+            handleMessageInternal(msg);
+        } finally {
+            if (useCustomProvider) {
+                ThreadLocalSecurityProvider.unsetProvider();
+            }
+        }
+    }
+    
+    private void handleMessageInternal(SoapMessage msg) throws Fault {
         boolean utWithCallbacks = 
             MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
         translateProperties(msg);

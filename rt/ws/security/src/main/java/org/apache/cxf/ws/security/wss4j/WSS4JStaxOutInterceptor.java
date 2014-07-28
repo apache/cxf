@@ -19,6 +19,7 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.OutputStream;
+import java.security.Provider;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
@@ -304,7 +306,22 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             getBefore().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
         }
         
-        public void handleMessage(Message mc) throws Fault {
+        public void handleMessage(Message message) throws Fault {
+            Object provider = message.getExchange().get(Provider.class);
+            final boolean useCustomProvider = provider != null && ThreadLocalSecurityProvider.isInstalled();
+            try {
+                if (useCustomProvider) {
+                    ThreadLocalSecurityProvider.setProvider((Provider)provider);
+                }
+                handleMessageInternal(message);
+            } finally {
+                if (useCustomProvider) {
+                    ThreadLocalSecurityProvider.unsetProvider();
+                }
+            }
+        }
+        
+        private void handleMessageInternal(Message mc) throws Fault {
             try {
                 XMLStreamWriter xtw = mc.getContent(XMLStreamWriter.class);
                 if (xtw != null) {

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.security.Provider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -48,6 +49,7 @@ import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -103,6 +105,21 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         }
 
         public void handleMessage(SoapMessage message) throws Fault {
+            Object provider = message.getExchange().get(Provider.class);
+            final boolean useCustomProvider = provider != null && ThreadLocalSecurityProvider.isInstalled();
+            try {
+                if (useCustomProvider) {
+                    ThreadLocalSecurityProvider.setProvider((Provider)provider);
+                }
+                handleMessageInternal(message);
+            } finally {
+                if (useCustomProvider) {
+                    ThreadLocalSecurityProvider.unsetProvider();
+                }
+            }
+        }
+        
+        private void handleMessageInternal(SoapMessage message) throws Fault {
             Collection<AssertionInfo> ais;
             SOAPMessage saaj = message.getContent(SOAPMessage.class);
 
