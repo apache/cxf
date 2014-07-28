@@ -23,6 +23,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,13 +39,14 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
+import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -55,12 +57,17 @@ import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.EncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedParts;
 import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.RequiredElements;
 import org.apache.wss4j.policy.model.SignedElements;
 import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.SupportingTokens;
 
 /**
  * A base class to use to validate various SupportingToken policies.
@@ -873,4 +880,47 @@ public abstract class AbstractSupportingTokenPolicyValidator
         this.encryptedParts = encryptedParts;
     }
     
+    protected void assertSecurePartsIfTokenNotRequired(
+        SupportingTokens supportingToken, AssertionInfoMap aim
+    ) {
+        if (supportingToken.getSignedParts() != null) {
+            assertSecurePartsIfTokenNotRequired(supportingToken.getSignedParts(),
+                                                SPConstants.SIGNED_PARTS, aim);
+        }
+        if (supportingToken.getSignedElements() != null) {
+            assertSecurePartsIfTokenNotRequired(supportingToken.getSignedElements(),
+                                                SPConstants.SIGNED_ELEMENTS, aim);
+        }
+        if (supportingToken.getEncryptedParts() != null) {
+            assertSecurePartsIfTokenNotRequired(supportingToken.getEncryptedParts(),
+                                                SPConstants.ENCRYPTED_PARTS, aim);
+        }
+        if (supportingToken.getEncryptedElements() != null) {
+            assertSecurePartsIfTokenNotRequired(supportingToken.getEncryptedElements(),
+                                                SPConstants.ENCRYPTED_ELEMENTS, aim);
+        }
+    }
+
+    protected void assertSecurePartsIfTokenNotRequired(
+        AbstractSecurityAssertion securedPart, String localName, AssertionInfoMap aim
+    ) {
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localName));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            for (AssertionInfo ai : sp11Ais) {
+                if (ai.getAssertion().equals(securedPart)) {
+                    ai.setAsserted(true);
+                }
+            }    
+        }
+
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localName));
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            for (AssertionInfo ai : sp12Ais) {
+                if (ai.getAssertion().equals(securedPart)) {
+                    ai.setAsserted(true);
+                }
+            }    
+        }
+    }
+
 }

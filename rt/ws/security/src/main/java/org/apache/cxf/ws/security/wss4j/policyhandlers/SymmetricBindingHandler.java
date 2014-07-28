@@ -139,8 +139,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             AbstractTokenWrapper encryptionWrapper = getEncryptionToken();
             assertTokenWrapper(encryptionWrapper);
             AbstractToken encryptionToken = encryptionWrapper.getToken();
-            List<WSEncryptionPart> encrParts = getEncryptedParts();
-            List<WSEncryptionPart> sigParts = getSignedParts();
             
             if (encryptionToken != null) {
                 //The encryption token can be an IssuedToken or a 
@@ -192,17 +190,19 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     attached = true;
                 }
                 
-                WSSecBase encr = doEncryption(encryptionWrapper, tok, attached, encrParts, true);
-                
-                handleEncryptedSignedHeaders(encrParts, sigParts);
-                
+                List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
                 if (timestampEl != null) {
                     WSEncryptionPart timestampPart = 
                         convertToEncryptionPart(timestampEl.getElement());
                     sigParts.add(timestampPart);        
                 }
-                
                 addSupportingTokens(sigParts);
+                sigParts.addAll(this.getSignedParts(null));
+
+                List<WSEncryptionPart> encrParts = getEncryptedParts();
+                WSSecBase encr = doEncryption(encryptionWrapper, tok, attached, encrParts, true);
+                handleEncryptedSignedHeaders(encrParts, sigParts);
+                
                 if (!isRequestor()) {
                     addSignatureConfirmation(sigParts);
                 }
@@ -327,13 +327,14 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
         
             //Add timestamp
-            List<WSEncryptionPart> sigs = getSignedParts();
+            List<WSEncryptionPart> sigs = new ArrayList<WSEncryptionPart>();
             if (timestampEl != null) {
                 WSEncryptionPart timestampPart = convertToEncryptionPart(timestampEl.getElement());
                 sigs.add(timestampPart);        
             }
 
             addSupportingTokens(sigs);
+            sigs.addAll(getSignedParts(null));
             if (isRequestor()) {
                 if (!sigs.isEmpty()) {
                     signatures.add(doSignature(sigs, sigAbstractTokenWrapper, sigToken, sigTok, tokIncluded));

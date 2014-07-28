@@ -111,6 +111,7 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
@@ -177,6 +178,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     private Element lastSupportingTokenElement;
     private Element lastDerivedKeyElement;
+    private List<AbstractSecurityAssertion> suppTokenParts = new ArrayList<AbstractSecurityAssertion>();
     
     public AbstractBindingBuilder(
                            WSSConfig config,
@@ -392,7 +394,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             for (AssertionInfo assertionInfo : tokensInfos) {
                 if (assertionInfo.getAssertion() instanceof SupportingTokens) {
                     assertionInfo.setAsserted(true);
-                    handleSupportingTokens((SupportingTokens)assertionInfo.getAssertion(), endorse, ret);
+                    try {
+                        handleSupportingTokens((SupportingTokens)assertionInfo.getAssertion(), endorse, ret);
+                    } catch (SOAPException ex) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+                    }
                 }
             }
         }
@@ -403,13 +409,15 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         SupportingTokens suppTokens, 
         boolean endorse,
         List<SupportingToken> ret
-    ) throws WSSecurityException {
+    ) throws WSSecurityException, SOAPException {
         if (suppTokens == null) {
             return ret;
         }
         for (AbstractToken token : suppTokens.getTokens()) {
             assertToken(token);
             if (!isTokenRequired(token.getIncludeTokenType())) {
+                // Check for any SignedParts so as *not* to sign them
+                getSignedParts(suppTokens);
                 continue;
             }
             if (token instanceof UsernameToken) {
@@ -442,7 +450,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         
                 if (secToken.getX509Certificate() == null) {  
                     ret.add(
-                        new SupportingToken(token, new WSSecurityTokenHolder(wssConfig, secToken))
+                        new SupportingToken(token, new WSSecurityTokenHolder(wssConfig, secToken),
+                                            getSignedParts(suppTokens))
                     );
                 } else {
                     WSSecSignature sig = new WSSecSignature(wssConfig);                    
@@ -482,7 +491,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                         throw new Fault(e);
                     }
                     
-                    ret.add(new SupportingToken(token, sig));                
+                    ret.add(new SupportingToken(token, sig, getSignedParts(suppTokens)));                
                 }
 
             } else if (token instanceof X509Token) {
@@ -506,20 +515,20 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                         encryptedTokensList.add(part);
                     }
                 }
-                ret.add(new SupportingToken(token, sig));
+                ret.add(new SupportingToken(token, sig, getSignedParts(suppTokens)));
             } else if (token instanceof KeyValueToken) {
                 WSSecSignature sig = getSignatureBuilder(suppTokens, token, endorse);
                 if (suppTokens.isEncryptedToken()) {
                     WSEncryptionPart part = new WSEncryptionPart(sig.getBSTTokenId(), "Element");
                     encryptedTokensList.add(part);
                 }
-                ret.add(new SupportingToken(token, sig));                
+                ret.add(new SupportingToken(token, sig, getSignedParts(suppTokens)));                
             } else if (token instanceof SamlToken) {
                 SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
                 if (assertionWrapper != null) {
                     Element assertionElement = assertionWrapper.toDOM(saaj.getSOAPPart());
                     addSupportingElement(assertionElement);
-                    ret.add(new SupportingToken(token, assertionWrapper));
+                    ret.add(new SupportingToken(token, assertionWrapper, getSignedParts(suppTokens)));
                     if (suppTokens.isEncryptedToken()) {
                         WSEncryptionPart part = new WSEncryptionPart(assertionWrapper.getId(), "Element");
                         part.setElement(assertionElement);
@@ -528,6 +537,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 }
             }
         }
+        
         return ret;
     }
     
@@ -539,7 +549,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             if (utBuilder != null) {
                 utBuilder.prepare(saaj.getSOAPPart());
                 addSupportingElement(utBuilder.getUsernameTokenElement());
-                ret.add(new SupportingToken(token, utBuilder));
+                ret.add(new SupportingToken(token, utBuilder, null));
                 if (encryptedToken) {
                     WSEncryptionPart part = new WSEncryptionPart(utBuilder.getId(), "Element");
                     part.setElement(utBuilder.getUsernameTokenElement());
@@ -551,7 +561,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             if (utBuilder != null) {
                 utBuilder.prepare(saaj.getSOAPPart());
                 addSupportingElement(utBuilder.getUsernameTokenElement());
-                ret.add(new SupportingToken(token, utBuilder));
+                ret.add(new SupportingToken(token, utBuilder, null));
                 //WebLogic and WCF always encrypt these
                 //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
                 //encryptedTokensIdList.add(utBuilder.getId());
@@ -1066,7 +1076,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                                    celements == null ? null : celements.getXPaths());
     }    
     
-    public List<WSEncryptionPart> getSignedParts() 
+    public List<WSEncryptionPart> getSignedParts(SupportingTokens supportingToken) 
         throws SOAPException {
         
         boolean isSignBody = false;
@@ -1074,20 +1084,38 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         SignedParts parts = null;
         SignedElements elements = null;
         
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.SIGNED_PARTS);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                parts = (SignedParts)ai.getAssertion();
-                ai.setAsserted(true);
-            }            
-        }
-        
-        ais = getAllAssertionsByLocalname(SPConstants.SIGNED_ELEMENTS);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                elements = (SignedElements)ai.getAssertion();
-                ai.setAsserted(true);
-            }            
+        if (supportingToken != null && supportingToken.isEndorsing()) {
+            parts = supportingToken.getSignedParts();
+            elements = supportingToken.getSignedElements();
+            // Store them so that the main Signature doesn't sign them
+            if (parts != null) {
+                suppTokenParts.add(parts);
+            }
+            if (elements != null) {
+                suppTokenParts.add(elements);
+            }
+        } else {
+            Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.SIGNED_PARTS);
+            if (!ais.isEmpty()) {
+                for (AssertionInfo ai : ais) {
+                    SignedParts signedParts = (SignedParts)ai.getAssertion();
+                    if (!suppTokenParts.contains(signedParts)) {
+                        parts = signedParts;
+                        ai.setAsserted(true);
+                    }
+                }            
+            }
+            
+            ais = getAllAssertionsByLocalname(SPConstants.SIGNED_ELEMENTS);
+            if (!ais.isEmpty()) {
+                for (AssertionInfo ai : ais) {
+                    SignedElements signedElements = (SignedElements)ai.getAssertion();
+                    if (!suppTokenParts.contains(signedElements)) {
+                        elements = signedElements;
+                        ai.setAsserted(true);
+                    }
+                }            
+            }
         }
         
         List<WSEncryptionPart> signedParts = new ArrayList<WSEncryptionPart>();
@@ -1785,6 +1813,12 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             sigPart.setElement(bottomUpElement);
             sigParts.add(sigPart);
             
+            if (supportingToken.getSignedParts() != null) {
+                for (WSEncryptionPart signedPart : supportingToken.getSignedParts()) {
+                    sigParts.add(signedPart);
+                }
+            }
+            
             if (tempTok instanceof WSSecSignature) {
                 WSSecSignature sig = (WSSecSignature)tempTok;
                 if (isTokenProtection && sig.getBSTTokenId() != null) {
@@ -2191,10 +2225,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     static class SupportingToken {
         private final AbstractToken token;
         private final Object tokenImplementation;
+        private final List<WSEncryptionPart> signedParts;
         
-        public SupportingToken(AbstractToken token, Object tokenImplementation) {
+        public SupportingToken(AbstractToken token, Object tokenImplementation,
+                               List<WSEncryptionPart> signedParts) {
             this.token = token;
             this.tokenImplementation = tokenImplementation;
+            this.signedParts = signedParts;
         }
         
         public AbstractToken getToken() {
@@ -2204,5 +2241,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         public Object getTokenImplementation() {
             return tokenImplementation;
         }
+
+        public List<WSEncryptionPart> getSignedParts() {
+            return signedParts;
+        }
+
     }
 }

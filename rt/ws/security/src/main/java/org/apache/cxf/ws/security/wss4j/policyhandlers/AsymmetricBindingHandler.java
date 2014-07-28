@@ -308,24 +308,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             assertToken(initiatorToken);
         }
         
-        List<WSEncryptionPart> encrParts = null;
-        List<WSEncryptionPart> sigParts = null;
-        try {
-            encrParts = getEncryptedParts();
-            //Signed parts are determined before encryption because encrypted signed  headers
-            //will not be included otherwise
-            sigParts = getSignedParts();
-        } catch (SOAPException ex) {
-            LOG.log(Level.FINE, ex.getMessage(), ex);
-            throw new Fault(ex);
-        }
-        
-        WSSecBase encrBase = null;
-        if (encryptionToken != null && encrParts.size() > 0) {
-            encrBase = doEncryption(wrapper, encrParts, true);
-            handleEncryptedSignedHeaders(encrParts, sigParts);
-        }
-
+        List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
         if (timestampEl != null) {
             WSEncryptionPart timestampPart = 
                 convertToEncryptionPart(timestampEl.getElement());
@@ -337,6 +320,23 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         } catch (WSSecurityException ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             policyNotAsserted(encryptionToken, ex);
+        }
+        
+        List<WSEncryptionPart> encrParts = null;
+        try {
+            encrParts = getEncryptedParts();
+            //Signed parts are determined before encryption because encrypted signed  headers
+            //will not be included otherwise
+            sigParts.addAll(this.getSignedParts(null));
+        } catch (SOAPException ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
+            throw new Fault(ex);
+        }
+        
+        WSSecBase encrBase = null;
+        if (encryptionToken != null && encrParts.size() > 0) {
+            encrBase = doEncryption(wrapper, encrParts, true);
+            handleEncryptedSignedHeaders(encrParts, sigParts);
         }
         
         if (!isRequestor()) {
@@ -597,7 +597,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
         
         AbstractToken sigToken = wrapper.getToken();
-        sigParts.addAll(this.getSignedParts());
+        sigParts.addAll(this.getSignedParts(null));
         if (sigParts.isEmpty()) {
             // Add the BST to the security header if required
             if (!attached && isTokenRequired(sigToken.getIncludeTokenType())) {
