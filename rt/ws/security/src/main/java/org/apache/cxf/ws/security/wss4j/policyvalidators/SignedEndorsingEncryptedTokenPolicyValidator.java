@@ -65,13 +65,13 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
             setSignedResults(signedResults);
             setEncryptedResults(encryptedResults);
             
-            parsePolicies(ais, message);
+            parsePolicies(aim, ais, message);
         }
         
         return true;
     }
     
-    private void parsePolicies(Collection<AssertionInfo> ais, Message message) {
+    private void parsePolicies(AssertionInfoMap aim, Collection<AssertionInfo> ais, Message message) {
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
@@ -84,6 +84,7 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
             List<AbstractToken> tokens = binding.getTokens();
             for (AbstractToken token : tokens) {
                 if (!isTokenRequired(token, message)) {
+                    assertSecurePartsIfTokenNotRequired(binding, aim);
                     continue;
                 }
                 
