@@ -94,7 +94,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
     }
     
     private List<Class<?>> getSchemaClassFiles() throws Exception {
-        ClassLoader cl = new URLClassLoader(new URL[] {output.toURI().toURL()},
+        URLClassLoader cl = new URLClassLoader(new URL[] {output.toURI().toURL()},
                                             Thread.currentThread().getContextClassLoader());
            
         List<Class<?>> files = new ArrayList<Class<?>>(4);
@@ -102,6 +102,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
         files.add(cl.loadClass("superbooks.Book"));
         files.add(cl.loadClass("superbooks.TheBook2"));
         files.add(cl.loadClass("superbooks.Chapter"));
+        cl.close();
         return files;
     }
 

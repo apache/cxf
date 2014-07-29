@@ -39,46 +39,42 @@ import org.apache.cxf.message.Message;
 public final class PhaseChainCache {
     AtomicReference<ChainHolder> lastData = new AtomicReference<ChainHolder>();
     
-    
-    @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
                                      List<Interceptor<? extends Message>> p1) {
-        return getChain(phaseList, p1);
+        return getChain(lastData, phaseList, p1);
     }
 
-    @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
                                      List<Interceptor<? extends Message>> p1,
                                      List<Interceptor<? extends Message>> p2) {
-        return getChain(phaseList, p1, p2);
+        return getChain(lastData, phaseList, p1, p2);
     }
-    @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
                                      List<Interceptor<? extends Message>> p1,
                                      List<Interceptor<? extends Message>> p2,
                                      List<Interceptor<? extends Message>> p3) {
-        return getChain(phaseList, p1, p2, p3);
+        return getChain(lastData, phaseList, p1, p2, p3);
     }
-    @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
                                      List<Interceptor<? extends Message>> p1,
                                      List<Interceptor<? extends Message>> p2,
                                      List<Interceptor<? extends Message>> p3,
                                      List<Interceptor<? extends Message>> p4) {
-        return getChain(phaseList, p1, p2, p3, p4);
+        return getChain(lastData, phaseList, p1, p2, p3, p4);
     }
-    @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
                                      List<Interceptor<? extends Message>> p1,
                                      List<Interceptor<? extends Message>> p2,
                                      List<Interceptor<? extends Message>> p3,
                                      List<Interceptor<? extends Message>> p4,
                                      List<Interceptor<? extends Message>> p5) {
-        return getChain(phaseList, p1, p2, p3, p4, p5);
+        return getChain(lastData, phaseList, p1, p2, p3, p4, p5);
     }
     
-    private PhaseInterceptorChain getChain(SortedSet<Phase> phaseList,
-                                           List<Interceptor<? extends Message>> ... providers) {
+    @SafeVarargs
+    static PhaseInterceptorChain getChain(AtomicReference<ChainHolder> lastData,
+                                          SortedSet<Phase> phaseList,
+                                         List<Interceptor<? extends Message>> ... providers) {
         ChainHolder last = lastData.get();
         
         if (last == null 
@@ -110,7 +106,8 @@ public final class PhaseChainCache {
             chain = c;
         }
         
-        boolean matches(List<Interceptor<? extends Message>> ... providers) {
+        @SafeVarargs
+        final boolean matches(List<Interceptor<? extends Message>> ... providers) {
             if (lists.size() == providers.length) {
                 for (int x = 0; x < providers.length; x++) {
                     if (lists.get(x).size() != providers[x].size()) {

@@ -61,10 +61,12 @@ public class ClasspathScanner {
      * @throws IOException class metadata is not readable 
      * @throws ClassNotFoundException class not found
      */
+    @SafeVarargs
     public static Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClasses(
         String basePackage, Class< ? extends Annotation > ... annotations) 
         throws IOException, ClassNotFoundException {
-        return findClasses(Collections.singletonList(basePackage), Arrays.asList(annotations));
+        return findClasses(Collections.singletonList(basePackage), 
+                           Collections.unmodifiableList(Arrays.asList(annotations)));
     }
     
     /**
@@ -75,10 +77,11 @@ public class ClasspathScanner {
      * @throws IOException class metadata is not readable 
      * @throws ClassNotFoundException class not found
      */
+    @SafeVarargs
     public static Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClasses(
         Collection< String > basePackages, Class< ? extends Annotation > ... annotations) 
         throws IOException, ClassNotFoundException {
-        return findClasses(basePackages, Arrays.asList(annotations));
+        return findClasses(basePackages, Collections.unmodifiableList(Arrays.asList(annotations)));
     }
     
     /**

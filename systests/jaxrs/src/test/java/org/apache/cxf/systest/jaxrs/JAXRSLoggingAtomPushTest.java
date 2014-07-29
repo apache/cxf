@@ -67,8 +67,6 @@ public class JAXRSLoggingAtomPushTest extends Assert {
 
     private static Server server;
     
-    
-    @SuppressWarnings("unchecked")
     @BeforeClass
     public static void beforeClass() throws Exception {
         // disable logging for server startup

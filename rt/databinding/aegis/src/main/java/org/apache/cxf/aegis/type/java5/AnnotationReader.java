@@ -42,29 +42,24 @@ public class AnnotationReader {
     private static final Class<? extends Annotation> XML_TRANSIENT =
             load("javax.xml.bind.annotation.XmlTransient");
 
-    @SuppressWarnings("unchecked")
     public boolean isIgnored(AnnotatedElement element) {
         return isAnnotationPresent(element,
                 IgnoreProperty.class,
                 XML_TRANSIENT);
     }
 
-    @SuppressWarnings("unchecked")
     public boolean isAttribute(AnnotatedElement element) {
         return isAnnotationPresent(element,
                 XmlAttribute.class,
                 XML_ATTRIBUTE);
     }
 
-    @SuppressWarnings("unchecked")
     public boolean isElement(AnnotatedElement element) {
         return isAnnotationPresent(element,
                 XmlElement.class,
                 XML_ELEMENT);
     }
 
-    // PMD incorrectly identifies this as a string comparison
-    @SuppressWarnings("unchecked")
     public Boolean isNillable(AnnotatedElement element) {
         return Boolean.TRUE.equals(getAnnotationValue("nillable", // NOPMD
                 element,
@@ -72,7 +67,6 @@ public class AnnotationReader {
                 XmlElement.class,
                 XML_ELEMENT));
     }
-    @SuppressWarnings("unchecked")
     public static Boolean isNillable(Annotation[] anns) {
         if (anns == null) {
             return null;
@@ -83,7 +77,6 @@ public class AnnotationReader {
                 XML_ELEMENT);
     }
 
-    @SuppressWarnings("unchecked")
     public Class<?> getType(AnnotatedElement element) {
         Class<?> value = (Class<?>) getAnnotationValue("type",
                 element,
@@ -101,7 +94,6 @@ public class AnnotationReader {
         return value;
     }
 
-    @SuppressWarnings("unchecked")
     public Class<?> getParamType(Method method, int index) {
         return (Class<?>) getAnnotationValue("type",
                 method,
@@ -110,7 +102,6 @@ public class AnnotationReader {
                 XmlParamType.class);
     }
 
-    @SuppressWarnings("unchecked")
     public Class<?> getReturnType(AnnotatedElement element) {
         return (Class<?>) getAnnotationValue("type",
                 element,
@@ -118,7 +109,6 @@ public class AnnotationReader {
                 XmlReturnType.class);
     }
 
-    @SuppressWarnings("unchecked")
     public String getName(AnnotatedElement element) {
         String name = (String) getAnnotationValue("name",
                 element,
@@ -139,7 +129,6 @@ public class AnnotationReader {
         return name;
     }
 
-    @SuppressWarnings("unchecked")
     public String getParamTypeName(Method method, int index) {
         return (String) getAnnotationValue("name",
                 method,
@@ -148,7 +137,6 @@ public class AnnotationReader {
                 XmlParamType.class);
     }
 
-    @SuppressWarnings("unchecked")
     public String getReturnTypeName(AnnotatedElement element) {
         return (String) getAnnotationValue("name",
                 element,
@@ -156,7 +144,6 @@ public class AnnotationReader {
                 XmlReturnType.class);
     }
 
-    @SuppressWarnings("unchecked")
     public String getNamespace(AnnotatedElement element) {
         // some poor class loader implementations may end not define Package elements
         if (element == null) {
@@ -184,7 +171,6 @@ public class AnnotationReader {
         return namespace;
     }
 
-    @SuppressWarnings("unchecked")
     public String getParamNamespace(Method method, int index) {
         String namespace = (String) getAnnotationValue("namespace",
                 method,
@@ -199,7 +185,6 @@ public class AnnotationReader {
         return namespace;
     }
 
-    @SuppressWarnings("unchecked")
     public String getReturnNamespace(AnnotatedElement element) {
         String namespace = (String) getAnnotationValue("namespace",
                 element,
@@ -213,7 +198,6 @@ public class AnnotationReader {
         return namespace;
     }
 
-    @SuppressWarnings("unchecked")
     public int getMinOccurs(AnnotatedElement element) {
         String minOccurs = (String) getAnnotationValue("minOccurs",
                 element,
@@ -231,7 +215,6 @@ public class AnnotationReader {
 
         return 0;
     }
-    @SuppressWarnings("unchecked")
     public static Integer getMinOccurs(Annotation[] anns) {
         if (anns == null) {
             return null;
@@ -250,7 +233,6 @@ public class AnnotationReader {
         }
         return null;
     }
-    @SuppressWarnings("unchecked")
     public boolean isExtensibleElements(AnnotatedElement element, boolean defaultValue) {
         Boolean extensibleElements = (Boolean) getAnnotationValue("extensibleElements",
                 element,
@@ -263,7 +245,6 @@ public class AnnotationReader {
         return extensibleElements;
     }
 
-    @SuppressWarnings("unchecked")
     public boolean isExtensibleAttributes(AnnotatedElement element, boolean defaultValue) {
         Boolean extensibleAttributes = (Boolean) getAnnotationValue("extensibleAttributes",
                 element,
@@ -276,7 +257,7 @@ public class AnnotationReader {
         return extensibleAttributes;
     }
 
-    // PMD doesn't fully understand varargs
+    @SafeVarargs
     private static boolean isAnnotationPresent(AnnotatedElement element, // NOPMD
             Class<? extends Annotation>... annotations) {
         for (Class<?> annotation : annotations) {
@@ -287,6 +268,7 @@ public class AnnotationReader {
         return false;
     }
 
+    @SafeVarargs
     static Object getAnnotationValue(String name,
             AnnotatedElement element,
             Object ignoredValue,
@@ -311,6 +293,7 @@ public class AnnotationReader {
         }
         return null;
     }
+    @SafeVarargs
     static Object getAnnotationValue(String name,
                                      Annotation[] anns,
                                      Class<? extends Annotation>... annotations) {
@@ -331,6 +314,7 @@ public class AnnotationReader {
         return null;
     }
 
+    @SafeVarargs
     static Object getAnnotationValue(String name,
             Method method,
             int index,

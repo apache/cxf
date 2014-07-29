@@ -48,7 +48,6 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
     public static final String PORT = allocatePort(JAXRSClientServerValidationTest.class);
     @Ignore
     public static class Server extends AbstractBusTestServerBase {        
-        @SuppressWarnings("unchecked")
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 

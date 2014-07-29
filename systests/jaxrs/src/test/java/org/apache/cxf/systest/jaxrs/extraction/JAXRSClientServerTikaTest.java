@@ -133,7 +133,6 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
             .get(Collection.class);
     }
     
-    @SuppressWarnings("unchecked")
     private WebClient createWebClient(final String url) {
         WebClient wc = WebClient.create("http://localhost:" + PORT + url, 
             Arrays.asList(new MultipartProvider(), new JacksonJsonProvider()));

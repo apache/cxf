@@ -50,7 +50,6 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.DeferredConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
@@ -862,7 +861,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     protected Conduit buildConduit(SoapMessage message, final Endpoint endpoint, AttributedURIType to) {
         Conduit c;
         final String address = to.getValue();
-        ConduitSelector cs = new DeferredConduitSelector() {
+        DeferredConduitSelector cs = new DeferredConduitSelector() {
             @Override
             public synchronized Conduit selectConduit(Message message) {
                 Conduit conduit = null;
@@ -876,6 +875,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 } finally {
                     endpointInfo.setAddress(original);
                 }
+                conduits.clear();
                 return conduit;
             }
         };
@@ -889,7 +889,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 LOG.fine("Ignoring response to resent message.");
             }
         });
-        
+        cs.close();
         message.getExchange().setConduit(c);
         return c;
     }

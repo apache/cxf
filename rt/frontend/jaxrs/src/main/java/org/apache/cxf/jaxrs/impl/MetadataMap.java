@@ -237,7 +237,8 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         
     }
 
-    public void addAll(K key, V... newValues) {
+    @SafeVarargs
+    public final void addAll(K key, V... newValues) {
         this.addAllValues(key, Arrays.asList(newValues));
     }
 
