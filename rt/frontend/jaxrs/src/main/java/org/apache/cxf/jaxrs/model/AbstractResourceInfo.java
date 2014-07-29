@@ -25,22 +25,53 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.logging.Logger;
 
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public abstract class AbstractResourceInfo {
     public static final String CONSTRUCTOR_PROXY_MAP = "jaxrs-constructor-proxy-map";
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractResourceInfo.class);
     private static final String FIELD_PROXY_MAP = "jaxrs-field-proxy-map";
     private static final String SETTER_PROXY_MAP = "jaxrs-setter-proxy-map";
+    
+    private static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<String>();
+    static {
+        STANDARD_CONTEXT_CLASSES.add(Application.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add(UriInfo.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add(HttpHeaders.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add(Request.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add(SecurityContext.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add(Providers.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add(ResourceContext.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add(Configuration.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add(ResourceInfo.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add(ContextResolver.class.getSimpleName());
+        STANDARD_CONTEXT_CLASSES.add("HttpServletRequest");
+        STANDARD_CONTEXT_CLASSES.add("HttpServletResponse");
+        STANDARD_CONTEXT_CLASSES.add("ServletContext");
+    }
     
     protected boolean root;
     protected Class<?> resourceClass;
@@ -240,8 +271,11 @@ public abstract class AbstractResourceInfo {
     
     private void checkContextMethod(Method m, Object provider) {
         Class<?> type = m.getParameterTypes()[0];
-        if (m.getName().equals("set" + type.getSimpleName())) {        
+        if (type.isInterface() || (type == Application.class)) {        
             addContextMethod(type, m, provider);
+            if (!STANDARD_CONTEXT_CLASSES.contains(type.getSimpleName())) {
+                LOG.fine("Injecting a custom context " + type + ", ContextProvider is required for this type");
+            }
         }
     }
     
