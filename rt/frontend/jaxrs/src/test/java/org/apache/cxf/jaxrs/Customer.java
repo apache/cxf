@@ -265,7 +265,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
     
     @Context
-    public void setUriInfo(UriInfo ui) {
+    public void setTestUriInfo(UriInfo ui) {
         uriInfo = ui;
     }
     
