@@ -19,8 +19,11 @@
 package org.apache.cxf.rs.security.oauth2.jwe;
 
 
-
-public interface JweEncryptionProvider {
-    String encrypt(byte[] jweContent, String contentType);
-    JweEncryptionState createJweEncryptionState(String contentType);
+public class DirectKeyEncryption implements KeyEncryptionAlgorithm {
+    public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
+        if (headers.getKeyEncryptionAlgorithm() != null) {
+            throw new SecurityException();
+        }
+        return new byte[0];
+    }
 }

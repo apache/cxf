@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 
@@ -89,6 +90,9 @@ public class JweHeaders extends JwtHeaders {
         return (JwtHeaders)super.setHeader(name, value);
     }
     
+    public byte[] toCipherAdditionalAuthData() { 
+        return toCipherAdditionalAuthData(new JwtTokenReaderWriter());
+    }
     public byte[] toCipherAdditionalAuthData(JwtHeadersWriter writer) { 
         return toCipherAdditionalAuthData(writer.headersToJson(this));
     }

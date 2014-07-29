@@ -545,10 +545,10 @@ public final class CryptoUtils {
     public static byte[] wrapSecretKey(byte[] keyBytes, 
                                        String keyAlgo,
                                        Key wrapperKey,
-                                       String wrapperKeyAlgo)  throws SecurityException {
+                                       KeyProperties wrapperKeyProps)  throws SecurityException {
         return wrapSecretKey(new SecretKeySpec(keyBytes, convertJCECipherToSecretKeyName(keyAlgo)), 
                              wrapperKey, 
-                             new KeyProperties(wrapperKeyAlgo));
+                             wrapperKeyProps);
     }
     
     public static byte[] wrapSecretKey(Key secretKey,

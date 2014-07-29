@@ -18,19 +18,28 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import javax.crypto.SecretKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 
-public class DirectKeyJweEncryption extends AbstractJweEncryption {
-    public DirectKeyJweEncryption(SecretKey cek, byte[] iv) {
-        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
-                                                cek.getEncoded().length * 8)), cek.getEncoded(), iv);
+public class RSAOaepKeyEncryption extends AbstractWrapKeyEncryption {
+    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
+        Arrays.asList(Algorithm.RSA_OAEP.getJwtName(),
+                      Algorithm.RSA_OAEP_256.getJwtName()));
+    public RSAOaepKeyEncryption(RSAPublicKey publicKey) {
+        this(publicKey, null, true);
     }
-    public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
-        this(headers, cek, iv, AbstractJweEncryption.DEFAULT_AUTH_TAG_LENGTH);
+    public RSAOaepKeyEncryption(RSAPublicKey publicKey, boolean wrap) {
+        this(publicKey, null, wrap);
     }
-    public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
-        super(headers, cek, iv, authTagLen, new DirectKeyEncryption());
+    public RSAOaepKeyEncryption(RSAPublicKey publicKey, String jweAlgo) {
+        this(publicKey, jweAlgo, true);
     }
+    public RSAOaepKeyEncryption(RSAPublicKey publicKey, String jweAlgo, boolean wrap) {
+        super(publicKey, jweAlgo, wrap, SUPPORTED_ALGORITHMS);
+    }
+    
 }

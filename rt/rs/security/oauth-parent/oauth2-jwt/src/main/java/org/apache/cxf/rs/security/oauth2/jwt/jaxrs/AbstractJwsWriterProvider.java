@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.PrivateKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.Properties;
 
 import org.apache.cxf.helpers.IOUtils;
@@ -58,6 +59,9 @@ public class AbstractJwsWriterProvider {
         try {
             Properties props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
             PrivateKey pk = CryptoUtils.loadPrivateKey(m, props, CryptoUtils.RSSEC_SIG_KEY_PSWD_PROVIDER);
+            if (!(pk instanceof RSAPrivateKey)) {
+                throw new SecurityException();
+            }
             PrivateKeyJwsSignatureProvider provider = new PrivateKeyJwsSignatureProvider(pk);
             provider.setDefaultJwtAlgorithm(props.getProperty(JSON_WEB_SIGNATURE_ALGO_PROP));
             return provider;

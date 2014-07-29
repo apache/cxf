@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Properties;
 import java.util.zip.DeflaterOutputStream;
 
@@ -39,12 +40,12 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.oauth2.jwe.JweCompactProducer;
-import org.apache.cxf.rs.security.oauth2.jwe.JweEncryption;
 import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptionProvider;
+import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptionState;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
 import org.apache.cxf.rs.security.oauth2.jwe.JweOutputStream;
+import org.apache.cxf.rs.security.oauth2.jwe.RSAOaepKeyEncryption;
 import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryption;
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
@@ -54,6 +55,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
     private static final String JSON_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
     private static final String JSON_ENCRYPTION_PROPS = "rs.security.encryption.properties";
     private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";
+    private static final String JSON_WEB_ENCRYPTION_KEY_ALGO_PROP = "rs.security.jwe.key.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
     private JweEncryptionProvider encryptionProvider;
     private boolean contentTypeRequired = true;
@@ -75,7 +77,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
         
         
         if (useJweOutputStream) {
-            JweEncryption encryption = theEncryptionProvider.createJweEncryption(ctString);
+            JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(ctString);
             try {
                 JweCompactProducer.startJweContent(actualOs,
                                                    encryption.getHeaders(), 
@@ -118,14 +120,17 @@ public class JweWriterInterceptor implements WriterInterceptor {
         try {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             PublicKey pk = CryptoUtils.loadPublicKey(m, props);
-            JweHeaders headers = new JweHeaders(Algorithm.RSA_OAEP.getJwtName(),
+            if (!(pk instanceof RSAPublicKey)) {
+                throw new SecurityException();
+            }
+            JweHeaders headers = new JweHeaders(props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP),
                                                 props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP));
             String compression = props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP);
             if (compression != null) {
                 headers.setZipAlgorithm(compression);
             }
             
-            return new WrappedKeyJweEncryption(headers, pk);
+            return new WrappedKeyJweEncryption(headers, new RSAOaepKeyEncryption((RSAPublicKey)pk));
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {

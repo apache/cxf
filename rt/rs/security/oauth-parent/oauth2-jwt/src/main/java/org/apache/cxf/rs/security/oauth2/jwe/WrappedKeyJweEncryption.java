@@ -18,34 +18,29 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.security.Key;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public class WrappedKeyJweEncryption extends AbstractJweEncryption {
-    private Key cekEncryptionKey;
-    private boolean wrap;
     private AtomicInteger providedCekUsageCount;
-    public WrappedKeyJweEncryption(JweHeaders headers, Key cekEncryptionKey) {
-        this(headers, cekEncryptionKey, null, null);
+    public WrappedKeyJweEncryption(JweHeaders headers, 
+                                   KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
+        this(headers, null, null, keyEncryptionAlgorithm);
     }
-    public WrappedKeyJweEncryption(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv) {
-        this(headers, cekEncryptionKey, cek, iv, DEFAULT_AUTH_TAG_LENGTH, true);
+    public WrappedKeyJweEncryption(JweHeaders headers, byte[] cek, 
+                                   byte[] iv, KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
+        this(headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH, keyEncryptionAlgorithm, null);
     }
-    public WrappedKeyJweEncryption(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, 
-                                   int authTagLen, boolean wrap) {
-        this(headers, cekEncryptionKey, cek, iv, authTagLen, wrap, null);
-    }
-    
-    public WrappedKeyJweEncryption(JweHeaders headers, Key cekEncryptionKey, byte[] cek, byte[] iv, int authTagLen, 
-                                   boolean wrap, JwtHeadersWriter writer) {
-        super(headers, cek, iv, authTagLen, writer);
-        this.cekEncryptionKey = cekEncryptionKey;
-        this.wrap = wrap;
+    public WrappedKeyJweEncryption(JweHeaders headers, 
+                                   byte[] cek, 
+                                   byte[] iv, 
+                                   int authTagLen, 
+                                   KeyEncryptionAlgorithm keyEncryptionAlgorithm,
+                                   JwtHeadersWriter writer) {
+        super(headers, cek, iv, authTagLen, keyEncryptionAlgorithm, writer);
         if (cek != null) {
             providedCekUsageCount = new AtomicInteger();
         }
@@ -62,16 +57,5 @@ public class WrappedKeyJweEncryption extends AbstractJweEncryption {
         }
         return theCek;
     }
-    protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
-        KeyProperties secretKeyProperties = new KeyProperties(getContentEncryptionKeyEncryptionAlgo());
-        if (!wrap) {
-            return CryptoUtils.encryptBytes(theCek, cekEncryptionKey, secretKeyProperties);
-        } else {
-            return CryptoUtils.wrapSecretKey(theCek, getContentEncryptionAlgoJava(), cekEncryptionKey, 
-                                             secretKeyProperties.getKeyAlgo());
-        }
-    }
-    protected String getContentEncryptionKeyEncryptionAlgo() {
-        return Algorithm.toJavaName(getJweHeaders().getKeyEncryptionAlgorithm());
-    }
+    
 }

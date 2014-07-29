@@ -18,19 +18,28 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
-public class DirectKeyJweEncryption extends AbstractJweEncryption {
-    public DirectKeyJweEncryption(SecretKey cek, byte[] iv) {
-        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
-                                                cek.getEncoded().length * 8)), cek.getEncoded(), iv);
+public class AesWrapKeyEncryption extends AbstractWrapKeyEncryption {
+    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
+        Arrays.asList(Algorithm.A128KW.getJwtName(),
+                      Algorithm.A192KW.getJwtName(),
+                      Algorithm.A256KW.getJwtName()));
+    public AesWrapKeyEncryption(byte[] keyBytes, String keyAlgoJwt) {
+        this(CryptoUtils.createSecretKeySpec(keyBytes, Algorithm.toJavaName(keyAlgoJwt)),
+             keyAlgoJwt);
     }
-    public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
-        this(headers, cek, iv, AbstractJweEncryption.DEFAULT_AUTH_TAG_LENGTH);
+    public AesWrapKeyEncryption(SecretKey key, String keyAlgoJwt) {
+        super(key, keyAlgoJwt, SUPPORTED_ALGORITHMS);
     }
-    public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
-        super(headers, cek, iv, authTagLen, new DirectKeyEncryption());
-    }
+    
+    
+    
 }

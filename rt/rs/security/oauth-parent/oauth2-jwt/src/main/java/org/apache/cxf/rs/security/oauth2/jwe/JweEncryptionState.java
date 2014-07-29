@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 
 import javax.crypto.Cipher;
 
-public class JweEncryption {
+public class JweEncryptionState {
     private Cipher cipher;
     private int authTagLen;
     private JweHeaders headers;
@@ -28,7 +28,7 @@ public class JweEncryption {
     private byte[] iv;
     private boolean compressionSupported;
     
-    public JweEncryption(Cipher cipher, int authTagLen, JweHeaders headers, 
+    public JweEncryptionState(Cipher cipher, int authTagLen, JweHeaders headers, 
                         byte[] contentEncryptionKey, 
                         byte[] iv, boolean compressionSupported) {
         this.cipher = cipher;

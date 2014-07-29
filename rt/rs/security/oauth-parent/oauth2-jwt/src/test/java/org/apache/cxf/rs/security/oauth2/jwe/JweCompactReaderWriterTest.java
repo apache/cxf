@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
@@ -31,7 +30,6 @@ import javax.crypto.spec.IvParameterSpec;
 
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactReaderWriterTest;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
-import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
@@ -114,17 +112,11 @@ public class JweCompactReaderWriterTest extends Assert {
         headers.setAlgorithm(Algorithm.A128KW.getJwtName());
         headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
         
-        SecretKey secretCompleteCek = CryptoUtils.createSecretKeySpec(CONTENT_ENCRYPTION_KEY_A3, 
-                                                                      Algorithm.A128CBC_HS256.getJavaAlgoName());
-        byte[] wrapperKeyBytes = Base64UrlUtility.decode(KEY_ENCRYPTION_KEY_A3);
-        SecretKey secretWrapperKey = 
-            CryptoUtils.createSecretKeySpec(wrapperKeyBytes, Algorithm.A128KW.getJavaAlgoName());
-        byte[] defaultAesWrapIv = new BigInteger("A6A6A6A6A6A6A6A6", 16).toByteArray();
-        KeyProperties wrapperkeyProps = new KeyProperties(Algorithm.A128KW.getJavaName());
-        keyProps.setAlgoSpec(new IvParameterSpec(defaultAesWrapIv));
-        byte[] encryptedCek = CryptoUtils.wrapSecretKey(secretCompleteCek, secretWrapperKey, wrapperkeyProps);
+        AesWrapKeyEncryption keyEncryption = new AesWrapKeyEncryption(Base64UrlUtility.decode(KEY_ENCRYPTION_KEY_A3), 
+                                                                      Algorithm.A128KW.getJwtName());
+        byte[] encryptedCek = keyEncryption.getEncryptedContentEncryptionKey(headers, CONTENT_ENCRYPTION_KEY_A3);
         
-        byte[] aad = headers.toCipherAdditionalAuthData(new JwtTokenReaderWriter());
+        byte[] aad = headers.toCipherAdditionalAuthData();
         ByteBuffer buf = ByteBuffer.allocate(8);
         byte[] al = buf.putInt(0).putInt(aad.length * 8).array();
         
@@ -180,6 +172,7 @@ public class JweCompactReaderWriterTest extends Assert {
             jwtKeyName = Algorithm.toJwtName(key.getAlgorithm(), key.getEncoded().length * 8);
         }
         RSAJweEncryption encryptor = new RSAJweEncryption(publicKey, 
+                                                          Algorithm.RSA_OAEP.getJwtName(),
                                                         key, 
                                                         jwtKeyName, 
                                                         INIT_VECTOR);

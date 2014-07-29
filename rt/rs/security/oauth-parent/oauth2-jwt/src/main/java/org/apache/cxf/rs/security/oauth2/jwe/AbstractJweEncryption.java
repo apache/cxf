@@ -35,38 +35,47 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected static final int DEFAULT_IV_SIZE = 96;
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private JweHeaders headers;
-    private JwtHeadersWriter writer = new JwtTokenReaderWriter();
+    private JwtHeadersWriter writer;
     private byte[] cek;
     private byte[] iv;
     private AtomicInteger providedIvUsageCount;
-    private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
+    private int authTagLen;
+    private KeyEncryptionAlgorithm keyEncryptionAlgo;
     
-    protected AbstractJweEncryption(SecretKey cek, byte[] iv) {
+    protected AbstractJweEncryption(SecretKey cek, byte[] iv, KeyEncryptionAlgorithm keyEncryptionAlgo) {
         this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
                                                 cek.getEncoded().length * 8)),
-                                                cek.getEncoded(), iv);
+                                                cek.getEncoded(), iv, keyEncryptionAlgo);
     }
-    protected AbstractJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
+    protected AbstractJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, 
+                                    KeyEncryptionAlgorithm keyEncryptionAlgo) {
+        this(headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH, keyEncryptionAlgo);
+    }
+    protected AbstractJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen,
+                                    KeyEncryptionAlgorithm keyEncryptionAlgo) {
+        this(headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH, keyEncryptionAlgo, null);
+    }
+    protected AbstractJweEncryption(JweHeaders headers, KeyEncryptionAlgorithm keyEncryptionAlgo) {
+        this(headers, null, null, DEFAULT_AUTH_TAG_LENGTH, keyEncryptionAlgo, null);
+    }
+    protected AbstractJweEncryption(JweHeaders headers, 
+                                    byte[] cek, 
+                                    byte[] iv, 
+                                    int authTagLen, 
+                                    KeyEncryptionAlgorithm keyEncryptionAlgo,
+                                    JwtHeadersWriter writer) {
         this.headers = headers;
         this.cek = cek;
         this.iv = iv;
         if (iv != null && iv.length > 0) {
             providedIvUsageCount = new AtomicInteger();
         }
-    }
-    protected AbstractJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
-        this(headers, cek, iv);
         this.authTagLen = authTagLen;
-    }
-    protected AbstractJweEncryption(JweHeaders headers) {
-        this.headers = headers;
-    }
-    protected AbstractJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen, 
-                                   JwtHeadersWriter writer) {
-        this(headers, cek, iv, authTagLen);
-        if (writer != null) {
-            this.writer = writer;
+        this.writer = writer;
+        if (this.writer == null) {
+            this.writer = new JwtTokenReaderWriter();
         }
+        this.keyEncryptionAlgo = keyEncryptionAlgo;
     }
     
     protected AlgorithmParameterSpec getContentEncryptionCipherSpec(byte[] theIv) {
@@ -87,7 +96,9 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         return cek;
     }
     
-    protected abstract byte[] getEncryptedContentEncryptionKey(byte[] theCek);
+    protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
+        return keyEncryptionAlgo.getEncryptedContentEncryptionKey(headers, theCek);
+    }
     
     protected String getContentEncryptionAlgoJwt() {
         return headers.getContentEncryptionAlgorithm();
@@ -121,11 +132,11 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     }
     
     @Override
-    public JweEncryption createJweEncryption(String contentType) {
+    public JweEncryptionState createJweEncryptionState(String contentType) {
         JweEncryptionInternal state = getInternalState(contentType);
         Cipher c = CryptoUtils.initCipher(state.secretKey, state.keyProps, 
                                           Cipher.ENCRYPT_MODE);
-        return new JweEncryption(c, getAuthTagLen(), state.theHeaders, state.jweContentEncryptionKey, 
+        return new JweEncryptionState(c, getAuthTagLen(), state.theHeaders, state.jweContentEncryptionKey, 
                                 state.theIv, state.keyProps.isCompressionSupported());
     }
     
