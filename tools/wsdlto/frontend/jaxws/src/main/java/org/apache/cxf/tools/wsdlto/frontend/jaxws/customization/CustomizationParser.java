@@ -297,7 +297,6 @@ public final class CustomizationParser {
                     }
                 }
                 appinfoNode.appendChild(cloneNode);
-                childNode = childNode.getNextSibling();
             }
         }
         
