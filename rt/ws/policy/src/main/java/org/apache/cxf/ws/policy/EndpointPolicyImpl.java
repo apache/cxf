@@ -21,6 +21,7 @@ package org.apache.cxf.ws.policy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -158,7 +159,12 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     void chooseAlternative(Message m) {
         Collection<Assertion> alternative = null;
         if (requestor) {
-            alternative = engine.getAlternativeSelector().selectAlternative(policy, engine, assertor, null, m);
+            if (engine.isEnabled()) {
+                alternative = engine.getAlternativeSelector().selectAlternative(policy, engine, assertor, null, m);
+            } else {
+                // use an empty list to avoid getting NPE
+                alternative = Collections.emptyList();
+            }
         } else {
             alternative = getSupportedAlternatives(m);
         }
