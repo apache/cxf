@@ -508,6 +508,9 @@ public class JettyHTTPServerEngine
                 if (getThreadingParameters().isSetMaxThreads()) {
                     pl.setMaxThreads(getThreadingParameters().getMaxThreads());
                 }
+                if (getThreadingParameters().isThreadNamePrefixSet()) {
+                    pl.setName(getThreadingParameters().getThreadNamePrefix());
+                }
             } else {
                 try {
                     if (getThreadingParameters().isSetMinThreads()) {
@@ -517,6 +520,10 @@ public class JettyHTTPServerEngine
                     if (getThreadingParameters().isSetMaxThreads()) {
                         pool.getClass().getMethod("setMaxThreads", Integer.TYPE)
                             .invoke(pool, getThreadingParameters().getMaxThreads());
+                    }
+                    if (getThreadingParameters().isThreadNamePrefixSet()) {
+                        pool.getClass().getMethod("setName", String.class)
+                                .invoke(pool, getThreadingParameters().getThreadNamePrefix());
                     }
                 } catch (Throwable t) {
                     //ignore - this won't happen for Jetty 7.1 - 7.2 and 7.3 and newer 

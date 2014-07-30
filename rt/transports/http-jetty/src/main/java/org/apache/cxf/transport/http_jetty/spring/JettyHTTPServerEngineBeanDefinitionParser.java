@@ -226,6 +226,9 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         if (paramtype.getMinThreads() != null) {
             params.setMinThreads(paramtype.getMinThreads());
         }
+        if (paramtype.getThreadNamePrefix() != null) {
+            params.setThreadNamePrefix(paramtype.getThreadNamePrefix());
+        }
         return params;
     }
     
