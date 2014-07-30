@@ -112,7 +112,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 writer.writeStartElement(defaultPrefix, "Reason", ns);
                 writer.writeStartElement(defaultPrefix, "Text", ns);
                 String lang = f.getLang();
-                if (lang == null || lang.equalsIgnoreCase("")) {
+                if (StringUtils.isEmpty(lang)) {
                     lang = getLangCode();
                 }
                 writer.writeAttribute("xml", "http://www.w3.org/XML/1998/namespace", "lang", lang);

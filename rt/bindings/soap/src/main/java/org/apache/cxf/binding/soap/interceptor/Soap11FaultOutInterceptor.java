@@ -33,6 +33,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.Soap12FaultOutInterceptor.Soap12FaultOutInterceptorInternal;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -90,6 +91,10 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
                 writer.writeEndElement();
 
                 writer.writeStartElement("faultstring");
+                String lang = f.getLang();
+                if (!StringUtils.isEmpty(lang)) {
+                    writer.writeAttribute("xml", "http://www.w3.org/XML/1998/namespace", "lang", lang);
+                }
                 writer.writeCharacters(getFaultMessage(message, fault));
                 writer.writeEndElement();
                 prepareStackTrace(message, fault);
