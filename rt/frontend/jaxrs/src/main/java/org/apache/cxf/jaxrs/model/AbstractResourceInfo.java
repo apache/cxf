@@ -32,10 +32,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
@@ -58,19 +55,21 @@ public abstract class AbstractResourceInfo {
     
     private static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<String>();
     static {
-        STANDARD_CONTEXT_CLASSES.add(Application.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add(UriInfo.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add(HttpHeaders.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add(Request.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add(SecurityContext.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add(Providers.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add(ResourceContext.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add(Configuration.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add(ResourceInfo.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add(ContextResolver.class.getSimpleName());
-        STANDARD_CONTEXT_CLASSES.add("HttpServletRequest");
-        STANDARD_CONTEXT_CLASSES.add("HttpServletResponse");
-        STANDARD_CONTEXT_CLASSES.add("ServletContext");
+        // JAX-RS 1.0-1.1
+        STANDARD_CONTEXT_CLASSES.add(Application.class.getName());
+        STANDARD_CONTEXT_CLASSES.add(UriInfo.class.getName());
+        STANDARD_CONTEXT_CLASSES.add(HttpHeaders.class.getName());
+        STANDARD_CONTEXT_CLASSES.add(Request.class.getName());
+        STANDARD_CONTEXT_CLASSES.add(SecurityContext.class.getName());
+        STANDARD_CONTEXT_CLASSES.add(Providers.class.getName());
+        STANDARD_CONTEXT_CLASSES.add(ContextResolver.class.getName());
+        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletRequest");
+        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletResponse");
+        STANDARD_CONTEXT_CLASSES.add("javax.servlet.ServletContext");
+        // JAX-RS 2.0
+        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceContext");
+        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceInfo");
+        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.core.Configuration");
     }
     
     protected boolean root;
@@ -151,7 +150,8 @@ public abstract class AbstractResourceInfo {
             for (Annotation a : f.getAnnotations()) {
                 if (a.annotationType() == Context.class) {
                     contextFields = addContextField(contextFields, f);
-                    if (f.getType() != Application.class) {
+                    if (f.getType().isInterface()) {
+                        checkContextClass(f.getType());
                         addToMap(getFieldProxyMap(true), f, getFieldThreadLocalProxy(f, provider));
                     }
                 }
@@ -271,11 +271,15 @@ public abstract class AbstractResourceInfo {
     
     private void checkContextMethod(Method m, Object provider) {
         Class<?> type = m.getParameterTypes()[0];
-        if (type.isInterface() || (type == Application.class)) {        
+        if (type.isInterface() || type == Application.class) {        
+            checkContextClass(type);
             addContextMethod(type, m, provider);
-            if (!STANDARD_CONTEXT_CLASSES.contains(type.getSimpleName())) {
-                LOG.fine("Injecting a custom context " + type + ", ContextProvider is required for this type");
-            }
+        }
+    }
+    private void checkContextClass(Class<?> type) {
+        if (!STANDARD_CONTEXT_CLASSES.contains(type.getName())) {
+            LOG.fine("Injecting a custom context " + type.getName() 
+                     + ", ContextProvider is required for this type");
         }
     }
     
