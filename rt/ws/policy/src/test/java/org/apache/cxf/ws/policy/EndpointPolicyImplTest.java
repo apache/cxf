@@ -166,6 +166,7 @@ public class EndpointPolicyImplTest extends Assert {
         EndpointPolicyImpl epi = new EndpointPolicyImpl(null, engine, true, assertor);
         epi.setPolicy(policy);
 
+        EasyMock.expect(engine.isEnabled()).andReturn(true).anyTimes();
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
         EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null, m)).andReturn(null);
 
@@ -179,6 +180,7 @@ public class EndpointPolicyImplTest extends Assert {
         control.verify();
 
         control.reset();
+        EasyMock.expect(engine.isEnabled()).andReturn(true).anyTimes();
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
         Collection<Assertion> alternative = new ArrayList<Assertion>();
         EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null, m)).andReturn(alternative);
@@ -186,6 +188,20 @@ public class EndpointPolicyImplTest extends Assert {
         epi.chooseAlternative(m);
         Collection<Assertion> choice = epi.getChosenAlternative();
         assertSame(choice, alternative);
+        control.verify();
+
+        control.reset();
+        EasyMock.expect(engine.isEnabled()).andReturn(false).anyTimes();
+        EasyMock.expect(engine.getAlternativeSelector()).andReturn(null).anyTimes();
+        control.replay();
+        try {
+            epi.chooseAlternative(m);
+        } catch (Exception ex) {
+            // no NPE expected
+            fail("No Exception expected: " + ex);
+        }
+        choice = epi.getChosenAlternative();
+        assertTrue("not an empty list", choice != null && choice.isEmpty());
         control.verify();
     }
 
