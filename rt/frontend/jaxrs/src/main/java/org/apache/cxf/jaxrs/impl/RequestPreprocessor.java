@@ -148,7 +148,7 @@ public class RequestPreprocessor {
         String method = queries.getFirst(METHOD_QUERY);
         if (method == null) {
             List<String> list = headers.getRequestHeader(METHOD_HEADER);
-            if (list != null && list.size() == 1) {
+            if (list.size() == 1) {
                 method = list.get(0);
             }
         }
