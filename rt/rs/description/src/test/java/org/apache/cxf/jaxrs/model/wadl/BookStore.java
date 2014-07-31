@@ -178,7 +178,7 @@ public class BookStore implements BookDescription {
         private int b;
         private QueryBean2 bean;
         
-        public int getA() {
+        public int getAProp() {
             return a;
         }
         
