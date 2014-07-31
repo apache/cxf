@@ -1196,7 +1196,7 @@ public final class InjectionUtils {
                 if (methodName.length() <= minLen) {
                     continue;
                 }
-                String propertyName = methodName.substring(minLen).toLowerCase();
+                String propertyName = StringUtils.uncapitalize(methodName.substring(minLen));
                 if (m.getReturnType() == Class.class
                     || checkIgnorable && canPropertyBeIgnored(m, propertyName)) {
                     continue;

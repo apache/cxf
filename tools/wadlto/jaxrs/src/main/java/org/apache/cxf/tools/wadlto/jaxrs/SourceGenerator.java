@@ -550,12 +550,10 @@ public class SourceGenerator {
     }
     
     private String firstCharToUpperCase(String name) {
-        StringBuilder sb = new StringBuilder();
-        if (name.length() > 0) {
-            sb.append(Character.toUpperCase(name.charAt(0)));
-            return name.length() > 1 ? sb.append(name.substring(1)).toString() : sb.toString();
+        if (name.length() > 0 && Character.isLowerCase(name.charAt(0))) {
+            return StringUtils.capitalize(name);
         } else {
-            return sb.toString();
+            return name;
         }
     }
     

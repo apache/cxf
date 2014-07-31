@@ -586,7 +586,7 @@ public class WadlGeneratorTest extends Assert {
         
         // 4 parameters are expected
         verifyParameters(requestEls.get(0), 5, 
-                         new Param("a", "query", "xs:int"),
+                         new Param("aProp", "query", "xs:int"),
                          new Param("c.a", "query", "xs:int"),
                          new Param("c.b", "query", "xs:int"),
                          new Param("c.d.a", "query", "xs:boolean"),
