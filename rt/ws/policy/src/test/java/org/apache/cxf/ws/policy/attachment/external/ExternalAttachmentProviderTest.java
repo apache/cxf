@@ -84,13 +84,13 @@ public class ExternalAttachmentProviderTest extends Assert {
         BindingFaultInfo bfi = control.createMock(BindingFaultInfo.class);
         setUpAttachment(bfi, false, eap);
         control.replay();
-        assertNull(eap.getEffectivePolicy(bfi));
+        assertNull(eap.getEffectivePolicy(bfi, null));
         control.verify();
         
         control.reset();
         setUpAttachment(bfi, true, eap);
         control.replay();
-        assertSame(assertion, eap.getEffectivePolicy(bfi).getAssertions().get(0));
+        assertSame(assertion, eap.getEffectivePolicy(bfi, null).getAssertions().get(0));
         control.verify();
     }
     
@@ -100,13 +100,13 @@ public class ExternalAttachmentProviderTest extends Assert {
         BindingMessageInfo bmi = control.createMock(BindingMessageInfo.class);
         setUpAttachment(bmi, false, eap);
         control.replay();
-        assertNull(eap.getEffectivePolicy(bmi));
+        assertNull(eap.getEffectivePolicy(bmi, null));
         control.verify();
         
         control.reset();
         setUpAttachment(bmi, true, eap);
         control.replay();
-        assertSame(assertion, eap.getEffectivePolicy(bmi).getAssertions().get(0));
+        assertSame(assertion, eap.getEffectivePolicy(bmi, null).getAssertions().get(0));
         control.verify();
     }
     
@@ -116,13 +116,13 @@ public class ExternalAttachmentProviderTest extends Assert {
         ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         setUpAttachment(boi, false, eap);
         control.replay();
-        assertNull(eap.getEffectivePolicy(boi));
+        assertNull(eap.getEffectivePolicy(boi, null));
         control.verify();
         
         control.reset();
         setUpAttachment(boi, true, eap);
         control.replay();
-        assertSame(assertion, eap.getEffectivePolicy(boi).getAssertions().get(0));
+        assertSame(assertion, eap.getEffectivePolicy(boi, null).getAssertions().get(0));
         control.verify();
     }
 
@@ -132,13 +132,13 @@ public class ExternalAttachmentProviderTest extends Assert {
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         setUpAttachment(ei, false, eap);
         control.replay();
-        assertNull(eap.getEffectivePolicy(ei));
+        assertNull(eap.getEffectivePolicy(ei, null));
         control.verify();
         
         control.reset();
         setUpAttachment(ei, true, eap);
         control.replay();
-        assertSame(assertion, eap.getEffectivePolicy(ei).getAssertions().get(0));
+        assertSame(assertion, eap.getEffectivePolicy(ei, null).getAssertions().get(0));
         control.verify();
     }
 
@@ -148,13 +148,13 @@ public class ExternalAttachmentProviderTest extends Assert {
         ServiceInfo si = control.createMock(ServiceInfo.class);
         setUpAttachment(si, false, eap);
         control.replay();
-        assertNull(eap.getEffectivePolicy(si));
+        assertNull(eap.getEffectivePolicy(si, null));
         control.verify();
         
         control.reset();
         setUpAttachment(si, true, eap);
         control.replay();
-        assertSame(assertion, eap.getEffectivePolicy(si).getAssertions().get(0));
+        assertSame(assertion, eap.getEffectivePolicy(si, null).getAssertions().get(0));
         control.verify();
     }
     

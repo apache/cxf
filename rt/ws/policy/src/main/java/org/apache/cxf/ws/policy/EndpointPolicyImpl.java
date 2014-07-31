@@ -137,7 +137,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
     
     public void initialize(Message m) {
-        initializePolicy();
+        initializePolicy(m);
         checkExactlyOnes();
         finalizeConfig(m);
     }
@@ -146,10 +146,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         chooseAlternative(m);
     }
    
-    void initializePolicy() {
+    void initializePolicy(Message m) {
         if (engine != null) {
-            policy = engine.getAggregatedServicePolicy(ei.getService());
-            policy = policy.merge(engine.getAggregatedEndpointPolicy(ei));
+            policy = engine.getAggregatedServicePolicy(ei.getService(), m);
+            policy = policy.merge(engine.getAggregatedEndpointPolicy(ei, m));
             if (!policy.isEmpty()) {
                 policy = policy.normalize(engine.getRegistry(), true);
             }

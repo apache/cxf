@@ -429,13 +429,13 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         addedBusInterceptors = true;
     }  
 
-    Policy getAggregatedServicePolicy(ServiceInfo si) {
+    Policy getAggregatedServicePolicy(ServiceInfo si, Message m) {
         if (si == null) {
             return new Policy();
         }
         Policy aggregated = null;
         for (PolicyProvider pp : getPolicyProviders()) {
-            Policy p = pp.getEffectivePolicy(si);
+            Policy p = pp.getEffectivePolicy(si, m);
             if (null == aggregated) {
                 aggregated = p;
             } else if (p != null) {
@@ -445,10 +445,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         return aggregated == null ? new Policy() : aggregated;
     }
 
-    Policy getAggregatedEndpointPolicy(EndpointInfo ei) {
+    Policy getAggregatedEndpointPolicy(EndpointInfo ei, Message m) {
         Policy aggregated = null;
         for (PolicyProvider pp : getPolicyProviders()) {
-            Policy p = pp.getEffectivePolicy(ei);
+            Policy p = pp.getEffectivePolicy(ei, m);
             if (null == aggregated) {
                 aggregated = p;
             } else if (p != null) {
@@ -458,10 +458,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         return aggregated == null ? new Policy() : aggregated;
     }
 
-    Policy getAggregatedOperationPolicy(BindingOperationInfo boi) {
+    Policy getAggregatedOperationPolicy(BindingOperationInfo boi, Message m) {
         Policy aggregated = null;
         for (PolicyProvider pp : getPolicyProviders()) {
-            Policy p = pp.getEffectivePolicy(boi);
+            Policy p = pp.getEffectivePolicy(boi, m);
             if (null == aggregated) {
                 aggregated = p;
             } else if (p != null) {
@@ -471,10 +471,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         return aggregated == null ? new Policy() : aggregated;
     }
 
-    Policy getAggregatedMessagePolicy(BindingMessageInfo bmi) {
+    Policy getAggregatedMessagePolicy(BindingMessageInfo bmi, Message m) {
         Policy aggregated = null;
         for (PolicyProvider pp : getPolicyProviders()) {
-            Policy p = pp.getEffectivePolicy(bmi);
+            Policy p = pp.getEffectivePolicy(bmi, m);
             if (null == aggregated) {
                 aggregated = p;
             } else if (p != null) {
@@ -484,10 +484,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         return aggregated == null ? new Policy() : aggregated;
     }
 
-    Policy getAggregatedFaultPolicy(BindingFaultInfo bfi) {
+    Policy getAggregatedFaultPolicy(BindingFaultInfo bfi, Message m) {
         Policy aggregated = null;
         for (PolicyProvider pp : getPolicyProviders()) {
-            Policy p = pp.getEffectivePolicy(bfi);
+            Policy p = pp.getEffectivePolicy(bfi, m);
             if (null == aggregated) {
                 aggregated = p;
             } else if (p != null) {

@@ -195,25 +195,25 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         Policy ep;
         
         // no extensions        
-        ep = app.getEffectivePolicy(services[0]);
+        ep = app.getEffectivePolicy(services[0], null);
         assertTrue(ep == null || ep.isEmpty());
         p = app.getElementPolicy(services[0]);
         assertTrue(p == null || p.isEmpty());
         
         // extensions not of type Policy or PolicyReference
-        ep = app.getEffectivePolicy(services[1]);
+        ep = app.getEffectivePolicy(services[1], null);
         assertTrue(ep == null || ep.isEmpty());
         
         // one extension of type Policy, without assertion builder
         try {
-            ep = app.getEffectivePolicy(services[2]);
+            ep = app.getEffectivePolicy(services[2], null);
             fail("Expected PolicyException not thrown.");
         } catch (PolicyException ex) {
             // expected
         }
         
         // one extension of type Policy
-        ep = app.getEffectivePolicy(services[3]);
+        ep = app.getEffectivePolicy(services[3], null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 2);
@@ -221,7 +221,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         assertTrue(PolicyComparator.compare(p, ep));
         
         // two extensions of type Policy
-        ep = app.getEffectivePolicy(services[4]);
+        ep = app.getEffectivePolicy(services[4], null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 3);
@@ -237,13 +237,13 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         // port has no extensions
         // porttype has no extensions
         // binding has no extensions
-        ep = app.getEffectivePolicy(endpoints[0]);
+        ep = app.getEffectivePolicy(endpoints[0], null);
         assertTrue(ep == null || ep.isEmpty());
         
         // port has one extension of type Policy        
         // binding has no extensions
         // porttype has no extensions
-        ep = app.getEffectivePolicy(endpoints[5]);
+        ep = app.getEffectivePolicy(endpoints[5], null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
@@ -253,7 +253,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         // port has no extensions
         // binding has one extension of type Policy
         // porttype has no extensions
-        ep = app.getEffectivePolicy(endpoints[6]);
+        ep = app.getEffectivePolicy(endpoints[6], null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
@@ -263,7 +263,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         // port has no extensions
         // binding has no extensions
         // porttype has one extension of type Policy
-        ep = app.getEffectivePolicy(endpoints[7]);
+        ep = app.getEffectivePolicy(endpoints[7], null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
@@ -273,7 +273,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         // port has one extension of type Policy
         // porttype has one extension of type Policy
         // binding has one extension of type Policy
-        ep = app.getEffectivePolicy(endpoints[8]);
+        ep = app.getEffectivePolicy(endpoints[8], null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 3);
@@ -283,7 +283,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         // porttype has no extension elements but one extension attribute of type PolicyURIs
         // consisting of two references (one local, one external)
         
-        ep = app.getEffectivePolicy(endpoints[18]);
+        ep = app.getEffectivePolicy(endpoints[18], null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 2);       
@@ -295,26 +295,26 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         
         // operation has no extensions
         // binding operation has no extensions
-        ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[0]));
+        ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[0]), null);
         assertTrue(ep == null || ep.isEmpty());
         
         // operation has no extensions
         // binding operation has one extension of type Policy
-        ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[9]));
+        ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[9]), null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
         
         // operation has one extension of type Policy
         // binding operation has no extensions
-        ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[10]));
+        ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[10]), null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 2);
         
         // operation has one extension of type Policy
         // binding operation one extension of type Policy
-        ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[11]));
+        ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[11]), null);
         assertNotNull(ep);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 3);
@@ -327,34 +327,34 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         // binding operation message has no extensions
         // operation message has no extensions
         // message has no extensions
-        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[0], true));
+        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[0], true), null);
         assertTrue(ep == null || ep.isEmpty());
         
         // binding operation message has one extension of type Policy
         // operation message has no extensions
         // message has no extensions
-        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[12], true));
+        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[12], true), null);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
         
         // binding operation message has no extensions
         // operation message has one extension of type Policy
         // message has no extensions  
-        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[13], true));
+        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[13], true), null);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
         
         // binding operation message has no extensions
         // operation message has no extensions
         // message has one extension of type Policy
-        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[14], true));
+        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[14], true), null);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
         
         // binding operation message has one extension of type Policy
         // operation message has one extension of type Policy
         // message has one extension of type Policy
-        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[15], true));
+        ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[15], true), null);
         assertTrue(!ep.isEmpty());
         verifyAssertionsOnly(ep, 3);      
     }

@@ -201,11 +201,11 @@ public class EffectivePolicyImplTest extends Assert {
         Policy ep = control.createMock(Policy.class);
         EasyMock.expect(effectivePolicy.getPolicy()).andReturn(ep);        
         Policy op = control.createMock(Policy.class);
-        EasyMock.expect(engine.getAggregatedOperationPolicy(boi)).andReturn(op);
+        EasyMock.expect(engine.getAggregatedOperationPolicy(boi, null)).andReturn(op);
         Policy merged = control.createMock(Policy.class);
         EasyMock.expect(ep.merge(op)).andReturn(merged);
         Policy mp = control.createMock(Policy.class);
-        EasyMock.expect(engine.getAggregatedMessagePolicy(bmi)).andReturn(mp);
+        EasyMock.expect(engine.getAggregatedMessagePolicy(bmi, null)).andReturn(mp);
         EasyMock.expect(merged.merge(mp)).andReturn(merged);
         EasyMock.expect(merged.normalize(null, true)).andReturn(merged);
         
@@ -230,11 +230,11 @@ public class EffectivePolicyImplTest extends Assert {
         Policy ep = control.createMock(Policy.class);
         EasyMock.expect(endpointPolicy.getPolicy()).andReturn(ep);        
         Policy op = control.createMock(Policy.class);
-        EasyMock.expect(engine.getAggregatedOperationPolicy(boi)).andReturn(op);
+        EasyMock.expect(engine.getAggregatedOperationPolicy(boi, m)).andReturn(op);
         Policy merged = control.createMock(Policy.class);
         EasyMock.expect(ep.merge(op)).andReturn(merged);
         Policy fp = control.createMock(Policy.class);
-        EasyMock.expect(engine.getAggregatedFaultPolicy(bfi)).andReturn(fp);
+        EasyMock.expect(engine.getAggregatedFaultPolicy(bfi, m)).andReturn(fp);
         EasyMock.expect(merged.merge(fp)).andReturn(merged);
         EasyMock.expect(merged.normalize(null, true)).andReturn(merged);
         

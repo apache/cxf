@@ -35,6 +35,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.AbstractDescriptionElement;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -70,7 +71,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         super(bus);
     }  
     
-    public Policy getEffectivePolicy(ServiceInfo si) {
+    public Policy getEffectivePolicy(ServiceInfo si, Message m) {
         return getElementPolicy(si);
     }
     
@@ -92,7 +93,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
      * @param ei the EndpointInfo object identifying the endpoint
      * @return the effective policy
      */
-    public Policy getEffectivePolicy(EndpointInfo ei) {
+    public Policy getEffectivePolicy(EndpointInfo ei, Message m) {
         Policy p = getElementPolicy(ei);
         p = mergePolicies(p, getElementPolicy(ei.getBinding()));
         p = mergePolicies(p, getElementPolicy(ei.getInterface(), true));
@@ -109,7 +110,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
      * @param bi the BindingOperationInfo identifying the operation in relation to a port
      * @return the effective policy
      */
-    public Policy getEffectivePolicy(BindingOperationInfo bi) {
+    public Policy getEffectivePolicy(BindingOperationInfo bi, Message m) {
         DescriptionInfo di = bi.getBinding().getDescription();
         Policy p = getElementPolicy(bi, false, di);
         p = mergePolicies(p, getElementPolicy(bi.getOperationInfo(), false, di));
@@ -129,7 +130,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
      * @param bmi the BindingMessageInfo identifiying the message
      * @return the effective policy
      */
-    public Policy getEffectivePolicy(BindingMessageInfo bmi) {
+    public Policy getEffectivePolicy(BindingMessageInfo bmi, Message m) {
         ServiceInfo si = bmi.getBindingOperation().getBinding().getService();
         DescriptionInfo di = si.getDescription();
         Policy p = getElementPolicy(bmi, false, di);
@@ -143,7 +144,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
     
 
     
-    public Policy getEffectivePolicy(BindingFaultInfo bfi) {
+    public Policy getEffectivePolicy(BindingFaultInfo bfi, Message m) {
         ServiceInfo si = bfi.getBindingOperation().getBinding().getService();
         DescriptionInfo di = si.getDescription();
 
