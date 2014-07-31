@@ -114,10 +114,7 @@ public class SAMLProtocolResponseValidator {
         // Decrypt any encrypted Assertions and add them to the Response (note that this will break any
         // signature on the Response)
         for (org.opensaml.saml2.core.EncryptedAssertion assertion : samlResponse.getEncryptedAssertions()) {
-            EncryptedData encryptedData = assertion.getEncryptedData();
-            Element encryptedDataDOM = encryptedData.getDOM();
-            
-            Element decAssertion = decryptAssertion(encryptedDataDOM, sigCrypto, callbackHandler);
+            Element decAssertion = decryptAssertion(assertion, sigCrypto, callbackHandler);
             
             AssertionWrapper wrapper = new AssertionWrapper(decAssertion);
             samlResponse.getAssertions().add(wrapper.getSaml2());
@@ -368,9 +365,14 @@ public class SAMLProtocolResponseValidator {
     }
     
     private Element decryptAssertion(
-        Element encryptedDataDOM, Crypto sigCrypto, CallbackHandler callbackHandler
+        org.opensaml.saml2.core.EncryptedAssertion assertion, Crypto sigCrypto, CallbackHandler callbackHandler
     ) throws WSSecurityException {
-        Element encKeyElement = getNode(encryptedDataDOM, WSConstants.ENC_NS, "EncryptedKey", 0);
+        EncryptedData encryptedData = assertion.getEncryptedData();
+        Element encryptedDataDOM = encryptedData.getDOM();
+        Element encKeyElement = getNode(assertion.getDOM(), WSConstants.ENC_NS, "EncryptedKey", 0);
+        if (encKeyElement == null) {
+            encKeyElement = getNode(encryptedDataDOM, WSConstants.ENC_NS, "EncryptedKey", 0);
+        }
         if (encKeyElement == null) {
             LOG.log(Level.FINE, "EncryptedKey element is not available");
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
