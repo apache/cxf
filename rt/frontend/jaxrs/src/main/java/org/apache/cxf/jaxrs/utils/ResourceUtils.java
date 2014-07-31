@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -871,7 +872,7 @@ public final class ResourceUtils {
                                           contextProperties);
             return ctx;
         } catch (JAXBException ex) {
-            LOG.fine("No JAXB context can be created");
+            LOG.log(Level.WARNING, "No JAXB context can be created", ex);
         }
         return null;
     }
