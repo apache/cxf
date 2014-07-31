@@ -27,16 +27,16 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
-public class AesWrapKeyEncryption extends AbstractWrapKeyEncryption {
+public class AesWrapKeyAlgorithm extends AbstractWrapKeyAlgorithm {
     private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
         Arrays.asList(Algorithm.A128KW.getJwtName(),
                       Algorithm.A192KW.getJwtName(),
                       Algorithm.A256KW.getJwtName()));
-    public AesWrapKeyEncryption(byte[] keyBytes, String keyAlgoJwt) {
+    public AesWrapKeyAlgorithm(byte[] keyBytes, String keyAlgoJwt) {
         this(CryptoUtils.createSecretKeySpec(keyBytes, Algorithm.toJavaName(keyAlgoJwt)),
              keyAlgoJwt);
     }
-    public AesWrapKeyEncryption(SecretKey key, String keyAlgoJwt) {
+    public AesWrapKeyAlgorithm(SecretKey key, String keyAlgoJwt) {
         super(key, keyAlgoJwt, SUPPORTED_ALGORITHMS);
     }
     

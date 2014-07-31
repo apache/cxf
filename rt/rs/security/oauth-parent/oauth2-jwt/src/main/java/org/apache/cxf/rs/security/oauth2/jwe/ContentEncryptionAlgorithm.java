@@ -18,16 +18,11 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import javax.crypto.SecretKey;
+import java.security.spec.AlgorithmParameterSpec;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 
-public class DirectKeyJweEncryption extends AbstractJweEncryption {
-    public DirectKeyJweEncryption(SecretKey cek, byte[] iv) {
-        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
-                                                cek.getEncoded().length * 8)), cek.getEncoded(), iv);
-    }
-    public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
-        super(headers, new AesGcmContentEncryptionAlgorithm(cek, iv), new DirectKeyAlgorithm());
-    }
+interface ContentEncryptionAlgorithm {
+    byte[] getInitVector();
+    byte[] getContentEncryptionKey(JweHeaders headers);
+    AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] iv);
 }

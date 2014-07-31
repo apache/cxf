@@ -18,44 +18,24 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class WrappedKeyJweEncryption extends AbstractJweEncryption {
-    private AtomicInteger providedCekUsageCount;
     public WrappedKeyJweEncryption(JweHeaders headers, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
         this(headers, null, null, keyEncryptionAlgorithm);
     }
     public WrappedKeyJweEncryption(JweHeaders headers, byte[] cek, 
                                    byte[] iv, KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
-        this(headers, cek, iv, DEFAULT_AUTH_TAG_LENGTH, keyEncryptionAlgorithm, null);
+        this(headers, cek, iv, keyEncryptionAlgorithm, null);
     }
     public WrappedKeyJweEncryption(JweHeaders headers, 
                                    byte[] cek, 
                                    byte[] iv, 
-                                   int authTagLen, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm,
                                    JwtHeadersWriter writer) {
-        super(headers, cek, iv, authTagLen, keyEncryptionAlgorithm, writer);
-        if (cek != null) {
-            providedCekUsageCount = new AtomicInteger();
-        }
+        super(headers, new AesGcmContentEncryptionAlgorithm(cek, iv), keyEncryptionAlgorithm, writer);
     }
-    protected byte[] getContentEncryptionKey() {
-        byte[] theCek = super.getContentEncryptionKey();
-        if (theCek == null) {
-            String algoJava = getContentEncryptionAlgoJava();
-            String algoJwt = getContentEncryptionAlgoJwt();
-            theCek = CryptoUtils.getSecretKey(Algorithm.stripAlgoProperties(algoJava), 
-                Algorithm.valueOf(algoJwt).getKeySizeBits()).getEncoded();
-        } else if (providedCekUsageCount.addAndGet(1) > 1) {
-            throw new SecurityException();
-        }
-        return theCek;
-    }
+    
     
 }
