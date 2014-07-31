@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 
-public class RSAOaepKeyEncryption extends AbstractWrapKeyEncryption {
+public class RSAOaepKeyEncryption extends AbstractWrapKeyAlgorithm {
     private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
         Arrays.asList(Algorithm.RSA_OAEP.getJwtName(),
                       Algorithm.RSA_OAEP_256.getJwtName()));

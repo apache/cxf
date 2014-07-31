@@ -19,7 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.jwe;
 
 
-public class DirectKeyEncryption implements KeyEncryptionAlgorithm {
+public class DirectKeyAlgorithm implements KeyEncryptionAlgorithm {
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
         if (headers.getKeyEncryptionAlgorithm() != null) {
             throw new SecurityException();
