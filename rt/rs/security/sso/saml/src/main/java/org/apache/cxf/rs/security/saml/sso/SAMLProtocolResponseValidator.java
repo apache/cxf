@@ -116,8 +116,7 @@ public class SAMLProtocolResponseValidator {
         // signature on the Response)
         for (org.opensaml.saml2.core.EncryptedAssertion assertion : samlResponse.getEncryptedAssertions()) {
             
-            Element decAssertion = 
-                decryptAssertion(assertion, sigCrypto, callbackHandler);
+            Element decAssertion = decryptAssertion(assertion, sigCrypto, callbackHandler);
             
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper(decAssertion);
             samlResponse.getAssertions().add(wrapper.getSaml2());
@@ -410,7 +409,12 @@ public class SAMLProtocolResponseValidator {
     private Element decryptAssertion(
         org.opensaml.saml2.core.EncryptedAssertion assertion, Crypto sigCrypto, CallbackHandler callbackHandler
     ) throws WSSecurityException {
+        EncryptedData encryptedData = assertion.getEncryptedData();
+        Element encryptedDataDOM = encryptedData.getDOM();
         Element encKeyElement = getNode(assertion.getDOM(), WSConstants.ENC_NS, "EncryptedKey", 0);
+        if (encKeyElement == null) {
+            encKeyElement = getNode(encryptedDataDOM, WSConstants.ENC_NS, "EncryptedKey", 0);
+        }
         if (encKeyElement == null) {
             LOG.log(Level.FINE, "EncryptedKey element is not available");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -458,8 +462,6 @@ public class SAMLProtocolResponseValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
-        EncryptedData encryptedData = assertion.getEncryptedData();
-        Element encryptedDataDOM = encryptedData.getDOM();
         String symKeyAlgo = getEncodingMethodAlgorithm(encryptedDataDOM);
         
         byte[] decryptedPayload = null;
