@@ -551,9 +551,7 @@ public class SourceGenerator {
     
     private String firstCharToUpperCase(String name) {
         if (name.length() > 0 && Character.isLowerCase(name.charAt(0))) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(Character.toUpperCase(name.charAt(0)));
-            return name.length() > 1 ? sb.append(name.substring(1)).toString() : sb.toString();
+            return StringUtils.capitalize(name);
         } else {
             return name;
         }
@@ -561,9 +559,7 @@ public class SourceGenerator {
     
     private String firstCharToLowerCase(String name) {
         if (name.length() > 0 && Character.isUpperCase(name.charAt(0))) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(Character.toLowerCase(name.charAt(0)));
-            return name.length() > 1 ? sb.append(name.substring(1)).toString() : sb.toString();
+            return StringUtils.uncapitalize(name);
         } else {
             return name;
         }
