@@ -131,9 +131,6 @@ public class Claim implements Serializable, Cloneable {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
         if (!(obj instanceof Claim)) {
             return false;
         }

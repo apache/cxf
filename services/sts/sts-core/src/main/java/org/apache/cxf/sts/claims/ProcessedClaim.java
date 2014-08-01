@@ -103,10 +103,10 @@ public class ProcessedClaim extends Claim {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
+        if (!(obj instanceof ProcessedClaim)) {
             return false;
         }
-        if (!(obj instanceof ProcessedClaim)) {
+        if (!super.equals(obj)) {
             return false;
         }
         ProcessedClaim other = (ProcessedClaim)obj;
