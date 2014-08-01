@@ -21,6 +21,7 @@ package org.apache.cxf.tools.java2wsdl.processor;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,10 @@ import java.util.Map;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,14 +41,20 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.WSDLHelper;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.jaxb.JAXBEncoderDecoder;
+import org.apache.cxf.service.model.FaultInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
+import org.apache.cxf.tools.fortest.exception.TransientMessageException;
 import org.apache.cxf.tools.java2ws.JavaToWS;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
@@ -925,4 +935,54 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         //if the test works, this won't throw an exception.  CXF-4877 generated bad XML at this point
         StaxUtils.read(new FileInputStream(wsdlFile));
     }
+    
+    @Test
+    public void testTransientMessage() throws Exception {
+        //CXF-5744
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/transient_message.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.Echo4");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        File wsdlFile = new File(output, "transient_message.wsdl");
+        assertTrue(wsdlFile.exists());
+        
+        Document doc = StaxUtils.read(wsdlFile);
+        //StaxUtils.print(doc);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        map.put("tns", "http://cxf.apache.org/test/HelloService");
+        XPathUtils util = new XPathUtils(map);
+
+        String path = "//xsd:complexType[@name='TransientMessageException']//xsd:sequence/xsd:element[@name='message']";
+        Element nd = (Element)util.getValueNode(path, doc);
+        assertNull(nd);
+        
+        //ok, we didn't map it into the schema.  Make sure the runtime won't write it out.
+        List<ServiceInfo> sl = CastUtils.cast((List<?>)env.get("serviceList"));
+        FaultInfo mi = sl.get(0).getInterface().getOperation(new QName("http://cxf.apache.org/test/HelloService",
+                                                                       "echo"))
+            .getFault(new QName("http://cxf.apache.org/test/HelloService",
+                                "TransientMessageException"));
+        MessagePartInfo mpi = mi.getMessagePart(0);
+        JAXBContext ctx = JAXBContext.newInstance(String.class, Integer.TYPE);
+        StringWriter sw = new StringWriter();
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(sw);
+        TransientMessageException tme = new TransientMessageException(12, "Exception Message");
+        Marshaller ms = ctx.createMarshaller();
+        ms.setProperty(Marshaller.JAXB_FRAGMENT, true);
+        JAXBEncoderDecoder.marshallException(ms, tme, mpi, writer);
+        writer.flush();
+        writer.close();
+        assertEquals(-1, sw.getBuffer().indexOf("Exception Message"));
+    }
+    
 }
+q
