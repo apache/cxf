@@ -985,4 +985,3 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     }
     
 }
-q
