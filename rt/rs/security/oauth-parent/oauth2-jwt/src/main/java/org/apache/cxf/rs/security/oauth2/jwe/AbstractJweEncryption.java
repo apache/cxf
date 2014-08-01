@@ -117,10 +117,16 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         JweEncryptionInternal state = getInternalState(contentType);
         Cipher c = CryptoUtils.initCipher(createCekSecretKey(state), state.keyProps, 
                                           Cipher.ENCRYPT_MODE);
-        return new JweEncryptionState(c, getAuthTagLen(), state.theHeaders, state.jweContentEncryptionKey, 
-                                state.theIv, state.keyProps.isCompressionSupported());
+        return new JweEncryptionState(c, 
+                                      state.theHeaders, 
+                                      state.jweContentEncryptionKey, 
+                                      state.theIv,
+                                      getAuthenticationTagProducer(state),
+                                      state.keyProps.isCompressionSupported());
     }
-    
+    protected AuthenticationTagProducer getAuthenticationTagProducer(JweEncryptionInternal state) {
+        return null;
+    }
     protected SecretKey createCekSecretKey(JweEncryptionInternal state) {
         return CryptoUtils.createSecretKeySpec(getActualCek(state.secretKey), state.keyProps.getKeyAlgo());
     }
