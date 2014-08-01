@@ -51,7 +51,7 @@ public enum Algorithm {
     A192GCM(JwtConstants.A192GCM_ALGO, "AES/GCM/NoPadding", 192),
     A256GCM(JwtConstants.A256GCM_ALGO, "AES/GCM/NoPadding", 256),
     A128CBC_HS256(JwtConstants.A128CBC_HS256_ALGO, "AES/CBC/PKCS7Padding", 128),
-    A192CBC_HS354(JwtConstants.A192CBC_HS354_ALGO, "AES/CBC/PKCS7Padding", 192),
+    A192CBC_HS384(JwtConstants.A192CBC_HS384_ALGO, "AES/CBC/PKCS7Padding", 192),
     A256CBC_HS512(JwtConstants.A256CBC_HS512_ALGO, "AES/CBC/PKCS7Padding", 256);
     
     public static final String HMAC_SHA_256_JAVA = "HmacSHA256";
@@ -94,7 +94,7 @@ public enum Algorithm {
         JAVA_TO_JWT_NAMES.put(AES_WRAP_ALGO_JAVA, JwtConstants.A192KW_ALGO);
         JAVA_TO_JWT_NAMES.put(AES_WRAP_ALGO_JAVA, JwtConstants.A256KW_ALGO);
         JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JwtConstants.A128CBC_HS256_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JwtConstants.A192CBC_HS354_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JwtConstants.A192CBC_HS384_ALGO);
         JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JwtConstants.A256CBC_HS512_ALGO);
         JWT_TO_JAVA_NAMES = new HashMap<String, String>();
         JWT_TO_JAVA_NAMES.put(JwtConstants.HMAC_SHA_256_ALGO, HMAC_SHA_256_JAVA);
@@ -116,7 +116,7 @@ public enum Algorithm {
         JWT_TO_JAVA_NAMES.put(JwtConstants.A192GCM_ALGO, AES_GCM_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.A128GCM_ALGO, AES_GCM_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.A128CBC_HS256_ALGO, AES_CBC_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A192CBC_HS354_ALGO, AES_CBC_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.A192CBC_HS384_ALGO, AES_CBC_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.A256CBC_HS512_ALGO, AES_CBC_ALGO_JAVA);
     }
     private final String jwtName;

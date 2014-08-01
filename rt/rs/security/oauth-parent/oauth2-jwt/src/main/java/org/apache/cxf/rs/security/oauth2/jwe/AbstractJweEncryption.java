@@ -84,34 +84,49 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected int getAuthTagLen() {
         return DEFAULT_AUTH_TAG_LENGTH;
     }
-    protected JweHeaders getJweHeaders() {
-        return headers;
+    protected byte[] getAAD(JweHeaders theHeaders) {
+        return contentEncryptionAlgo.getAAD(theHeaders, writer);
     }
     public String encrypt(byte[] content, String contentType) {
         JweEncryptionInternal state = getInternalState(contentType);
         
-        byte[] cipherText = CryptoUtils.encryptBytes(
-            content, 
-            state.secretKey,
-            state.keyProps);
+        byte[] cipher = CryptoUtils.encryptBytes(content, createCekSecretKey(state), state.keyProps);
         
         
-        JweCompactProducer producer = new JweCompactProducer(state.theHeaders, 
-                                             writer,                
-                                             state.jweContentEncryptionKey,
-                                             state.theIv,
-                                             cipherText,
-                                             getAuthTagLen());
+        JweCompactProducer producer = getJweCompactProducer(state, cipher);
         return producer.getJweContent();
     }
     
+    protected JweCompactProducer getJweCompactProducer(JweEncryptionInternal state, byte[] cipher) {
+        return new JweCompactProducer(state.theHeaders, 
+                                      getJwtHeadersWriter(),                
+                                      state.jweContentEncryptionKey,
+                                      state.theIv,
+                                      cipher,
+                                      getAuthTagLen());
+    }
+    
+    protected JwtHeadersWriter getJwtHeadersWriter() {
+        return writer;
+    }
+    protected JweHeaders getJweHeaders() {
+        return headers;
+    }
     @Override
     public JweEncryptionState createJweEncryptionState(String contentType) {
         JweEncryptionInternal state = getInternalState(contentType);
-        Cipher c = CryptoUtils.initCipher(state.secretKey, state.keyProps, 
+        Cipher c = CryptoUtils.initCipher(createCekSecretKey(state), state.keyProps, 
                                           Cipher.ENCRYPT_MODE);
         return new JweEncryptionState(c, getAuthTagLen(), state.theHeaders, state.jweContentEncryptionKey, 
                                 state.theIv, state.keyProps.isCompressionSupported());
+    }
+    
+    protected SecretKey createCekSecretKey(JweEncryptionInternal state) {
+        return CryptoUtils.createSecretKeySpec(getActualCek(state.secretKey), state.keyProps.getKeyAlgo());
+    }
+    
+    protected byte[] getActualCek(byte[] theCek) {
+        return theCek;
     }
     
     private JweEncryptionInternal getInternalState(String contentType) {
@@ -125,7 +140,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         String contentEncryptionAlgoJavaName = Algorithm.toJavaName(theHeaders.getContentEncryptionAlgorithm());
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
         keyProps.setCompressionSupported(compressionRequired(theHeaders));
-        byte[] additionalEncryptionParam = theHeaders.toCipherAdditionalAuthData(writer);
+        byte[] additionalEncryptionParam = getAAD(theHeaders);
         keyProps.setAdditionalData(additionalEncryptionParam);
         
         byte[] theIv = contentEncryptionAlgo.getInitVector();
@@ -136,19 +151,21 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         state.theHeaders = theHeaders;
         state.jweContentEncryptionKey = jweContentEncryptionKey;
         state.keyProps = keyProps;
-        state.secretKey = CryptoUtils.createSecretKeySpec(theCek, 
-                                        contentEncryptionAlgoJavaName);
+        state.secretKey = theCek; 
         state.theIv = theIv;
         return state;
     }
     private boolean compressionRequired(JweHeaders theHeaders) {
         return JwtConstants.DEFLATE_ZIP_ALGORITHM.equals(theHeaders.getZipAlgorithm());
     }
-    private static class JweEncryptionInternal {
+    protected KeyEncryptionAlgorithm getKeyEncryptionAlgo() {
+        return keyEncryptionAlgo;
+    }
+    protected static class JweEncryptionInternal {
         JweHeaders theHeaders;
         byte[] jweContentEncryptionKey;
         byte[] theIv;
         KeyProperties keyProps;
-        SecretKey secretKey;
+        byte[] secretKey;
     }
 }
