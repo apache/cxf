@@ -22,10 +22,14 @@ import javax.crypto.SecretKey;
 
 
 public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
+    private static final int DEFAULT_IV_SIZE = 96;
     public AesGcmContentEncryptionAlgorithm(SecretKey key, byte[] iv) { 
         this(key.getEncoded(), iv);    
     }
     public AesGcmContentEncryptionAlgorithm(byte[] cek, byte[] iv) { 
         super(cek, iv);    
+    }
+    protected int getIvSize() { 
+        return DEFAULT_IV_SIZE;
     }
 }
