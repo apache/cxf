@@ -82,6 +82,28 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
     }
     
     protected JweCompactProducer getJweCompactProducer(JweEncryptionInternal state, byte[] cipher) {
+        final MacState macState = getInitializedMacState(state);
+        
+        macState.mac.update(cipher);
+        macState.mac.update(macState.al);
+        byte[] sig = macState.mac.doFinal();
+        byte[] authTag = getTagFromSignature(sig);
+        
+        return new JweCompactProducer(macState.headersJson,
+                                      state.jweContentEncryptionKey,
+                                      state.theIv,
+                                      cipher,
+                                      authTag);
+    }
+    
+    private byte[] getTagFromSignature(byte[] sig) {
+        int authTagLen = getAuthTagLen() / 8;
+        byte[] authTag = new byte[authTagLen];
+        System.arraycopy(sig, 0, authTag, 0, authTagLen);
+        return authTag;
+    }
+    
+    private MacState getInitializedMacState(final JweEncryptionInternal state) {
         int size = getCekKeySize() / 2;
         byte[] macKey = new byte[size];
         System.arraycopy(state.secretKey, 0, macKey, 0, size);
@@ -92,24 +114,37 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         String headersJson = getJwtHeadersWriter().headersToJson(state.theHeaders);
         byte[] aad = JweHeaders.toCipherAdditionalAuthData(headersJson);
         ByteBuffer buf = ByteBuffer.allocate(8);
-        byte[] al = buf.putInt(0).putInt(aad.length * 8).array();
+        final byte[] al = buf.putInt(0).putInt(aad.length * 8).array();
         
         mac.update(aad);
         mac.update(state.theIv);
-        mac.update(cipher);
-        mac.update(al);
-        byte[] sig = mac.doFinal();
-        int authTagLen = getAuthTagLen() / 8;
-        byte[] authTag = new byte[authTagLen];
-        System.arraycopy(sig, 0, authTag, 0, authTagLen);
-        
-        return new JweCompactProducer(headersJson,
-                                      state.jweContentEncryptionKey,
-                                      state.theIv,
-                                      cipher,
-                                      authTag);
+        MacState macState = new MacState();
+        macState.mac = mac;
+        macState.al = al;
+        macState.headersJson = headersJson;
+        return macState;
     }
     
+    protected AuthenticationTagProducer getAuthenticationTagProducer(final JweEncryptionInternal state) {
+        final MacState macState = getInitializedMacState(state);
+        
+        
+        return new AuthenticationTagProducer() {
+
+            @Override
+            public void update(byte[] cipher, int off, int len) {
+                macState.mac.update(cipher, off, len);
+            }
+
+            @Override
+            public byte[] getTag() {
+                macState.mac.update(macState.al);
+                byte[] sig = macState.mac.doFinal();
+                return getTagFromSignature(sig);
+            }
+            
+        };
+    }
     
     protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
         return getKeyEncryptionAlgo().getEncryptedContentEncryptionKey(getJweHeaders(), theCek);
@@ -127,5 +162,11 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         public byte[] getAAD(JweHeaders theHeaders, JwtHeadersWriter writer) {
             return null;
         }
+    }
+    
+    private static class MacState {
+        private Mac mac;
+        private byte[] al;
+        private String headersJson;
     }
 }
