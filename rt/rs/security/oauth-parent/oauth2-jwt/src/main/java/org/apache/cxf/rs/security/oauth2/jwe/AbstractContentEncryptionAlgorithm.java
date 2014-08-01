@@ -28,7 +28,7 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
 public abstract class AbstractContentEncryptionAlgorithm implements ContentEncryptionAlgorithm {
-    private static final int DEFAULT_IV_SIZE = 96;
+    private static final int DEFAULT_IV_SIZE = 128;
     private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private byte[] cek;
     private byte[] iv;
@@ -57,7 +57,7 @@ public abstract class AbstractContentEncryptionAlgorithm implements ContentEncry
     }
     public byte[] getInitVector() {
         if (iv == null) {
-            return CryptoUtils.generateSecureRandomBytes(DEFAULT_IV_SIZE);
+            return CryptoUtils.generateSecureRandomBytes(getIvSize());
         } else if (iv.length > 0 && providedIvUsageCount.addAndGet(1) > 1) {
             throw new SecurityException();
         } else {
@@ -66,5 +66,8 @@ public abstract class AbstractContentEncryptionAlgorithm implements ContentEncry
     }
     protected int getAuthTagLen() {
         return authTagLen;
+    }
+    protected int getIvSize() { 
+        return DEFAULT_IV_SIZE;
     }
 }
