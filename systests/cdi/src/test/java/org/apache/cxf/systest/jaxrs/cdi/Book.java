@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.jaxrs.cdi;
 
 import javax.validation.constraints.NotNull;
 
