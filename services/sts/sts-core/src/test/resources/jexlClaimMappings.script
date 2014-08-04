@@ -1,0 +1,127 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+{
+    // Role value mapping
+    var roleClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role';
+    var roleMappings = { "admin" : "administrator", "manager" : "manager" };
+    
+    for (c : sourceClaims) {
+    	if(c.claimType == roleClaimType) {
+	    	var mappedValues = new("java.util.ArrayList");
+	    	for (v : c.values) {
+	    		var newValue = roleMappings.get(v);
+	    		if (newValue != null) {
+	    			mappedValues.add(newValue);
+	    		}
+	    	}
+	    	c.values = mappedValues;
+	    	targetClaims.add(c);
+    	}
+    }
+    
+    // Claim merge
+    var firstNameClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname';
+    var lastNameClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname';
+    var firstName;
+    var lastName;
+    var issuer;
+    for (c : sourceClaims) {
+    	if(c.claimType == firstNameClaimType) {
+    		firstName = c.values[0];
+    		issuer = c.issuer;
+    	} else if(c.claimType == lastNameClaimType) {
+    		lastName = c.values[0];
+    	}
+    }
+    if (firstName != null && lastName != null) {
+    	var claim = new("org.apache.cxf.sts.claims.Claim");
+    	claim.issuer = issuer;
+    	claim.claimType = new("java.net.URI", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
+    	claim.addValue(firstName + " " + lastName);
+    	targetClaims.add(claim);
+    }
+    
+    // Additional static claim
+    var idpClaim = new("org.apache.cxf.sts.claims.Claim");
+    idpClaim.claimType = new("java.net.URI", "http://schemas.microsoft.com/identity/claims/identityprovider");
+    idpClaim.value = "https://idp.apache.org/cbb375d-33b-45fa-9bf5-f33bd8721a77/";
+    targetClaims.add(idpClaim);
+    
+    // Claim value updates
+    var uppercaseClaim = new("org.apache.cxf.sts.claims.Claim");
+    uppercaseClaim.claimType = new("java.net.URI", "http://my.schema.org/identity/claims/uppercase");
+    uppercaseClaim.values.add("Value");
+    uppercaseClaim.values.add("Value2");
+    var newValues = new("java.util.ArrayList");
+    for (v : uppercaseClaim.values) {
+    	newValue = v.toUpperCase();
+    	newValues.add(newValue);
+    }
+    uppercaseClaim.values = newValues;
+    targetClaims.add(uppercaseClaim);
+    
+    var lowercaseClaim = new("org.apache.cxf.sts.claims.Claim");
+    lowercaseClaim.claimType = new("java.net.URI", "http://my.schema.org/identity/claims/lowercase");
+    lowercaseClaim.values.add("Value");
+    lowercaseClaim.values.add("Value2");
+    var newValues = new("java.util.ArrayList");
+    for (v : lowercaseClaim.values) {
+    	newValue = v.toLowerCase();
+    	newValues.add(newValue);
+    }
+    lowercaseClaim.values = newValues;
+    targetClaims.add(lowercaseClaim);
+    
+    var wrappedUppercaseClaim = new("org.apache.cxf.sts.claims.Claim");
+    wrappedUppercaseClaim.claimType = new("java.net.URI", "http://my.schema.org/identity/claims/wrappedUppercase");
+    wrappedUppercaseClaim.values.add("Value");
+    var newValues = new("java.util.ArrayList");
+    for (v : wrappedUppercaseClaim.values) {
+    	newValue = "Prefix_" + v + "_Suffix";
+    	newValues.add(newValue);
+    }
+    wrappedUppercaseClaim.values = newValues;
+    var newValues = new("java.util.ArrayList");
+    for (v : wrappedUppercaseClaim.values) {
+    	newValue = v.toUpperCase();
+    	newValues.add(newValue);
+    }
+    wrappedUppercaseClaim.values = newValues;
+    targetClaims.add(wrappedUppercaseClaim);
+    
+    // Direct copy
+    var emailClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mail';
+    for (c : sourceClaims) {
+    	if(c.claimType == emailClaimType) {
+    		targetClaims.add(c);
+    	}
+    }
+    
+    // Set correct issuer
+    for (c : targetClaims) {
+    	if(c.originalIssuer == null) {
+    		c.originalIssuer = c.issuer;
+    	}
+    	c.issuer = claimsParameters.stsProperties.issuer;
+    }
+    
+    // Return new claims
+    return targetClaims;
+}
