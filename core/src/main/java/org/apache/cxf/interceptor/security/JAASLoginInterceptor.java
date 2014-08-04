@@ -19,21 +19,24 @@
 package org.apache.cxf.interceptor.security;
 
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.security.SecurityToken;
-import org.apache.cxf.common.security.TokenType;
-import org.apache.cxf.common.security.UsernameToken;
-import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.interceptor.security.callback.CallbackHandlerProvider;
+import org.apache.cxf.interceptor.security.callback.CallbackHandlerProviderAuthPol;
+import org.apache.cxf.interceptor.security.callback.CallbackHandlerProviderUsernameToken;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -51,14 +54,18 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     private String roleClassifierType = ROLE_CLASSIFIER_PREFIX;
     private boolean reportFault;
     private boolean useDoAs = true;
-    
+    private List<CallbackHandlerProvider> callbackHandlerProviders;
+    private boolean allowAnonymous = true;
     
     public JAASLoginInterceptor() {
-        super(Phase.UNMARSHAL);
+        this(Phase.UNMARSHAL);
     }
     
     public JAASLoginInterceptor(String phase) {
         super(phase);
+        this.callbackHandlerProviders = new ArrayList<CallbackHandlerProvider>();
+        this.callbackHandlerProviders.add(new CallbackHandlerProviderAuthPol());
+        this.callbackHandlerProviders.add(new CallbackHandlerProviderUsernameToken());
     }
     
     public void setContextName(String name) {
@@ -101,37 +108,29 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     public void setUseDoAs(boolean useDoAs) {
         this.useDoAs = useDoAs;
     }
-
-    public void handleMessage(final Message message) throws Fault {
-
-        String name = null;
-        String password = null;
-        
-        AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
-        if (policy != null) {
-            name = policy.getUserName();
-            password = policy.getPassword();
-        } else {
-            // try the UsernameToken
-            SecurityToken token = message.get(SecurityToken.class);
-            if (token != null && token.getTokenType() == TokenType.UsernameToken) {
-                UsernameToken ut = (UsernameToken)token;
-                name = ut.getName();
-                password = ut.getPassword();
+    
+    private CallbackHandler getFirstCallbackHandler(Message message) {
+        for (CallbackHandlerProvider cbp : callbackHandlerProviders) {
+            CallbackHandler cbh = cbp.create(message);
+            if (cbh != null) {
+                return cbh;
             }
         }
+        return null;
+    }
 
-        if (name == null || password == null) {
-            throw new AuthenticationException("Authentication required but no user or password was supplied");
+    public void handleMessage(final Message message) throws Fault {
+        CallbackHandler handler = getFirstCallbackHandler(message);
+
+        if (handler == null && !allowAnonymous) {
+            throw new AuthenticationException("Authentication required but no authentication information was supplied");
         }
 
         try {
-            CallbackHandler handler = getCallbackHandler(name, password);  
             LoginContext ctx = new LoginContext(getContextName(), null, handler, loginConfig);  
-            
             ctx.login();
-            
             Subject subject = ctx.getSubject();
+            String name = getUsername(handler);
             message.put(SecurityContext.class, createSecurityContext(name, subject));
             
             // Run the further chain in the context of this subject.
@@ -151,13 +150,29 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
             }
 
         } catch (LoginException ex) {
-            String errorMessage = "Authentication failed for user " + name + " : " + ex.getMessage();
+            String errorMessage = "Authentication failed: " + ex.getMessage();
             LOG.fine(errorMessage);
             if (reportFault) {
-                throw new AuthenticationException(errorMessage);
+                AuthenticationException aex = new AuthenticationException(errorMessage);
+                aex.initCause(ex);
+                throw aex;
+                
             } else {
                 throw new AuthenticationException("Authentication failed (details can be found in server log)");
             }
+        }
+    }
+
+    private String getUsername(CallbackHandler handler) {
+        if (handler == null) {
+            return null;
+        }
+        try {
+            NameCallback usernameCallBack = new NameCallback("user");
+            handler.handle(new Callback[]{usernameCallBack });
+            return usernameCallBack.getName();
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -181,6 +196,22 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     public void setLoginConfig(Configuration loginConfig) {
         this.loginConfig = loginConfig;
     }
+
+    public List<CallbackHandlerProvider> getCallbackHandlerProviders() {
+        return callbackHandlerProviders;
+    }
+
+    public void setCallbackHandlerProviders(List<CallbackHandlerProvider> callbackHandlerProviders) {
+        this.callbackHandlerProviders.clear();
+        this.callbackHandlerProviders.addAll(callbackHandlerProviders);
+    }
     
-    
+    public void addCallbackHandlerProviders(List<CallbackHandlerProvider> callbackHandlerProviders2) {
+        this.callbackHandlerProviders.addAll(callbackHandlerProviders2);
+    }
+
+    public void setAllowAnonymous(boolean allowAnonymous) {
+        this.allowAnonymous = allowAnonymous;
+    }
+
 }
