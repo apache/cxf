@@ -22,21 +22,37 @@ package org.apache.cxf.sts.claims.mapper;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimsParameters;
-import org.apache.cxf.sts.claims.JexlClaimsMapper;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class JexlClaimsMapperTest extends org.junit.Assert {
 
     JexlClaimsMapper jcm;
 
-    public JexlClaimsMapperTest() throws IOException {
+    public JexlClaimsMapperTest(String scriptPath) throws IOException {
         jcm = new JexlClaimsMapper();
-        jcm.setScript("src/test/resources/jexlClaimMappings.script");
+        jcm.setScript(scriptPath);
+    }
+
+    @Parameters
+    public static Collection<Object[]> data() {
+        Object[][] data = new Object[][] {
+            {
+                "src/test/resources/jexlClaimMappingsWithoutFunctions.script"
+            }, {
+                "src/test/resources/jexlClaimMappingsWithFunctions.script"
+            }
+        };
+        return Arrays.asList(data);
     }
 
     @Test
