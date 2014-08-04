@@ -17,10 +17,12 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.claims;
+package org.apache.cxf.sts.claims.mapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.commons.jexl2.JexlContext;
@@ -28,6 +30,9 @@ import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
 import org.apache.commons.jexl2.Script;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.sts.claims.ClaimsMapper;
+import org.apache.cxf.sts.claims.ClaimsParameters;
+import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 
 public class JexlClaimsMapper implements ClaimsMapper {
 
@@ -41,6 +46,10 @@ public class JexlClaimsMapper implements ClaimsMapper {
         // jexl.setCache(512);
         // jexl.setLenient(false);
         jexl.setSilent(false);
+        
+        Map<String, Object> functions = new HashMap<String, Object>();
+        functions.put("claims", new ClaimUtils());
+        jexl.setFunctions(functions);
     }
 
     public ProcessedClaimCollection mapClaims(String sourceRealm, ProcessedClaimCollection sourceClaims,
