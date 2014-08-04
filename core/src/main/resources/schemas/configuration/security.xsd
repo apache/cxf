@@ -249,6 +249,14 @@
                 </xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="keyPasswordCallbackHandler" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>
+                This attribute contains the name of the class implementing
+                password callback handler. Alternative to keyPassword attribute.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="provider" type="xs:string">
               <xs:annotation>
                 <xs:documentation>

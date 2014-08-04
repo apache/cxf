@@ -32,12 +32,15 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -267,9 +270,7 @@ public final class TLSParameterJaxBUtils {
                      ? kmc.getFactoryAlgorithm()
                      : KeyManagerFactory.getDefaultAlgorithm();
 
-        char[] keyPass = kmc.isSetKeyPassword()
-                     ? deobfuscate(kmc.getKeyPassword())
-                     : null;
+        char[] keyPass = getKeyPassword(kmc);
 
         KeyManagerFactory fac =
                      kmc.isSetProvider()
@@ -279,6 +280,37 @@ public final class TLSParameterJaxBUtils {
         fac.init(keyStore, keyPass);
 
         return fac.getKeyManagers();
+    }
+
+    private static char[] getKeyPassword(KeyManagersType kmc) {
+        char[] keyPass = kmc.isSetKeyPassword()
+            ? deobfuscate(kmc.getKeyPassword())
+            : null;
+
+        if (keyPass != null) {
+            return keyPass;
+        }
+
+        String callbackHandlerClass = kmc.getKeyPasswordCallbackHandler();
+        if (callbackHandlerClass == null) {
+            return null;
+        }
+        CallbackHandler ch = null;
+        try {
+            ch = (CallbackHandler)ClassLoaderUtils.loadClass(callbackHandlerClass, TLSParameterJaxBUtils.class)
+                .newInstance();
+            if (ch == null) {
+                return null;
+            }
+            PasswordCallback pwCb = new PasswordCallback(kmc.getKeyStore().getFile(), false);
+            PasswordCallback[] callbacks = new PasswordCallback[] {pwCb};
+            ch.handle(callbacks);
+            keyPass = callbacks[0].getPassword();
+        } catch (Exception e) {
+            LOG.log(Level.WARNING,
+                    "Cannot load key password from callback handler: " + e.getMessage(), e);
+        }
+        return keyPass;
     }
 
     /**
