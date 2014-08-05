@@ -253,7 +253,8 @@
               <xs:annotation>
                 <xs:documentation>
                 This attribute contains the name of the class implementing
-                password callback handler. Alternative to keyPassword attribute.
+                password callback handler to unlock the keys withing the keystore. 
+                Alternative to keyPassword attribute.
                 </xs:documentation>
               </xs:annotation>
             </xs:attribute>
