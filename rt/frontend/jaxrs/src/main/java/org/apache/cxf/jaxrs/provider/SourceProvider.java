@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -43,6 +44,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
@@ -62,6 +64,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
     MessageBodyReader<T>, MessageBodyWriter<T> {
 
     private static final String PREFERRED_FORMAT = "source-preferred-format";
+    private static final Logger LOG = LogUtils.getL7dLogger(BinaryDataProvider.class);
     @Context
     private MessageContext context;
     
@@ -88,41 +91,46 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
                 theSource = SAXSource.class;
             }
         }
-        
-        if (DOMSource.class.isAssignableFrom(theSource) || Document.class.isAssignableFrom(theSource)) {
-            
-            boolean docRequired = Document.class.isAssignableFrom(theSource);
-            XMLStreamReader reader = getReader(is);
-            try {
-                Document doc = StaxUtils.read(reader);
-                return source.cast(docRequired ? doc : new DOMSource(doc));
-            } catch (DepthExceededStaxException e) {
-                throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413));
-            } catch (XMLStreamException e) {
-                if (e.getMessage() != null && e.getMessage().startsWith("Maximum Number")) {
-                    throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413));
-                } else {
-                    throw ExceptionUtils.toBadRequestException(e, null);
-                }
-            } catch (Exception e) {
-                IOException ioex = new IOException("Problem creating a Source object");
-                ioex.setStackTrace(e.getStackTrace());
-                throw ioex;
-            } finally {
+        try {
+            if (DOMSource.class.isAssignableFrom(theSource) || Document.class.isAssignableFrom(theSource)) {
+                
+                boolean docRequired = Document.class.isAssignableFrom(theSource);
+                XMLStreamReader reader = getReader(is);
                 try {
-                    reader.close();
+                    Document doc = StaxUtils.read(reader);
+                    return source.cast(docRequired ? doc : new DOMSource(doc));
+                } catch (DepthExceededStaxException e) {
+                    throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413));
                 } catch (XMLStreamException e) {
-                    //ignore
+                    if (e.getMessage() != null && e.getMessage().startsWith("Maximum Number")) {
+                        throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413));
+                    } else {
+                        throw ExceptionUtils.toBadRequestException(e, null);
+                    }
+                } catch (Exception e) {
+                    IOException ioex = new IOException("Problem creating a Source object");
+                    ioex.setStackTrace(e.getStackTrace());
+                    throw ioex;
+                } finally {
+                    try {
+                        reader.close();
+                    } catch (XMLStreamException e) {
+                        //ignore
+                    }
                 }
+            } else if (SAXSource.class.isAssignableFrom(theSource)
+                      || StaxSource.class.isAssignableFrom(theSource)) {
+                return source.cast(new StaxSource(getReader(is)));
+            } else if (StreamSource.class.isAssignableFrom(theSource)
+                       || Source.class.isAssignableFrom(theSource)) {
+                return source.cast(new StreamSource(getRealStream(is)));
+            } else if (XMLSource.class.isAssignableFrom(theSource)) {
+                return source.cast(new XMLSource(getRealStream(is)));
             }
-        } else if (SAXSource.class.isAssignableFrom(theSource)
-                  || StaxSource.class.isAssignableFrom(theSource)) {
-            return source.cast(new StaxSource(getReader(is)));
-        } else if (StreamSource.class.isAssignableFrom(theSource)
-                   || Source.class.isAssignableFrom(theSource)) {
-            return source.cast(new StreamSource(getRealStream(is)));
-        } else if (XMLSource.class.isAssignableFrom(theSource)) {
-            return source.cast(new XMLSource(getRealStream(is)));
+        } catch (ClassCastException e) {
+            String msg = "Unsupported class: " + source.getName();
+            LOG.warning(msg);
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         
         throw new IOException("Unrecognized source");
