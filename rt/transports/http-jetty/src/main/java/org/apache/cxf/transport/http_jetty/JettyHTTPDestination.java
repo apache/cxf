@@ -23,6 +23,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -51,8 +52,7 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
-import org.eclipse.jetty.server.AbstractHttpConnection;
-import org.eclipse.jetty.server.AbstractHttpConnection.Output;
+import org.eclipse.jetty.server.HttpOutput;
 import org.eclipse.jetty.server.Request;
 
 
@@ -261,8 +261,8 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     
     private OutputStream wrapOutput(OutputStream out) {
         try {
-            if (out instanceof Output) {
-                out = new JettyOutputStream((Output)out);
+            if (out instanceof HttpOutput) {
+                out = new JettyOutputStream((HttpOutput)out);
             }
         } catch (Throwable t) {
             //ignore
@@ -272,20 +272,36 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     
     
     static class JettyOutputStream extends FilterOutputStream implements CopyingOutputStream {
-        final Output out;
+        final HttpOutput out;
         boolean written;
-        public JettyOutputStream(Output o) {
+        public JettyOutputStream(HttpOutput o) {
             super(o);
             out = o;
         }
 
+        private boolean sendContent(Class<?> type, InputStream c) throws IOException {
+            try {
+                out.getClass().getMethod("sendContent", type).invoke(out, c);
+            } catch (InvocationTargetException ioe) {
+                if (ioe.getTargetException() instanceof IOException) {
+                    throw (IOException)ioe.getTargetException();
+                }
+                return false;
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
         @Override
         public int copyFrom(InputStream in) throws IOException {
             if (written) {
                 return IOUtils.copy(in, out);
             }
             CountingInputStream c = new CountingInputStream(in);
-            out.sendContent(c);
+            if (!sendContent(InputStream.class, c)
+                && !sendContent(Object.class, c)) {
+                IOUtils.copy(c, out);
+            }
             return c.getCount();
         }
         public void write(int b) throws IOException {
@@ -356,11 +372,24 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
     }
     
-    private AbstractHttpConnection getCurrentConnection() {
-        return AbstractHttpConnection.getCurrentConnection();
-    }
     private Request getCurrentRequest() {
-        AbstractHttpConnection con = getCurrentConnection();
-        return con.getRequest();
+        try {
+            //Jetty 8
+            Object con = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.AbstractHttpConnection",
+                                                    getClass()).getMethod("getCurrentConnection").invoke(null);
+            return (Request)con.getClass().getMethod("getRequest").invoke(con);
+        } catch (Throwable t) {
+            //
+        }
+        try {
+            //Jetty 9
+            Object con = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.HttpConnection",
+                                                    getClass()).getMethod("getCurrentConnection").invoke(null);
+            Object channel = con.getClass().getMethod("getHttpChannel").invoke(con);
+            return (Request)channel.getClass().getMethod("getRequest").invoke(channel);
+        } catch (Throwable t) {
+            //
+        }
+        return null;
     }
 }
