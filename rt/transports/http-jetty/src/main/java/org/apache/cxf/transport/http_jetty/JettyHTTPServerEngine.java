@@ -334,7 +334,7 @@ public class JettyHTTPServerEngine
             }
             
             if (connector == null) {
-                connector = connectorFactory.createConnector(getHost(), getPort());
+                connector = connectorFactory.createConnector(this, getHost(), getPort());
                 if (LOG.isLoggable(Level.FINER)) {
                     logConnector(connector);
                 }
@@ -408,7 +408,6 @@ public class JettyHTTPServerEngine
             }
 
             try {                
-                setReuseAddress(connector);
                 setupThreadPool();
                 server.start();
             } catch (Exception e) {
@@ -540,14 +539,6 @@ public class JettyHTTPServerEngine
         return pool;
     }
     
-    private void setReuseAddress(Connector conn) throws IOException {
-        if (conn instanceof AbstractConnector) {
-            ((AbstractConnector)conn).setReuseAddress(isReuseAddress());
-        } else {
-            LOG.log(Level.INFO, "UNKNOWN_CONNECTOR_MSG", new Object[] {conn});
-        }
-    }
-
     /**
      * Remove a previously registered servant.
      * 
@@ -674,10 +665,7 @@ public class JettyHTTPServerEngine
      */
     protected JettyConnectorFactory getHTTPConnectorFactory() {
         return new JettyConnectorFactory() {
-            public AbstractConnector createConnector(int porto) {
-                return createConnector(null, porto);
-            }
-            public AbstractConnector createConnector(String hosto, int porto) {
+            public AbstractConnector createConnector(JettyHTTPServerEngine engine, String hosto, int porto) {
                 /*
                 HttpConfiguration httpConfig = new HttpConfiguration();
                 httpConfig.setSendServerVersion(getSendServerVersion());
@@ -685,9 +673,10 @@ public class JettyHTTPServerEngine
                 ServerConnector httpConnector = new ServerConnector(server, httpFactory);
                 httpConnector.setPort(porto);
                 httpConnector.setHost(hosto);
-                if (getMaxIdleTime() > 0) {
-                    httpConnector.setIdleTimeout(getMaxIdleTime());
+                if (engine.getMaxIdleTime() > 0) {
+                    httpConnector.setIdleTimeout(engine.getMaxIdleTime());
                 }
+                httpConnector.setReuseAddress(engine.isReuseAddress());
                 return httpConnector;
                 */
                 
@@ -703,9 +692,10 @@ public class JettyHTTPServerEngine
                     result.setHost(hosto);
                 }
                 result.setPort(porto);
-                if (getMaxIdleTime() > 0) {
-                    result.setMaxIdleTime(getMaxIdleTime());
+                if (engine.getMaxIdleTime() > 0) {
+                    result.setMaxIdleTime(engine.getMaxIdleTime());
                 }
+                result.setReuseAddress(engine.isReuseAddress());
                 return result;
             }
         };
@@ -717,7 +707,7 @@ public class JettyHTTPServerEngine
     protected JettyConnectorFactory getHTTPSConnectorFactory(
             TLSServerParameters tlsParams
     ) {
-        return new JettySslConnectorFactory(tlsParams, getMaxIdleTime());
+        return new JettySslConnectorFactory(tlsParams);
     }
     
     /**

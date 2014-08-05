@@ -21,6 +21,7 @@ package org.apache.cxf.transport.https_jetty;
 
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.transport.http_jetty.JettyConnectorFactory;
+import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.eclipse.jetty.server.AbstractConnector;
 
 /**
@@ -29,24 +30,10 @@ import org.eclipse.jetty.server.AbstractConnector;
  */
 public final class JettySslConnectorFactory implements JettyConnectorFactory {
     
-    TLSServerParameters tlsServerParameters;
-    int maxIdleTime;
+    final TLSServerParameters tlsServerParameters;
     
     public JettySslConnectorFactory(TLSServerParameters params) {
         tlsServerParameters = params;
-    }
-    
-    public JettySslConnectorFactory(TLSServerParameters params, int maxIdle) {
-        this(params);
-        this.maxIdleTime = maxIdle;
-    }
-    /**
-     * Create a Listener.
-     * 
-     * @param port the listen port
-     */
-    public AbstractConnector createConnector(int port) {
-        return createConnector(null, port);
     }
 
     /**
@@ -55,7 +42,7 @@ public final class JettySslConnectorFactory implements JettyConnectorFactory {
      * @param host the host to bind to.  IP address or hostname is allowed. null to bind to all hosts.
      * @param port the listen port
      */
-    public AbstractConnector createConnector(String host, int port) {
+    public AbstractConnector createConnector(JettyHTTPServerEngine engine, String host, int port) {
         assert tlsServerParameters != null;
         
         CXFJettySslSocketConnector secureConnector = 
@@ -64,9 +51,10 @@ public final class JettySslConnectorFactory implements JettyConnectorFactory {
             secureConnector.setHost(host);
         }
         secureConnector.setPort(port);
-        if (maxIdleTime > 0) {
-            secureConnector.setMaxIdleTime(maxIdleTime);
+        if (engine.getMaxIdleTime() > 0) {
+            secureConnector.setMaxIdleTime(engine.getMaxIdleTime());
         }
+        secureConnector.setReuseAddress(engine.isReuseAddress());
         decorateCXFJettySslSocketConnector(secureConnector);
         return secureConnector;
     }

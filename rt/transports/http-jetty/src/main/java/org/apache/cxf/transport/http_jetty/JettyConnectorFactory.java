@@ -28,16 +28,10 @@ public interface JettyConnectorFactory {
 
     /**
      * Create a Listener.
-     * 
-     * @param port the listen port
-     */
-    AbstractConnector createConnector(int port);
-
-    /**
-     * Create a Listener.
+     * @param jettyHTTPServerEngine 
      * 
      * @param host the host to bind to.  IP address or hostname is allowed. null to bind to all hosts.
      * @param port the listen port
      */
-    AbstractConnector createConnector(String host, int port);
+    AbstractConnector createConnector(JettyHTTPServerEngine jettyHTTPServerEngine, String host, int port);
 }
