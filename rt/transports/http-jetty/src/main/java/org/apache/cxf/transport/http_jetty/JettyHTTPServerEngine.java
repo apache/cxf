@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http_jetty;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -329,20 +330,15 @@ public class JettyHTTPServerEngine
             server.setSendServerVersion(getSendServerVersion());
             
             if (mBeanContainer != null) {
-                server.getContainer().addEventListener(mBeanContainer);
+                getContainer(server).addEventListener(mBeanContainer);
             }
             
             if (connector == null) {
                 connector = connectorFactory.createConnector(getHost(), getPort());
                 if (LOG.isLoggable(Level.FINER)) {
-                    LOG.finer("connector.host: " 
-                              + connector.getHost() == null 
-                                ? "null" 
-                                : "\"" + connector.getHost() + "\"");
-                    LOG.finer("connector.port: " + connector.getPort());
+                    logConnector(connector);
                 }
             } 
-
             server.addConnector(connector);
             /*
              * The server may have no handler, it might have a collection handler,
@@ -477,20 +473,40 @@ public class JettyHTTPServerEngine
         ++servantCount;
     }
     
+    private static Container getContainer(Object server) {
+        if (server instanceof Container) {
+            return (Container)server;
+        }
+        try {
+            return (Container)server.getClass().getMethod("getContainer").invoke(server);
+        } catch (RuntimeException t) {
+            throw t;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    private static void logConnector(Connector connector) {
+        try {
+            String h = (String)connector.getClass().getMethod("getHost").invoke(connector);
+            int port = (Integer)connector.getClass().getMethod("getPort").invoke(connector);
+            LOG.finer("connector.host: " 
+                + h == null 
+                  ? "null" 
+                  : "\"" + h + "\"");
+            LOG.finer("connector.port: " + port);
+        } catch (Throwable t) {
+            //ignore
+        }
+    }
+
     protected void setupThreadPool() {
-        AbstractConnector aconn = (AbstractConnector) connector;
         if (isSetThreadingParameters()) {
-            ThreadPool pool = aconn.getThreadPool();
-            if (pool == null) {
-                pool = aconn.getServer().getThreadPool();
-            }
-            if (pool == null) {
-                pool = new QueuedThreadPool();
-                aconn.getServer().setThreadPool(pool);
-                aconn.setThreadPool(pool);
-            }
+            
+            QueuedThreadPool pl = getThreadPool();
             //threads for the acceptors and selectors are taken from 
             //the pool so we need to have room for those
+            AbstractConnector aconn = (AbstractConnector) connector;
             int acc = aconn.getAcceptors() * 2;
             if (getThreadingParameters().isSetMaxThreads()
                 && getThreadingParameters().getMaxThreads() <= acc) {
@@ -500,30 +516,28 @@ public class JettyHTTPServerEngine
                                             getThreadingParameters().getMaxThreads(),
                                             acc));
             }
-            if (pool instanceof QueuedThreadPool) {
-                QueuedThreadPool pl = (QueuedThreadPool)pool;
-                if (getThreadingParameters().isSetMinThreads()) {
-                    pl.setMinThreads(getThreadingParameters().getMinThreads());
-                }
-                if (getThreadingParameters().isSetMaxThreads()) {
-                    pl.setMaxThreads(getThreadingParameters().getMaxThreads());
-                }
-            } else {
-                try {
-                    if (getThreadingParameters().isSetMinThreads()) {
-                        pool.getClass().getMethod("setMinThreads", Integer.TYPE)
-                            .invoke(pool, getThreadingParameters().getMinThreads());
-                    }
-                    if (getThreadingParameters().isSetMaxThreads()) {
-                        pool.getClass().getMethod("setMaxThreads", Integer.TYPE)
-                            .invoke(pool, getThreadingParameters().getMaxThreads());
-                    }
-                } catch (Throwable t) {
-                    //ignore - this won't happen for Jetty 7.1 - 7.2 and 7.3 and newer 
-                    //will be instanceof QueuedThreadPool above
-                }
+            if (getThreadingParameters().isSetMinThreads()) {
+                pl.setMinThreads(getThreadingParameters().getMinThreads());
+            }
+            if (getThreadingParameters().isSetMaxThreads()) {
+                pl.setMaxThreads(getThreadingParameters().getMaxThreads());
             }
         }
+    }
+    
+    private QueuedThreadPool getThreadPool() {
+        QueuedThreadPool pool = (QueuedThreadPool)server.getThreadPool();
+        if (pool == null) {
+            pool = new QueuedThreadPool();
+            try {
+                server.getClass().getMethod("setThreadPool", ThreadPool.class).invoke(server, pool);
+            } catch (RuntimeException t) {
+                throw t;
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+        return pool;
     }
     
     private void setReuseAddress(Connector conn) throws IOException {
@@ -664,6 +678,19 @@ public class JettyHTTPServerEngine
                 return createConnector(null, porto);
             }
             public AbstractConnector createConnector(String hosto, int porto) {
+                /*
+                HttpConfiguration httpConfig = new HttpConfiguration();
+                httpConfig.setSendServerVersion(getSendServerVersion());
+                HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
+                ServerConnector httpConnector = new ServerConnector(server, httpFactory);
+                httpConnector.setPort(porto);
+                httpConnector.setHost(hosto);
+                if (getMaxIdleTime() > 0) {
+                    httpConnector.setIdleTimeout(getMaxIdleTime());
+                }
+                return httpConnector;
+                */
+                
                 // now we just use the SelectChannelConnector as the default connector
                 SelectChannelConnector result = 
                     new SelectChannelConnector();
@@ -724,7 +751,11 @@ public class JettyHTTPServerEngine
         if (server != null) {
             try {
                 connector.stop();
-                connector.close();            
+                if (connector instanceof Closeable) {
+                    ((Closeable)connector).close();
+                } else {
+                    connector.getClass().getMethod("close").invoke(connector);
+                }
             } finally {         
                 server.stop();
                 server.destroy();
