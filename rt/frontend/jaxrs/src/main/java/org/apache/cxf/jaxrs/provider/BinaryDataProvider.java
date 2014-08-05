@@ -32,6 +32,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -40,8 +41,10 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -50,7 +53,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
     
     private static final String HTTP_RANGE_PROPERTY = "http.range.support";
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(BinaryDataProvider.class);
     private static final int BUFFER_SIZE = 4096;
     private boolean reportByteArraySize;
     private boolean closeResponseInputStream = true;
@@ -63,20 +66,26 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     public T readFrom(Class<T> clazz, Type genericType, Annotation[] annotations, MediaType type, 
                            MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
-        if (InputStream.class.isAssignableFrom(clazz)) {
-            return clazz.cast(is);
-        }
-        if (Reader.class.isAssignableFrom(clazz)) {
-            return clazz.cast(new InputStreamReader(is, getEncoding(type)));
-        }
-        if (byte[].class.isAssignableFrom(clazz)) {
-            String enc = getCharset(type);
-            if (enc == null) {
-                return clazz.cast(IOUtils.readBytesFromStream(is));
-            } else {
-                return clazz.cast(IOUtils.toString(is, enc).getBytes(enc));
+        try {
+            if (InputStream.class.isAssignableFrom(clazz)) {
+                return clazz.cast(is);
             }
-        }
+            if (Reader.class.isAssignableFrom(clazz)) {
+                return clazz.cast(new InputStreamReader(is, getEncoding(type)));
+            }
+            if (byte[].class.isAssignableFrom(clazz)) {
+                String enc = getCharset(type);
+                if (enc == null) {
+                    return clazz.cast(IOUtils.readBytesFromStream(is));
+                } else {
+                    return clazz.cast(IOUtils.toString(is, enc).getBytes(enc));
+                }
+            }
+        } catch (ClassCastException e) {
+            String msg = "Unsupported class: " + clazz.getName();
+            LOG.warning(msg);
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
+        }    
         throw new IOException("Unrecognized class");
     }
 
