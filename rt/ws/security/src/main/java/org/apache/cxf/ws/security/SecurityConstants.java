@@ -528,6 +528,13 @@ public final class SecurityConstants {
      * The default value is "true".
      */
     public static final String SC_FROM_JAAS_SUBJECT = "ws-security.sc.jaas-subject";
+    
+    /**
+     * A delegated credential to use for WS-Security. Currently only a Kerberos GSSCredential
+     * Object is supported. This is used to retrieve a service ticket instead of using the
+     * client credentials.
+     */
+    public static final String DELEGATED_CREDENTIAL = "ws-security.delegated.credential";
 
     //
     // Internal tags
@@ -556,8 +563,15 @@ public final class SecurityConstants {
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
+<<<<<<< HEAD
             ASYMMETRIC_SIGNATURE_ALGORITHM, ENABLE_SAML_ONE_TIME_USE_CACHE, SAML_ONE_TIME_USE_CACHE_INSTANCE,
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG
+=======
+            ASYMMETRIC_SIGNATURE_ALGORITHM, PASSWORD_ENCRYPTOR_INSTANCE, ENABLE_SAML_ONE_TIME_USE_CACHE,
+            SAML_ONE_TIME_USE_CACHE_INSTANCE, ENABLE_STREAMING_SECURITY, RETURN_SECURITY_ERROR,
+            CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
+            DELEGATED_CREDENTIAL
+>>>>>>> 6e6c139... Adding support for WS-Security kerberos credential delegation + a system test
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

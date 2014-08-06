@@ -554,7 +554,18 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 if (!utWithCallbacks) {
                     WSS4JTokenConverter.convertToken(msg, p);
                 }
+<<<<<<< HEAD
                 Object receivedAssertion = null;
+=======
+                Object receivedAssertion = o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                if (receivedAssertion == null) {
+                    receivedAssertion  = o.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
+                }
+                if (o.get(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL) != null) {
+                    msg.put(SecurityConstants.DELEGATED_CREDENTIAL, 
+                            o.get(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL));
+                }
+>>>>>>> 6e6c139... Adding support for WS-Security kerberos credential delegation + a system test
                 
                 List<String> roles = null;
                 if (o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION) != null) {
