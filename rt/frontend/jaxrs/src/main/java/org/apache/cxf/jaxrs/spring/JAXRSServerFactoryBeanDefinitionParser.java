@@ -191,7 +191,6 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             
             try {
                 if (basePackages != null) {
-                    @SuppressWarnings("unchecked")
                     final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
                         ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
                                               
