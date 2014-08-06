@@ -42,12 +42,6 @@
         <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
         <cxf.codegen.jvmArgs />
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
-        <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
-        <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
-        <cxf.saaj.impl.version>1.3.23</cxf.saaj.impl.version>
-        <extra.saaj.dep.groupId>${cxf.saaj.impl.groupId}</extra.saaj.dep.groupId>
-        <extra.saaj.dep.artifactId>${cxf.saaj.impl.artifactId}</extra.saaj.dep.artifactId>
-        <extra.saaj.dep.version>${cxf.saaj.impl.version}</extra.saaj.dep.version>
         <!-- stuff related to ASM -->
         <!-- use asm 3.x for now to avoid breaking 3rd party components -->
         <cxf.asm.groupId>asm</cxf.asm.groupId>
@@ -133,7 +127,6 @@
         <cxf.opensaml.xmltooling.version>1.4.0_1</cxf.opensaml.xmltooling.version>
         <cxf.opensamlws.version>1.5.0_1</cxf.opensamlws.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
-        <cxf.saaj-api.version>1.3.5</cxf.saaj-api.version>
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
@@ -916,36 +909,6 @@
                     <exclusion>
                         <groupId>xalan</groupId>
                         <artifactId>xalan</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.soap</groupId>
-                <artifactId>saaj-api</artifactId>
-                <version>${cxf.saaj-api.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.activation</groupId>
-                        <artifactId>activation</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>activation</groupId>
-                        <artifactId>activation</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>${cxf.saaj.impl.groupId}</groupId>
-                <artifactId>${cxf.saaj.impl.artifactId}</artifactId>
-                <version>${cxf.saaj.impl.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.activation</groupId>
-                        <artifactId>activation</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>activation</groupId>
-                        <artifactId>activation</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1742,14 +1705,6 @@
             </properties>
         </profile>
         <profile>
-            <id>axis2-saaj</id>
-            <properties>
-                <cxf.saaj.impl.groupId>org.apache.axis2</cxf.saaj.impl.groupId>
-                <cxf.saaj.impl.artifactId>axis2-saaj</cxf.saaj.impl.artifactId>
-                <cxf.saaj.impl.version>1.4.1</cxf.saaj.impl.version>
-            </properties>
-        </profile>
-        <profile>
             <id>fastinstall</id>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
@@ -1907,11 +1862,6 @@
                     <artifactId>xalan</artifactId>
                 </dependency>
             </dependencies>
-            <properties>
-                <extra.saaj.dep.groupId>com.sun.xml.parsers</extra.saaj.dep.groupId>
-                <extra.saaj.dep.artifactId>jaxp-ri</extra.saaj.dep.artifactId>
-                <extra.saaj.dep.version>1.4.2</extra.saaj.dep.version>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
