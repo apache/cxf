@@ -19,16 +19,29 @@
 
 package org.apache.cxf.transport.https_jetty;
 
+import java.util.logging.Logger;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509KeyManager;
+
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.transport.http_jetty.JettyConnectorFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
+import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
 import org.eclipse.jetty.server.AbstractConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 /**
  * This class wraps the JettyConnectorFactory and will create 
  * TLS enabled acceptors.
  */
 public final class JettySslConnectorFactory implements JettyConnectorFactory {
+    private static final Logger LOG = LogUtils.getL7dLogger(JettySslConnectorFactory.class);    
     
     final TLSServerParameters tlsServerParameters;
     
@@ -45,8 +58,9 @@ public final class JettySslConnectorFactory implements JettyConnectorFactory {
     public AbstractConnector createConnector(JettyHTTPServerEngine engine, String host, int port) {
         assert tlsServerParameters != null;
         
-        CXFJettySslSocketConnector secureConnector = 
-            new CXFJettySslSocketConnector();
+        SslContextFactory sslcf = new CXFSslContextFactory();
+        SslSelectChannelConnector secureConnector = 
+            new SslSelectChannelConnector(sslcf);
         if (host != null) {
             secureConnector.setHost(host);
         }
@@ -55,27 +69,82 @@ public final class JettySslConnectorFactory implements JettyConnectorFactory {
             secureConnector.setMaxIdleTime(engine.getMaxIdleTime());
         }
         secureConnector.setReuseAddress(engine.isReuseAddress());
-        decorateCXFJettySslSocketConnector(secureConnector);
+        decorateCXFJettySslSocketConnector(sslcf);
         return secureConnector;
     }
     
+    private class CXFSslContextFactory extends SslContextFactory {
+        public CXFSslContextFactory() {
+            super();
+        }
+        protected void doStart() throws Exception {
+            setSslContext(createSSLContext(this));
+            super.doStart();
+        }
+        public void checkKeyStore() {
+            //we'll handle this later
+        }
+    }
+    
+    protected SSLContext createSSLContext(SslContextFactory scf) throws Exception  {
+        String proto = tlsServerParameters.getSecureSocketProtocol() == null
+            ? "TLS" : tlsServerParameters.getSecureSocketProtocol();
+ 
+        SSLContext context = tlsServerParameters.getJsseProvider() == null
+            ? SSLContext.getInstance(proto)
+                : SSLContext.getInstance(proto, tlsServerParameters.getJsseProvider());
+            
+        KeyManager keyManagers[] = tlsServerParameters.getKeyManagers();
+        if (tlsServerParameters.getCertAlias() != null) {
+            keyManagers = getKeyManagersWithCertAlias(keyManagers);
+        }
+        context.init(tlsServerParameters.getKeyManagers(), 
+                     tlsServerParameters.getTrustManagers(),
+                     tlsServerParameters.getSecureRandom());
+
+        String[] cs = 
+            SSLUtils.getCiphersuites(
+                    tlsServerParameters.getCipherSuites(),
+                    SSLUtils.getServerSupportedCipherSuites(context),
+                    tlsServerParameters.getCipherSuitesFilter(),
+                    LOG, true);
+                
+        scf.setExcludeCipherSuites(cs);
+        return context;
+    }
+    protected KeyManager[] getKeyManagersWithCertAlias(KeyManager keyManagers[]) throws Exception {
+        if (tlsServerParameters.getCertAlias() != null) {
+            for (int idx = 0; idx < keyManagers.length; idx++) {
+                if (keyManagers[idx] instanceof X509KeyManager) {
+                    keyManagers[idx] = new AliasedX509ExtendedKeyManager(
+                        tlsServerParameters.getCertAlias(), (X509KeyManager)keyManagers[idx]);
+                }
+            }
+        }
+        return keyManagers;
+    }
+    protected void setClientAuthentication(SslContextFactory con,
+                                           ClientAuthentication clientAuth) {
+        con.setWantClientAuth(true);
+        if (clientAuth != null) {
+            if (clientAuth.isSetWant()) {
+                con.setWantClientAuth(clientAuth.isWant());
+            }
+            if (clientAuth.isSetRequired()) {
+                con.setNeedClientAuth(clientAuth.isRequired());
+            }
+        }
+    }    
     /**
      * This method sets the security properties for the CXF extension
      * of the JettySslConnector.
      */
     private void decorateCXFJettySslSocketConnector(
-            CXFJettySslSocketConnector con
+            SslContextFactory con
     ) {
-        con.setKeyManagers(tlsServerParameters.getKeyManagers());
-        con.setTrustManagers(tlsServerParameters.getTrustManagers());
-        con.setSecureRandom(tlsServerParameters.getSecureRandom());
-        con.setClientAuthentication(
-                tlsServerParameters.getClientAuthentication());
-        con.getCxfSslContextFactory().setProtocol(tlsServerParameters.getSecureSocketProtocol());
-        con.getCxfSslContextFactory().setProvider(tlsServerParameters.getJsseProvider());
-        con.setCipherSuites(tlsServerParameters.getCipherSuites());
-        con.setCipherSuitesFilter(tlsServerParameters.getCipherSuitesFilter());
-        con.getCxfSslContextFactory().setCertAlias(tlsServerParameters.getCertAlias());
+        setClientAuthentication(con,
+                                tlsServerParameters.getClientAuthentication());
+        con.setCertAlias(tlsServerParameters.getCertAlias());
     }
 
 

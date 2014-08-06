@@ -50,11 +50,9 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.session.HashSessionIdManager;
 import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.server.ssl.SslConnector;
 import org.eclipse.jetty.util.component.Container;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
@@ -326,8 +324,6 @@ public class JettyHTTPServerEngine
             DefaultHandler defaultHandler = null;
             // create a new jetty server instance if there is no server there            
             server = new Server();
-            
-            server.setSendServerVersion(getSendServerVersion());
             
             if (mBeanContainer != null) {
                 getContainer(server).addEventListener(mBeanContainer);
@@ -636,10 +632,18 @@ public class JettyHTTPServerEngine
         }
         return ret;
     }
+    
+    private boolean isSsl() {
+        if (connector == null) {
+            return false;
+        }
+        //return "https".equalsIgnoreCase(connector.getDefaultConnectionFactory().getProtocol());
+        return connector instanceof org.eclipse.jetty.server.ssl.SslConnector;
+    }
 
     protected void retrieveListenerFactory() {
         if (tlsServerParameters != null) {
-            if (null != connector && !(connector instanceof SslConnector)) {
+            if (connector != null && !isSsl()) {
                 LOG.warning("Connector " + connector + " for JettyServerEngine Port " 
                         + port + " does not support SSL connections.");
                 return;
@@ -649,7 +653,7 @@ public class JettyHTTPServerEngine
             protocol = "https";
             
         } else {
-            if (connector instanceof SslConnector) {
+            if (isSsl()) {
                 throw new RuntimeException("Connector " + connector + " for JettyServerEngine Port " 
                       + port + " does not support non-SSL connections.");
             }
@@ -666,34 +670,29 @@ public class JettyHTTPServerEngine
     protected JettyConnectorFactory getHTTPConnectorFactory() {
         return new JettyConnectorFactory() {
             public AbstractConnector createConnector(JettyHTTPServerEngine engine, String hosto, int porto) {
+                
+                
+                // now we just use the SelectChannelConnector as the default connector
+                org.eclipse.jetty.server.nio.SelectChannelConnector result = 
+                    new org.eclipse.jetty.server.nio.SelectChannelConnector();
+                engine.getServer().setSendServerVersion(getSendServerVersion());
+                if (engine.getMaxIdleTime() > 0) {
+                    result.setMaxIdleTime(engine.getMaxIdleTime());
+                }
+                
                 /*
                 HttpConfiguration httpConfig = new HttpConfiguration();
                 httpConfig.setSendServerVersion(getSendServerVersion());
                 HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
-                ServerConnector httpConnector = new ServerConnector(server, httpFactory);
-                httpConnector.setPort(porto);
-                httpConnector.setHost(hosto);
+                ServerConnector result = new ServerConnector(server, httpFactory);
                 if (engine.getMaxIdleTime() > 0) {
-                    httpConnector.setIdleTimeout(engine.getMaxIdleTime());
+                    result.setIdleTimeout(engine.getMaxIdleTime());
                 }
-                httpConnector.setReuseAddress(engine.isReuseAddress());
-                return httpConnector;
                 */
                 
-                // now we just use the SelectChannelConnector as the default connector
-                SelectChannelConnector result = 
-                    new SelectChannelConnector();
-                
-                // Regardless the port has to equal the one
-                // we are configured for.
-                assert porto == port;
-                assert hosto == null ? host == null : hosto.equals(host);
+                result.setPort(porto);
                 if (hosto != null) {
                     result.setHost(hosto);
-                }
-                result.setPort(porto);
-                if (engine.getMaxIdleTime() > 0) {
-                    result.setMaxIdleTime(engine.getMaxIdleTime());
                 }
                 result.setReuseAddress(engine.isReuseAddress());
                 return result;
@@ -723,9 +722,16 @@ public class JettyHTTPServerEngine
     }
     
     private void checkConnectorPort() throws IOException {
-        if (null != connector && port != connector.getPort()) {
-            throw new IOException("Error: Connector port " + connector.getPort() + " does not match"
-                        + " with the server engine port " + port);
+        try {
+            int cp = (Integer)connector.getClass().getMethod("getPort").invoke(connector);
+            if (null != connector && port != cp) {
+                throw new IOException("Error: Connector port " + cp + " does not match"
+                            + " with the server engine port " + port);
+            }
+        } catch (IOException ioe) {
+            throw ioe;
+        } catch (Throwable t) {
+            //ignore...
         }
     }
     
