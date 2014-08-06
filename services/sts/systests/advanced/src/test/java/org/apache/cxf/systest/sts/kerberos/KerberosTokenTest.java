@@ -42,11 +42,7 @@ import org.junit.BeforeClass;
  * user principal "alice" (keytab in "/etc/alice.keytab"), and host service "bob@service.ws.apache.org" 
  * (keytab in "/etc/bob.keytab").
  */
-<<<<<<< HEAD
-=======
-@RunWith(value = org.junit.runners.Parameterized.class)
 @org.junit.Ignore
->>>>>>> 6e6c139... Adding support for WS-Security kerberos credential delegation + a system test
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);

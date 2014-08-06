@@ -98,8 +98,6 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml2Port, INTERMEDIARY_PORT);
         
-        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
-
         doubleIt(transportSaml2Port, 25);
         
         ((java.io.Closeable)transportSaml2Port).close();

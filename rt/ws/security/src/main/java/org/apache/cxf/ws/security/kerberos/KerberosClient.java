@@ -33,18 +33,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-<<<<<<< HEAD
+
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
-=======
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.utils.Base64;
 import org.ietf.jgss.GSSCredential;
->>>>>>> 6e6c139... Adding support for WS-Security kerberos credential delegation + a system test
 
 /**
  * A class that obtains a ticket from a KDC and wraps it in a SecurityToken object.
