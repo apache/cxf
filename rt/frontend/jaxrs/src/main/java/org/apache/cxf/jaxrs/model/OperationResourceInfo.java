@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.model;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +50,11 @@ public class OperationResourceInfo {
     private List<Parameter> parameters;
     private boolean oneway; 
     private Set<String> nameBindings = new LinkedHashSet<String>();
-
+    private Class<?>[] actualInParamTypes;
+    private Type[] actualInGenericParamTypes;
+    private Annotation[][] actualInParamAnnotations;
+    private Annotation[] actualOutParamAnnotations;
+    
     public OperationResourceInfo(Method mInvoke, ClassResourceInfo cri) {
         this(mInvoke, mInvoke, cri);
     }
@@ -67,6 +72,7 @@ public class OperationResourceInfo {
         this.oneway = ori.oneway;
         this.classResourceInfo = cri;
         this.nameBindings = ori.nameBindings;
+        initActualMethodProperties();
     }
     
     public OperationResourceInfo(Method mInvoke, Method mAnnotated, ClassResourceInfo cri) {
@@ -81,6 +87,7 @@ public class OperationResourceInfo {
         checkEncoded();
         checkDefaultParameterValue();
         checkOneway();
+        initActualMethodProperties();
     }
     
     //CHECKSTYLE:OFF
@@ -101,6 +108,30 @@ public class OperationResourceInfo {
         checkMediaTypes(consumeMediaTypes, produceMediaTypes);
         parameters = params;
         this.oneway = oneway;
+        initActualMethodProperties();
+    }
+    
+    private void initActualMethodProperties() {
+        Method actualMethod = annotatedMethod == null ? methodToInvoke : annotatedMethod;
+        actualInParamTypes = actualMethod.getParameterTypes();
+        actualInGenericParamTypes = actualMethod.getGenericParameterTypes();
+        actualInParamAnnotations = actualMethod.getParameterAnnotations();
+        
+        // out annotations
+        Annotation[] invokedAnns = methodToInvoke.getAnnotations();
+        if (methodToInvoke != annotatedMethod && annotatedMethod != null) {
+            Annotation[] superAnns = annotatedMethod.getAnnotations();
+            if (invokedAnns.length > 0) {
+                Annotation[] merged = new Annotation[superAnns.length + invokedAnns.length];
+                System.arraycopy(superAnns, 0, merged, 0, superAnns.length);
+                System.arraycopy(invokedAnns, 0, merged, superAnns.length, invokedAnns.length);
+                actualOutParamAnnotations = merged;
+            } else {
+                actualOutParamAnnotations = superAnns;
+            }
+        } else {
+            actualOutParamAnnotations = invokedAnns;
+        }
     }
     
     public void addNameBindings(List<String> names) {
@@ -236,20 +267,17 @@ public class OperationResourceInfo {
             defaultParamValue = dv.value();
         }
     }
-    public Annotation[] getOutAnnotations() {
-        Annotation[] invokedAnns = methodToInvoke.getAnnotations();
-        if (methodToInvoke != annotatedMethod && annotatedMethod != null) {
-            Annotation[] superAnns = annotatedMethod.getAnnotations();
-            if (invokedAnns.length > 0) {
-                Annotation[] merged = new Annotation[superAnns.length + invokedAnns.length];
-                System.arraycopy(superAnns, 0, merged, 0, superAnns.length);
-                System.arraycopy(invokedAnns, 0, merged, superAnns.length, invokedAnns.length);
-                return merged;
-            } else {
-                return superAnns;
-            }
-        } else {
-            return invokedAnns;
-        }
+    public Annotation[][] getInParameterAnnotations() {
+        return actualInParamAnnotations;
     }
+    public Type[] getInGenericParameterTypes() {
+        return actualInGenericParamTypes;
+    }
+    public Class<?>[] getInParameterTypes() {
+        return actualInParamTypes;
+    }
+    public Annotation[] getOutAnnotations() {
+        return actualOutParamAnnotations;
+    }
+    
 }
