@@ -33,7 +33,7 @@ import org.apache.cxf.message.Exchange;
 public class FactoryInvoker extends AbstractInvoker {
     static final ResourceBundle BUNDLE = BundleUtils.getBundle(FactoryInvoker.class);
 
-    private Factory factory;
+    protected Factory factory;
 
     /**
      * Create a FactoryInvoker object.
