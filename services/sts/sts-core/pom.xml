@@ -111,7 +111,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-jexl</artifactId>
             <version>${cxf.jexl.version}</version>
-			<optional>true</optional>
+            <optional>true</optional>
         </dependency>
    </dependencies>
 
