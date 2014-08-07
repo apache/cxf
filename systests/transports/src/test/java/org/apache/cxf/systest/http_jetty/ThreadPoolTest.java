@@ -105,8 +105,9 @@ public class ThreadPoolTest extends AbstractClientServerTestBase {
                 countLess++;
             }
         }
-        assertEquals(3, countLess);
-        assertEquals(2, countMore);
-        
+        //Jetty 8 and 9 use different numbers of threads for the connectors and internal management.
+        //Make sure we have some that took longer and some that took shorter
+        assertTrue(countLess >= 2 && countLess <= 3);
+        assertTrue(countMore >= 2 && countMore <= 3);
     }
 }

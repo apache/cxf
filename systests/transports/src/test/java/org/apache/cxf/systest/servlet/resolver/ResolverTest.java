@@ -23,12 +23,10 @@ package org.apache.cxf.systest.servlet.resolver;
 import java.net.URL;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import org.junit.Test;
@@ -42,11 +40,7 @@ public class ResolverTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void startServer() throws Throwable {
-        Server server = new org.eclipse.jetty.server.Server();
-
-        SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(Integer.parseInt(PORT));
-        server.setConnectors(new Connector[] {connector});
+        Server server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/resolver");

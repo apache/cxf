@@ -24,11 +24,9 @@ import java.net.URL;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public class DigestServer extends AbstractBusTestServerBase {
@@ -50,11 +48,7 @@ public class DigestServer extends AbstractBusTestServerBase {
     protected void run() {
         //System.out.println("Starting Server");
 
-        server = new org.eclipse.jetty.server.Server();
-
-        SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(Integer.parseInt(PORT));
-        server.setConnectors(new Connector[] {connector});
+        server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/digestauth");

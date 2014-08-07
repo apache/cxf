@@ -357,7 +357,6 @@ public class JettyHTTPServerEngine
             // create a new jetty server instance if there is no server there
             server = createServer();
             addServerMBean();
-            setupThreadPool();
                     
             if (connector == null) {
                 connector = createConnector(getHost(), getPort());
@@ -366,6 +365,7 @@ public class JettyHTTPServerEngine
                 }
             } 
             server.addConnector(connector);
+            setupThreadPool();
             /*
              * The server may have no handler, it might have a collection handler,
              * it might have a one-shot. We need to add one or more of ours.

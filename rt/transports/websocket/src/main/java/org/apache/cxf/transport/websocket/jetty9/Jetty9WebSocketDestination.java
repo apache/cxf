@@ -27,6 +27,7 @@ import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 import javax.servlet.DispatcherType;
@@ -276,7 +277,12 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         }
         @Override
         public void write(byte[] data, int offset, int length) throws IOException {
-            session.getRemote().sendBytes(ByteBuffer.wrap(data,  offset, length));
+            try {
+                session.getRemote().sendBytesByFuture(ByteBuffer.wrap(data,  offset, length)).get();
+            } catch (InterruptedException | ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
