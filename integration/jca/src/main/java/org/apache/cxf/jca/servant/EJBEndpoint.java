@@ -41,8 +41,6 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jca.cxf.WorkManagerThreadPool;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
-import org.eclipse.jetty.server.AbstractConnector;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 
 
 public class EJBEndpoint {
@@ -110,10 +108,7 @@ public class EJBEndpoint {
             return;
         }
         JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
-        AbstractConnector connector = new SelectChannelConnector();
-        connector.setPort(port);
-        connector.setThreadPool(new WorkManagerThreadPool(getWorkManager()));
-        engine.setConnector(connector);
+        engine.setThreadPool(new WorkManagerThreadPool(getWorkManager()));
         engine.setPort(port);
         
         List<JettyHTTPServerEngine> engineList = new ArrayList<JettyHTTPServerEngine>();

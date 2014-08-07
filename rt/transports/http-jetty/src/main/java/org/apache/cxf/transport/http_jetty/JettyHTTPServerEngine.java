@@ -107,6 +107,7 @@ public class JettyHTTPServerEngine
     private ContextHandlerCollection contexts;
     private Container.Listener mBeanContainer;
     private SessionManager sessionManager;
+    private ThreadPool threadPool;
     
     
     /**
@@ -143,6 +144,9 @@ public class JettyHTTPServerEngine
     
     public JettyHTTPServerEngine() {
         
+    }
+    public void setThreadPool(ThreadPool p) {
+        threadPool = p;
     }
      
     public void setPort(int p) {
@@ -316,6 +320,25 @@ public class JettyHTTPServerEngine
         
     }
     
+    private Server createServer() {
+        Server s = null;
+        if (threadPool != null) {
+            try {
+                if (!Server.getVersion().startsWith("8")) {
+                    s = Server.class.getConstructor(ThreadPool.class).newInstance(threadPool);
+                } else {
+                    s = new Server();
+                    Server.class.getMethod("setThreadPool", ThreadPool.class).invoke(s, threadPool);
+                }
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        if (s == null) {
+            s = new Server();
+        }
+        return s;
+    }
     
     /**
      * Register a servant.
@@ -331,11 +354,11 @@ public class JettyHTTPServerEngine
         SecurityHandler securityHandler = null;
         if (server == null) {
             DefaultHandler defaultHandler = null;
-            // create a new jetty server instance if there is no server there            
-            server = new Server();
-
+            // create a new jetty server instance if there is no server there
+            server = createServer();
             addServerMBean();
-                                    
+            setupThreadPool();
+                    
             if (connector == null) {
                 connector = createConnector(getHost(), getPort());
                 if (LOG.isLoggable(Level.FINER)) {
@@ -411,7 +434,6 @@ public class JettyHTTPServerEngine
             }
 
             try {                
-                setupThreadPool();
                 server.start();
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "START_UP_SERVER_FAILED_MSG", new Object[] {e.getMessage(), port});
@@ -708,7 +730,7 @@ public class JettyHTTPServerEngine
     protected void setupThreadPool() {
         if (isSetThreadingParameters()) {
             
-            QueuedThreadPool pl = getThreadPool();
+            ThreadPool pl = getThreadPool();
             //threads for the acceptors and selectors are taken from 
             //the pool so we need to have room for those
             AbstractConnector aconn = (AbstractConnector) connector;
@@ -721,17 +743,20 @@ public class JettyHTTPServerEngine
                                             getThreadingParameters().getMaxThreads(),
                                             acc));
             }
+            if (!(pl instanceof QueuedThreadPool)) {
+                throw new Fault(new Message("NOT_A_QUEUED_THREAD_POOL", LOG, pl.getClass()));
+            }
             if (getThreadingParameters().isSetMinThreads()) {
-                pl.setMinThreads(getThreadingParameters().getMinThreads());
+                ((QueuedThreadPool)pl).setMinThreads(getThreadingParameters().getMinThreads());
             }
             if (getThreadingParameters().isSetMaxThreads()) {
-                pl.setMaxThreads(getThreadingParameters().getMaxThreads());
+                ((QueuedThreadPool)pl).setMaxThreads(getThreadingParameters().getMaxThreads());
             }
         }
     }
     
-    private QueuedThreadPool getThreadPool() {
-        QueuedThreadPool pool = (QueuedThreadPool)server.getThreadPool();
+    private ThreadPool getThreadPool() {
+        ThreadPool pool = (ThreadPool)server.getThreadPool();
         if (pool == null) {
             pool = new QueuedThreadPool();
             try {
