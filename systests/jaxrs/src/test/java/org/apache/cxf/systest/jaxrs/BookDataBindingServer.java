@@ -22,11 +22,9 @@ package org.apache.cxf.systest.jaxrs;
 import java.net.URISyntaxException;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 
@@ -36,11 +34,7 @@ public class BookDataBindingServer extends AbstractBusTestServerBase {
     private org.eclipse.jetty.server.Server server;
     
     protected void run() {
-        server = new org.eclipse.jetty.server.Server();
-
-        SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(Integer.parseInt(PORT));
-        server.setConnectors(new Connector[] {connector});
+        server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
         WebAppContext webappcontext = new WebAppContext();
         String contextPath = null;
