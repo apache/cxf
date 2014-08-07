@@ -19,16 +19,20 @@
 package org.apache.cxf.systest.sts.kerberos;
 
 import java.net.URL;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.auth.SpnegoAuthSupplier;
 import org.example.contract.doubleit.DoubleItPortType;
+import org.ietf.jgss.GSSName;
 import org.junit.BeforeClass;
 
 /**
@@ -100,6 +104,29 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
         
         ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testKerberosTokenJAXRS() throws Exception {
+        
+        final String configLocation = "org/apache/cxf/systest/sts/kerberos/cxf-intermediary-jaxrs-client.xml";
+        final String address = "https://localhost:" + INTERMEDIARY_PORT + "/doubleit/services/doubleit-rs";
+        final int numToDouble = 35;  
+
+        WebClient client = WebClient.create(address, configLocation);
+        client.type("text/plain").accept("text/plain");
+        
+        Map<String, Object> requestContext = WebClient.getConfig(client).getRequestContext();
+        requestContext.put("auth.spnego.useKerberosOid", "true");
+        requestContext.put("auth.spnego.requireCredDelegation", "true");
+        
+        SpnegoAuthSupplier authSupplier = new SpnegoAuthSupplier();
+        authSupplier.setServicePrincipalName("bob@service.ws.apache.org");
+        authSupplier.setServiceNameType(GSSName.NT_HOSTBASED_SERVICE);
+        WebClient.getConfig(client).getHttpConduit().setAuthSupplier(authSupplier);
+        
+        int resp = client.post(numToDouble, Integer.class);
+        org.junit.Assert.assertEquals(2 * numToDouble, resp);
     }
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
