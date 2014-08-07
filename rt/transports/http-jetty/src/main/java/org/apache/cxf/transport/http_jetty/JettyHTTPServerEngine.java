@@ -333,14 +333,9 @@ public class JettyHTTPServerEngine
             DefaultHandler defaultHandler = null;
             // create a new jetty server instance if there is no server there            
             server = new Server();
-            
-            if (mBeanContainer != null) {
-                getContainer(server).addEventListener(mBeanContainer);
-                if (!Server.getVersion().startsWith("8")) {
-                    addServerMBean();
-                }
-            }
-                        
+
+            addServerMBean();
+                                    
             if (connector == null) {
                 connector = createConnector(getHost(), getPort());
                 if (LOG.isLoggable(Level.FINER)) {
@@ -481,7 +476,16 @@ public class JettyHTTPServerEngine
     }
     
     private void addServerMBean() {
+        if (mBeanContainer == null) {
+            return;
+        }        
+        
         try {
+            Object o = getContainer(server);
+            o.getClass().getMethod("addEventListener", Container.Listener.class).invoke(o, mBeanContainer);
+            if (Server.getVersion().startsWith("8")) {
+                return;
+            }
             mBeanContainer.getClass().getMethod("beanAdded", Container.class, Object.class)
                 .invoke(mBeanContainer, null, server);
         } catch (RuntimeException rex) {
@@ -919,11 +923,13 @@ public class JettyHTTPServerEngine
         registedPaths.clear();
         if (server != null) {
             try {
-                connector.stop();
-                if (connector instanceof Closeable) {
-                    ((Closeable)connector).close();
-                } else {
-                    connector.getClass().getMethod("close").invoke(connector);
+                if (connector != null) {
+                    connector.stop();
+                    if (connector instanceof Closeable) {
+                        ((Closeable)connector).close();
+                    } else {
+                        connector.getClass().getMethod("close").invoke(connector);
+                    }
                 }
             } finally {  
                 if (contexts != null) {
