@@ -61,6 +61,7 @@ public abstract class AbstractSpnegoAuthSupplier {
     private String realm;
     private boolean credDelegation;
     private Configuration loginConfig;
+    private Oid serviceNameType;
     
     public String getAuthorization(AuthorizationPolicy authPolicy,
                                    URI currentURI,
@@ -144,7 +145,7 @@ public abstract class AbstractSpnegoAuthSupplier {
                             Message message) throws GSSException, 
         LoginException {
         GSSManager manager = GSSManager.getInstance();
-        GSSName serverName = manager.createName(spn, null);
+        GSSName serverName = manager.createName(spn, serviceNameType);
 
         GSSCredential delegatedCred = 
             (GSSCredential)message.getContextualProperty(GSSCredential.class.getName());
@@ -216,6 +217,14 @@ public abstract class AbstractSpnegoAuthSupplier {
 
     public void setLoginConfig(Configuration config) {
         this.loginConfig = config;
+    }
+
+    public Oid getServiceNameType() {
+        return serviceNameType;
+    }
+
+    public void setServiceNameType(Oid serviceNameType) {
+        this.serviceNameType = serviceNameType;
     }
 
 }
