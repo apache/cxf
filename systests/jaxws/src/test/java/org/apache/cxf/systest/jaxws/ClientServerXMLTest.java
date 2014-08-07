@@ -223,6 +223,14 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         }
        
     }
+    String stripSpaces(String s) {
+        String s2 = s.replace(" ", "");
+        while (!s2.equals(s)) {
+            s = s2;
+            s2 = s.replace(" ", "");
+        }
+        return s2;
+    }
 
     @Test
     public void testXMLFault() throws Exception {
@@ -243,7 +251,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
             BindingProvider bp = (BindingProvider) greeter;
             Map<String, Object> responseContext = bp.getResponseContext();
             String contentType = (String) responseContext.get(Message.CONTENT_TYPE);
-            assertEquals("text/xml;charset=utf-8", contentType.toLowerCase());
+            assertEquals("text/xml;charset=utf-8", stripSpaces(contentType.toLowerCase()));
             Integer responseCode = (Integer) responseContext.get(Message.RESPONSE_CODE);
             assertEquals(500, responseCode.intValue());
         }

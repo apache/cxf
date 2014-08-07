@@ -728,7 +728,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                 BindingProvider bp = (BindingProvider)greeter;
                 Map<String, Object> responseContext = bp.getResponseContext();
                 String contentType = (String) responseContext.get(Message.CONTENT_TYPE);
-                assertEquals("text/xml;charset=utf-8", contentType.toLowerCase());
+                assertEquals("text/xml;charset=utf-8", stripSpaces(contentType.toLowerCase()));
                 Integer responseCode = (Integer) responseContext.get(Message.RESPONSE_CODE);
                 assertEquals(500, responseCode.intValue());                
                 assertNotNull(brlf.getFaultInfo());
@@ -772,7 +772,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         
         assertEquals(200, httpConnection.getResponseCode());
     
-        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
+        assertEquals("text/xml;charset=utf-8", stripSpaces(httpConnection.getContentType().toLowerCase()));
         assertEquals("OK", httpConnection.getResponseMessage());
         
         InputStream in = httpConnection.getInputStream();
@@ -782,6 +782,14 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(doc);
     }
     
+    String stripSpaces(String s) {
+        String s2 = s.replace(" ", "");
+        while (!s2.equals(s)) {
+            s = s2;
+            s2 = s.replace(" ", "");
+        }
+        return s2;
+    }
     @Test
     public void testGetWSDLWithGzip() throws Exception {
         String url = "http://localhost:" + PORT + "/SoapContext/SoapPortWithGzip?wsdl";
@@ -789,7 +797,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         httpConnection.setRequestProperty("Accept-Encoding", "gzip, deflate");
         httpConnection.connect();
         assertEquals(200, httpConnection.getResponseCode());
-        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
+        assertEquals("text/xml;charset=utf-8", stripSpaces(httpConnection.getContentType().toLowerCase()));
         assertEquals("OK", httpConnection.getResponseMessage());
         assertEquals("gzip", httpConnection.getContentEncoding());
         InputStream in = httpConnection.getInputStream();
