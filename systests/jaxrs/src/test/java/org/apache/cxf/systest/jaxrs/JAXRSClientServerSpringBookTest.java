@@ -33,6 +33,7 @@ import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -182,6 +183,16 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetBookISOXML3() throws Exception {
         doTestGetBookISOXML(null, "1");
+    }
+    
+    @Test
+    public void testGetBookLink() throws Exception {
+        String address = "http://localhost:" + PORT + "/the/bookstore/link";
+        WebClient wc = WebClient.create(address);
+        Response r = wc.get();
+        Link l = r.getLink("self");
+        assertEquals("<http://localhost:" + PORT + "/the/bookstore/>;rel=\"self\"",
+                     l.toString());
     }
     private void doTestGetBookISO(String charset, String pathSegment) throws Exception {
         String address = "http://localhost:" + PORT + "/the/bookstore/ISO-8859-1/" + pathSegment;    
