@@ -41,8 +41,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
@@ -89,6 +91,13 @@ public class BookStoreSpring {
     @Path("/books/redirectStart")
     public Book getBookRedirectStart() {
         return new Book("Redirect start", 123L); 
+    }
+    @GET
+    @Path("/link")
+    public Response getBookLink() {
+        Link link = Link.fromResource(BookStoreSpring.class)
+            .baseUri(ui.getBaseUri()).rel("self").build();
+        return Response.ok().links(link).build();
     }
     
     @GET

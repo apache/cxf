@@ -57,8 +57,18 @@ public class LinkBuilderImpl implements Builder {
     private URI getResolvedUri(Object... values) {
         URI uri = ub.build(values);
                 
-        return baseUri != null 
-            ? HttpUtils.resolve(UriBuilder.fromUri(baseUri), uri) : uri;
+        if (baseUri != null) {
+            UriBuilder linkUriBuilder = UriBuilder.fromUri(baseUri);
+            String scheme = uri.getScheme();
+            if (scheme != null && scheme.startsWith("http")) {
+                return HttpUtils.resolve(linkUriBuilder, uri);    
+            } else {
+                String theUri = uri.toString();
+                return linkUriBuilder.path(theUri).build();
+            }
+        } else {
+            return uri;
+        }
     }
     
     @Override
