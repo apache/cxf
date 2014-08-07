@@ -138,8 +138,6 @@ public class ApplicationContextTest extends Assert {
         assertTrue("The engine should support session manager", engine.isSessionSupport());
         assertNotNull("The handlers should not be null", engine.getHandlers());
         assertEquals(1, engine.getHandlers().size());
-        assertTrue("The connector should be instance of org.eclipse.jetty.server.bio.SocketConnector",
-                   engine.getConnector() instanceof org.eclipse.jetty.server.bio.SocketConnector);
         
         JettyHTTPDestination jd3 = 
             (JettyHTTPDestination)factory.getDestination(

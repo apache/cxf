@@ -140,21 +140,6 @@ public class JettyHTTPServerEngineFactoryTest
             bus.getExtension(JettyHTTPServerEngineFactory.class);
             
         assertNotNull("EngineFactory is not configured.", factory);
-
-
-        // The Engine for port 1234 was configured for TLS.
-        // and the connector which is injected into the engine
-        // should be an instance of SslSocketConnector
-        // here will throw an error if it is not.
-
-        
-        try {
-            factory.createJettyHTTPServerEngine(1234, "https");
-            fail("A configure error should be thrown here ");            
-        } catch (Exception e) {
-            // experct the exception
-        }
-        
     }   
 
 }

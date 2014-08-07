@@ -57,11 +57,6 @@
         </hj:engine>
         <hj:engine port="$(engine.port.nine.one)" maxIdleTime="$(engine.port.nine.one.maxIdle)" sendServerVersion="$(engine.port.nine.one.sendServerVersion)">
             <hj:threadingParameters minThreads="${engine.port.nine.one.minThreads}" maxThreads="${engine.port.nine.one.maxThreads}"/>
-            <hj:connector>
-                <beans:bean class="org.eclipse.jetty.server.bio.SocketConnector">
-                    <beans:property name="port" value="${engine.port.nine.one}"/>
-                </beans:bean>
-            </hj:connector>
             <hj:handlers>
                 <beans:bean class="org.eclipse.jetty.server.handler.DefaultHandler"/>
             </hj:handlers>
