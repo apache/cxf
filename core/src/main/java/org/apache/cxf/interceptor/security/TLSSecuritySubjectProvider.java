@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
@@ -62,5 +65,20 @@ public abstract class TLSSecuritySubjectProvider {
         subject.setReadOnly();
 
         return subject;
+    }
+
+    /**
+     * Creates subject by login using JAAS Module with specified name and handler
+     * 
+     * @param loginContextName
+     * @param handler
+     * @return
+     * @throws LoginException
+     */
+    public Subject login(String loginContextName, CallbackHandler handler) throws LoginException {
+        LoginContext ctx = new LoginContext(loginContextName, handler);
+        ctx.login();
+
+        return ctx.getSubject();
     }
 }
