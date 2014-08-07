@@ -27,15 +27,13 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
-import org.eclipse.jetty.plus.jaas.spi.PropertyFileLoginModule;
-
 public class BookLoginModule implements LoginModule {
 
-    private PropertyFileLoginModule module;
+    private LoginModule module;
     private String fileResource;
     
     public BookLoginModule() {
-        module = new PropertyFileLoginModule();
+        module = new org.eclipse.jetty.jaas.spi.PropertyFileLoginModule();
         try {
             fileResource = getClass()
                 .getResource("/org/apache/cxf/systest/jaxrs/security/jetty-realm.properties")

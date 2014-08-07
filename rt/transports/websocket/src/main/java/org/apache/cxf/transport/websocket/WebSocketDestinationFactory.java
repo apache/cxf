@@ -33,6 +33,7 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketServletDestination;
 import org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination;
 import org.apache.cxf.transport.websocket.jetty.JettyWebSocketServletDestination;
+import org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination;
 
 @NoJSR250Annotations()
 public class WebSocketDestinationFactory implements HttpDestinationFactory {
@@ -53,7 +54,10 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
             // for the embedded mode, we stick with jetty. 
             JettyHTTPServerEngineFactory serverEngineFactory = bus
                 .getExtension(JettyHTTPServerEngineFactory.class);
-            return new JettyWebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+            if (serverEngineFactory.isJetty8()) {
+                return new JettyWebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+            }
+            return new Jetty9WebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
         } else {
             //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
             registry = getDestinationRegistry(bus);

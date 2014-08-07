@@ -171,7 +171,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         } catch (Exception e) {
             throw new Fault(e);
         }
-        // pick the handler supportig websocket if jetty-websocket is available otherwise pick the default handler.
+        // pick the handler supporting websocket if jetty-websocket is available otherwise pick the default handler.
         JettyHTTPHandler jhd = createJettyHTTPHandler(this, contextMatchOnExact());
         engine.addServant(url, jhd);
 
