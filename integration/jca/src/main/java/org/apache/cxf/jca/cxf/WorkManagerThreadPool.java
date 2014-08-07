@@ -104,4 +104,8 @@ public class WorkManagerThreadPool extends CXFWorkAdapter implements ThreadPool 
         }
     }
 
+    public void execute(Runnable command) {
+        dispatch(command);
+    }
+
 }
