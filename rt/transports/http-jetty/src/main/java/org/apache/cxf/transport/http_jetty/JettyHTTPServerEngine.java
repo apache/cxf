@@ -563,12 +563,12 @@ public class JettyHTTPServerEngine
                                                           Server.class);
                 httpConfig.getClass().getMethod("addCustomizer", src.getInterfaces()[0])
                     .invoke(httpConfig, src.newInstance());
-
                 Object scf = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.SslConnectionFactory",
                                                         Server.class).getConstructor(SslContextFactory.class,
                                                                                      String.class)
                                                         .newInstance(sslcf, "HTTP/1.1");
                 connectionFactories.add(scf);
+                result.getClass().getMethod("setDefaultProtocol", String.class).invoke(result, "SSL-HTTP/1.1");
             }
             connectionFactories.add(httpFactory);
             result.getClass().getMethod("setConnectionFactories", Collection.class)
