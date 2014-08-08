@@ -23,6 +23,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 
 /**
@@ -48,9 +49,15 @@ public final class KerberosUtils {
                 getCallbackHandler(
                     message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER)
                 );
+            boolean useCredentialDelegation = 
+                MessageUtils.getContextualBoolean(message, 
+                                              SecurityConstants.KERBEROS_USE_CREDENTIAL_DELEGATION, 
+                                              false);
+            
             client.setContextName(jaasContext);
             client.setServiceName(kerberosSpn);
             client.setCallbackHandler(callbackHandler);
+            client.setUseDelegatedCredential(useCredentialDelegation);
         }
         return client;
     }
