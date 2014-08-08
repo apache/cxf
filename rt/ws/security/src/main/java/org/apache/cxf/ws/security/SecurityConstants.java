@@ -201,6 +201,31 @@ public final class SecurityConstants {
     public static final String VALIDATE_SAML_SUBJECT_CONFIRMATION = 
         "ws-security.validate.saml.subject.conf";
     
+<<<<<<< HEAD
+=======
+    /**
+     * Whether to enable streaming WS-Security. If set to false (the default), the old DOM
+     * implementation is used. If set to true, the new streaming (StAX) implementation is used.
+     */
+    public static final String ENABLE_STREAMING_SECURITY = 
+        "ws-security.enable.streaming";
+    
+    /**
+     * Whether to return the security error message to the client, and not one of the default error
+     * QNames. The default is false.
+     */
+    public static final String RETURN_SECURITY_ERROR = "ws-security.return.security.error";
+    
+    /**
+     * Whether to use credential delegation or not in the KerberosClient. If this is set to "true",
+     * then it tries to get a GSSCredential Object from the Message Context using the 
+     * DELEGATED_CREDENTIAL configuration tag below, and then use this to obtain a service ticket.
+     * The default is "false".
+     */
+    public static final String KERBEROS_USE_CREDENTIAL_DELEGATION = 
+        "ws-security.kerberos.use.credential.delegation";
+    
+>>>>>>> e86ad8d... Add a way to enable credential delegation via a property
     //
     // Non-boolean WS-Security Configuration parameters
     //
@@ -565,7 +590,7 @@ public final class SecurityConstants {
             TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
             ASYMMETRIC_SIGNATURE_ALGORITHM, ENABLE_SAML_ONE_TIME_USE_CACHE, SAML_ONE_TIME_USE_CACHE_INSTANCE,
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
-            DELEGATED_CREDENTIAL
+            DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
