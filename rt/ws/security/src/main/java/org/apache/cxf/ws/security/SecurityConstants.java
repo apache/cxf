@@ -208,6 +208,15 @@ public final class SecurityConstants {
      */
     public static final String RETURN_SECURITY_ERROR = "ws-security.return.security.error";
     
+    /**
+     * Whether to use credential delegation or not in the KerberosClient. If this is set to "true",
+     * then it tries to get a GSSCredential Object from the Message Context using the 
+     * DELEGATED_CREDENTIAL configuration tag below, and then use this to obtain a service ticket.
+     * The default is "false".
+     */
+    public static final String KERBEROS_USE_CREDENTIAL_DELEGATION = 
+        "ws-security.kerberos.use.credential.delegation";
+    
     //
     // Non-boolean WS-Security Configuration parameters
     //
@@ -586,7 +595,7 @@ public final class SecurityConstants {
             ASYMMETRIC_SIGNATURE_ALGORITHM, PASSWORD_ENCRYPTOR_INSTANCE, ENABLE_SAML_ONE_TIME_USE_CACHE,
             SAML_ONE_TIME_USE_CACHE_INSTANCE, ENABLE_STREAMING_SECURITY, RETURN_SECURITY_ERROR,
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
-            DELEGATED_CREDENTIAL
+            DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
