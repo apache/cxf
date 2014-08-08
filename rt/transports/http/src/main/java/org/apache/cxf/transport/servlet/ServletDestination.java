@@ -51,7 +51,16 @@ public class ServletDestination extends AbstractHTTPDestination {
         // would add the default port to the address
         super(b, registry, ei, path, false);
     }
-    
+    public ServletDestination(Bus b,
+                              DestinationRegistry registry,
+                              EndpointInfo ei,
+                              String path,
+                              boolean dp)
+        throws IOException {
+        // would add the default port to the address
+        super(b, registry, ei, path, dp);
+    }
+        
     protected Logger getLogger() {
         return LOG;
     }

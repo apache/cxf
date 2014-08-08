@@ -40,6 +40,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<HttpServletRequest> 
@@ -312,5 +313,17 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
 
     public void logout() throws ServletException {
         get().logout();
+    }
+
+    //Servlet 3.1 additions
+    public long getContentLengthLong() {
+        return get().getContentLengthLong();
+    }
+    public String changeSessionId() {
+        return get().changeSessionId();
+    }
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException,
+        ServletException {
+        return get().upgrade(handlerClass);
     }
 }

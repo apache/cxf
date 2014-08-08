@@ -69,6 +69,9 @@ class WebSocketTestClient {
     public void connect() throws InterruptedException, ExecutionException, IOException {
         websocket = client.prepareGet(url).execute(
             new WebSocketUpgradeHandler.Builder().addWebSocketListener(new WsSocketListener()).build()).get();
+        if (websocket == null) {
+            throw new NullPointerException("websocket is null");
+        }
     }
 
     public void sendTextMessage(String message) {
@@ -102,8 +105,12 @@ class WebSocketTestClient {
     }
     
     public void close() {
-        websocket.close();
-        client.close();
+        if (websocket != null) {
+            websocket.close();
+        }
+        if (client != null) {
+            client.close();
+        }
     }
 
     class WsSocketListener implements WebSocketTextListener, WebSocketByteListener {

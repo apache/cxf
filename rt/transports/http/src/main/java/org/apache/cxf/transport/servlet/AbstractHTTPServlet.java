@@ -361,7 +361,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 new HttpServletRequestFilter(request, pathInfo, theServletPath, customServletPath);
             rd.forward(servletRequest, response);
         } catch (Throwable ex) {
-            throw new ServletException("RequestDispatcher for path " + pathInfo + " has failed");
+            throw new ServletException("RequestDispatcher for path " + pathInfo + " has failed", ex);
         }   
     }
     
@@ -381,8 +381,13 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             super(request);
             this.pathInfo = pathInfo;
             this.servletPath = servletPath;
-            if (pathInfo != null && "/".equals(this.servletPath) && !customServletPath) {
-                this.servletPath = "";
+            if ("/".equals(this.servletPath) && !customServletPath) {
+                if (this.pathInfo == null) {
+                    this.pathInfo = "/";
+                    this.servletPath = "";                    
+                } else {
+                    this.servletPath = "";
+                }
             }
         }
         

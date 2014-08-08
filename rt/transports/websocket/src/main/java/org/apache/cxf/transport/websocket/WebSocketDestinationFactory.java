@@ -68,9 +68,15 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                 return new AtmosphereWebSocketServletDestination(bus, registry,
                                                                  endpointInfo, endpointInfo.getAddress());
             } else {
-                // use jetty-websocket
-                return new JettyWebSocketServletDestination(bus, registry,
-                                                            endpointInfo, endpointInfo.getAddress());
+                JettyHTTPServerEngineFactory serverEngineFactory = bus
+                    .getExtension(JettyHTTPServerEngineFactory.class);
+                if (serverEngineFactory.isJetty8()) { 
+                    // use jetty-websocket
+                    return new JettyWebSocketServletDestination(bus, registry,
+                                                                endpointInfo, endpointInfo.getAddress());
+                } else { 
+                    return new Jetty9WebSocketDestination(bus, registry, endpointInfo, null);
+                }
             }
         }
     }

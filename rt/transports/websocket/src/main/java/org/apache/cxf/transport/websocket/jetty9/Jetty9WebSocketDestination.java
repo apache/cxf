@@ -22,7 +22,6 @@ package org.apache.cxf.transport.websocket.jetty9;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -38,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
@@ -51,6 +49,7 @@ import org.apache.cxf.transport.websocket.WebSocketServletHolder;
 import org.apache.cxf.transport.websocket.WebSocketVirtualServletRequest;
 import org.apache.cxf.transport.websocket.WebSocketVirtualServletResponse;
 import org.apache.cxf.workqueue.WorkQueueManager;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
@@ -90,7 +89,17 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                                HttpServletResponse resp) throws IOException {
         super.invoke(config, context, req, resp);
     }
-
+    public void invoke(final ServletConfig config, 
+                       final ServletContext context, 
+                       final HttpServletRequest request, 
+                       final HttpServletResponse response) throws IOException {
+        if (webSocketFactory.isUpgradeRequest(request, response)
+            && webSocketFactory.acceptWebSocket(request, response)) {
+            ((Request)request).setHandled(true);
+            return;
+        }
+        super.invoke(config, context, request, response);
+    }
     @Override
     protected String getAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
@@ -99,16 +108,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         }
         return address;
     }
-
-
-    @Override
-    protected String getBasePath(String contextPath) throws IOException {
-        if (StringUtils.isEmpty(endpointInfo.getAddress())) {
-            return "";
-        }
-        return new URL(getAddress(endpointInfo)).getPath();
-    }
-    
+        
     @Override
     protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
         return new JettyWebSocketHandler(jhd, cmExact, webSocketFactory);
@@ -207,7 +207,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
             return null;
         }
         public String getContextPath() {
-            return null;
+            return ((ServletUpgradeRequest)session.getUpgradeRequest()).getHttpServletRequest().getContextPath();
         }
         public String getLocalAddr() {
             return null;
@@ -261,7 +261,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
             return null;
         }
         public String getServletPath() {
-            return "/";
+            return "";
         }
         public ServletContext getServletContext() {
             return null;
@@ -273,7 +273,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
             return null;
         }
         public Object getAttribute(String name) {
-            return session.getUpgradeRequest().getHeader(name);
+            return ((ServletUpgradeRequest)session.getUpgradeRequest()).getHttpServletRequest().getAttribute(name);
         }
         @Override
         public void write(byte[] data, int offset, int length) throws IOException {

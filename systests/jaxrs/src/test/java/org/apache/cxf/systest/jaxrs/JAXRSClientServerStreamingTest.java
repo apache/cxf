@@ -114,7 +114,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
     public void testGetBook123Fail() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/text/xml/123");
         wc.accept("text/xml");
-        wc.header("fail-write", "");
+        wc.header("fail-write", "yes");
         Response r = wc.get();
         assertEquals(500, r.getStatus());
     }

@@ -99,8 +99,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${cxf.servlet-api.group}</groupId>
-            <artifactId>${cxf.servlet-api.artifact}</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

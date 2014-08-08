@@ -43,20 +43,19 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
+import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.eclipse.jetty.server.HttpOutput;
 import org.eclipse.jetty.server.Request;
 
 
-public class JettyHTTPDestination extends AbstractHTTPDestination {
+public class JettyHTTPDestination extends ServletDestination {
     
     private static final Logger LOG =
         LogUtils.getL7dLogger(JettyHTTPDestination.class);
@@ -93,7 +92,9 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         //Add the default port if the address is missing it
         super(bus, registry, ei, getAddressValue(ei, true).getAddress(), true);
         this.serverEngineFactory = serverEngineFactory;
-        nurl = new URL(getAddress(endpointInfo));
+        if (serverEngineFactory != null) {
+            nurl = new URL(getAddress(endpointInfo));
+        }
         loader = bus.getExtension(ClassLoader.class);
     }
 
@@ -111,7 +112,9 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected void retrieveEngine()
         throws GeneralSecurityException, 
                IOException {
-        
+        if (serverEngineFactory == null) {
+            return;
+        }
         engine = 
             serverEngineFactory.retrieveJettyHTTPServerEngine(nurl.getPort());
         if (engine == null) {
@@ -165,16 +168,12 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected void activate() {
         super.activate();
         LOG.log(Level.FINE, "Activating receipt of incoming messages");
-        URL url = null;
-        try {
-            url = new URL(getAddress(endpointInfo));
-        } catch (Exception e) {
-            throw new Fault(e);
-        }
         // pick the handler supporting websocket if jetty-websocket is available otherwise pick the default handler.
-        JettyHTTPHandler jhd = createJettyHTTPHandler(this, contextMatchOnExact());
-        engine.addServant(url, jhd);
-
+        
+        if (engine != null) {
+            JettyHTTPHandler jhd = createJettyHTTPHandler(this, contextMatchOnExact());
+            engine.addServant(nurl, jhd);
+        }
     }
 
     protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd,
@@ -188,7 +187,9 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected void deactivate() {
         super.deactivate();
         LOG.log(Level.FINE, "Deactivating receipt of incoming messages");
-        engine.removeServant(nurl);   
+        if (engine != null) {
+            engine.removeServant(nurl);
+        }
     }   
      
 
@@ -366,7 +367,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected void setupContinuation(Message inMessage,
                       final HttpServletRequest req, 
                       final HttpServletResponse resp) {
-        if (engine.getContinuationsEnabled()) {
+        if (engine != null && engine.getContinuationsEnabled()) {
             inMessage.put(ContinuationProvider.class.getName(), 
                       new JettyContinuationProvider(req, resp, inMessage));
         }

@@ -89,7 +89,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     @Override
     public Object getAttribute(String name) {
         if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "getAttribute({0})", name);
+            LOG.log(Level.INFO, "getAttribute({0}) -> {1}", new Object[] {name , attributes.get(name)});
         }
         return attributes.get(name);
     }
@@ -333,7 +333,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getContextPath() {
-        LOG.log(Level.INFO, "getContextPath");
+        LOG.log(Level.INFO, "getContextPath -> " + webSocketHolder.getContextPath());
         return webSocketHolder.getContextPath();
     }
 
@@ -395,9 +395,9 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getPathInfo() {
-        LOG.log(Level.INFO, "getPathInfo");
         String uri = requestHeaders.get(WebSocketUtils.URI_KEY);
-        String servletpath = webSocketHolder.getServletPath();
+        String servletpath = webSocketHolder.getServletPath();       
+        LOG.log(Level.INFO, "getPathInfo " + servletpath + " " + uri);
         //TODO remove the query string part
         //REVISIT may cache this value in requstHeaders?
         return uri.substring(servletpath.length());
@@ -405,7 +405,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getPathTranslated() {
-        LOG.log(Level.INFO, "getPathTranslated");
         String path = getPathInfo();
         String opathtrans = webSocketHolder.getPathTranslated();
         // some container may choose not to return this value
@@ -413,6 +412,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
             return null;
         }
         String opathinfo = webSocketHolder.getPathInfo();
+        LOG.log(Level.INFO, "getPathTranslated " + path + " " + opathinfo);
         int pos = opathtrans.indexOf(opathinfo);
         //REVISIT may cache this value in requstHeaders?
         return new StringBuilder().append(opathtrans.substring(0, pos)).append(path).toString();
@@ -432,17 +432,17 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getRequestURI() {
-        LOG.log(Level.INFO, "getRequestURI");
+        LOG.log(Level.INFO, "getRequestURI " + requestHeaders.get(WebSocketUtils.URI_KEY));
         return requestHeaders.get(WebSocketUtils.URI_KEY);
     }
 
     @Override
     public StringBuffer getRequestURL() {
-        LOG.log(Level.INFO, "getRequestURL");
         StringBuffer sb = webSocketHolder.getRequestURL();
         String ouri = webSocketHolder.getRequestURI();
         String uri = getRequestURI();
         sb.append(uri.substring(ouri.length()));
+        LOG.log(Level.INFO, "getRequestURL " + uri);
         return sb;
     }
 
@@ -454,7 +454,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getServletPath() {
-        LOG.log(Level.INFO, "getServletPath");
+        LOG.log(Level.INFO, "getServletPath " + webSocketHolder.getServletPath());
         return webSocketHolder.getServletPath();
     }
 
