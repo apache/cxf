@@ -201,21 +201,6 @@ public final class SecurityConstants {
     public static final String VALIDATE_SAML_SUBJECT_CONFIRMATION = 
         "ws-security.validate.saml.subject.conf";
     
-<<<<<<< HEAD
-=======
-    /**
-     * Whether to enable streaming WS-Security. If set to false (the default), the old DOM
-     * implementation is used. If set to true, the new streaming (StAX) implementation is used.
-     */
-    public static final String ENABLE_STREAMING_SECURITY = 
-        "ws-security.enable.streaming";
-    
-    /**
-     * Whether to return the security error message to the client, and not one of the default error
-     * QNames. The default is false.
-     */
-    public static final String RETURN_SECURITY_ERROR = "ws-security.return.security.error";
-    
     /**
      * Whether to use credential delegation or not in the KerberosClient. If this is set to "true",
      * then it tries to get a GSSCredential Object from the Message Context using the 
@@ -225,7 +210,6 @@ public final class SecurityConstants {
     public static final String KERBEROS_USE_CREDENTIAL_DELEGATION = 
         "ws-security.kerberos.use.credential.delegation";
     
->>>>>>> e86ad8d... Add a way to enable credential delegation via a property
     //
     // Non-boolean WS-Security Configuration parameters
     //
