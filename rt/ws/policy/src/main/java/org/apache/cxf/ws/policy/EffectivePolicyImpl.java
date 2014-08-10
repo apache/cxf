@@ -170,9 +170,9 @@ public class EffectivePolicyImpl implements EffectivePolicy {
             assertor = ((EndpointPolicyImpl)ep).getAssertor();
         }
         
-        policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedOperationPolicy(boi));
+        policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedOperationPolicy(boi, m));
         if (null != bmi) {
-            policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedMessagePolicy(bmi));
+            policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedMessagePolicy(bmi, m));
         }
         policy = policy.normalize(engine.getRegistry(), true);
         return assertor;
@@ -181,9 +181,9 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     void initialisePolicy(EndpointInfo ei, BindingOperationInfo boi,
                           BindingFaultInfo bfi, PolicyEngine engine, Message m) {
         policy = engine.getServerEndpointPolicy(ei, (Destination)null, m).getPolicy();         
-        policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedOperationPolicy(boi));
+        policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedOperationPolicy(boi, m));
         if (bfi != null) {
-            policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedFaultPolicy(bfi));
+            policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedFaultPolicy(bfi, m));
         }
         policy = policy.normalize(engine.getRegistry(), true);
     }

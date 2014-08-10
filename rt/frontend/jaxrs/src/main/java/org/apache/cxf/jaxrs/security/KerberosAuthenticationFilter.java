@@ -73,7 +73,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
         
         List<String> authHeaders = messageContext.getHttpHeaders()
             .getRequestHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeaders.size() != 1) {
+        if (authHeaders == null || authHeaders.size() != 1) {
             LOG.fine("No Authorization header is available");
             throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
         }

@@ -113,7 +113,7 @@ public class EndpointPolicyImplTest extends Assert {
     @Test
     public void testInitialize() throws NoSuchMethodException {
         Message m = new MessageImpl();
-        Method m1 = EndpointPolicyImpl.class.getDeclaredMethod("initializePolicy", new Class[] {});
+        Method m1 = EndpointPolicyImpl.class.getDeclaredMethod("initializePolicy", new Class[] {Message.class});
         Method m2 = EndpointPolicyImpl.class.getDeclaredMethod("checkExactlyOnes", new Class[] {});
         Method m3 = EndpointPolicyImpl.class.getDeclaredMethod("chooseAlternative", new Class[] {Message.class});
         Method m4 = EndpointPolicyImpl.class.getDeclaredMethod("initializeVocabulary", new Class[] {Message.class});
@@ -121,7 +121,7 @@ public class EndpointPolicyImplTest extends Assert {
         EndpointPolicyImpl epi = EasyMock.createMockBuilder(EndpointPolicyImpl.class)
             .addMockedMethods(m1, m2, m3, m4, m5).createMock(control);
 
-        epi.initializePolicy();
+        epi.initializePolicy(m);
         EasyMock.expectLastCall();
         epi.checkExactlyOnes();
         EasyMock.expectLastCall();
@@ -140,16 +140,16 @@ public class EndpointPolicyImplTest extends Assert {
         ServiceInfo si = control.createMock(ServiceInfo.class);
         EasyMock.expect(ei.getService()).andReturn(si);
         Policy sp = control.createMock(Policy.class);
-        EasyMock.expect(engine.getAggregatedServicePolicy(si)).andReturn(sp);
+        EasyMock.expect(engine.getAggregatedServicePolicy(si, null)).andReturn(sp);
         Policy ep = control.createMock(Policy.class);
-        EasyMock.expect(engine.getAggregatedEndpointPolicy(ei)).andReturn(ep);
+        EasyMock.expect(engine.getAggregatedEndpointPolicy(ei, null)).andReturn(ep);
         Policy merged = control.createMock(Policy.class);
         EasyMock.expect(sp.merge(ep)).andReturn(merged);
         EasyMock.expect(merged.normalize(null, true)).andReturn(merged);
 
         control.replay();
         EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, engine, true, null);
-        epi.initializePolicy();
+        epi.initializePolicy(null);
         assertSame(merged, epi.getPolicy());
         control.verify();
     }
@@ -166,6 +166,7 @@ public class EndpointPolicyImplTest extends Assert {
         EndpointPolicyImpl epi = new EndpointPolicyImpl(null, engine, true, assertor);
         epi.setPolicy(policy);
 
+        EasyMock.expect(engine.isEnabled()).andReturn(true).anyTimes();
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
         EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null, m)).andReturn(null);
 
@@ -179,6 +180,7 @@ public class EndpointPolicyImplTest extends Assert {
         control.verify();
 
         control.reset();
+        EasyMock.expect(engine.isEnabled()).andReturn(true).anyTimes();
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
         Collection<Assertion> alternative = new ArrayList<Assertion>();
         EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null, m)).andReturn(alternative);
@@ -186,6 +188,20 @@ public class EndpointPolicyImplTest extends Assert {
         epi.chooseAlternative(m);
         Collection<Assertion> choice = epi.getChosenAlternative();
         assertSame(choice, alternative);
+        control.verify();
+
+        control.reset();
+        EasyMock.expect(engine.isEnabled()).andReturn(false).anyTimes();
+        EasyMock.expect(engine.getAlternativeSelector()).andReturn(null).anyTimes();
+        control.replay();
+        try {
+            epi.chooseAlternative(m);
+        } catch (Exception ex) {
+            // no NPE expected
+            fail("No Exception expected: " + ex);
+        }
+        choice = epi.getChosenAlternative();
+        assertTrue("not an empty list", choice != null && choice.isEmpty());
         control.verify();
     }
 

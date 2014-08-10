@@ -23,11 +23,6 @@
             <httpj:tlsServerParameters>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
-            <httpj:connector>
-                <beans:bean class="org.eclipse.jetty.server.bio.SocketConnector">
-                    <beans:property name="port" value="1234"/>
-                </beans:bean>
-            </httpj:connector>
         </httpj:engine>
     </httpj:engine-factory>
 </beans>

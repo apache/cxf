@@ -28,9 +28,6 @@ public class DirectKeyJweEncryption extends AbstractJweEncryption {
                                                 cek.getEncoded().length * 8)), cek.getEncoded(), iv);
     }
     public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
-        this(headers, cek, iv, AbstractJweEncryption.DEFAULT_AUTH_TAG_LENGTH);
-    }
-    public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv, int authTagLen) {
-        super(headers, cek, iv, authTagLen, new DirectKeyEncryption());
+        super(headers, new AesGcmContentEncryptionAlgorithm(cek, iv), new DirectKeyAlgorithm());
     }
 }

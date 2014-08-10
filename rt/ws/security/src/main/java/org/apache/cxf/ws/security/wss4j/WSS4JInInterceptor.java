@@ -560,6 +560,10 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 if (receivedAssertion == null) {
                     receivedAssertion  = o.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
                 }
+                if (o.get(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL) != null) {
+                    msg.put(SecurityConstants.DELEGATED_CREDENTIAL, 
+                            o.get(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL));
+                }
                 
                 if (receivedAssertion instanceof SamlAssertionWrapper) {
                     String roleAttributeName = (String)msg.getContextualProperty(

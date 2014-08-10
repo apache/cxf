@@ -32,6 +32,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.ClientFaultConverter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
@@ -57,12 +58,13 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
         QName faultCode = null;
         String role = null;
         Element detail = null;
-        
+        String lang = null;
         try {
             while (reader.nextTag() == XMLStreamReader.START_ELEMENT) {
                 if (reader.getLocalName().equals("faultcode")) {
                     faultCode = StaxUtils.readQName(reader);
                 } else if (reader.getLocalName().equals("faultstring")) {
+                    lang = reader.getAttributeValue("http://www.w3.org/XML/1998/namespace", "lang");
                     exMessage = reader.getElementText();
                 } else if (reader.getLocalName().equals("faultactor")) {
                     role = reader.getElementText();
@@ -84,6 +86,9 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
         SoapFault fault = new SoapFault(exMessage, faultCode);
         fault.setDetail(detail);
         fault.setRole(role);
+        if (!StringUtils.isEmpty(lang)) {
+            fault.setLang(lang);
+        }
         return fault;
     }
 }

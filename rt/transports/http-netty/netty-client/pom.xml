@@ -62,13 +62,6 @@
             <artifactId>spring-context</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <!-- we don't implement the servlet 3.0 specification here -->
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.5_spec</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
         <!-- testing -->
         <dependency>
             <groupId>junit</groupId>

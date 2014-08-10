@@ -18,12 +18,18 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import javax.crypto.SecretKey;
 
-public class DirectKeyEncryption implements KeyEncryptionAlgorithm {
-    public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
-        if (headers.getKeyEncryptionAlgorithm() != null) {
-            throw new SecurityException();
-        }
-        return new byte[0];
+
+public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
+    private static final int DEFAULT_IV_SIZE = 96;
+    public AesGcmContentEncryptionAlgorithm(SecretKey key, byte[] iv) { 
+        this(key.getEncoded(), iv);    
+    }
+    public AesGcmContentEncryptionAlgorithm(byte[] cek, byte[] iv) { 
+        super(cek, iv);    
+    }
+    protected int getIvSize() { 
+        return DEFAULT_IV_SIZE;
     }
 }

@@ -44,12 +44,9 @@ import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
 import org.junit.Assert;
@@ -184,7 +181,8 @@ public class JettyHTTPServerEngineTest extends Assert {
         engine.addServant(new URL("https://localhost:" + PORT2 + "/test"), handler1);
         assertTrue("Protocol must be https",
                 "https".equals(engine.getProtocol()));
-        assertEquals("Get the wrong maxIdleTime.", 30000, engine.getConnector().getMaxIdleTime());
+        
+        assertEquals("Get the wrong maxIdleTime.", 30000, getMaxIdle(engine.getConnector()));
 
         factory.setTLSServerParametersForPort(PORT1, new TLSServerParameters());
         engine = factory.createJettyHTTPServerEngine(PORT1, "https");
@@ -202,38 +200,13 @@ public class JettyHTTPServerEngineTest extends Assert {
     }
 
 
-    @Test
-    public void testSetConnector() throws Exception {
-        JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
-        Connector conn = new SslSocketConnector();
-        engine.setConnector(conn);
-        engine.setPort(9000);
+    private int getMaxIdle(Connector connector) throws Exception {
         try {
-            engine.finalizeConfig();
-            fail("We should get the connector not set with TSLServerParameter exception.");
-        } catch (Exception ex) {
-            // expect the excepion
+            return (int)connector.getClass().getMethod("getMaxIdleTime").invoke(connector);
+        } catch (NoSuchMethodException nex) {
+            //jetty 9
         }
-
-        engine = new JettyHTTPServerEngine();
-        conn = new SelectChannelConnector();
-        conn.setPort(9002);
-        engine.setConnector(conn);
-        engine.setPort(9000);
-        try {
-            engine.finalizeConfig();
-            fail("We should get the connector not set right port exception.");
-        } catch (Exception ex) {
-            // expect the exception
-        }
-
-        engine = new JettyHTTPServerEngine();
-        conn = new SslSocketConnector();
-        conn.setPort(9003);
-        engine.setConnector(conn);
-        engine.setPort(9003);
-        engine.setTlsServerParameters(new TLSServerParameters());
-        engine.finalizeConfig();
+        return ((Long)connector.getClass().getMethod("getIdleTimeout").invoke(connector)).intValue();
     }
 
     @Test
@@ -243,31 +216,30 @@ public class JettyHTTPServerEngineTest extends Assert {
         JettyHTTPServerEngine engine =
             factory.createJettyHTTPServerEngine(PORT1, "http");
         engine.setMaxIdleTime(30000);
-        JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
-        JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
-        engine.addServant(new URL(urlStr), handler1);
-        assertEquals("Get the wrong maxIdleTime.", 30000, engine.getConnector().getMaxIdleTime());
+        engine.addServant(new URL(urlStr), new JettyHTTPTestHandler("string1", true));
+        assertEquals("Get the wrong maxIdleTime.", 30000, getMaxIdle(engine.getConnector()));
         
         String response = null;
         response = getResponse(urlStr);
         assertEquals("The jetty http handler did not take effect", response, "string1");
 
         try {
-            engine.addServant(new URL(urlStr), handler2);
+            engine.addServant(new URL(urlStr), new JettyHTTPTestHandler("string2", true));
             fail("We don't support to publish the two service at the same context path");
         } catch (Exception ex) {
             assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test") > 0);
         }
         
         try {
-            engine.addServant(new URL(urlStr + "/test"), handler2);
+            engine.addServant(new URL(urlStr + "/test"), new JettyHTTPTestHandler("string2", true));
             fail("We don't support to publish the two service at the same context path");
         } catch (Exception ex) {
             assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test/test") > 0);
         }
         
         try {
-            engine.addServant(new URL("http://localhost:" + PORT1 + "/hello"), handler2);
+            engine.addServant(new URL("http://localhost:" + PORT1 + "/hello"), 
+                              new JettyHTTPTestHandler("string2", true));
             fail("We don't support to publish the two service at the same context path");
         } catch (Exception ex) {
             assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello") > 0);
@@ -275,11 +247,11 @@ public class JettyHTTPServerEngineTest extends Assert {
         
         // check if the system property change could work
         System.setProperty("org.apache.cxf.transports.http_jetty.DontCheckUrl", "true");
-        engine.addServant(new URL(urlStr + "/test"), handler2);
+        engine.addServant(new URL(urlStr + "/test"), new JettyHTTPTestHandler("string2", true));
         // clean up the System property setting
         System.clearProperty("org.apache.cxf.transports.http_jetty.DontCheckUrl");
         
-        engine.addServant(new URL(urlStr2), handler2);
+        engine.addServant(new URL(urlStr2), new JettyHTTPTestHandler("string2", true));
         
         Set<ObjectName>  s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
             queryNames(new ObjectName("org.eclipse.jetty.server:type=server,*"), null));

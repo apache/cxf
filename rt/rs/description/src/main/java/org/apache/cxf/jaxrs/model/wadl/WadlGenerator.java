@@ -1412,13 +1412,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             return null;
         }
         if (JAXB_DEFAULT_NAME.equals(name)) {
-            name = type.getSimpleName();
-            StringBuilder sb = new StringBuilder();
-            sb.append(Character.toLowerCase(name.charAt(0)));
-            if (name.length() > 1) {
-                sb.append(name.substring(1));
-            }
-            name = sb.toString();
+            name = StringUtils.uncapitalize(type.getSimpleName());
         }
         String prefix = getPrefix(namespace, clsMap);
         return new QName(namespace, name, prefix);
@@ -1915,4 +1909,5 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
     }
 
+    
 }

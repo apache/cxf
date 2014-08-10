@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.policy;
 
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -31,14 +32,14 @@ import org.apache.neethi.Policy;
  */
 public interface PolicyProvider {
 
-    Policy getEffectivePolicy(ServiceInfo si);
+    Policy getEffectivePolicy(ServiceInfo si, Message m);
     
-    Policy getEffectivePolicy(EndpointInfo ei);
+    Policy getEffectivePolicy(EndpointInfo ei, Message m);
     
-    Policy getEffectivePolicy(BindingOperationInfo bi);
+    Policy getEffectivePolicy(BindingOperationInfo bi, Message m);
     
-    Policy getEffectivePolicy(BindingMessageInfo bmi);
+    Policy getEffectivePolicy(BindingMessageInfo bmi, Message m);
     
-    Policy getEffectivePolicy(BindingFaultInfo bfi);
+    Policy getEffectivePolicy(BindingFaultInfo bfi, Message m);
     
 }

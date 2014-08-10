@@ -24,6 +24,8 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import org.apache.cxf.systest.jaxrs.cdi.Book;
+
 @Named
 public class BookStoreService {
     private Map< String, Book > books = new HashMap< String, Book >();

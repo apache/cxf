@@ -36,6 +36,16 @@ public class ProcessedClaim extends Claim {
     private String originalIssuer;
     private transient Principal principal;
 
+    public ProcessedClaim() {
+    }
+    
+    public ProcessedClaim(ProcessedClaim processedClaim) {
+        super(processedClaim);
+        issuer = processedClaim.issuer;
+        originalIssuer = processedClaim.originalIssuer;
+        principal = processedClaim.principal;
+    }
+
     public String getIssuer() {
         return issuer;
     }
@@ -60,4 +70,66 @@ public class ProcessedClaim extends Claim {
         this.principal = principal;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProcessedClaim [");
+        builder.append(super.toString());
+        builder.append(", issuer=");
+        builder.append(issuer);
+        builder.append(", originalIssuer=");
+        builder.append(originalIssuer);
+        builder.append(", principal=");
+        builder.append(principal);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((issuer == null)
+            ? 0
+            : issuer.hashCode());
+        result = prime * result + ((originalIssuer == null)
+            ? 0
+            : originalIssuer.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof ProcessedClaim)) {
+            return false;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        ProcessedClaim other = (ProcessedClaim)obj;
+        if (issuer == null) {
+            if (other.issuer != null) {
+                return false;
+            }
+        } else if (!issuer.equals(other.issuer)) {
+            return false;
+        }
+        if (originalIssuer == null) {
+            if (other.originalIssuer != null) {
+                return false;
+            }
+        } else if (!originalIssuer.equals(other.originalIssuer)) {
+            return false;
+        }
+        return true;
+    }
+    
+    @Override
+    public ProcessedClaim clone() {
+        super.clone(); // Checkstyle requires this call
+        return new ProcessedClaim(this);
+    }
 }

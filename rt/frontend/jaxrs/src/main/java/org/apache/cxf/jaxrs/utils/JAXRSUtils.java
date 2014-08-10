@@ -758,15 +758,12 @@ public final class JAXRSUtils {
         throws IOException, WebApplicationException {
         
         
-        Method method = ori.getMethodToInvoke();
-        Method annotatedMethod = ori.getAnnotatedMethod();
-        Method actualMethod = annotatedMethod == null ? method : annotatedMethod;
         
-        Class<?>[] parameterTypes = actualMethod.getParameterTypes();
+        Class<?>[] parameterTypes = ori.getInParameterTypes();
         Parameter[] paramsInfo = ori.getParameters().toArray(new Parameter[ori.getParameters().size()]);  
         
-        Type[] genericParameterTypes = actualMethod.getGenericParameterTypes();
-        Annotation[][] anns = actualMethod.getParameterAnnotations();
+        Type[] genericParameterTypes = ori.getInGenericParameterTypes();
+        Annotation[][] anns = ori.getInParameterAnnotations();
         List<Object> params = new ArrayList<Object>(parameterTypes.length);
 
         for (int i = 0; i < parameterTypes.length; i++) {

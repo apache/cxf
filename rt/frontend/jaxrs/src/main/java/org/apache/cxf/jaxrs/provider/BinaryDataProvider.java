@@ -47,6 +47,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -70,36 +71,44 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     public T readFrom(Class<T> clazz, Type genericType, Annotation[] annotations, MediaType type, 
                            MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
-        if (InputStream.class.isAssignableFrom(clazz)) {
-            return clazz.cast(is);
-        }
-        if (Reader.class.isAssignableFrom(clazz)) {
-            return clazz.cast(new InputStreamReader(is, getEncoding(type)));
-        }
-        if (byte[].class.isAssignableFrom(clazz)) {
-            String enc = getCharset(type);
-            if (enc == null) {
-                return clazz.cast(IOUtils.readBytesFromStream(is));
-            } else {
-                return clazz.cast(IOUtils.toString(is, enc).getBytes(enc));
+        try {
+            if (InputStream.class.isAssignableFrom(clazz)) {
+                return clazz.cast(is);
             }
-        }
-        if (File.class.isAssignableFrom(clazz)) {
-            LOG.warning("Reading data into File objects with the help of pre-packaged" 
-                + " providers is not recommended - use InputStream or custom File reader");
-            // create a temp file, delete on exit
-            File f = FileUtils.createTempFile("File" + UUID.randomUUID().toString(), 
-                                              "jaxrs",
-                                              null,
-                                              true);
-            FileOutputStream fos = new FileOutputStream(f);
-            IOUtils.copy(is, fos);
-            fos.close();
-            return clazz.cast(f);
+            if (Reader.class.isAssignableFrom(clazz)) {
+                return clazz.cast(new InputStreamReader(is, getEncoding(type)));
+            }
+            if (byte[].class.isAssignableFrom(clazz)) {
+                String enc = getCharset(type);
+                if (enc == null) {
+                    return clazz.cast(IOUtils.readBytesFromStream(is));
+                } else {
+                    return clazz.cast(IOUtils.toString(is, enc).getBytes(enc));
+                }
+            }
+            if (File.class.isAssignableFrom(clazz)) {
+                LOG.warning("Reading data into File objects with the help of pre-packaged" 
+                    + " providers is not recommended - use InputStream or custom File reader");
+                // create a temp file, delete on exit
+                File f = FileUtils.createTempFile("File" + UUID.randomUUID().toString(), 
+                                                  "jaxrs",
+                                                  null,
+                                                  true);
+                FileOutputStream fos = new FileOutputStream(f);
+                IOUtils.copy(is, fos);
+                fos.close();
+                return clazz.cast(f);
+            }
+        } catch (ClassCastException e) {
+            String msg = "Unsupported class: " + clazz.getName();
+            LOG.warning(msg);
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         throw new IOException("Unrecognized class");
     }
 
+    
+    
     public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         // TODO: if it's a range request, then we should probably always return -1 and set 
         // Content-Length and Content-Range in handleRangeRequest

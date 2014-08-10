@@ -46,11 +46,22 @@ public class JweCompactProducer {
                        byte[] cipherInitVector,
                        byte[] encryptedContentNoTag,
                        byte[] authenticationTag) {
-        jweContentBuilder = startJweContent(new StringBuilder(), headers, writer, 
-                                   encryptedContentEncryptionKey, cipherInitVector);
+        this(getHeadersJson(headers, writer),
+             encryptedContentEncryptionKey,
+             cipherInitVector,
+             encryptedContentNoTag,
+             authenticationTag);
+    }
+    public JweCompactProducer(String headersJson,
+                              byte[] encryptedContentEncryptionKey,
+                              byte[] cipherInitVector,
+                              byte[] encryptedContentNoTag,
+                              byte[] authenticationTag) {
+        jweContentBuilder = startJweContent(new StringBuilder(), headersJson, 
+                                  encryptedContentEncryptionKey, cipherInitVector);
         this.encodedEncryptedContent = Base64UrlUtility.encode(encryptedContentNoTag);
         this.encodedAuthTag = Base64UrlUtility.encode(authenticationTag);
-        
+       
     }
     
     public JweCompactProducer(JweHeaders headers,
@@ -91,8 +102,22 @@ public class JweCompactProducer {
                                         JwtHeadersWriter writer, 
                                         byte[] encryptedContentEncryptionKey,
                                         byte[] cipherInitVector) {
+        return startJweContent(sb, 
+                               getHeadersJson(headers, writer), 
+                               encryptedContentEncryptionKey, 
+                               cipherInitVector);
+    }
+    private static String getHeadersJson(JweHeaders headers,
+                                         JwtHeadersWriter writer) {
         writer = writer == null ? new JwtTokenReaderWriter() : writer;
-        String encodedHeaders = Base64UrlUtility.encode(writer.headersToJson(headers));
+        return writer.headersToJson(headers);
+        
+    }
+    public static StringBuilder startJweContent(StringBuilder sb,
+                                                String headersJson,
+                                                byte[] encryptedContentEncryptionKey,
+                                                byte[] cipherInitVector) {
+        String encodedHeaders = Base64UrlUtility.encode(headersJson);
         String encodedContentEncryptionKey = Base64UrlUtility.encode(encryptedContentEncryptionKey);
         String encodedInitVector = Base64UrlUtility.encode(cipherInitVector);
         sb.append(encodedHeaders)

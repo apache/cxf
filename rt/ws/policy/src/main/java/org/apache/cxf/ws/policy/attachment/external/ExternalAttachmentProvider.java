@@ -29,11 +29,10 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -79,7 +78,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         return location;
     }
 
-    public Policy getEffectivePolicy(BindingFaultInfo bfi) {
+    public Policy getEffectivePolicy(BindingFaultInfo bfi, Message m) {
         readDocument();
         Policy p = null;
         for (PolicyAttachment pa : attachments) {
@@ -94,7 +93,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         return p;
     }
 
-    public Policy getEffectivePolicy(BindingMessageInfo bmi) {
+    public Policy getEffectivePolicy(BindingMessageInfo bmi, Message m) {
         readDocument();
         Policy p = null;
         for (PolicyAttachment pa : attachments) {
@@ -108,7 +107,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         return p;
     }
 
-    public Policy getEffectivePolicy(BindingOperationInfo boi) {
+    public Policy getEffectivePolicy(BindingOperationInfo boi, Message m) {
         readDocument();
         Policy p = null;
         for (PolicyAttachment pa : attachments) {
@@ -123,7 +122,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         return p;
     }
 
-    public Policy getEffectivePolicy(EndpointInfo ei) {
+    public Policy getEffectivePolicy(EndpointInfo ei, Message m) {
         readDocument();
         Policy p = null;
         for (PolicyAttachment pa : attachments) {
@@ -138,7 +137,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         return p;
     }
 
-    public Policy getEffectivePolicy(ServiceInfo si) {
+    public Policy getEffectivePolicy(ServiceInfo si, Message m) {
         readDocument();
         Policy p = null;
         for (PolicyAttachment pa : attachments) {
@@ -164,7 +163,10 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         try {
             InputStream is = location.getInputStream();
             if (null == is) {
-                throw new PolicyException(new Message("COULD_NOT_OPEN_ATTACHMENT_DOC_EXC", BUNDLE, location));
+                throw new PolicyException(
+                                          new org.apache.cxf.common.i18n.Message(
+                                                                                 "COULD_NOT_OPEN_ATTACHMENT_DOC_EXC",
+                                                                                 BUNDLE, location));
             }
             doc = StaxUtils.read(is);
         } catch (Exception ex) {

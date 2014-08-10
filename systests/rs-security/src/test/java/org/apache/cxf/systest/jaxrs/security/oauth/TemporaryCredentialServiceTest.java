@@ -36,8 +36,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.eclipse.jetty.http.HttpHeaders;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -80,7 +78,7 @@ public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestB
 
                 List<OAuth.Parameter> responseParams = OAuthTestUtils.getResponseParams(message);
 
-                String wwwHeader = message.getHeader(HttpHeaders.WWW_AUTHENTICATE);
+                String wwwHeader = message.getHeader("Authenticate");
                 Assert.assertNull(wwwHeader);
 
                 String callbacConf = OAuthTestUtils

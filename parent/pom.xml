@@ -42,12 +42,6 @@
         <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
         <cxf.codegen.jvmArgs />
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
-        <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
-        <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
-        <cxf.saaj.impl.version>1.3.23</cxf.saaj.impl.version>
-        <extra.saaj.dep.groupId>${cxf.saaj.impl.groupId}</extra.saaj.dep.groupId>
-        <extra.saaj.dep.artifactId>${cxf.saaj.impl.artifactId}</extra.saaj.dep.artifactId>
-        <extra.saaj.dep.version>${cxf.saaj.impl.version}</extra.saaj.dep.version>
         <!-- stuff related to ASM -->
         <!-- use asm 3.x for now to avoid breaking 3rd party components -->
         <cxf.asm.groupId>asm</cxf.asm.groupId>
@@ -114,8 +108,10 @@
         <cxf.joda.time.version>2.2</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.3.5</cxf.jettison.version>
-        <cxf.jetty.version>8.1.15.v20140411</cxf.jetty.version>
-        <cxf.jetty.osgi.version>[7.6,8.2)</cxf.jetty.osgi.version>
+        <cxf.jetty8.version>8.1.15.v20140411</cxf.jetty8.version>
+        <cxf.jetty9.version>9.2.2.v20140723</cxf.jetty9.version>
+        <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
+        <cxf.jetty.osgi.version>[8.1,10)</cxf.jetty.osgi.version>
         <cxf.jibx.version>1.2.5</cxf.jibx.version>
         <cxf.junit.version>4.11</cxf.junit.version>
         <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
@@ -131,7 +127,6 @@
         <cxf.opensaml.xmltooling.version>1.4.0_1</cxf.opensaml.xmltooling.version>
         <cxf.opensamlws.version>1.5.0_1</cxf.opensamlws.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
-        <cxf.saaj-api.version>1.3.5</cxf.saaj-api.version>
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
@@ -144,7 +139,7 @@
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.ldap.version>1.3.1.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.swagger.version>1.3.4</cxf.swagger.version>
+        <cxf.swagger.version>1.3.7</cxf.swagger.version>
         <cxf.velocity.version>1.7</cxf.velocity.version>
         <cxf.woodstox.core.version>4.4.0</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.4</cxf.woodstox.stax2-api.version>
@@ -189,6 +184,7 @@
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
         <cxf.olingo.version>1.2.0</cxf.olingo.version>
         <cxf.tika.version>1.5</cxf.tika.version>
+        <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
         <cxf.spring.validation.mode>VALIDATION_AUTO</cxf.spring.validation.mode>
@@ -868,16 +864,6 @@
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
                 <version>${cxf.jetty.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                        <artifactId>javax.servlet</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
@@ -887,6 +873,42 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-servlet</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-io</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-security</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-continuation</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-jmx</artifactId>
+                <version>${cxf.jetty.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-http</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-plus</artifactId>
                 <version>${cxf.jetty.version}</version>
             </dependency>
             <dependency>
@@ -913,36 +935,6 @@
                     <exclusion>
                         <groupId>xalan</groupId>
                         <artifactId>xalan</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.soap</groupId>
-                <artifactId>saaj-api</artifactId>
-                <version>${cxf.saaj-api.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.activation</groupId>
-                        <artifactId>activation</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>activation</groupId>
-                        <artifactId>activation</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>${cxf.saaj.impl.groupId}</groupId>
-                <artifactId>${cxf.saaj.impl.artifactId}</artifactId>
-                <version>${cxf.saaj.impl.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.activation</groupId>
-                        <artifactId>activation</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>activation</groupId>
-                        <artifactId>activation</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1739,19 +1731,17 @@
             </properties>
         </profile>
         <profile>
-            <id>axis2-saaj</id>
-            <properties>
-                <cxf.saaj.impl.groupId>org.apache.axis2</cxf.saaj.impl.groupId>
-                <cxf.saaj.impl.artifactId>axis2-saaj</cxf.saaj.impl.artifactId>
-                <cxf.saaj.impl.version>1.4.1</cxf.saaj.impl.version>
-            </properties>
-        </profile>
-        <profile>
             <id>fastinstall</id>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
                 <pmd.skip>true</pmd.skip>
                 <checkstyle.skip>true</checkstyle.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>jetty9</id>
+            <properties>
+                <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
             </properties>
         </profile>
         <profile>
@@ -1904,11 +1894,6 @@
                     <artifactId>xalan</artifactId>
                 </dependency>
             </dependencies>
-            <properties>
-                <extra.saaj.dep.groupId>com.sun.xml.parsers</extra.saaj.dep.groupId>
-                <extra.saaj.dep.artifactId>jaxp-ri</extra.saaj.dep.artifactId>
-                <extra.saaj.dep.version>1.4.2</extra.saaj.dep.version>
-            </properties>
             <build>
                 <plugins>
                     <plugin>

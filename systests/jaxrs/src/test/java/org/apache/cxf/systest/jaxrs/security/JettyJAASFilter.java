@@ -18,20 +18,26 @@
  */
 package org.apache.cxf.systest.jaxrs.security;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.jaxrs.security.JAASAuthenticationFilter;
-import org.eclipse.jetty.plus.jaas.callback.ObjectCallback;
 
 public class JettyJAASFilter extends JAASAuthenticationFilter {
     @Override
     protected CallbackHandler getCallbackHandler(final String name, final String password) {
         return new NamePasswordCallbackHandler(name, password) {
             protected boolean handleCallback(Callback c) {
-                if (c instanceof ObjectCallback) {
-                    ((ObjectCallback)c).setObject(password);
+                if ("ObjectCallback".equals(c.getClass().getSimpleName())) {
+                    try {
+                        c.getClass().getMethod("setObject", Object.class).invoke(c, password);
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                        | NoSuchMethodException | SecurityException e) {
+                        throw new RuntimeException(e);
+                    }
                     return true;
                 } else {
                     return false;

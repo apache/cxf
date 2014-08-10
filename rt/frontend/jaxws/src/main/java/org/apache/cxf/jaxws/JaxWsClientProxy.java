@@ -52,6 +52,7 @@ import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
@@ -218,7 +219,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             }
             final boolean isSoap11 = SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE.equals(soapFault.getNamespaceURI());
             
-            if (isSoap11 || ((SoapFault)ex).getLang() == null) {
+            if (StringUtils.isEmpty(((SoapFault)ex).getLang())) {
                 soapFault.setFaultString(((SoapFault)ex).getReason());
             } else {
                 soapFault.setFaultString(((SoapFault)ex).getReason(), stringToLocale(((SoapFault)ex).getLang()));

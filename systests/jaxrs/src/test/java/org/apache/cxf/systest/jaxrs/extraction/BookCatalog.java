@@ -65,6 +65,7 @@ public class BookCatalog {
     private final Directory directory = new RAMDirectory();
     private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
     private final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+    private final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
     
     @POST
     @Consumes("multipart/form-data")
@@ -102,13 +103,7 @@ public class BookCatalog {
         IndexSearcher searcher = new IndexSearcher(reader);        
 
         try {
-            final Map< String, Class< ? > > fieldTypes = new HashMap< String, Class< ? > >();
-            fieldTypes.put("modified", Date.class);
-            
-            LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
-            visitor.setPrimitiveFieldTypeMap(fieldTypes);
             visitor.visit(searchContext.getCondition(SearchBean.class));
-    
             return Arrays.asList(searcher.search(visitor.getQuery(), null, 1000).scoreDocs);
         } finally {
             reader.close();
@@ -128,6 +123,16 @@ public class BookCatalog {
         
         return Response.ok().build();
     }
+    
+    private static LuceneQueryVisitor< SearchBean > createVisitor() {
+        final Map< String, Class< ? > > fieldTypes = new HashMap< String, Class< ? > >();
+        fieldTypes.put("modified", Date.class);
+        
+        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
+        visitor.setPrimitiveFieldTypeMap(fieldTypes);
+        return visitor;
+    }
+
 }
 
 

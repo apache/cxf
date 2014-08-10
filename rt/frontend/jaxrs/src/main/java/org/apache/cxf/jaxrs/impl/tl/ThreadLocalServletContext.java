@@ -260,4 +260,9 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
         return get().getJspConfigDescriptor();
     }
 
+    //Servlet 3.1 additions
+    public String getVirtualServerName() {
+        return get().getVirtualServerName();
+    }
+
 }

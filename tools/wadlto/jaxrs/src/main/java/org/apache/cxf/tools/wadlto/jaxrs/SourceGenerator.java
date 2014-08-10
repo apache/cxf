@@ -551,9 +551,7 @@ public class SourceGenerator {
     
     private String firstCharToUpperCase(String name) {
         if (name.length() > 0 && Character.isLowerCase(name.charAt(0))) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(Character.toUpperCase(name.charAt(0)));
-            return name.length() > 1 ? sb.append(name.substring(1)).toString() : sb.toString();
+            return StringUtils.capitalize(name);
         } else {
             return name;
         }
@@ -561,9 +559,7 @@ public class SourceGenerator {
     
     private String firstCharToLowerCase(String name) {
         if (name.length() > 0 && Character.isUpperCase(name.charAt(0))) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(Character.toLowerCase(name.charAt(0)));
-            return name.length() > 1 ? sb.append(name.substring(1)).toString() : sb.toString();
+            return StringUtils.uncapitalize(name);
         } else {
             return name;
         }
@@ -1195,7 +1191,7 @@ public class SourceGenerator {
             if (XSD_SPECIFIC_TYPE_MAP.containsKey(pair[1])) {
                 String expandedName = "{" + Constants.URI_2001_SCHEMA_XSD + "}" + pair[1];
                 if (schemaTypeMap.containsKey(expandedName)) {
-                    return schemaTypeMap.get(expandedName);
+                    return checkGenericType(schemaTypeMap.get(expandedName));
                 }
                 
                 String xsdType = XSD_SPECIFIC_TYPE_MAP.get(pair[1]);
@@ -1242,6 +1238,19 @@ public class SourceGenerator {
         
         if (index != -1) {
             clsName = clsName.substring(index + 1);
+        }
+        return checkGenericType(clsName);
+    }
+    
+    private String checkGenericType(String clsName) {
+        if (clsName != null) {
+            int typeIndex = clsName.lastIndexOf("..");
+            if (typeIndex != -1) {
+                clsName = clsName.substring(0, typeIndex) 
+                    + "<"
+                    + clsName.substring(typeIndex + 2)
+                    + ">";
+            }
         }
         return clsName;
     }
@@ -1300,7 +1309,7 @@ public class SourceGenerator {
             }
         }
         if (clsName == null && javaTypeMap != null) {
-            clsName = javaTypeMap.get(packageName + "." + localName);
+            clsName = checkGenericType(javaTypeMap.get(packageName + "." + localName));
         }
         return clsName;
     }

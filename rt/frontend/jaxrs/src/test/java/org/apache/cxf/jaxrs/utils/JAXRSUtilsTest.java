@@ -1730,7 +1730,8 @@ public class JAXRSUtilsTest extends Assert {
         
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         cri.setResourceProvider(new PerRequestResourceProvider(Customer.class));
-        OperationResourceInfo ori = new OperationResourceInfo(null, cri);
+        OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethod("postConstruct", 
+                                                                                       new Class[]{}), cri);
         
         Customer c = new Customer();
         
@@ -1919,7 +1920,8 @@ public class JAXRSUtilsTest extends Assert {
         
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         cri.setResourceProvider(new PerRequestResourceProvider(Customer.class));
-        OperationResourceInfo ori = new OperationResourceInfo(null, cri);
+        OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethod("postConstruct", 
+                                                                                       new Class[]{}), cri);
         
         Message m = createMessage();
         HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
@@ -1938,7 +1940,9 @@ public class JAXRSUtilsTest extends Assert {
         
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         cri.setResourceProvider(new PerRequestResourceProvider(Customer.class));
-        OperationResourceInfo ori = new OperationResourceInfo(null, cri);
+        OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethod("postConstruct", 
+                                                                                       new Class[]{}), 
+                                                              cri);
         
         Customer c = new Customer();
         

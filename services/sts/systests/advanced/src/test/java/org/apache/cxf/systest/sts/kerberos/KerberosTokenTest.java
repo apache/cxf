@@ -50,6 +50,7 @@ import org.junit.runners.Parameterized.Parameters;
  * (keytab in "/etc/bob.keytab").
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
+@org.junit.Ignore
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
@@ -105,7 +106,6 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

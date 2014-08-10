@@ -124,7 +124,6 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             try {
                 if (basePackages != null) {
-                    @SuppressWarnings("unchecked")
                     final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
                         ClasspathScanner.findClasses(basePackages, Path.class, Provider.class);
                     

@@ -9,9 +9,6 @@ that calls in all the other jar.
 Jars marked with a [7] at the end are optional for Java 7 as the 
 functionality provided by those jars are provided in the JDK.
 
-Some users may prefer to use axis2-saaj.jar rather than saaj-impl.jar. Both are
-supported.
-
 The following jars are required for all CXF usage:
 - cxf-core.jar
 - geronimo-javamail.jar (Or the Sun equivalent) [7]
@@ -46,8 +43,6 @@ For Java2WSDL and WSDL2Java:
 For JAX-WS support:
 - neethi.jar
 - wsdl4j.jar
-- saaj-api.jar [7]
-- saaj-impl.jar [7]
 - asm.jar (semi-optional, helps with performance of wrapper types and is 
         required when adding JAXB annotations onto the SEI methods and 
 	parameters.)

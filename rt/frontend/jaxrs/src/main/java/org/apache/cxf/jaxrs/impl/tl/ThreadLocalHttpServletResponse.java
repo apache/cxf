@@ -191,6 +191,11 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
         return get().getStatus();
     }
 
+    //Servlet 3.1 additions
+    public void setContentLengthLong(long len) {
+        get().setContentLengthLong(len);
+    }
+
     
 
 }

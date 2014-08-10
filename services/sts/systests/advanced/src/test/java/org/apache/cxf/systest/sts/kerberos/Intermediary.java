@@ -16,39 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.sts.kerberos;
 
-import javax.validation.constraints.NotNull;
+import java.net.URL;
 
-public class Book {
-    @NotNull private String name;
-    private String id;
-    
-    public Book() {
-    }
-    
-    public Book(String id) {
-        this.id = id;
-    }
-    
-    public Book(String name, String id) {
-        this.name = name;
-        this.id = id;
-    }
-    
-    public void setName(String n) {
-        name = n;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
+public class Intermediary extends AbstractBusTestServerBase {
+
+    public Intermediary() {
+
     }
 
-    public String getName() {
-        return name;
-    }
-    
-    public void setId(String i) {
-        id = i;
-    }
- 
-    public String getId() {
-        return id;
+    protected void run()  {
+        URL busFile = Intermediary.class.getResource("cxf-intermediary.xml");
+        Bus busLocal = new SpringBusFactory().createBus(busFile);
+        BusFactory.setDefaultBus(busLocal);
+        setBus(busLocal);
+
+        try {
+            new Intermediary();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

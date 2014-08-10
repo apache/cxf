@@ -23,6 +23,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -38,28 +39,23 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
+import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
-import org.eclipse.jetty.http.Generator;
-import org.eclipse.jetty.io.AbstractConnection;
-import org.eclipse.jetty.server.AbstractHttpConnection.Output;
+import org.eclipse.jetty.server.HttpOutput;
 import org.eclipse.jetty.server.Request;
-import org.springframework.util.ClassUtils;
 
 
-public class JettyHTTPDestination extends AbstractHTTPDestination {
+public class JettyHTTPDestination extends ServletDestination {
     
     private static final Logger LOG =
         LogUtils.getL7dLogger(JettyHTTPDestination.class);
@@ -96,7 +92,9 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         //Add the default port if the address is missing it
         super(bus, registry, ei, getAddressValue(ei, true).getAddress(), true);
         this.serverEngineFactory = serverEngineFactory;
-        nurl = new URL(getAddress(endpointInfo));
+        if (serverEngineFactory != null) {
+            nurl = new URL(getAddress(endpointInfo));
+        }
         loader = bus.getExtension(ClassLoader.class);
     }
 
@@ -114,7 +112,9 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected void retrieveEngine()
         throws GeneralSecurityException, 
                IOException {
-        
+        if (serverEngineFactory == null) {
+            return;
+        }
         engine = 
             serverEngineFactory.retrieveJettyHTTPServerEngine(nurl.getPort());
         if (engine == null) {
@@ -168,16 +168,12 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected void activate() {
         super.activate();
         LOG.log(Level.FINE, "Activating receipt of incoming messages");
-        URL url = null;
-        try {
-            url = new URL(getAddress(endpointInfo));
-        } catch (Exception e) {
-            throw new Fault(e);
+        // pick the handler supporting websocket if jetty-websocket is available otherwise pick the default handler.
+        
+        if (engine != null) {
+            JettyHTTPHandler jhd = createJettyHTTPHandler(this, contextMatchOnExact());
+            engine.addServant(nurl, jhd);
         }
-        // pick the handler supportig websocket if jetty-websocket is available otherwise pick the default handler.
-        JettyHTTPHandler jhd = createJettyHTTPHandler(this, contextMatchOnExact());
-        engine.addServant(url, jhd);
-
     }
 
     protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd,
@@ -191,7 +187,9 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected void deactivate() {
         super.deactivate();
         LOG.log(Level.FINE, "Deactivating receipt of incoming messages");
-        engine.removeServant(nurl);   
+        if (engine != null) {
+            engine.removeServant(nurl);
+        }
     }   
      
 
@@ -208,24 +206,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
                              HttpServletResponse resp) throws IOException {
         doService(servletContext, req, resp);
     }
-    
-    static AbstractConnection getConnectionForRequest(Request r) {
-        try {
-            return (AbstractConnection)r.getClass().getMethod("getConnection").invoke(r);
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-    
-    private void setHeadFalse(AbstractConnection con) {
-        try {
-            Generator gen = (Generator)con.getClass().getMethod("getGenerator").invoke(con);
-            gen.setHead(false);
-        } catch (Exception ex) {
-            //ignore - can continue
-        }
-    }
-    
+        
     protected void doService(ServletContext context,
                              HttpServletRequest req,
                              HttpServletResponse resp) throws IOException {
@@ -235,14 +216,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         Request baseRequest = (req instanceof Request) 
             ? (Request)req : getCurrentRequest();
             
-        if (!"HEAD".equals(req.getMethod())) {
-            //bug in Jetty with persistent connections that if a HEAD is
-            //sent, a _head flag is never reset
-            AbstractConnection c = getConnectionForRequest(baseRequest);
-            if (c != null) {
-                setHeadFalse(c);
-            }
-        }
         HTTPServerPolicy sp = getServer();
         if (sp.isSetRedirectURL()) {
             resp.sendRedirect(sp.getRedirectURL());
@@ -289,8 +262,8 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     
     private OutputStream wrapOutput(OutputStream out) {
         try {
-            if (out instanceof Output) {
-                out = new JettyOutputStream((Output)out);
+            if (out instanceof HttpOutput) {
+                out = new JettyOutputStream((HttpOutput)out);
             }
         } catch (Throwable t) {
             //ignore
@@ -300,20 +273,36 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     
     
     static class JettyOutputStream extends FilterOutputStream implements CopyingOutputStream {
-        final Output out;
+        final HttpOutput out;
         boolean written;
-        public JettyOutputStream(Output o) {
+        public JettyOutputStream(HttpOutput o) {
             super(o);
             out = o;
         }
 
+        private boolean sendContent(Class<?> type, InputStream c) throws IOException {
+            try {
+                out.getClass().getMethod("sendContent", type).invoke(out, c);
+            } catch (InvocationTargetException ioe) {
+                if (ioe.getTargetException() instanceof IOException) {
+                    throw (IOException)ioe.getTargetException();
+                }
+                return false;
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
         @Override
         public int copyFrom(InputStream in) throws IOException {
             if (written) {
                 return IOUtils.copy(in, out);
             }
             CountingInputStream c = new CountingInputStream(in);
-            out.sendContent(c);
+            if (!sendContent(InputStream.class, c)
+                && !sendContent(Object.class, c)) {
+                IOUtils.copy(c, out);
+            }
             return c.getCount();
         }
         public void write(int b) throws IOException {
@@ -378,45 +367,29 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected void setupContinuation(Message inMessage,
                       final HttpServletRequest req, 
                       final HttpServletResponse resp) {
-        if (engine.getContinuationsEnabled()) {
+        if (engine != null && engine.getContinuationsEnabled()) {
             inMessage.put(ContinuationProvider.class.getName(), 
                       new JettyContinuationProvider(req, resp, inMessage));
         }
     }
     
-    private AbstractConnection getCurrentConnection() {
-        // AbstractHttpConnection on Jetty 7.6, HttpConnection on Jetty <=7.5
-        Class<?> cls = null;
-        try {
-            cls = ClassUtils.forName("org.eclipse.jetty.server.AbstractHttpConnection",
-                                     AbstractConnection.class.getClassLoader());
-        } catch (Exception e) {
-            //ignore
-        }
-        if (cls == null) {
-            try {
-                cls = ClassUtils.forName("org.eclipse.jetty.server.HttpConnection",
-                                         AbstractConnection.class.getClassLoader());
-            } catch (Exception e) {
-                //ignore
-            }
-        }
-
-        try {
-            return (AbstractConnection)ReflectionUtil
-                .setAccessible(cls.getMethod("getCurrentConnection")).invoke(null);
-        } catch (Exception e) {
-            //ignore
-        }
-        return null;
-    }
     private Request getCurrentRequest() {
-        AbstractConnection con = getCurrentConnection();
         try {
-            return (Request)ReflectionUtil
-                .setAccessible(con.getClass().getMethod("getRequest")).invoke(con);
-        } catch (Exception e) {
-            //ignore
+            //Jetty 8
+            Object con = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.AbstractHttpConnection",
+                                                    getClass()).getMethod("getCurrentConnection").invoke(null);
+            return (Request)con.getClass().getMethod("getRequest").invoke(con);
+        } catch (Throwable t) {
+            //
+        }
+        try {
+            //Jetty 9
+            Object con = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.HttpConnection",
+                                                    getClass()).getMethod("getCurrentConnection").invoke(null);
+            Object channel = con.getClass().getMethod("getHttpChannel").invoke(con);
+            return (Request)channel.getClass().getMethod("getRequest").invoke(channel);
+        } catch (Throwable t) {
+            //
         }
         return null;
     }

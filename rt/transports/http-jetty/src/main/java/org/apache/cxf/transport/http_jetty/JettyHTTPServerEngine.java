@@ -19,26 +19,36 @@
 
 package org.apache.cxf.transport.http_jetty;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509KeyManager;
 import javax.servlet.ServletContext;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
-import org.apache.cxf.transport.https_jetty.JettySslConnectorFactory;
+import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Connector;
@@ -49,12 +59,11 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.session.HashSessionIdManager;
 import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.server.ssl.SslConnector;
 import org.eclipse.jetty.util.component.Container;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
 
@@ -95,10 +104,10 @@ public class JettyHTTPServerEngine
     private Server server;
     private Connector connector;
     private List<Handler> handlers;
-    private JettyConnectorFactory connectorFactory;
     private ContextHandlerCollection contexts;
     private Container.Listener mBeanContainer;
     private SessionManager sessionManager;
+    private ThreadPool threadPool;
     
     
     /**
@@ -135,6 +144,9 @@ public class JettyHTTPServerEngine
     
     public JettyHTTPServerEngine() {
         
+    }
+    public void setThreadPool(ThreadPool p) {
+        threadPool = p;
     }
      
     public void setPort(int p) {
@@ -308,6 +320,25 @@ public class JettyHTTPServerEngine
         
     }
     
+    private Server createServer() {
+        Server s = null;
+        if (threadPool != null) {
+            try {
+                if (!Server.getVersion().startsWith("8")) {
+                    s = Server.class.getConstructor(ThreadPool.class).newInstance(threadPool);
+                } else {
+                    s = new Server();
+                    Server.class.getMethod("setThreadPool", ThreadPool.class).invoke(s, threadPool);
+                }
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        if (s == null) {
+            s = new Server();
+        }
+        return s;
+    }
     
     /**
      * Register a servant.
@@ -323,27 +354,18 @@ public class JettyHTTPServerEngine
         SecurityHandler securityHandler = null;
         if (server == null) {
             DefaultHandler defaultHandler = null;
-            // create a new jetty server instance if there is no server there            
-            server = new Server();
-            
-            server.setSendServerVersion(getSendServerVersion());
-            
-            if (mBeanContainer != null) {
-                server.getContainer().addEventListener(mBeanContainer);
-            }
-            
+            // create a new jetty server instance if there is no server there
+            server = createServer();
+            addServerMBean();
+                    
             if (connector == null) {
-                connector = connectorFactory.createConnector(getHost(), getPort());
+                connector = createConnector(getHost(), getPort());
                 if (LOG.isLoggable(Level.FINER)) {
-                    LOG.finer("connector.host: " 
-                              + connector.getHost() == null 
-                                ? "null" 
-                                : "\"" + connector.getHost() + "\"");
-                    LOG.finer("connector.port: " + connector.getPort());
+                    logConnector(connector);
                 }
             } 
-
             server.addConnector(connector);
+            setupThreadPool();
             /*
              * The server may have no handler, it might have a collection handler,
              * it might have a one-shot. We need to add one or more of ours.
@@ -412,8 +434,6 @@ public class JettyHTTPServerEngine
             }
 
             try {                
-                setReuseAddress(connector);
-                setupThreadPool();
                 server.start();
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "START_UP_SERVER_FAILED_MSG", new Object[] {e.getMessage(), port});
@@ -477,20 +497,243 @@ public class JettyHTTPServerEngine
         ++servantCount;
     }
     
+    private void addServerMBean() {
+        if (mBeanContainer == null) {
+            return;
+        }        
+        
+        try {
+            Object o = getContainer(server);
+            o.getClass().getMethod("addEventListener", Container.Listener.class).invoke(o, mBeanContainer);
+            if (Server.getVersion().startsWith("8")) {
+                return;
+            }
+            mBeanContainer.getClass().getMethod("beanAdded", Container.class, Object.class)
+                .invoke(mBeanContainer, null, server);
+        } catch (RuntimeException rex) {
+            throw rex;
+        } catch (Exception r) {
+            throw new RuntimeException(r);
+        }
+    }
+    private void removeServerMBean() {
+        try {
+            mBeanContainer.getClass().getMethod("beanRemoved", Container.class, Object.class)
+                .invoke(mBeanContainer, null, server);
+        } catch (RuntimeException rex) {
+            throw rex;
+        } catch (Exception r) {
+            throw new RuntimeException(r);
+        }
+    }
+
+    private Connector createConnector(String hosto, int porto) {
+        // now we just use the SelectChannelConnector as the default connector
+        SslContextFactory sslcf = null;
+        if (tlsServerParameters != null) { 
+            sslcf = new SslContextFactory() {
+                protected void doStart() throws Exception {
+                    setSslContext(createSSLContext(this));
+                    super.doStart();
+                }
+                public void checkKeyStore() {
+                    //we'll handle this later
+                }
+            };
+            decorateCXFJettySslSocketConnector(sslcf);
+        }
+        AbstractConnector result = null;
+        if (!Server.getVersion().startsWith("8")) {
+            result = createConnectorJetty9(sslcf, hosto, porto);
+        } else {
+            result = createConnectorJetty8(sslcf, hosto, porto);
+        }        
+        
+        try {
+            result.getClass().getMethod("setPort", Integer.TYPE).invoke(result, porto);
+            if (hosto != null) {
+                result.getClass().getMethod("setHost", String.class).invoke(result, hosto);
+            }
+            result.getClass().getMethod("setReuseAddress", Boolean.TYPE).invoke(result, isReuseAddress());
+        } catch (RuntimeException rex) {
+            throw rex;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }        
+        
+        return result;
+    }
+    
+    AbstractConnector createConnectorJetty9(SslContextFactory sslcf, String hosto, int porto) {
+        //Jetty 9
+        AbstractConnector result = null;
+        try {
+            Class<?> configClass = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.HttpConfiguration", 
+                                                              Server.class); 
+            Object httpConfig = configClass.newInstance();
+            httpConfig.getClass().getMethod("setSendServerVersion", Boolean.TYPE)
+                .invoke(httpConfig, getSendServerVersion());
+            
+            Object httpFactory = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.HttpConnectionFactory", 
+                                                            Server.class)
+                                                            .getConstructor(configClass).newInstance(httpConfig); 
+
+            Collection<Object> connectionFactories = new ArrayList<Object>();
+            result = (AbstractConnector)ClassLoaderUtils.loadClass("org.eclipse.jetty.server.ServerConnector", 
+                                                                   Server.class)
+                                                                   .getConstructor(Server.class)
+                                                                   .newInstance(server);
+            
+            if (tlsServerParameters != null) {
+                Class<?> src = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.SecureRequestCustomizer",
+                                                          Server.class);
+                httpConfig.getClass().getMethod("addCustomizer", src.getInterfaces()[0])
+                    .invoke(httpConfig, src.newInstance());
+                Object scf = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.SslConnectionFactory",
+                                                        Server.class).getConstructor(SslContextFactory.class,
+                                                                                     String.class)
+                                                        .newInstance(sslcf, "HTTP/1.1");
+                connectionFactories.add(scf);
+                result.getClass().getMethod("setDefaultProtocol", String.class).invoke(result, "SSL-HTTP/1.1");
+            }
+            connectionFactories.add(httpFactory);
+            result.getClass().getMethod("setConnectionFactories", Collection.class)
+                .invoke(result, connectionFactories);
+            
+            if (getMaxIdleTime() > 0) {
+                result.getClass().getMethod("setIdleTimeout", Long.TYPE).invoke(result, new Long(getMaxIdleTime()));
+            }
+
+        } catch (RuntimeException rex) {
+            throw rex;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        return result;
+    }
+    AbstractConnector createConnectorJetty8(SslContextFactory sslcf, String hosto, int porto) {
+        //Jetty 8
+        AbstractConnector result = null;
+        try {
+            if (sslcf == null) { 
+                result = (AbstractConnector)ClassLoaderUtils
+                    .loadClass("org.eclipse.jetty.server.nio.SelectChannelConnector",
+                               Server.class).newInstance();
+            } else {
+                result = (AbstractConnector)ClassLoaderUtils
+                    .loadClass("org.eclipse.jetty.server.ssl.SslSelectChannelConnector",
+                               Server.class).getConstructor(SslContextFactory.class)
+                               .newInstance(sslcf);
+            }
+            Server.class.getMethod("setSendServerVersion", Boolean.TYPE).invoke(server, getSendServerVersion());
+            if (getMaxIdleTime() > 0) {
+                result.getClass().getMethod("setMaxIdleTime", Integer.TYPE).invoke(result, getMaxIdleTime());
+            }
+        } catch (RuntimeException rex) {
+            throw rex;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        return result;
+    }
+    
+    
+    protected SSLContext createSSLContext(SslContextFactory scf) throws Exception  {
+        String proto = tlsServerParameters.getSecureSocketProtocol() == null
+            ? "TLS" : tlsServerParameters.getSecureSocketProtocol();
+ 
+        SSLContext context = tlsServerParameters.getJsseProvider() == null
+            ? SSLContext.getInstance(proto)
+                : SSLContext.getInstance(proto, tlsServerParameters.getJsseProvider());
+            
+        KeyManager keyManagers[] = tlsServerParameters.getKeyManagers();
+        if (tlsServerParameters.getCertAlias() != null) {
+            keyManagers = getKeyManagersWithCertAlias(keyManagers);
+        }
+        context.init(tlsServerParameters.getKeyManagers(), 
+                     tlsServerParameters.getTrustManagers(),
+                     tlsServerParameters.getSecureRandom());
+
+        String[] cs = 
+            SSLUtils.getCiphersuites(
+                    tlsServerParameters.getCipherSuites(),
+                    SSLUtils.getServerSupportedCipherSuites(context),
+                    tlsServerParameters.getCipherSuitesFilter(),
+                    LOG, true);
+                
+        scf.setExcludeCipherSuites(cs);
+        return context;
+    }
+    protected KeyManager[] getKeyManagersWithCertAlias(KeyManager keyManagers[]) throws Exception {
+        if (tlsServerParameters.getCertAlias() != null) {
+            for (int idx = 0; idx < keyManagers.length; idx++) {
+                if (keyManagers[idx] instanceof X509KeyManager) {
+                    keyManagers[idx] = new AliasedX509ExtendedKeyManager(
+                        tlsServerParameters.getCertAlias(), (X509KeyManager)keyManagers[idx]);
+                }
+            }
+        }
+        return keyManagers;
+    }
+    protected void setClientAuthentication(SslContextFactory con,
+                                           ClientAuthentication clientAuth) {
+        con.setWantClientAuth(true);
+        if (clientAuth != null) {
+            if (clientAuth.isSetWant()) {
+                con.setWantClientAuth(clientAuth.isWant());
+            }
+            if (clientAuth.isSetRequired()) {
+                con.setNeedClientAuth(clientAuth.isRequired());
+            }
+        }
+    }    
+    /**
+     * This method sets the security properties for the CXF extension
+     * of the JettySslConnector.
+     */
+    private void decorateCXFJettySslSocketConnector(
+            SslContextFactory con
+    ) {
+        setClientAuthentication(con,
+                                tlsServerParameters.getClientAuthentication());
+        con.setCertAlias(tlsServerParameters.getCertAlias());
+    }
+    
+
+    private static Container getContainer(Object server) {
+        if (server instanceof Container) {
+            return (Container)server;
+        }
+        try {
+            return (Container)server.getClass().getMethod("getContainer").invoke(server);
+        } catch (RuntimeException t) {
+            throw t;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    private static void logConnector(Connector connector) {
+        try {
+            String h = (String)connector.getClass().getMethod("getHost").invoke(connector);
+            int port = (Integer)connector.getClass().getMethod("getPort").invoke(connector);
+            LOG.finer("connector.host: " 
+                + h == null 
+                  ? "null" 
+                  : "\"" + h + "\"");
+            LOG.finer("connector.port: " + port);
+        } catch (Throwable t) {
+            //ignore
+        }
+    }
+
     protected void setupThreadPool() {
-        AbstractConnector aconn = (AbstractConnector) connector;
         if (isSetThreadingParameters()) {
-            ThreadPool pool = aconn.getThreadPool();
-            if (pool == null) {
-                pool = aconn.getServer().getThreadPool();
-            }
-            if (pool == null) {
-                pool = new QueuedThreadPool();
-                aconn.getServer().setThreadPool(pool);
-                aconn.setThreadPool(pool);
-            }
+            
+            ThreadPool pl = getThreadPool();
             //threads for the acceptors and selectors are taken from 
             //the pool so we need to have room for those
+            AbstractConnector aconn = (AbstractConnector) connector;
             int acc = aconn.getAcceptors() * 2;
             if (getThreadingParameters().isSetMaxThreads()
                 && getThreadingParameters().getMaxThreads() <= acc) {
@@ -500,47 +743,36 @@ public class JettyHTTPServerEngine
                                             getThreadingParameters().getMaxThreads(),
                                             acc));
             }
-            if (pool instanceof QueuedThreadPool) {
-                QueuedThreadPool pl = (QueuedThreadPool)pool;
-                if (getThreadingParameters().isSetMinThreads()) {
-                    pl.setMinThreads(getThreadingParameters().getMinThreads());
-                }
-                if (getThreadingParameters().isSetMaxThreads()) {
-                    pl.setMaxThreads(getThreadingParameters().getMaxThreads());
-                }
-                if (getThreadingParameters().isThreadNamePrefixSet()) {
-                    pl.setName(getThreadingParameters().getThreadNamePrefix());
-                }
-            } else {
-                try {
-                    if (getThreadingParameters().isSetMinThreads()) {
-                        pool.getClass().getMethod("setMinThreads", Integer.TYPE)
-                            .invoke(pool, getThreadingParameters().getMinThreads());
-                    }
-                    if (getThreadingParameters().isSetMaxThreads()) {
-                        pool.getClass().getMethod("setMaxThreads", Integer.TYPE)
-                            .invoke(pool, getThreadingParameters().getMaxThreads());
-                    }
-                    if (getThreadingParameters().isThreadNamePrefixSet()) {
-                        pool.getClass().getMethod("setName", String.class)
-                                .invoke(pool, getThreadingParameters().getThreadNamePrefix());
-                    }
-                } catch (Throwable t) {
-                    //ignore - this won't happen for Jetty 7.1 - 7.2 and 7.3 and newer 
-                    //will be instanceof QueuedThreadPool above
-                }
+            if (!(pl instanceof QueuedThreadPool)) {
+                throw new Fault(new Message("NOT_A_QUEUED_THREAD_POOL", LOG, pl.getClass()));
+            }
+            if (getThreadingParameters().isThreadNamePrefixSet()) {
+                ((QueuedThreadPool) pl).setName(getThreadingParameters().getThreadNamePrefix());
+            }
+            if (getThreadingParameters().isSetMinThreads()) {
+                ((QueuedThreadPool) pl).setMinThreads(getThreadingParameters().getMinThreads());
+            }
+            if (getThreadingParameters().isSetMaxThreads()) {
+                ((QueuedThreadPool) pl).setMaxThreads(getThreadingParameters().getMaxThreads());
             }
         }
     }
     
-    private void setReuseAddress(Connector conn) throws IOException {
-        if (conn instanceof AbstractConnector) {
-            ((AbstractConnector)conn).setReuseAddress(isReuseAddress());
-        } else {
-            LOG.log(Level.INFO, "UNKNOWN_CONNECTOR_MSG", new Object[] {conn});
+    private ThreadPool getThreadPool() {
+        ThreadPool pool = (ThreadPool)server.getThreadPool();
+        if (pool == null) {
+            pool = new QueuedThreadPool();
+            try {
+                server.getClass().getMethod("setThreadPool", ThreadPool.class).invoke(server, pool);
+            } catch (RuntimeException t) {
+                throw t;
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
+        return pool;
     }
-
+    
     /**
      * Remove a previously registered servant.
      * 
@@ -560,7 +792,9 @@ public class JettyHTTPServerEngine
                     contextHandler = (ContextHandler) handler;
                     Handler jh = contextHandler.getHandler();
                     if (jh instanceof JettyHTTPHandler
-                        && contextName.equals(contextHandler.getContextPath())
+                        && (contextName.equals(contextHandler.getContextPath())
+                            || (StringUtils.isEmpty(contextName) 
+                                && "/".equals(contextHandler.getContextPath())))
                         && ((JettyHTTPHandler)jh).getName().equals(smap)) {
                         try {
                             contexts.removeHandler(handler);                            
@@ -638,66 +872,46 @@ public class JettyHTTPServerEngine
         }
         return ret;
     }
+    
+    private boolean isSsl() {
+        if (connector == null) {
+            return false;
+        }
+                        
+        try {
+            //Jetty 8
+            return ClassLoaderUtils.loadClass("org.eclipse.jetty.server.ssl.SslConnector",
+                                              Server.class).isInstance(connector);
+        } catch (ClassNotFoundException e) {
+            //Jetty 9
+            //return "https".equalsIgnoreCase(connector.getDefaultConnectionFactory().getProtocol());
+            try {
+                Object o = connector.getClass().getMethod("getDefaultConnectionFactory").invoke(connector);
+                return "https".equalsIgnoreCase((String)o.getClass().getMethod("getProtocol").invoke(o));
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+        return false;
+    }
 
     protected void retrieveListenerFactory() {
         if (tlsServerParameters != null) {
-            if (null != connector && !(connector instanceof SslConnector)) {
+            if (connector != null && !isSsl()) {
                 LOG.warning("Connector " + connector + " for JettyServerEngine Port " 
                         + port + " does not support SSL connections.");
                 return;
             }
-            connectorFactory = 
-                getHTTPSConnectorFactory(tlsServerParameters);            
             protocol = "https";
             
         } else {
-            if (connector instanceof SslConnector) {
+            if (isSsl()) {
                 throw new RuntimeException("Connector " + connector + " for JettyServerEngine Port " 
                       + port + " does not support non-SSL connections.");
             }
-            connectorFactory = getHTTPConnectorFactory();            
             protocol = "http";
         }
         LOG.fine("Configured port " + port + " for \"" + protocol + "\".");
-    }
-
-    /**
-     * This method creates a connector factory. If there are TLS parameters
-     * then it creates a TLS enabled one.
-     */
-    protected JettyConnectorFactory getHTTPConnectorFactory() {
-        return new JettyConnectorFactory() {
-            public AbstractConnector createConnector(int porto) {
-                return createConnector(null, porto);
-            }
-            public AbstractConnector createConnector(String hosto, int porto) {
-                // now we just use the SelectChannelConnector as the default connector
-                SelectChannelConnector result = 
-                    new SelectChannelConnector();
-                
-                // Regardless the port has to equal the one
-                // we are configured for.
-                assert porto == port;
-                assert hosto == null ? host == null : hosto.equals(host);
-                if (hosto != null) {
-                    result.setHost(hosto);
-                }
-                result.setPort(porto);
-                if (getMaxIdleTime() > 0) {
-                    result.setMaxIdleTime(getMaxIdleTime());
-                }
-                return result;
-            }
-        };
-    }
-    
-    /**
-     * This method creates a connector factory enabled with the JSSE
-     */
-    protected JettyConnectorFactory getHTTPSConnectorFactory(
-            TLSServerParameters tlsParams
-    ) {
-        return new JettySslConnectorFactory(tlsParams, getMaxIdleTime());
     }
     
     /**
@@ -713,9 +927,16 @@ public class JettyHTTPServerEngine
     }
     
     private void checkConnectorPort() throws IOException {
-        if (null != connector && port != connector.getPort()) {
-            throw new IOException("Error: Connector port " + connector.getPort() + " does not match"
-                        + " with the server engine port " + port);
+        try {
+            int cp = (Integer)connector.getClass().getMethod("getPort").invoke(connector);
+            if (null != connector && port != cp) {
+                throw new IOException("Error: Connector port " + cp + " does not match"
+                            + " with the server engine port " + port);
+            }
+        } catch (IOException ioe) {
+            throw ioe;
+        } catch (Throwable t) {
+            //ignore...
         }
     }
     
@@ -730,10 +951,27 @@ public class JettyHTTPServerEngine
         registedPaths.clear();
         if (server != null) {
             try {
-                connector.stop();
-                connector.close();            
-            } finally {         
+                if (connector != null) {
+                    connector.stop();
+                    if (connector instanceof Closeable) {
+                        ((Closeable)connector).close();
+                    } else {
+                        connector.getClass().getMethod("close").invoke(connector);
+                    }
+                }
+            } finally {  
+                if (contexts != null) {
+                    for (Handler h : contexts.getHandlers()) {
+                        h.stop();
+                    }
+                    contexts.stop();
+                }
+                contexts = null;
                 server.stop();
+                if (mBeanContainer != null
+                    && !Server.getVersion().startsWith("8")) {
+                    removeServerMBean();
+                }
                 server.destroy();
                 server = null;
             }

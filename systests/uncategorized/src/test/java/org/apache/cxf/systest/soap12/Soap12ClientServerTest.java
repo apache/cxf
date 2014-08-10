@@ -83,7 +83,14 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
             assertEquals("PingMeFault raised by server", ex.getMessage());            
         }
     }
-    
+    String stripSpaces(String s) {
+        String s2 = s.replace(" ", "");
+        while (!s2.equals(s)) {
+            s = s2;
+            s2 = s.replace(" ", "");
+        }
+        return s2;
+    }    
     @Test
     public void testSayHiSoap12ToSoap11() throws Exception {
         HttpURLConnection httpConnection = 
@@ -94,7 +101,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull("could not load test data", reqin);
 
         httpConnection.setRequestMethod("POST");
-        httpConnection.addRequestProperty("Content-Type", "text/xml");
+        httpConnection.addRequestProperty("Content-Type", "text/xml;charset=utf-8");
         OutputStream reqout = httpConnection.getOutputStream();
         IOUtils.copy(reqin, reqout);
         reqout.close();
@@ -105,7 +112,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(respin);
         
         // we expect a soap 1.1 fault from the soap 1.1 test service that does not support soap 1.2
-        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
+        assertEquals("text/xml;charset=utf-8", stripSpaces(httpConnection.getContentType().toLowerCase()));
        
         Document doc = StaxUtils.read(respin);
         assertNotNull(doc);

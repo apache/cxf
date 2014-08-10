@@ -43,6 +43,8 @@ public class WADLToJavaTest extends ProcessorTestBase {
                 output.getCanonicalPath(),
                 "-p",
                 "custom.service",
+                "-tMap",
+                "{http://www.w3.org/2001/XMLSchema}date=java.util.List..String",
                 "-async getName,delete",
                 "-compile",
                 getLocation("/wadl/bookstore.xml"),

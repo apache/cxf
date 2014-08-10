@@ -429,7 +429,7 @@ public class PolicyEngineTest extends Assert {
         ServiceInfo si = control.createMock(ServiceInfo.class);
         
         control.replay();
-        Policy p = engine.getAggregatedServicePolicy(si);
+        Policy p = engine.getAggregatedServicePolicy(si, null);
         assertTrue(p.isEmpty());
         control.verify();
         control.reset();
@@ -437,10 +437,10 @@ public class PolicyEngineTest extends Assert {
         PolicyProvider provider1 = control.createMock(PolicyProvider.class);
         engine.getPolicyProviders().add(provider1);
         Policy p1 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(si)).andReturn(p1);
+        EasyMock.expect(provider1.getEffectivePolicy(si, null)).andReturn(p1);
         
         control.replay();
-        assertSame(p1, engine.getAggregatedServicePolicy(si));
+        assertSame(p1, engine.getAggregatedServicePolicy(si, null));
         control.verify();
         control.reset();
         
@@ -448,12 +448,12 @@ public class PolicyEngineTest extends Assert {
         engine.getPolicyProviders().add(provider2);
         Policy p2 = control.createMock(Policy.class);
         Policy p3 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(si)).andReturn(p1);
-        EasyMock.expect(provider2.getEffectivePolicy(si)).andReturn(p2);
+        EasyMock.expect(provider1.getEffectivePolicy(si, null)).andReturn(p1);
+        EasyMock.expect(provider2.getEffectivePolicy(si, null)).andReturn(p2);
         EasyMock.expect(p1.merge(p2)).andReturn(p3);
         
         control.replay();
-        assertSame(p3, engine.getAggregatedServicePolicy(si));
+        assertSame(p3, engine.getAggregatedServicePolicy(si, null));
         control.verify();      
     }
     
@@ -463,7 +463,7 @@ public class PolicyEngineTest extends Assert {
         EndpointInfo ei = createMockEndpointInfo();
         
         control.replay();
-        Policy p = engine.getAggregatedEndpointPolicy(ei);
+        Policy p = engine.getAggregatedEndpointPolicy(ei, null);
         assertTrue(p.isEmpty());
         control.verify();
         control.reset();
@@ -471,10 +471,10 @@ public class PolicyEngineTest extends Assert {
         PolicyProvider provider1 = control.createMock(PolicyProvider.class);
         engine.getPolicyProviders().add(provider1);
         Policy p1 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(ei)).andReturn(p1);
+        EasyMock.expect(provider1.getEffectivePolicy(ei, null)).andReturn(p1);
         
         control.replay();
-        assertSame(p1, engine.getAggregatedEndpointPolicy(ei));
+        assertSame(p1, engine.getAggregatedEndpointPolicy(ei, null));
         control.verify();
         control.reset();
         
@@ -482,12 +482,12 @@ public class PolicyEngineTest extends Assert {
         engine.getPolicyProviders().add(provider2);
         Policy p2 = control.createMock(Policy.class);
         Policy p3 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(ei)).andReturn(p1);
-        EasyMock.expect(provider2.getEffectivePolicy(ei)).andReturn(p2);
+        EasyMock.expect(provider1.getEffectivePolicy(ei, null)).andReturn(p1);
+        EasyMock.expect(provider2.getEffectivePolicy(ei, null)).andReturn(p2);
         EasyMock.expect(p1.merge(p2)).andReturn(p3);
         
         control.replay();
-        assertSame(p3, engine.getAggregatedEndpointPolicy(ei));
+        assertSame(p3, engine.getAggregatedEndpointPolicy(ei, null));
         control.verify();      
     }
     
@@ -497,7 +497,7 @@ public class PolicyEngineTest extends Assert {
         BindingOperationInfo boi = createMockBindingOperationInfo();
         
         control.replay();
-        Policy p = engine.getAggregatedOperationPolicy(boi);
+        Policy p = engine.getAggregatedOperationPolicy(boi, null);
         assertTrue(p.isEmpty());
         control.verify();
         control.reset();
@@ -505,10 +505,10 @@ public class PolicyEngineTest extends Assert {
         PolicyProvider provider1 = control.createMock(PolicyProvider.class);
         engine.getPolicyProviders().add(provider1);
         Policy p1 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(boi)).andReturn(p1);
+        EasyMock.expect(provider1.getEffectivePolicy(boi, null)).andReturn(p1);
         
         control.replay();
-        assertSame(p1, engine.getAggregatedOperationPolicy(boi));
+        assertSame(p1, engine.getAggregatedOperationPolicy(boi, null));
         control.verify();
         control.reset();
         
@@ -516,12 +516,12 @@ public class PolicyEngineTest extends Assert {
         engine.getPolicyProviders().add(provider2);
         Policy p2 = control.createMock(Policy.class);
         Policy p3 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(boi)).andReturn(p1);
-        EasyMock.expect(provider2.getEffectivePolicy(boi)).andReturn(p2);
+        EasyMock.expect(provider1.getEffectivePolicy(boi, null)).andReturn(p1);
+        EasyMock.expect(provider2.getEffectivePolicy(boi, null)).andReturn(p2);
         EasyMock.expect(p1.merge(p2)).andReturn(p3);
         
         control.replay();
-        assertSame(p3, engine.getAggregatedOperationPolicy(boi));
+        assertSame(p3, engine.getAggregatedOperationPolicy(boi, null));
         control.verify();      
     }
     
@@ -531,7 +531,7 @@ public class PolicyEngineTest extends Assert {
         BindingMessageInfo bmi = control.createMock(BindingMessageInfo.class);
         
         control.replay();
-        Policy p = engine.getAggregatedMessagePolicy(bmi);
+        Policy p = engine.getAggregatedMessagePolicy(bmi, null);
         assertTrue(p.isEmpty());
         control.verify();
         control.reset();
@@ -539,10 +539,10 @@ public class PolicyEngineTest extends Assert {
         PolicyProvider provider1 = control.createMock(PolicyProvider.class);
         engine.getPolicyProviders().add(provider1);
         Policy p1 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(bmi)).andReturn(p1);
+        EasyMock.expect(provider1.getEffectivePolicy(bmi, null)).andReturn(p1);
         
         control.replay();
-        assertSame(p1, engine.getAggregatedMessagePolicy(bmi));
+        assertSame(p1, engine.getAggregatedMessagePolicy(bmi, null));
         control.verify();
         control.reset();
         
@@ -550,12 +550,12 @@ public class PolicyEngineTest extends Assert {
         engine.getPolicyProviders().add(provider2);
         Policy p2 = control.createMock(Policy.class);
         Policy p3 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(bmi)).andReturn(p1);
-        EasyMock.expect(provider2.getEffectivePolicy(bmi)).andReturn(p2);
+        EasyMock.expect(provider1.getEffectivePolicy(bmi, null)).andReturn(p1);
+        EasyMock.expect(provider2.getEffectivePolicy(bmi, null)).andReturn(p2);
         EasyMock.expect(p1.merge(p2)).andReturn(p3);
         
         control.replay();
-        assertSame(p3, engine.getAggregatedMessagePolicy(bmi));
+        assertSame(p3, engine.getAggregatedMessagePolicy(bmi, null));
         control.verify();      
     }
     
@@ -565,7 +565,7 @@ public class PolicyEngineTest extends Assert {
         BindingFaultInfo bfi = control.createMock(BindingFaultInfo.class);
         
         control.replay();
-        Policy p = engine.getAggregatedFaultPolicy(bfi);
+        Policy p = engine.getAggregatedFaultPolicy(bfi, null);
         assertTrue(p.isEmpty());
         control.verify();
         control.reset();
@@ -573,10 +573,10 @@ public class PolicyEngineTest extends Assert {
         PolicyProvider provider1 = control.createMock(PolicyProvider.class);
         engine.getPolicyProviders().add(provider1);
         Policy p1 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(bfi)).andReturn(p1);
+        EasyMock.expect(provider1.getEffectivePolicy(bfi, null)).andReturn(p1);
         
         control.replay();
-        assertSame(p1, engine.getAggregatedFaultPolicy(bfi));
+        assertSame(p1, engine.getAggregatedFaultPolicy(bfi, null));
         control.verify();
         control.reset();
         
@@ -584,12 +584,12 @@ public class PolicyEngineTest extends Assert {
         engine.getPolicyProviders().add(provider2);
         Policy p2 = control.createMock(Policy.class);
         Policy p3 = control.createMock(Policy.class);
-        EasyMock.expect(provider1.getEffectivePolicy(bfi)).andReturn(p1);
-        EasyMock.expect(provider2.getEffectivePolicy(bfi)).andReturn(p2);
+        EasyMock.expect(provider1.getEffectivePolicy(bfi, null)).andReturn(p1);
+        EasyMock.expect(provider2.getEffectivePolicy(bfi, null)).andReturn(p2);
         EasyMock.expect(p1.merge(p2)).andReturn(p3);
         
         control.replay();
-        assertSame(p3, engine.getAggregatedFaultPolicy(bfi));
+        assertSame(p3, engine.getAggregatedFaultPolicy(bfi, null));
         control.verify();      
     }
     

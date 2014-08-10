@@ -16,28 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http_jetty;
+package org.apache.cxf.systest.http;
 
-import org.eclipse.jetty.server.AbstractConnector;
+import java.io.IOException;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
-/**
- * Encapsulates creation of Jetty listener.
- */
-public interface JettyConnectorFactory {
+public class KeyPasswordCallbackHandler implements CallbackHandler {
 
-    /**
-     * Create a Listener.
-     * 
-     * @param port the listen port
-     */
-    AbstractConnector createConnector(int port);
+    @Override
+    public void handle(Callback[] callbacks) throws IOException,
+        UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
+            PasswordCallback pc = (PasswordCallback)callbacks[i];
+            pc.setPassword("password".toCharArray());
+        }
+    }
 
-    /**
-     * Create a Listener.
-     * 
-     * @param host the host to bind to.  IP address or hostname is allowed. null to bind to all hosts.
-     * @param port the listen port
-     */
-    AbstractConnector createConnector(String host, int port);
 }

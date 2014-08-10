@@ -21,6 +21,7 @@ package org.apache.cxf.ws.policy.attachment;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -35,23 +36,23 @@ public class ServiceModelPolicyProvider extends AbstractPolicyProvider {
         super(b);
     }
 
-    public Policy getEffectivePolicy(BindingFaultInfo bfi) {
+    public Policy getEffectivePolicy(BindingFaultInfo bfi, Message m) {
         return bfi.getExtensor(Policy.class);
     }
 
-    public Policy getEffectivePolicy(BindingMessageInfo bmi) {
+    public Policy getEffectivePolicy(BindingMessageInfo bmi, Message m) {
         return bmi.getExtensor(Policy.class);
     }
 
-    public Policy getEffectivePolicy(BindingOperationInfo bi) {
+    public Policy getEffectivePolicy(BindingOperationInfo bi, Message m) {
         return bi.getExtensor(Policy.class);
     }
 
-    public Policy getEffectivePolicy(EndpointInfo ei) {
+    public Policy getEffectivePolicy(EndpointInfo ei, Message m) {
         return ei.getExtensor(Policy.class);
     }
 
-    public Policy getEffectivePolicy(ServiceInfo si) {
+    public Policy getEffectivePolicy(ServiceInfo si, Message m) {
         return si.getExtensor(Policy.class);
     }
 

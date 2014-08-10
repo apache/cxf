@@ -22,20 +22,23 @@ import javax.crypto.Cipher;
 
 public class JweEncryptionState {
     private Cipher cipher;
-    private int authTagLen;
     private JweHeaders headers;
     private byte[] contentEncryptionKey;
     private byte[] iv;
     private boolean compressionSupported;
+    private AuthenticationTagProducer authTagProducer;
     
-    public JweEncryptionState(Cipher cipher, int authTagLen, JweHeaders headers, 
-                        byte[] contentEncryptionKey, 
-                        byte[] iv, boolean compressionSupported) {
+    public JweEncryptionState(Cipher cipher, 
+                              JweHeaders headers, 
+                              byte[] contentEncryptionKey, 
+                              byte[] iv, 
+                              AuthenticationTagProducer authTagProducer,
+                              boolean compressionSupported) {
         this.cipher = cipher;
-        this.authTagLen = authTagLen;
         this.headers = headers;
         this.contentEncryptionKey = contentEncryptionKey;
         this.iv = iv;
+        this.authTagProducer = authTagProducer;
         this.compressionSupported = compressionSupported;
     }
     public Cipher getCipher() {
@@ -53,8 +56,8 @@ public class JweEncryptionState {
     public boolean isCompressionSupported() {
         return compressionSupported;
     }
-    public int getAuthTagLen() {
-        return authTagLen;
+    public AuthenticationTagProducer getAuthTagProducer() {
+        return authTagProducer;
     }
     
 }

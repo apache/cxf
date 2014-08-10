@@ -36,11 +36,6 @@ public class WSDLQueryTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(BareServer.class, true));
     }
-    
-    @Test
-    public void testEmptyHostHeader() throws Exception {
-        sendQuery("", "HTTP/1.1 200 OK");
-    }
 
     @Test
     public void testCorrectHostHeader() throws Exception {

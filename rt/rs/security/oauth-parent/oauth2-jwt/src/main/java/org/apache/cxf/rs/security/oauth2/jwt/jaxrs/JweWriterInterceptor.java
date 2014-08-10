@@ -88,7 +88,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 throw new SecurityException(ex);
             }
             OutputStream jweStream = new JweOutputStream(actualOs, encryption.getCipher(), 
-                                                         encryption.getAuthTagLen());
+                                                         encryption.getAuthTagProducer());
             if (encryption.isCompressionSupported()) {
                 jweStream = new DeflaterOutputStream(jweStream);
             }

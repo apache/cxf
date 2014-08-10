@@ -30,15 +30,17 @@ import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 public class JweOutputStream extends FilterOutputStream {
     private Cipher encryptingCipher;
     private int blockSize;
-    private int authTagLengthBits;
+    private AuthenticationTagProducer authTagProducer;
     private byte[] lastRawDataChunk;
     private byte[] lastEncryptedDataChunk;
     private boolean flushed;
-    public JweOutputStream(OutputStream out, Cipher encryptingCipher, int authTagLengthBits) {
+    public JweOutputStream(OutputStream out, 
+                           Cipher encryptingCipher, 
+                           AuthenticationTagProducer authTagProducer) {
         super(out);
         this.encryptingCipher = encryptingCipher;
         this.blockSize = encryptingCipher.getBlockSize(); 
-        this.authTagLengthBits = authTagLengthBits;
+        this.authTagProducer = authTagProducer;
     }
 
     @Override
@@ -75,6 +77,9 @@ public class JweOutputStream extends FilterOutputStream {
     
     private void encryptAndWrite(byte[] chunk, int off, int len) throws IOException {
         byte[] encrypted = encryptingCipher.update(chunk, off, len);
+        if (authTagProducer != null) {
+            authTagProducer.update(encrypted, 0, encrypted.length);
+        }
         encodeAndWrite(encrypted, 0, encrypted.length, false);
     }
     private void encodeAndWrite(byte[] encryptedChunk, int off, int len, boolean finalWrite) throws IOException {
@@ -106,9 +111,19 @@ public class JweOutputStream extends FilterOutputStream {
             byte[] finalBytes = lastRawDataChunk == null 
                 ? encryptingCipher.doFinal()
                 : encryptingCipher.doFinal(lastRawDataChunk, 0, lastRawDataChunk.length);
-            encodeAndWrite(finalBytes, 0, finalBytes.length - authTagLengthBits / 8, true);
+            final int authTagLengthBits = 128;
+            if (authTagProducer == null) {
+                encodeAndWrite(finalBytes, 0, finalBytes.length - authTagLengthBits / 8, true);    
+            } else {
+                authTagProducer.update(finalBytes, 0, finalBytes.length);
+            }
             out.write(new byte[]{'.'});
-            encodeAndWrite(finalBytes, finalBytes.length - authTagLengthBits / 8, authTagLengthBits / 8, true);
+            if (authTagProducer == null) {
+                encodeAndWrite(finalBytes, finalBytes.length - authTagLengthBits / 8, authTagLengthBits / 8, true);
+            } else {
+                byte[] authTag = authTagProducer.getTag();
+                encodeAndWrite(authTag, 0, authTagLengthBits / 8, true);
+            }
         } catch (Exception ex) {
             throw new SecurityException();
         }

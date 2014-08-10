@@ -29,6 +29,7 @@ import com.google.common.collect.Sets;
 
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
+import org.apache.cxf.systest.jaxrs.cdi.BookStore;
 
 @ApplicationPath("/custom")
 public class BookStoreCustomApplication extends Application {

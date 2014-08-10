@@ -53,6 +53,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
     @Override
     public void flushBuffer() throws IOException {
         LOG.log(Level.INFO, "flushBuffer()");
+        outputStream.flush();
     }
 
     @Override
@@ -248,6 +249,8 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
             LOG.log(Level.INFO, "sendError{0}", sc);
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
+        byte[] data = WebSocketUtils.buildResponse(responseHeaders, null, 0, 0);
+        webSocketHolder.write(data, 0, data.length);
     }
 
     @Override
@@ -257,6 +260,8 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
         responseHeaders.put(WebSocketUtils.SM_KEY, msg);
+        byte[] data = WebSocketUtils.buildResponse(responseHeaders, null, 0, 0);
+        webSocketHolder.write(data, 0, data.length);
     }
 
     @Override
@@ -342,8 +347,6 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
                     webSocketHolder.write(data, 0, data.length);
                 }
             }
-
-            @Override
             public void close() throws IOException {
                 if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
                     byte[] data = WebSocketUtils.buildResponse(responseHeaders, buffer.getBytes(), 0, buffer.size());

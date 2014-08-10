@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -56,5 +57,13 @@ public class ServletOutputStreamFilter extends ServletOutputStream {
 
     private void setComittedStatus() {
         m.getExchange().put(AbstractHTTPDestination.RESPONSE_COMMITED, Boolean.TRUE);
+    }
+
+    //Servlet 3.1 additions
+    public boolean isReady() {
+        return os.isReady();
+    }
+    public void setWriteListener(WriteListener writeListener) {
+        os.setWriteListener(writeListener);
     }
 }
