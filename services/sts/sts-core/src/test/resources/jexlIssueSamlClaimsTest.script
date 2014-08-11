@@ -1,0 +1,21 @@
+{
+    //  Role value mapping
+    var roleClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role';
+    var roleClaim = claims:get(sourceClaims, roleClaimType);
+    var roleMappings = { "admin" : "administrator", "manager" : "manager" };
+    var mappedRoles = claims:mapValues(roleClaim, roleMappings, false);
+    
+    // Last name transformation
+    var lastNameClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname';
+    var nameClaim = claims:get(sourceClaims, lastNameClaimType);
+    claims:upperCaseValues(nameClaim);
+    
+    // Collect claims for new token
+    claims:add(targetClaims, mappedRoles, nameClaim);
+    
+    // Set correct issuer
+    claims:updateIssuer(targetClaims, claimsParameters.stsProperties.issuer);
+    
+    // Return new claims
+    return targetClaims;
+}
