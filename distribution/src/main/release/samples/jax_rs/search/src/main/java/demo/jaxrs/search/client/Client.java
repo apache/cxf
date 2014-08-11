@@ -40,8 +40,11 @@ public final class Client {
         final HttpClient httpClient = new HttpClient();
                         
         uploadToCatalog(url, httpClient, "jsr339-jaxrs-2.0-final-spec.pdf");
-        uploadToCatalog(url, httpClient, "JavaWebSocketAPI_1.0_Final.pdf");
-        list(url, httpClient);
+        uploadToCatalog(url, httpClient, "JavaWebSocketAPI_1.0_Final.pdf");              
+        
+        list(url, httpClient);        
+        
+        search(url, httpClient, "ct==java");        
     }
 
     private static void list(final String url, final HttpClient httpClient) 
@@ -59,6 +62,25 @@ public final class Client {
             get.releaseConnection();
         }
     }
+    
+    private static void search(final String url, final HttpClient httpClient, final String expression) 
+        throws IOException, HttpException {
+            
+        System.out.println("Sent HTTP GET request to search the books in catalog: " + expression);
+        
+        final GetMethod get = new GetMethod(url + "/search");
+        get.setQueryString("$filter=" + expression);
+        
+        try {
+            int status = httpClient.executeMethod(get);
+            if (status == 200) {   
+                System.out.println(get.getResponseBodyAsString());
+            }
+        } finally {
+            get.releaseConnection();
+        }
+    }
+    
 
     private static void uploadToCatalog(final String url, final HttpClient httpClient,
             final String filename) throws IOException, HttpException {

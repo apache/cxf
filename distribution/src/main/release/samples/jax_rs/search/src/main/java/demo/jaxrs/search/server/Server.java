@@ -40,6 +40,7 @@ public class Server {
         properties.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy/MM/dd");
 
         final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setProperties(properties);
         sf.setResourceClasses(Catalog.class);
         sf.setResourceProvider(Catalog.class, new SingletonResourceProvider(new Catalog()));
         sf.setAddress("http://localhost:9000/");

@@ -22,8 +22,6 @@ package demo.jaxrs.search.server;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,6 +61,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
@@ -73,8 +72,7 @@ public class Catalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());    
     private final Directory directory = new RAMDirectory();
     private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-    private final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
-    private final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
+    private final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);    
     
     public Catalog() throws IOException {
         initIndex();
@@ -129,11 +127,12 @@ public class Catalog {
             final Query query = new MatchAllDocsQuery();
             
             for (final ScoreDoc scoreDoc: searcher.search(query, 1000).scoreDocs) {
-                final DocumentStoredFieldVisitor fieldVisitor = 
+                final DocumentStoredFieldVisitor visitor = 
                     new DocumentStoredFieldVisitor("source");
                 
-                reader.document(scoreDoc.doc, fieldVisitor);
-                builder.add(fieldVisitor.getDocument().getField("source").stringValue());
+                
+                reader.document(scoreDoc.doc, visitor);
+                builder.add(visitor.getDocument().getField("source").stringValue());
             }
             
             return builder.build();
@@ -145,13 +144,27 @@ public class Catalog {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/search")
-    public Collection<ScoreDoc> findBook(@Context SearchContext searchContext) throws IOException {
+    public JsonArray findBook(@Context SearchContext searchContext) throws IOException {
         final IndexReader reader = DirectoryReader.open(directory);
         final IndexSearcher searcher = new IndexSearcher(reader);
+        final JsonArrayBuilder builder = Json.createArrayBuilder();
 
-        try {
+        try {            
+            final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
             visitor.visit(searchContext.getCondition(SearchBean.class));
-            return Arrays.asList(searcher.search(visitor.getQuery(), null, 1000).scoreDocs);
+            
+            final TopDocs topDocs = searcher.search(visitor.getQuery(), 1000);
+            for (final ScoreDoc scoreDoc: topDocs.scoreDocs) {
+                final Document document = reader.document(scoreDoc.doc);
+                
+                builder.add(
+                    Json.createObjectBuilder()
+                        .add("source", document.getField("source").stringValue())
+                        .add("score", scoreDoc.score)
+                );
+            }
+            
+            return builder.build();
         } finally {
             reader.close();
         }
@@ -174,7 +187,7 @@ public class Catalog {
     private void initIndex() throws IOException {
         final IndexWriter writer = new IndexWriter(directory, config);
         
-        try {            
+        try {
             writer.commit();
         } finally {
             writer.close();
