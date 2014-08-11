@@ -20,14 +20,9 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 
 import java.security.Key;
 
-import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersReader;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public class WrappedKeyJweDecryption extends AbstractJweDecryption {
-    private Key cekDecryptionKey;
-    private boolean unwrap;
     public WrappedKeyJweDecryption(Key cekDecryptionKey) {    
         this(cekDecryptionKey, true);
     }
@@ -43,30 +38,11 @@ public class WrappedKeyJweDecryption extends AbstractJweDecryption {
     }
     public WrappedKeyJweDecryption(Key cekDecryptionKey, boolean unwrap,
                                    JweCryptoProperties props, JwtHeadersReader reader) {    
-        super(props, reader);
-        this.cekDecryptionKey = cekDecryptionKey;
-        this.unwrap = unwrap;
+        this(new WrappedKeyDecryptionAlgorithm(cekDecryptionKey, unwrap),
+             props, reader);
     }
-    protected byte[] getContentEncryptionKey(JweCompactConsumer consumer) {
-        KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm(consumer));
-        if (!unwrap) {
-            keyProps.setBlockSize(getKeyCipherBlockSize());
-            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(consumer), 
-                                            getCekDecryptionKey(), keyProps);
-        } else {
-            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(consumer), 
-                                               getContentEncryptionAlgorithm(consumer), 
-                                               getCekDecryptionKey(), 
-                                               keyProps).getEncoded();
-        }
-    }
-    protected Key getCekDecryptionKey() {
-        return cekDecryptionKey;
-    }
-    protected int getKeyCipherBlockSize() {
-        return -1;
-    }
-    protected String getKeyEncryptionAlgorithm(JweCompactConsumer consumer) {
-        return Algorithm.toJavaName(consumer.getJweHeaders().getKeyEncryptionAlgorithm());
+    public WrappedKeyJweDecryption(WrappedKeyDecryptionAlgorithm keyDecryptionAlgo,
+                                   JweCryptoProperties props, JwtHeadersReader reader) {    
+        super(props, reader, keyDecryptionAlgo);
     }
 }

@@ -18,28 +18,28 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.crypto.SecretKey;
-
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
-public class AesWrapKeyAlgorithm extends AbstractWrapKeyAlgorithm {
+public class RSAOaepKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgorithm {
     private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.A128KW.getJwtName(),
-                      Algorithm.A192KW.getJwtName(),
-                      Algorithm.A256KW.getJwtName()));
-    public AesWrapKeyAlgorithm(byte[] keyBytes, String keyAlgoJwt) {
-        this(CryptoUtils.createSecretKeySpec(keyBytes, Algorithm.toJavaName(keyAlgoJwt)),
-             keyAlgoJwt);
+        Arrays.asList(Algorithm.RSA_OAEP.getJwtName(),
+                      Algorithm.RSA_OAEP_256.getJwtName()));
+    public RSAOaepKeyEncryptionAlgorithm(RSAPublicKey publicKey) {
+        this(publicKey, null, true);
     }
-    public AesWrapKeyAlgorithm(SecretKey key, String keyAlgoJwt) {
-        super(key, keyAlgoJwt, SUPPORTED_ALGORITHMS);
+    public RSAOaepKeyEncryptionAlgorithm(RSAPublicKey publicKey, boolean wrap) {
+        this(publicKey, null, wrap);
     }
-    
-    
+    public RSAOaepKeyEncryptionAlgorithm(RSAPublicKey publicKey, String jweAlgo) {
+        this(publicKey, jweAlgo, true);
+    }
+    public RSAOaepKeyEncryptionAlgorithm(RSAPublicKey publicKey, String jweAlgo, boolean wrap) {
+        super(publicKey, jweAlgo, wrap, SUPPORTED_ALGORITHMS);
+    }
     
 }

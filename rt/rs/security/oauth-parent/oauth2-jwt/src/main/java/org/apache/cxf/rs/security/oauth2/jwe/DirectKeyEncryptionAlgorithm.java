@@ -18,20 +18,12 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.security.Key;
 
-import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersReader;
-
-public class DirectKeyJweDecryption extends AbstractJweDecryption {
-    public DirectKeyJweDecryption(Key contentDecryptionKey) {    
-        this(contentDecryptionKey, null);
+public class DirectKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
+    public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
+        if (headers.getKeyEncryptionAlgorithm() != null) {
+            throw new SecurityException();
+        }
+        return new byte[0];
     }
-    public DirectKeyJweDecryption(Key contentDecryptionKey, JweCryptoProperties props) {    
-        this(contentDecryptionKey, props, null);
-    }
-    public DirectKeyJweDecryption(Key contentDecryptionKey, JweCryptoProperties props, 
-                                  JwtHeadersReader reader) {    
-        super(props, reader, new DirectKeyDecryptionAlgorithm(contentDecryptionKey));
-    }
-    
 }

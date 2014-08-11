@@ -30,15 +30,21 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public abstract class AbstractJweDecryption implements JweDecryption {
     private JweCryptoProperties props;
+    private KeyDecryptionAlgorithm keyDecryptionAlgo;
     private JwtHeadersReader reader = new JwtTokenReaderWriter();
-    protected AbstractJweDecryption(JweCryptoProperties props, JwtHeadersReader thereader) {
+    protected AbstractJweDecryption(JweCryptoProperties props, 
+                                    JwtHeadersReader theReader,
+                                    KeyDecryptionAlgorithm keyDecryptionAlgo) {
         this.props = props;
-        if (thereader != null) {
-            reader = thereader;
+        if (theReader != null) {
+            reader = theReader;
         }
+        this.keyDecryptionAlgo = keyDecryptionAlgo;
     }
     
-    protected abstract byte[] getContentEncryptionKey(JweCompactConsumer consumer);
+    protected byte[] getContentEncryptionKey(JweCompactConsumer consumer) {
+        return this.keyDecryptionAlgo.getDecryptedContentEncryptionKey(consumer);
+    }
     
     public JweDecryptionOutput decrypt(String content) {
         JweCompactConsumer consumer = new JweCompactConsumer(content, reader);
