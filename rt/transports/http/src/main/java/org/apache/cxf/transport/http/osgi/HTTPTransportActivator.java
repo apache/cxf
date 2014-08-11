@@ -138,6 +138,8 @@ public class HTTPTransportActivator
                        getProp(properties, "org.apache.cxf.servlet.service-list-page-authenticate", "false"));
             sprops.put("service-list-page-authenticate-realm", 
                        getProp(properties, "org.apache.cxf.servlet.service-list-page-authenticate-realm", "karaf"));
+            sprops.put("use-x-forwarded-headers", 
+                       getProp(properties, "org.apache.cxf.servlet.use-x-forwarded-headers", "false"));
             context.registerService(Servlet.class.getName(), servlet, sprops);
         }
 
