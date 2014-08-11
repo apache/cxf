@@ -76,6 +76,9 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     private static final String REDIRECT_SERVLET_PATH_PARAMETER = "redirect-servlet-path";
     private static final String REDIRECT_ATTRIBUTES_PARAMETER = "redirect-attributes";
     private static final String REDIRECT_QUERY_CHECK_PARAMETER = "redirect-query-check";
+    private static final String USE_X_FORWARDED_HEADERS_PARAMETER = "use-x-forwarded-headers";
+    private static final String X_FORWARDED_PROTO_HEADER = "X-Forwarded-Proto";
+    private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
     
     private static final Map<String, String> DEFAULT_STATIC_CONTENT_TYPES;
     
@@ -98,19 +101,19 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     private Map<String, String> staticContentTypes = 
         new HashMap<String, String>(DEFAULT_STATIC_CONTENT_TYPES);
     private boolean redirectQueryCheck;
+    private boolean useXForwardedHeaders; 
     
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
 
         staticResourcesList = parseListSequence(servletConfig.getInitParameter(STATIC_RESOURCES_PARAMETER));
         staticWelcomeFile = servletConfig.getInitParameter(STATIC_WELCOME_FILE_PARAMETER);
-        
         redirectList = parseListSequence(servletConfig.getInitParameter(REDIRECTS_PARAMETER));
         redirectQueryCheck = Boolean.valueOf(servletConfig.getInitParameter(REDIRECT_QUERY_CHECK_PARAMETER));
         dispatcherServletName = servletConfig.getInitParameter(REDIRECT_SERVLET_NAME_PARAMETER);
         dispatcherServletPath = servletConfig.getInitParameter(REDIRECT_SERVLET_PATH_PARAMETER);
-        
         redirectAttributes = parseMapSequence(servletConfig.getInitParameter(REDIRECT_ATTRIBUTES_PARAMETER));
+        useXForwardedHeaders = Boolean.valueOf(servletConfig.getInitParameter(USE_X_FORWARDED_HEADERS_PARAMETER));
     }
     
     protected void finalizeServletInit(ServletConfig servletConfig) {
@@ -283,8 +286,23 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                                staticWelcomeFileMatch ? staticWelcomeFile : request.getPathInfo());
             return;
         }
+        request = checkXForwardedHeaders(request);
         invoke(request, response);
     }
+    
+    protected HttpServletRequest checkXForwardedHeaders(HttpServletRequest request) {
+        if (useXForwardedHeaders) {
+            String originalProto = request.getHeader(X_FORWARDED_PROTO_HEADER);
+            String originalIp = request.getHeader(X_FORWARDED_FOR_HEADER);
+            if (originalProto != null || originalIp != null) {
+                return new HttpServletRequestXForwardedFilter(request, originalProto, originalIp); 
+            }
+        } 
+        
+        return request;
+        
+    }
+    
     
     private boolean matchPath(List<Pattern> values, HttpServletRequest request) {
         String path = request.getPathInfo();
@@ -357,8 +375,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             for (Map.Entry<String, String> entry : redirectAttributes.entrySet()) {
                 request.setAttribute(entry.getKey(), entry.getValue());
             }
-            HttpServletRequestFilter servletRequest = 
-                new HttpServletRequestFilter(request, pathInfo, theServletPath, customServletPath);
+            HttpServletRequest servletRequest = 
+                new HttpServletRequestRedirectFilter(request, pathInfo, theServletPath, customServletPath);
             rd.forward(servletRequest, response);
         } catch (Throwable ex) {
             throw new ServletException("RequestDispatcher for path " + pathInfo + " has failed", ex);
@@ -369,12 +387,12 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     protected abstract void invoke(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException;
     
-    private static class HttpServletRequestFilter extends HttpServletRequestWrapper {
+    private static class HttpServletRequestRedirectFilter extends HttpServletRequestWrapper {
         
         private String pathInfo;
         private String servletPath;
         
-        public HttpServletRequestFilter(HttpServletRequest request, 
+        public HttpServletRequestRedirectFilter(HttpServletRequest request, 
                                         String pathInfo,
                                         String servletPath,
                                         boolean customServletPath) {
@@ -417,6 +435,50 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             }
             return super.getAttribute(name);
         }
+    }
+    private static class HttpServletRequestXForwardedFilter extends HttpServletRequestWrapper {
+        
+        private String originalProto;
+        private String originalClientIp;
+        
+        public HttpServletRequestXForwardedFilter(HttpServletRequest request, 
+                                                  String originalProto, 
+                                                  String originalIp) {
+            super(request);
+            this.originalProto = originalProto;
+            if (originalIp != null) {
+                originalClientIp = (originalIp.split(",")[0]).trim();
+            }
+        }
+        @Override
+        public boolean isSecure() {
+            if (originalProto != null) {
+                return "https".equals(originalProto);
+            } else {
+                return super.isSecure();
+            }
+        }
+        @Override
+        public StringBuffer getRequestURL() {
+            StringBuffer buf = super.getRequestURL();
+            if (originalProto != null && isSecure()) {
+                String str = buf.toString();
+                if (str.startsWith("http:")) {
+                    buf = new StringBuffer();
+                    buf.append("https").append(str.substring(4));
+                }
+            }
+            return buf;
+        }
+        @Override
+        public String getRemoteAddr() {
+            if (originalClientIp != null) {
+                return originalClientIp;
+            } else {
+                return super.getRemoteAddr();
+            }
+        }
+        
     }
 
 }
