@@ -20,20 +20,22 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-//import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
@@ -56,6 +58,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.StaxUtils.StreamToDOMContext;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 
@@ -179,75 +182,72 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     doc = (Document)nd;
                     StaxUtils.readDocElements(doc, doc, filteredReader, false, false);
                 } else {
-                    doc = StaxUtils.read(filteredReader);
-                    message.setContent(Node.class, doc);
+                    HeadersProcessor processor = new HeadersProcessor(soapVersion);
+                    doc = processor.process(filteredReader);
+                    if (doc != null) {
+                        message.setContent(Node.class, doc);
+                    }
                 }
 
                 // Find header
-                // TODO - we could stream read the "known" headers and just DOM read the 
-                // unknown ones
-                Element element = doc.getDocumentElement();
-                QName header = soapVersion.getHeader();                
-                List<Element> elemList = 
-                    DOMUtils.findAllElementsByTagNameNS(element, 
-                                                        header.getNamespaceURI(), 
-                                                        header.getLocalPart());
-                for (Element elem : elemList) {
-                    Element hel = DOMUtils.getFirstElement(elem);
-                    while (hel != null) {
-                        // Need to add any attributes that are present on the parent element
-                        // which otherwise would be lost.
-                        if (elem.hasAttributes()) {
-                            NamedNodeMap nnp = elem.getAttributes();
-                            for (int ct = 0; ct < nnp.getLength(); ct++) {
-                                Node attr = nnp.item(ct);
-                                Node headerAttrNode = hel.hasAttributes() 
-                                        ?  hel.getAttributes().getNamedItemNS(
-                                                        attr.getNamespaceURI(), attr.getLocalName()) 
-                                        : null;
-                                
-                                if (headerAttrNode == null) {
-                                    Attr attribute = hel.getOwnerDocument().createAttributeNS(
-                                            attr.getNamespaceURI(), 
-                                            attr.getNodeName());
-                                    attribute.setNodeValue(attr.getNodeValue());
-                                    hel.setAttributeNodeNS(attribute);
+                if (doc != null) {
+                    Element element = doc.getDocumentElement();
+                    QName header = soapVersion.getHeader();
+                    List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element,
+                                                                                 header.getNamespaceURI(),
+                                                                                 header.getLocalPart());
+                    for (Element elem : elemList) {
+                        Element hel = DOMUtils.getFirstElement(elem);
+                        while (hel != null) {
+                            // Need to add any attributes that are present on the parent element
+                            // which otherwise would be lost.
+                            if (elem.hasAttributes()) {
+                                NamedNodeMap nnp = elem.getAttributes();
+                                for (int ct = 0; ct < nnp.getLength(); ct++) {
+                                    Node attr = nnp.item(ct);
+                                    Node headerAttrNode = hel.hasAttributes() ? hel.getAttributes()
+                                        .getNamedItemNS(attr.getNamespaceURI(), attr.getLocalName()) : null;
+
+                                    if (headerAttrNode == null) {
+                                        Attr attribute = hel.getOwnerDocument()
+                                            .createAttributeNS(attr.getNamespaceURI(), attr.getNodeName());
+                                        attribute.setNodeValue(attr.getNodeValue());
+                                        hel.setAttributeNodeNS(attribute);
+                                    }
                                 }
                             }
-                        }
-                        
-                        HeaderProcessor p = bus == null ? null : bus.getExtension(HeaderManager.class)
-                            .getHeaderProcessor(hel.getNamespaceURI());
 
-                        Object obj;
-                        DataBinding dataBinding = null;
-                        if (p == null || p.getDataBinding() == null) {
-                            obj = hel;
-                        } else {
-                            dataBinding = p.getDataBinding();
-                            obj = dataBinding.createReader(Node.class).read(hel);
-                        }
-                        //TODO - add the interceptors
-                        
-                        SoapHeader shead = new SoapHeader(new QName(hel.getNamespaceURI(),
-                                                                    hel.getLocalName()),
-                                                           obj,
-                                                           dataBinding);
-                        String mu = hel.getAttributeNS(soapVersion.getNamespace(),
-                                                      soapVersion.getAttrNameMustUnderstand());
-                        String act = hel.getAttributeNS(soapVersion.getNamespace(),
-                                                        soapVersion.getAttrNameRole());
+                            HeaderProcessor p = bus == null ? null : bus.getExtension(HeaderManager.class)
+                                .getHeaderProcessor(hel.getNamespaceURI());
 
-                        if (!StringUtils.isEmpty(act)) {
-                            shead.setActor(act);
+                            Object obj;
+                            DataBinding dataBinding = null;
+                            if (p == null || p.getDataBinding() == null) {
+                                obj = hel;
+                            } else {
+                                dataBinding = p.getDataBinding();
+                                obj = dataBinding.createReader(Node.class).read(hel);
+                            }
+                            // TODO - add the interceptors
+
+                            SoapHeader shead = new SoapHeader(new QName(hel.getNamespaceURI(),
+                                                                        hel.getLocalName()), obj, dataBinding);
+                            String mu = hel.getAttributeNS(soapVersion.getNamespace(),
+                                                           soapVersion.getAttrNameMustUnderstand());
+                            String act = hel.getAttributeNS(soapVersion.getNamespace(),
+                                                            soapVersion.getAttrNameRole());
+
+                            if (!StringUtils.isEmpty(act)) {
+                                shead.setActor(act);
+                            }
+                            shead.setMustUnderstand(Boolean.valueOf(mu) || "1".equals(mu));
+                            // mark header as inbound header.(for distinguishing between the direction to
+                            // avoid piggybacking of headers from request->server->response.
+                            shead.setDirection(SoapHeader.Direction.DIRECTION_IN);
+                            message.getHeaders().add(shead);
+
+                            hel = DOMUtils.getNextElement(hel);
                         }
-                        shead.setMustUnderstand(Boolean.valueOf(mu) || "1".equals(mu));
-                        //mark header as inbound header.(for distinguishing between the  direction to 
-                        //avoid piggybacking of headers from request->server->response.
-                        shead.setDirection(SoapHeader.Direction.DIRECTION_IN);
-                        message.getHeaders().add(shead);
-                        
-                        hel = DOMUtils.getNextElement(hel);
                     }
                 }
 
@@ -266,6 +266,108 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e, 
                                         message.getVersion().getSender());
                 }
+            }
+        }
+    }
+
+    /**
+     * A convenient class for parsing the message header stream into a DOM document;
+     * the document is created only if a SOAP Header is actually found, keeping the
+     * memory usage as low as possible (there's no reason for building the DOM doc
+     * here if there's actually no header in the message, but we need to figure that
+     * out while parsing the stream).
+     */
+    private static class HeadersProcessor {
+        private static final XMLEventFactory FACTORY = XMLEventFactory.newFactory();
+        private final QName soapVersionHeader;
+        private final List<XMLEvent> events = new ArrayList<XMLEvent>(8);
+        private StreamToDOMContext context;
+        private Document doc;
+        private Node parent;
+
+        public HeadersProcessor(SoapVersion version) {
+            this.soapVersionHeader = version.getHeader();
+        }
+
+        public Document process(XMLStreamReader reader) throws XMLStreamException {
+            // number of elements read in
+            int read = 0;
+            int event = reader.getEventType();
+            while (reader.hasNext()) {
+                switch (event) {
+                case XMLStreamConstants.START_ELEMENT:
+                    read++;
+                    addEvent(FACTORY.createStartElement(new QName(reader.getNamespaceURI(), reader
+                                                            .getLocalName(), reader.getPrefix()), null, null));
+                    for (int i = 0; i < reader.getNamespaceCount(); i++) {
+                        addEvent(FACTORY.createNamespace(reader.getNamespacePrefix(i),
+                                                         reader.getNamespaceURI(i)));
+                    }
+                    for (int i = 0; i < reader.getAttributeCount(); i++) {
+                        addEvent(FACTORY.createAttribute(reader.getAttributePrefix(i),
+                                                         reader.getAttributeNamespace(i),
+                                                         reader.getAttributeLocalName(i),
+                                                         reader.getAttributeValue(i)));
+                    }
+                    if (doc != null) {
+                        //go on parsing the stream directly till the end and stop generating events
+                        StaxUtils.readDocElements(doc, parent, reader, context);
+                    }
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    if (read > 0) {
+                        addEvent(FACTORY.createEndElement(new QName(reader.getNamespaceURI(), reader
+                                                              .getLocalName(), reader.getPrefix()), null));
+                    }
+                    read--;
+                    break;
+                case XMLStreamConstants.CHARACTERS:
+                    String s = reader.getText();
+                    if (s != null) {
+                        addEvent(FACTORY.createCharacters(s));
+                    }
+                    break;
+                case XMLStreamConstants.COMMENT:
+                    addEvent(FACTORY.createComment(reader.getText()));
+                    break;
+                case XMLStreamConstants.CDATA:
+                    addEvent(FACTORY.createCData(reader.getText()));
+                    break;
+                case XMLStreamConstants.START_DOCUMENT:
+                case XMLStreamConstants.END_DOCUMENT:
+                case XMLStreamConstants.ATTRIBUTE:
+                case XMLStreamConstants.NAMESPACE:
+                    break;
+                default:
+                    break;
+                }
+                event = reader.next();
+            }
+
+            return doc;
+        }
+
+        private void addEvent(XMLEvent event) {
+            if (event.isStartElement()) {
+                QName qName = event.asStartElement().getName();
+                if (soapVersionHeader.getLocalPart().equals(qName.getLocalPart())
+                    && soapVersionHeader.getNamespaceURI().equals(qName.getNamespaceURI())) {
+                    // process all events recorded so far
+                    context = new StreamToDOMContext(true, false, false);
+                    doc = DOMUtils.createDocument();
+                    parent = doc;
+                    try {
+                        for (XMLEvent ev : events) {
+                            parent = StaxUtils.readDocElement(doc, parent, ev, context);
+                        }
+                    } catch (XMLStreamException e) {
+                        throw new Fault(e);
+                    }
+                } else {
+                    events.add(event);
+                }
+            } else {
+                events.add(event);
             }
         }
     }
