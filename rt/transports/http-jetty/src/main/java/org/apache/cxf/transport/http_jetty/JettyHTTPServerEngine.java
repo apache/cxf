@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.Writer;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -34,7 +35,10 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509KeyManager;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -49,15 +53,19 @@ import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
+import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.session.HashSessionIdManager;
 import org.eclipse.jetty.server.session.HashSessionManager;
@@ -336,6 +344,29 @@ public class JettyHTTPServerEngine
         }
         if (s == null) {
             s = new Server();
+        }
+        if (!Server.getVersion().startsWith("8")) {
+            //need an error handler that won't leak information about the exception 
+            //back to the client.
+            ErrorHandler eh = new ErrorHandler() {
+                @SuppressWarnings("deprecation")
+                public void handle(String target, Request baseRequest, 
+                                   HttpServletRequest request, HttpServletResponse response) 
+                    throws IOException {
+                    String msg = HttpStatus.getMessage(response.getStatus());
+                    request.setAttribute(RequestDispatcher.ERROR_MESSAGE, msg);
+                    if (response instanceof Response) {
+                        ((Response)response).setStatus(response.getStatus(), msg);
+                    }
+                    super.handle(target, baseRequest, request, response);
+                }
+                protected void writeErrorPage(HttpServletRequest request, Writer writer, int code,
+                                              String message, boolean showStacks)
+                    throws IOException {
+                    super.writeErrorPage(request, writer, code, message, false);
+                }
+            };
+            s.addBean(eh);
         }
         return s;
     }

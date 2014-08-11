@@ -805,9 +805,22 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testPropogateException() throws Exception {
-        getAndCompare("http://localhost:" + PORT + "/bookstore/propagate-exception",
-                      "Error: 500", "application/xml", 500);
+    public void testPropogateException() throws Exception {       
+        GetMethod get = new GetMethod("http://localhost:" + PORT + "/bookstore/propagate-exception");
+        get.setRequestHeader("Accept", "application/xml");
+        get.addRequestHeader("Cookie", "a=b;c=d");
+        get.addRequestHeader("Cookie", "e=f");
+        get.setRequestHeader("Accept-Language", "da;q=0.8,en");
+        get.setRequestHeader("Book", "1,2,3");
+        HttpClient httpClient = new HttpClient();
+        try {
+            int result = httpClient.executeMethod(get);
+            assertEquals(500, result);
+            String content = getStringFromInputStream(get.getResponseBodyAsStream());
+            assertTrue(content.contains("Error") && content.contains("500"));
+        } finally {
+            get.releaseConnection();
+        }        
     }
     
     @Test
@@ -1643,7 +1656,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testEmptyResponseProxyNullable() {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
-        WebClient.getConfig(store).getInInterceptors().add(new ReplaceStatusInterceptor());
         assertNull(store.getEmptyBookNullable());
     }
     
