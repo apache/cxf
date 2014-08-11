@@ -450,12 +450,33 @@ public class WadlGenerator implements ContainerRequestFilter {
         return change ? builder.toString() : value;
     }
     
-    private void startMethodTag(StringBuilder sb, OperationResourceInfo ori) {
+    protected void startMethodTag(StringBuilder sb, OperationResourceInfo ori) {
         sb.append("<method name=\"").append(ori.getHttpMethod()).append("\"");
         if (addResourceAndMethodIds) {
             sb.append(" id=\"").append(getMethod(ori).getName()).append("\"");
         }
         sb.append(">");
+    }
+    protected void endMethodTag(StringBuilder sb, OperationResourceInfo ori) {
+        sb.append("</method>");
+    }
+    protected void startMethodRequestTag(StringBuilder sb, OperationResourceInfo ori) {
+        sb.append("<request>");
+    }
+    protected void startMethodResponseTag(StringBuilder sb, OperationResourceInfo ori) {
+        sb.append("<response");
+    }
+    protected void endMethodRequestTag(StringBuilder sb, OperationResourceInfo ori) {
+        sb.append("</request>");
+    }
+    protected void endMethodResponseTag(StringBuilder sb, OperationResourceInfo ori) {
+        sb.append("</response>");
+    }
+    protected void startResourceTag(StringBuilder sb, OperationResourceInfo ori, String path) {
+        sb.append("<resource path=\"").append(path).append("\">");
+    }
+    protected void endResourceTag(StringBuilder sb, OperationResourceInfo ori) {
+        sb.append("</resource>");
     }
 
     // CHECKSTYLE:OFF
@@ -478,7 +499,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                     path = path.substring(1);
                 }
             }
-            sb.append("<resource path=\"").append(getPath(path)).append("\">");
+            startResourceTag(sb, ori, getPath(path));
             handleDocs(anns, sb, DocTarget.RESOURCE, false, isJson);
             handlePathAndMatrixClassParams(ori, sb, classParams, isJson);
             handlePathAndMatrixParams(sb, ori, isJson);
@@ -492,7 +513,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             handleOperJavaDocs(ori, sb);
         }
         if (getMethod(ori).getParameterTypes().length != 0 || classParams.size() != 0) {
-            sb.append("<request>");
+            startMethodRequestTag(sb, ori);
             handleDocs(anns, sb, DocTarget.REQUEST, false, isJson);
 
             boolean isForm = isFormRequest(ori);
@@ -507,9 +528,9 @@ public class WadlGenerator implements ContainerRequestFilter {
             if (isForm) {
                 handleFormRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, getFormClass(ori), isJson);
             }
-            sb.append("</request>");
+            endMethodRequestTag(sb, ori);
         }
-        sb.append("<response");
+        startMethodResponseTag(sb, ori);
         Class<?> returnType = getMethod(ori).getReturnType();
         boolean isVoid = void.class == returnType;
         if (isVoid) {
@@ -521,12 +542,12 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (!isVoid) {
             handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, returnType, isJson, false);
         }
-        sb.append("</response>");
+        endMethodResponseTag(sb, ori);
 
-        sb.append("</method>");
+        endMethodTag(sb, ori);
 
         if (resourceTagOpened && !samePathOperationFollows) {
-            sb.append("</resource>");
+            endResourceTag(sb, ori);
             resourceTagOpened = false;
         }
         return resourceTagOpened;
