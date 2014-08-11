@@ -26,21 +26,22 @@ import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
-public abstract class AbstractWrapKeyAlgorithm implements KeyEncryptionAlgorithm {
+public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
     private Key keyEncryptionKey;
     private boolean wrap;
     private String algorithm;
     private Set<String> supportedAlgorithms;
-    protected AbstractWrapKeyAlgorithm(Key key, Set<String> supportedAlgorithms) {
+    protected AbstractWrapKeyEncryptionAlgorithm(Key key, Set<String> supportedAlgorithms) {
         this(key, null, true, supportedAlgorithms);
     }
-    protected AbstractWrapKeyAlgorithm(Key key, boolean wrap, Set<String> supportedAlgorithms) {
+    protected AbstractWrapKeyEncryptionAlgorithm(Key key, boolean wrap, Set<String> supportedAlgorithms) {
         this(key, null, wrap, supportedAlgorithms);
     }
-    protected AbstractWrapKeyAlgorithm(Key key, String jweAlgo, Set<String> supportedAlgorithms) {
+    protected AbstractWrapKeyEncryptionAlgorithm(Key key, String jweAlgo, Set<String> supportedAlgorithms) {
         this(key, jweAlgo, true, supportedAlgorithms);
     }
-    protected AbstractWrapKeyAlgorithm(Key key, String jweAlgo, boolean wrap, Set<String> supportedAlgorithms) {
+    protected AbstractWrapKeyEncryptionAlgorithm(Key key, String jweAlgo, boolean wrap, 
+                                                 Set<String> supportedAlgorithms) {
         this.keyEncryptionKey = key;
         this.algorithm = jweAlgo;
         this.wrap = wrap;

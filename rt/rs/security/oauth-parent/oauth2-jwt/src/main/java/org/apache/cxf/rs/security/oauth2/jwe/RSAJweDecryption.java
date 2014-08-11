@@ -31,10 +31,8 @@ public class RSAJweDecryption extends WrappedKeyJweDecryption {
     }
     public RSAJweDecryption(RSAPrivateKey privateKey, boolean unwrap,
                            JweCryptoProperties props) {    
-        super(privateKey, unwrap, props);
+        super(new RSAOaepKeyDecryptionAlgorithm(privateKey, unwrap), props, null);
     }
     
-    protected int getKeyCipherBlockSize() {
-        return ((RSAPrivateKey)getCekDecryptionKey()).getModulus().toByteArray().length;
-    }
+    
 }

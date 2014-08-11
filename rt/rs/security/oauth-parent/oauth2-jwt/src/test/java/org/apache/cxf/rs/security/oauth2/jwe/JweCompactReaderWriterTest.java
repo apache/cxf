@@ -99,8 +99,9 @@ public class JweCompactReaderWriterTest extends Assert {
         headers.setAlgorithm(Algorithm.A128KW.getJwtName());
         headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
         
-        AesWrapKeyAlgorithm keyEncryption = new AesWrapKeyAlgorithm(Base64UrlUtility.decode(KEY_ENCRYPTION_KEY_A3), 
-                                                                    Algorithm.A128KW.getJwtName());
+        AesWrapKeyEncryptionAlgorithm keyEncryption = 
+            new AesWrapKeyEncryptionAlgorithm(Base64UrlUtility.decode(KEY_ENCRYPTION_KEY_A3), 
+                                    Algorithm.A128KW.getJwtName());
         JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers,
                                                            CONTENT_ENCRYPTION_KEY_A3, 
                                                            INIT_VECTOR_A3,

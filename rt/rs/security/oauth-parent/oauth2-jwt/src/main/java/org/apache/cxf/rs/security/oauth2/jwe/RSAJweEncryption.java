@@ -30,7 +30,7 @@ public class RSAJweEncryption extends WrappedKeyJweEncryption {
                             String contentEncryptionJwtAlgo) {
         super(new JweHeaders(keyEncryptionJwtAlgo,
                              contentEncryptionJwtAlgo), 
-              new RSAOaepKeyEncryption(publicKey, keyEncryptionJwtAlgo));
+              new RSAOaepKeyEncryptionAlgorithm(publicKey, keyEncryptionJwtAlgo));
     }
     public RSAJweEncryption(RSAPublicKey publicKey, JweHeaders headers, byte[] cek, byte[] iv) {
         this(publicKey, headers, cek, iv, true, null);
@@ -51,9 +51,9 @@ public class RSAJweEncryption extends WrappedKeyJweEncryption {
                             byte[] iv, 
                             boolean wrap,
                             JwtHeadersWriter writer) {
-        this(new RSAOaepKeyEncryption(publicKey, wrap), headers, cek, iv, writer);
+        this(new RSAOaepKeyEncryptionAlgorithm(publicKey, wrap), headers, cek, iv, writer);
     }
-    public RSAJweEncryption(RSAOaepKeyEncryption keyEncryptionAlgorithm, JweHeaders headers, byte[] cek, 
+    public RSAJweEncryption(RSAOaepKeyEncryptionAlgorithm keyEncryptionAlgorithm, JweHeaders headers, byte[] cek, 
                             byte[] iv, JwtHeadersWriter writer) {
         super(headers, cek, iv, keyEncryptionAlgorithm, writer);
     }

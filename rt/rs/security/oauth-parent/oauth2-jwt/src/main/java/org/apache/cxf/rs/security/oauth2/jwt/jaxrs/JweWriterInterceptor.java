@@ -44,7 +44,7 @@ import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptionState;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
 import org.apache.cxf.rs.security.oauth2.jwe.JweOutputStream;
-import org.apache.cxf.rs.security.oauth2.jwe.RSAOaepKeyEncryption;
+import org.apache.cxf.rs.security.oauth2.jwe.RSAOaepKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryption;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
@@ -130,7 +130,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 headers.setZipAlgorithm(compression);
             }
             
-            return new WrappedKeyJweEncryption(headers, new RSAOaepKeyEncryption((RSAPublicKey)pk));
+            return new WrappedKeyJweEncryption(headers, new RSAOaepKeyEncryptionAlgorithm((RSAPublicKey)pk));
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {

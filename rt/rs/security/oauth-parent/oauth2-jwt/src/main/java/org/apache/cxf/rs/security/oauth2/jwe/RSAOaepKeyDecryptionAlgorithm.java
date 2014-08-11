@@ -18,12 +18,16 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import java.security.interfaces.RSAPrivateKey;
 
-public class DirectKeyAlgorithm implements KeyEncryptionAlgorithm {
-    public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
-        if (headers.getKeyEncryptionAlgorithm() != null) {
-            throw new SecurityException();
-        }
-        return new byte[0];
+public class RSAOaepKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
+    public RSAOaepKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {    
+        this(privateKey, true);
+    }
+    public RSAOaepKeyDecryptionAlgorithm(RSAPrivateKey privateKey, boolean unwrap) {    
+        super(privateKey, unwrap);
+    }
+    protected int getKeyCipherBlockSize() {
+        return ((RSAPrivateKey)getCekDecryptionKey()).getModulus().toByteArray().length;
     }
 }
