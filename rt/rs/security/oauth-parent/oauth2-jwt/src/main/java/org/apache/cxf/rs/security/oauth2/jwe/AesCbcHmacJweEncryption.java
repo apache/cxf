@@ -159,7 +159,7 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
             return new IvParameterSpec(theIv);
         }
         @Override
-        public byte[] getAAD(JweHeaders theHeaders, JwtHeadersWriter writer) {
+        public byte[] getAdditionalAuthenticationData(String headersJson) {
             return null;
         }
     }

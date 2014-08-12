@@ -18,9 +18,22 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import java.security.spec.AlgorithmParameterSpec;
+
+import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
-interface ContentEncryptionAlgorithm extends ContentEncryptionCipherProperties {
-    byte[] getInitVector();
-    byte[] getContentEncryptionKey(JweHeaders headers);
+public abstract class AbstractContentEncryptionCipherProperties implements ContentEncryptionCipherProperties {
+    private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
+    private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
+    
+    public AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] theIv) {
+        return CryptoUtils.getContentEncryptionCipherSpec(getAuthTagLen(), theIv);
+    }
+    public byte[] getAdditionalAuthenticationData(String headersJson) {
+        return JweHeaders.toCipherAdditionalAuthData(headersJson);
+    }
+    protected int getAuthTagLen() {
+        return authTagLen;
+    }
 }

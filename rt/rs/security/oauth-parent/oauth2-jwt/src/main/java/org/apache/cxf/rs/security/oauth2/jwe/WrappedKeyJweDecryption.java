@@ -43,6 +43,11 @@ public class WrappedKeyJweDecryption extends AbstractJweDecryption {
     }
     public WrappedKeyJweDecryption(WrappedKeyDecryptionAlgorithm keyDecryptionAlgo,
                                    JweCryptoProperties props, JwtHeadersReader reader) {    
-        super(props, reader, keyDecryptionAlgo);
+        this(keyDecryptionAlgo, props, reader, new AesGcmContentDecryptionAlgorithm());
+    }
+    public WrappedKeyJweDecryption(WrappedKeyDecryptionAlgorithm keyDecryptionAlgo,
+                                   JweCryptoProperties props, JwtHeadersReader reader,
+                                   ContentEncryptionCipherProperties cipherProps) {    
+        super(props, reader, keyDecryptionAlgo, cipherProps);
     }
 }

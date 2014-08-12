@@ -20,7 +20,5 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 
 
 
-interface ContentEncryptionAlgorithm extends ContentEncryptionCipherProperties {
-    byte[] getInitVector();
-    byte[] getContentEncryptionKey(JweHeaders headers);
+public class AesGcmContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties {
 }
