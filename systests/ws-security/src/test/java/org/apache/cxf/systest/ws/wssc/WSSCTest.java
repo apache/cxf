@@ -27,10 +27,21 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.binding.soap.SoapBindingConstants;
+import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
+import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.ws.security.trust.STSUtils;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,14 +71,23 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
         final String prefix;
         final boolean streaming;
         final String port;
+        final boolean clearAction;
         
         public TestParam(String p, String port, boolean b) {
             prefix = p;
             this.port = port;
             streaming = b;
+            clearAction = false;
+        }
+        public TestParam(String p, String port, boolean b, boolean a) {
+            prefix = p;
+            this.port = port;
+            streaming = b;
+            clearAction = a;
         }
         public String toString() {
-            return prefix + ":" + port + ":" + (streaming ? "streaming" : "dom");
+            return prefix + ":" + port + ":" + (streaming ? "streaming" : "dom") 
+                + (clearAction ? "/no SOAPAction" : "");
         }
     }
     
@@ -204,6 +224,11 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             // {new TestParam("_XD_IPingService", STAX_PORT, true)},
             // {new TestParam("_XD-SEES_IPingService", STAX_PORT, true)},
             // {new TestParam("_XD-ES_IPingService", STAX_PORT, true)},
+            
+            {new TestParam("AC_IPingService", PORT, false, true)},
+            {new TestParam("AC_IPingService", PORT, true, true)},
+            {new TestParam("AC_IPingService", STAX_PORT, false, true)},
+            {new TestParam("AC_IPingService", STAX_PORT, true, true)},
         });
     }
     
@@ -243,6 +268,25 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             ((BindingProvider)port).getResponseContext().put(
                 SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
             );
+        }
+        if (test.clearAction) {
+            AbstractPhaseInterceptor<Message> clearActionInterceptor 
+                = new AbstractPhaseInterceptor<Message>(Phase.POST_LOGICAL) {
+                    public void handleMessage(Message message) throws Fault {
+                        STSClient client = STSUtils.getClient(message, "sct");
+                        client.getOutInterceptors().add(this);
+                        message.put(SecurityConstants.STS_CLIENT, client);
+                        String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
+                        if (s == null) {
+                            s = SoapActionInInterceptor.getSoapAction(message);
+                        }
+                        if (s != null && s.contains("RST/SCT")) {
+                            message.put(SoapBindingConstants.SOAP_ACTION, "");
+                        }
+                    }
+                };
+            clearActionInterceptor.addBefore(SoapPreProtocolOutInterceptor.class.getName());
+            ((Client)port).getOutInterceptors().add(clearActionInterceptor);
         }
 
         wssec.wssc.PingRequest params = new wssec.wssc.PingRequest();
