@@ -18,22 +18,19 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
-import java.security.spec.AlgorithmParameterSpec;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.crypto.SecretKey;
 
-import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
-public abstract class AbstractContentEncryptionAlgorithm implements ContentEncryptionAlgorithm {
+public abstract class AbstractContentEncryptionAlgorithm extends AbstractContentEncryptionCipherProperties
+    implements ContentEncryptionAlgorithm {
     private static final int DEFAULT_IV_SIZE = 128;
-    private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private byte[] cek;
     private byte[] iv;
     private AtomicInteger providedIvUsageCount;
-    private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
     protected AbstractContentEncryptionAlgorithm(SecretKey key, byte[] iv) { 
         this(key.getEncoded(), iv);    
     }
@@ -45,15 +42,8 @@ public abstract class AbstractContentEncryptionAlgorithm implements ContentEncry
         }    
     }
     
-    
     public byte[] getContentEncryptionKey(JweHeaders headers) {
         return cek;
-    }
-    public AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] theIv) {
-        return CryptoUtils.getContentEncryptionCipherSpec(getAuthTagLen(), theIv);
-    }
-    public byte[] getAAD(JweHeaders theHeaders, JwtHeadersWriter writer) {
-        return theHeaders.toCipherAdditionalAuthData(writer);
     }
     public byte[] getInitVector() {
         if (iv == null) {
@@ -63,9 +53,6 @@ public abstract class AbstractContentEncryptionAlgorithm implements ContentEncry
         } else {
             return iv;
         }
-    }
-    protected int getAuthTagLen() {
-        return authTagLen;
     }
     protected int getIvSize() { 
         return DEFAULT_IV_SIZE;

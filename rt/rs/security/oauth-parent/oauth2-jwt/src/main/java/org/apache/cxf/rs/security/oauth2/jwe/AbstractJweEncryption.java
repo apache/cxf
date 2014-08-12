@@ -85,7 +85,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         return DEFAULT_AUTH_TAG_LENGTH;
     }
     protected byte[] getAAD(JweHeaders theHeaders) {
-        return contentEncryptionAlgo.getAAD(theHeaders, writer);
+        return contentEncryptionAlgo.getAdditionalAuthenticationData(writer.headersToJson(theHeaders));
     }
     public String encrypt(byte[] content, String contentType) {
         JweEncryptionInternal state = getInternalState(contentType);

@@ -31,15 +31,18 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 public abstract class AbstractJweDecryption implements JweDecryption {
     private JweCryptoProperties props;
     private KeyDecryptionAlgorithm keyDecryptionAlgo;
+    private ContentEncryptionCipherProperties contentEncryptionProps;
     private JwtHeadersReader reader = new JwtTokenReaderWriter();
     protected AbstractJweDecryption(JweCryptoProperties props, 
                                     JwtHeadersReader theReader,
-                                    KeyDecryptionAlgorithm keyDecryptionAlgo) {
+                                    KeyDecryptionAlgorithm keyDecryptionAlgo,
+                                    ContentEncryptionCipherProperties contentEncryptionProps) {
         this.props = props;
         if (theReader != null) {
             reader = theReader;
         }
         this.keyDecryptionAlgo = keyDecryptionAlgo;
+        this.contentEncryptionProps = contentEncryptionProps;
     }
     
     protected byte[] getContentEncryptionKey(JweCompactConsumer consumer) {
@@ -73,14 +76,13 @@ public abstract class AbstractJweDecryption implements JweDecryption {
         return consumer.getEncryptedContentEncryptionKey();
     }
     protected AlgorithmParameterSpec getContentEncryptionCipherSpec(JweCompactConsumer consumer) {
-        return CryptoUtils.getContentEncryptionCipherSpec(getEncryptionAuthenticationTagLenBits(consumer), 
-                                                   getContentEncryptionCipherInitVector(consumer));
+        return contentEncryptionProps.getAlgorithmParameterSpec(getContentEncryptionCipherInitVector(consumer));
     }
     protected String getContentEncryptionAlgorithm(JweCompactConsumer consumer) {
         return Algorithm.toJavaName(consumer.getJweHeaders().getContentEncryptionAlgorithm());
     }
     protected byte[] getContentEncryptionCipherAAD(JweCompactConsumer consumer) {
-        return consumer.getContentEncryptionCipherAAD();
+        return contentEncryptionProps.getAdditionalAuthenticationData(consumer.getDecodedJsonHeaders());
     }
     protected byte[] getEncryptedContentWithAuthTag(JweCompactConsumer consumer) {
         return consumer.getEncryptedContentWithAuthTag();
