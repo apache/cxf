@@ -24,11 +24,21 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.binding.soap.SoapBindingConstants;
+import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
+import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.wssc.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.ws.security.trust.STSUtils;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -186,8 +196,17 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
     public void testXDESIPingService() throws Exception {
         runTest("_XD-ES_IPingService");
     }
+    
+    
+    @Test
+    public void testACIPingServiceNoAction() throws Exception {
+        runTest(true, "AC_IPingService");
+    }
 
-    private void runTest(String ... argv) throws Exception {
+    void runTest(String ... argv) throws Exception {
+        runTest(false, argv);
+    }
+    void runTest(boolean clearAction, String ... argv) throws Exception {
         for (String portPrefix : argv) {
             final wssec.wssc.IPingService port = 
                 svc.getPort(
@@ -211,6 +230,26 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
                 ((BindingProvider)port).getRequestContext()
                     .put(SecurityConstants.STS_TOKEN_DO_CANCEL, Boolean.TRUE);
             }
+            if (clearAction) {
+                AbstractPhaseInterceptor<Message> clearActionInterceptor
+                    = new AbstractPhaseInterceptor<Message>(Phase.POST_LOGICAL) {
+                        public void handleMessage(Message message) throws Fault {
+                            STSClient client = STSUtils.getClient(message, "sct");
+                            client.getOutInterceptors().add(this);
+                            message.put(SecurityConstants.STS_CLIENT, client);
+                            String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
+                            if (s == null) {
+                                s = SoapActionInInterceptor.getSoapAction(message);
+                            }
+                            if (s != null && s.contains("RST/SCT")) {
+                                message.put(SoapBindingConstants.SOAP_ACTION, "");
+                            }
+                        }
+                    };
+                clearActionInterceptor.addBefore(SoapPreProtocolOutInterceptor.class.getName());
+                ClientProxy.getClient(port).getOutInterceptors().add(clearActionInterceptor);
+            }
+            
             wssec.wssc.PingRequest params = new wssec.wssc.PingRequest();
             org.xmlsoap.ping.Ping ping = new org.xmlsoap.ping.Ping();
             ping.setOrigin("CXF");

@@ -45,6 +45,7 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -66,6 +67,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.interceptors.NegotiationUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -122,6 +124,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
         setPhase(Phase.PRE_PROTOCOL);
         getAfter().add(SAAJInInterceptor.class.getName());
+        getAfter().add(MAPCodec.class.getName());
     }
     public WSS4JInInterceptor(boolean ignore) {
         this();
