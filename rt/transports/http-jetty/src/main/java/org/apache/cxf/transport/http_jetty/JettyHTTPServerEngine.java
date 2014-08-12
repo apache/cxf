@@ -777,11 +777,14 @@ public class JettyHTTPServerEngine
             if (!(pl instanceof QueuedThreadPool)) {
                 throw new Fault(new Message("NOT_A_QUEUED_THREAD_POOL", LOG, pl.getClass()));
             }
+            if (getThreadingParameters().isThreadNamePrefixSet()) {
+                ((QueuedThreadPool) pl).setName(getThreadingParameters().getThreadNamePrefix());
+            }
             if (getThreadingParameters().isSetMinThreads()) {
-                ((QueuedThreadPool)pl).setMinThreads(getThreadingParameters().getMinThreads());
+                ((QueuedThreadPool) pl).setMinThreads(getThreadingParameters().getMinThreads());
             }
             if (getThreadingParameters().isSetMaxThreads()) {
-                ((QueuedThreadPool)pl).setMaxThreads(getThreadingParameters().getMaxThreads());
+                ((QueuedThreadPool) pl).setMaxThreads(getThreadingParameters().getMaxThreads());
             }
         }
     }

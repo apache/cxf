@@ -116,6 +116,7 @@ public class ApplicationContextTest extends Assert {
         JettyHTTPServerEngine engine = (JettyHTTPServerEngine)jd.getEngine();
         assertEquals(111, engine.getThreadingParameters().getMinThreads());
         assertEquals(120, engine.getThreadingParameters().getMaxThreads());
+        assertEquals("TestPrefix", engine.getThreadingParameters().getThreadNamePrefix());
         
         ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
         ConduitInitiator ci = cim.getConduitInitiator("http://cxf.apache.org/transports/http");
@@ -135,6 +136,8 @@ public class ApplicationContextTest extends Assert {
         assertFalse(engine.getSendServerVersion());
         assertEquals(99, engine.getThreadingParameters().getMinThreads());
         assertEquals(777, engine.getThreadingParameters().getMaxThreads());
+        assertEquals("AnotherPrefix", engine.getThreadingParameters().getThreadNamePrefix());
+        
         assertTrue("The engine should support session manager", engine.isSessionSupport());
         assertNotNull("The handlers should not be null", engine.getHandlers());
         assertEquals(1, engine.getHandlers().size());
@@ -146,6 +149,7 @@ public class ApplicationContextTest extends Assert {
         engine = (JettyHTTPServerEngine)jd3.getEngine();
         assertEquals(111, engine.getThreadingParameters().getMinThreads());
         assertEquals(120, engine.getThreadingParameters().getMaxThreads());
+        assertEquals("TestPrefix", engine.getThreadingParameters().getThreadNamePrefix());
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), true);
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), true);
         
@@ -178,6 +182,6 @@ public class ApplicationContextTest extends Assert {
         info2.setAddress(address);
         return info2;
     }
-    
+
 
 }

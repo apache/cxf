@@ -29,6 +29,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.ObjectName;
@@ -46,7 +47,8 @@ import org.easymock.IMocksControl;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.ContextHandler;
-
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.util.thread.ThreadPool;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,7 +88,64 @@ public class JettyHTTPServerEngineTest extends Assert {
         factory.setBus(bus);
 
     }
+    
+    /**
+     * Check that names of threads serving requests for instances of JettyHTTPServerEngine 
+     * can be set with user specified name.
+     */
+    @Test
+    public void testSettingThreadNames() throws Exception {
+        // User specific thread name prefix 1
+        String threadNamePrefix1 = "TestPrefix";
+        JettyHTTPServerEngine engine = factory.createJettyHTTPServerEngine(PORT1, "http");
+        ThreadingParameters parameters = new ThreadingParameters();
+        parameters.setThreadNamePrefix(threadNamePrefix1);
+        engine.setThreadingParameters(parameters);
+        engine.finalizeConfig();
+        JettyHTTPTestHandler handler = new JettyHTTPTestHandler("string1", true);
+        engine.addServant(new URL("https://localhost:" + PORT1 + "/test"), handler);
+        assertTrue("No threads whose name is started with " + threadNamePrefix1, 
+                checkForExistenceOfThreads(threadNamePrefix1));
+        
+        // Default thread name prefix
+        engine = factory.createJettyHTTPServerEngine(PORT3, "http");
+        engine.finalizeConfig();
+        handler = new JettyHTTPTestHandler("string3", true);
+        engine.addServant(new URL("https://localhost:" + PORT3 + "/test"), handler);
+        ThreadPool threadPool = engine.getServer().getThreadPool();
+        QueuedThreadPool qtp = (QueuedThreadPool)threadPool;
+        String prefixDefault = qtp.getName();
+        assertTrue("No threads whose name is started with " + prefixDefault, 
+                checkForExistenceOfThreads(prefixDefault));
+        
+        // User specific thread name prefix 2
+        String threadNamePrefix2 = "AnotherPrefix";
+        engine = factory.createJettyHTTPServerEngine(PORT2, "http");
+        parameters = new ThreadingParameters();
+        parameters.setThreadNamePrefix(threadNamePrefix2);
+        engine.setThreadingParameters(parameters);
+        engine.finalizeConfig();
+        handler = new JettyHTTPTestHandler("string2", true);
+        engine.addServant(new URL("https://localhost:" + PORT2 + "/test"), handler);
+        assertTrue("No threads whose name is started with " + threadNamePrefix2, 
+                checkForExistenceOfThreads(threadNamePrefix2));
+        
+        JettyHTTPServerEngineFactory.destroyForPort(PORT1);
+        JettyHTTPServerEngineFactory.destroyForPort(PORT2);
+        JettyHTTPServerEngineFactory.destroyForPort(PORT3);
+    }
 
+    private boolean checkForExistenceOfThreads(String prefixName) {
+        Map<Thread, StackTraceElement[]> threads = Thread.getAllStackTraces();
+        Set<Thread> threadSet = threads.keySet();
+        for (Thread thread : threadSet) {
+            if (thread.getName().startsWith(prefixName)) {
+                return true;
+            } 
+        }
+        return false;
+    }
+    
     @Test
     public void testEngineRetrieval() throws Exception {
         JettyHTTPServerEngine engine =
