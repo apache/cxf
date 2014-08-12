@@ -28,6 +28,7 @@ import java.util.Properties;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -42,6 +43,7 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
@@ -52,6 +54,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.DefaultSymmetricBinding;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
@@ -97,10 +100,10 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     }
     
     public void handleMessage(SoapMessage message) throws Fault {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        final AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
+            final Collection<AssertionInfo> ais = 
                 NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
             if (ais.isEmpty()) {
                 return;
@@ -122,105 +125,132 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (s == null) {
                 s = SoapActionInInterceptor.getSoapAction(message);
             }
-            String addNs = null;
-            AddressingProperties inProps = (AddressingProperties)message
-                .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
-            if (inProps != null) {
-                addNs = inProps.getNamespaceURI();
-                if (s == null) {
-                    //MS/WCF doesn't put a soap action out for this, must check the headers
-                    s = inProps.getAction().getValue();
-                }
-            }
-
-            if (s != null 
-                && s.contains("/RST/SCT")
-                && (s.startsWith(STSUtils.WST_NS_05_02)
-                    || s.startsWith(STSUtils.WST_NS_05_12))) {
-
-                SecureConversationToken tok = (SecureConversationToken)ais.iterator()
-                    .next().getAssertion();
-                Policy pol = tok.getBootstrapPolicy().getPolicy();
-                if (s.endsWith("Cancel") || s.endsWith("/Renew")) {
-                    //Cancel and Renew just sign with the token
-                    Policy p = new Policy();
-                    ExactlyOne ea = new ExactlyOne();
-                    p.addPolicyComponent(ea);
-                    All all = new All();
-                    Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
-                    all.addPolicyComponent(ass);
-                    ea.addPolicyComponent(all);
-                    
-                    final SecureConversationToken secureConversationToken = 
-                        new SecureConversationToken(
-                            SPConstants.SPVersion.SP12,
-                            SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER,
-                            null,
-                            null,
-                            null,
-                            new Policy()
-                        );
-                    
-                    Policy sctPolicy = new Policy();
-                    ExactlyOne sctPolicyEa = new ExactlyOne();
-                    sctPolicy.addPolicyComponent(sctPolicyEa);
-                    All sctPolicyAll = new All();
-                    sctPolicyAll.addPolicyComponent(secureConversationToken);
-                    sctPolicyEa.addPolicyComponent(sctPolicyAll);
-                    
-                    Policy bindingPolicy = new Policy();
-                    ExactlyOne bindingPolicyEa = new ExactlyOne();
-                    bindingPolicy.addPolicyComponent(bindingPolicyEa);
-                    All bindingPolicyAll = new All();
-                    
-                    AbstractBinding origBinding = getBinding(aim);
-                    bindingPolicyAll.addPolicyComponent(origBinding.getAlgorithmSuite());
-                    bindingPolicyAll.addPolicyComponent(new ProtectionToken(SPConstants.SPVersion.SP12, sctPolicy));
-                    bindingPolicyAll.addAssertion(
-                        new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
-                    bindingPolicyAll.addAssertion(
-                        new PrimitiveAssertion(SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
-                    bindingPolicyEa.addPolicyComponent(bindingPolicyAll);
-                    
-                    DefaultSymmetricBinding binding = 
-                        new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, bindingPolicy);
-                    binding.setOnlySignEntireHeadersAndBody(true);
-                    binding.setProtectTokens(false);
-                    
-                    all.addPolicyComponent(binding);
-                    
-                    SignedParts signedParts = getSignedParts(aim, addNs);
-                    all.addPolicyComponent(signedParts);
-                    pol = p;
-                    message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
-                } else {
-                    Policy p = new Policy();
-                    ExactlyOne ea = new ExactlyOne();
-                    p.addPolicyComponent(ea);
-                    All all = new All();
-                    Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
-                    all.addPolicyComponent(ass);
-                    ea.addPolicyComponent(all);
-                    pol = p.merge(pol);
-                }
-                
-                //setup SCT endpoint and forward to it.
-                unmapSecurityProps(message);
-                String ns = STSUtils.WST_NS_05_12;
-                if (s.startsWith(STSUtils.WST_NS_05_02)) {
-                    ns = STSUtils.WST_NS_05_02;
-                }
-                NegotiationUtils.recalcEffectivePolicy(message, ns, pol, 
-                                                       new SecureConversationSTSInvoker(),
-                                                       true);
-                //recalc based on new endpoint
-                SoapActionInInterceptor.getAndSetOperation(message, s);
+            
+            if (s != null) {
+                handleMessageForAction(message, s, aim, ais);
             } else {
+                // could not get an action, we have to delay until after the WS-A headers are read and
+                // processed
+                AbstractPhaseInterceptor<SoapMessage> post 
+                    = new AbstractPhaseInterceptor<SoapMessage>(Phase.PRE_PROTOCOL) {
+                            public void handleMessage(SoapMessage message) throws Fault {
+                                String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
+                                if (s == null) {
+                                    s = SoapActionInInterceptor.getSoapAction(message);
+                                }
+                                handleMessageForAction(message, s, aim, ais);
+                            }
+                        };
+                post.addAfter(MAPCodec.class.getName());
+                post.addBefore(PolicyBasedWSS4JInInterceptor.class.getName());
+                //need to drop to DOM version so we can setup the sec/conv stuff in advance
+                message.put(SecurityConstants.ENABLE_STREAMING_SECURITY, Boolean.FALSE);
+                message.getInterceptorChain().add(post);
+            }
+        }
+    }
+    
+    void handleMessageForAction(SoapMessage message, String s, 
+                                AssertionInfoMap aim,
+                                Collection<AssertionInfo> ais) {
+        String addNs = null;
+        AddressingProperties inProps = (AddressingProperties)message
+            .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
+        if (inProps != null) {
+            addNs = inProps.getNamespaceURI();
+            if (s == null) {
+                //MS/WCF doesn't put a soap action out for this, must check the headers
+                s = inProps.getAction().getValue();
+            }
+        }
+
+        if (s != null 
+            && s.contains("/RST/SCT")
+            && (s.startsWith(STSUtils.WST_NS_05_02)
+                || s.startsWith(STSUtils.WST_NS_05_12))) {
+
+            SecureConversationToken tok = (SecureConversationToken)ais.iterator()
+                .next().getAssertion();
+            Policy pol = tok.getBootstrapPolicy().getPolicy();
+            if (s.endsWith("Cancel") || s.endsWith("/Renew")) {
+                //Cancel and Renew just sign with the token
+                Policy p = new Policy();
+                ExactlyOne ea = new ExactlyOne();
+                p.addPolicyComponent(ea);
+                All all = new All();
+                Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
+                all.addPolicyComponent(ass);
+                ea.addPolicyComponent(all);
+                
+                final SecureConversationToken secureConversationToken = 
+                    new SecureConversationToken(
+                        SPConstants.SPVersion.SP12,
+                        SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER,
+                        null,
+                        null,
+                        null,
+                        new Policy()
+                    );
+                
+                Policy sctPolicy = new Policy();
+                ExactlyOne sctPolicyEa = new ExactlyOne();
+                sctPolicy.addPolicyComponent(sctPolicyEa);
+                All sctPolicyAll = new All();
+                sctPolicyAll.addPolicyComponent(secureConversationToken);
+                sctPolicyEa.addPolicyComponent(sctPolicyAll);
+                
+                Policy bindingPolicy = new Policy();
+                ExactlyOne bindingPolicyEa = new ExactlyOne();
+                bindingPolicy.addPolicyComponent(bindingPolicyEa);
+                All bindingPolicyAll = new All();
+                
+                AbstractBinding origBinding = getBinding(aim);
+                bindingPolicyAll.addPolicyComponent(origBinding.getAlgorithmSuite());
+                bindingPolicyAll.addPolicyComponent(new ProtectionToken(SPConstants.SPVersion.SP12, sctPolicy));
+                bindingPolicyAll.addAssertion(
+                    new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
+                bindingPolicyAll.addAssertion(
+                    new PrimitiveAssertion(SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
+                bindingPolicyEa.addPolicyComponent(bindingPolicyAll);
+                
+                DefaultSymmetricBinding binding = 
+                    new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, bindingPolicy);
+                binding.setOnlySignEntireHeadersAndBody(true);
+                binding.setProtectTokens(false);
+                
+                all.addPolicyComponent(binding);
+                
+                SignedParts signedParts = getSignedParts(aim, addNs);
+                all.addPolicyComponent(signedParts);
+                pol = p;
                 message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
+            } else {
+                Policy p = new Policy();
+                ExactlyOne ea = new ExactlyOne();
+                p.addPolicyComponent(ea);
+                All all = new All();
+                Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
+                all.addPolicyComponent(ass);
+                ea.addPolicyComponent(all);
+                pol = p.merge(pol);
             }
             
-            assertPolicies(aim);
+            //setup SCT endpoint and forward to it.
+            unmapSecurityProps(message);
+            String ns = STSUtils.WST_NS_05_12;
+            if (s.startsWith(STSUtils.WST_NS_05_02)) {
+                ns = STSUtils.WST_NS_05_02;
+            }
+            NegotiationUtils.recalcEffectivePolicy(message, ns, pol, 
+                                                   new SecureConversationSTSInvoker(),
+                                                   true);
+            //recalc based on new endpoint
+            SoapActionInInterceptor.getAndSetOperation(message, s);
+        } else {
+            message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
         }
+        
+        assertPolicies(aim);
     }
     
     private SignedParts getSignedParts(AssertionInfoMap aim, String addNs) {
