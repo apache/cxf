@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.activation.DataHandler;
 import javax.json.Json;
@@ -36,6 +39,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -72,7 +77,8 @@ public class Catalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());    
     private final Directory directory = new RAMDirectory();
     private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-    private final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);    
+    private final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+    private final ExecutorService executor = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors() );
     
     public Catalog() throws IOException {
         initIndex();
@@ -80,40 +86,48 @@ public class Catalog {
     
     @POST
     @Consumes("multipart/form-data")
-    public Response addBook(@Context final UriInfo uri, final MultipartBody body) throws Exception {
-        for (final Attachment attachment: body.getAllAttachments()) {
-            final DataHandler handler =  attachment.getDataHandler();
-            
-            if (handler != null) {
-                final String source = handler.getName();                
-                final LuceneDocumentMetadata metadata = new LuceneDocumentMetadata()
-                    .withSource(source)
-                    .withField("modified", Date.class);
-                
-                final BufferedInputStream in = new BufferedInputStream(handler.getInputStream());
-                try {
-                    final Document document = extractor.extract(in, metadata);
-                    if (document != null) {                    
-                        final IndexWriter writer = new IndexWriter(directory, config);
-                        
-                        try {
-                            writer.addDocument(document);
-                            writer.commit();
-                        } finally {
-                            writer.close();
-                        }
-                    }
-                } finally {
-                    if (in != null) { 
-                        in.close(); 
-                    }
-                }
-                
-                return Response.created(uri.getRequestUriBuilder().path(source).build()).build();
-            }                       
-        }              
+    public void addBook(@Suspended final AsyncResponse response, @Context final UriInfo uri, 
+            final MultipartBody body)  {
         
-        return Response.status(Status.BAD_REQUEST).build();
+        executor.submit(new Callable< Void >() {
+            public Void call() throws Exception {
+                for (final Attachment attachment: body.getAllAttachments()) {
+                    final DataHandler handler =  attachment.getDataHandler();
+                    
+                    if (handler != null) {
+                        final String source = handler.getName();                
+                        final LuceneDocumentMetadata metadata = new LuceneDocumentMetadata()
+                            .withSource(source)
+                            .withField("modified", Date.class);
+                        
+                        final BufferedInputStream in = new BufferedInputStream(handler.getInputStream());
+                        try {
+                            final Document document = extractor.extract(in, metadata);
+                            if (document != null) {                    
+                                final IndexWriter writer = new IndexWriter(directory, config);
+                                
+                                try {
+                                    writer.addDocument(document);
+                                    writer.commit();
+                                } finally {
+                                    writer.close();
+                                }
+                            }
+                        } finally {
+                            if (in != null) { 
+                                in.close(); 
+                            }
+                        }
+                        
+                        response.resume( Response.created(uri.getRequestUriBuilder().path(source).build()).build() );
+                        return null;
+                    }                       
+                }              
+                
+                response.resume( Response.status(Status.BAD_REQUEST).build() );   
+                return null;
+            }
+        });
     }
     
     @GET
