@@ -385,7 +385,7 @@ public final class ResponseImpl extends Response {
         } 
         
         throw new IllegalStateException("The entity is not backed by an input stream, entity class is : "
-            + (entity != null ? entity.getClass().getName() : null));
+            + (entity != null ? entity.getClass().getName() : cls.getName()));
         
     }
     
