@@ -26,8 +26,10 @@ public class ThreadingParameters {
 
     private int minThreads;
     private int maxThreads;
+    private String threadNamePrefix;
     private boolean minThreadsSet;
     private boolean maxThreadsSet;
+    private boolean threadNamePrefixSet;
     
     public void setMinThreads(int number) {
         minThreadsSet = true;
@@ -37,6 +39,15 @@ public class ThreadingParameters {
     public void setMaxThreads(int number) {
         maxThreadsSet = true;
         maxThreads = number;
+    }
+
+    public String getThreadNamePrefix() {
+        return threadNamePrefix;
+    }
+
+    public void setThreadNamePrefix(String threadNamePrefix) {
+        threadNamePrefixSet = true;
+        this.threadNamePrefix = threadNamePrefix;
     }
     
     public int getMinThreads() {
@@ -54,4 +65,9 @@ public class ThreadingParameters {
     public boolean isSetMinThreads() {
         return minThreadsSet;
     }
+
+    public boolean isThreadNamePrefixSet() {
+        return threadNamePrefixSet;
+    }
+    
 }

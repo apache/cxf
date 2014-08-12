@@ -52,6 +52,11 @@
              <xs:documentation>Specifies the maximum number of threads available to the Jetty instance for processing requests.</xs:documentation>
           </xs:annotation>
        </xs:attribute>
+       <xs:attribute name="threadNamePrefix" type="xs:string">
+       <xs:annotation>
+             <xs:documentation>Specifies the thread name prefix for threads that are used by the Jetty instance for processing requests.</xs:documentation>
+          </xs:annotation>
+       </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="ThreadingParametersIdentifiedType">
