@@ -18,13 +18,17 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwe;
 
+import javax.crypto.SecretKey;
 
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
-public class AesGcmContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
-    implements ContentDecryptionAlgorithm {
-
-    @Override
-    public byte[] getEncryptedSequence(byte[] cipher, byte[] authTag) {
-        return JweCompactConsumer.getEncryptedContentWithAuthTag(cipher, authTag);
+public class AesWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
+    public AesWrapKeyDecryptionAlgorithm(byte[] secretKey) {    
+        this(CryptoUtils.createSecretKeySpec(secretKey, Algorithm.AES_WRAP_ALGO_JAVA));
     }
+    public AesWrapKeyDecryptionAlgorithm(SecretKey secretKey) {    
+        super(secretKey, true);
+    }
+    
 }

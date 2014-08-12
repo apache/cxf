@@ -31,7 +31,7 @@ public class JweCompactConsumer {
     private String headersJson;
     private byte[] encryptedCEK;
     private byte[] initVector;
-    private byte[] encryptedContentWithTag;
+    private byte[] encryptedContent;
     private byte[] authTag;
     private JweHeaders jweHeaders;
     public JweCompactConsumer(String jweContent) {
@@ -47,11 +47,8 @@ public class JweCompactConsumer {
             encryptedCEK = Base64UrlUtility.decode(parts[1]);
             initVector = Base64UrlUtility.decode(parts[2]);
             
-            byte[] cipherText = Base64UrlUtility.decode(parts[3]);
+            encryptedContent = Base64UrlUtility.decode(parts[3]);
             authTag = Base64UrlUtility.decode(parts[4]);
-            encryptedContentWithTag = new byte[cipherText.length + authTag.length];
-            System.arraycopy(cipherText, 0, encryptedContentWithTag, 0, cipherText.length);
-            System.arraycopy(authTag, 0, encryptedContentWithTag, cipherText.length, authTag.length);
             jweHeaders = new JweHeaders(reader.fromJsonHeaders(headersJson).asMap());
         } catch (Base64Exception ex) {
             throw new SecurityException(ex);
@@ -88,14 +85,25 @@ public class JweCompactConsumer {
         return authTag;
     }
     
+    public byte[] getEncryptedContent() {
+        return encryptedContent;
+    }
+    
     public byte[] getEncryptedContentWithAuthTag() {
+        return getEncryptedContentWithAuthTag(encryptedContent, authTag);
+    }
+    
+    public static byte[] getEncryptedContentWithAuthTag(byte[] cipher, byte[] authTag) {
+        byte[] encryptedContentWithTag = new byte[cipher.length + authTag.length];
+        System.arraycopy(cipher, 0, encryptedContentWithTag, 0, cipher.length);
+        System.arraycopy(authTag, 0, encryptedContentWithTag, cipher.length, authTag.length);  
         return encryptedContentWithTag;
     }
     
-    public byte[] getDecryptedContent(JweDecryption decryption) {
+    public byte[] getDecryptedContent(JweDecryptionProvider decryption) {
         return decryption.decrypt(this);
     }
-    public String getDecryptedContentText(JweDecryption decryption) {
+    public String getDecryptedContentText(JweDecryptionProvider decryption) {
         try {
             return new String(getDecryptedContent(decryption), "UTF-8");
         } catch (UnsupportedEncodingException ex) {

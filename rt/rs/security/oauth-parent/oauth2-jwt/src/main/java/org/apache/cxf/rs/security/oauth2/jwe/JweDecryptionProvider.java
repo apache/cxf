@@ -20,11 +20,7 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 
 
 
-public class AesGcmContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
-    implements ContentDecryptionAlgorithm {
-
-    @Override
-    public byte[] getEncryptedSequence(byte[] cipher, byte[] authTag) {
-        return JweCompactConsumer.getEncryptedContentWithAuthTag(cipher, authTag);
-    }
+public interface JweDecryptionProvider {
+    JweDecryptionOutput decrypt(String jweContent);
+    byte[] decrypt(JweCompactConsumer consumer);
 }

@@ -69,26 +69,25 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
             throw new SecurityException();
         }
     }
-    
-    protected byte[] getActualCek(byte[] theCek) {
-        int size = getCekKeySize() / 2;
+    @Override
+    protected byte[] getActualCek(byte[] theCek, String algoJwt) {
+        return doGetActualCek(theCek, algoJwt);
+    }
+    protected static byte[] doGetActualCek(byte[] theCek, String algoJwt) {
+        int size = getCekKeySize(algoJwt) / 2;
         byte[] actualCek = new byte[size];
         System.arraycopy(theCek, size, actualCek, 0, size);
         return actualCek;
     }
     
-    protected int getCekKeySize() {
-        return AES_CEK_SIZE_MAP.get(super.getContentEncryptionAlgoJwt());
+    protected static int getCekKeySize(String algoJwt) {
+        return AES_CEK_SIZE_MAP.get(algoJwt);
     }
     
     protected JweCompactProducer getJweCompactProducer(JweEncryptionInternal state, byte[] cipher) {
         final MacState macState = getInitializedMacState(state);
-        
         macState.mac.update(cipher);
-        macState.mac.update(macState.al);
-        byte[] sig = macState.mac.doFinal();
-        byte[] authTag = getTagFromSignature(sig);
-        
+        byte[] authTag = signAndGetTag(macState);
         return new JweCompactProducer(macState.headersJson,
                                       state.jweContentEncryptionKey,
                                       state.theIv,
@@ -96,28 +95,38 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
                                       authTag);
     }
     
-    private byte[] getTagFromSignature(byte[] sig) {
-        int authTagLen = getAuthTagLen() / 8;
+    protected static byte[] signAndGetTag(MacState macState) {
+        macState.mac.update(macState.al);
+        byte[] sig = macState.mac.doFinal();
+        
+        int authTagLen = DEFAULT_AUTH_TAG_LENGTH / 8;
         byte[] authTag = new byte[authTagLen];
         System.arraycopy(sig, 0, authTag, 0, authTagLen);
         return authTag;
     }
-    
     private MacState getInitializedMacState(final JweEncryptionInternal state) {
-        int size = getCekKeySize() / 2;
+        String headersJson = getJwtHeadersWriter().headersToJson(state.theHeaders);
+        return getInitializedMacState(state.secretKey, state.theIv, state.theHeaders, headersJson);
+    }
+    protected static MacState getInitializedMacState(byte[] secretKey,
+                                                     byte[] theIv,
+                                                     JweHeaders theHeaders, 
+                                                     String headersJson) {
+        String algoJwt = theHeaders.getContentEncryptionAlgorithm();
+        int size = getCekKeySize(algoJwt) / 2;
         byte[] macKey = new byte[size];
-        System.arraycopy(state.secretKey, 0, macKey, 0, size);
+        System.arraycopy(secretKey, 0, macKey, 0, size);
         
-        String hmacAlgoJava = AES_HMAC_MAP.get(super.getContentEncryptionAlgoJwt());
+        String hmacAlgoJava = AES_HMAC_MAP.get(algoJwt);
         Mac mac = HmacUtils.getInitializedMac(macKey, hmacAlgoJava, null);
         
-        String headersJson = getJwtHeadersWriter().headersToJson(state.theHeaders);
+        
         byte[] aad = JweHeaders.toCipherAdditionalAuthData(headersJson);
         ByteBuffer buf = ByteBuffer.allocate(8);
         final byte[] al = buf.putInt(0).putInt(aad.length * 8).array();
         
         mac.update(aad);
-        mac.update(state.theIv);
+        mac.update(theIv);
         MacState macState = new MacState();
         macState.mac = mac;
         macState.al = al;
@@ -138,9 +147,7 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
 
             @Override
             public byte[] getTag() {
-                macState.mac.update(macState.al);
-                byte[] sig = macState.mac.doFinal();
-                return getTagFromSignature(sig);
+                return signAndGetTag(macState);
             }
             
         };
@@ -164,8 +171,8 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         }
     }
     
-    private static class MacState {
-        private Mac mac;
+    protected static class MacState {
+        protected Mac mac;
         private byte[] al;
         private String headersJson;
     }

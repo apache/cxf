@@ -47,7 +47,7 @@ public class WrappedKeyJweDecryption extends AbstractJweDecryption {
     }
     public WrappedKeyJweDecryption(WrappedKeyDecryptionAlgorithm keyDecryptionAlgo,
                                    JweCryptoProperties props, JwtHeadersReader reader,
-                                   ContentEncryptionCipherProperties cipherProps) {    
+                                   ContentDecryptionAlgorithm cipherProps) {    
         super(props, reader, keyDecryptionAlgo, cipherProps);
     }
 }
