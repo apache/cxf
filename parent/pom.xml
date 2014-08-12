@@ -106,7 +106,7 @@
         <cxf.geronimo.servlet25.version>1.2</cxf.geronimo.servlet25.version>
         <cxf.geronimo.transaction.version>1.1.1</cxf.geronimo.transaction.version>
         <cxf.jasypt.bundle.version>1.9.0_1</cxf.jasypt.bundle.version>
-        <cxf.javax.ws.rs.version>2.0</cxf.javax.ws.rs.version>
+        <cxf.javax.ws.rs.version>2.0.1</cxf.javax.ws.rs.version>
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.14</cxf.jaxb21.impl.version>
         <cxf.jaxb21.core.version>2.1.14</cxf.jaxb21.core.version>
