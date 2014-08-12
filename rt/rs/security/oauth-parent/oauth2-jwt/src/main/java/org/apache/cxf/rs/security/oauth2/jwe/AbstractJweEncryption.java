@@ -31,7 +31,7 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public abstract class AbstractJweEncryption implements JweEncryptionProvider {
-    private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
+    protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private JweHeaders headers;
     private JwtHeadersWriter writer;
     private ContentEncryptionAlgorithm contentEncryptionAlgo;
@@ -80,10 +80,6 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected String getContentEncryptionAlgoJava() {
         return Algorithm.toJavaName(getContentEncryptionAlgoJwt());
     }
-    
-    protected int getAuthTagLen() {
-        return DEFAULT_AUTH_TAG_LENGTH;
-    }
     protected byte[] getAAD(JweHeaders theHeaders) {
         return contentEncryptionAlgo.getAdditionalAuthenticationData(writer.headersToJson(theHeaders));
     }
@@ -103,7 +99,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
                                       state.jweContentEncryptionKey,
                                       state.theIv,
                                       cipher,
-                                      getAuthTagLen());
+                                      DEFAULT_AUTH_TAG_LENGTH);
     }
     
     protected JwtHeadersWriter getJwtHeadersWriter() {
@@ -128,10 +124,11 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         return null;
     }
     protected SecretKey createCekSecretKey(JweEncryptionInternal state) {
-        return CryptoUtils.createSecretKeySpec(getActualCek(state.secretKey), state.keyProps.getKeyAlgo());
+        return CryptoUtils.createSecretKeySpec(getActualCek(state.secretKey, this.getContentEncryptionAlgoJwt()), 
+                                               state.keyProps.getKeyAlgo());
     }
     
-    protected byte[] getActualCek(byte[] theCek) {
+    protected byte[] getActualCek(byte[] theCek, String algoJwt) {
         return theCek;
     }
     

@@ -28,21 +28,21 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
-public abstract class AbstractJweDecryption implements JweDecryption {
+public abstract class AbstractJweDecryption implements JweDecryptionProvider {
     private JweCryptoProperties props;
     private KeyDecryptionAlgorithm keyDecryptionAlgo;
-    private ContentEncryptionCipherProperties contentEncryptionProps;
+    private ContentDecryptionAlgorithm contentDecryptionAlgo;
     private JwtHeadersReader reader = new JwtTokenReaderWriter();
     protected AbstractJweDecryption(JweCryptoProperties props, 
                                     JwtHeadersReader theReader,
                                     KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                    ContentEncryptionCipherProperties contentEncryptionProps) {
+                                    ContentDecryptionAlgorithm contentDecryptionAlgo) {
         this.props = props;
         if (theReader != null) {
             reader = theReader;
         }
         this.keyDecryptionAlgo = keyDecryptionAlgo;
-        this.contentEncryptionProps = contentEncryptionProps;
+        this.contentDecryptionAlgo = contentDecryptionAlgo;
     }
     
     protected byte[] getContentEncryptionKey(JweCompactConsumer consumer) {
@@ -60,6 +60,9 @@ public abstract class AbstractJweDecryption implements JweDecryption {
     protected JweDecryptionOutput doDecrypt(JweCompactConsumer consumer) {
         consumer.enforceJweCryptoProperties(props);
         byte[] cek = getContentEncryptionKey(consumer);
+        return doDecrypt(consumer, cek);
+    }
+    protected JweDecryptionOutput doDecrypt(JweCompactConsumer consumer, byte[] cek) {
         KeyProperties keyProperties = new KeyProperties(getContentEncryptionAlgorithm(consumer));
         keyProperties.setAdditionalData(getContentEncryptionCipherAAD(consumer));
         AlgorithmParameterSpec spec = getContentEncryptionCipherSpec(consumer);
@@ -67,7 +70,8 @@ public abstract class AbstractJweDecryption implements JweDecryption {
         boolean compressionSupported = 
             JwtConstants.DEFLATE_ZIP_ALGORITHM.equals(consumer.getJweHeaders().getZipAlgorithm());
         keyProperties.setCompressionSupported(compressionSupported);
-        Key secretKey = CryptoUtils.createSecretKeySpec(cek, keyProperties.getKeyAlgo());
+        byte[] actualCek = getActualCek(cek, consumer.getJweHeaders().getContentEncryptionAlgorithm());
+        Key secretKey = CryptoUtils.createSecretKeySpec(actualCek, keyProperties.getKeyAlgo());
         byte[] bytes = 
             CryptoUtils.decryptBytes(getEncryptedContentWithAuthTag(consumer), secretKey, keyProperties);
         return new JweDecryptionOutput(consumer.getJweHeaders(), bytes);
@@ -76,16 +80,17 @@ public abstract class AbstractJweDecryption implements JweDecryption {
         return consumer.getEncryptedContentEncryptionKey();
     }
     protected AlgorithmParameterSpec getContentEncryptionCipherSpec(JweCompactConsumer consumer) {
-        return contentEncryptionProps.getAlgorithmParameterSpec(getContentEncryptionCipherInitVector(consumer));
+        return contentDecryptionAlgo.getAlgorithmParameterSpec(getContentEncryptionCipherInitVector(consumer));
     }
     protected String getContentEncryptionAlgorithm(JweCompactConsumer consumer) {
         return Algorithm.toJavaName(consumer.getJweHeaders().getContentEncryptionAlgorithm());
     }
     protected byte[] getContentEncryptionCipherAAD(JweCompactConsumer consumer) {
-        return contentEncryptionProps.getAdditionalAuthenticationData(consumer.getDecodedJsonHeaders());
+        return contentDecryptionAlgo.getAdditionalAuthenticationData(consumer.getDecodedJsonHeaders());
     }
     protected byte[] getEncryptedContentWithAuthTag(JweCompactConsumer consumer) {
-        return consumer.getEncryptedContentWithAuthTag();
+        return contentDecryptionAlgo.getEncryptedSequence(consumer.getEncryptedContent(), 
+                                                          getEncryptionAuthenticationTag(consumer));
     }
     protected byte[] getContentEncryptionCipherInitVector(JweCompactConsumer consumer) { 
         return consumer.getContentDecryptionCipherInitVector();
@@ -96,6 +101,8 @@ public abstract class AbstractJweDecryption implements JweDecryption {
     protected int getEncryptionAuthenticationTagLenBits(JweCompactConsumer consumer) {
         return getEncryptionAuthenticationTag(consumer).length * 8;
     }
-    
+    protected byte[] getActualCek(byte[] theCek, String algoJwt) {
+        return theCek;
+    }
     
 }

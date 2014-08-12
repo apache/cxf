@@ -37,7 +37,7 @@ public class DirectKeyJweDecryption extends AbstractJweDecryption {
     public DirectKeyJweDecryption(Key contentDecryptionKey, 
                                   JweCryptoProperties props, 
                                   JwtHeadersReader reader,
-                                  ContentEncryptionCipherProperties cipherProps) {    
+                                  ContentDecryptionAlgorithm cipherProps) {    
         super(props, reader, new DirectKeyDecryptionAlgorithm(contentDecryptionKey),
               cipherProps);
     }
