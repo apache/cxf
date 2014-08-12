@@ -93,6 +93,7 @@ public class JettyHTTPServerEngineFactoryHolder {
                     String id = threads.getId();
                     rThreads.setMaxThreads(threads.getThreadingParameters().getMaxThreads());
                     rThreads.setMinThreads(threads.getThreadingParameters().getMinThreads());
+                    rThreads.setThreadNamePrefix(threads.getThreadingParameters().getThreadNamePrefix());
                     threadingParametersMap.put(id, rThreads);
                 }
 
