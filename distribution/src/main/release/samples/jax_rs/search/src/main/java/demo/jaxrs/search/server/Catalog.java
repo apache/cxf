@@ -78,7 +78,8 @@ public class Catalog {
     private final Directory directory = new RAMDirectory();
     private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
     private final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
-    private final ExecutorService executor = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors() );
+    private final ExecutorService executor = 
+            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     
     public Catalog() throws IOException {
         initIndex();
@@ -119,12 +120,13 @@ public class Catalog {
                             }
                         }
                         
-                        response.resume( Response.created(uri.getRequestUriBuilder().path(source).build()).build() );
+                        response.resume(Response.created(uri.getRequestUriBuilder()
+                                .path(source).build()).build());
                         return null;
                     }                       
                 }              
                 
-                response.resume( Response.status(Status.BAD_REQUEST).build() );   
+                response.resume(Response.status(Status.BAD_REQUEST).build());   
                 return null;
             }
         });
