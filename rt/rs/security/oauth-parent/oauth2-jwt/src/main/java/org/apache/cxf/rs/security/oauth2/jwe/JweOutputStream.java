@@ -112,12 +112,14 @@ public class JweOutputStream extends FilterOutputStream {
                 ? encryptingCipher.doFinal()
                 : encryptingCipher.doFinal(lastRawDataChunk, 0, lastRawDataChunk.length);
             final int authTagLengthBits = 128;
-            if (authTagProducer == null) {
-                encodeAndWrite(finalBytes, 0, finalBytes.length - authTagLengthBits / 8, true);    
-            } else {
+            if (authTagProducer != null) {
                 authTagProducer.update(finalBytes, 0, finalBytes.length);
+                encodeAndWrite(finalBytes, 0, finalBytes.length, true);
+            } else {
+                encodeAndWrite(finalBytes, 0, finalBytes.length - authTagLengthBits / 8, true);
             }
             out.write(new byte[]{'.'});
+            
             if (authTagProducer == null) {
                 encodeAndWrite(finalBytes, finalBytes.length - authTagLengthBits / 8, authTagLengthBits / 8, true);
             } else {
