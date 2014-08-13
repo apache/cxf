@@ -47,7 +47,7 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
     }
     public byte[] getInitVector() {
         if (iv == null) {
-            return CryptoUtils.generateSecureRandomBytes(getIvSize());
+            return CryptoUtils.generateSecureRandomBytes(getIvSize() / 8);
         } else if (iv.length > 0 && providedIvUsageCount.addAndGet(1) > 1) {
             throw new SecurityException();
         } else {

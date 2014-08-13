@@ -30,6 +30,10 @@ import javax.crypto.Cipher;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.rs.security.oauth2.jwe.AesCbcHmacJweDecryption;
+import org.apache.cxf.rs.security.oauth2.jwe.AesCbcHmacJweEncryption;
+import org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyDecryptionAlgorithm;
+import org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
@@ -116,6 +120,42 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         PrivateKeyPasswordProvider provider = new PrivateKeyPasswordProviderImpl();
         bean.getProperties(true).put("rs.security.signature.key.password.provider", provider);
         bean.getProperties(true).put("rs.security.decryption.key.password.provider", provider);
+        BookStore bs = bean.create(BookStore.class);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    
+    @Test
+    public void testJweAesCbcHmac() throws Exception {
+        String address = "https://localhost:" + PORT + "/jweaescbchmac";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress(address);
+        List<Object> providers = new LinkedList<Object>();
+        // writer
+        JweWriterInterceptor jweWriter = new JweWriterInterceptor();
+        //jweWriter.setUseJweOutputStream(true);
+        
+        final String cekEncryptionKey = "GawgguFyGrWKav7AX4VKUg";
+        AesWrapKeyEncryptionAlgorithm keyEncryption = 
+            new AesWrapKeyEncryptionAlgorithm(cekEncryptionKey, Algorithm.A128KW.getJwtName());
+        jweWriter.setEncryptionProvider(new AesCbcHmacJweEncryption(Algorithm.A128KW.getJwtName(), 
+                                                                    Algorithm.A128CBC_HS256.getJwtName(),
+                                                                    keyEncryption));
+        
+        // reader 
+        JweClientResponseFilter jweReader = new JweClientResponseFilter();
+        jweReader.setDecryptionProvider(new AesCbcHmacJweDecryption(
+                                    new AesWrapKeyDecryptionAlgorithm(cekEncryptionKey)));
+        
+        providers.add(jweWriter);
+        providers.add(jweReader);
+        bean.setProviders(providers);
+        
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
         assertEquals("book", text);

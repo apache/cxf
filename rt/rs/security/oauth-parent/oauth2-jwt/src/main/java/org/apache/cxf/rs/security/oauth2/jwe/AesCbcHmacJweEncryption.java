@@ -51,6 +51,12 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         AES_CEK_SIZE_MAP.put(Algorithm.A192CBC_HS384.getJwtName(), 48);
         AES_CEK_SIZE_MAP.put(Algorithm.A256CBC_HS512.getJwtName(), 64);
     }
+    public AesCbcHmacJweEncryption(String keyAlgo, 
+                                   String celAlgoJwt, 
+                                   KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
+        this(new JweHeaders(keyAlgo, validateCekAlgorithm(celAlgoJwt)), 
+             null, null, keyEncryptionAlgorithm);
+    }
     public AesCbcHmacJweEncryption(JweHeaders headers, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
         this(headers, null, null, keyEncryptionAlgorithm);
@@ -65,22 +71,24 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm,
                                    JwtHeadersWriter writer) {
         super(headers, new AesCbcContentEncryptionAlgorithm(cek, iv), keyEncryptionAlgorithm, writer);
-        if (!SUPPORTED_CEK_ALGORITHMS.contains(headers.getContentEncryptionAlgorithm())) {
-            throw new SecurityException();
-        }
+        validateCekAlgorithm(headers.getContentEncryptionAlgorithm());
     }
     @Override
     protected byte[] getActualCek(byte[] theCek, String algoJwt) {
         return doGetActualCek(theCek, algoJwt);
     }
+    @Override
+    protected int getCekSize(String algoJwt) {
+        return getFullCekKeySize(algoJwt) * 8;
+    }
     protected static byte[] doGetActualCek(byte[] theCek, String algoJwt) {
-        int size = getCekKeySize(algoJwt) / 2;
+        int size = getFullCekKeySize(algoJwt) / 2;
         byte[] actualCek = new byte[size];
         System.arraycopy(theCek, size, actualCek, 0, size);
         return actualCek;
     }
     
-    protected static int getCekKeySize(String algoJwt) {
+    protected static int getFullCekKeySize(String algoJwt) {
         return AES_CEK_SIZE_MAP.get(algoJwt);
     }
     
@@ -113,7 +121,7 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
                                                      JweHeaders theHeaders, 
                                                      String headersJson) {
         String algoJwt = theHeaders.getContentEncryptionAlgorithm();
-        int size = getCekKeySize(algoJwt) / 2;
+        int size = getFullCekKeySize(algoJwt) / 2;
         byte[] macKey = new byte[size];
         System.arraycopy(secretKey, 0, macKey, 0, size);
         
@@ -175,5 +183,12 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         protected Mac mac;
         private byte[] al;
         private String headersJson;
+    }
+    
+    private static String validateCekAlgorithm(String cekAlgo) {
+        if (!SUPPORTED_CEK_ALGORITHMS.contains(cekAlgo)) {
+            throw new SecurityException();
+        }
+        return cekAlgo;
     }
 }

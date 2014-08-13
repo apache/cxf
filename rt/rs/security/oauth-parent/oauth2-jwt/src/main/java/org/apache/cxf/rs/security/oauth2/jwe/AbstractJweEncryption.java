@@ -60,14 +60,22 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     }
     
     protected byte[] getContentEncryptionKey() {
-        byte[] cek = contentEncryptionAlgo.getContentEncryptionKey(headers);
+        byte[] cek = getProvidedContentEncryptionKey();
         if (cek == null) {
             String algoJava = getContentEncryptionAlgoJava();
             String algoJwt = getContentEncryptionAlgoJwt();
             cek = CryptoUtils.getSecretKey(Algorithm.stripAlgoProperties(algoJava), 
-                Algorithm.valueOf(algoJwt).getKeySizeBits()).getEncoded();
+                                           getCekSize(algoJwt)).getEncoded();
         }
         return cek;
+    }
+   
+    protected int getCekSize(String algoJwt) {
+        return Algorithm.valueOf(algoJwt.replace('-', '_')).getKeySizeBits();
+    }
+    
+    protected byte[] getProvidedContentEncryptionKey() {
+        return contentEncryptionAlgo.getContentEncryptionKey(headers);
     }
     
     protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
