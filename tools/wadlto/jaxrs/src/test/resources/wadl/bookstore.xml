@@ -182,7 +182,7 @@
                 <param name="bookid" style="template" type="xs:int"/>
                 <param name="mid" style="matrix" type="xs:int"/>
             </resource>
-            <resource path="/booksubresource" id="{http://superbooks}thebook">
+            <resource path="/booksubresource" id="{http://superbooks}thebooksub">
                 <doc>Book subresource</doc>
                 <param name="id" style="template" type="xs:int"/>
                 <param name="mid" style="matrix" type="xs:int"/>
@@ -240,7 +240,32 @@
                         </response>
                     </method>
                     <resource path="/form" id="org.apache.cxf.jaxrs.model.wadl.FormInterface">
-                        <resource path="/recursive" id="org.apache.cxf.jaxrs.model.wadl.FormInterface"/>
+                        <resource path="/multipart">
+		                    <method name="POST" id="multipart1">
+		                        <request>
+		                            <representation mediaType="multipart/mixed">
+		                                <param name="field1" style="query" type="xs:string"/>
+		                                <param name="field2" style="query" type="xs:anyType"/>
+		                            </representation>
+		                        </request>
+		                        <response>
+		                            <representation mediaType="text/plain">
+		                                <param name="result" style="plain" type="xs:string"/>
+		                            </representation>
+		                        </response>
+		                    </method>
+		                    <method name="PUT" id="multipart2">
+		                        <request>
+		                            <representation mediaType="multipart/form-data"/>
+		                        </request>
+		                        <response>
+		                            <representation mediaType="text/plain">
+		                                <param name="result" style="plain" type="xs:string"/>
+		                            </representation>
+		                        </response>
+		                    </method>
+		                </resource>
+                    	<resource path="/recursive" id="org.apache.cxf.jaxrs.model.wadl.FormInterface"/>
                         <resource path="/c">
                             <resource path="/formSub" id="org.apache.cxf.jaxrs.model.wadl.FormInterface2">
                                 <param name="formid" style="template" type="xs:int"/>
