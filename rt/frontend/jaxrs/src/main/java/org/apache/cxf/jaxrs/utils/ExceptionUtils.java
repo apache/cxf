@@ -79,7 +79,7 @@ public final class ExceptionUtils {
             if (mapper != null) {
                 try {
                     response = mapper.toResponse(ex);
-                } catch (Exception mapperEx) {
+                } catch (Throwable mapperEx) {
                     inMessage.getExchange().put(JAXRSUtils.EXCEPTION_FROM_MAPPER, "true");
                     mapperEx.printStackTrace();
                     return Response.serverError().build();
