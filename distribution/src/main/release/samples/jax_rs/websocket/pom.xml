@@ -33,9 +33,50 @@
         <!-- TODO remove these local entries after making the referenced dependency managed in parent/pom.xml -->
         <cxf.ahc.version>1.8.5</cxf.ahc.version>
         <cxf.jetty8.version>8.1.15.v20140411</cxf.jetty8.version>
+        <cxf.jetty9.version>9.2.2.v20140723</cxf.jetty9.version>
+        <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
         <cxf.netty3.version>3.9.1.Final</cxf.netty3.version>
     </properties>
     <profiles>
+        <profile>
+            <id>jetty8</id>
+            <activation>
+                <property>
+                    <name>!jetty9</name>
+                </property>
+            </activation>
+            <properties>
+                <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
+            </properties>
+            <dependencies>
+                <!-- jetty8 websocket -->
+                <dependency>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-websocket</artifactId>
+                    <version>${cxf.jetty8.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jetty9</id>
+            <properties>
+                <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+            </properties>
+            <dependencies>
+                <!-- jetty9 websocket -->
+                <dependency>
+                    <groupId>org.eclipse.jetty.websocket</groupId>
+                    <artifactId>websocket-server</artifactId>
+                    <version>${cxf.jetty9.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>javax.servlet</groupId>
+                            <artifactId>javax.servlet-api</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
         <profile>
             <id>server</id>
             <build>
@@ -91,6 +132,42 @@
         </dependency>
         <!-- This dependency is needed if you're using the Jetty container -->
         <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${cxf.jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-io</artifactId>
+            <version>${cxf.jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-security</artifactId>
+            <version>${cxf.jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-plus</artifactId>
+            <version>${cxf.jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>${cxf.jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-http</artifactId>
+            <version>${cxf.jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>${cxf.jetty.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-websocket</artifactId>
             <version>3.1.0-SNAPSHOT</version>
@@ -104,11 +181,6 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-	    <artifactId>jetty-websocket</artifactId>
-	    <version>${cxf.jetty8.version}</version>
-	</dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>async-http-client</artifactId>
