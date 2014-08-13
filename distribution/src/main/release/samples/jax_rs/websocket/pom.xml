@@ -30,9 +30,10 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.ahc.version>1.8.1</cxf.ahc.version>
-        <cxf.jetty.version>8.1.14.v20131031</cxf.jetty.version>
-        <cxf.netty3.version>3.8.0.Final</cxf.netty3.version>
+        <!-- TODO remove these local entries after making the referenced dependency managed in parent/pom.xml -->
+        <cxf.ahc.version>1.8.5</cxf.ahc.version>
+        <cxf.jetty8.version>8.1.15.v20140411</cxf.jetty8.version>
+        <cxf.netty3.version>3.9.1.Final</cxf.netty3.version>
     </properties>
     <profiles>
         <profile>
@@ -103,11 +104,11 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-websocket</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
+	    <artifactId>jetty-websocket</artifactId>
+	    <version>${cxf.jetty8.version}</version>
+	</dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>async-http-client</artifactId>
