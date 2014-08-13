@@ -138,7 +138,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         List<Object> providers = new LinkedList<Object>();
         // writer
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
-        //jweWriter.setUseJweOutputStream(true);
+        jweWriter.setUseJweOutputStream(true);
         
         final String cekEncryptionKey = "GawgguFyGrWKav7AX4VKUg";
         AesWrapKeyEncryptionAlgorithm keyEncryption = 
