@@ -56,8 +56,9 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                 .getExtension(JettyHTTPServerEngineFactory.class);
             if (serverEngineFactory.isJetty8()) {
                 return new JettyWebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+            } else {
+                return new Jetty9WebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
             }
-            return new Jetty9WebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
         } else {
             //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
             registry = getDestinationRegistry(bus);

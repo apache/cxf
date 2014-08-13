@@ -30,6 +30,7 @@ import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.eclipse.jetty.websocket.WebSocketFactory;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,6 +54,8 @@ public class JettyWebSocketManagerTest extends Assert {
         JettyWebSocketDestination dest = control.createMock(JettyWebSocketDestination.class);
         setupDestination(dest);
 
+        WebSocketFactory.Acceptor acceptor = control.createMock(WebSocketFactory.Acceptor.class);
+
         HttpServletRequest request = control.createMock(HttpServletRequest.class);
         HttpServletResponse response = control.createMock(HttpServletResponse.class);
         
@@ -61,7 +64,7 @@ public class JettyWebSocketManagerTest extends Assert {
         EasyMock.expectLastCall();
         
         control.replay();
-        jwsm.init(dest);
+        jwsm.init(dest, acceptor);
 
         jwsm.service(request, response);
         control.verify();
@@ -74,6 +77,8 @@ public class JettyWebSocketManagerTest extends Assert {
         JettyWebSocketServletDestination dest = control.createMock(JettyWebSocketServletDestination.class);
         setupDestination(dest);
 
+        WebSocketFactory.Acceptor acceptor = control.createMock(WebSocketFactory.Acceptor.class);
+
         HttpServletRequest request = control.createMock(HttpServletRequest.class);
         HttpServletResponse response = control.createMock(HttpServletResponse.class);
         
@@ -81,7 +86,7 @@ public class JettyWebSocketManagerTest extends Assert {
                     EasyMock.eq(request), EasyMock.eq(response));
         EasyMock.expectLastCall();
         control.replay();
-        jwsm.init(dest);
+        jwsm.init(dest, acceptor);
         
         jwsm.service(request, response);
         control.verify();

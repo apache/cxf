@@ -61,7 +61,7 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
  * 
  */
 public class Jetty9WebSocketDestination extends JettyHTTPDestination implements 
-    WebSocketDestinationService,  WebSocketCreator {
+    WebSocketDestinationService {
 
     //REVISIT make these keys configurable
     private String requestIdKey = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
@@ -80,7 +80,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        webSocketFactory.setCreator(this);
+        webSocketFactory.setCreator(new Creator());
         executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
     
@@ -125,31 +125,6 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         }
     }
     
-    @Override
-    public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
-        return new WebSocketAdapter() {
-            Session session;
-            @Override
-            public void onWebSocketConnect(Session session) {
-                this.session = session;
-            }
-            @Override
-            public void onWebSocketBinary(byte[] payload, int offset, int len) {
-                invoke(payload, offset, len, session);
-            }
-            @Override
-            public void onWebSocketText(String message) {
-                //TODO may want use string directly instead of converting it to byte[]
-                try {
-                    byte[] bdata = message.getBytes("utf-8");
-                    onWebSocketBinary(bdata, 0, bdata.length);
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        };
-    }
     private void invoke(final byte[] data, final int offset, final int length, final Session session) {
         // invoke the service asynchronously as the jetty websocket's onMessage is synchronously blocked
         // make sure the byte array passed to this method is immutable, as the websocket framework
@@ -196,6 +171,37 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
 
     private WebSocketVirtualServletResponse createServletResponse(WebSocketServletHolder holder) throws IOException {
         return new WebSocketVirtualServletResponse(holder);
+    }
+
+    // hide this jetty9 interface here to avoid CNFE on WebSocketCreator
+    private class Creator implements WebSocketCreator {
+
+        @Override
+        public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
+            return new WebSocketAdapter() {
+                Session session;
+                @Override
+                public void onWebSocketConnect(Session session) {
+                    this.session = session;
+                }
+                @Override
+                public void onWebSocketBinary(byte[] payload, int offset, int len) {
+                    invoke(payload, offset, len, session);
+                }
+                @Override
+                public void onWebSocketText(String message) {
+                    //TODO may want use string directly instead of converting it to byte[]
+                    try {
+                        byte[] bdata = message.getBytes("utf-8");
+                        onWebSocketBinary(bdata, 0, bdata.length);
+                    } catch (UnsupportedEncodingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            };
+        }
+        
     }
     
     class Jetty9WebSocketHolder implements WebSocketServletHolder {

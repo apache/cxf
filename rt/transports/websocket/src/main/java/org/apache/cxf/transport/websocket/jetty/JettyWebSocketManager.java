@@ -45,11 +45,11 @@ class JettyWebSocketManager {
     private ServletContext servletContext;
     private Executor executor;
 
-    public void init(AbstractHTTPDestination dest) {
+    public void init(AbstractHTTPDestination dest, Acceptor acceptor) {
         this.destination = dest;
 
         //TODO customize websocket factory configuration options when using the destination.
-        webSocketFactory = new WebSocketFactory((Acceptor)dest, 8192);
+        webSocketFactory = new WebSocketFactory(acceptor, 8192);
 
         // the executor for decoupling the service invocation from websocket's onMessage call which is
         // synchronously blocked

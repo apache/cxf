@@ -42,14 +42,14 @@ import org.eclipse.jetty.websocket.WebSocketFactory;
  * 
  */
 public class JettyWebSocketDestination extends JettyHTTPDestination implements 
-    WebSocketDestinationService, WebSocketFactory.Acceptor {
+    WebSocketDestinationService {
     private JettyWebSocketManager webSocketManager;
-
+    
     public JettyWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
         super(bus, registry, ei, serverEngineFactory);
         webSocketManager = new JettyWebSocketManager();
-        webSocketManager.init(this);
+        webSocketManager.init(this, new Acceptor());
     }
     
     @Override
@@ -82,16 +82,6 @@ public class JettyWebSocketDestination extends JettyHTTPDestination implements
     }
 
     @Override
-    public boolean checkOrigin(HttpServletRequest arg0, String arg1) {
-        return true;
-    }
-
-    @Override
-    public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
-        return new JettyWebSocket(webSocketManager, request, protocol);
-    }
-
-    @Override
     public void shutdown() {
         try {
             webSocketManager.destroy();
@@ -102,4 +92,16 @@ public class JettyWebSocketDestination extends JettyHTTPDestination implements
         }
     }
 
+    private class Acceptor implements WebSocketFactory.Acceptor {
+
+        @Override
+        public boolean checkOrigin(HttpServletRequest request, String protocol) {
+            return true;
+        }
+
+        @Override
+        public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
+            return new JettyWebSocket(webSocketManager, request, protocol);
+        }
+    }
 }
