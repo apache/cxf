@@ -199,7 +199,7 @@ required="true">
    </resource>
 
    
-  <resource path="/booksubresource" id="{http://superbooks}thebook">
+  <resource path="/booksubresource" id="{http://superbooks}thebooksub">
 	    <doc>Book subresource</doc>
 	    <param name="id" style="template" type="xs:int"/>
 	    <param name="mid" style="matrix" type="xs:int"/>
