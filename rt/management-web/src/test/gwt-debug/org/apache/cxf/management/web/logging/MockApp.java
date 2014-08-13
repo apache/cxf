@@ -24,8 +24,9 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
-import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
+import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
+import org.apache.cxf.jaxrs.provider.atom.AtomEntryProvider;
+import org.apache.cxf.jaxrs.provider.atom.AtomFeedProvider;
 import org.apache.cxf.management.web.browser.bootstrapping.BootstrapStorage;
 import org.apache.cxf.management.web.browser.bootstrapping.SimpleXMLSettingsStorage;
 import org.apache.cxf.management.web.logging.atom.AtomPullServer;
@@ -57,6 +58,7 @@ public class MockApp extends Application {
         classes.add(AtomEntryProvider.class);
         classes.add(BootstrapStorage.class);
         classes.add(BootstrapStorage.SettingsProvider.class);
+        classes.add(SearchContextProvider.class);
         return classes;
     }
 
