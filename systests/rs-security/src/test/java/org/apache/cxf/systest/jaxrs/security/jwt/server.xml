@@ -48,6 +48,31 @@ under the License.
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jwt.BookStore"/>
     <bean id="jweInFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweContainerRequestFilter"/>
     <bean id="jweOutFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweWriterInterceptor"/>
+    
+    <bean id="aesWrapEncryptionAlgo" class="org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyEncryptionAlgorithm">
+        <constructor-arg value="GawgguFyGrWKav7AX4VKUg"/>
+        <constructor-arg value="A128KW"/>
+    </bean>
+    <bean id="aesCbcHmacEncryption" class="org.apache.cxf.rs.security.oauth2.jwe.AesCbcHmacJweEncryption">
+        <constructor-arg value="A128KW"/>
+        <constructor-arg value="A128CBC-HS256"/>
+        <constructor-arg ref="aesWrapEncryptionAlgo"/>
+    </bean>
+    
+    <bean id="aesWrapDecryptionAlgo" class="org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyDecryptionAlgorithm">
+        <constructor-arg value="GawgguFyGrWKav7AX4VKUg"/>
+    </bean>
+    <bean id="aesCbcHmacDecryption" class="org.apache.cxf.rs.security.oauth2.jwe.AesCbcHmacJweDecryption">
+        <constructor-arg ref="aesWrapDecryptionAlgo"/>
+    </bean>
+    
+    <bean id="jweInAesCbcHmacFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweContainerRequestFilter">
+        <property name="decryptionProvider" ref="aesCbcHmacDecryption"/>
+    </bean>
+    <bean id="jweOutAesCbcHmacFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweWriterInterceptor">
+        <property name="encryptionProvider" ref="aesCbcHmacEncryption"/>
+    </bean>
+    
     <bean id="hmacSigVerifier" class="org.apache.cxf.rs.security.oauth2.jws.HmacJwsSignatureProvider">
         <constructor-arg value="AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"/>
     </bean>
@@ -93,5 +118,14 @@ under the License.
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
         </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jweaescbchmac">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInAesCbcHmacFilter"/>
+            <ref bean="jweOutAesCbcHmacFilter"/>
+        </jaxrs:providers>
     </jaxrs:server>
 </beans>

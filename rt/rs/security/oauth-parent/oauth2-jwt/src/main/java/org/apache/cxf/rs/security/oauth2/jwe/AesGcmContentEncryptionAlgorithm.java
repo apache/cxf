@@ -20,9 +20,17 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
+
 
 public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
     private static final int DEFAULT_IV_SIZE = 96;
+    public AesGcmContentEncryptionAlgorithm() {
+        this((byte[])null, null);
+    }
+    public AesGcmContentEncryptionAlgorithm(String encodedCek, String encodedIv) {
+        this((byte[])CryptoUtils.decodeSequence(encodedCek), CryptoUtils.decodeSequence(encodedIv));
+    }
     public AesGcmContentEncryptionAlgorithm(SecretKey key, byte[] iv) { 
         this(key.getEncoded(), iv);    
     }

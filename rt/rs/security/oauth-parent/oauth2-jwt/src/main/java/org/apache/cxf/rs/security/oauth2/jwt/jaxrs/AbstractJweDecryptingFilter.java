@@ -48,7 +48,7 @@ public class AbstractJweDecryptingFilter {
     protected void validateHeaders(JweHeaders headers) {
         // complete
     }
-    public void setDecryption(JweDecryptionProvider decryptor) {
+    public void setDecryptionProvider(JweDecryptionProvider decryptor) {
         this.decryption = decryptor;
     }
     protected JweDecryptionProvider getInitializedDecryption() {

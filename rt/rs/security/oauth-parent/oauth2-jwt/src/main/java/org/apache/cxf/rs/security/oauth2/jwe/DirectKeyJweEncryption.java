@@ -28,6 +28,20 @@ public class DirectKeyJweEncryption extends AbstractJweEncryption {
                                                 cek.getEncoded().length * 8)), cek.getEncoded(), iv);
     }
     public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
-        super(headers, new AesGcmContentEncryptionAlgorithm(cek, iv), new DirectKeyEncryptionAlgorithm());
+        this(headers, new AesGcmContentEncryptionAlgorithm(cek, iv));
+    }
+    public DirectKeyJweEncryption(JweHeaders headers, ContentEncryptionAlgorithm ceAlgo) {
+        super(headers, ceAlgo, new DirectKeyEncryptionAlgorithm());
+    }
+    protected byte[] getProvidedContentEncryptionKey() {
+        return validateCek(super.getProvidedContentEncryptionKey());
+    }
+    private static byte[] validateCek(byte[] cek) {
+        if (cek == null) {
+            // to prevent the cek from being auto-generated which 
+            // does not make sense for the direct key case
+            throw new NullPointerException("CEK must not be null");
+        }
+        return cek;
     }
 }

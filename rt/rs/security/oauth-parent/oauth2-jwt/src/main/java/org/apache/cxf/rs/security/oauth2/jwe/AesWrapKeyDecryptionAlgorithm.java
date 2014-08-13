@@ -24,11 +24,15 @@ import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AesWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
+    public AesWrapKeyDecryptionAlgorithm(String encodedKey) {    
+        this(CryptoUtils.decodeSequence(encodedKey));
+    }
     public AesWrapKeyDecryptionAlgorithm(byte[] secretKey) {    
         this(CryptoUtils.createSecretKeySpec(secretKey, Algorithm.AES_WRAP_ALGO_JAVA));
     }
     public AesWrapKeyDecryptionAlgorithm(SecretKey secretKey) {    
         super(secretKey, true);
     }
+    
     
 }
