@@ -96,6 +96,7 @@ public class HTTPTransportActivator
         private ServiceRegistration reg;
         private BundleContext context;
         private Servlet servlet;
+        private ServiceRegistration serviceRegistration;
         
         public ServletConfigurer(BundleContext context, Servlet servlet) {
             this.servlet = servlet;
@@ -140,7 +141,10 @@ public class HTTPTransportActivator
                        getProp(properties, "org.apache.cxf.servlet.service-list-page-authenticate-realm", "karaf"));
             sprops.put("use-x-forwarded-headers", 
                        getProp(properties, "org.apache.cxf.servlet.use-x-forwarded-headers", "false"));
-            context.registerService(Servlet.class.getName(), servlet, sprops);
+            if (serviceRegistration != null) {
+                serviceRegistration.unregister();
+            }
+            serviceRegistration = context.registerService(Servlet.class.getName(), servlet, sprops);
         }
 
         @SuppressWarnings("rawtypes")
