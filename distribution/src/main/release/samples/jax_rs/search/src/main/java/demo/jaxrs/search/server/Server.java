@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 public class Server {
 
     protected Server() throws Exception {
+        final Storage storage = new Storage();
         final Map< String, Object > properties = new HashMap< String, Object >();        
         properties.put("search.query.parameter.name", "$filter");
         properties.put("search.parser", new FiqlParser< SearchBean >(SearchBean.class));
@@ -42,7 +43,7 @@ public class Server {
         final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setProperties(properties);
         sf.setResourceClasses(Catalog.class);
-        sf.setResourceProvider(Catalog.class, new SingletonResourceProvider(new Catalog()));
+        sf.setResourceProvider(Catalog.class, new SingletonResourceProvider(new Catalog(storage)));
         sf.setAddress("http://localhost:9000/");
         sf.setProvider(new MultipartProvider());
         sf.setProvider(new SearchContextProvider());

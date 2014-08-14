@@ -21,11 +21,11 @@ package demo.jaxrs.search.server;
 
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,6 +47,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
@@ -78,10 +79,12 @@ public class Catalog {
     private final Directory directory = new RAMDirectory();
     private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
     private final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
-    private final ExecutorService executor = 
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private final Storage storage; 
+    private final ExecutorService executor = Executors.newFixedThreadPool(
+        Runtime.getRuntime().availableProcessors());
     
-    public Catalog() throws IOException {
+    public Catalog(final Storage storage) throws IOException {
+        this.storage = storage;
         initIndex();
     }
     
@@ -90,45 +93,38 @@ public class Catalog {
     public void addBook(@Suspended final AsyncResponse response, @Context final UriInfo uri, 
             final MultipartBody body)  {
         
-        executor.submit(new Callable< Void >() {
-            public Void call() throws Exception {
+        executor.submit(new Runnable() {
+            public void run() {
                 for (final Attachment attachment: body.getAllAttachments()) {
                     final DataHandler handler =  attachment.getDataHandler();
                     
                     if (handler != null) {
-                        final String source = handler.getName();                
+                        final String source = handler.getName();    
+                        
                         final LuceneDocumentMetadata metadata = new LuceneDocumentMetadata()
                             .withSource(source)
                             .withField("modified", Date.class);
                         
-                        final BufferedInputStream in = new BufferedInputStream(handler.getInputStream());
                         try {
-                            final Document document = extractor.extract(in, metadata);
-                            if (document != null) {                    
-                                final IndexWriter writer = new IndexWriter(directory, config);
-                                
-                                try {
-                                    writer.addDocument(document);
-                                    writer.commit();
-                                } finally {
-                                    writer.close();
-                                }
-                            }
-                        } finally {
-                            if (in != null) { 
-                                in.close(); 
-                            }
-                        }
+                            final byte[] content = IOUtils.readBytesFromStream(handler.getInputStream());
+                            storeAndIndex(metadata, content);
+                        } catch (final IOException ex) {
+                            response.resume(Response.serverError().build());  
+                        } 
                         
-                        response.resume(Response.created(uri.getRequestUriBuilder()
+                        if (response.isSuspended()) {
+                            response.resume(Response.created(uri.getRequestUriBuilder()
                                 .path(source).build()).build());
-                        return null;
+                        }
                     }                       
                 }              
                 
-                response.resume(Response.status(Status.BAD_REQUEST).build());   
-                return null;
+                if (response.isSuspended()) {
+                    response.resume(Response.status(Status.BAD_REQUEST).build());
+                }
             }
+
+            
         });
     }
     
@@ -144,8 +140,7 @@ public class Catalog {
             
             for (final ScoreDoc scoreDoc: searcher.search(query, 1000).scoreDocs) {
                 final DocumentStoredFieldVisitor visitor = 
-                    new DocumentStoredFieldVisitor("source");
-                
+                    new DocumentStoredFieldVisitor("source");                
                 
                 reader.document(scoreDoc.doc, visitor);
                 builder.add(visitor.getDocument().getField("source").stringValue());
@@ -217,6 +212,32 @@ public class Catalog {
         LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
         visitor.setPrimitiveFieldTypeMap(fieldTypes);
         return visitor;
+    }
+    
+    private void storeAndIndex(final LuceneDocumentMetadata metadata, final byte[] content)
+        throws IOException {
+        
+        BufferedInputStream in = null;        
+        try {
+            in = new BufferedInputStream(new ByteArrayInputStream(content));
+            
+            final Document document = extractor.extract(in, metadata);
+            if (document != null) {                    
+                final IndexWriter writer = new IndexWriter(directory, config);
+                
+                try {                                              
+                    storage.addDocument(metadata.getSource(), content);
+                    writer.addDocument(document);
+                    writer.commit();
+                } finally {
+                    writer.close();
+                }
+            }
+        } finally {
+            if (in != null) { 
+                try { in.close(); } catch (IOException ex) { /* do nothing */ }
+            }
+        }
     }
 }
 
