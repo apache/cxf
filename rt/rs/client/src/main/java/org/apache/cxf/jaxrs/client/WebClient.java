@@ -1112,6 +1112,7 @@ public class WebClient extends AbstractClient {
         URI uri = getCurrentURI();
         Message m = createMessage(body, httpMethod, headers, uri, exchange, 
                 invContext, false);
+        setSupportOnewayResponseProperty(m);
         if (inAnns != null) {
             m.put(Annotation.class.getName(), inAnns);
         }

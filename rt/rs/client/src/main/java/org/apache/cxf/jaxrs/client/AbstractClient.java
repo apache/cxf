@@ -866,6 +866,12 @@ public abstract class AbstractClient implements Client {
         }
     }
     
+    protected void setSupportOnewayResponseProperty(Message outMessage) {
+        if (!outMessage.getExchange().isOneWay()) {
+            outMessage.put(Message.PROCESS_ONEWAY_RESPONSE, true);
+        }
+    }
+    
     protected Message createMessage(Object body,
                                     String httpMethod, 
                                     MultivaluedMap<String, String> headers,
