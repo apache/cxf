@@ -19,7 +19,24 @@
 				</method>
 				<method name="DELETE" id="deleteRepository">
 				</method>
-
+                <method name="GET" id="getName">
+	                <request>
+	                    <param name="a" style="query" type="xs:int"/>
+	                    <param name="c.a" style="query" type="xs:int"/>
+	                    <param name="c.b" style="query" type="xs:int"/>
+	                    <param name="c.d.a" style="query" type="xs:dateTime"/>
+	                    <param name="option" default="A" style="query" required="true">
+	                        <option value="A"/>
+	                        <option value="B"/>
+	                    </param>
+	                    <param name="If-Modified-Since" style="header" type="xsd:date"/>
+	                </request>
+	                <response>
+	                    <representation mediaType="text/plain">
+	                        <param name="result" style="plain" type="xs:string"/>
+	                    </representation>
+	                </response>
+	            </method>
 			</resource>
 		</resource>
 	</resources>

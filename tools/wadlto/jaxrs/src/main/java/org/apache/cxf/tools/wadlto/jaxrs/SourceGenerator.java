@@ -178,6 +178,7 @@ public class SourceGenerator {
         XSD_SPECIFIC_TYPE_MAP.put("dateTime", "java.util.Date");
         XSD_SPECIFIC_TYPE_MAP.put("time", "java.util.Date");
         XSD_SPECIFIC_TYPE_MAP.put("anyType", "String");
+        XSD_SPECIFIC_TYPE_MAP.put("anyURI", "java.net.URI");
     }
 
     private Comparator<String> importsComparator;
@@ -901,7 +902,7 @@ public class SourceGenerator {
         }
         if (!suspendedAsync && !responseRequired && responseEls.size() == 1 && generateResponseIfHeadersSet) {
             List<Element> outResponseParamElements = 
-                getParameters(responseEls.get(0), info.getInheritedParams(), false);
+                getParameters(responseEls.get(0), Collections.<Element>emptyList(), false);
             if (outResponseParamElements.size() > 0) {
                 writeJaxrResponse(sbCode, imports);
                 return true;
