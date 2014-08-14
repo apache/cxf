@@ -1371,6 +1371,14 @@ public class BookStore {
     public Response echoBookNameAndHeader3(String name) {
         return echoBookNameAndHeader(httpHeaders.getRequestHeader("customheader").get(0), name);
     }
+    
+    @POST
+    @Path("/booksecho202")
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    public Response echoBookName202(String name) {
+        return Response.accepted(name).build();
+    }
         
     
     @GET
