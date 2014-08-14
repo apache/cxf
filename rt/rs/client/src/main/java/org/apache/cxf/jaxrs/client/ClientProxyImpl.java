@@ -651,6 +651,7 @@ public class ClientProxyImpl extends AbstractClient implements
                 outMessage.put(Type.class, ori.getMethodToInvoke().getGenericParameterTypes()[bodyIndex]);
             }
             outMessage.getExchange().setOneWay(ori.isOneway());
+            setSupportOnewayResponseProperty(outMessage);
             outMessage.setContent(OperationResourceInfo.class, ori);
             setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
             outMessage.getExchange().put(Method.class, ori.getMethodToInvoke());

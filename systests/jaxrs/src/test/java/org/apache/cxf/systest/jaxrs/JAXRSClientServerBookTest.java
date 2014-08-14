@@ -1624,7 +1624,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testEchoBookName202() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/booksecho202");
-        WebClient.getConfig(wc).getRequestContext().put(Message.PROCESS_ONEWAY_RESPONSE, true);
         wc.type("text/plain").accept("text/plain");
         Response r = wc.post("book");
         assertEquals(202, r.getStatus());
