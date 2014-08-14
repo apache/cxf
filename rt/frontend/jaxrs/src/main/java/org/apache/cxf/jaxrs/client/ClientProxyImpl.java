@@ -643,7 +643,7 @@ public class ClientProxyImpl extends AbstractClient implements
             }
             Message outMessage = createMessage(body, ori.getHttpMethod(), headers, uri, 
                                                exchange, invocationContext, true);
-            
+            setSupportOnewayResponseProperty(outMessage);
             outMessage.getExchange().setOneWay(ori.isOneway());
             outMessage.setContent(OperationResourceInfo.class, ori);
             setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
