@@ -9,8 +9,9 @@
 				</response>
 			</method>
 
-			<resource path="{name}">
-				<param name="name" style="template" type="xs:string"/>
+			<resource path="{the-name}">
+				<param name="the-name" style="template" type="xs:string"/>
+				
 				<method name="PUT" id="createRepository" >
 					<request>
 					</request>
@@ -19,17 +20,12 @@
 				</method>
 				<method name="DELETE" id="deleteRepository">
 				</method>
-                <method name="GET" id="getName">
+					
+                <method name="POST">
 	                <request>
-	                    <param name="a" style="query" type="xs:int"/>
-	                    <param name="c.a" style="query" type="xs:int"/>
-	                    <param name="c.b" style="query" type="xs:int"/>
-	                    <param name="c.d.a" style="query" type="xs:dateTime"/>
-	                    <param name="option" default="A" style="query" required="true">
-	                        <option value="A"/>
-	                        <option value="B"/>
-	                    </param>
-	                    <param name="If-Modified-Since" style="header" type="xsd:date"/>
+	                    <representation mediaType="text/plain">
+	                        <param name="id" style="plain" type="java.util.Date"/>
+	                    </representation>
 	                </request>
 	                <response>
 	                    <representation mediaType="text/plain">
