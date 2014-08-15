@@ -103,7 +103,10 @@ public final class Client {
             int status = httpClient.executeMethod(post);
             if (status == 201) {   
                 System.out.println(post.getResponseHeader("Location"));
+            } else if (status == 409) {   
+                System.out.println("Document already exists: " + filename);
             }
+
         } finally {
             post.releaseConnection();
         }

@@ -63,10 +63,12 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
@@ -99,13 +101,18 @@ public class Catalog {
                     final DataHandler handler =  attachment.getDataHandler();
                     
                     if (handler != null) {
-                        final String source = handler.getName();    
-                        
+                        final String source = handler.getName();
+                                                
                         final LuceneDocumentMetadata metadata = new LuceneDocumentMetadata()
                             .withSource(source)
                             .withField("modified", Date.class);
                         
                         try {
+                            if (exists(source)) {
+                                response.resume(Response.status(Status.CONFLICT).build());
+                                return;
+                            }
+
                             final byte[] content = IOUtils.readBytesFromStream(handler.getInputStream());
                             storeAndIndex(metadata, content);
                         } catch (final IOException ex) {
@@ -123,8 +130,6 @@ public class Catalog {
                     response.resume(Response.status(Status.BAD_REQUEST).build());
                 }
             }
-
-            
         });
     }
     
@@ -140,10 +145,13 @@ public class Catalog {
             
             for (final ScoreDoc scoreDoc: searcher.search(query, 1000).scoreDocs) {
                 final DocumentStoredFieldVisitor visitor = 
-                    new DocumentStoredFieldVisitor("source");                
+                    new DocumentStoredFieldVisitor(LuceneDocumentMetadata.SOURCE_FIELD);                
                 
                 reader.document(scoreDoc.doc, visitor);
-                builder.add(visitor.getDocument().getField("source").stringValue());
+                builder.add(visitor
+                        .getDocument()
+                        .getField(LuceneDocumentMetadata.SOURCE_FIELD)
+                        .stringValue());
             }
             
             return builder.build();
@@ -170,7 +178,7 @@ public class Catalog {
                 
                 builder.add(
                     Json.createObjectBuilder()
-                        .add("source", document.getField("source").stringValue())
+                        .add("source", document.getField(LuceneDocumentMetadata.SOURCE_FIELD).stringValue())
                         .add("score", scoreDoc.score)
                 );
             }
@@ -212,6 +220,18 @@ public class Catalog {
         LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
         visitor.setPrimitiveFieldTypeMap(fieldTypes);
         return visitor;
+    }
+    
+    private boolean exists(final String source) throws IOException {
+        final IndexReader reader = DirectoryReader.open(directory);
+        final IndexSearcher searcher = new IndexSearcher(reader);
+
+        try {            
+            return searcher.search(new TermQuery(
+                new Term(LuceneDocumentMetadata.SOURCE_FIELD, source)), 1).totalHits > 0;
+        } finally {
+            reader.close();
+        }
     }
     
     private void storeAndIndex(final LuceneDocumentMetadata metadata, final byte[] content)

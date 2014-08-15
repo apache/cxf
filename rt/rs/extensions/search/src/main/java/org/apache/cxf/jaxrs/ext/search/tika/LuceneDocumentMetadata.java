@@ -26,6 +26,8 @@ import javax.ws.rs.ext.ParamConverterProvider;
 import org.apache.cxf.jaxrs.ext.search.DefaultParamConverterProvider;
 
 public class LuceneDocumentMetadata {
+    public static final String SOURCE_FIELD = "source";
+    
     private final Map< String, Class< ? > > fieldTypes;
     private final String contentFieldName;
     private String source;
@@ -63,7 +65,11 @@ public class LuceneDocumentMetadata {
     public String getContentFieldName() {
         return contentFieldName;
     }
-    
+
+    public String getSourceFieldName() {
+        return SOURCE_FIELD;
+    }
+
     public String getSource() {
         return source;
     }

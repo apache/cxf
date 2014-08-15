@@ -193,7 +193,8 @@ public class TikaLuceneContentExtractor {
         }
         
         if (!StringUtils.isBlank(documentMetadata.getSource())) {
-            document.add(new StringField("source", documentMetadata.getSource(), Store.YES));
+            document.add(new StringField(documentMetadata.getSourceFieldName(), 
+                documentMetadata.getSource(), Store.YES));
         }
         
         return document;
