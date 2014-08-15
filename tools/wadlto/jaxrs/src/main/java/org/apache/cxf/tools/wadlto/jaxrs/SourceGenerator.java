@@ -737,7 +737,7 @@ public class SourceGenerator {
                     }
                     genMethodName += firstCharToUpperCase(sb.toString());
                 }
-                sbCode.append(genMethodName);
+                sbCode.append(genMethodName.replace("-", ""));
             } else {
                 boolean expandedQName = id.startsWith("{");
                 QName qname = convertToQName(id, expandedQName);
@@ -918,11 +918,11 @@ public class SourceGenerator {
             }
         }
         
-        String elementName = responseRequired ? null : getElementRefName(
+        String elementType = responseRequired ? null : getElementRefName(
                 getActualRepElement(repElements, getXmlReps(repElements, info.getGrammarInfo()).get(0)), 
-                info, imports);
-        if (elementName != null) {
-            sbCode.append(elementName + " ");
+                info, imports, true);
+        if (elementType != null) {
+            sbCode.append(elementType + " ");
         } else {
             writeJaxrResponse(sbCode, imports);
         }
@@ -1041,13 +1041,19 @@ public class SourceGenerator {
         String elementParamName = null;
         if (!form) {
             if (!jaxpRequired) {    
-                elementParamType = getElementRefName(repElement, info, imports);
+                elementParamType = getElementRefName(repElement, info, imports, false);
                 if (elementParamType != null) {
                     int lastIndex = elementParamType.lastIndexOf('.');
                     if (lastIndex != -1) {
                         elementParamType = elementParamType.substring(lastIndex + 1);
                     }
                     elementParamName = elementParamType.toLowerCase();
+                } else if (repElement != null) {
+                    Element param = DOMUtils.getFirstChildWithName(repElement, getWadlNamespace(), "param");
+                    if (param != null) {
+                        elementParamType = getPrimitiveType(param, info, imports);
+                        elementParamName = param.getAttribute("name");
+                    }
                 }
             } else {
                 addImport(imports, Source.class.getName());
@@ -1210,7 +1216,7 @@ public class SourceGenerator {
             String value = pair[1].replaceAll("[\\-\\_]", "");
             return convertRefToClassName(pair[0], value, defaultValue, info, imports);
         } else {
-            return type;
+            return addImportsAndGetSimpleName(imports, type);
         }
         
     }
@@ -1266,7 +1272,8 @@ public class SourceGenerator {
     
     private String getElementRefName(Element repElement,
                                      ContextInfo info, 
-                                     Set<String> imports) {
+                                     Set<String> imports,
+                                     boolean checkPrimitive) {
         if (repElement == null) {
             return null;
         }
@@ -1286,10 +1293,11 @@ public class SourceGenerator {
             if (!StringUtils.isEmpty(mediaType) && mediaTypesMap.containsKey(mediaType)) {
                 return addImportsAndGetSimpleName(imports, mediaTypesMap.get(mediaType));
             }
-            
-            Element param = DOMUtils.getFirstChildWithName(repElement, getWadlNamespace(), "param");
-            if (param != null) {
-                return getPrimitiveType(param, info, imports);
+            if (checkPrimitive) {
+                Element param = DOMUtils.getFirstChildWithName(repElement, getWadlNamespace(), "param");
+                if (param != null) {
+                    return getPrimitiveType(param, info, imports);
+                }
             }
         }
         return null;
