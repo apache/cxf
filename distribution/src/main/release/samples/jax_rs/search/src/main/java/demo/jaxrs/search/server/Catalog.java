@@ -22,7 +22,10 @@ package demo.jaxrs.search.server;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,15 +39,19 @@ import javax.json.JsonArrayBuilder;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.helpers.IOUtils;
@@ -163,7 +170,9 @@ public class Catalog {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/search")
-    public JsonArray findBook(@Context SearchContext searchContext) throws IOException {
+    public JsonArray findBook(@Context SearchContext searchContext, 
+            @Context final UriInfo uri) throws IOException {
+        
         final IndexReader reader = DirectoryReader.open(directory);
         final IndexSearcher searcher = new IndexSearcher(reader);
         final JsonArrayBuilder builder = Json.createArrayBuilder();
@@ -175,11 +184,16 @@ public class Catalog {
             final TopDocs topDocs = searcher.search(visitor.getQuery(), 1000);
             for (final ScoreDoc scoreDoc: topDocs.scoreDocs) {
                 final Document document = reader.document(scoreDoc.doc);
+                final String source = document.getField(LuceneDocumentMetadata.SOURCE_FIELD).stringValue();
                 
                 builder.add(
                     Json.createObjectBuilder()
-                        .add("source", document.getField(LuceneDocumentMetadata.SOURCE_FIELD).stringValue())
+                        .add("source", source)
                         .add("score", scoreDoc.score)
+                        .add("url", uri.getBaseUriBuilder()
+                                .path(Catalog.class)
+                                .path(source)
+                                .build().toString())
                 );
             }
             
@@ -189,11 +203,35 @@ public class Catalog {
         }
     }
     
+    @GET
+    @Path("/{source}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public StreamingOutput getBook(@PathParam("source") final String source) throws IOException {            
+        return new StreamingOutput() {            
+            @Override
+            public void write(final OutputStream out) throws IOException, WebApplicationException {
+                InputStream in = null;
+                
+                try {
+                    in = storage.getDocument(source);
+                    out.write(IOUtils.readBytesFromStream(in));
+                } catch (final FileNotFoundException ex) {
+                    throw new NotFoundException("Document does not exist: " + source);
+                } finally {
+                    if (in != null) { 
+                        try { in.close(); } catch (IOException ex) { /* do nothing */ }
+                    }    
+                }                
+            }
+        };
+    }
+    
     @DELETE
     public Response delete() throws IOException {
         final IndexWriter writer = new IndexWriter(directory, config);
         
         try {
+            storage.deleteAll();
             writer.deleteAll();
             writer.commit();
         } finally {

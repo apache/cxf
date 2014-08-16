@@ -14,6 +14,30 @@ returns all the documents currently stored and managed (in JSON format):
     "JavaWebSocketAPI_1.0_Final.pdf"
 ]
 
+A HTTP POST request to URL http://localhost:9000/catalog
+uploads document and stores it.
+
+A HTTP GET request to URL http://localhost:9000/catalog/search?$filter=<query>
+searches the relevant documents which match the query and returns them (in JSON format):
+
+[
+    {
+        "source":"JavaWebSocketAPI_1.0_Final.pdf",
+        "score":0.07321092486381531,
+        "url":"http://localhost:9000/catalog/JavaWebSocketAPI_1.0_Final.pdf"
+    },
+    {
+        "source":"jsr339-jaxrs-2.0-final-spec.pdf",
+        "score":0.03448590263724327,
+        "url":"http://localhost:9000/catalog/jsr339-jaxrs-2.0-final-spec.pdf"
+    }
+]
+
+A HTTP GET request to URL http://localhost:9000/catalog/<document> returns the
+original document content (in  binary form).
+
+A HTTP DELETE request to URL http://localhost:9000/catalog removes all documents
+from the catalog.
 
 Building and running the demo using Maven
 ---------------------------------------

@@ -21,6 +21,8 @@ package demo.jaxrs.search.server;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,6 +72,24 @@ public class Storage {
         } finally {
             if (out != null) {
                 try { out.close(); } catch (IOException ex) { /* do nothing */ }
+            }
+        }
+    }
+    
+    public InputStream getDocument(final String name) throws IOException {
+        final File f = new File(folder, name);
+        
+        if (!f.exists() || !f.isFile()) {
+            throw new FileNotFoundException("Unable to access FS file:" + f.getAbsolutePath());
+        }
+        
+        return new FileInputStream(f);
+    }
+    
+    public void deleteAll() throws IOException {
+        for (final File f: folder.listFiles()) {
+            if (!f.delete()) {
+                throw new IOException("Unable to delete FS file:" + f.getAbsolutePath());
             }
         }
     }

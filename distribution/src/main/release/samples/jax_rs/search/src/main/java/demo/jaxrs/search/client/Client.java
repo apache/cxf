@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
@@ -46,6 +47,8 @@ public final class Client {
         
         search(url, httpClient, "ct==java");        
         search(url, httpClient, "ct==websockets");
+        
+        delete(url, httpClient);
     }
 
     private static void list(final String url, final HttpClient httpClient) 
@@ -109,6 +112,22 @@ public final class Client {
 
         } finally {
             post.releaseConnection();
+        }
+    }
+    
+    private static void delete(final String url, final HttpClient httpClient) 
+        throws IOException, HttpException {
+                
+        System.out.println("Sent HTTP DELETE request to remove all books from catalog");
+        
+        final DeleteMethod delete = new DeleteMethod(url);            
+        try {
+            int status = httpClient.executeMethod(delete);
+            if (status == 200) {   
+                System.out.println(delete.getResponseBodyAsString());
+            }
+        } finally {
+            delete.releaseConnection();
         }
     }
 
