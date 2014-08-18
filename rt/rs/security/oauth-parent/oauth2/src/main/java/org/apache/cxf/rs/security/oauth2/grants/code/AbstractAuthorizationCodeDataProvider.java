@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.util.List;
 
+import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -28,9 +29,10 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 /**
  * Abstract AuthorizationCodeDataProvider implementation 
  */
-public abstract class AbstractAuthorizationCodeDataProvider implements AuthorizationCodeDataProvider {
+public abstract class AbstractAuthorizationCodeDataProvider 
+    extends AbstractOAuthDataProvider implements AuthorizationCodeDataProvider {
 
-    private long grantLifetime;
+    private long grantLifetime = 3600L;
     
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
