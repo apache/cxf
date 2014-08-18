@@ -48,6 +48,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
 
     private String contentsFieldName;
     private Map<String, String> contentsFieldMap;
+    private boolean caseInsensitiveMatch;
     private Stack<List<Query>> queryStack = new Stack<List<Query>>();
     public LuceneQueryVisitor() {
         this(Collections.<String, String>emptyMap());        
@@ -139,6 +140,9 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         Query query = null;
         if (cls == String.class) {
             String strValue = value.toString();
+            if (caseInsensitiveMatch) {
+                strValue = strValue.toLowerCase();
+            }
             boolean isWildCard = strValue.contains("*") || super.isWildcardStringMatch(); 
             
             String theContentsFieldName = getContentsFieldName(name);
@@ -267,5 +271,9 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         }
         
         return booleanQuery;
+    }
+
+    public void setCaseInsensitiveMatch(boolean caseInsensitiveMatch) {
+        this.caseInsensitiveMatch = caseInsensitiveMatch;
     }    
 }
