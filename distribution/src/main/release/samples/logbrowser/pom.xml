@@ -20,17 +20,72 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>logbrowser</artifactId>
-    <name>LogBrowser</name>
-    <description>LogBrowser</description>
-    <version>2.7.13-SNAPSHOT</version>
-
+    <packaging>war</packaging>
+    <name>Apache CXF Samples LogBrowser</name>
+    <description>Apacher CXF Samples LogBrowser</description>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
         <version>2.7.13-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
-
+    <build>
+      <plugins>
+        <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+            </configuration>
+        </plugin>
+	<plugin>
+	  <groupId>org.apache.maven.plugins</groupId>
+	  <artifactId>maven-war-plugin</artifactId>
+	  <configuration>
+	    <!-- excluding libs and classes/META-INF for OSGi -->
+	    <packagingExcludes>WEB-INF/lib/,WEB-INF/classes/META-INF/</packagingExcludes>
+	    <archive>
+                <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+            </archive>
+	  </configuration>
+	</plugin>
+	<plugin>
+	    <groupId>org.apache.felix</groupId>
+	    <artifactId>maven-bundle-plugin</artifactId>
+	    <executions>
+                <execution>
+                    <id>bundle-manifest</id>
+                    <phase>process-classes</phase>
+                    <goals>
+                        <goal>manifest</goal>
+                    </goals>
+		</execution>
+            </executions>
+	    <extensions>true</extensions>
+	    <configuration>
+	        <supportedProjectTypes>
+		    <supportedProjectType>jar</supportedProjectType>
+		    <supportedProjectType>bundle</supportedProjectType>
+		    <supportedProjectType>war</supportedProjectType>
+		</supportedProjectTypes>
+		<instructions>
+		    <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+		    <Bundle-Description>${project.description}</Bundle-Description>
+		    <Web-ContextPath>/cxf-samples-logbrowser</Web-ContextPath>
+		    <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+		    <Export-Package />
+		    <Import-Package>
+			org.apache.cxf.jaxrs.servlet,
+			org.apache.abdera.parser.stax,
+			com.ctc.wstx.stax,
+			org.apache.abdera,
+			*
+		    </Import-Package>
+		</instructions>
+	    </configuration>
+	</plugin>
+      </plugins>
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -62,19 +117,6 @@
             </build>
         </profile>
     </profiles>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-
-        </plugins>
-    </build>
-    
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -104,6 +146,12 @@
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-parser</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.james</groupId>
+                    <artifactId>apache-mime4j-core</artifactId>
+                </exclusion>
+	    </exclusions>
         </dependency>
 
         <dependency>

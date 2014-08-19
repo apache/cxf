@@ -34,6 +34,10 @@
     </parent>
 
     <properties>
+        <cxf.osgi.import>
+	  !com.google.*,
+	  *
+        </cxf.osgi.import>
         <gwt.version>2.4.0</gwt.version>
         <gwt.inject.version>1.5.0</gwt.inject.version>
         <gwt.plugin.version>2.4.0</gwt.plugin.version>
