@@ -743,13 +743,14 @@ public class SourceGenerator {
                 QName qname = convertToQName(id, expandedQName);
                 String packageName = possiblyConvertNamespaceURI(qname.getNamespaceURI(), expandedQName);
                 
-                String clsSimpleName = getSchemaClassName(packageName, info.getGrammarInfo(), 
+                String clsFullName = getSchemaClassName(packageName, info.getGrammarInfo(), 
                         qname.getLocalPart(), info.getTypeClassNames());
-                String localName = clsSimpleName == null 
+                int lastDotIndex = clsFullName == null ? -1 : clsFullName.lastIndexOf(".");
+                String localName = clsFullName == null 
                     ? getClassName(qname.getLocalPart(), true, info.getTypeClassNames()) 
-                    : clsSimpleName.substring(packageName.length() + 1);
-                String subResponseNs = clsSimpleName == null ? getClassPackageName(packageName) 
-                    : clsSimpleName.substring(0, packageName.length());
+                    : clsFullName.substring(lastDotIndex + 1);
+                String subResponseNs = clsFullName == null ? getClassPackageName(packageName) 
+                    : clsFullName.substring(0, lastDotIndex);
                 Object parentNode = resourceEl.getParentNode();
                 String parentId = parentNode instanceof Element 
                     ? ((Element)parentNode).getAttribute("id")
@@ -1003,7 +1004,13 @@ public class SourceGenerator {
                 }
             }
             if (writeAnnotations(info.isInterfaceGenerated())) {
-                writeAnnotation(sbCode, imports, paramAnn, name, false, false);
+                String required = paramEl.getAttribute("required");
+                if (Multipart.class.equals(paramAnn) && "false".equals(required)) {
+                    writeAnnotation(sbCode, imports, paramAnn, null, false, false);
+                    sbCode.append("(value = \"").append(name).append("\", required = \"false\"").append(')');
+                } else {
+                    writeAnnotation(sbCode, imports, paramAnn, name, false, false);
+                }
                 sbCode.append(" ");
                 String defaultVal = paramEl.getAttribute("default");
                 if (defaultVal.length() > 0) {
@@ -1011,7 +1018,7 @@ public class SourceGenerator {
                     sbCode.append(" ");    
                 }
             }
-            boolean isRepeating = Boolean.valueOf(paramEl.getAttribute("repeating"));
+            boolean isRepeating = isRepeatingParam(paramEl);
             String type = enumCreated ? getTypicalClassName(name)
                 : getPrimitiveType(paramEl, info, imports);
             if (OPTIONAL_PARAMS.contains(paramAnn)
@@ -1019,10 +1026,7 @@ public class SourceGenerator {
                 && AUTOBOXED_PRIMITIVES_MAP.containsKey(type)) {
                 type = AUTOBOXED_PRIMITIVES_MAP.get(type);
             }
-            if (isRepeating) {
-                addImport(imports, List.class.getName());
-                type = "List<" + type + ">";
-            }
+            type = addListIfRepeating(type, isRepeating, imports);
             String paramName;
             if (JavaUtils.isJavaKeyword(name)) {
                 paramName = name.concat("_arg");
@@ -1084,6 +1088,18 @@ public class SourceGenerator {
             sbCode.append("@").append(Suspended.class.getSimpleName()).append(" ")
                 .append(AsyncResponse.class.getSimpleName()).append(" ").append("async");
         }
+    }
+    
+    private boolean isRepeatingParam(Element paramEl) {
+        return Boolean.valueOf(paramEl.getAttribute("repeating"));
+    }
+    
+    private String addListIfRepeating(String type, boolean isRepeating, Set<String> imports) {
+        if (isRepeating) {
+            addImport(imports, List.class.getName());
+            type = "List<" + type + ">";
+        }
+        return type;
     }
     
     private Class<?> getParamAnnotation(String paramStyle) {
@@ -1206,7 +1222,7 @@ public class SourceGenerator {
             if (XSD_SPECIFIC_TYPE_MAP.containsKey(pair[1])) {
                 String expandedName = "{" + XmlSchemaConstants.XSD_NAMESPACE_URI + "}" + pair[1];
                 if (schemaTypeMap.containsKey(expandedName)) {
-                    return checkGenericType(schemaTypeMap.get(expandedName));
+                    return addImportsAndGetSimpleName(imports, schemaTypeMap.get(expandedName));
                 }
                 
                 String xsdType = XSD_SPECIFIC_TYPE_MAP.get(pair[1]);
@@ -1248,13 +1264,21 @@ public class SourceGenerator {
     }
     
     private String addImportsAndGetSimpleName(Set<String> imports, String clsName) {
+        String originalName = clsName;
+        int typeIndex = clsName.lastIndexOf("..");
+        if (typeIndex != -1) {
+            clsName = clsName.substring(0, typeIndex);
+        }
         addImport(imports, clsName);
         int index = clsName.lastIndexOf(".");
         
         if (index != -1) {
             clsName = clsName.substring(index + 1);
         }
-        return checkGenericType(clsName);
+        if (typeIndex != -1) {
+            clsName = clsName + "<" + originalName.substring(typeIndex + 2) + ">";  
+        }
+        return clsName;
     }
     
     private String checkGenericType(String clsName) {
@@ -1294,9 +1318,10 @@ public class SourceGenerator {
                 return addImportsAndGetSimpleName(imports, mediaTypesMap.get(mediaType));
             }
             if (checkPrimitive) {
-                Element param = DOMUtils.getFirstChildWithName(repElement, getWadlNamespace(), "param");
-                if (param != null) {
-                    return getPrimitiveType(param, info, imports);
+                Element paramEl = DOMUtils.getFirstChildWithName(repElement, getWadlNamespace(), "param");
+                if (paramEl != null) {
+                    String type = getPrimitiveType(paramEl, info, imports);
+                    type = addListIfRepeating(type, isRepeatingParam(paramEl), imports);
                 }
             }
         }
