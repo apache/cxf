@@ -24,7 +24,7 @@
                 <method name="POST">
 	                <request>
 	                    <representation mediaType="text/plain">
-	                        <param name="id" style="plain" type="java.util.Date"/>
+	                        <param name="id" style="plain" type="xsd:anyType"/>
 	                    </representation>
 	                </request>
 	                <response>
