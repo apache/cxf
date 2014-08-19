@@ -98,6 +98,9 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/test.xml"));
             context.put(WadlToolConstants.CFG_COMPILE, "true");
+            context.put(WadlToolConstants.CFG_SCHEMA_TYPE_MAP, 
+                        "{http://www.w3.org/2001/XMLSchema}anyType=" 
+                        + "java.io.InputStream");
             context.put(WadlToolConstants.CFG_INHERIT_PARAMS, "true");
             
             container.setContext(context);
