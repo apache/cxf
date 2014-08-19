@@ -399,4 +399,15 @@
         <bundle start-level="30" dependency="true">mvn:org.glassfish/javax.el/3.0-b1</bundle>  
     </feature>
 
+    <feature name="cxf-management-web" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-core</feature>
+        <feature version="${project.version}">cxf-jaxrs</feature>
+        <bundle start-level="35" dependency="true">mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:commons-codec/commons-codec/${cxf.commons-codec.version}</bundle>
+        <bundle start-level="35">mvn:org.apache.abdera/abdera-core/${cxf.abdera.version}</bundle>
+        <bundle start-level="35">mvn:org.apache.abdera/abdera-i18n/${cxf.abdera.version}</bundle>
+        <bundle start-level="35">mvn:org.apache.james/apache-mime4j-core/${cxf.james.mim4j.version}</bundle>
+        <bundle start-level="35">mvn:org.apache.abdera/abdera-parser/${cxf.abdera.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-management-web/${project.version}</bundle>
+    </feature>
 </features>

@@ -41,6 +41,10 @@
     <script type="text/javascript" src="./jquery-1.4.2.min.js"></script>
     
     <script type="text/javascript">
+
+        var wloc = window.location.pathname;
+	wloc = wloc.substring(0, wloc.lastIndexOf('/'));
+
         function buildCustomerAsString(id, name) {
             return "{ \"Customer\" : { \"id\" : \"" + id + "\", \"name\" : \"" + name +"\" } }";
         }
@@ -67,7 +71,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url : "/service/customers/",
+                    url : wloc + "/service/customers/",
                     contentType : "application/json",
                     data : buildCustomerAsString(id, name),
                     complete : function(xhr) {
@@ -89,7 +93,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url : "/service/customers/" + id,
+                    url : wloc + "/service/customers/" + id,
                     dataType : "text",
                     complete : function(xhr) {
                         if (xhr.status == 200) {
@@ -112,7 +116,7 @@
 
                 $.ajax({
                     type: "DELETE",
-                    url : "/service/customers/" + id,
+                    url : wloc + "/service/customers/" + id,
                     complete : function(xhr) {
                         if (xhr.status == 200) {
                             alert("Customer deleted successfully");
