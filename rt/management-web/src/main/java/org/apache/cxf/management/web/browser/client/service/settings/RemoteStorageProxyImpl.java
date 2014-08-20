@@ -34,7 +34,7 @@ import com.google.gwt.json.client.JSONValue;
 import org.apache.cxf.management.web.browser.client.service.AbstractCallback;
 
 public class RemoteStorageProxyImpl implements RemoteStorageProxy {
-    private static final String HOSTED_MODE_ENDPOINT_URL = "/log/browser/settings";
+    private static final String HOSTED_MODE_ENDPOINT_URL = "settings";
     private static final String RESOURCES_ENDPOINT_SUFFIX = "/resources/";
     private static final String SETTINGS_ENDPOINT_SUFFIX = "/settings";
     
