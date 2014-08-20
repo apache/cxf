@@ -47,7 +47,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
     @Override
     public ServerAccessToken refreshAccessToken(Client client, String refreshTokenKey,
                                                 List<String> requestedScopes) throws OAuthServiceException {
-        RefreshToken oldRefreshToken = removeRefreshToken(client, refreshTokenKey);
+        RefreshToken oldRefreshToken = revokeRefreshToken(client, refreshTokenKey);
 
         ServerAccessToken serverToken = doRefreshAccessToken(client, oldRefreshToken, requestedScopes);
         saveAccessToken(serverToken);
@@ -56,13 +56,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
     
     @Override
     public void revokeToken(Client client, String tokenKey, String tokenTypeHint) throws OAuthServiceException {
-        if (removeAccessToken(tokenKey)) {
+        if (revokeAccessToken(tokenKey)) {
             return;
         }
-        RefreshToken oldRefreshToken = removeRefreshToken(client, tokenKey);
+        RefreshToken oldRefreshToken = revokeRefreshToken(client, tokenKey);
         if (oldRefreshToken != null) {
             for (String accessTokenKey : oldRefreshToken.getAccessTokens()) {
-                removeAccessToken(accessTokenKey);
+                revokeAccessToken(accessTokenKey);
             }
         }
     }
@@ -111,7 +111,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
         rt.setScopes(at.getScopes());
         rt.getAccessTokens().add(at.getTokenKey());
         at.setRefreshToken(rt.getTokenKey());
-        saveRefreshToken(rt);
+        saveRefreshToken(at, rt);
         return rt;
     }
     
@@ -142,8 +142,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
     }
     
     protected abstract void saveAccessToken(ServerAccessToken serverToken);
-    protected abstract void saveRefreshToken(RefreshToken refreshToken);
-    protected abstract boolean removeAccessToken(String accessTokenKey);
-    protected abstract RefreshToken removeRefreshToken(Client client, String refreshTokenKey);
+    protected abstract void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken);
+    protected abstract boolean revokeAccessToken(String accessTokenKey);
+    protected abstract RefreshToken revokeRefreshToken(Client client, String refreshTokenKey);
     
 }
