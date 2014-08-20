@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -32,13 +34,15 @@ import net.sf.ehcache.config.DiskStoreConfiguration;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.EHCacheUtil;
 
-public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
+public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider 
+    implements ClientRegistrationProvider {
     public static final String CLIENT_CACHE_KEY = "cxf.oauth2.client.cache";
     public static final String ACCESS_TOKEN_CACHE_KEY = "cxf.oauth2.accesstoken.cache";
     public static final String REFRESH_TOKEN_CACHE_KEY = "cxf.oauth2.refreshtoken.cache";
@@ -68,6 +72,29 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
         return getCacheValue(clientCache, clientId, Client.class);
+    }
+    
+    @Override
+    public void setClient(Client client) {
+        putCacheValue(clientCache, client.getClientId(), client, 0);
+        
+    }
+
+    @Override
+    public Client removeClient(String clientId) {
+        Client c = getClient(clientId);
+        clientCache.remove(clientId);
+        return c;
+    }
+
+    @Override
+    public List<Client> getClients() {
+        List<String> keys = CastUtils.cast(clientCache.getKeys());
+        List<Client> clients = new ArrayList<Client>(keys.size());
+        for (String key : keys) {
+            clients.add(getClient(key));
+        }
+        return clients;
     }
     
     @Override
@@ -165,4 +192,6 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         accessTokenCache = createCache(cacheManager, accessTokenKey);
         refreshTokenCache = createCache(cacheManager, refreshTokenKey);
     }
+
+    
 }

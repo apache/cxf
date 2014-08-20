@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,11 +34,12 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.ModelEncryptionSupport;
 
-public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvider {
+public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvider 
+    implements ClientRegistrationProvider {
     protected SecretKey key;
     private Set<String> tokens = Collections.synchronizedSet(new HashSet<String>());
     private ConcurrentHashMap<String, String> refreshTokens = new ConcurrentHashMap<String, String>();
-    
+    private ConcurrentHashMap<String, String> clientsMap = new ConcurrentHashMap<String, String>();
     public DefaultEncryptingOAuthDataProvider(String algo, int keySize) {
         this(new KeyProperties(algo, keySize));
     }
@@ -49,9 +52,29 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
-        return null;
+        return ModelEncryptionSupport.decryptClient(clientsMap.get(clientId), key);
     }
 
+    @Override
+    public void setClient(Client client) {
+        clientsMap.put(client.getClientId(), ModelEncryptionSupport.encryptClient(client, key));
+        
+    }
+    @Override
+    public Client removeClient(String clientId) {
+        Client client = getClient(clientId);
+        clientsMap.remove(clientId);
+        return client;
+    }
+    @Override
+    public List<Client> getClients() {
+        List<Client> clients = new ArrayList<Client>(clientsMap.size());
+        for (String clientKey : clientsMap.keySet()) {
+            clients.add(getClient(clientKey));
+        }
+        return clients;
+    }
+    
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
         return ModelEncryptionSupport.decryptAccessToken(this, accessToken, key);
