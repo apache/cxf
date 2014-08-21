@@ -191,6 +191,7 @@ public class SourceGenerator {
     private boolean generateEnums;
     private boolean skipSchemaGeneration;
     private boolean inheritResourceParams;
+    private boolean inheritResourceParamsFirst;
     private boolean useVoidForEmptyResponses = true;
     private boolean generateResponseIfHeadersSet;
     
@@ -830,6 +831,7 @@ public class SourceGenerator {
             }
             inParamElements.add(el);
         }
+        int inheritedCount = 0;
         for (Element inherited : inheritedParams) {
             boolean duplicate = false;
             for (Element in : inParamElements) {
@@ -839,7 +841,12 @@ public class SourceGenerator {
                 }
             }
             if (!duplicate) {
-                inParamElements.add(inherited);
+                if (inheritResourceParamsFirst && inheritedCount < inParamElements.size()) {
+                    inParamElements.set(inheritedCount, inherited);
+                } else {
+                    inParamElements.add(inherited);
+                }
+                inheritedCount++;
             }
         }
         inheritedParams.addAll(newInheritedParams);
@@ -1015,7 +1022,7 @@ public class SourceGenerator {
                 String required = paramEl.getAttribute("required");
                 if (Multipart.class.equals(paramAnn) && "false".equals(required)) {
                     writeAnnotation(sbCode, imports, paramAnn, null, false, false);
-                    sbCode.append("(value = \"").append(name).append("\", required = \"false\"").append(')');
+                    sbCode.append("(value = \"").append(name).append("\", required = false").append(')');
                 } else {
                     writeAnnotation(sbCode, imports, paramAnn, name, false, false);
                 }
@@ -1329,7 +1336,7 @@ public class SourceGenerator {
                 Element paramEl = DOMUtils.getFirstChildWithName(repElement, getWadlNamespace(), "param");
                 if (paramEl != null) {
                     String type = getPrimitiveType(paramEl, info, imports);
-                    type = addListIfRepeating(type, isRepeatingParam(paramEl), imports);
+                    return addListIfRepeating(type, isRepeatingParam(paramEl), imports);
                 }
             }
         }
@@ -1672,6 +1679,10 @@ public class SourceGenerator {
 
     public void setInheritResourceParams(boolean inherit) {
         this.inheritResourceParams = inherit;
+    }
+    
+    public void setInheritResourceParamsFirst(boolean inherit) {
+        this.inheritResourceParamsFirst = inherit;
     }
     
     public void setSchemaPackageMap(Map<String, String> map) {
