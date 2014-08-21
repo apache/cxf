@@ -120,6 +120,7 @@ public class BookStore {
     private SecurityContext securityContext;
     @Context 
     private UriInfo ui;
+    private UriInfo uiFromConstructor;
     @Context 
     private ResourceContext resourceContext;
     
@@ -129,6 +130,10 @@ public class BookStore {
     private Book2 book2Sub = new Book2();
     
     public BookStore() {
+        init();
+    }
+    public BookStore(UriInfo ui) {
+        this.uiFromConstructor = ui;
         init();
     }
     
@@ -166,6 +171,13 @@ public class BookStore {
     @Produces("text/plain")
     public double[] getBookIndexAsDoubleArray() {
         return new double[]{1, 2, 3};
+    }
+    
+    @GET
+    @Path("/uifromconstructor")
+    @Produces("text/plain")
+    public String getPathFromUriInfo() {
+        return uiFromConstructor.getAbsolutePath().toString();
     }
         
     @GET
