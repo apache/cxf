@@ -44,6 +44,8 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
@@ -369,20 +371,21 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (c == null) {
             throw new ServletException("No valid constructor found for " + cls.getName());
         }
-        boolean isDefault = c.getParameterTypes().length == 0; 
-        if (!isDefault && (c.getParameterTypes().length != 1 
-            || c.getParameterTypes()[0] != ServletConfig.class
-            && c.getParameterTypes()[0] != ServletContext.class)) {
-            throw new ServletException("Resource classes with singleton scope can only have "
-                + "ServletConfig or ServletContext instances injected through their constructors");
-        }
-        Object[] values = isDefault ? new Object[]{} 
-            : new Object[]{c.getParameterTypes()[0] == ServletConfig.class ? sc : sc.getServletContext()}; 
+        boolean isApplication = Application.class.isAssignableFrom(c.getDeclaringClass());
         try {
-            Object instance = c.newInstance(values);
+            ProviderInfo<? extends Object> provider = null;
+            if (c.getParameterTypes().length == 0) {
+                provider = new ProviderInfo<Object>(c.newInstance(), getBus(), isApplication);
+            } else {
+                Map<Class<?>, Object> values = new HashMap<Class<?>, Object>();
+                values.put(ServletContext.class, sc.getServletContext());
+                values.put(ServletConfig.class, sc);
+                provider = ProviderFactory.createProviderFromConstructor(c, values, getBus(), isApplication);
+            }
+            Object instance = provider.getProvider();
             injectProperties(instance, props);
             configureSingleton(instance);
-            return instance;
+            return isApplication ? provider : instance;
         } catch (InstantiationException ex) {
             ex.printStackTrace();
             throw new ServletException("Resource class " + cls.getName()
@@ -441,9 +444,9 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         
         for (String cName : classNames) {
-            Application app = createApplicationInstance(cName, servletConfig);
+            ProviderInfo<Application> providerApp = createApplicationInstance(cName, servletConfig);
             
-            JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, 
+            JAXRSServerFactoryBean bean = ResourceUtils.createApplication(providerApp.getProvider(), 
                                                 ignoreApplicationPath,
                                                 getStaticSubResolutionValue(servletConfig));
             String splitChar = getParameterSplitChar(servletConfig);
@@ -452,18 +455,21 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             setExtensions(bean, servletConfig);
             setDocLocation(bean, servletConfig);
             setSchemasLocations(bean, servletConfig);
-            
             bean.setBus(getBus());
+            bean.setApplication(providerApp);
             bean.create();
         }
     }
     
-    protected Application createApplicationInstance(String appClassName, ServletConfig servletConfig) 
+    protected ProviderInfo<Application> createApplicationInstance(String appClassName, ServletConfig servletConfig) 
         throws ServletException {
         Map<String, List<String>> props = new HashMap<String, List<String>>();
         appClassName = getClassNameAndProperties(appClassName, props);
         Class<?> appClass = loadApplicationClass(appClassName);
-        return (Application)createSingletonInstance(appClass, props, servletConfig);
+        @SuppressWarnings("unchecked")
+        ProviderInfo<Application> provider = 
+            (ProviderInfo<Application>)createSingletonInstance(appClass, props, servletConfig);
+        return provider;
     }
     
     protected Class<?> loadApplicationClass(String appClassName) throws ServletException {

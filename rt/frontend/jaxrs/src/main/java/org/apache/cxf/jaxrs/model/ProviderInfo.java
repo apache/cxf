@@ -29,13 +29,24 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
     private T provider;
     
     public ProviderInfo(T provider, Bus bus) {
-        this(provider, null, bus);
+        this(provider, bus, true);
+    }
+    
+    public ProviderInfo(T provider, Bus bus, boolean checkContexts) {
+        this(provider, null, bus, checkContexts);
     }
     
     public ProviderInfo(T provider, 
                         Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
                         Bus bus) {
-        super(provider.getClass(), provider.getClass(), true, true, constructorProxies, bus, provider);
+        this(provider, constructorProxies, bus, true);
+    }
+    
+    public ProviderInfo(T provider, 
+                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
+                        Bus bus,
+                        boolean checkContexts) {
+        super(provider.getClass(), provider.getClass(), true, checkContexts, constructorProxies, bus, provider);
         this.provider = provider;
     }
     

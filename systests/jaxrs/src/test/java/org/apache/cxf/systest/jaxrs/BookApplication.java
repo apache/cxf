@@ -38,7 +38,8 @@ public class BookApplication extends Application {
 
     private String defaultName;
     private long defaultId;
-    
+    @Context
+    private UriInfo uriInfo;
     
     public BookApplication(@Context ServletContext sc) {
         if (sc == null) {
@@ -64,7 +65,7 @@ public class BookApplication extends Application {
     public Set<Object> getSingletons() {
         Set<Object> classes = new HashSet<Object>();
         org.apache.cxf.systest.jaxrs.BookStore store = 
-            new org.apache.cxf.systest.jaxrs.BookStore();
+            new org.apache.cxf.systest.jaxrs.BookStore(uriInfo);
         store.setDefaultNameAndId(defaultName, defaultId);
         classes.add(store);
         BookExceptionMapper mapper = new org.apache.cxf.systest.jaxrs.BookExceptionMapper();

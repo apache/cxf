@@ -1056,12 +1056,14 @@ public abstract class ProviderFactory {
         }
     }
     
-    protected ProviderInfo<? extends Object> createProviderFromConstructor(Constructor<?> c, 
-                                                                 Map<Class<?>, Object> values) {
+    public static ProviderInfo<? extends Object> createProviderFromConstructor(Constructor<?> c, 
+                                                                 Map<Class<?>, Object> values,
+                                                                 Bus theBus,
+                                                                 boolean checkContexts) {
         
         
         Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> proxiesMap = 
-            CastUtils.cast((Map<?, ?>)getBus().getProperty(AbstractResourceInfo.CONSTRUCTOR_PROXY_MAP));
+            CastUtils.cast((Map<?, ?>)theBus.getProperty(AbstractResourceInfo.CONSTRUCTOR_PROXY_MAP));
         Map<Class<?>, ThreadLocalProxy<?>> existingProxies = null; 
         if (proxiesMap != null) {
             existingProxies = proxiesMap.get(c.getDeclaringClass());
@@ -1091,7 +1093,7 @@ public abstract class ProviderFactory {
                 proxies.put(paramTypes[i], proxy);
             }
         }
-        return new ProviderInfo<Object>(instance, proxies, getBus()); 
+        return new ProviderInfo<Object>(instance, proxies, theBus, checkContexts); 
     }
     
     protected static class NameKey { 
@@ -1223,7 +1225,7 @@ public abstract class ProviderFactory {
             if (o instanceof Constructor) {
                 Map<Class<?>, Object> values = CastUtils.cast(application == null ? null 
                     : Collections.singletonMap(Application.class, application.getProvider()));
-                theProviders.add(createProviderFromConstructor((Constructor<?>)o, values));
+                theProviders.add(createProviderFromConstructor((Constructor<?>)o, values, getBus(), true));
             } else if (o instanceof ProviderInfo) {
                 theProviders.add((ProviderInfo<?>)o);
             } else {    

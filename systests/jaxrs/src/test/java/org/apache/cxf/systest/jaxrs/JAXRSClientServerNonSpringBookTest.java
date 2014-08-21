@@ -69,6 +69,15 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         assertEquals("application/xml+model", wc.getResponse().getMetadata().getFirst("Content-Type"));
         
     }
+    @Test
+    public void testGetPathFromUriInfo() throws Exception {
+        String address = "http://localhost:" + PORT + "/application/bookstore/uifromconstructor";
+        WebClient wc = WebClient.create(address);
+        wc.accept("text/plain");
+        String response = wc.get(String.class);
+        assertEquals(address, response);
+        
+    }
     
     @Test
     public void testGetBook123UserModel() throws Exception {
