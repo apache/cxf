@@ -143,13 +143,13 @@ Examples:
                 </annotation>
                 <switch>impl</switch>
             </option>
-            <option id="async" maxOccurs="unbounded">
+            <option id="async" maxOccurs="1">
                 <annotation>
                     Specifies a comma separated list of method names or identifiers 
                     which need to support suspended asynchronous invocations                     
                 </annotation>
                 <associatedArgument placement="immediate">
-                    <annotation>methodNames</annotation>
+                    <annotation> methodNames</annotation>
                 </associatedArgument>
                 <switch>async</switch>
             </option>
@@ -162,9 +162,14 @@ Examples:
             </option>
             <option id="inheritResourceParams" maxOccurs="1">
                 <annotation>
-                    Specifies that resource-level (path or matrix) parameters
-                    can be inherited by child resources
+                    Specifies that path or matrix parameters can be inherited by child resources.
+                    By default the inherited parameters will be listed first in a method parameter list.
+                    The "last" qualifier can be used to reverse the order.
                 </annotation>
+                <associatedArgument placement="immediate">
+                    <annotation> first|last</annotation>
+                    <valueenum>first|last</valueenum>
+                </associatedArgument>
                 <switch>inheritResourceParams</switch>
             </option>
             <option id="notypes" maxOccurs="1">
@@ -201,25 +206,15 @@ Examples:
                 </annotation>
                 <switch>generateResponseIfHeadersSet</switch>
             </option>
-            <option id="generateResponseForMethods" maxOccurs="unbounded">
+            <option id="generateResponseForMethods" maxOccurs="1">
                 <annotation>
                     Specifies a comma separated list of method names or identifiers 
                     which need to have JAXRS Response return type generated                     
                 </annotation>
                 <associatedArgument placement="immediate">
-                    <annotation>methodNames</annotation>
+                    <annotation> methodNames</annotation>
                 </associatedArgument>
                 <switch>generateResponseForMethods</switch>
-            </option>
-            <option id="async" maxOccurs="unbounded">
-                <annotation>
-                    Specifies a comma separated list of method names or identifiers 
-                    which need to support suspended asynchronous invocations                     
-                </annotation>
-                <associatedArgument placement="immediate">
-                    <annotation>methodNames</annotation>
-                </associatedArgument>
-                <switch>async</switch>
             </option>
             <option id="xjc" maxOccurs="unbounded">
                 <annotation>

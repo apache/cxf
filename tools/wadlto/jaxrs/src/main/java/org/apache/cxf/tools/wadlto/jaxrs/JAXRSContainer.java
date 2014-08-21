@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.tools.common.AbstractCXFToolContainer;
@@ -152,9 +153,13 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
         sg.setSuspendedAsyncMethods(getSuspendedAsyncMethods());
         sg.setResponseMethods(getResponseMethods());
-        
+                
         sg.setGenerateEnums(context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS));
-        sg.setInheritResourceParams(context.optionSet(WadlToolConstants.CFG_INHERIT_PARAMS));
+        boolean inheritResourceParams = context.optionSet(WadlToolConstants.CFG_INHERIT_PARAMS);
+        sg.setInheritResourceParams(inheritResourceParams);
+        if (inheritResourceParams) {
+            sg.setInheritResourceParamsFirst(isInheritResourceParamsFirst());
+        }
         sg.setSkipSchemaGeneration(context.optionSet(WadlToolConstants.CFG_NO_TYPES));
         
         boolean noVoidForEmptyResponses = context.optionSet(WadlToolConstants.CFG_NO_VOID_FOR_EMPTY_RESPONSES);
@@ -236,6 +241,14 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
             return methods;
         } else {
             return Collections.emptySet();
+        }
+    }
+    private boolean isInheritResourceParamsFirst() {
+        Object value = context.get(WadlToolConstants.CFG_INHERIT_PARAMS);
+        if (StringUtils.isEmpty((String)value)) {
+            return true;
+        } else {
+            return "first".equals(value.toString().trim());
         }
     }
     
