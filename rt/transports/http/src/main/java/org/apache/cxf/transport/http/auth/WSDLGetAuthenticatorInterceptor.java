@@ -70,14 +70,11 @@ public class WSDLGetAuthenticatorInterceptor extends AbstractPhaseInterceptor<Me
             if (!StringUtils.isEmpty(contextName)) {
                 AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
                 if (policy == null) {
-                    //should return 401
-                    LOG.info("=====> no authorization header, should return 401");
                     handle401response(message, endpoint);
                     return;
                 } else {
                     Subject subject = (Subject)authenticate(policy.getUserName(), policy.getPassword());
                     if (subject == null) {
-                        LOG.info("=====> login failed, should return 401");
                         handle401response(message, endpoint);
                         return;
                     }
@@ -93,7 +90,6 @@ public class WSDLGetAuthenticatorInterceptor extends AbstractPhaseInterceptor<Me
         response.setHeader(HEADER_WWW_AUTHENTICATE, AUTHENTICATION_SCHEME_BASIC + " realm=\"" + contextName + "\"");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentLength(0);
-        LOG.info("=====> reset response header");
         message.getInterceptorChain().pause();
     }
 
