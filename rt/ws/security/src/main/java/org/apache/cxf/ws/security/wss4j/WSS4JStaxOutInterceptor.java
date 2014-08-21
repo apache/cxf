@@ -33,6 +33,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -77,7 +78,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         super(props);
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
-        
+        getAfter().add(LoggingOutInterceptor.class.getName());
         ending = createEndingInterceptor();
     }
     
@@ -85,7 +86,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         super();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
-        
+        getAfter().add(LoggingOutInterceptor.class.getName());
         ending = createEndingInterceptor();
     }
     
