@@ -46,6 +46,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
                 "-tMap",
                 "{http://www.w3.org/2001/XMLSchema}date=java.util.List..String",
                 "-async getName,delete",
+                "-inheritResourceParams first",
                 "-compile",
                 getLocation("/wadl/bookstore.xml"),
             };

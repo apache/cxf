@@ -2,7 +2,7 @@
 	<grammars />
 	<resources>
 		<resource id="Test" path="/repository">
-
+            <param name="top" style="template" type="xs:string"/>
 			<method name="GET" id="listRepositories">
 				<response>
 					<representation mediaType="application/json" />
