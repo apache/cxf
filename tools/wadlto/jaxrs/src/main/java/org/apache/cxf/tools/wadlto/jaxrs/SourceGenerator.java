@@ -834,14 +834,18 @@ public class SourceGenerator {
             }
             if (!duplicate) {
                 if (inheritResourceParamsFirst && inheritedCount < inParamElements.size()) {
-                    inParamElements.set(inheritedCount, inherited);
+                    inParamElements.add(inheritedCount, inherited);
                 } else {
                     inParamElements.add(inherited);
                 }
                 inheritedCount++;
             }
         }
-        inheritedParams.addAll(newInheritedParams);
+        if (inheritResourceParamsFirst) {
+            inheritedParams.addAll(newInheritedParams);
+        } else {
+            inheritedParams.addAll(0, newInheritedParams);
+        }
         return inParamElements;
     }
 
