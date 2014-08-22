@@ -25,10 +25,10 @@ or even in an OSGi container.
 
 Assuming you have a freshly intalled Apache Karaf-3.x,
 1) Start Karaf and at its console, type(*Note)
-   feature:repo-add cxf 3.m.n
+   feature:repo-add cxf 3.0.2
    feature:install war
    feature:install cxf-management-web
-   install -s mvn:org.apache.cxf.samples/logbrowser/3.1.0-SNAPSHOT/war
+   install -s mvn:org.apache.cxf.samples/logbrowser/3.0.2/war
 
 2) Open browser and go to:
     http://localhost:8181/cxf-samples-logbrowser/log/browser/LogBrowser.html
@@ -38,8 +38,12 @@ Assuming you have a freshly intalled Apache Karaf-3.x,
     http://localhost:8181/cxf-samples-logbrowser/customer-service.html
 
 *Note:
-- 3.m.n corresponding the CXF's version numbers (e.g., 3.1.0, 3.0.2, etc)
+- CXF version 3.0.2 is used in this example, but any verions that include this
+sample code may be used.
 - As this web.xml registers two CXFServlets (one for the browsing the log and
 the other for providing the test service), OSGi system property
 org.apache.cxf.osgi.http.transport.disable must be set to false
 (in etc/system.properties) to allow these two servlets to be started.
+However, this will disable the auto-registration of normal CXF endpoints.
+To avoid this issue, use samples/logbrowser-blueprint which is compatible
+with the normal CXF endpoints.
