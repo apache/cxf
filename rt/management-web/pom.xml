@@ -175,6 +175,11 @@
                           {maven-resources},
                           static-content=${gwt.classes.dir}/static-content
                         </Include-Resource>
+			<Export-Package>
+			  org.apache.cxf.management.web.browser,
+			  org.apache.cxf.management.web.browser*,
+			  org.apache.cxf.management.web.logging.atom*,
+			</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
