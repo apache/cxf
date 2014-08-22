@@ -29,6 +29,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.validation.ResponseConstraintViolationException;
 
 @Provider
@@ -37,11 +38,11 @@ public class ValidationExceptionMapper implements ExceptionMapper< ValidationExc
     
     @Override
     public Response toResponse(ValidationException exception) {
+        Response.Status errorStatus = Response.Status.INTERNAL_SERVER_ERROR;
         if (exception instanceof ConstraintViolationException) { 
             
             final ConstraintViolationException constraint = (ConstraintViolationException) exception;
-            final boolean isResponseException = constraint instanceof ResponseConstraintViolationException;
-                        
+            
             for (final ConstraintViolation< ? > violation: constraint.getConstraintViolations()) {
                 LOG.log(Level.WARNING, 
                     violation.getRootBeanClass().getSimpleName() 
@@ -49,15 +50,10 @@ public class ValidationExceptionMapper implements ExceptionMapper< ValidationExc
                     + ": " + violation.getMessage());
             }
             
-            if (isResponseException) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            if (!(constraint instanceof ResponseConstraintViolationException)) {
+                errorStatus = Response.Status.BAD_REQUEST;
             }
-            
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        } else {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-        
-        
+        } 
+        return JAXRSUtils.toResponse(errorStatus);
     }
 }

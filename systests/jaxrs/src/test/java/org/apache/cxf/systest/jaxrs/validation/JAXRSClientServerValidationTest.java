@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.validation;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.validation.ValidationException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -30,11 +31,13 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor;
 import org.apache.cxf.jaxrs.validation.JAXRSParameterNameProvider;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.validation.BeanValidationInInterceptor;
 import org.apache.cxf.validation.BeanValidationProvider;
@@ -54,7 +57,14 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
             sf.setResourceClasses(BookStoreWithValidation.class);
             sf.setResourceProvider(BookStoreWithValidation.class, 
                 new SingletonResourceProvider(new BookStoreWithValidation()));
-            sf.setProvider(new ValidationExceptionMapper());
+            sf.setProvider(new ValidationExceptionMapper() {
+                @Override
+                public Response toResponse(ValidationException exception) {
+                    Response r = super.toResponse(exception);
+                    return JAXRSUtils.toResponseBuilder(
+                        r.getStatus()).type("application/xml").entity(new Book("Validation", 123L)).build();
+                }
+            });
 
             sf.setAddress("http://localhost:" + PORT + "/");
             BeanValidationInInterceptor in = new JAXRSBeanValidationInInterceptor();

@@ -58,6 +58,9 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
         if (r != null) {
             JAXRSUtils.setMessageContentType(message, r);
             message.setContent(List.class, new MessageContentsList(r));
+            if (message.getExchange().getOutMessage() == null && message.getExchange().getOutFaultMessage() != null) {
+                message.getExchange().setOutMessage(message.getExchange().getOutFaultMessage());
+            }
             new JAXRSOutInterceptor().handleMessage(message);
             return;
         }
