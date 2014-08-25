@@ -44,8 +44,8 @@ import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -81,7 +81,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
     private ResourceComparator rc;
-    private ProviderInfo<Application> appProvider;
+    private ApplicationInfo appProvider;
     private String documentLocation;
     
     public JAXRSServerFactoryBean() {
@@ -97,10 +97,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * @param app
      */
     public void setApplication(Application app) {
-        setApplication(new ProviderInfo<Application>(app, getBus()));
+        setApplication(new ApplicationInfo(app, getBus()));
     }
     
-    public void setApplication(ProviderInfo<Application> provider) {
+    public void setApplication(ApplicationInfo provider) {
         appProvider = provider;
         Set<String> appNameBindings = AnnotationUtils.getNameBindings(provider.getProvider()
                                                                       .getClass().getAnnotations());

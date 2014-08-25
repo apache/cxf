@@ -252,7 +252,7 @@ public class ClientImpl implements Client {
             }
             
             pf.setUserProviders(providers);
-            pf.setDynamicConfiguration(getConfiguration());
+            pf.setConfiguration(getConfiguration());
             WebClient.getConfig(targetClient).getRequestContext().putAll(getConfiguration().getProperties());
             WebClient.getConfig(targetClient).getRequestContext().put(Client.class.getName(), ClientImpl.this);
             // TLS

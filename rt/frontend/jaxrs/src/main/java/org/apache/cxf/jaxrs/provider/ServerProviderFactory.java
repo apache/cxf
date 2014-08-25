@@ -35,9 +35,8 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.ReaderInterceptor;
@@ -52,6 +51,7 @@ import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
@@ -78,10 +78,10 @@ public final class ServerProviderFactory extends ProviderFactory {
         new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
     private Map<NameKey, ProviderInfo<ContainerRequestFilter>> postMatchContainerRequestFilters = 
         new NameKeyMap<ProviderInfo<ContainerRequestFilter>>(true);
-    private Map<NameKey, ProviderInfo<ContainerResponseFilter>> postMatchContainerResponseFilters = 
+    private Map<NameKey, ProviderInfo<ContainerResponseFilter>> containerResponseFilters = 
         new NameKeyMap<ProviderInfo<ContainerResponseFilter>>(false);
     private RequestPreprocessor requestPreprocessor;
-    private ProviderInfo<Application> application;
+    private ApplicationInfo application;
     private Set<DynamicFeature> dynamicFeatures = new LinkedHashSet<DynamicFeature>();
     
     private Map<Class<?>, BeanParamInfo> beanParams = new HashMap<Class<?>, BeanParamInfo>();
@@ -167,8 +167,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
     
     public List<ProviderInfo<ContainerResponseFilter>> getContainerResponseFilters(Set<String> names) {
-        return getBoundFilters(postMatchContainerResponseFilters, 
-                                            names);
+        return getBoundFilters(containerResponseFilters, names);
     }
     
     public void addBeanParamInfo(BeanParamInfo bpi) {
@@ -245,12 +244,12 @@ public final class ServerProviderFactory extends ProviderFactory {
             new BindingPriorityComparator(ContainerRequestFilter.class, true));
         mapInterceptorFilters(postMatchContainerRequestFilters, postMatchRequestFilters,
                               ContainerRequestFilter.class, true);
-        mapInterceptorFilters(postMatchContainerResponseFilters, postMatchResponseFilters,
+        mapInterceptorFilters(containerResponseFilters, postMatchResponseFilters,
                               ContainerResponseFilter.class, false);
         
         injectContextProxies(exceptionMappers,
             postMatchContainerRequestFilters.values(), preMatchContainerRequestFilters,
-            postMatchContainerResponseFilters.values());
+            containerResponseFilters.values());
     }
     
     @Override
@@ -299,11 +298,11 @@ public final class ServerProviderFactory extends ProviderFactory {
         return requestPreprocessor;
     }
     
-    public void setApplicationProvider(ProviderInfo<Application> app) {
+    public void setApplicationProvider(ApplicationInfo app) {
         application = app;
     }
     
-    public ProviderInfo<Application> getApplicationProvider() {
+    public ApplicationInfo getApplicationProvider() {
         return application;
     }
     
@@ -319,9 +318,9 @@ public final class ServerProviderFactory extends ProviderFactory {
     public void clearProviders() {
         super.clearProviders();
         exceptionMappers.clear();
-        postMatchContainerRequestFilters.clear();
-        postMatchContainerResponseFilters.clear();
         preMatchContainerRequestFilters.clear();
+        postMatchContainerRequestFilters.clear();
+        containerResponseFilters.clear();
     }
     
     @Override
@@ -340,13 +339,18 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
     }
     
+    @Override
+    public Configuration getConfiguration() {
+        return new ServerConfigurationImpl(super.getConfiguration());
+    }
+    
     private void doApplyDynamicFeatures(ClassResourceInfo cri) {
         Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
         for (OperationResourceInfo ori : oris) {
             for (DynamicFeature feature : dynamicFeatures) {
                 FeatureContext featureContext = new MethodFeatureContextImpl(ori);
                 feature.configure(new ResourceInfoImpl(ori), featureContext);
-                super.setDynamicConfiguration(featureContext.getConfiguration());
+                super.setConfiguration(featureContext.getConfiguration());
             }
         }
         Collection<ClassResourceInfo> subs = cri.getSubResources();
@@ -364,13 +368,19 @@ public final class ServerProviderFactory extends ProviderFactory {
     
     
     private class MethodFeatureContextImpl implements FeatureContext {
-        private Configurable<FeatureContext> configImpl;    
+        private MethodFeatureContextConfigurable configImpl;    
         private OperationResourceInfo ori;
         private String nameBinding;
         
         public MethodFeatureContextImpl(OperationResourceInfo ori) {
             this.ori = ori;
             configImpl = new MethodFeatureContextConfigurable(this);
+            if (application != null) {
+                Map<String, Object> appProps = application.getProvider().getProperties();
+                for (Map.Entry<String, Object> entry : appProps.entrySet()) {
+                    configImpl.property(entry.getKey(), entry.getValue());
+                }
+            }
             nameBinding = DEFAULT_FILTER_NAME_BINDING 
                 + ori.getClassResourceInfo().getServiceClass().getName()
                 + "."
@@ -495,6 +505,69 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
     
     
-    
+    private class ServerConfigurationImpl implements Configuration {
+        private Configuration superConfig;
+        public ServerConfigurationImpl(Configuration superConfig) {
+            this.superConfig = superConfig;
+        }
+        
+        @Override
+        public Set<Class<?>> getClasses() {
+            return superConfig != null ? superConfig.getClasses() : Collections.<Class<?>>emptySet();
+        }
+
+        @Override
+        public Set<Object> getInstances() {
+            return superConfig != null ? superConfig.getInstances() : Collections.emptySet();
+        }
+
+        @Override
+        public Map<String, Object> getProperties() {
+            return application != null ? application.getProperties() 
+                : Collections.<String, Object>emptyMap();
+        }
+
+        @Override
+        public Object getProperty(String name) {
+            return getProperties().get(name);
+        }
+
+        @Override
+        public Collection<String> getPropertyNames() {
+            return getProperties().keySet();
+        }
+
+        @Override
+        public RuntimeType getRuntimeType() {
+            return RuntimeType.SERVER;
+        }
+
+        @Override
+        public boolean isEnabled(Feature f) {
+            return superConfig != null ? superConfig.isEnabled(f) : false;
+        }
+
+        @Override
+        public boolean isEnabled(Class<? extends Feature> featureCls) {
+            return superConfig != null ? superConfig.isEnabled(featureCls) : false;
+        }
+
+        @Override
+        public boolean isRegistered(Object o) {
+            return superConfig != null ? superConfig.isRegistered(o) : false;
+        }
+
+        @Override
+        public boolean isRegistered(Class<?> cls) {
+            return superConfig != null ? superConfig.isRegistered(cls) : false;
+        }
+
+        @Override
+        public Map<Class<?>, Integer> getContracts(Class<?> cls) {
+            return superConfig != null ? superConfig.getContracts(cls)
+                : Collections.<Class<?>, Integer>emptyMap();
+        }
+        
+    }
     
 }

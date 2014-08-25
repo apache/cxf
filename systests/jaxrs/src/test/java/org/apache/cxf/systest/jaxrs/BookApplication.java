@@ -20,8 +20,10 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Priority;
@@ -72,6 +74,12 @@ public class BookApplication extends Application {
         mapper.setToHandle(true);
         classes.add(mapper);
         return classes;
+    }
+    
+
+    @Override
+    public Map<String, Object> getProperties() {
+        return Collections.<String, Object>singletonMap("book", "cxf");
     }
     
     public void setDefaultName(String name) {
