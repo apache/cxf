@@ -57,6 +57,7 @@ public class PrimitiveTextProvider<T>
                     string, 
                     false,
                     type,
+                    genType,
                     anns,
                     ParameterType.REQUEST_BODY, null);
         

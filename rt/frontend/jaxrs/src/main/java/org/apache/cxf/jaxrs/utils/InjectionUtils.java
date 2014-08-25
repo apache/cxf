@@ -335,6 +335,7 @@ public final class InjectionUtils {
     public static <T> T handleParameter(String value, 
                                         boolean decoded,
                                         Class<T> pClass,
+                                        Type genericType,
                                         Annotation[] paramAnns,
                                         ParameterType pType,
                                         Message message) {
@@ -352,7 +353,7 @@ public final class InjectionUtils {
         
         value = decodeValue(value, decoded, pType);
         
-        Object result = createFromParameterHandler(value, pClass, paramAnns, message);
+        Object result = createFromParameterHandler(value, pClass, genericType, paramAnns, message);
         if (result != null) {
             return pClass.cast(result);
         }
@@ -431,12 +432,13 @@ public final class InjectionUtils {
 
     public static <T> T createFromParameterHandler(String value, 
                                                     Class<T> pClass,
+                                                    Type genericType,
                                                     Annotation[] anns,
                                                     Message message) {
         T result = null;
         if (message != null) {
             ServerProviderFactory pf = ServerProviderFactory.getInstance(message);
-            ParamConverter<T> pm = pf.createParameterHandler(pClass, anns);
+            ParamConverter<T> pm = pf.createParameterHandler(pClass, genericType, anns);
             if (pm != null) {
                 result = pm.fromString(value);
             }
@@ -628,7 +630,7 @@ public final class InjectionUtils {
                         } else {
                             paramValue = InjectionUtils.handleParameter(
                                 processedValues.values().iterator().next().get(0), 
-                                decoded, type, paramAnns, pType, message);
+                                decoded, type, type, paramAnns, pType, message);
                         }
 
                         if (paramValue != null) {
@@ -678,7 +680,7 @@ public final class InjectionUtils {
                 List<String> valuesList = processedValuesEntry.getValue();
                 for (String value : valuesList) {
                     Object o = InjectionUtils.handleParameter(value,
-                                       decoded, valueType, paramAnns, pathParam, message);
+                                       decoded, valueType, valueType, paramAnns, pathParam, message);
                     theValues.add(convertStringToPrimitive(processedValuesEntry.getKey(), keyType), o);
                 }
             }
@@ -691,7 +693,7 @@ public final class InjectionUtils {
                 List<String> valuesList = processedValuesEntry.getValue();
                 for (String value : valuesList) {
                     Object o = InjectionUtils.handleParameter(value,
-                                       decoded, valueType, paramAnns, pathParam, message);
+                                       decoded, valueType, valueType, paramAnns, pathParam, message);
                     theValues.put(
                         convertStringToPrimitive(processedValuesEntry.getKey(), keyType), 
                         o);
@@ -860,7 +862,7 @@ public final class InjectionUtils {
             valuesList = checkPathSegment(valuesList, realType, pathParam);
             for (int ind = 0; ind < valuesList.size(); ind++) {
                 Object o = InjectionUtils.handleParameter(valuesList.get(ind), decoded, 
-                                                          realType, paramAnns, pathParam, message);
+                                                          realType, realType, paramAnns, pathParam, message);
                 addToCollectionValues(theValues, o, ind);
             }
         }
@@ -941,7 +943,7 @@ public final class InjectionUtils {
                                 : paramValues.get(0);
             }
             if (result != null) {
-                value = InjectionUtils.handleParameter(result, decoded, paramType, 
+                value = InjectionUtils.handleParameter(result, decoded, paramType, genericType,
                                                        paramAnns, pathParam, message);
             }
         }
@@ -1284,7 +1286,7 @@ public final class InjectionUtils {
     }
     public static Object convertStringToPrimitive(String value, Class<?> cls, Annotation[] anns) {
         Message m = JAXRSUtils.getCurrentMessage();
-        Object obj = createFromParameterHandler(value, cls, anns, m);
+        Object obj = createFromParameterHandler(value, cls, cls, anns, m);
         if (obj != null) {
             return obj;
         }

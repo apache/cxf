@@ -261,7 +261,8 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
     private Object convertToDate(Class<?> valueType, String value) throws SearchParseException {
         
         Message m = JAXRSUtils.getCurrentMessage();
-        Object obj = InjectionUtils.createFromParameterHandler(value, valueType, new Annotation[]{}, m);
+        Object obj = InjectionUtils.createFromParameterHandler(value, valueType, valueType, 
+                                                               new Annotation[]{}, m);
         if (obj != null) {
             return obj;
         }

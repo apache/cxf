@@ -722,7 +722,8 @@ public abstract class AbstractClient implements Client {
             Class<?> pClass = pValue.getClass();
             
             @SuppressWarnings("unchecked")
-            ParamConverter<Object> prov = (ParamConverter<Object>)pf.createParameterHandler(pClass, anns);
+            ParamConverter<Object> prov = 
+                (ParamConverter<Object>)pf.createParameterHandler(pClass, pClass, anns);
             if (prov != null) {
                 return prov.toString(pValue);
             }
