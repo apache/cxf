@@ -57,6 +57,7 @@ public class InjectionUtilsTest extends Assert {
         Object id = InjectionUtils.handleParameter(value, 
                                                    true, 
                                                    Id.class, 
+                                                   Id.class,
                                                    new Annotation[] {}, 
                                                    ParameterType.PATH,  
                                                    createMessage());
@@ -138,7 +139,8 @@ public class InjectionUtilsTest extends Assert {
 
     @Test
     public void testInstantiateJAXBEnum() {
-        CarType carType = InjectionUtils.handleParameter("AUDI", false, CarType.class, null,
+        CarType carType = InjectionUtils.handleParameter("AUDI", false, CarType.class, 
+                                                         CarType.class, null,
                                                          ParameterType.QUERY, null);
         assertEquals("Type is wrong", CarType.AUDI, carType);
     }
