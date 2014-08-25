@@ -54,10 +54,10 @@ public class TikaLuceneContentExtractorTest extends Assert {
     
     @Before
     public void setUp() throws Exception {
-        final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
+        final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
         directory = new RAMDirectory();
         
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_9, analyzer);
         writer = new IndexWriter(directory, config);    
         writer.commit();
         

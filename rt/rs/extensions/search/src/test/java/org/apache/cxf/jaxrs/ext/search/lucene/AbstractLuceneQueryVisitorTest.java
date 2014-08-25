@@ -53,9 +53,9 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
     
     @Before
     public void setUp() throws Exception {
-        analyzer = new StandardAnalyzer(Version.LUCENE_40);
+        analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
         directory = new RAMDirectory();
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_9, analyzer);
         IndexWriter iwriter = new IndexWriter(directory, config);
         
         Document doc = new Document();

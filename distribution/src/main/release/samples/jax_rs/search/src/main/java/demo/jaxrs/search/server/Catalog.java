@@ -86,8 +86,7 @@ import org.apache.tika.parser.pdf.PDFParser;
 public class Catalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());    
     private final Directory directory = new RAMDirectory();
-    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-    private final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);    
     private final Storage storage; 
     private final ExecutorService executor = Executors.newFixedThreadPool(
         Runtime.getRuntime().availableProcessors());
@@ -122,7 +121,7 @@ public class Catalog {
 
                             final byte[] content = IOUtils.readBytesFromStream(handler.getInputStream());
                             storeAndIndex(metadata, content);
-                        } catch (final IOException ex) {
+                        } catch (final Exception ex) {
                             response.resume(Response.serverError().build());  
                         } 
                         
@@ -228,7 +227,7 @@ public class Catalog {
     
     @DELETE
     public Response delete() throws IOException {
-        final IndexWriter writer = new IndexWriter(directory, config);
+        final IndexWriter writer = getIndexWriter();
         
         try {
             storage.deleteAll();
@@ -242,13 +241,17 @@ public class Catalog {
     }
     
     private void initIndex() throws IOException {
-        final IndexWriter writer = new IndexWriter(directory, config);
+        final IndexWriter writer = getIndexWriter();
         
         try {
             writer.commit();
         } finally {
             writer.close();
         }
+    }
+
+    private IndexWriter getIndexWriter() throws IOException {
+        return new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_4_9, analyzer));
     }
     
     private static LuceneQueryVisitor< SearchBean > createVisitor() {
@@ -281,7 +284,7 @@ public class Catalog {
             
             final Document document = extractor.extract(in, metadata);
             if (document != null) {                    
-                final IndexWriter writer = new IndexWriter(directory, config);
+                final IndexWriter writer = getIndexWriter();
                 
                 try {                                              
                     storage.addDocument(metadata.getSource(), content);

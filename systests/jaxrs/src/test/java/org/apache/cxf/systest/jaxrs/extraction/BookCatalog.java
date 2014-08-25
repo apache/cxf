@@ -63,8 +63,7 @@ import org.apache.tika.parser.pdf.PDFParser;
 public class BookCatalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());    
     private final Directory directory = new RAMDirectory();
-    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-    private final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);    
     private final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
     
     @POST
@@ -81,7 +80,7 @@ public class BookCatalog {
                 
                 final Document document = extractor.extract(handler.getInputStream(), metadata);
                 if (document != null) {                    
-                    final IndexWriter writer = new IndexWriter(directory, config);
+                    final IndexWriter writer = getIndexWriter();
                     
                     try {
                         writer.addDocument(document);
@@ -112,7 +111,7 @@ public class BookCatalog {
     
     @DELETE
     public Response delete() throws IOException {
-        final IndexWriter writer = new IndexWriter(directory, config);
+        final IndexWriter writer = getIndexWriter();
         
         try {
             writer.deleteAll();
@@ -122,6 +121,10 @@ public class BookCatalog {
         }  
         
         return Response.ok().build();
+    }
+    
+    private IndexWriter getIndexWriter() throws IOException {
+        return new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_4_9, analyzer));
     }
     
     private static LuceneQueryVisitor< SearchBean > createVisitor() {
