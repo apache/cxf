@@ -67,6 +67,7 @@ import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -162,13 +163,13 @@ public abstract class ProviderFactory {
         return null;
     }
     
-    public void setDynamicConfiguration(Configuration config) {
+    public void setConfiguration(Configuration config) {
         // Whatever is set inside Configuration is also set in this ProviderFactory
         // We use it only to support Configuration injection at a basic level
         this.dynamicConfiguration = config;
     }
     
-    public Configuration getDynamicConfiguration() {
+    public Configuration getConfiguration() {
         return dynamicConfiguration;
     }
     
@@ -1093,7 +1094,12 @@ public abstract class ProviderFactory {
                 proxies.put(paramTypes[i], proxy);
             }
         }
-        return new ProviderInfo<Object>(instance, proxies, theBus, checkContexts); 
+        boolean isApplication = Application.class.isAssignableFrom(c.getDeclaringClass());
+        if (isApplication) {
+            return new ApplicationInfo((Application)instance, proxies, theBus);
+        } else {
+            return new ProviderInfo<Object>(instance, proxies, theBus, checkContexts);
+        }
     }
     
     protected static class NameKey { 

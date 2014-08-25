@@ -75,7 +75,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         WebClient wc = WebClient.create(address);
         wc.accept("text/plain");
         String response = wc.get(String.class);
-        assertEquals(address, response);
+        assertEquals(address + "?prop=cxf", response);
         
     }
     

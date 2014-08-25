@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -375,7 +377,11 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         try {
             ProviderInfo<? extends Object> provider = null;
             if (c.getParameterTypes().length == 0) {
-                provider = new ProviderInfo<Object>(c.newInstance(), getBus(), isApplication);
+                if (isApplication) {
+                    provider = new ApplicationInfo((Application)c.newInstance(), getBus());
+                } else {
+                    provider = new ProviderInfo<Object>(c.newInstance(), getBus(), false);    
+                }
             } else {
                 Map<Class<?>, Object> values = new HashMap<Class<?>, Object>();
                 values.put(ServletContext.class, sc.getServletContext());
@@ -444,7 +450,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         
         for (String cName : classNames) {
-            ProviderInfo<Application> providerApp = createApplicationInstance(cName, servletConfig);
+            ApplicationInfo providerApp = createApplicationInstance(cName, servletConfig);
             
             JAXRSServerFactoryBean bean = ResourceUtils.createApplication(providerApp.getProvider(), 
                                                 ignoreApplicationPath,
@@ -461,15 +467,24 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
     }
     
-    protected ProviderInfo<Application> createApplicationInstance(String appClassName, ServletConfig servletConfig) 
+    protected ApplicationInfo createApplicationInstance(String appClassName, ServletConfig servletConfig) 
         throws ServletException {
         Map<String, List<String>> props = new HashMap<String, List<String>>();
         appClassName = getClassNameAndProperties(appClassName, props);
         Class<?> appClass = loadApplicationClass(appClassName);
-        @SuppressWarnings("unchecked")
-        ProviderInfo<Application> provider = 
-            (ProviderInfo<Application>)createSingletonInstance(appClass, props, servletConfig);
-        return provider;
+        ApplicationInfo appInfo = (ApplicationInfo)createSingletonInstance(appClass, props, servletConfig);
+        Map<String, Object> servletProps = new HashMap<String, Object>();
+        ServletContext servletContext = servletConfig.getServletContext();
+        for (Enumeration<String> names = servletContext.getInitParameterNames(); names.hasMoreElements();) {
+            String name = names.nextElement();
+            servletProps.put(name, servletContext.getInitParameter(name));
+        }
+        for (Enumeration<String> names = servletConfig.getInitParameterNames(); names.hasMoreElements();) {
+            String name = names.nextElement();
+            servletProps.put(name, servletConfig.getInitParameter(name));
+        }
+        appInfo.setOverridingProps(servletProps);
+        return appInfo;
     }
     
     protected Class<?> loadApplicationClass(String appClassName) throws ServletException {
