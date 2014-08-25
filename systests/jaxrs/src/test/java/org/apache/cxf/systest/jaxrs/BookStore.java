@@ -59,6 +59,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
@@ -123,6 +124,8 @@ public class BookStore {
     private UriInfo uiFromConstructor;
     @Context 
     private ResourceContext resourceContext;
+    @Context 
+    private Configuration configuration;
     
     @BeanParam
     private BookBean theBookBean;
@@ -177,7 +180,8 @@ public class BookStore {
     @Path("/uifromconstructor")
     @Produces("text/plain")
     public String getPathFromUriInfo() {
-        return uiFromConstructor.getAbsolutePath().toString();
+        return uiFromConstructor.getAbsolutePath().toString() + "?prop=" 
+            + configuration.getProperty("book").toString();
     }
         
     @GET

@@ -66,7 +66,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     @Override
     public Configuration getConfiguration() {
         ClientProviderFactory cpf = ClientProviderFactory.getInstance(m);
-        return cpf.getDynamicConfiguration();
+        return cpf.getConfiguration();
     }
     
     private Object getMessageContent() {
