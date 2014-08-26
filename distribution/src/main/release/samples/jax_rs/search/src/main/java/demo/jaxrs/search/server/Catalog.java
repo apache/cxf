@@ -254,11 +254,12 @@ public class Catalog {
         return new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_4_9, analyzer));
     }
     
-    private static LuceneQueryVisitor< SearchBean > createVisitor() {
+    private LuceneQueryVisitor< SearchBean > createVisitor() {
         final Map< String, Class< ? > > fieldTypes = new HashMap< String, Class< ? > >();
         fieldTypes.put("modified", Date.class);
         
-        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
+        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>(
+            "ct", "contents", analyzer);
         visitor.setPrimitiveFieldTypeMap(fieldTypes);
         return visitor;
     }

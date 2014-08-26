@@ -29,6 +29,7 @@ import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.visitor.AbstractSearchConditionVisitor;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.index.Term;
@@ -40,6 +41,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.util.QueryBuilder;
 
 import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getString;
 import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getValue;
@@ -50,6 +52,8 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     private Map<String, String> contentsFieldMap;
     private boolean caseInsensitiveMatch;
     private Stack<List<Query>> queryStack = new Stack<List<Query>>();
+    private QueryBuilder queryBuilder;
+    
     public LuceneQueryVisitor() {
         this(Collections.<String, String>emptyMap());        
     }
@@ -57,7 +61,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     public LuceneQueryVisitor(String contentsFieldAlias, String contentsFieldName) {
         this(Collections.singletonMap(contentsFieldAlias, contentsFieldName));
     }
-     
+         
     public LuceneQueryVisitor(String contentsFieldName) {
         this(Collections.<String, String>emptyMap(), contentsFieldName);
     }
@@ -67,8 +71,21 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     }
     
     public LuceneQueryVisitor(Map<String, String> fieldsMap, String contentsFieldName) {
+        this(fieldsMap, contentsFieldName, null);
+    }
+    
+    public LuceneQueryVisitor(String contentsFieldAlias, String contentsFieldName, Analyzer analyzer) {
+        this(Collections.singletonMap(contentsFieldAlias, contentsFieldName), null, analyzer);
+    }
+    
+    public LuceneQueryVisitor(Map<String, String> fieldsMap, String contentsFieldName, Analyzer analyzer) {
         super(fieldsMap);
         this.contentsFieldName = contentsFieldName;
+        
+        if (analyzer != null) {
+            queryBuilder = new QueryBuilder(analyzer);
+        }
+        
         queryStack.push(new ArrayList<Query>());
     }
     
@@ -99,6 +116,10 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         List<Query> queries = queryStack.peek();
         return queries.isEmpty() ? null : queries.get(0);
     }
+    
+    public void setCaseInsensitiveMatch(boolean caseInsensitiveMatch) {
+        this.caseInsensitiveMatch = caseInsensitiveMatch;
+    }   
     
     private Query buildSimpleQuery(ConditionType ct, String name, Object value) {
         name = super.getRealPropertyName(name);
@@ -147,25 +168,15 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             
             String theContentsFieldName = getContentsFieldName(name);
             if (theContentsFieldName == null) {
-                Term term = new Term(name, strValue);
-                
                 if (!isWildCard) {
-                    query = new TermQuery(term);
+                    query = newTermQuery(name, strValue);
                 } else {
-                    query = new WildcardQuery(term);
+                    query = new WildcardQuery(new Term(name, strValue));
                 } 
             } else if (!isWildCard) {
-                PhraseQuery pquery = new PhraseQuery();
-                pquery.add(new Term(theContentsFieldName, name));
-                pquery.add(new Term(theContentsFieldName, strValue));
-                query = pquery;
+                query = newPhraseQuery(theContentsFieldName, strValue);
             } else {
-                BooleanQuery pquery = new BooleanQuery();
-                pquery.add(new TermQuery(new Term(theContentsFieldName, name)),
-                           BooleanClause.Occur.MUST);
-                pquery.add(new WildcardQuery(new Term(theContentsFieldName, strValue)),
-                           BooleanClause.Occur.MUST);
-                query = pquery;                
+                query = new WildcardQuery(new Term(theContentsFieldName, strValue));
             }
         } else {
             query = createRangeQuery(cls, name, value, ConditionType.EQUALS);
@@ -273,7 +284,18 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         return booleanQuery;
     }
 
-    public void setCaseInsensitiveMatch(boolean caseInsensitiveMatch) {
-        this.caseInsensitiveMatch = caseInsensitiveMatch;
-    }    
+    private Query newTermQuery(final String field, final String query) {
+        return (queryBuilder != null) ? queryBuilder.createBooleanQuery(field, query) 
+            : new TermQuery(new Term(field, query));
+    }
+    
+    private Query newPhraseQuery(final String field, final String query) {
+        if (queryBuilder != null) {
+            return queryBuilder.createPhraseQuery(field, query);
+        }
+        
+        final PhraseQuery phraseQuery = new PhraseQuery();
+        phraseQuery.add(new Term(field, query));
+        return phraseQuery;
+    }
 }

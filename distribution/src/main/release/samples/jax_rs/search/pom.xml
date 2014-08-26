@@ -30,6 +30,7 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
+        <cxf.lucene.version>4.9.0</cxf.lucene.version>
         <httpclient.version>3.1</httpclient.version>
     </properties>
     <profiles>
