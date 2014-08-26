@@ -33,8 +33,10 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.X509Token;
@@ -59,7 +61,7 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
     ) {
         Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
         if (!ais.isEmpty()) {
-            parsePolicies(ais, message, results);
+            parsePolicies(ais, message, signedResults, results);
             
             assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10);
             assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11);
@@ -80,6 +82,7 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
     private void parsePolicies(
         Collection<AssertionInfo> ais, 
         Message message,
+        List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> results
     ) {
         List<WSSecurityEngineResult> bstResults = 
@@ -93,14 +96,14 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
                 continue;
             }
 
-            if (bstResults.isEmpty()) {
+            if (bstResults.isEmpty() && signedResults.isEmpty()) {
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
                 continue;
             }
 
-            if (!checkTokenType(x509TokenPolicy.getTokenType(), bstResults)) {
+            if (!checkTokenType(x509TokenPolicy.getTokenType(), bstResults, signedResults)) {
                 ai.setNotAsserted("An incorrect X.509 Token Type is detected");
                 continue;
             }
@@ -112,9 +115,10 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
      */
     private boolean checkTokenType(
         TokenType tokenType,
-        List<WSSecurityEngineResult> bstResults
+        List<WSSecurityEngineResult> bstResults,
+        List<WSSecurityEngineResult> signedResults
     ) {
-        if (bstResults.isEmpty()) {
+        if (bstResults.isEmpty() && signedResults.isEmpty()) {
             return false;
         }
 
@@ -150,6 +154,56 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
                 }
             }
         }
+        
+        // Maybe the X.509 token was included as a KeyIdentifier
+        if (X509_V3_VALUETYPE.equals(requiredType)) {
+            for (WSSecurityEngineResult result : signedResults) {
+                STRParser.REFERENCE_TYPE referenceType = 
+                    (STRParser.REFERENCE_TYPE)result.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
+                if (STRParser.REFERENCE_TYPE.KEY_IDENTIFIER == referenceType) {
+                    Element signatureElement = 
+                        (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                    Element keyIdentifier = getKeyIdentifier(signatureElement);
+                    if (keyIdentifier != null 
+                        && X509_V3_VALUETYPE.equals(keyIdentifier.getAttributeNS(null, "ValueType"))) {
+                        try {
+                            X509Security token = 
+                                new X509Security(keyIdentifier, 
+                                                 new BSPEnforcer(true));
+                            X509Certificate cert = token.getX509Certificate(null);
+                            if (cert != null && cert.getVersion() == 3) {
+                                return true;
+                            }
+                        } catch (WSSecurityException e) {
+                            LOG.log(Level.FINE, e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
         return false;
+    }
+    
+    private Element getKeyIdentifier(Element signatureElement) {
+        if (signatureElement != null) {
+            Element keyInfoElement = 
+                WSSecurityUtil.getDirectChildElement(
+                    signatureElement, "KeyInfo", WSConstants.SIG_NS
+                );
+            if (keyInfoElement != null) {
+                Element strElement = 
+                    WSSecurityUtil.getDirectChildElement(
+                        keyInfoElement, "SecurityTokenReference", WSConstants.WSSE_NS
+                    );
+                if (strElement != null) {
+                    Element kiElement = 
+                        WSSecurityUtil.getDirectChildElement(
+                            strElement, "KeyIdentifier", WSConstants.WSSE_NS
+                        );
+                    return kiElement;
+                }
+            }
+        }
+        return null;
     }
 }

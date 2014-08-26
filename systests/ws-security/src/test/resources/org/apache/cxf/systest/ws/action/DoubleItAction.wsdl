@@ -34,6 +34,7 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleIt3DESEncryptionPort" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleIt3DESEncryption"/>
@@ -56,5 +57,9 @@
         <wsdl:port name="DoubleItSignaturePort2" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItSignature2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItAsymmetric"/>
+        </wsdl:port>
     </wsdl:service>
+    
 </wsdl:definitions>

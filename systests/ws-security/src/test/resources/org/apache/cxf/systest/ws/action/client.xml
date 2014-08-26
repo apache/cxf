@@ -138,4 +138,36 @@
             </bean>
         </jaxws:inInterceptors>
     </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricPort" createdFromAPI="true">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Timestamp Signature Encrypt"/>
+                        <entry key="signatureUser" value="alice"/>
+                        <entry key="signaturePropFile" value="alice.properties"/>
+                        <entry key="encryptionUser" value="bob"/>
+                        <entry key="encryptionPropFile" value="bob.properties"/>
+                        <entry key="signatureKeyIdentifier" value="DirectReference"/>
+                        <entry key="signatureParts" value="{}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                        <entry key="signatureKeyIdentifier" value="X509KeyIdentifier"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:outInterceptors>
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Timestamp Signature Encrypt"/>
+                        <entry key="signatureVerificationPropFile" value="bob.properties"/>
+                        <entry key="decryptionPropFile" value="alice.properties"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:client>
 </beans>
