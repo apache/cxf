@@ -86,6 +86,19 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testOrderOfProvidersWithSameProperties() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        WildcardReader reader1 = new WildcardReader();
+        pf.registerUserProvider(reader1);
+        WildcardReader2 reader2 = new WildcardReader2();
+        pf.registerUserProvider(reader2);
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
+        assertEquals(2, readers.size());
+        assertSame(reader1, readers.get(0).getProvider());
+        assertSame(reader2, readers.get(1).getProvider());
+    }
+    
+    @Test
     public void testCustomJaxbProvider() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
@@ -709,7 +722,42 @@ public class ProviderFactoryTest extends Assert {
         }
         
     }
-            
+    
+    @Produces("*/*")
+    @Consumes("*/*")
+    private static class WildcardReader implements MessageBodyReader<Object> {
+
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+                                  MediaType mediaType) {
+            return true;
+        }
+
+        public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
+                                  MultivaluedMap<String, String> arg4, InputStream arg5) 
+            throws IOException, WebApplicationException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+    }
+    @Produces("*/*")
+    @Consumes("*/*")
+    private static class WildcardReader2 implements MessageBodyReader<Object> {
+
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+                                  MediaType mediaType) {
+            return true;
+        }
+
+        public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
+                                  MultivaluedMap<String, String> arg4, InputStream arg5) 
+            throws IOException, WebApplicationException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+    }
+    
     private static class RuntimeExceptionMapper1 
         extends AbstractTestExceptionMapper<RuntimeException> {
         
