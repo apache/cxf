@@ -214,9 +214,6 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-<<<<<<< HEAD
-
-=======
     
     // Here the client is using "Actions", where the server is using an AsymmetricBinding policy
     @org.junit.Test
@@ -242,5 +239,4 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
->>>>>>> 6d6ce13... Adding a Action -> Policy test for a KeyIdentifier fix
 }

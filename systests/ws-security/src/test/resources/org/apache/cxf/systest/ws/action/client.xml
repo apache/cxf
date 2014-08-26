@@ -188,9 +188,6 @@
         </jaxws:inInterceptors>
     </jaxws:client>
     
-<<<<<<< HEAD
-    
-=======
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricPort" createdFromAPI="true">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
@@ -198,12 +195,12 @@
                     <map>
                         <entry key="action" value="Timestamp Signature Encrypt"/>
                         <entry key="signatureUser" value="alice"/>
-                        <entry key="signaturePropFile" value="alice.properties"/>
+                        <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
                         <entry key="encryptionUser" value="bob"/>
-                        <entry key="encryptionPropFile" value="bob.properties"/>
+                        <entry key="encryptionPropFile" value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
                         <entry key="signatureKeyIdentifier" value="DirectReference"/>
                         <entry key="signatureParts" value="{}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"/>
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.wssec10.server.KeystorePasswordCallback"/>
                         <entry key="signatureKeyIdentifier" value="X509KeyIdentifier"/>
                     </map>
                 </constructor-arg>
@@ -214,13 +211,13 @@
                 <constructor-arg>
                     <map>
                         <entry key="action" value="Timestamp Signature Encrypt"/>
-                        <entry key="signatureVerificationPropFile" value="bob.properties"/>
-                        <entry key="decryptionPropFile" value="alice.properties"/>
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                        <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
+                        <entry key="decryptionPropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.wssec10.server.KeystorePasswordCallback"/>
                     </map>
                 </constructor-arg>
             </bean>
         </jaxws:inInterceptors>
     </jaxws:client>
->>>>>>> 6d6ce13... Adding a Action -> Policy test for a KeyIdentifier fix
+
 </beans>
