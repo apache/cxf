@@ -20,12 +20,14 @@
 package org.apache.cxf.management.web.browser.client.ui.browser;
 
 import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -103,16 +105,10 @@ public class ViewerViewImpl extends Composite implements ViewerView {
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-
-        if (entry.getMessage() != null) {
-            sb.append(entry.getMessage()).append("\n");
-        }
-        if (entry.getThrowable() != null) {
-            sb.append(entry.getThrowable());
-        }
-
-        entryDetails.setHTML(sb.toString());
+        String val = entry.getMessage() != null 
+            ? entry.getMessage() : entry.getThrowable() != null
+            ? entry.getThrowable() : "";
+        entryDetails.setHTML(SafeHtmlUtils.fromString(val));
     }
 
     public void setLinks(@Nonnull final Links links) {
