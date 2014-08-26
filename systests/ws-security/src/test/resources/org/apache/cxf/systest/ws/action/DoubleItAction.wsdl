@@ -72,6 +72,13 @@
         <wsdl:port name="DoubleItSignaturePort2" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItSignature2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItAsymmetric"/>
+        </wsdl:port>
     </wsdl:service>
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 6d6ce13... Adding a Action -> Policy test for a KeyIdentifier fix
 </wsdl:definitions>
