@@ -155,6 +155,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setResponseMethods(getResponseMethods());
                 
         sg.setGenerateEnums(context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS));
+        sg.setValidateWadl(context.optionSet(WadlToolConstants.CFG_VALIDATE_WADL));
         boolean inheritResourceParams = context.optionSet(WadlToolConstants.CFG_INHERIT_PARAMS);
         sg.setInheritResourceParams(inheritResourceParams);
         if (inheritResourceParams) {

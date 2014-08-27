@@ -263,9 +263,6 @@ Examples:
                     <annotation>encoding</annotation>
                 </associatedArgument>
             </option>
-            
-            <!-- 
-
             <option id="validate" maxOccurs="1">
                 <annotation>
                     Specifies that the WADL is validated before generating the code. Using 
@@ -273,9 +270,6 @@ Examples:
                 </annotation>
                 <switch>validate</switch>
             </option>
-            
-            -->
-            
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
