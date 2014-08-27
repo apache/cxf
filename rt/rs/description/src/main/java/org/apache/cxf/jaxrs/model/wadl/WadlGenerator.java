@@ -120,7 +120,6 @@ public class WadlGenerator implements ContainerRequestFilter {
     public static final MediaType WADL_TYPE = JAXRSUtils.toMediaType("application/vnd.sun.wadl+xml");
     public static final String WADL_NS = "http://wadl.dev.java.net/2009/02";
 
-    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_XML_TYPE;
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
@@ -151,7 +150,8 @@ public class WadlGenerator implements ContainerRequestFilter {
     private List<String> privateAddresses;
     private String applicationTitle;
     private String nsPrefix = DEFAULT_NS_PREFIX;
-    private MediaType defaultMediaType = DEFAULT_MEDIA_TYPE;
+    private MediaType defaultWadlResponseMediaType = MediaType.APPLICATION_XML_TYPE;
+    private MediaType defaultRepMediaType = MediaType.WILDCARD_TYPE;
     private Bus bus;
     private DocumentationProvider docProvider;
         
@@ -195,7 +195,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         HttpHeaders headers = new HttpHeadersImpl(m);
         List<MediaType> accepts = headers.getAcceptableMediaTypes();
         MediaType type = accepts.contains(WADL_TYPE) ? WADL_TYPE : accepts
-            .contains(MediaType.APPLICATION_JSON_TYPE) ? MediaType.APPLICATION_JSON_TYPE : defaultMediaType;
+            .contains(MediaType.APPLICATION_JSON_TYPE) ? MediaType.APPLICATION_JSON_TYPE 
+                : defaultWadlResponseMediaType;
 
         Response response = getExistingWadl(m, ui, type);
         if (response != null) {
@@ -834,7 +835,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (MultivaluedMap.class.isAssignableFrom(type)) {
             types = Collections.singletonList(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
         } else if (isWildcard(types)) {
-            types = Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            types = Collections.singletonList(defaultRepMediaType);
         }
 
         Method opMethod = getMethod(ori);
@@ -1889,8 +1890,25 @@ public class WadlGenerator implements ContainerRequestFilter {
         this.supportCollections = support;
     }
 
+    /**
+     * Set the default WADL response media type.
+     * For example, a browser may display WADL better if Content-Type 
+     * is set application/xml which is a default response content type. 
+     * Users may set it to application/vnd.sun.wadl+xml or other type.
+     * @param mt WADL response media type 
+     */
     public void setDefaultMediaType(String mt) {
-        this.defaultMediaType = JAXRSUtils.toMediaType(mt);
+        this.defaultWadlResponseMediaType = JAXRSUtils.toMediaType(mt);
+    }
+    
+    /**
+     * Set the default representation media type to be used 
+     * if JAX-RS Produces or Consumes annotation is missing.
+     * Wild-card media type is used by default in such cases.
+     * @param mt the default representation media type 
+     */
+    public void setDefaultRepresentationMediaType(String mt) {
+        this.defaultWadlResponseMediaType = JAXRSUtils.toMediaType(mt);
     }
 
     public void setSupportJaxbXmlType(boolean supportJaxbXmlType) {
