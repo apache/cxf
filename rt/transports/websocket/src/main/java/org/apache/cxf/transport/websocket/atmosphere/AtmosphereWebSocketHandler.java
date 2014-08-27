@@ -71,14 +71,14 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     /** {@inheritDoc}*/
     @Override
     public void configure(AtmosphereConfig config) {
-        LOG.info("configure(AtmosphereConfig)");
+        LOG.fine("configure(AtmosphereConfig)");
 
     }
 
     /** {@inheritDoc}*/
     @Override
     public List<AtmosphereRequest> onMessage(WebSocket webSocket, String data) {
-        LOG.info("onMessage(WebSocket, String)");
+        LOG.fine("onMessage(WebSocket, String)");
         //TODO may want to use string directly instead of converting it to byte[]
         byte[] bdata = null;
         try {
@@ -98,7 +98,7 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     }
     
     protected List<AtmosphereRequest> invokeService(final WebSocket webSocket,  final InputStream stream) {
-        LOG.info("invokeService(WebSocket, InputStream)");
+        LOG.fine("invokeService(WebSocket, InputStream)");
         // invoke the service directly as onMessage is synchronously blocked (in jetty)
         // make sure the byte array passed to this method is immutable, as the websocket framework
         // may corrupt the byte array after this method is returned (i.e., before the data is returned in
@@ -161,7 +161,7 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     /** {@inheritDoc}*/
     @Override
     public void onError(WebSocket webSocket, WebSocketException t) {
-        LOG.info("onError(WebSocket, WebSocketException)");
+        LOG.severe("onError(WebSocket, WebSocketException)");
     }
 
 //    protected WebSocketVirtualServletRequest createServletRequest(WebSocketServletHolder webSocketHolder, 
