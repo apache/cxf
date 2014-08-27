@@ -162,7 +162,7 @@
                             javax.xml.bind*;version="[0.0,3)",
                             javax.jws*;version="[0.0,3)",
                             javax.xml.ws*;version="[0.0,3)",
-                            org.apache.cxf*;version="[2.5,3)",
+                            org.apache.cxf*;version="[3.0,4)",
                             *
                         </Import-Package>
                         <Export-Package>
