@@ -325,8 +325,8 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         }
 
         public void onMessage(byte[] message) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "onMessage({0})", message);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "onMessage({0})", message);
             }
             Response resp = new Response(responseIdKey, message);
             RequestResponse rr = uncorrelatedRequests.get(resp.getId());
@@ -344,8 +344,8 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         }
 
         public void onMessage(String message) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "onMessage({0})", message);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "onMessage({0})", message);
             }
             Response resp = new Response(responseIdKey, message);
             RequestResponse rr = uncorrelatedRequests.get(resp.getId());

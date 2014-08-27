@@ -52,30 +52,31 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public void flushBuffer() throws IOException {
-        LOG.log(Level.INFO, "flushBuffer()");
+        LOG.log(Level.FINE, "flushBuffer()");
+        outputStream.flush();
     }
 
     @Override
     public int getBufferSize() {
-        LOG.log(Level.INFO, "getBufferSize()");
+        LOG.log(Level.FINE, "getBufferSize()");
         return 0;
     }
 
     @Override
     public String getCharacterEncoding() {
-        LOG.log(Level.INFO, "getCharacterEncoding()");
+        LOG.log(Level.FINE, "getCharacterEncoding()");
         return null;
     }
 
     @Override
     public String getContentType() {
-        LOG.log(Level.INFO, "getContentType()");
+        LOG.log(Level.FINE, "getContentType()");
         return responseHeaders.get("Content-Type");
     }
 
     @Override
     public Locale getLocale() {
-        LOG.log(Level.INFO, "getLocale");
+        LOG.log(Level.FINE, "getLocale");
         return null;
     }
 
@@ -86,7 +87,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public PrintWriter getWriter() throws IOException {
-        LOG.log(Level.INFO, "getWriter()");
+        LOG.log(Level.FINE, "getWriter()");
         return new PrintWriter(getOutputStream());
     }
 
@@ -101,159 +102,159 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public void resetBuffer() {
-        LOG.log(Level.INFO, "resetBuffer()");
+        LOG.log(Level.FINE, "resetBuffer()");
     }
 
     @Override
     public void setBufferSize(int size) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setBufferSize({0})", size);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setBufferSize({0})", size);
         }
     }
 
     @Override
     public void setCharacterEncoding(String charset) {
         // TODO 
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setCharacterEncoding({0})", charset);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setCharacterEncoding({0})", charset);
         }
     }
 
     @Override
     public void setContentLength(int len) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setContentLength({0})", len);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setContentLength({0})", len);
         }
         responseHeaders.put("Content-Length", Integer.toString(len));
     }
 
     @Override
     public void setContentType(String type) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setContentType({0})", type);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setContentType({0})", type);
         }
         responseHeaders.put("Content-Type", type);
     }
 
     @Override
     public void setLocale(Locale loc) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setLocale({0})", loc);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setLocale({0})", loc);
         }
     }
 
     @Override
     public void addCookie(Cookie cookie) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "addCookie({0})", cookie);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "addCookie({0})", cookie);
         }
     }
 
     @Override
     public void addDateHeader(String name, long date) {
         // TODO
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "addDateHeader({0}, {1})", new Object[]{name, date});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "addDateHeader({0}, {1})", new Object[]{name, date});
         }
     }
 
     @Override
     public void addHeader(String name, String value) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "addHeader({0}, {1})", new Object[]{name, value});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "addHeader({0}, {1})", new Object[]{name, value});
         }
         responseHeaders.put(name, value);
     }
 
     @Override
     public void addIntHeader(String name, int value) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "addIntHeader({0}, {1})", new Object[]{name, value});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "addIntHeader({0}, {1})", new Object[]{name, value});
         }
         responseHeaders.put(name, Integer.toString(value));
     }
 
     @Override
     public boolean containsHeader(String name) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "containsHeader({0})", name);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "containsHeader({0})", name);
         }
         return responseHeaders.containsKey(name);
     }
 
     @Override
     public String encodeRedirectURL(String url) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "encodeRedirectURL({0})", url);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "encodeRedirectURL({0})", url);
         }
         return null;
     }
 
     @Override
     public String encodeRedirectUrl(String url) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "encodeRedirectUrl({0})", url);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "encodeRedirectUrl({0})", url);
         }
         return null;
     }
 
     @Override
     public String encodeURL(String url) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "encodeURL({0})", url);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "encodeURL({0})", url);
         }
         return null;
     }
 
     @Override
     public String encodeUrl(String url) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "encodeUrl({0})", url);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "encodeUrl({0})", url);
         }
         return null;
     }
 
     @Override
     public String getHeader(String name) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "getHeader({0})", name);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "getHeader({0})", name);
         }
         return null;
     }
 
     @Override
     public Collection<String> getHeaderNames() {
-        LOG.log(Level.INFO, "getHeaderNames()");
+        LOG.log(Level.FINE, "getHeaderNames()");
         return null;
     }
 
     @Override
     public Collection<String> getHeaders(String name) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "getHeaders({0})", name);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "getHeaders({0})", name);
         }
         return null;
     }
 
     @Override
     public int getStatus() {
-        LOG.log(Level.INFO, "getStatus()");
+        LOG.log(Level.FINE, "getStatus()");
         String v = responseHeaders.get(WebSocketUtils.SC_KEY);
         return v == null ? 200 : Integer.parseInt(v);
     }
 
     @Override
     public void sendError(int sc) throws IOException {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "sendError{0}", sc);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "sendError{0}", sc);
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
     }
 
     @Override
     public void sendError(int sc, String msg) throws IOException {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "sendError({0}, {1})", new Object[]{sc, msg});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "sendError({0}, {1})", new Object[]{sc, msg});
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
         responseHeaders.put(WebSocketUtils.SM_KEY, msg);
@@ -261,46 +262,46 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public void sendRedirect(String location) throws IOException {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "sendRedirect({0})", location);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "sendRedirect({0})", location);
         }
     }
 
     @Override
     public void setDateHeader(String name, long date) {
         // ignore
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setDateHeader({0}, {1})", new Object[]{name, date});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setDateHeader({0}, {1})", new Object[]{name, date});
         }
     }
 
     @Override
     public void setHeader(String name, String value) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setHeader({0}, {1})", new Object[]{name, value});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setHeader({0}, {1})", new Object[]{name, value});
         }
         responseHeaders.put(name, value);
     }
 
     @Override
     public void setIntHeader(String name, int value) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setIntHeader({0}, {1})", new Object[]{name, value});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setIntHeader({0}, {1})", new Object[]{name, value});
         }
     }
 
     @Override
     public void setStatus(int sc) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setStatus({0})", sc);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setStatus({0})", sc);
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
     }
 
     @Override
     public void setStatus(int sc, String sm) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "setStatus({0}, {1})", new Object[]{sc, sm});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setStatus({0}, {1})", new Object[]{sc, sm});
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
         responseHeaders.put(WebSocketUtils.SM_KEY, sm);
