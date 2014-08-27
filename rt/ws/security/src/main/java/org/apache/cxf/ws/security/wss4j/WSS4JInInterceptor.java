@@ -67,7 +67,6 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.interceptors.NegotiationUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -124,7 +123,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
         setPhase(Phase.PRE_PROTOCOL);
         getAfter().add(SAAJInInterceptor.class.getName());
-        getAfter().add(MAPCodec.class.getName());
+        getAfter().add("org.apache.cxf.ws.addressing.soap.MAPCodec");
     }
     public WSS4JInInterceptor(boolean ignore) {
         this();
