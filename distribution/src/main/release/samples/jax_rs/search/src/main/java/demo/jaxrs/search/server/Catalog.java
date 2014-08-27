@@ -180,20 +180,25 @@ public class Catalog {
             final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
             visitor.visit(searchContext.getCondition(SearchBean.class));
             
-            final TopDocs topDocs = searcher.search(visitor.getQuery(), 1000);
-            for (final ScoreDoc scoreDoc: topDocs.scoreDocs) {
-                final Document document = reader.document(scoreDoc.doc);
-                final String source = document.getField(LuceneDocumentMetadata.SOURCE_FIELD).stringValue();
-                
-                builder.add(
-                    Json.createObjectBuilder()
-                        .add("source", source)
-                        .add("score", scoreDoc.score)
-                        .add("url", uri.getBaseUriBuilder()
-                                .path(Catalog.class)
-                                .path(source)
-                                .build().toString())
-                );
+            final Query query = visitor.getQuery();            
+            if (query != null) {
+                final TopDocs topDocs = searcher.search(query, 1000);
+                for (final ScoreDoc scoreDoc: topDocs.scoreDocs) {
+                    final Document document = reader.document(scoreDoc.doc);
+                    final String source = document
+                        .getField(LuceneDocumentMetadata.SOURCE_FIELD)
+                        .stringValue();
+                    
+                    builder.add(
+                        Json.createObjectBuilder()
+                            .add("source", source)
+                            .add("score", scoreDoc.score)
+                            .add("url", uri.getBaseUriBuilder()
+                                    .path(Catalog.class)
+                                    .path(source)
+                                    .build().toString())
+                    );
+                }
             }
             
             return builder.build();

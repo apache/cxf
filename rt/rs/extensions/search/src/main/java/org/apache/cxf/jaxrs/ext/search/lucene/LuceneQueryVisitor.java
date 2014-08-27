@@ -58,12 +58,21 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         this(Collections.<String, String>emptyMap());        
     }
     
+    public LuceneQueryVisitor(Analyzer analyzer) {
+        this(Collections.<String, String>emptyMap(), null, analyzer);        
+    }
+
+    
     public LuceneQueryVisitor(String contentsFieldAlias, String contentsFieldName) {
         this(Collections.singletonMap(contentsFieldAlias, contentsFieldName));
     }
          
     public LuceneQueryVisitor(String contentsFieldName) {
         this(Collections.<String, String>emptyMap(), contentsFieldName);
+    }
+
+    public LuceneQueryVisitor(String contentsFieldName, Analyzer analyzer) {
+        this(Collections.<String, String>emptyMap(), contentsFieldName, analyzer);
     }
     
     public LuceneQueryVisitor(Map<String, String> fieldsMap) {

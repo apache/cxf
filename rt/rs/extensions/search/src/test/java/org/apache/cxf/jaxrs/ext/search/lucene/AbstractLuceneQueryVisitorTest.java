@@ -80,8 +80,15 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
     protected abstract SearchConditionParser<SearchBean> getParser();
  
     protected void doTestTextContentMatch(String expression) throws Exception {
-        
-        Query query = createTermQuery("contents", expression);
+        doTestTextContentMatch(expression, false);    
+    }
+    
+    protected void doTestTextContentMatchWithAnalyzer(String expression) throws Exception {
+        doTestTextContentMatch(expression, true);    
+    }
+    
+    protected void doTestTextContentMatch(String expression, boolean useAnalyzer) throws Exception {        
+        Query query = createTermQuery("contents", expression, useAnalyzer);
         doTestTextContentMatchWithQuery(query);
             
     }
@@ -123,24 +130,47 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
     }
     
     protected Query createTermQuery(String expression) throws Exception {
+        return createTermQuery(expression, false);
+    }
+    
+    protected Query createTermQueryWithAnalyzer(String expression) throws Exception {
+        return createTermQuery(expression, true);
+    }
+    
+    protected Query createTermQuery(String expression, boolean useAnalyzer) throws Exception {
         SearchCondition<SearchBean> filter = getParser().parse(expression);
-        SearchConditionVisitor<SearchBean, Query> lucene = new LuceneQueryVisitor<SearchBean>();
+        SearchConditionVisitor<SearchBean, Query> lucene = 
+            new LuceneQueryVisitor<SearchBean>(useAnalyzer ? analyzer : null);
         lucene.visit(filter);
         return lucene.getQuery();
     }
     
+    protected Query createTermQueryWithFieldClassWithAnalyzer(String expression, Class<?> cls) throws Exception {
+        return createTermQueryWithFieldClass(expression, cls, true);
+    }
+    
     protected Query createTermQueryWithFieldClass(String expression, Class<?> cls) throws Exception {
+        return createTermQueryWithFieldClass(expression, cls, false);
+    }
+    
+    protected Query createTermQueryWithFieldClass(String expression, Class<?> cls, 
+            boolean useAnalyzer) throws Exception {
         SearchCondition<SearchBean> filter = getParser().parse(expression);
-        LuceneQueryVisitor<SearchBean> lucene = new LuceneQueryVisitor<SearchBean>();
+        LuceneQueryVisitor<SearchBean> lucene = 
+            new LuceneQueryVisitor<SearchBean>(useAnalyzer ? analyzer : null);
         lucene.setPrimitiveFieldTypeMap(Collections.<String, Class<?>>singletonMap("intfield", cls));
         lucene.visit(filter);
         return lucene.getQuery();
     }
     
     protected Query createTermQuery(String fieldName, String expression) throws Exception {
+        return createTermQuery(fieldName, expression, false);
+    }
+    
+    protected Query createTermQuery(String fieldName, String expression, boolean useAnalyzer) throws Exception {
         SearchCondition<SearchBean> filter = getParser().parse(expression);
         LuceneQueryVisitor<SearchBean> lucene = 
-            new LuceneQueryVisitor<SearchBean>("ct", fieldName);
+            new LuceneQueryVisitor<SearchBean>("ct", fieldName, useAnalyzer ? analyzer : null);
         lucene.visit(filter);
         return lucene.getQuery();
     }
@@ -156,9 +186,17 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
     }
     
     protected Query createPhraseQuery(String fieldName, String expression) throws Exception {
+        return createPhraseQuery(fieldName, expression, false);
+    }
+
+    protected Query createPhraseQueryWithAnalyzer(String fieldName, String expression) throws Exception {
+        return createPhraseQuery(fieldName, expression, true);
+    }
+
+    protected Query createPhraseQuery(String fieldName, String expression, boolean useAnalyzer) throws Exception {
         SearchCondition<SearchBean> filter = getParser().parse(expression);
         LuceneQueryVisitor<SearchBean> lucene = 
-            new LuceneQueryVisitor<SearchBean>(fieldName);
+            new LuceneQueryVisitor<SearchBean>(fieldName, useAnalyzer ? analyzer : null);
         lucene.visit(filter);
         return lucene.getQuery();
     }
