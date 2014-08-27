@@ -185,7 +185,7 @@
     </feature>
     <feature name="cxf-rs-security-xml" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-jaxrs</feature>
-        <feature version="${cxf.wss4j.version}">wss4j</feature>
+        <feature version="${project.version}">cxf-rt-security</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-xml/${project.version}</bundle>
     </feature>
     <feature name="cxf-rs-security-sso-saml" version="${project.version}" resolver="(obr)">
@@ -395,8 +395,8 @@
 
     <feature name="cxf-bean-validation-java6" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-bean-validation-core</feature>
-        <bundle start-level="30" dependency="true">mvn:javax.el/javax.el-api/3.0-b2</bundle> 
-        <bundle start-level="30" dependency="true">mvn:org.glassfish/javax.el/3.0-b1</bundle>  
+        <bundle start-level="30" dependency="true">mvn:javax.el/javax.el-api/3.0-b02</bundle>
+        <bundle start-level="30" dependency="true">mvn:org.glassfish/javax.el/3.0-b01</bundle>
     </feature>
 
     <feature name="cxf-management-web" version="${project.version}" resolver="(obr)">

@@ -91,6 +91,7 @@
                     <artifactId>javax.servlet</artifactId>
                 </exclusion>
             </exclusions>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
