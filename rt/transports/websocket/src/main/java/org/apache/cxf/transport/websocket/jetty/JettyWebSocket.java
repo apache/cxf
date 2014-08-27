@@ -82,8 +82,8 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
     @Override
     public void onMessage(String data) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "onMessage({0})", data);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "onMessage({0})", data);
         }
         try {
             //TODO may want use string directly instead of converting it to byte[]
@@ -96,8 +96,8 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
     @Override
     public void onMessage(byte[] data, int offset, int length) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "onMessage({0}, {1}, {2})", new Object[]{data, offset, length});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "onMessage({0}, {1}, {2})", new Object[]{data, offset, length});
         }
         final byte[] safedata = new byte[length];
         System.arraycopy(data, offset, safedata, 0, length);
@@ -165,7 +165,7 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
      * @param length
      */
     void write(byte[] data, int offset, int length) throws IOException {
-        LOG.log(Level.INFO, "write(byte[], offset, length)");
+        LOG.log(Level.FINE, "write(byte[], offset, length)");
         webSocketConnection.sendMessage(data, offset, length);
     }
     

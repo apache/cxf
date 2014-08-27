@@ -38,7 +38,7 @@ public class AtmosphereWebSocketStreamHandler extends AtmosphereWebSocketHandler
 
     @Override
     public List<AtmosphereRequest> onTextStream(WebSocket webSocket, Reader r) {
-        LOG.info("onTextStream(WebSocket, Reader)");
+        LOG.fine("onTextStream(WebSocket, Reader)");
         //TODO add support for Reader
         throw new IllegalArgumentException("not implemented");
     }

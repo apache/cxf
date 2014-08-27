@@ -88,40 +88,40 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public Object getAttribute(String name) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "getAttribute({0}) -> {1}", new Object[] {name , attributes.get(name)});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "getAttribute({0}) -> {1}", new Object[] {name , attributes.get(name)});
         }
         return attributes.get(name);
     }
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        LOG.log(Level.INFO, "getAttributeNames()");
+        LOG.log(Level.FINE, "getAttributeNames()");
         return Collections.enumeration(attributes.keySet());
     }
 
     @Override
     public String getCharacterEncoding() {
         // TODO Auto-generated method stub
-        LOG.log(Level.INFO, "getCharacterEncoding()");
+        LOG.log(Level.FINE, "getCharacterEncoding()");
         return null;
     }
 
     @Override
     public int getContentLength() {
-        LOG.log(Level.INFO, "getContentLength()");
+        LOG.log(Level.FINE, "getContentLength()");
         return 0;
     }
 
     @Override
     public String getContentType() {
-        LOG.log(Level.INFO, "getContentType()");
+        LOG.log(Level.FINE, "getContentType()");
         return requestHeaders.get("Content-Type");
     }
 
     @Override
     public DispatcherType getDispatcherType() {
-        LOG.log(Level.INFO, "getDispatcherType()");
+        LOG.log(Level.FINE, "getDispatcherType()");
         return webSocketHolder.getDispatcherType();
     }
 
@@ -142,39 +142,39 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getLocalAddr() {
-        LOG.log(Level.INFO, "getLocalAddr()");
+        LOG.log(Level.FINE, "getLocalAddr()");
         return webSocketHolder.getLocalAddr();
     }
 
     @Override
     public String getLocalName() {
-        LOG.log(Level.INFO, "getLocalName()");
+        LOG.log(Level.FINE, "getLocalName()");
         return webSocketHolder.getLocalName();
     }
 
     @Override
     public int getLocalPort() {
-        LOG.log(Level.INFO, "getLocalPort()");
+        LOG.log(Level.FINE, "getLocalPort()");
         return webSocketHolder.getLocalPort();
     }
 
     @Override
     public Locale getLocale() {
-        LOG.log(Level.INFO, "getLocale()");
+        LOG.log(Level.FINE, "getLocale()");
         return webSocketHolder.getLocale();
     }
 
     @Override
     public Enumeration<Locale> getLocales() {
-        LOG.log(Level.INFO, "getLocales()");
+        LOG.log(Level.FINE, "getLocales()");
         return webSocketHolder.getLocales();
     }
 
     @Override
     public String getParameter(String name) {
         // TODO Auto-generated method stub
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "getParameter({0})", name);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "getParameter({0})", name);
         }
         return null;
     }
@@ -182,73 +182,73 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     @Override
     public Map<String, String[]> getParameterMap() {
         // TODO Auto-generated method stub
-        LOG.log(Level.INFO, "getParameterMap()");
+        LOG.log(Level.FINE, "getParameterMap()");
         return null;
     }
 
     @Override
     public Enumeration<String> getParameterNames() {
         // TODO Auto-generated method stub
-        LOG.log(Level.INFO, "getParameterNames()");
+        LOG.log(Level.FINE, "getParameterNames()");
         return null;
     }
 
     @Override
     public String[] getParameterValues(String name) {
         // TODO Auto-generated method stub
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "getParameterValues({0})", name);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "getParameterValues({0})", name);
         }
         return null;
     }
 
     @Override
     public String getProtocol() {
-        LOG.log(Level.INFO, "getProtocol");
+        LOG.log(Level.FINE, "getProtocol");
         return webSocketHolder.getProtocol();
     }
 
     @Override
     public BufferedReader getReader() throws IOException {
-        LOG.log(Level.INFO, "getReader");
+        LOG.log(Level.FINE, "getReader");
         return new BufferedReader(new InputStreamReader(in, "utf-8"));
     }
 
     @Override
     public String getRealPath(String path) {
         // TODO Auto-generated method stub
-        LOG.log(Level.INFO, "getRealPath");
+        LOG.log(Level.FINE, "getRealPath");
         return null;
     }
 
     @Override
     public String getRemoteAddr() {
-        LOG.log(Level.INFO, "getRemoteAddr");
+        LOG.log(Level.FINE, "getRemoteAddr");
         return webSocketHolder.getRemoteAddr();
     }
 
     @Override
     public String getRemoteHost() {
-        LOG.log(Level.INFO, "getRemoteHost");
+        LOG.log(Level.FINE, "getRemoteHost");
         return webSocketHolder.getRemoteHost();
     }
 
     @Override
     public int getRemotePort() {
-        LOG.log(Level.INFO, "getRemotePort");
+        LOG.log(Level.FINE, "getRemotePort");
         return webSocketHolder.getRemotePort();
     }
 
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
         // TODO Auto-generated method stub
-        LOG.log(Level.INFO, "getRequestDispatcher");
+        LOG.log(Level.FINE, "getRequestDispatcher");
         return null;
     }
 
     @Override
     public String getScheme() {
-        LOG.log(Level.INFO, "getScheme");
+        LOG.log(Level.FINE, "getScheme");
         return webSocketHolder.getScheme();
     }
 
@@ -259,137 +259,137 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public int getServerPort() {
-        LOG.log(Level.INFO, "getServerPort");
+        LOG.log(Level.FINE, "getServerPort");
         return webSocketHolder.getServerPort();
     }
 
     @Override
     public ServletContext getServletContext() {
-        LOG.log(Level.INFO, "getServletContext");
+        LOG.log(Level.FINE, "getServletContext");
         return webSocketHolder.getServletContext();
     }
 
     @Override
     public boolean isAsyncStarted() {
-        LOG.log(Level.INFO, "isAsyncStarted");
+        LOG.log(Level.FINE, "isAsyncStarted");
         return false;
     }
 
     @Override
     public boolean isAsyncSupported() {
-        LOG.log(Level.INFO, "isAsyncSupported");
+        LOG.log(Level.FINE, "isAsyncSupported");
         return false;
     }
 
     @Override
     public boolean isSecure() {
-        LOG.log(Level.INFO, "isSecure");
+        LOG.log(Level.FINE, "isSecure");
         return webSocketHolder.isSecure();
     }
 
     @Override
     public void removeAttribute(String name) {
-        LOG.log(Level.INFO, "removeAttribute");
+        LOG.log(Level.FINE, "removeAttribute");
         attributes.remove(name);
     }
 
     @Override
     public void setAttribute(String name, Object o) {
-        LOG.log(Level.INFO, "setAttribute");
+        LOG.log(Level.FINE, "setAttribute");
         attributes.put(name,  o);
     }
 
     @Override
     public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
-        LOG.log(Level.INFO, "setCharacterEncoding");
+        LOG.log(Level.FINE, "setCharacterEncoding");
         // ignore as we stick to utf-8.
     }
 
     @Override
     public AsyncContext startAsync() {
-        LOG.log(Level.INFO, "startAsync");
+        LOG.log(Level.FINE, "startAsync");
         return null;
     }
 
     @Override
     public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) {
         // TODO Auto-generated method stub
-        LOG.log(Level.INFO, "startAsync");
+        LOG.log(Level.FINE, "startAsync");
         return null;
     }
 
     @Override
     public boolean authenticate(HttpServletResponse servletResponse) throws IOException, ServletException {
         // TODO Auto-generated method stub
-        LOG.log(Level.INFO, "authenticate");
+        LOG.log(Level.FINE, "authenticate");
         return false;
     }
 
     @Override
     public String getAuthType() {
-        LOG.log(Level.INFO, "getAuthType");
+        LOG.log(Level.FINE, "getAuthType");
         return webSocketHolder.getAuthType();
     }
 
     @Override
     public String getContextPath() {
-        LOG.log(Level.INFO, "getContextPath -> " + webSocketHolder.getContextPath());
+        LOG.log(Level.FINE, "getContextPath -> " + webSocketHolder.getContextPath());
         return webSocketHolder.getContextPath();
     }
 
     @Override
     public Cookie[] getCookies() {
-        LOG.log(Level.INFO, "getCookies");
+        LOG.log(Level.FINE, "getCookies");
         return null;
     }
 
     @Override
     public long getDateHeader(String name) {
-        LOG.log(Level.INFO, "getDateHeader");
+        LOG.log(Level.FINE, "getDateHeader");
         return 0;
     }
 
     @Override
     public String getHeader(String name) {
-        LOG.log(Level.INFO, "getHeader");
+        LOG.log(Level.FINE, "getHeader");
         return requestHeaders.get(name);
     }
 
     @Override
     public Enumeration<String> getHeaderNames() {
-        LOG.log(Level.INFO, "getHeaderNames");
+        LOG.log(Level.FINE, "getHeaderNames");
         return Collections.enumeration(requestHeaders.keySet());
     }
 
     @Override
     public Enumeration<String> getHeaders(String name) {
-        LOG.log(Level.INFO, "getHeaders");
+        LOG.log(Level.FINE, "getHeaders");
         // our protocol assumes no multiple headers
         return Collections.enumeration(Arrays.asList(requestHeaders.get(name)));
     }
 
     @Override
     public int getIntHeader(String name) {
-        LOG.log(Level.INFO, "getIntHeader");
+        LOG.log(Level.FINE, "getIntHeader");
         String v = requestHeaders.get(name);
         return v == null ? -1 : Integer.parseInt(v);
     }
 
     @Override
     public String getMethod() {
-        LOG.log(Level.INFO, "getMethod");
+        LOG.log(Level.FINE, "getMethod");
         return requestHeaders.get(WebSocketUtils.METHOD_KEY);
     }
 
     @Override
     public Part getPart(String name) throws IOException, ServletException {
-        LOG.log(Level.INFO, "getPart");
+        LOG.log(Level.FINE, "getPart");
         return null;
     }
 
     @Override
     public Collection<Part> getParts() throws IOException, ServletException {
-        LOG.log(Level.INFO, "getParts");
+        LOG.log(Level.FINE, "getParts");
         return null;
     }
 
@@ -397,7 +397,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     public String getPathInfo() {
         String uri = requestHeaders.get(WebSocketUtils.URI_KEY);
         String servletpath = webSocketHolder.getServletPath();       
-        LOG.log(Level.INFO, "getPathInfo " + servletpath + " " + uri);
+        LOG.log(Level.FINE, "getPathInfo " + servletpath + " " + uri);
         //TODO remove the query string part
         //REVISIT may cache this value in requstHeaders?
         return uri.substring(servletpath.length());
@@ -412,7 +412,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
             return null;
         }
         String opathinfo = webSocketHolder.getPathInfo();
-        LOG.log(Level.INFO, "getPathTranslated " + path + " " + opathinfo);
+        LOG.log(Level.FINE, "getPathTranslated " + path + " " + opathinfo);
         int pos = opathtrans.indexOf(opathinfo);
         //REVISIT may cache this value in requstHeaders?
         return new StringBuilder().append(opathtrans.substring(0, pos)).append(path).toString();
@@ -420,19 +420,19 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getQueryString() {
-        LOG.log(Level.INFO, "getQueryString");
+        LOG.log(Level.FINE, "getQueryString");
         return null;
     }
 
     @Override
     public String getRemoteUser() {
-        LOG.log(Level.INFO, "getRemoteUser");
+        LOG.log(Level.FINE, "getRemoteUser");
         return null;
     }
 
     @Override
     public String getRequestURI() {
-        LOG.log(Level.INFO, "getRequestURI " + requestHeaders.get(WebSocketUtils.URI_KEY));
+        LOG.log(Level.FINE, "getRequestURI " + requestHeaders.get(WebSocketUtils.URI_KEY));
         return requestHeaders.get(WebSocketUtils.URI_KEY);
     }
 
@@ -442,78 +442,78 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         String ouri = webSocketHolder.getRequestURI();
         String uri = getRequestURI();
         sb.append(uri.substring(ouri.length()));
-        LOG.log(Level.INFO, "getRequestURL " + uri);
+        LOG.log(Level.FINE, "getRequestURL " + uri);
         return sb;
     }
 
     @Override
     public String getRequestedSessionId() {
-        LOG.log(Level.INFO, "getRequestedSessionId");
+        LOG.log(Level.FINE, "getRequestedSessionId");
         return null;
     }
 
     @Override
     public String getServletPath() {
-        LOG.log(Level.INFO, "getServletPath " + webSocketHolder.getServletPath());
+        LOG.log(Level.FINE, "getServletPath " + webSocketHolder.getServletPath());
         return webSocketHolder.getServletPath();
     }
 
     @Override
     public HttpSession getSession() {
-        LOG.log(Level.INFO, "getSession");
+        LOG.log(Level.FINE, "getSession");
         return null;
     }
 
     @Override
     public HttpSession getSession(boolean create) {
-        LOG.log(Level.INFO, "getSession");
+        LOG.log(Level.FINE, "getSession");
         return null;
     }
 
     @Override
     public Principal getUserPrincipal() {
-        LOG.log(Level.INFO, "getUserPrincipal");
+        LOG.log(Level.FINE, "getUserPrincipal");
         return webSocketHolder.getUserPrincipal();
     }
 
     @Override
     public boolean isRequestedSessionIdFromCookie() {
-        LOG.log(Level.INFO, "isRequestedSessionIdFromCookie");
+        LOG.log(Level.FINE, "isRequestedSessionIdFromCookie");
         return false;
     }
 
     @Override
     public boolean isRequestedSessionIdFromURL() {
-        LOG.log(Level.INFO, "isRequestedSessionIdFromURL");
+        LOG.log(Level.FINE, "isRequestedSessionIdFromURL");
         return false;
     }
 
     @Override
     public boolean isRequestedSessionIdFromUrl() {
-        LOG.log(Level.INFO, "isRequestedSessionIdFromUrl");
+        LOG.log(Level.FINE, "isRequestedSessionIdFromUrl");
         return false;
     }
 
     @Override
     public boolean isRequestedSessionIdValid() {
-        LOG.log(Level.INFO, "isRequestedSessionIdValid");
+        LOG.log(Level.FINE, "isRequestedSessionIdValid");
         return false;
     }
 
     @Override
     public boolean isUserInRole(String role) {
-        LOG.log(Level.INFO, "isUserInRole");
+        LOG.log(Level.FINE, "isUserInRole");
         return false;
     }
 
     @Override
     public void login(String username, String password) throws ServletException {
-        LOG.log(Level.INFO, "login");
+        LOG.log(Level.FINE, "login");
         
     }
 
     @Override
     public void logout() throws ServletException {
-        LOG.log(Level.INFO, "logout");
+        LOG.log(Level.FINE, "logout");
     }
 }
