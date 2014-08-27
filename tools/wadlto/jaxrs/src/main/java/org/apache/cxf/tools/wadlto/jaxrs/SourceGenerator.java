@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.tools.wadlto.jaxrs;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -66,12 +68,19 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import org.apache.cxf.Bus;
@@ -97,7 +106,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.tools.common.ToolException;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.constants.Constants;
 
@@ -210,7 +218,7 @@ public class SourceGenerator {
     private Map<String, String> mediaTypesMap = Collections.emptyMap();
     private Bus bus;
     private boolean supportMultipleXmlReps;
-        
+    private boolean validateWadl;    
     private SchemaCollection schemaCollection = new SchemaCollection();
     
     public SourceGenerator() {
@@ -279,7 +287,6 @@ public class SourceGenerator {
     
     public void generateSource(String wadl, File srcDir, String codeType) {
         Application app = readWadl(wadl, wadlPath);
-        
         Set<String> typeClassNames = new HashSet<String>();
         GrammarInfo gInfo = generateSchemaCodeAndInfo(app, typeClassNames, srcDir);
         if (!CODE_TYPE_GRAMMAR.equals(codeType)) {
@@ -1128,7 +1135,7 @@ public class SourceGenerator {
             if (PLAIN_PARAM_STYLE.equals(paramStyle)) {
                 error += ", plain style parameters have to be wrapped by representations";    
             }
-            throw new ToolException(error); 
+            throw new ValidationException(error); 
         }
         return paramAnn;
     }
@@ -1456,7 +1463,30 @@ public class SourceGenerator {
     }
     
     private Application readWadl(String wadl, String docPath) {
-        return new Application(readXmlDocument(new StringReader(wadl)), docPath);
+        Element wadlElement = readXmlDocument(new StringReader(wadl));
+        try {
+            if (validateWadl) {
+                SchemaFactory factory = SchemaFactory.newInstance(Constants.URI_2001_SCHEMA_XSD);
+                URL schemaURL = ResourceUtils.getResourceURL("classpath:/schemas/wadl/wadl.xsd", bus);
+                Reader r = new BufferedReader(new InputStreamReader(schemaURL.openStream(), "UTF-8"));
+                StreamSource source = new StreamSource(r);
+                source.setSystemId(schemaURL.toString());
+                Schema s = factory.newSchema(new Source[]{source});
+                DOMSource wadlDoc = new DOMSource(wadlElement);
+                Validator v = s.newValidator();
+                WadlValidationErrorHandler errorHandler = new WadlValidationErrorHandler();
+                v.setErrorHandler(errorHandler);
+                v.validate(wadlDoc);
+                if (errorHandler.isValidationFailed()) {
+                    throw new ValidationException("WADL document is not valid.");
+                }
+            }
+        } catch (ValidationException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ValidationException("WADL document can not be validated", ex);
+        }
+        return new Application(wadlElement, docPath);
     }
     
     private Element readXmlDocument(Reader reader) {
@@ -1717,6 +1747,10 @@ public class SourceGenerator {
         return generatedTypeClasses;    
     }
     
+    public void setValidateWadl(boolean validateWadl) {
+        this.validateWadl = validateWadl;
+    }
+
     private static class GrammarInfo {
         private Map<String, String> nsMap = new HashMap<String, String>();
         private Map<String, String> elementTypeMap = new HashMap<String, String>();
@@ -1843,5 +1877,29 @@ public class SourceGenerator {
         }
         
         
+    }
+    
+    private static class WadlValidationErrorHandler implements ErrorHandler {
+        private int fatalErrors;
+        private int errors;
+        @Override
+        public void warning(SAXParseException exception) throws SAXException {
+            LOG.log(Level.WARNING, exception.toString());
+        }
+
+        @Override
+        public void error(SAXParseException exception) throws SAXException {
+            LOG.log(Level.WARNING, exception.toString());
+            errors++;
+        }
+
+        @Override
+        public void fatalError(SAXParseException exception) throws SAXException {
+            LOG.log(Level.WARNING, exception.toString());
+            fatalErrors++;
+        }
+        private boolean isValidationFailed() {
+            return fatalErrors > 0 || errors > 0;
+        }
     }
 }

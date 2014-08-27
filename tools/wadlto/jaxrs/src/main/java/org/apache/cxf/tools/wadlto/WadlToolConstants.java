@@ -56,6 +56,7 @@ public final class WadlToolConstants {
     public static final String CFG_INHERIT_PARAMS = "inheritResourceParams";
     public static final String CFG_GENERATE_RESPONSE_IF_HEADERS_SET = "generateResponseIfHeadersSet";
     public static final String CFG_GENERATE_RESPONSE_FOR_METHODS = "generateResponseForMethods";
+    public static final String CFG_VALIDATE_WADL = "validate";
     
     // JAX-RS 2.0 @Suspended AsyncResponse
     public static final String CFG_SUSPENDED_ASYNC = "async";

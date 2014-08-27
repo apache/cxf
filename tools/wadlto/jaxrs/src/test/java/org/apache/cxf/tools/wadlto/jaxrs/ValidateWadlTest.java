@@ -23,7 +23,6 @@ import java.net.URISyntaxException;
 
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolContext;
-import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
 import org.junit.Test;
@@ -31,7 +30,23 @@ import org.junit.Test;
 public class ValidateWadlTest extends ProcessorTestBase {
 
     @Test    
-    public void testCodeGenInterfaces() throws Exception {
+    public void testInvalidWadl() throws Exception {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/invalidWadl.xml"));
+            context.put(WadlToolConstants.CFG_VALIDATE_WADL, "true");
+            container.setContext(context);
+            container.execute();
+            fail("Validation exception expected");
+        } catch (ValidationException e) {
+            // expected
+        }
+    }
+    
+    @Test    
+    public void testInvalidParameterStyle() throws Exception {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
 
@@ -40,7 +55,7 @@ public class ValidateWadlTest extends ProcessorTestBase {
             container.setContext(context);
             container.execute();
             fail();            
-        } catch (ToolException e) {
+        } catch (ValidationException e) {
             String message = e.getMessage();
             assertTrue(message.startsWith("Unsupported parameter style: plain"));
         }
