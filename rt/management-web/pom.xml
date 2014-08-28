@@ -33,6 +33,9 @@
     <properties>
         <cxf.osgi.import>
 	  !com.google.*,
+	  org.apache.abdera.parser.stax,
+	  org.apache.abdera,
+	  com.ctc.wstx.stax,
 	  *
         </cxf.osgi.import>
         <gwt.version>2.6.0</gwt.version>
