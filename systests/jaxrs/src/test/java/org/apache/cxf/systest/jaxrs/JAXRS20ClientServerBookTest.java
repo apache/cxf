@@ -39,6 +39,7 @@ import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
@@ -153,8 +154,10 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         Client client = ClientBuilder.newClient();
         client.register(new BookInfoReader());
-        BookInfo book = client.target(address)
-            .request("application/xml").get(BookInfo.class);
+        WebTarget target = client.target(address);
+        BookInfo book = target.request("application/xml").get(BookInfo.class);
+        assertEquals(124L, book.getId());
+        book = target.request("application/xml").get(BookInfo.class);
         assertEquals(124L, book.getId());
     }
     

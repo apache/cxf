@@ -1078,7 +1078,7 @@ public final class JAXRSUtils {
         } else if (ContextResolver.class.isAssignableFrom(clazz)) {
             o = createContextResolver(genericType, contextMessage);
         } else if (Configuration.class.isAssignableFrom(clazz)) {
-            o = ProviderFactory.getInstance(contextMessage).getConfiguration();
+            o = ProviderFactory.getInstance(contextMessage).getConfiguration(contextMessage);
         } else if (Application.class.isAssignableFrom(clazz)) {
             ProviderInfo<?> providerInfo = 
                 (ProviderInfo<?>)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
