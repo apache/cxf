@@ -1458,7 +1458,7 @@ public class SourceGenerator {
         Element wadlElement = readXmlDocument(new StringReader(wadl));
         try {
             if (validateWadl) {
-                SchemaFactory factory = SchemaFactory.newInstance(Constants.URI_2001_SCHEMA_XSD);
+                SchemaFactory factory = SchemaFactory.newInstance(XmlSchemaConstants.XSD_NAMESPACE_URI);
                 URL schemaURL = ResourceUtils.getResourceURL("classpath:/schemas/wadl/wadl.xsd", bus);
                 Reader r = new BufferedReader(new InputStreamReader(schemaURL.openStream(), "UTF-8"));
                 StreamSource source = new StreamSource(r);
