@@ -37,7 +37,9 @@
 
   <bean id="aep" class="org.apache.cxf.jaxrs.provider.atom.AtomEntryProvider" />
 
-  <jaxrs:server id="serviceEndpoint" address="/samples/logbrowser">
+  <bean id="srp" class="org.apache.cxf.jaxrs.provider.StreamingResponseProvider" />
+
+  <jaxrs:server id="serviceEndpoint" address="/samples/logbrowser" transportId="http://cxf.apache.org/transports/websocket">
     <jaxrs:serviceBeans>
       <ref component-id="aps" />
       <ref component-id="bs" />
@@ -48,7 +50,7 @@
       <ref component-id="scp" />
       <ref component-id="afp" />
       <ref component-id="aep" />
+      <ref component-id="srp" />
     </jaxrs:providers>
   </jaxrs:server>
-
 </blueprint>

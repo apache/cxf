@@ -41,8 +41,8 @@
 		    <Import-Package>
 			org.apache.cxf.jaxrs.servlet,
 			org.apache.abdera.parser.stax,
-			com.ctc.wstx.stax,
 			org.apache.abdera,
+			com.ctc.wstx.stax,
 			*
 		    </Import-Package>
 		</instructions>
@@ -71,6 +71,11 @@
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${project.version}</version>
         </dependency>
+	<dependency>
+	  <groupId>org.apache.cxf</groupId>
+	  <artifactId>cxf-rt-transports-websocket</artifactId>
+	  <version>${project.version}</version>
+	</dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-core</artifactId>
