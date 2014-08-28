@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.Priorities;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -46,6 +47,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
@@ -132,6 +134,8 @@ public final class ServerProviderFactory extends ProviderFactory {
         factory.setProviders(new WebApplicationExceptionMapper());
         
         bus.setProperty(SHARED_SERVER_FACTORY, factory);
+
+
         return factory;
     }
     
@@ -339,9 +343,8 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
     }
     
-    @Override
-    public Configuration getConfiguration() {
-        return new ServerConfigurationImpl(super.getConfiguration());
+    public Configuration getConfiguration(Message m) {
+        return new ServerConfigurationImpl();
     }
     
     private void doApplyDynamicFeatures(ClassResourceInfo cri) {
@@ -350,7 +353,6 @@ public final class ServerProviderFactory extends ProviderFactory {
             for (DynamicFeature feature : dynamicFeatures) {
                 FeatureContext featureContext = new MethodFeatureContextImpl(ori);
                 feature.configure(new ResourceInfoImpl(ori), featureContext);
-                super.setConfiguration(featureContext.getConfiguration());
             }
         }
         Collection<ClassResourceInfo> subs = cri.getSubResources();
@@ -506,21 +508,81 @@ public final class ServerProviderFactory extends ProviderFactory {
     
     
     private class ServerConfigurationImpl implements Configuration {
-        private Configuration superConfig;
-        public ServerConfigurationImpl(Configuration superConfig) {
-            this.superConfig = superConfig;
+        public ServerConfigurationImpl() {
+            
         }
         
         @Override
         public Set<Class<?>> getClasses() {
-            return superConfig != null ? superConfig.getClasses() : Collections.<Class<?>>emptySet();
+            return application != null ? application.getProvider().getClasses() 
+                : Collections.<Class<?>>emptySet();
         }
 
         @Override
         public Set<Object> getInstances() {
-            return superConfig != null ? superConfig.getInstances() : Collections.emptySet();
+            return application != null ? application.getProvider().getSingletons() 
+                : Collections.emptySet();
         }
 
+        @Override
+        public boolean isEnabled(Feature f) {
+            return dynamicFeatures.contains(f);
+        }
+
+        @Override
+        public boolean isEnabled(Class<? extends Feature> featureCls) {
+            for (DynamicFeature f : dynamicFeatures) {
+                if (featureCls.isAssignableFrom(f.getClass())) { 
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public boolean isRegistered(Object o) {
+            return isRegistered(preMatchContainerRequestFilters, o)
+                || isRegistered(postMatchContainerRequestFilters.values(), o)
+                || isRegistered(containerResponseFilters.values(), o)
+                || isRegistered(readerInterceptors.values(), o)
+                || isRegistered(writerInterceptors.values(), o);
+        }
+
+        @Override
+        public boolean isRegistered(Class<?> cls) {
+            return isRegistered(preMatchContainerRequestFilters, cls)
+                || isRegistered(postMatchContainerRequestFilters.values(), cls)
+                || isRegistered(containerResponseFilters.values(), cls)
+                || isRegistered(readerInterceptors.values(), cls)
+                || isRegistered(writerInterceptors.values(), cls);
+        }
+
+        @Override
+        public Map<Class<?>, Integer> getContracts(Class<?> cls) {
+            Map<Class<?>, Integer> map = new HashMap<Class<?>, Integer>();
+            if (isRegistered(cls)) {
+                if (ContainerRequestFilter.class.isAssignableFrom(cls)) {
+                    boolean isPreMatch = cls.getAnnotation(PreMatching.class) != null;
+                    map.put(ContainerRequestFilter.class, 
+                            getPriority(isPreMatch ? preMatchContainerRequestFilters
+                                : postMatchContainerRequestFilters.values(), cls, ContainerRequestFilter.class));    
+                }
+                if (ContainerResponseFilter.class.isAssignableFrom(cls)) {
+                    map.put(ContainerResponseFilter.class, 
+                            getPriority(containerResponseFilters.values(), cls, ContainerResponseFilter.class));    
+                }
+                if (WriterInterceptor.class.isAssignableFrom(cls)) {
+                    map.put(WriterInterceptor.class, 
+                            getPriority(writerInterceptors.values(), cls, WriterInterceptor.class));    
+                }
+                if (ReaderInterceptor.class.isAssignableFrom(cls)) {
+                    map.put(ReaderInterceptor.class, 
+                            getPriority(readerInterceptors.values(), cls, ReaderInterceptor.class));    
+                }
+            }
+            return map;
+        }
+        
         @Override
         public Map<String, Object> getProperties() {
             return application != null ? application.getProperties() 
@@ -541,33 +603,34 @@ public final class ServerProviderFactory extends ProviderFactory {
         public RuntimeType getRuntimeType() {
             return RuntimeType.SERVER;
         }
-
-        @Override
-        public boolean isEnabled(Feature f) {
-            return superConfig != null ? superConfig.isEnabled(f) : false;
-        }
-
-        @Override
-        public boolean isEnabled(Class<? extends Feature> featureCls) {
-            return superConfig != null ? superConfig.isEnabled(featureCls) : false;
-        }
-
-        @Override
-        public boolean isRegistered(Object o) {
-            return superConfig != null ? superConfig.isRegistered(o) : false;
-        }
-
-        @Override
-        public boolean isRegistered(Class<?> cls) {
-            return superConfig != null ? superConfig.isRegistered(cls) : false;
-        }
-
-        @Override
-        public Map<Class<?>, Integer> getContracts(Class<?> cls) {
-            return superConfig != null ? superConfig.getContracts(cls)
-                : Collections.<Class<?>, Integer>emptyMap();
-        }
         
+        private boolean isRegistered(Collection<?> list, Object o) {
+            Collection<ProviderInfo<?>> list2 = CastUtils.cast(list);
+            for (ProviderInfo<?> pi : list2) {
+                if (pi.getProvider() == o) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        private boolean isRegistered(Collection<?> list, Class<?> cls) {
+            Collection<ProviderInfo<?>> list2 = CastUtils.cast(list);
+            for (ProviderInfo<?> pi : list2) {
+                if (cls.isAssignableFrom(pi.getProvider().getClass())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        private Integer getPriority(Collection<?> list, Class<?> cls, Class<?> filterClass) {
+            Collection<ProviderInfo<?>> list2 = CastUtils.cast(list);
+            for (ProviderInfo<?> pi : list2) {
+                if (pi instanceof FilterProviderInfo && pi.getProvider().getClass().isAssignableFrom(cls)) {
+                    return ((FilterProviderInfo<?>)pi).getPriority(filterClass);
+                }
+            }
+            return Priorities.USER;
+        }
     }
     
 }

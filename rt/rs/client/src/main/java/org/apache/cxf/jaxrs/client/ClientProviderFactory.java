@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.core.Configuration;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -43,7 +44,6 @@ public final class ClientProviderFactory extends ProviderFactory {
         new ArrayList<ProviderInfo<ClientResponseFilter>>(1);
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
         new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
-   
     
     private ClientProviderFactory(ProviderFactory baseFactory, Bus bus) {
         super(baseFactory, bus);
@@ -82,8 +82,6 @@ public final class ClientProviderFactory extends ProviderFactory {
         bus.setProperty(SHARED_CLIENT_FACTORY, factory);
         return factory;
     }
-    
-    
     @Override
     protected void setProviders(Object... providers) {
         List<ProviderInfo<? extends Object>> theProviders = 
@@ -141,6 +139,12 @@ public final class ClientProviderFactory extends ProviderFactory {
     
     public List<ProviderInfo<ClientResponseFilter>> getClientResponseFilters() {
         return Collections.unmodifiableList(clientResponseFilters);
+    }
+
+    @Override
+    public Configuration getConfiguration(Message m) {
+        return (Configuration)m.getExchange().getOutMessage()
+            .getContextualProperty(Configuration.class.getName());
     }
     
 }

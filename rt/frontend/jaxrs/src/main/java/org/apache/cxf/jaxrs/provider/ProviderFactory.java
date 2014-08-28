@@ -97,8 +97,6 @@ public abstract class ProviderFactory {
         new NameKeyMap<ProviderInfo<ReaderInterceptor>>(true);
     protected Map<NameKey, ProviderInfo<WriterInterceptor>> writerInterceptors = 
         new NameKeyMap<ProviderInfo<WriterInterceptor>>(true);
-    private Configuration dynamicConfiguration;
-    
     
     private List<ProviderInfo<MessageBodyReader<?>>> messageReaders = 
         new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
@@ -163,15 +161,7 @@ public abstract class ProviderFactory {
         return null;
     }
     
-    public void setConfiguration(Configuration config) {
-        // Whatever is set inside Configuration is also set in this ProviderFactory
-        // We use it only to support Configuration injection at a basic level
-        this.dynamicConfiguration = config;
-    }
-    
-    public Configuration getConfiguration() {
-        return dynamicConfiguration;
-    }
+    public abstract Configuration getConfiguration(Message message);
     
     public <T> ContextResolver<T> createContextResolver(Type contextType, 
                                                         Message m) {
@@ -570,7 +560,7 @@ public abstract class ProviderFactory {
     protected void addProviderToList(List<?> list, ProviderInfo<?> provider) {
         List<ProviderInfo<?>> list2 = CastUtils.cast(list);
         for (ProviderInfo<?> pi : list2) {
-            if (pi.getProvider().getClass() == provider.getProvider().getClass()) {
+            if (pi.getProvider() == provider.getProvider()) {
                 return;
             }
         }
