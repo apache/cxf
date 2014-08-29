@@ -23,12 +23,16 @@ package org.apache.cxf.systest.jaxrs.websocket;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -39,11 +43,12 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 import org.apache.cxf.systest.jaxrs.Book;
+import org.apache.cxf.transport.websocket.WebSocketConstants;
 
 @Path("/web/bookstore")
 public class BookStoreWebSocket {
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
-
+    private Map<String, OutputStream> eventsStreams = new HashMap<String, OutputStream>();
     
     @GET
     @Path("/booknames")
@@ -135,6 +140,43 @@ public class BookStoreWebSocket {
             // ignore
         }
         return "Held from " + from + " for " + t + " ms";
+    }
+    
+    @GET
+    @Path("/events/register")
+    @Produces("text/plain")
+    public StreamingOutput registerEventsStream(@HeaderParam(WebSocketConstants.DEFAULT_REQUEST_ID_KEY) String reqid) {
+        final String key = reqid == null ? "*" : reqid;
+        return new StreamingOutput() {
+            public void write(final OutputStream out) throws IOException, WebApplicationException {
+                eventsStreams.put(key, out);
+                out.write(("Registered " + key + " at " + new java.util.Date()).getBytes());
+            }
+        };
+
+    }
+
+    @GET
+    @Path("/events/create/{name}")
+    @Produces("text/plain")
+    public String createEvent(@PathParam("name") String name) {
+        for (Iterator<OutputStream> it = eventsStreams.values().iterator(); it.hasNext();) {
+            OutputStream out = it.next();
+            try {
+                out.write(("News: event " + name + " created").getBytes());
+            } catch (IOException e) {
+                it.remove();
+                e.printStackTrace();
+            }
+        }
+        return name + " created";
+    }
+
+    @GET
+    @Path("/events/unregister/{key}")
+    @Produces("text/plain")
+    public String unregisterEventsStream(@PathParam("key") String key) {
+        return (eventsStreams.remove(key) != null ? "Unregistered: " : "Already Unregistered: ") + key; 
     }
 }
 

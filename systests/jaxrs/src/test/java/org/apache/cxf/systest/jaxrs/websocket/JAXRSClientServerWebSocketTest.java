@@ -159,6 +159,39 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         }
     }
     
+    @Test
+    public void testGetBookStreamWithIDReferences() throws Exception {
+        String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
+
+        WebSocketTestClient wsclient = new WebSocketTestClient(address);
+        wsclient.connect();
+        try {
+            wsclient.reset(5);
+            String reqid = UUID.randomUUID().toString();
+            wsclient.sendMessage(
+                ("GET " +  getContext() + "/websocket/web/bookstore/bookstream\r\nAccept: application/json\r\n"
+                    + WebSocketConstants.DEFAULT_REQUEST_ID_KEY + ": " + reqid + "\r\n\r\n")
+                .getBytes());
+            assertTrue("response expected", wsclient.await(5));
+            List<WebSocketTestClient.Response> received = wsclient.getReceivedResponses();
+            assertEquals(5, received.size());
+            WebSocketTestClient.Response resp = received.get(0);
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("application/json", resp.getContentType());
+            String value = resp.getTextEntity();
+            assertEquals(value, getBookJson(1));
+            for (int i = 2; i <= 5; i++) {
+                // subsequent data should not carry the status but the id header
+                resp = received.get(i - 1);
+                assertEquals(0, resp.getStatusCode());
+                assertEquals(reqid, resp.getId());
+                assertEquals(resp.getTextEntity(), getBookJson(i));
+            }
+        } finally {
+            wsclient.close();
+        }
+    }
+    
     private String getBookJson(int index) {
         return "{\"Book\":{\"id\":" + index + ",\"name\":\"WebSocket" + index + "\"}}";
     }
@@ -327,6 +360,117 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertEquals(2, received.size());
         } finally {
             wsclient.close();
+        }
+    }
+
+    @Test
+    public void testStreamRegisterAndUnregister() throws Exception {
+        String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
+
+        WebSocketTestClient wsclient1 = new WebSocketTestClient(address);
+        WebSocketTestClient wsclient2 = new WebSocketTestClient(address);
+        wsclient1.connect();
+        wsclient2.connect();
+        try {
+            String regkey = UUID.randomUUID().toString();
+
+            EventCreatorRunner runner = new EventCreatorRunner(wsclient2, regkey, 1000, 1000);
+            new Thread(runner).start();
+            
+            // register for the event stream with requestId ane expect to get 2 messages
+            wsclient1.reset(3);
+            wsclient1.sendTextMessage(
+                "GET " +  getContext() + "/websocket/web/bookstore/events/register\r\n"
+                    + WebSocketConstants.DEFAULT_REQUEST_ID_KEY + ": " + regkey + "\r\n\r\n");
+            assertFalse("only 2 responses expected", wsclient1.await(5));
+            List<WebSocketTestClient.Response> received = wsclient1.getReceivedResponses();
+            assertEquals(2, received.size());
+            
+            // the first response is the registration confirmation
+            WebSocketTestClient.Response resp = received.get(0);
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("text/plain", resp.getContentType());
+            String value = resp.getTextEntity();
+            assertTrue(value.startsWith("Registered " + regkey));
+            String id = resp.getId();
+            assertEquals("unexpected responseId", regkey, id);
+
+            // the second response is the event news
+            resp = received.get(1);
+            assertEquals(0, resp.getStatusCode());
+            value = resp.getTextEntity();
+            assertEquals("News: event Hello created", value);
+            id = resp.getId();
+            assertEquals("unexpected responseId", regkey, id);
+
+            String[] values = runner.getValues();
+            assertTrue(runner.isCompleted());
+            assertEquals("Hello created", values[0]);
+            assertTrue(values[1].startsWith("Unregistered: " + regkey));
+            assertEquals("Hola created", values[2]);
+        } finally {
+            wsclient1.close();
+            wsclient2.close();
+        }        
+    }
+
+    private class EventCreatorRunner implements Runnable {
+        private WebSocketTestClient wsclient;
+        private String key;
+        private long delay1;
+        private long delay2;
+        private String[] values = new String[3];
+        private boolean completed;
+
+        public EventCreatorRunner(WebSocketTestClient wsclient, String key, long delay1, long delay2) {
+            this.wsclient = wsclient;
+            this.key = key;
+            this.delay1 = delay1;
+            this.delay2 = delay2;
+        }
+
+        public void run() {
+            try {
+                Thread.sleep(delay1);
+                // creating an event and the event stream will see this event
+                wsclient.sendTextMessage(
+                    "GET " +  getContext() + "/websocket/web/bookstore/events/create/Hello\r\n\r\n");
+                assertTrue("response expected", wsclient.await(3));
+                List<WebSocketTestClient.Response> received = wsclient.getReceivedResponses();
+                WebSocketTestClient.Response resp = received.get(0);
+                values[0] = resp.getTextEntity();
+
+                Thread.sleep(delay2);
+                wsclient.reset(1);
+                // unregistering the event stream
+                wsclient.sendTextMessage(
+                    "GET " +  getContext() + "/websocket/web/bookstore/events/unregister/" + key + "\r\n\r\n");
+                assertTrue("response expected", wsclient.await(3));
+                received = wsclient.getReceivedResponses();
+                resp = received.get(0);
+                values[1] = resp.getTextEntity();
+
+                wsclient.reset(1);
+                // creating another event and the event stream will not see this event
+                wsclient.sendTextMessage(
+                    "GET " +  getContext() + "/websocket/web/bookstore/events/create/Hola\r\n\r\n");
+                assertTrue("response expected", wsclient.await(3));
+                received = wsclient.getReceivedResponses();
+                resp = received.get(0);
+                values[2] = resp.getTextEntity();
+            } catch (InterruptedException e) {
+                // ignore
+            } finally {
+                completed = true;
+            }
+        }
+
+        public String[] getValues() {
+            return values;
+        }
+
+        public boolean isCompleted() {
+            return completed;
         }
     }
 

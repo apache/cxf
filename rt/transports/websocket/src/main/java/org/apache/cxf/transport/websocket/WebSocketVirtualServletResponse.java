@@ -343,7 +343,10 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
                     buffer.write(data, offset, length);
                 } else {
                     // unbuffered write to the socket
-                    data = WebSocketUtils.buildResponse(data, offset, length);
+                    String respid = responseHeaders.get(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY);
+                    byte[] headers = respid != null 
+                        ? WebSocketUtils.buildHeaderLine(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, respid) : null;
+                    data = WebSocketUtils.buildResponse(headers, data, offset, length);
                     webSocketHolder.write(data, 0, data.length);
                 }
             }

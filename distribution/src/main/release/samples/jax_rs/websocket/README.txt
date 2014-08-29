@@ -75,14 +75,24 @@ with the data:
 updates the customer instance whose id is 123
 
 
-A GET request to path /monitor
+A GET request to path /monitor with id monitor-12345
 
 ------------------------------------------------------------------------
 GET /customerservice/monitor
+requestId: monitor-12345
 ------------------------------------------------------------------------
 
 returns a continuous event stream on the customer
-activities.
+activities. Try invoking some customer related operations.
+
+A GET request to path /unmonitor with id monitor-12345
+
+------------------------------------------------------------------------
+GET /customerservice/unmonitor/monitor-12345
+------------------------------------------------------------------------
+
+unregisters the event stream and returns its status.
+
 
 The client code demonstrates how to send GET/POST/PUT/DELETE requests over
 a websocket.
