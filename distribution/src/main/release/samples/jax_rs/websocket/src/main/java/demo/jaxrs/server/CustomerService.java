@@ -30,6 +30,7 @@ import java.util.concurrent.Executors;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -39,6 +40,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.cxf.transport.websocket.WebSocketConstants;
+
 @Path("/customerservice/")
 @Produces("text/xml")
 public class CustomerService {
@@ -47,7 +50,7 @@ public class CustomerService {
     long currentId = 123;
     Map<Long, Customer> customers = new HashMap<Long, Customer>();
     Map<Long, Order> orders = new HashMap<Long, Order>();
-    Set<OutputStream> monitors = new HashSet<OutputStream>();
+    Map<String, OutputStream> monitors = new HashMap<String, OutputStream>();
     
     public CustomerService() {
         init();
@@ -123,13 +126,21 @@ public class CustomerService {
     @GET
     @Path("/monitor")
     @Produces("text/*")
-    public StreamingOutput getBookBought() {
+    public StreamingOutput monitorCustomers(@HeaderParam(WebSocketConstants.DEFAULT_REQUEST_ID_KEY) String reqid) {
+        final String key = reqid == null ? "*" : reqid; 
         return new StreamingOutput() {
             public void write(final OutputStream out) throws IOException, WebApplicationException {
-                monitors.add(out);
+                monitors.put(key, out);
                 out.write(("Subscribed at " + new java.util.Date()).getBytes());
             }
         };
+    }
+
+    @GET
+    @Path("/unmonitor/{key}")
+    @Produces("text/*")
+    public String unmonitorCustomers(@PathParam("key") String key) {
+        return (monitors.remove(key) != null ? "Removed: " : "Already removed: ") + key; 
     }
 
     private void sendCustomerEvent(final String msg, final Customer customer) {
@@ -137,7 +148,7 @@ public class CustomerService {
             public void run() {
                 try {
                     String t = msg + ": " + customer.getId() + "/" + customer.getName();
-                    for (Iterator<OutputStream> it = monitors.iterator(); it.hasNext();) {
+                    for (Iterator<OutputStream> it = monitors.values().iterator(); it.hasNext();) {
                         OutputStream out = it.next();
                         try {
                             out.write(t.getBytes());
