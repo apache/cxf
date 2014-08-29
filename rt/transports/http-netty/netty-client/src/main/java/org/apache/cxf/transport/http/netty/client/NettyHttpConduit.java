@@ -113,24 +113,19 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         if (o == null) {
             o = factory.getUseAsyncPolicy();
         }
-        if (o instanceof String) {
-            o = NettyHttpConduitFactory.UseAsyncPolicy.valueOf(o.toString().toUpperCase());
+        switch (NettyHttpConduitFactory.UseAsyncPolicy.getPolicy(o)) {
+        case ALWAYS:
+            o = true;
+            break;
+        case NEVER:
+            o = false;
+            break;
+        case ASYNC_ONLY:
+        default:
+            o = !message.getExchange().isSynchronous();
+            break;
         }
-        if (o instanceof NettyHttpConduitFactory.UseAsyncPolicy) {
-            switch ((NettyHttpConduitFactory.UseAsyncPolicy)o) {
-            case ALWAYS:
-                o = true;
-                break;
-            case NEVER:
-                o = false;
-                break;
-            case ASYNC_ONLY:
-            default:
-                o = !message.getExchange().isSynchronous();
-                break;
-            }
             
-        }
         // check tlsClientParameters from message header
         TLSClientParameters clientParameters = message.get(TLSClientParameters.class);
         if (clientParameters == null) {

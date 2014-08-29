@@ -88,7 +88,28 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     
     
     public static enum UseAsyncPolicy {
-        ALWAYS, ASYNC_ONLY, NEVER
+        ALWAYS, ASYNC_ONLY, NEVER;
+        
+        public static UseAsyncPolicy getPolicy(Object st) {
+            if (st instanceof UseAsyncPolicy) {
+                return (UseAsyncPolicy)st;
+            } else if (st instanceof String) {
+                String s = ((String)st).toUpperCase();
+                if ("ALWAYS".equals(s)) {
+                    return ALWAYS;
+                } else if ("NEVER".equals(s)) {
+                    return NEVER;
+                } else if ("ASYNC_ONLY".equals(s)) {
+                    return ASYNC_ONLY;
+                } else {
+                    st = Boolean.parseBoolean(s);
+                }
+            }
+            if (st instanceof Boolean) {
+                return ((Boolean)st).booleanValue() ? ALWAYS : NEVER;
+            }
+            return ASYNC_ONLY;
+        }
     };
         
     volatile PoolingNHttpClientConnectionManager connectionManager;
@@ -150,14 +171,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         if (st == null) {
             st = SystemPropertyAction.getPropertyOrNull(USE_POLICY);
         }
-        if (st instanceof UseAsyncPolicy) {
-            policy = (UseAsyncPolicy)st;
-        } else if (st instanceof String) {
-            policy = UseAsyncPolicy.valueOf(((String)st).toUpperCase());
-        } else {
-            //policy = UseAsyncPolicy.ALWAYS;
-            policy = UseAsyncPolicy.ASYNC_ONLY;
-        }
+        policy = UseAsyncPolicy.getPolicy(st);
         
         maxConnections = getInt(s.get(MAX_CONNECTIONS), maxConnections);
         connectionTTL = getInt(s.get(CONNECTION_TTL), connectionTTL);
