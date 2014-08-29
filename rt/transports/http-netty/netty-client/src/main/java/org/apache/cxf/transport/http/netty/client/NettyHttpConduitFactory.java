@@ -41,20 +41,34 @@ public class NettyHttpConduitFactory implements HTTPConduitFactory {
     public static final String USE_POLICY = "org.apache.cxf.transport.http.netty.usePolicy";
     
     public static enum UseAsyncPolicy {
-        ALWAYS, ASYNC_ONLY, NEVER
+        ALWAYS, ASYNC_ONLY, NEVER;
+        
+        public static UseAsyncPolicy getPolicy(Object st) {
+            if (st instanceof UseAsyncPolicy) {
+                return (UseAsyncPolicy)st;
+            } else if (st instanceof String) {
+                String s = ((String)st).toUpperCase();
+                if ("ALWAYS".equals(s)) {
+                    return ALWAYS;
+                } else if ("NEVER".equals(s)) {
+                    return NEVER;
+                } else if ("ASYNC_ONLY".equals(s)) {
+                    return ASYNC_ONLY;
+                } else {
+                    st = Boolean.parseBoolean(s);
+                }
+            }
+            if (st instanceof Boolean) {
+                return ((Boolean)st).booleanValue() ? ALWAYS : NEVER;
+            }
+            return ASYNC_ONLY;
+        }
     };
     
     UseAsyncPolicy policy;
     public NettyHttpConduitFactory() {
         Object st = SystemPropertyAction.getPropertyOrNull(USE_POLICY);
-        if (st instanceof UseAsyncPolicy) {
-            policy = (UseAsyncPolicy)st;
-        } else if (st instanceof String) {
-            policy = UseAsyncPolicy.valueOf(((String)st).toUpperCase());
-        } else {
-            //policy = UseAsyncPolicy.ALWAYS;
-            policy = UseAsyncPolicy.ASYNC_ONLY;
-        }        
+        policy = UseAsyncPolicy.getPolicy(st);
     }
     
     public UseAsyncPolicy getUseAsyncPolicy() {

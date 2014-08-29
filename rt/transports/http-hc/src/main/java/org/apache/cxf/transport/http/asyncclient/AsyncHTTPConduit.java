@@ -149,24 +149,19 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         if (o == null) {
             o = factory.getUseAsyncPolicy();
         }
-        if (o instanceof String) {
-            o = UseAsyncPolicy.valueOf(o.toString().toUpperCase());
+        switch (UseAsyncPolicy.getPolicy(o)) {
+        case ALWAYS:
+            o = true;
+            break;
+        case NEVER:
+            o = false;
+            break;
+        case ASYNC_ONLY:
+        default:
+            o = !message.getExchange().isSynchronous();
+            break;
         }
-        if (o instanceof UseAsyncPolicy) {
-            switch ((UseAsyncPolicy)o) {
-            case ALWAYS:
-                o = true;
-                break;
-            case NEVER:
-                o = false;
-                break;
-            case ASYNC_ONLY:
-            default:
-                o = !message.getExchange().isSynchronous();
-                break;
-            }
             
-        }
         // check tlsClientParameters from message header
         TLSClientParameters clientParameters = message.get(TLSClientParameters.class);
         if (clientParameters == null) {
