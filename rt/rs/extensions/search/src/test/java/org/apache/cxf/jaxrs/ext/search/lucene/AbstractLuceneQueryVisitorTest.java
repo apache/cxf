@@ -76,7 +76,6 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
         directory.close();
     }
     
-
     protected abstract SearchConditionParser<SearchBean> getParser();
  
     protected void doTestTextContentMatch(String expression) throws Exception {

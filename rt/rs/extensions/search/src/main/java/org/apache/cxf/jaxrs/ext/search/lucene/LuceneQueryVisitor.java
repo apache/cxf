@@ -29,6 +29,8 @@ import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.visitor.AbstractSearchConditionVisitor;
+import org.apache.cxf.jaxrs.ext.search.visitor.ThreadLocalVisitorState;
+import org.apache.cxf.jaxrs.ext.search.visitor.VisitorState;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
@@ -51,7 +53,9 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     private String contentsFieldName;
     private Map<String, String> contentsFieldMap;
     private boolean caseInsensitiveMatch;
-    private Stack<List<Query>> queryStack = new Stack<List<Query>>();
+    private VisitorState< Stack< List< Query > > > state = new ThreadLocalVisitorState< Stack< List< Query > > >();
+    private VisitorState< Stack< SearchCondition< ? > > > conditions = 
+        new ThreadLocalVisitorState< Stack< SearchCondition< ? > > >();
     private QueryBuilder queryBuilder;
     
     public LuceneQueryVisitor() {
@@ -93,9 +97,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         
         if (analyzer != null) {
             queryBuilder = new QueryBuilder(analyzer);
-        }
-        
-        queryStack.push(new ArrayList<Query>());
+        }                
     }
     
     public void setContentsFieldMap(Map<String, String> map) {
@@ -103,26 +105,43 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     }
     
     public void visit(SearchCondition<T> sc) {
+        if (conditions.get() == null || conditions.get().isEmpty()) {
+            state.set(new Stack<List<Query>>());
+            state.get().push(new ArrayList<Query>());
+        }
+        
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
-                queryStack.peek().add(buildSimpleQuery(sc.getConditionType(), 
+                state.get().peek().add(buildSimpleQuery(sc.getConditionType(), 
                                          statement.getProperty(), 
                                          statement.getValue()));
             }
         } else {
-            queryStack.push(new ArrayList<Query>());
+            state.get().push(new ArrayList<Query>());
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
-                condition.accept(this);
+                try {
+                    // There could me multiple recursive calls to the visit() method.
+                    // The conditions stack keeps track of every call down the call chain
+                    // in order to understand when visitor's state should be reset.
+                    if (conditions.get() == null) {
+                        conditions.set(new Stack<SearchCondition<?>>());
+                    }
+                    
+                    conditions.get().push(condition);
+                    condition.accept(this);
+                } finally {
+                    conditions.get().pop();
+                }
             }
             boolean orCondition = sc.getConditionType() == ConditionType.OR;
-            List<Query> queries = queryStack.pop();
-            queryStack.peek().add(createCompositeQuery(queries, orCondition));
+            List<Query> queries = state.get().pop();
+            state.get().peek().add(createCompositeQuery(queries, orCondition));
         }    
     }
     
     public Query getQuery() {
-        List<Query> queries = queryStack.peek();
+        List<Query> queries = state.get().peek();
         return queries.isEmpty() ? null : queries.get(0);
     }
     

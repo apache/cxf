@@ -18,11 +18,22 @@
  */
 package org.apache.cxf.jaxrs.ext.search.lucene;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.lucene.search.Query;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class LuceneQueryVisitorFiqlTest extends AbstractLuceneQueryVisitorTest {
     @Test
@@ -188,6 +199,53 @@ public class LuceneQueryVisitorFiqlTest extends AbstractLuceneQueryVisitorTest {
         Query query = createPhraseQuery("contents", "name==tex*");
         doTestTextContentMatchWithQuery(query);
     }
+    
+    @Test
+    public void testThatMultipleQueriesForTheSameFieldAreHandledProperly() {
+        final SearchCondition<SearchBean> filter1 = getParser().parse("name==text");
+        final SearchCondition<SearchBean> filter2 = getParser().parse("name==word");       
+        final LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>();
+        
+        visitor.visit(filter1);        
+        assertThat(visitor.getQuery().toString(), equalTo("name:text"));
+        
+        visitor.visit(filter2);        
+        assertThat(visitor.getQuery().toString(), equalTo("name:word"));
+    }
+    
+    @Test
+    public void testThatMultipleQueriesForTheSameFieldAreThreadSafe() throws InterruptedException, ExecutionException {
+        final LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>();
+        final ExecutorService executorService = Executors.newFixedThreadPool(5);
+        
+        final Collection< Future< ? > > futures = new ArrayList< Future< ? > >();
+        for (int i = 0; i < 5; ++i) {
+            final int index = i;
+            
+            futures.add(
+                executorService.submit(new Runnable() {                
+                    @Override
+                    public void run() {
+                        final SearchCondition<SearchBean> filter = getParser().parse("name==text" + index);            
+                        visitor.visit(filter);        
+                        
+                        assertNotNull("Query should not be null", visitor.getQuery());
+                        assertThat(visitor.getQuery().toString(), equalTo("name:text" + index));
+                    }                
+                }) 
+            );
+        }
+        
+        executorService.shutdown();
+        assertTrue("All threads should be terminated", 
+            executorService.awaitTermination(5, TimeUnit.SECONDS));
+        
+        for (final Future< ? > future: futures) {
+            // The exception will be raised if queries are messed up
+            future.get(); 
+        }
+    }
+
     
     @Override
     protected SearchConditionParser<SearchBean> getParser() {
