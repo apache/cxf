@@ -216,18 +216,21 @@ class WebSocketTestClient {
         
         public Response(Object data) {
             this.data = data;
-            String line = readLine();
-            if (line != null) {
-                statusCode = Integer.parseInt(line);
-                while ((line = readLine()) != null) {
-                    if (line.length() > 0) {
-                        int del = line.indexOf(':');
-                        String h = line.substring(0, del).trim();
-                        String v = line.substring(del + 1).trim();
-                        if ("Content-Type".equalsIgnoreCase(h)) {
-                            contentType = v;
-                        }
-                    }
+            String line;
+            boolean first = true;
+            while ((line = readLine()) != null) {
+                if (first && isStatusCode(line)) {
+                    statusCode = Integer.parseInt(line);
+                    continue;
+                } else {
+                    first = false;
+                }
+
+                int del = line.indexOf(':');
+                String h = line.substring(0, del).trim();
+                String v = line.substring(del + 1).trim();
+                if ("Content-Type".equalsIgnoreCase(h)) {
+                    contentType = v;
                 }
             }
             if (data instanceof String) {
@@ -237,8 +240,11 @@ class WebSocketTestClient {
                 System.arraycopy((byte[])data, pos, (byte[])entity, 0, ((byte[])entity).length);
             }
         }
-                
-            
+        
+        private static boolean isStatusCode(String line) {
+            char c = line.charAt(0);
+            return '0' <= c && c <= '9';
+        }
         
         public int getStatusCode() {
             return statusCode;
