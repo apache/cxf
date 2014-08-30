@@ -48,14 +48,18 @@ import org.apache.lucene.util.QueryBuilder;
 import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getString;
 import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getValue;
 
+/**
+ * LuceneQueryVisitor implements SearchConditionVisitor and returns corresponding Lucene query. The
+ * implementations is thread-safe, however if visitor is called multiple times, each call to visit()
+ * method should be preceded by reset() method call (to properly reset the visitor's internal 
+ * state). 
+ */
 public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Query> {
 
     private String contentsFieldName;
     private Map<String, String> contentsFieldMap;
     private boolean caseInsensitiveMatch;
     private VisitorState< Stack< List< Query > > > state = new ThreadLocalVisitorState< Stack< List< Query > > >();
-    private VisitorState< Stack< SearchCondition< ? > > > conditions = 
-        new ThreadLocalVisitorState< Stack< SearchCondition< ? > > >();
     private QueryBuilder queryBuilder;
     
     public LuceneQueryVisitor() {
@@ -98,18 +102,24 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         if (analyzer != null) {
             queryBuilder = new QueryBuilder(analyzer);
         }                
+        
+        reset();
     }
     
     public void setContentsFieldMap(Map<String, String> map) {
         this.contentsFieldMap = map;
     }
     
+    /**
+     * Resets visitor's internal state. If the instance of the visitor is intended to be used many times, 
+     * each call to visit() method should be preceded by reset() method call.
+     */
+    public void reset() {
+        state.set(new Stack<List<Query>>());
+        state.get().push(new ArrayList<Query>());        
+    }
+    
     public void visit(SearchCondition<T> sc) {
-        if (conditions.get() == null || conditions.get().isEmpty()) {
-            state.set(new Stack<List<Query>>());
-            state.get().push(new ArrayList<Query>());
-        }
-        
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
@@ -120,19 +130,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         } else {
             state.get().push(new ArrayList<Query>());
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
-                try {
-                    // There could me multiple recursive calls to the visit() method.
-                    // The conditions stack keeps track of every call down the call chain
-                    // in order to understand when visitor's state should be reset.
-                    if (conditions.get() == null) {
-                        conditions.set(new Stack<SearchCondition<?>>());
-                    }
-                    
-                    conditions.get().push(condition);
-                    condition.accept(this);
-                } finally {
-                    conditions.get().pop();
-                }
+                condition.accept(this);
             }
             boolean orCondition = sc.getConditionType() == ConditionType.OR;
             List<Query> queries = state.get().pop();

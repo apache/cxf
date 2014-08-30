@@ -209,6 +209,7 @@ public class LuceneQueryVisitorFiqlTest extends AbstractLuceneQueryVisitorTest {
         visitor.visit(filter1);        
         assertThat(visitor.getQuery().toString(), equalTo("name:text"));
         
+        visitor.reset();
         visitor.visit(filter2);        
         assertThat(visitor.getQuery().toString(), equalTo("name:word"));
     }
@@ -226,7 +227,8 @@ public class LuceneQueryVisitorFiqlTest extends AbstractLuceneQueryVisitorTest {
                 executorService.submit(new Runnable() {                
                     @Override
                     public void run() {
-                        final SearchCondition<SearchBean> filter = getParser().parse("name==text" + index);            
+                        final SearchCondition<SearchBean> filter = getParser().parse("name==text" + index);
+                        visitor.reset();
                         visitor.visit(filter);        
                         
                         assertNotNull("Query should not be null", visitor.getQuery());

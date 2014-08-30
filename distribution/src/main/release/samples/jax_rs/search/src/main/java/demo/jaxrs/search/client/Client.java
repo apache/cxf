@@ -45,9 +45,10 @@ public final class Client {
         
         list(url, httpClient);        
         
-        search(url, httpClient, "ct==java");        
-        search(url, httpClient, "ct==Java");
+        search(url, httpClient, "ct==java");
         search(url, httpClient, "ct==websockets");
+        
+        search(url, httpClient, "ct==Java");        
         search(url, httpClient, "ct==WebSockets");
         
         delete(url, httpClient);

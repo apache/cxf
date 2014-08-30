@@ -88,11 +88,13 @@ public class Catalog {
     private final Directory directory = new RAMDirectory();
     private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);    
     private final Storage storage; 
+    private final LuceneQueryVisitor<SearchBean> visitor;
     private final ExecutorService executor = Executors.newFixedThreadPool(
         Runtime.getRuntime().availableProcessors());
     
     public Catalog(final Storage storage) throws IOException {
         this.storage = storage;
+        this.visitor = createVisitor();
         initIndex();
     }
     
@@ -177,7 +179,7 @@ public class Catalog {
         final JsonArrayBuilder builder = Json.createArrayBuilder();
 
         try {            
-            final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
+            visitor.reset();
             visitor.visit(searchContext.getCondition(SearchBean.class));
             
             final Query query = visitor.getQuery();            
