@@ -103,7 +103,8 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             queryBuilder = new QueryBuilder(analyzer);
         }                
         
-        reset();
+        state.set(new Stack<List<Query>>());
+        state.get().push(new ArrayList<Query>());        
     }
     
     public void setContentsFieldMap(Map<String, String> map) {

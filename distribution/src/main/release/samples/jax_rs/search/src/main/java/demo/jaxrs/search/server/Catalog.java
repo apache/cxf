@@ -152,11 +152,11 @@ public class Catalog {
             final Query query = new MatchAllDocsQuery();
             
             for (final ScoreDoc scoreDoc: searcher.search(query, 1000).scoreDocs) {
-                final DocumentStoredFieldVisitor visitor = 
+                final DocumentStoredFieldVisitor fieldVisitor = 
                     new DocumentStoredFieldVisitor(LuceneDocumentMetadata.SOURCE_FIELD);                
                 
-                reader.document(scoreDoc.doc, visitor);
-                builder.add(visitor
+                reader.document(scoreDoc.doc, fieldVisitor);
+                builder.add(fieldVisitor
                         .getDocument()
                         .getField(LuceneDocumentMetadata.SOURCE_FIELD)
                         .stringValue());
@@ -265,10 +265,11 @@ public class Catalog {
         final Map< String, Class< ? > > fieldTypes = new HashMap< String, Class< ? > >();
         fieldTypes.put("modified", Date.class);
         
-        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>(
+        LuceneQueryVisitor<SearchBean> newVisitor = new LuceneQueryVisitor<SearchBean>(
             "ct", "contents", analyzer);
-        visitor.setPrimitiveFieldTypeMap(fieldTypes);
-        return visitor;
+        newVisitor.setPrimitiveFieldTypeMap(fieldTypes);
+        
+        return newVisitor;
     }
     
     private boolean exists(final String source) throws IOException {
