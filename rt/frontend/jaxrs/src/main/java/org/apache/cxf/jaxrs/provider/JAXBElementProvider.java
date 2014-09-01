@@ -195,7 +195,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             }
             if (isCollection) {
                 response = ((CollectionWrapper)response).getCollectionOrArray(
-                                 unmarshaller, theType, type, 
+                                 unmarshaller, theType, type, genericType, 
                                  org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(theGenericType, anns)); 
             } else {
                 response = checkAdapter(response, type, anns, false);
@@ -400,12 +400,10 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                                            MediaType mt, 
                                            String ns) throws Exception {
     //CHECKSTYLE:ON    
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement<?>)obj).getValue();    
-        } else {
+        if (!(obj instanceof JAXBElement)) {
             obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
         }
-        
+                
         if (obj instanceof JAXBElement && cls != JAXBElement.class) {
             cls = JAXBElement.class;
         }
