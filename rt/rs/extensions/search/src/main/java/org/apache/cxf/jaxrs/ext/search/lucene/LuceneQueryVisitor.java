@@ -103,8 +103,6 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             queryBuilder = new QueryBuilder(analyzer);
         }                
         
-        state.set(new Stack<List<Query>>());
-        state.get().push(new ArrayList<Query>());        
     }
     
     public void setContentsFieldMap(Map<String, String> map) {
@@ -121,6 +119,9 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     }
     
     public void visit(SearchCondition<T> sc) {
+        if (state.get() == null) {
+            reset();
+        }
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
