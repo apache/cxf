@@ -101,6 +101,8 @@ import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAdded;
 import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAddedAsync;
 import org.apache.cxf.systest.jaxrs.BookServer20.PostMatchMode;
 
+import org.junit.Assert;
+
 @Path("/bookstore")
 @GZIP(threshold = 1)
 public class BookStore {
@@ -598,14 +600,37 @@ public class BookStore {
     }
     
     @POST
-    @Path("/collections2")
+    @Path("/jaxbelementcollections")
     @Produces({"application/xml", "application/json" })
     @Consumes({"application/xml", "application/json" })
-    public List<JAXBElement<BookNoXmlRootElement>> getBookCollection2(
+    public List<JAXBElement<BookNoXmlRootElement>> getJAXBElementBookCollection(
         List<JAXBElement<BookNoXmlRootElement>> bs) throws Exception {
         if (bs == null || bs.size() != 2) {
             throw new RuntimeException();
         }
+        BookNoXmlRootElement b11 = bs.get(0).getValue();
+        Assert.assertEquals(123L, b11.getId());
+        Assert.assertEquals("CXF in Action", b11.getName());
+        BookNoXmlRootElement b22 = bs.get(1).getValue();
+        Assert.assertEquals(124L, b22.getId());
+        Assert.assertEquals("CXF Rocks", b22.getName());
+        return bs;
+    }
+    @POST
+    @Path("/jaxbelementxmlrootcollections")
+    @Produces({"application/xml", "application/json" })
+    @Consumes({"application/xml", "application/json" })
+    public List<JAXBElement<Book>> getJAXBElementBookXmlRootCollection(
+        List<JAXBElement<Book>> bs) throws Exception {
+        if (bs == null || bs.size() != 2) {
+            throw new RuntimeException();
+        }
+        Book b11 = bs.get(0).getValue();
+        Assert.assertEquals(123L, b11.getId());
+        Assert.assertEquals("CXF in Action", b11.getName());
+        Book b22 = bs.get(1).getValue();
+        Assert.assertEquals(124L, b22.getId());
+        Assert.assertEquals("CXF Rocks", b22.getName());
         return bs;
     }
     
@@ -1030,6 +1055,7 @@ public class BookStore {
     @POST
     @Path("/books/element/echo")
     public JAXBElement<Book> echoBookElement(JAXBElement<Book> element) throws Exception {
+        Assert.assertTrue(element instanceof JAXBElement);
         return element;
     }
     @POST

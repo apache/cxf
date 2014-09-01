@@ -410,7 +410,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         }
     }
     
-    private QName getQNameFromNamespaceAndName(String ns, String localName, Class<?> cls, boolean plural) {
+    private static QName getQNameFromNamespaceAndName(String ns, String localName, Class<?> cls, boolean plural) {
         String name = getLocalName(localName, cls.getSimpleName() , plural);
         String namespace = getNamespace(ns);
         if ("".equals(namespace)) {
@@ -419,7 +419,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return new QName(namespace, name);
     }
     
-    private String getLocalName(String name, String clsName, boolean pluralName) {
+    private static String getLocalName(String name, String clsName, boolean pluralName) {
         if (JAXB_DEFAULT_NAME.equals(name)) {
             name = clsName;
             if (name.length() > 1) {
@@ -434,12 +434,12 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return name;
     }
     
-    private String getPackageNamespace(Class<?> cls) {
+    private static String getPackageNamespace(Class<?> cls) {
         String packageNs = JAXBUtils.getPackageNamespace(cls);
         return packageNs != null ? getNamespace(packageNs) : "";
     }
     
-    private String getNamespace(String namespace) {
+    private static String getNamespace(String namespace) {
         if (JAXB_DEFAULT_NAMESPACE.equals(namespace)) {
             return "";
         }
@@ -883,7 +883,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         }
         
         @SuppressWarnings("unchecked")
-        public <T> Object getCollectionOrArray(Unmarshaller unm, Class<T> type, Class<?> origType,
+        public <T> Object getCollectionOrArray(Unmarshaller unm,
+                                               Class<T> type, 
+                                               Class<?> collectionType,
+                                               Type genericType,
                                                XmlJavaTypeAdapter adapter) throws JAXBException {
             List<?> theList = getList();
             boolean adapterChecked = false;
@@ -893,14 +896,17 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                 if (first instanceof Element) {
                     List<Object> newList = new ArrayList<Object>(theList.size());
                     for (Object o : theList) {
-                        newList.add(unm.unmarshal((Element)o));
+                        newList.add(unm.unmarshal((Element)o, type));
                     }
                     theList = newList;
                 }
                 
                 first = theList.get(0);
+                Type[] types = InjectionUtils.getActualTypes(genericType);
+                boolean isJaxbElement = types != null && types.length > 0 
+                    && InjectionUtils.getRawType(types[0]) == JAXBElement.class; 
                 
-                if (first instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
+                if (first instanceof JAXBElement && !isJaxbElement && !JAXBElement.class.isAssignableFrom(type)) {
                     adapterChecked = true;
                     List<Object> newList = new ArrayList<Object>(theList.size());
                     for (Object o : theList) {
@@ -908,9 +914,19 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                                         ((JAXBElement<?>)o).getValue(), adapter, false));
                     }
                     theList = newList;
+                } else if (!(first instanceof JAXBElement) && isJaxbElement) {
+                    List<Object> newList = new ArrayList<Object>(theList.size());
+                    XmlRootElement root = type.getAnnotation(XmlRootElement.class);
+                    QName qname = getQNameFromNamespaceAndName(root.namespace(), root.name(), type, false);
+                    @SuppressWarnings("rawtypes")
+                    Class theType = type;
+                    for (Object o : theList) {
+                        newList.add(new JAXBElement<Object>(qname, theType, null, o));
+                    }
+                    theList = newList;
                 }
             }
-            if (origType.isArray()) {
+            if (collectionType.isArray()) {
                 T[] values = (T[])Array.newInstance(type, theList.size());
                 for (int i = 0; i < theList.size(); i++) {
                     values[i] = (T)org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(
@@ -925,7 +941,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                     }
                     theList = newList;
                 }
-                if (origType == Set.class) {
+                if (collectionType == Set.class) {
                     return new HashSet<Object>(theList);
                 } else {
                     return theList;

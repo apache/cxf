@@ -946,17 +946,63 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertNotNull(books2);
         assertNotSame(books, books2);
         assertEquals(2, books2.size());
-        Book b11 = books.get(0);
+        Book b11 = books2.get(0);
         assertEquals(123L, b11.getId());
         assertEquals("CXF in Action", b11.getName());
-        Book b22 = books.get(1);
+        Book b22 = books2.get(1);
         assertEquals(124L, b22.getId());
         assertEquals("CXF Rocks", b22.getName());
     }
     
     @Test 
-    @Ignore
-    public void testGetBookCollection2() throws Exception {
+    public void testGetJAXBElementXmlRootBookCollection() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT,
+                                                    BookStore.class);
+        WebClient.getConfig(store).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        Book b1 = new Book("CXF in Action", 123L);
+        Book b2 = new Book("CXF Rocks", 124L);
+        List<JAXBElement<Book>> books = 
+            new ArrayList<JAXBElement<Book>>();
+        books.add(new JAXBElement<Book>(new QName("bookRootElement"), 
+            Book.class, b1));
+        books.add(new JAXBElement<Book>(new QName("bookRootElement"), 
+            Book.class, b2));
+        List<JAXBElement<Book>> books2 = store.getJAXBElementBookXmlRootCollection(books);
+        assertNotNull(books2);
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        Book b11 = books2.get(0).getValue();
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        Book b22 = books2.get(1).getValue();
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
+    }
+    @Test 
+    public void testGetJAXBElementXmlRootBookCollectionWebClient() throws Exception {
+        WebClient store = WebClient.create("http://localhost:" + PORT
+                                           + "/bookstore/jaxbelementxmlrootcollections");
+        WebClient.getConfig(store).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        Book b1 = new Book("CXF in Action", 123L);
+        Book b2 = new Book("CXF Rocks", 124L);
+        List<Book> books = new ArrayList<Book>();
+        books.add(b1);
+        books.add(b2);
+        store.type("application/xml").accept("application/xml");
+        List<Book> books2 = new ArrayList<Book>(store.postAndGetCollection(books, Book.class, Book.class));
+        assertNotNull(books2);
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        Book b11 = books2.get(0);
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        Book b22 = books2.get(1);
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
+    }
+    
+    @Test 
+    public void testGetJAXBElementBookCollection() throws Exception {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
         provider.setMarshallAsJaxbElement(true);
         provider.setUnmarshallAsJaxbElement(true);
@@ -971,8 +1017,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             BookNoXmlRootElement.class, b1));
         books.add(new JAXBElement<BookNoXmlRootElement>(new QName("bookNoXmlRootElement"), 
             BookNoXmlRootElement.class, b2));
-        WebClient.getConfig(store).getHttpConduit().getClient().setReceiveTimeout(10000000L);
-        List<JAXBElement<BookNoXmlRootElement>> books2 = store.getBookCollection2(books);
+        List<JAXBElement<BookNoXmlRootElement>> books2 = store.getJAXBElementBookCollection(books);
         assertNotNull(books2);
         assertNotSame(books, books2);
         assertEquals(2, books2.size());
@@ -1852,6 +1897,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                      Book.class,
                                      new Book("CXF", 123L)));
         Book book = element.getValue();
+        assertEquals(123L, book.getId());
+        assertEquals("CXF", book.getName());
+    }
+    
+    @Test
+    public void testEchoBookElementWebClient() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/element/echo");
+        wc.type("application/xml").accept("application/xml");
+        Book book = wc.post(new Book("CXF", 123L), Book.class);
         assertEquals(123L, book.getId());
         assertEquals("CXF", book.getName());
     }

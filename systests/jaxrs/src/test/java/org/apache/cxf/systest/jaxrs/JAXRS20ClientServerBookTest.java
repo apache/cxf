@@ -598,6 +598,41 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         doTestPostBookAsyncHandler(address);
     }
     
+    @Test 
+    public void testJAXBElementBookCollection() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/jaxbelementxmlrootcollections";
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(address);
+        
+        Book b1 = new Book("CXF in Action", 123L);
+        Book b2 = new Book("CXF Rocks", 124L);
+        List<JAXBElement<Book>> books = 
+            new ArrayList<JAXBElement<Book>>();
+        books.add(new JAXBElement<Book>(new QName("bookRootElement"), 
+            Book.class, b1));
+        books.add(new JAXBElement<Book>(new QName("bookRootElement"), 
+            Book.class, b2));
+        
+        GenericEntity<List<JAXBElement<Book>>> collectionEntity = 
+            new GenericEntity<List<JAXBElement<Book>>>(books) { };
+        GenericType<List<JAXBElement<Book>>> genericResponseType = 
+            new GenericType<List<JAXBElement<Book>>>() { };
+        
+        List<JAXBElement<Book>> books2 = 
+            target.request().accept("application/xml")
+            .post(Entity.entity(collectionEntity, "application/xml"), genericResponseType); 
+            
+        assertNotNull(books2);
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        Book b11 = books.get(0).getValue();
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        Book b22 = books.get(1).getValue();
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
+    }
+    
     private static class ReplaceBodyFilter implements ClientRequestFilter {
 
         @Override
