@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,6 +34,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Handler;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -73,8 +73,7 @@ public class AtomPullServer extends AbstractAtomBean {
     private volatile int recordsSize;
     private volatile boolean alreadyClosed;
     private SearchCondition<LogRecord> readableStorageCondition;
-    //TODO register streams using specific keys so that they can be individually unregistered
-    private List<Object> activeStreams;
+    private Map<String, Object> activeStreams;
     
     @Context
     private MessageContext context;
@@ -123,7 +122,7 @@ public class AtomPullServer extends AbstractAtomBean {
             }
             readableStorageCondition = list.size() == 0 ? null : new OrSearchCondition<LogRecord>(list);
         }
-        activeStreams = Collections.synchronizedList(new ArrayList<Object>());
+        activeStreams = Collections.synchronizedMap(new HashMap<String, Object>());
         initBusProperty();
     }
     
@@ -206,13 +205,14 @@ public class AtomPullServer extends AbstractAtomBean {
     @GET
     @Produces({"text/html", "application/xhtml+xml" })
     @Path("subscribe/alternate")
-    public StreamingOutput getAlternateContinuousFeed() {
+    public StreamingOutput getAlternateContinuousFeed(@HeaderParam("requestId") String reqid) {
+        final String key = reqid == null ? "*" : reqid;
         return new StreamingOutput() {
             public void write(final OutputStream out) throws IOException, WebApplicationException {
                 // return the last entry
                 out.write(convertEntryToHtmlFragment(((LinkedList<LogRecord>)records).getLast()).getBytes());
                 
-                activeStreams.add(out);
+                activeStreams.put(key, out);
             }
         };
     }
@@ -221,7 +221,8 @@ public class AtomPullServer extends AbstractAtomBean {
     @GET
     @Produces("application/atom+xml;type=entry")
     @Path("subscribe")
-    public StreamingResponse<Entry> getXmlContinuousFeed() {
+    public StreamingResponse<Entry> getXmlContinuousFeed(@HeaderParam("requestId") String reqid) {
+        final String key = reqid == null ? "*" : reqid;
         return new StreamingResponse<Entry>() {
             public void writeTo(final StreamingResponse.Writer<Entry> out) throws IOException {
                 // return the last entry
@@ -231,9 +232,16 @@ public class AtomPullServer extends AbstractAtomBean {
                     .convert(Collections.singletonList(((LinkedList<LogRecord>)records).getLast())).get(0);
                 out.write(entry);
 
-                activeStreams.add(out);
+                activeStreams.put(key, out);
             }
         };
+    }
+
+    @GET
+    @Produces("text/plain")
+    @Path("unsubscribe/{key}")
+    public Boolean unsubscribeContinuousFeed(@PathParam("key") String key) {
+        return activeStreams.remove(key) != null;
     }
 
     @GET
@@ -394,7 +402,7 @@ public class AtomPullServer extends AbstractAtomBean {
         if (activeStreams.size() > 0) {
             byte[] rbytes = null;
             Entry rentry = null;
-            for (Iterator<Object> it = activeStreams.iterator(); it.hasNext();) {
+            for (Iterator<Object> it = activeStreams.values().iterator(); it.hasNext();) {
                 Object out = it.next();
                 try {
                     if (out instanceof OutputStream) {
