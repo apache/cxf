@@ -385,6 +385,35 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals(200, wc.getResponse().getStatus());
     }
     
+    @Test
+    public void testPostGetCollectionGenericEntityAndType3() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").type("application/xml");
+        GenericEntity<List<Book>> collectionEntity = createGenericEntity();
+        GenericType<List<Book>> genericResponseType = new GenericType<List<Book>>() {        
+        };
+            
+        Future<Response> future = wc.async().post(Entity.entity(collectionEntity, "application/xml"));    
+            
+        Response r = future.get();
+        List<Book> books2 = r.readEntity(genericResponseType);
+        assertNotNull(books2);
+        
+        List<Book> books = collectionEntity.getEntity();
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        Book b11 = books.get(0);
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        Book b22 = books.get(1);
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
+        assertEquals(200, wc.getResponse().getStatus());
+    }
+    
     private GenericEntity<List<Book>> createGenericEntity() {
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
