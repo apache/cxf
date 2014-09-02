@@ -210,6 +210,12 @@ public final class SecurityConstants {
     public static final String KERBEROS_USE_CREDENTIAL_DELEGATION = 
         "ws-security.kerberos.use.credential.delegation";
     
+    /**
+     * Whether the Kerberos username is in servicename form or not. The default is "false".
+     */
+    public static final String KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM = 
+        "ws-security.kerberos.is.username.in.servicename.form";
+    
     //
     // Non-boolean WS-Security Configuration parameters
     //
@@ -574,7 +580,8 @@ public final class SecurityConstants {
             TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
             ASYMMETRIC_SIGNATURE_ALGORITHM, ENABLE_SAML_ONE_TIME_USE_CACHE, SAML_ONE_TIME_USE_CACHE_INSTANCE,
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
-            DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION
+            DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
+            KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
