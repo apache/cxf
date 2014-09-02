@@ -29,7 +29,6 @@
     <name>Apache CXF :: OSGi :: Integration Tests</name>
     <packaging>jar</packaging>
     <properties>
-        <pax.exam.version>3.4.0</pax.exam.version>
         <cxf.surefire.fork.mode>once</cxf.surefire.fork.mode>
     </properties>
     <dependencies>
@@ -100,28 +99,28 @@
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-junit4</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${cxf.pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${cxf.pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-karaf</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${cxf.pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-link-mvn</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${cxf.pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
 
