@@ -90,10 +90,10 @@ public class JweCompactConsumer {
     }
     
     public byte[] getEncryptedContentWithAuthTag() {
-        return getEncryptedContentWithAuthTag(encryptedContent, authTag);
+        return getCipherWithAuthTag(encryptedContent, authTag);
     }
     
-    public static byte[] getEncryptedContentWithAuthTag(byte[] cipher, byte[] authTag) {
+    public static byte[] getCipherWithAuthTag(byte[] cipher, byte[] authTag) {
         byte[] encryptedContentWithTag = new byte[cipher.length + authTag.length];
         System.arraycopy(cipher, 0, encryptedContentWithTag, 0, cipher.length);
         System.arraycopy(authTag, 0, encryptedContentWithTag, cipher.length, authTag.length);  

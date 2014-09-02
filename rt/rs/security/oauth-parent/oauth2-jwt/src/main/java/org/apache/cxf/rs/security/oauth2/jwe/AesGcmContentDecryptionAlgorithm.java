@@ -25,6 +25,6 @@ public class AesGcmContentDecryptionAlgorithm extends AbstractContentEncryptionC
 
     @Override
     public byte[] getEncryptedSequence(byte[] cipher, byte[] authTag) {
-        return JweCompactConsumer.getEncryptedContentWithAuthTag(cipher, authTag);
+        return JweCompactConsumer.getCipherWithAuthTag(cipher, authTag);
     }
 }

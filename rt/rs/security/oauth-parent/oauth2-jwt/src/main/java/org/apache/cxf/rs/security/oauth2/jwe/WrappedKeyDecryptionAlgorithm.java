@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.jwe;
 
 import java.security.Key;
+import java.security.spec.AlgorithmParameterSpec;
 
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
@@ -36,17 +37,22 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     }
     public byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer) {
         KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm(consumer));
+        AlgorithmParameterSpec spec = getAlgorithmParameterSpec(consumer); 
+        if (spec != null) {
+            keyProps.setAlgoSpec(spec);
+        }
         if (!unwrap) {
             keyProps.setBlockSize(getKeyCipherBlockSize());
-            return CryptoUtils.decryptBytes(consumer.getEncryptedContentEncryptionKey(), 
+            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(consumer), 
                                             getCekDecryptionKey(), keyProps);
         } else {
-            return CryptoUtils.unwrapSecretKey(consumer.getEncryptedContentEncryptionKey(), 
+            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(consumer), 
                                                getContentEncryptionAlgorithm(consumer), 
                                                getCekDecryptionKey(), 
                                                keyProps).getEncoded();
         }
     }
+    
     protected Key getCekDecryptionKey() {
         return cekDecryptionKey;
     }
@@ -58,5 +64,11 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     }
     protected String getContentEncryptionAlgorithm(JweCompactConsumer consumer) {
         return Algorithm.toJavaName(consumer.getJweHeaders().getContentEncryptionAlgorithm());
+    }
+    protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweCompactConsumer consumer) {
+        return null;
+    }
+    protected byte[] getEncryptedContentEncryptionKey(JweCompactConsumer consumer) {
+        return consumer.getEncryptedContentEncryptionKey();
     }
 }
