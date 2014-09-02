@@ -27,6 +27,7 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactReaderWriterTest;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -93,7 +94,7 @@ public class JweCompactReaderWriterTest extends Assert {
     }
     
     @Test
-    public void testEncryptDecryptA128CBCHS256() throws Exception {
+    public void testEncryptDecryptAesWrapA128CBCHS256() throws Exception {
         final String specPlainText = "Live long and prosper.";
         JweHeaders headers = new JweHeaders();
         headers.setAlgorithm(Algorithm.A128KW.getJwtName());
@@ -111,6 +112,28 @@ public class JweCompactReaderWriterTest extends Assert {
         assertEquals(JWE_OUTPUT_A3, jweContent);
         
         AesWrapKeyDecryptionAlgorithm keyDecryption = new AesWrapKeyDecryptionAlgorithm(cekEncryptionKey);
+        JweDecryptionProvider decryption = new AesCbcHmacJweDecryption(keyDecryption);
+        String decryptedText = decryption.decrypt(jweContent).getContentText();
+        assertEquals(specPlainText, decryptedText);
+    }
+    @Test
+    public void testEncryptDecryptAesGcmWrapA128CBCHS256() throws Exception {
+        final String specPlainText = "Live long and prosper.";
+        JweHeaders headers = new JweHeaders();
+        headers.setAlgorithm(JwtConstants.A128GCMKW_ALGO);
+        headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
+        
+        byte[] cekEncryptionKey = Base64UrlUtility.decode(KEY_ENCRYPTION_KEY_A3);
+        
+        AesGcmWrapKeyEncryptionAlgorithm keyEncryption = 
+            new AesGcmWrapKeyEncryptionAlgorithm(cekEncryptionKey, JwtConstants.A128GCMKW_ALGO);
+        JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers,
+                                                           CONTENT_ENCRYPTION_KEY_A3, 
+                                                           INIT_VECTOR_A3,
+                                                           keyEncryption);
+        String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
+        
+        AesGcmWrapKeyDecryptionAlgorithm keyDecryption = new AesGcmWrapKeyDecryptionAlgorithm(cekEncryptionKey);
         JweDecryptionProvider decryption = new AesCbcHmacJweDecryption(keyDecryption);
         String decryptedText = decryption.decrypt(jweContent).getContentText();
         assertEquals(specPlainText, decryptedText);

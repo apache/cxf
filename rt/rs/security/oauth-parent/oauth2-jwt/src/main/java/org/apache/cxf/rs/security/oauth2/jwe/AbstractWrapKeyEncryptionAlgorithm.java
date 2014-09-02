@@ -51,7 +51,7 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {
         checkAlgorithms(headers, algorithm);
         KeyProperties secretKeyProperties = new KeyProperties(getKeyEncryptionAlgoJava(headers));
-        AlgorithmParameterSpec spec = getAlgorithmParameterSpec(); 
+        AlgorithmParameterSpec spec = getAlgorithmParameterSpec(headers); 
         if (spec != null) {
             secretKeyProperties.setAlgoSpec(spec);
         }
@@ -70,7 +70,7 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
     protected String getContentEncryptionAlgoJava(JweHeaders headers) {
         return Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
     }
-    protected AlgorithmParameterSpec getAlgorithmParameterSpec() {
+    protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweHeaders headers) {
         return null;
     }
     private static String checkAlgorithm(Set<String> supportedAlgorithms, String algo) {
