@@ -35,9 +35,13 @@ import javax.xml.ws.ResponseWrapper;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.model.SoapBindingInfo;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.bus.managers.PhaseManagerImpl;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
@@ -46,6 +50,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -58,14 +63,19 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
+import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
+import org.apache.cxf.ws.addressing.WSAContextUtils;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -444,6 +454,66 @@ public class MAPAggregatorTest extends Assert {
         String action = aggregator.getActionUri(message, false);
         control.verify();
         assertEquals("http://foo/bar/SEI/opRequest", action);
+    }
+    
+    @Test
+    public void testGetReplyToUsingBaseAddress() throws Exception {
+        Message message = new MessageImpl();  
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+
+        final String localReplyTo =  "/SoapContext/decoupled";
+        final String decoupledEndpointBase = "http://localhost:8181/cxf";
+        final String replyTo =  decoupledEndpointBase + localReplyTo;
+        
+        ServiceInfo s = new ServiceInfo();
+        Service svc = new ServiceImpl(s);
+        EndpointInfo ei = new EndpointInfo();
+        InterfaceInfo ii = s.createInterface(new QName("FooInterface"));
+        s.setInterface(ii);
+        ii.addOperation(new QName("fooOp"));
+        SoapBindingInfo b = new SoapBindingInfo(s, "http://schemas.xmlsoap.org/soap/", Soap11.getInstance());
+        b.setTransportURI("http://schemas.xmlsoap.org/soap/http");
+        ei.setBinding(b);
+        
+        ei.setAddress("http://nowhere.com/bar/foo");
+        ei.setName(new QName("http://nowhere.com/port", "foo"));
+        Bus bus = new ExtensionManagerBus();
+        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
+        DestinationFactory df = control.createMock(DestinationFactory.class);
+        Destination d = control.createMock(Destination.class);
+        bus.setExtension(dfm, DestinationFactoryManager.class);
+        EasyMock.expect(dfm.getDestinationFactoryForUri(localReplyTo)).andReturn(df);
+        EasyMock.expect(df.getDestination(
+            EasyMock.anyObject(EndpointInfo.class), EasyMock.anyObject(Bus.class))).andReturn(d);
+        EasyMock.expect(d.getAddress()).andReturn(EndpointReferenceUtils.getEndpointReference(localReplyTo));
+        
+        Endpoint ep = new EndpointImpl(bus, svc, ei);
+        exchange.put(Endpoint.class, ep);
+        exchange.put(Bus.class, bus);
+        exchange.setOutMessage(message);
+        setUpMessageProperty(message,
+                             REQUESTOR_ROLE,
+                             Boolean.TRUE);
+        message.getContextualProperty(WSAContextUtils.REPLYTO_PROPERTY);
+        message.setContextualProperty(WSAContextUtils.REPLYTO_PROPERTY, localReplyTo);
+        message.setContextualProperty(WSAContextUtils.DECOUPLED_ENDPOINT_BASE_PROPERTY, decoupledEndpointBase);
+        
+        AddressingProperties maps = new AddressingProperties();
+        AttributedURIType id = 
+            ContextUtils.getAttributedURI("urn:uuid:12345");
+        maps.setMessageID(id);
+        maps.setAction(ContextUtils.getAttributedURI(""));
+        setUpMessageProperty(message,
+                             CLIENT_ADDRESSING_PROPERTIES,
+                             maps);
+        control.replay();
+        aggregator.mediate(message, false);
+        AddressingProperties props = 
+            (AddressingProperties)message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND);
+
+        assertEquals(replyTo, props.getReplyTo().getAddress().getValue());
+        control.verify();
     }
     
     private Message setUpMessage(boolean requestor, 
