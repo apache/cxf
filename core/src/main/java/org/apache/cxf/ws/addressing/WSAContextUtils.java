@@ -29,6 +29,8 @@ import org.apache.cxf.message.Message;
 public final class WSAContextUtils {
     public static final String REPLYTO_PROPERTY =
         "org.apache.cxf.ws.addressing.replyto";
+    public static final String DECOUPLED_ENDPOINT_BASE_PROPERTY =
+        "org.apache.cxf.ws.addressing.decoupled.endpoint.base";
 
     private static final String USING_PROPERTY =
         "org.apache.cxf.ws.addressing.using";    

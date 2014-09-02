@@ -932,6 +932,15 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 }
             }
             if (dest != null) {
+                // if the decoupled endpoint context prop is set and the address is relative, return the absolute url.
+                final String replyTo = dest.getAddress().getAddress().getValue();  
+                if (replyTo.startsWith("/")) {
+                    String debase = 
+                        (String)message.getContextualProperty(WSAContextUtils.DECOUPLED_ENDPOINT_BASE_PROPERTY);
+                    if (debase != null) {
+                        return EndpointReferenceUtils.getEndpointReference(debase + replyTo);
+                    }
+                }
                 return dest.getAddress();
             }
         }
