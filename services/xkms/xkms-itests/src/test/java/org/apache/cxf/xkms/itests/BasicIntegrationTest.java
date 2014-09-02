@@ -63,7 +63,7 @@ public class BasicIntegrationTest {
 
     @Configuration
     public Option[] getConfig() {
-        String karafVersion = System.getProperty("karaf.version", "2.3.5");
+        String karafVersion = System.getProperty("karaf.version", "2.3.6");
         String localRepository = System.getProperty("localRepository");
         karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf")
             .version(karafVersion).type("tar.gz");

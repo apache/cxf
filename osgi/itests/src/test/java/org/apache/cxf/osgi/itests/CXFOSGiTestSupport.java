@@ -24,6 +24,7 @@ package org.apache.cxf.osgi.itests;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,7 +45,9 @@ import javax.inject.Inject;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.karaf.features.FeaturesService;
+
 import org.junit.Assert;
+
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.ProbeBuilder;
 import org.ops4j.pax.exam.TestProbeBuilder;
@@ -69,7 +73,6 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDist
  * 
  */
 public class CXFOSGiTestSupport {
-    static final String KARAF_VERSION = "2.3.5";
     static final Long COMMAND_TIMEOUT = 10000L;
     static final Long DEFAULT_TIMEOUT = 20000L;
     static final Long SERVICE_TIMEOUT = 30000L;
@@ -95,20 +98,41 @@ public class CXFOSGiTestSupport {
         return probe;
     }
 
+    private static String getKarafVersion() {
+        InputStream ins = CXFOSGiTestSupport.class.getResourceAsStream("/META-INF/maven/dependencies.properties");
+        Properties p = new Properties();
+        try {
+            p.load(ins);
+        } catch (Throwable t) {
+            //
+        }
+        String karafVersion = p.getProperty("org.apache.karaf/apache-karaf/version");
+        if (karafVersion == null) {
+            karafVersion = System.getProperty("cxf.karaf.version");
+        }
+        if (karafVersion == null) {
+            karafVersion = System.getProperty("karaf.version");
+        }
+        if (karafVersion == null) {
+            // setup the default version of it
+            karafVersion = "2.3.6";
+        }
+        return karafVersion;
+    }    
     /**
      * Create an {@link org.ops4j.pax.exam.Option} for using a .
      * 
      * @return
      */
     protected Option cxfBaseConfig() {
-        karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf").version(KARAF_VERSION)
+        karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf").version(getKarafVersion())
             .type("tar.gz");
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
             .type("xml").classifier("features");
         String localRepo = System.getProperty("localRepository");
         return composite(karafDistributionConfiguration()
                              .frameworkUrl(karafUrl)
-                             .karafVersion(KARAF_VERSION)
+                             .karafVersion(getKarafVersion())
                              .name("Apache Karaf")
                              .useDeployFolder(false)
                              .unpackDirectory(new File("target/paxexam/")),

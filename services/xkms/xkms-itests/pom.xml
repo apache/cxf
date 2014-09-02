@@ -23,7 +23,6 @@
     </parent>
     <properties>
         <pax.exam.version>3.4.0</pax.exam.version>
-        <karaf.version>2.3.5</karaf.version>
     </properties>
     <dependencies>
         <dependency>
@@ -124,7 +123,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level>
-                        <karaf.version>${karaf.version}</karaf.version>
+                        <karaf.version>${cxf.karaf.version}</karaf.version>
                         <org.ops4j.pax.url.mvn.localRepository>${maven.repo.local}</org.ops4j.pax.url.mvn.localRepository>
                     </systemPropertyVariables>
                 </configuration>
