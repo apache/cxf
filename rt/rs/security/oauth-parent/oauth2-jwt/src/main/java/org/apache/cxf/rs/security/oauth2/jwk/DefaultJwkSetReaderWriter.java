@@ -26,21 +26,11 @@ import org.apache.cxf.rs.security.oauth2.jwt.AbstractJwtObjectReaderWriter;
 public class DefaultJwkSetReaderWriter extends AbstractJwtObjectReaderWriter
     implements JwkSetReaderWriter {
     @Override
-    public String jwkToJson(JsonWebKey jwk) {
-        return toJson(jwk);
-    }
-    @Override
-    public String jwksToJson(JsonWebKeys jwks) {
+    public String jwkSetToJson(JsonWebKeys jwks) {
         return toJson(jwks);
     }
     @Override
-    public JsonWebKey jsonToJwk(String jwkJson) {
-        JsonWebKey jwk = new JsonWebKey();
-        fromJsonInternal(jwk, jwkJson);
-        return jwk;
-    }
-    @Override
-    public JsonWebKeys jsonToJwks(String jwksJson) {
+    public JsonWebKeys jsonToJwkSet(String jwksJson) {
         JsonWebKeys jwks = new JsonWebKeys();
         fromJsonInternal(jwks, jwksJson);
         return jwks;
