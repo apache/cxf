@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.rs.security.oauth2.jwt.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.oauth2.jwk.JsonWebKey;
 
 public class JwtHeaders extends AbstractJwtObject {
     
