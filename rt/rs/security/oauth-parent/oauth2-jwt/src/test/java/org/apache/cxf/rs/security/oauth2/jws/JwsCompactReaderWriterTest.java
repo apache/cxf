@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.rs.security.oauth2.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
@@ -34,7 +35,6 @@ import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenWriter;
-import org.apache.cxf.rs.security.oauth2.jwt.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 import org.junit.Assert;

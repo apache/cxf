@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.jwt.jwk;
+package org.apache.cxf.rs.security.oauth2.jwk;
 
 import java.util.List;
 import java.util.Map;
@@ -38,9 +38,27 @@ public class JsonWebKey extends AbstractJwtObject {
     public static final String X509_THUMBPRINT = JwtConstants.HEADER_X509_THUMBPRINT;
     public static final String X509_THUMBPRINT_SHA256 = JwtConstants.HEADER_X509_THUMBPRINT_SHA256;
     
-    public static final String KEY_TYPE_OCTET = "oct";
     public static final String KEY_TYPE_RSA = "RSA";
-    public static final String KEY_TYPE_ECURVE = "EC";
+    public static final String RSA_MODULUS = "n";
+    public static final String RSA_PUBLIC_EXP = "e";
+    public static final String RSA_PRIVATE_EXP = "d";
+    public static final String RSA_FIRST_PRIME_FACTOR = "p";
+    public static final String RSA_SECOND_PRIME_FACTOR = "q";
+    public static final String RSA_FIRST_PRIME_CRT = "dp";
+    public static final String RSA_SECOND_PRIME_CRT = "dq";
+    public static final String RSA_FIRST_CRT_COEFFICIENT = "qi";
+        
+    public static final String KEY_TYPE_OCTET = "oct";
+    public static final String OCTET_KEY_VALUE = "k";
+    
+    public static final String KEY_TYPE_ELLIPTIC = "EC";
+    public static final String EC_CURVE = "crv";
+    public static final String EC_CURVE_P256 = "P-256";
+    public static final String EC_CURVE_P384 = "P-384";
+    public static final String EC_CURVE_P512 = "P-512";
+    public static final String EC_X_COORDINATE = "x";
+    public static final String EC_Y_COORDINATE = "y";
+    public static final String EC_PRIVATE_KEY = "d";
     
     public static final String PUBLIC_KEY_USE_SIGN = "sig";
     public static final String PUBLIC_KEY_USE_ENCRYPT = "enc";
