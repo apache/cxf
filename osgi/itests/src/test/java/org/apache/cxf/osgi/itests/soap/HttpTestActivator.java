@@ -20,12 +20,14 @@ package org.apache.cxf.osgi.itests.soap;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class HttpTestActivator implements BundleActivator {
-
+    public static final String PORT = TestUtil.getPortNumber(HttpTestActivator.class);
     private Server server;
+    private Server serverJetty;
 
     @Override
     public void start(BundleContext arg0) throws Exception {
@@ -34,11 +36,20 @@ public class HttpTestActivator implements BundleActivator {
         factory.setAddress("/greeter");
         factory.setServiceBean(new GreeterImpl());
         server = factory.create();
+        
+        factory = new JaxWsServerFactoryBean();
+        factory.setServiceClass(Greeter.class);
+        factory.setAddress("http://localhost:" + PORT + "/cxf/greeter");
+        factory.setServiceBean(new GreeterImpl());
+        serverJetty = factory.create();
     }
 
     @Override
     public void stop(BundleContext arg0) throws Exception {
+        server.stop();
         server.destroy();
+        serverJetty.stop();
+        serverJetty.destroy();
     }
 
 }
