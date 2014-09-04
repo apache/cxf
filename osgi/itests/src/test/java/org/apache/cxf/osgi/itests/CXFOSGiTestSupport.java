@@ -63,6 +63,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.when;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
@@ -124,12 +125,13 @@ public class CXFOSGiTestSupport {
      * 
      * @return
      */
-    protected Option cxfBaseConfig() {
+    protected Option cxfBaseConfig(boolean testUtils) {
         karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf").version(getKarafVersion())
             .type("tar.gz");
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
             .type("xml").classifier("features");
         String localRepo = System.getProperty("localRepository");
+        Object urp = System.getProperty("cxf.useRandomFirstPort");
         return composite(karafDistributionConfiguration()
                              .frameworkUrl(karafUrl)
                              .karafVersion(getKarafVersion())
@@ -138,12 +140,23 @@ public class CXFOSGiTestSupport {
                              .unpackDirectory(new File("target/paxexam/")),
                          features(cxfUrl, "cxf-core", "cxf-jaxws"),
                          systemProperty("java.awt.headless").value("true"),
+                         when(testUtils).useOptions(mavenBundle()
+                                                    .groupId("org.apache.cxf")
+                                                    .artifactId("cxf-testutils")
+                                                    .versionAsInProject()),
                          when(localRepo != null)
                              .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                                   "org.ops4j.pax.url.mvn.localRepository",
-                                                                  localRepo)));
+                                                                  localRepo)),
+                         when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true")));
     }
-
+    protected Option cxfBaseConfig() {
+        return cxfBaseConfig(false);
+    }
+    protected Option cxfBaseConfigWithTestUtils() {
+        return cxfBaseConfig(true);
+    }
+    
     /**
      * Executes a shell command and returns output as a String. Commands have a default timeout of 10 seconds.
      * 
