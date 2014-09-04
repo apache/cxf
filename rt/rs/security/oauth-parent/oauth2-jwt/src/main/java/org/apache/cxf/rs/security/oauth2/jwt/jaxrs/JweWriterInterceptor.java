@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Properties;
 import java.util.zip.DeflaterOutputStream;
@@ -46,14 +45,16 @@ import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
 import org.apache.cxf.rs.security.oauth2.jwe.JweOutputStream;
 import org.apache.cxf.rs.security.oauth2.jwe.RSAOaepKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryption;
+import org.apache.cxf.rs.security.oauth2.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.oauth2.jwk.JwkUtils;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 @Priority(Priorities.JWE_WRITE_PRIORITY)
 public class JweWriterInterceptor implements WriterInterceptor {
-    private static final String JSON_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
-    private static final String JSON_ENCRYPTION_PROPS = "rs.security.encryption.properties";
+    private static final String RSSEC_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
+    private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
     private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_KEY_ALGO_PROP = "rs.security.jwe.key.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
@@ -112,18 +113,28 @@ public class JweWriterInterceptor implements WriterInterceptor {
         } 
         Message m = JAXRSUtils.getCurrentMessage();
         String propLoc = 
-            (String)MessageUtils.getContextualProperty(m, JSON_ENCRYPTION_OUT_PROPS, JSON_ENCRYPTION_PROPS);
+            (String)MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_OUT_PROPS, RSSEC_ENCRYPTION_PROPS);
         if (propLoc == null) {
             throw new SecurityException();
         }
         Bus bus = m.getExchange().getBus();
         try {
+            RSAPublicKey pk = null;
+            String rsaKeyEncryptionAlgo = null;
+            
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
-            PublicKey pk = CryptoUtils.loadPublicKey(m, props);
-            if (!(pk instanceof RSAPublicKey)) {
-                throw new SecurityException();
+            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
+                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props);
+                pk = jwk.toRSAPublicKey();
+                rsaKeyEncryptionAlgo = jwk.getAlgorithm();
+            } else {
+                pk = (RSAPublicKey)CryptoUtils.loadPublicKey(m, props);
             }
-            JweHeaders headers = new JweHeaders(props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP),
+            if (rsaKeyEncryptionAlgo == null) {
+                rsaKeyEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP);
+            }
+            
+            JweHeaders headers = new JweHeaders(rsaKeyEncryptionAlgo,
                                                 props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP));
             String compression = props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP);
             if (compression != null) {

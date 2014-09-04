@@ -82,7 +82,7 @@ public class JsonWebKeyTest extends Assert {
     @Test
     public void testPublicSetAsMap() throws Exception {
         JsonWebKeys jwks = readKeySet("jwkPublicSet.txt");
-        Map<String, JsonWebKey> keysMap = jwks.getKeysMap();
+        Map<String, JsonWebKey> keysMap = jwks.getKeyIdMap();
         assertEquals(2, keysMap.size());
         
         JsonWebKey rsaKey = keysMap.get(RSA_KID_VALUE);
