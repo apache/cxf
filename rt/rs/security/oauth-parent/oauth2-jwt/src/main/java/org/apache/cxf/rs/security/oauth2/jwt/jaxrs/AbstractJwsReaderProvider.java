@@ -18,9 +18,16 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwt.jaxrs;
 
-import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Properties;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.oauth2.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.oauth2.jwk.JwkUtils;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProperties;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.jws.PublicKeyJwsSignatureVerifier;
@@ -50,10 +57,23 @@ public class AbstractJwsReaderProvider {
         if (sigVerifier != null) {
             return sigVerifier;    
         } 
+        
+        Message m = JAXRSUtils.getCurrentMessage();
+        String propLoc = 
+            (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
+        if (propLoc == null) {
+            throw new SecurityException();
+        }
+        Bus bus = m.getExchange().getBus();
         try {
-            PublicKey pk = CryptoUtils.loadPublicKey(JAXRSUtils.getCurrentMessage(), 
-                                                     RSSEC_SIGNATURE_IN_PROPS,
-                                                     RSSEC_SIGNATURE_PROPS);
+            RSAPublicKey pk = null;
+            Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
+                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props);
+                pk = jwk.toRSAPublicKey();
+            } else {
+                pk = (RSAPublicKey)CryptoUtils.loadPublicKey(m, props);
+            }
             return new PublicKeyJwsSignatureVerifier(pk);
         } catch (SecurityException ex) {
             throw ex;
