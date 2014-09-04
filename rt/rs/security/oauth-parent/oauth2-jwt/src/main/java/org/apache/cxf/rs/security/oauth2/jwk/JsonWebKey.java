@@ -18,12 +18,15 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwk;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.oauth2.jwt.AbstractJwtObject;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
+import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
 public class JsonWebKey extends AbstractJwtObject {
@@ -156,4 +159,16 @@ public class JsonWebKey extends AbstractJwtObject {
     public Object getProperty(String name) {
         return super.getValue(name);
     }
+    
+    public RSAPublicKey toRSAPublicKey() {
+        String encodedModulus = (String)super.getValue(RSA_MODULUS);
+        String encodedPublicExponent = (String)super.getValue(RSA_PUBLIC_EXP);
+        return CryptoUtils.getRSAPublicKey(encodedModulus, encodedPublicExponent);
+    }
+    public RSAPrivateKey toRSAPrivateKey() {
+        String encodedPublicExponent = (String)super.getValue(RSA_PUBLIC_EXP);
+        String encodedPrivateExponent = (String)super.getValue(RSA_PRIVATE_EXP);
+        return CryptoUtils.getRSAPrivateKey(encodedPublicExponent, encodedPrivateExponent);
+    }
+    
 }

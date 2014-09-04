@@ -53,7 +53,7 @@ public class JsonWebKeys extends AbstractJwtObject {
         super.setValue(KEYS_PROPERTY, keys);
     }
     
-    public Map<String, JsonWebKey> getKeysMap() {
+    public Map<String, JsonWebKey> getKeyIdMap() {
         List<JsonWebKey> keys = getKeys();
         if (keys == null) {
             return Collections.emptyMap();
@@ -66,5 +66,45 @@ public class JsonWebKeys extends AbstractJwtObject {
             }
         }
         return map;
+    }
+    public JsonWebKey getKey(String kid) {
+        return getKeyIdMap().get(kid);
+    }
+    public Map<String, List<JsonWebKey>> getKeyTypeMap() {
+        return getKeyPropertyMap(JsonWebKey.KEY_TYPE);
+    }
+    public Map<String, List<JsonWebKey>> getKeyUseMap() {
+        return getKeyPropertyMap(JsonWebKey.PUBLIC_KEY_USE);
+    }
+    private Map<String, List<JsonWebKey>> getKeyPropertyMap(String propertyName) {
+        List<JsonWebKey> keys = getKeys();
+        if (keys == null) {
+            return Collections.emptyMap();
+        }
+        Map<String, List<JsonWebKey>> map = new LinkedHashMap<String, List<JsonWebKey>>();
+        for (JsonWebKey key : keys) {
+            String keyType = (String)key.getProperty(propertyName);
+            if (keyType != null) {
+                List<JsonWebKey> list = map.get(keyType);
+                if (list == null) {
+                    list = new LinkedList<JsonWebKey>();
+                    map.put(keyType, list);
+                }
+                list.add(key);
+            }
+        }
+        return map;
+    }
+    public List<JsonWebKey> getKeys(String keyType) {
+        return getKeyTypeMap().get(keyType);
+    }
+    public List<JsonWebKey> getRsaKeys() {
+        return getKeyTypeMap().get(JsonWebKey.KEY_TYPE_RSA);
+    }
+    public List<JsonWebKey> getEllipticKeys() {
+        return getKeyTypeMap().get(JsonWebKey.KEY_TYPE_ELLIPTIC);
+    }
+    public List<JsonWebKey> getSecretKeys() {
+        return getKeyTypeMap().get(JsonWebKey.KEY_TYPE_OCTET);
     }
 }
