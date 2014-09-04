@@ -24,7 +24,7 @@
     	p:brokerURL="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
     <jaxrs:server xmlns:s="http://books.com" 
     	serviceName="s:BookService" 
-    	transportId="http://www.w3.org/2010/soapjms/" 
+    	transportId= "http://cxf.apache.org/transports/jms" 
     	address="jms:queue:test.jmstransport.text?replyToName=test.jmstransport.response">
         <jaxrs:serviceBeans>
             <bean class="org.apache.cxf.systest.jaxrs.JMSBookStore"/>
