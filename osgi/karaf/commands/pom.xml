@@ -45,6 +45,14 @@
             <artifactId>org.apache.karaf.util</artifactId>
             <version>${cxf.karaf.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

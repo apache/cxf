@@ -22,7 +22,7 @@ package org.apache.cxf.karaf.commands;
 import java.util.List;
 
 import org.apache.cxf.Bus;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 /**
