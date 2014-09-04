@@ -84,6 +84,8 @@ import org.apache.tika.parser.pdf.PDFParser;
 
 @Path("/catalog")
 public class Catalog {
+    private static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER = "Access-Control-Allow-Origin";
+    
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());    
     private final Directory directory = new RAMDirectory();
     private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);    
@@ -117,25 +119,29 @@ public class Catalog {
                         
                         try {
                             if (exists(source)) {
-                                response.resume(Response.status(Status.CONFLICT).build());
+                                response.resume(Response.status(Status.CONFLICT)
+                                        .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build());
                                 return;
                             }
 
                             final byte[] content = IOUtils.readBytesFromStream(handler.getInputStream());
                             storeAndIndex(metadata, content);
                         } catch (final Exception ex) {
-                            response.resume(Response.serverError().build());  
+                            response.resume(Response.serverError()
+                                    .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build());  
                         } 
                         
                         if (response.isSuspended()) {
-                            response.resume(Response.created(uri.getRequestUriBuilder()
-                                .path(source).build()).build());
+                            response.resume(Response
+                                    .created(uri.getRequestUriBuilder().path(source).build())
+                                    .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build());
                         }
                     }                       
                 }              
                 
                 if (response.isSuspended()) {
-                    response.resume(Response.status(Status.BAD_REQUEST).build());
+                    response.resume(Response.status(Status.BAD_REQUEST)
+                            .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build());
                 }
             }
         });

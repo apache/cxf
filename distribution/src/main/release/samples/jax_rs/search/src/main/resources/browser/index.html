@@ -21,6 +21,28 @@
             </div>
         </form>
     </div> <!-- /container -->
+    
+    <script type="text/javascript">
+    	$( "#form" ).submit(function(e) {    		
+    		var formData = new FormData($(this)[0]);
+
+    		$.ajax({
+    			url:$(this).attr("action"),
+    			type: 'POST',
+    			data: formData,
+    			async: false,
+    			success: function (data) {
+    			    $('#file').fileinput('clear');
+    			},
+	    		cache: false,
+    			contentType: false,
+    			processData: false
+    		});
+    			        
+	        e.preventDefault();
+	        return false;
+	    });
+    </script>
 </body>
 
 </html>
