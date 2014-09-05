@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.zip.DeflaterOutputStream;
 
 import javax.annotation.Priority;
+import javax.crypto.SecretKey;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -38,15 +39,18 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptionState;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
 import org.apache.cxf.rs.security.oauth2.jwe.JweOutputStream;
+import org.apache.cxf.rs.security.oauth2.jwe.KeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.RSAOaepKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweEncryption;
 import org.apache.cxf.rs.security.oauth2.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.oauth2.jwk.JwkUtils;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
@@ -119,29 +123,43 @@ public class JweWriterInterceptor implements WriterInterceptor {
         }
         Bus bus = m.getExchange().getBus();
         try {
-            RSAPublicKey pk = null;
-            String rsaKeyEncryptionAlgo = null;
-            
+            KeyEncryptionAlgorithm keyEncryptionProvider = null;
+            String keyEncryptionAlgo = null;
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props);
-                pk = jwk.toRSAPublicKey();
-                rsaKeyEncryptionAlgo = jwk.getAlgorithm();
+                keyEncryptionAlgo = jwk.getAlgorithm();
+                // TODO: Put it into some factory code
+                if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
+                    keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(jwk.toRSAPublicKey());
+                } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
+                    SecretKey key = jwk.toSecretKey();
+                    // TODO: Introduce an algo family check
+                    if (Algorithm.A128KW.getJwtName().equals(keyEncryptionAlgo)) {
+                        keyEncryptionProvider = new AesWrapKeyEncryptionAlgorithm(key, keyEncryptionAlgo);
+                    }
+                    // etc
+                } else {
+                    // TODO: support elliptic curve keys
+                    throw new SecurityException();
+                }
+                
             } else {
-                pk = (RSAPublicKey)CryptoUtils.loadPublicKey(m, props);
+                keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(
+                    (RSAPublicKey)CryptoUtils.loadPublicKey(m, props));
             }
-            if (rsaKeyEncryptionAlgo == null) {
-                rsaKeyEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP);
+            if (keyEncryptionAlgo == null) {
+                keyEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP);
             }
             
-            JweHeaders headers = new JweHeaders(rsaKeyEncryptionAlgo,
+            JweHeaders headers = new JweHeaders(keyEncryptionAlgo,
                                                 props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP));
             String compression = props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP);
             if (compression != null) {
                 headers.setZipAlgorithm(compression);
             }
             
-            return new WrappedKeyJweEncryption(headers, new RSAOaepKeyEncryptionAlgorithm((RSAPublicKey)pk));
+            return new WrappedKeyJweEncryption(headers, keyEncryptionProvider);
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {

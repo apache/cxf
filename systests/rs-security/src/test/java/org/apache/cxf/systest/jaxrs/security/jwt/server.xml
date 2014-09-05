@@ -101,7 +101,7 @@ under the License.
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
         </jaxrs:properties>
     </jaxrs:server>
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwk">
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwkrsa">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
@@ -112,6 +112,18 @@ under the License.
         <jaxrs:properties>
             <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.jwk.properties"/>
             <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwkaeswrap">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwshmac">

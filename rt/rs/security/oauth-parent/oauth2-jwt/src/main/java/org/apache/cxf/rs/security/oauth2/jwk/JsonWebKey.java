@@ -23,8 +23,11 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.SecretKey;
+
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.oauth2.jwt.AbstractJwtObject;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
@@ -186,6 +189,10 @@ public class JsonWebKey extends AbstractJwtObject {
                                                 encodedPrimeExpQ,
                                                 encodedCrtCoefficient);
         }
+    }
+    public SecretKey toSecretKey() {
+        return CryptoUtils.createSecretKeySpec((String)getProperty(OCTET_KEY_VALUE), 
+                                               Algorithm.toJavaName(getAlgorithm()));
     }
     
 }

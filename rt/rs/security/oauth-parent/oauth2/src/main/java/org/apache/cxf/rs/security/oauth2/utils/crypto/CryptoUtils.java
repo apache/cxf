@@ -113,8 +113,8 @@ public final class CryptoUtils {
     public static RSAPublicKey getRSAPublicKey(String encodedModulus,
                                                String encodedPublicExponent) {
         try {
-            return getRSAPublicKey(Base64UrlUtility.decode(encodedModulus),
-                                   Base64UrlUtility.decode(encodedPublicExponent));
+            return getRSAPublicKey(decodeSequence(encodedModulus),
+                                   decodeSequence(encodedPublicExponent));
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
@@ -287,8 +287,8 @@ public final class CryptoUtils {
     public static RSAPrivateKey getRSAPrivateKey(String encodedModulus,
                                                  String encodedPrivateExponent) {
         try {
-            return getRSAPrivateKey(Base64UrlUtility.decode(encodedModulus),
-                                    Base64UrlUtility.decode(encodedPrivateExponent));
+            return getRSAPrivateKey(decodeSequence(encodedModulus),
+                                    decodeSequence(encodedPrivateExponent));
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
@@ -317,14 +317,14 @@ public final class CryptoUtils {
                                                  String encodedCrtCoefficient) {
     //CHECKSTYLE:ON
         try {
-            return getRSAPrivateKey(Base64UrlUtility.decode(encodedModulus),
-                                    Base64UrlUtility.decode(encodedPublicExponent),
-                                    Base64UrlUtility.decode(encodedPrivateExponent),
-                                    Base64UrlUtility.decode(encodedPrimeP),
-                                    Base64UrlUtility.decode(encodedPrimeQ),
-                                    Base64UrlUtility.decode(encodedPrimeExpP),
-                                    Base64UrlUtility.decode(encodedPrimeExpQ),
-                                    Base64UrlUtility.decode(encodedCrtCoefficient));
+            return getRSAPrivateKey(decodeSequence(encodedModulus),
+                                    decodeSequence(encodedPublicExponent),
+                                    decodeSequence(encodedPrivateExponent),
+                                    decodeSequence(encodedPrimeP),
+                                    decodeSequence(encodedPrimeQ),
+                                    decodeSequence(encodedPrimeExpP),
+                                    decodeSequence(encodedPrimeExpQ),
+                                    decodeSequence(encodedCrtCoefficient));
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
@@ -365,7 +365,7 @@ public final class CryptoUtils {
     
     public static ECPrivateKey getECPrivateKey(String encodedPrivateKey) {
         try {
-            return getECPrivateKey(Base64UrlUtility.decode(encodedPrivateKey));
+            return getECPrivateKey(decodeSequence(encodedPrivateKey));
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
@@ -392,8 +392,8 @@ public final class CryptoUtils {
     
     public static ECPublicKey getECPublicKey(String encodedXPoint, String encodedYPoint) {
         try {
-            return getECPublicKey(Base64UrlUtility.decode(encodedXPoint),
-                                  Base64UrlUtility.decode(encodedYPoint));
+            return getECPublicKey(decodeSequence(encodedXPoint),
+                                  decodeSequence(encodedYPoint));
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
@@ -756,10 +756,12 @@ public final class CryptoUtils {
         return createSecretKeySpec(descryptedBytes, secretKeyAlgo);
     }
     
+    public static SecretKey createSecretKeySpec(String encodedBytes, String algo) {
+        return new SecretKeySpec(decodeSequence(encodedBytes), algo);
+    }
     public static SecretKey createSecretKeySpec(byte[] bytes, String algo) {
         return new SecretKeySpec(bytes, convertJCECipherToSecretKeyName(algo));
     }
-    
     public static byte[] decodeSequence(String encodedSequence) throws SecurityException {
         try {
             return Base64UrlUtility.decode(encodedSequence);
