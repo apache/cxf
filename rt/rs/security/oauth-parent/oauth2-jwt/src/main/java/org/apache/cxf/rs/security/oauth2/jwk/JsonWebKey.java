@@ -166,9 +166,26 @@ public class JsonWebKey extends AbstractJwtObject {
         return CryptoUtils.getRSAPublicKey(encodedModulus, encodedPublicExponent);
     }
     public RSAPrivateKey toRSAPrivateKey() {
-        String encodedPublicExponent = (String)super.getValue(RSA_MODULUS);
+        String encodedModulus = (String)super.getValue(RSA_MODULUS);
         String encodedPrivateExponent = (String)super.getValue(RSA_PRIVATE_EXP);
-        return CryptoUtils.getRSAPrivateKey(encodedPublicExponent, encodedPrivateExponent);
+        String encodedPrimeP = (String)super.getValue(RSA_FIRST_PRIME_FACTOR);
+        if (encodedPrimeP == null) {
+            return CryptoUtils.getRSAPrivateKey(encodedModulus, encodedPrivateExponent);
+        } else {
+            String encodedPublicExponent = (String)super.getValue(RSA_PUBLIC_EXP);
+            String encodedPrimeQ = (String)super.getValue(RSA_SECOND_PRIME_FACTOR);
+            String encodedPrimeExpP = (String)super.getValue(RSA_FIRST_PRIME_CRT);
+            String encodedPrimeExpQ = (String)super.getValue(RSA_SECOND_PRIME_CRT);
+            String encodedCrtCoefficient = (String)super.getValue(RSA_FIRST_CRT_COEFFICIENT);
+            return CryptoUtils.getRSAPrivateKey(encodedModulus, 
+                                                encodedPublicExponent,
+                                                encodedPrivateExponent,
+                                                encodedPrimeP,
+                                                encodedPrimeQ,
+                                                encodedPrimeExpP,
+                                                encodedPrimeExpQ,
+                                                encodedCrtCoefficient);
+        }
     }
     
 }
