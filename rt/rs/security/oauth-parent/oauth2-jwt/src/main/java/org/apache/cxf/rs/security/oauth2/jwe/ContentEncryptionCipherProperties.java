@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oauth2.jwe;
 import java.security.spec.AlgorithmParameterSpec;
 
 
-interface ContentEncryptionCipherProperties {
+public interface ContentEncryptionCipherProperties {
     byte[] getAdditionalAuthenticationData(String headersJson);
     AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] iv);
 }

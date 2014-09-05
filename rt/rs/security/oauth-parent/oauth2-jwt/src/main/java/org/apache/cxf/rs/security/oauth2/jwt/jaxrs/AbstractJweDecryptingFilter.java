@@ -23,19 +23,25 @@ import java.io.InputStream;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.Properties;
 
+import javax.crypto.SecretKey;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.JweCryptoProperties;
 import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.oauth2.jwe.JweHeaders;
+import org.apache.cxf.rs.security.oauth2.jwe.RSAOaepKeyDecryptionAlgorithm;
+import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.WrappedKeyJweDecryption;
 import org.apache.cxf.rs.security.oauth2.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.oauth2.jwk.JwkUtils;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJweDecryptingFilter {
@@ -70,17 +76,29 @@ public class AbstractJweDecryptingFilter {
         }
         Bus bus = m.getExchange().getBus();
         try {
-            RSAPrivateKey pk = null;
+            WrappedKeyDecryptionAlgorithm keyDecryptionProvider = null;
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 //TODO: Private JWK sets can be JWE encrypted
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props);
-                pk = jwk.toRSAPrivateKey();
+                if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
+                    keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(jwk.toRSAPrivateKey());
+                } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
+                    SecretKey key = jwk.toSecretKey();
+                    // TODO: Introduce an algo family check
+                    if (Algorithm.A128KW.getJwtName().equals(jwk.getAlgorithm())) {
+                        keyDecryptionProvider = new AesWrapKeyDecryptionAlgorithm(key);
+                    }
+                    // etc
+                } else {
+                    // TODO: support elliptic curve keys
+                    throw new SecurityException();
+                }
             } else {
-                pk = (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, 
-                                                              CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER);
+                keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(
+                    (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER));
             }
-            return new WrappedKeyJweDecryption(pk, cryptoProperties);
+            return new WrappedKeyJweDecryption(keyDecryptionProvider, cryptoProperties, null);
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {
