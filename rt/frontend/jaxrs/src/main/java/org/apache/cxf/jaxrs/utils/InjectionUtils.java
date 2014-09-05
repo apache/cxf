@@ -1152,7 +1152,7 @@ public final class InjectionUtils {
                 if (value == null) {
                     continue;
                 }
-                if (isPrimitive(value.getClass())) {
+                if (isPrimitive(value.getClass()) || Date.class.isAssignableFrom(value.getClass())) {
                     values.putSingle(propertyName, value);
                 } else if (value.getClass().isEnum()) {
                     values.putSingle(propertyName, value.toString());
