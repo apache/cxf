@@ -166,7 +166,7 @@ public class JsonWebKey extends AbstractJwtObject {
         return CryptoUtils.getRSAPublicKey(encodedModulus, encodedPublicExponent);
     }
     public RSAPrivateKey toRSAPrivateKey() {
-        String encodedPublicExponent = (String)super.getValue(RSA_PUBLIC_EXP);
+        String encodedPublicExponent = (String)super.getValue(RSA_MODULUS);
         String encodedPrivateExponent = (String)super.getValue(RSA_PRIVATE_EXP);
         return CryptoUtils.getRSAPrivateKey(encodedPublicExponent, encodedPrivateExponent);
     }

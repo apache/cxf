@@ -77,7 +77,30 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
         Security.removeProvider(BouncyCastleProvider.class.getName());    
     }
-    
+    @Test
+    public void testJweJwk() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejwk";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress(address);
+        List<Object> providers = new LinkedList<Object>();
+        JweWriterInterceptor jweWriter = new JweWriterInterceptor();
+        jweWriter.setUseJweOutputStream(true);
+        providers.add(jweWriter);
+        providers.add(new JweClientResponseFilter());
+        bean.setProviders(providers);
+        bean.getProperties(true).put("rs.security.encryption.out.properties", 
+                                     "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+        bean.getProperties(true).put("rs.security.encryption.in.properties",
+                                     "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
+        BookStore bs = bean.create(BookStore.class);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
     @Test
     public void testJweRsaJwsRsa() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwsrsa";
