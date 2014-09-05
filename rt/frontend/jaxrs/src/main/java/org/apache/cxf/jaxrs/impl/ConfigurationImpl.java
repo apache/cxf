@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,8 +36,8 @@ public class ConfigurationImpl implements Configuration {
     private Map<String, Object> props = new HashMap<String, Object>();
     private RuntimeType runtimeType;
     private Map<Object, Map<Class<?>, Integer>> providers = 
-        new HashMap<Object, Map<Class<?>, Integer>>(); 
-    private Map<Feature, Boolean> features = new HashMap<Feature, Boolean>();
+        new LinkedHashMap<Object, Map<Class<?>, Integer>>(); 
+    private Map<Feature, Boolean> features = new LinkedHashMap<Feature, Boolean>();
     
     public ConfigurationImpl(RuntimeType rt) {
         this.runtimeType = rt;
