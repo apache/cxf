@@ -41,6 +41,7 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
+import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Properties;
@@ -286,6 +287,76 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
+    
+    public static RSAPrivateKey getRSAPrivateKey(byte[] modulusBytes,
+                                                 byte[] privateExponentBytes) {
+        BigInteger modulus =  new BigInteger(1, modulusBytes);
+        BigInteger privateExponent =  new BigInteger(1, privateExponentBytes);
+        try {
+            KeyFactory factory = KeyFactory.getInstance("RSA");
+            return (RSAPrivateKey)factory.generatePrivate(
+                new RSAPrivateKeySpec(modulus, privateExponent));
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }    
+    }
+    //CHECKSTYLE:OFF
+    public static RSAPrivateKey getRSAPrivateKey(String encodedModulus,
+                                                 String encodedPublicExponent,
+                                                 String encodedPrivateExponent,
+                                                 String encodedPrimeP,
+                                                 String encodedPrimeQ,
+                                                 String encodedPrimeExpP,
+                                                 String encodedPrimeExpQ,
+                                                 String encodedCrtCoefficient) {
+    //CHECKSTYLE:ON
+        try {
+            return getRSAPrivateKey(Base64UrlUtility.decode(encodedModulus),
+                                    Base64UrlUtility.decode(encodedPublicExponent),
+                                    Base64UrlUtility.decode(encodedPrivateExponent),
+                                    Base64UrlUtility.decode(encodedPrimeP),
+                                    Base64UrlUtility.decode(encodedPrimeQ),
+                                    Base64UrlUtility.decode(encodedPrimeExpP),
+                                    Base64UrlUtility.decode(encodedPrimeExpQ),
+                                    Base64UrlUtility.decode(encodedCrtCoefficient));
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }
+    }
+    //CHECKSTYLE:OFF
+    public static RSAPrivateKey getRSAPrivateKey(byte[] modulusBytes,
+                                                 byte[] publicExponentBytes,
+                                                 byte[] privateExponentBytes,
+                                                 byte[] primePBytes,
+                                                 byte[] primeQBytes,
+                                                 byte[] primeExpPBytes,
+                                                 byte[] primeExpQBytes,
+                                                 byte[] crtCoefficientBytes) {
+    //CHECKSTYLE:ON
+        BigInteger modulus =  new BigInteger(1, modulusBytes);
+        BigInteger publicExponent =  new BigInteger(1, publicExponentBytes);
+        BigInteger privateExponent =  new BigInteger(1, privateExponentBytes);
+        BigInteger primeP =  new BigInteger(1, primePBytes);
+        BigInteger primeQ =  new BigInteger(1, primeQBytes);
+        BigInteger primeExpP =  new BigInteger(1, primeExpPBytes);
+        BigInteger primeExpQ =  new BigInteger(1, primeExpQBytes);
+        BigInteger crtCoefficient =  new BigInteger(1, crtCoefficientBytes);
+        try {
+            KeyFactory factory = KeyFactory.getInstance("RSA");
+            return (RSAPrivateKey)factory.generatePrivate(
+                new RSAPrivateCrtKeySpec(modulus, 
+                                         publicExponent,
+                                         privateExponent,
+                                         primeP,
+                                         primeQ,
+                                         primeExpP,
+                                         primeExpQ,
+                                         crtCoefficient));
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }    
+    }
+    
     public static ECPrivateKey getECPrivateKey(String encodedPrivateKey) {
         try {
             return getECPrivateKey(Base64UrlUtility.decode(encodedPrivateKey));
@@ -399,30 +470,6 @@ public final class CryptoUtils {
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
-    }
-    
-    public static RSAPrivateKey getRSAPrivateKey(byte[] modulusBytes,
-                                                 byte[] privateExponentBytes) {
-        try {
-            return getRSAPrivateKey(KeyFactory.getInstance("RSA"), 
-                                   modulusBytes,
-                                   privateExponentBytes);
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }    
-    }
-    
-    public static RSAPrivateKey getRSAPrivateKey(KeyFactory factory,
-                                         byte[] modulusBytes,
-                                         byte[] privateExponentBytes) {
-        BigInteger modulus =  new BigInteger(1, modulusBytes);
-        BigInteger privateExponent =  new BigInteger(1, privateExponentBytes);
-        try {
-            return (RSAPrivateKey)factory.generatePrivate(
-                new RSAPrivateKeySpec(modulus, privateExponent));
-        } catch (Exception ex) { 
-            throw new SecurityException(ex);
-        }    
     }
     
     public static SecretKey getSecretKey(String symEncAlgo) throws SecurityException {
