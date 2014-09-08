@@ -177,7 +177,7 @@ public class Catalog {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/search")
-    public JsonArray findBook(@Context SearchContext searchContext, 
+    public Response findBook(@Context SearchContext searchContext, 
             @Context final UriInfo uri) throws IOException {
         
         final IndexReader reader = DirectoryReader.open(directory);
@@ -209,7 +209,7 @@ public class Catalog {
                 }
             }
             
-            return builder.build();
+            return Response.ok(builder.build()).header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build();
         } finally {
             reader.close();
         }

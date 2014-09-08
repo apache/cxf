@@ -20,6 +20,19 @@
                 <input id="file" name="file" type="file" multiple=true class="file"></button>
             </div>
         </form>
+        
+        <form id="from-search" role="search" method="get" action="http://localhost:9000/catalog/search">
+            <h2 class="form-upload-heading">Query the Catalog</h2>
+		    <div class="input-group add-on">
+		        <input id="search-query" type="text" class="form-control" placeholder="Search">		    
+			    <div class="input-group-btn">
+			    	<button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-search"></i></button>
+			    </div>
+		    </div>
+		</form>
+		
+		<div class="fluent-container" id="results">
+		</div>
     </div> <!-- /container -->
     
     <script type="text/javascript">
@@ -38,6 +51,53 @@
     			contentType: false,
     			processData: false
     		});
+    			        
+	        e.preventDefault();
+	        return false;
+	    });
+    	
+    	$( "#from-search" ).submit(function(e) {    		
+    		var query = $( "#search-query" ).val();
+    		$( "#results" ).html("");
+    		
+    		if( query !== "" ) {
+	    		$.ajax({
+	    			url: $(this).attr("action") + "?$filter=ct=="  + encodeURIComponent( query ),
+	    			type: 'GET',
+	    			async: false,
+	    			success: function (data) {
+	    				var table = "\
+	    				<table class=\"table table-striped\">\
+	    			    <thead>\
+	    			        <tr>\
+	    			            <th>File</th>\
+	    			            <th>Score</th>\
+	    			            <th>Action</th>\
+	    			        </tr>\
+	    			    </thead>\
+	    			    <tbody>";	    			    
+	    				
+	    				$.each(data, function (index, value) {
+	    					table += "\
+	    					<tr>\
+	    		               <td>" + value.source + "</td>\
+	    		                <td>" + value.score + "</td>\
+	    		                <td><a href='" + value.url + "'>Open</a></td>\
+	    		            </tr>";
+	    				});
+
+	    				table += "\
+	    	    	    </tbody>\
+	    	    		</table>";
+	    	    		
+	    				$( "#results" ).html(table);
+	    		
+	    			},
+		    		cache: false,
+	    			contentType: false,
+	    			processData: false
+	    		});
+    	    }
     			        
 	        e.preventDefault();
 	        return false;
