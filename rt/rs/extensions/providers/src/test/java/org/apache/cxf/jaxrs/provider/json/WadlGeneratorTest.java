@@ -89,13 +89,13 @@ public class WadlGeneratorTest extends Assert {
                   new MetadataMap<String, Object>(), os);
         String s = os.toString();
         String expected1 = 
-            "{\"application\":{\"grammars\":{\"include\":{\"@href\":\"http:\\/\\/localhost:8080\\/baz"
-            + "\\/json.schema\"}},\"resources\":{\"@base\":\"http:\\/\\/localhost:8080\\/baz\","
-            + "\"resource\":{\"@path\":\"\\/bookstore\\/{id}\"";
+            "{\"application\":{\"grammars\":{\"include\":{\"@href\":\"http://localhost:8080/baz"
+            + "/json.schema\"}},\"resources\":{\"@base\":\"http://localhost:8080/baz\","
+            + "\"resource\":{\"@path\":\"/bookstore/{id}\"";
         assertTrue(s.startsWith(expected1));
         String expected2 =
-            "\"response\":{\"representation\":[{\"@mediaType\":\"application\\/xml\"},"
-            + "{\"@element\":\"Chapter\",\"@mediaType\":\"application\\/json\"}]}";
+            "\"response\":{\"representation\":[{\"@mediaType\":\"application/xml\"},"
+            + "{\"@element\":\"Chapter\",\"@mediaType\":\"application/json\"}]}";
         assertTrue(s.contains(expected2));
     }
     

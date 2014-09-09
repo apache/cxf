@@ -299,6 +299,25 @@ public class JSONProviderTest extends Assert {
         assertFalse(bos.toString().contains("\"id\":123"));
         assertTrue(bos.toString().startsWith("{\"Book\":"));
     }
+    @Test
+    public void testDoNotEscapeForwardSlashes() throws Exception {
+        JSONProvider<Book> provider = new JSONProvider<Book>();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(new Book("http://cxf", 123), Book.class, Book.class,
+                         new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        assertTrue(bos.toString().contains("\"name\":\"http://cxf\""));
+    }
+    @Test
+    public void testEscapeForwardSlashesAlways() throws Exception {
+        JSONProvider<Book> provider = new JSONProvider<Book>();
+        provider.setEscapeForwardSlashesAlways(true);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(new Book("http://cxf", 123), Book.class, Book.class,
+                         new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        assertTrue(bos.toString().contains("\"name\":\"http:\\/\\/cxf\""));
+    }
     
     @Test
     public void testWriteNullValueAsString() throws Exception {
@@ -1004,6 +1023,85 @@ public class JSONProviderTest extends Assert {
         assertEquals(
             "{\"Tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}",
             s);
+    }
+    
+    @Test
+    public void testWriteArrayWithStructuredArrayKeyName() throws Exception {
+        JSONProvider<BeanA> p = new JSONProvider<BeanA>();
+        p.setSerializeAsArray(true);
+        p.setArrayKeys(Collections.singletonList("beana/beanb/name"));
+        BeanA beanA = new BeanA();
+        beanA.setName("beana");
+        BeanB beanB = new BeanB();
+        beanB.setName(Collections.singletonList("beanbArray"));
+        beanA.setBeanB(beanB);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(beanA, BeanA.class, BeanA.class, BeanA.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertTrue(s.contains("\"name\":[\"beanbArray\"]"));
+        assertTrue(s.contains("\"name\":\"beana\""));
+    }
+    @Test
+    public void testWriteArrayWithStructuredArrayKeyName2() throws Exception {
+        JSONProvider<BeanC> p = new JSONProvider<BeanC>();
+        p.setSerializeAsArray(true);
+        p.setDropRootElement(true);
+        List<String> keys = new LinkedList<String>();
+        keys.add("beanblist");
+        keys.add("beanblist/name");
+        p.setArrayKeys(keys);
+        BeanC beanC = new BeanC();
+        beanC.setName("beanc");
+        BeanB beanB = new BeanB();
+        beanB.setName(Collections.singletonList("beanbArray"));
+        beanC.setBeanBList(Collections.singletonList(beanB));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(beanC, BeanC.class, BeanC.class, BeanC.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertTrue(s.contains("\"beanblist\":[{\"name\":[\"beanbArray\"]}]"));
+        assertTrue(s.contains("\"name\":\"beanc\""));
+    }
+    
+    @Test
+    public void testWriteArrayWithStructuredArrayKeyNameDropRoot() throws Exception {
+        JSONProvider<BeanA> p = new JSONProvider<BeanA>();
+        p.setSerializeAsArray(true);
+        p.setDropRootElement(true);
+        p.setArrayKeys(Collections.singletonList("beanb/name"));
+        BeanA beanA = new BeanA();
+        beanA.setName("beana");
+        BeanB beanB = new BeanB();
+        beanB.setName(Collections.singletonList("beanbArray"));
+        beanA.setBeanB(beanB);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(beanA, BeanA.class, BeanA.class, BeanA.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertTrue(s.contains("\"name\":[\"beanbArray\"]"));
+        assertTrue(s.contains("\"name\":\"beana\""));
+    }
+    @Test
+    public void testWriteArrayWithStructuredArrayKeyNameSingleBean() throws Exception {
+        JSONProvider<BeanB> p = new JSONProvider<BeanB>();
+        p.setSerializeAsArray(true);
+        p.setArrayKeys(Collections.singletonList("beanb/name"));
+        BeanB beanB = new BeanB();
+        beanB.setName(Collections.singletonList("beanbArray"));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(beanB, BeanB.class, BeanB.class, BeanB.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertTrue(s.contains("\"name\":[\"beanbArray\"]"));
     }
     
     @Test
@@ -1786,5 +1884,61 @@ public class JSONProviderTest extends Assert {
         public void setId(String id) {
             this.id = id;
         }
-    }    
+    }
+    @XmlRootElement(name = "beana")
+    public static class BeanA {
+        private String name;
+        private BeanB beanB;
+        public BeanA() {
+            
+        }
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public BeanB getBeanB() {
+            return beanB;
+        }
+        @XmlElement(name = "beanb")
+        public void setBeanB(BeanB beanB) {
+            this.beanB = beanB;
+        }
+    }
+    @XmlRootElement(name = "beanb")
+    public static class BeanB {
+        private List<String> name;
+        public BeanB() {
+            
+        }
+        public List<String> getName() {
+            return name;
+        }
+        public void setName(List<String> name) {
+            this.name = name;
+        }
+    }
+    @XmlRootElement(name = "beanc")
+    public static class BeanC {
+        private String name;
+        private List<BeanB> beanBList;
+        public BeanC() {
+            
+        }
+        public List<BeanB> getBeanBList() {
+            return beanBList;
+        }
+        @XmlElement(name = "beanblist")
+        public void setBeanBList(List<BeanB> beanBList) {
+            this.beanBList = beanBList;
+        }
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        
+    }
 }
