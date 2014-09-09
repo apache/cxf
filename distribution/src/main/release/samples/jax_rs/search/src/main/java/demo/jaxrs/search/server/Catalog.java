@@ -54,6 +54,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
@@ -112,6 +113,10 @@ public class Catalog {
                     
                     if (handler != null) {
                         final String source = handler.getName();
+                        if (StringUtils.isEmpty(source)) {
+                            response.resume(Response.status(Status.BAD_REQUEST).build());
+                            return;
+                        }
                                                 
                         final LuceneDocumentMetadata metadata = new LuceneDocumentMetadata()
                             .withSource(source)
@@ -130,8 +135,7 @@ public class Catalog {
                         } 
                         
                         if (response.isSuspended()) {
-                            response.resume(Response
-                                    .created(uri.getRequestUriBuilder().path(source).build())
+                            response.resume(Response.created(uri.getRequestUriBuilder().path(source).build())
                                     .build());
                         }
                     }                       
