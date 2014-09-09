@@ -92,12 +92,6 @@ public final class STSUtils {
     }
     
     public static STSClient getClient(Message message, String type, IssuedToken itok) {
-<<<<<<< HEAD
-        // Find out first if we have an EPR to get the STS Address (possibly via WS-MEX)
-        if (itok != null && itok.getIssuerEpr() != null && message != null) {
-            EndpointReferenceType epr = itok.getIssuerEpr();
-=======
-        
         // Retrieve or create the STSClient
         STSClient client = (STSClient)message
             .getContextualProperty(SecurityConstants.STS_CLIENT);
@@ -116,15 +110,9 @@ public final class STSUtils {
         
         
         // Find out if we have an EPR to get the STS Address (possibly via WS-MEX)
-        if (itok != null && itok.getIssuer() != null && message != null) {
-            EndpointReferenceType epr = null;
-            try {
-                epr = VersionTransformer.parseEndpointReference(itok.getIssuer());
-            } catch (JAXBException e) {
-                throw new IllegalArgumentException(e);
-            }
-            
->>>>>>> b535ff6... Added support + tests for creating "default" STSClients
+        if (itok != null && itok.getIssuerEpr() != null && message != null) {
+            EndpointReferenceType epr = itok.getIssuerEpr();
+
             String mexLocation = findMEXLocation(epr);
             // Configure via WS-MEX
             if (mexLocation != null
