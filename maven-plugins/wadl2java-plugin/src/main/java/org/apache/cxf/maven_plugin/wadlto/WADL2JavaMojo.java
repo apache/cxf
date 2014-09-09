@@ -127,7 +127,6 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     private List<WadlOption> createWadlOptionsFromScansAndExplicitWadlOptions(File classesDir) 
         throws MojoExecutionException {
         List<WadlOption> effectiveOptions = new ArrayList<WadlOption>();
-        
         mergeOptions(effectiveOptions);
         downloadRemoteDocs(effectiveOptions);
         if (effectiveOptions.isEmpty()) {
@@ -138,7 +137,11 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
             }
             File defaultRoot = wadlRoot != null && wadlRoot.exists() ? wadlRoot : testWadlRoot;
             effectiveOptions.addAll(
-                OptionLoader.loadWadlOptionsFromFile(defaultRoot, includes, excludes, null, classesDir));
+                OptionLoader.loadWadlOptionsFromFile(defaultRoot, 
+                                                     includes, 
+                                                     excludes, 
+                                                     defaultOptions, 
+                                                     classesDir));
         }
         return effectiveOptions;
     }
