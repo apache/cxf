@@ -21,9 +21,13 @@ package org.apache.cxf.maven_plugin.wadlto;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.maven_plugin.common.DocumentArtifact;
 
@@ -34,11 +38,17 @@ public class WadlOption extends Option {
      */
     String wadl;
 
+    String wadlFileExtension = "wadl";
+    
     /**
-     * Alternatively to the wsdl string an artifact can be specified
+     * Alternatively to the wadl string an artifact can be specified
      */
     DocumentArtifact wadlArtifact;
 
+    public WadlOption() {
+        super();
+    }
+    
     public String getWadl() {
         return wadl;
     }
@@ -83,8 +93,23 @@ public class WadlOption extends Option {
         return file;
     }
     
-    public URI getWadlURI(URI baseURI) {
+    public List<URI> getWadlURIs(URI baseURI, ClassLoader resourceLoader) {
         String wadlLocation = getWadl();
+        if (wadlLocation.contains(".") && !wadlLocation.contains("*")) {
+            return Collections.singletonList(getWadlURI(baseURI, wadlLocation));
+        }
+        List<URI> uris = new LinkedList<URI>();
+        try {
+            for (URL nextLocation : ClasspathScanner.findResources(wadlLocation, wadlFileExtension, resourceLoader)) {
+                uris.add(getWadlURI(baseURI, nextLocation.toURI().getPath()));
+            }
+        } catch (Exception ex) {
+            // ignore
+        }
+        return uris;
+    }
+    
+    private URI getWadlURI(URI baseURI, String wadlLocation) {
         File wadlFile = new File(wadlLocation);
         return wadlFile.exists() ? wadlFile.toURI() 
             : baseURI.resolve(URIParserUtil.escapeChars(wadlLocation));
@@ -115,7 +140,7 @@ public class WadlOption extends Option {
         return builder.toString();
     }
 
-    public List<String> generateCommandLine(File outputDirFile, URI basedir, URI wsdlURI, boolean debug) {
+    public List<String> generateCommandLine(File outputDirFile, URI basedir, URI wadlURI, boolean debug) {
         List<String> list = new ArrayList<String>();
         addIfNotNull(list, outputDirFile, "-d");
         for (String binding : getBindingFiles()) {
@@ -131,7 +156,7 @@ public class WadlOption extends Option {
         addIfTrue(list, isImpl(), "-impl");
         addIfTrue(list, isInterface(), "-interface");
         addList(list, "", false, getExtraargs());
-        list.add(wsdlURI.toString());
+        list.add(wadlURI.toString());
         return list;
     }
 
@@ -166,5 +191,13 @@ public class WadlOption extends Option {
         if (expression) {
             list.add(key);
         }
+    }
+
+    public String getWadlFileExtension() {
+        return wadlFileExtension;
+    }
+
+    public void setWadlFileExtension(String wadlFileExtension) {
+        this.wadlFileExtension = wadlFileExtension;
     }
 }

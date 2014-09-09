@@ -35,6 +35,7 @@ import org.apache.maven.project.MavenProject;
 
 public final class OptionLoader {
     private static final String WADL_TYPE = "wadl";
+    private static final String WADL_OPTIONS = "-options$";
     private static final String WADL_BINDINGS = "-binding-?\\d*.xml$";
     
     private OptionLoader() {
@@ -73,39 +74,39 @@ public final class OptionLoader {
     }
 
     /**
-     * Scan files in a directory and generate one wsdlOption per file found. Extra args for code generation
-     * can be defined in a file that is named like the wsdl file and ends in -options. Binding files can be
-     * defined in files named like the wsdl file and end in -binding-*.xml
+     * Scan files in a directory and generate one wadlOption per file found. Extra args for code generation
+     * can be defined in a file that is named like the wadl file and ends in -options. Binding files can be
+     * defined in files named like the wadl file and end in -binding-*.xml
      * 
-     * @param wsdlBasedir
+     * @param wadlBasedir
      * @param includes file name patterns to include
      * @param excludes file name patterns to exclude
      * @param defaultOptions options that should be used if no special file is given
-     * @return list of one WsdlOption object for each wsdl found
+     * @return list of one WadlOption object for each wadl found
      * @throws MojoExecutionException
      */
-    public static List<WadlOption> loadWsdlOptionsFromFiles(File wsdlBasedir, String includes[],
+    public static List<WadlOption> loadWadlOptionsFromFile(File wadlBasedir, String includes[],
                                                             String excludes[], Option defaultOptions,
                                                             File defaultOutputDir)
         throws MojoExecutionException {
 
-        if (wsdlBasedir == null) {
+        if (wadlBasedir == null) {
             return new ArrayList<WadlOption>();
         }
 
-        if (!wsdlBasedir.exists()) {
-            throw new MojoExecutionException(wsdlBasedir + " does not exist");
+        if (!wadlBasedir.exists()) {
+            throw new MojoExecutionException(wadlBasedir + " does not exist");
         }
 
-        List<File> wsdlFiles = getWsdlFiles(wsdlBasedir, includes, excludes);
-        List<WadlOption> wsdlOptions = new ArrayList<WadlOption>();
-        for (File wsdl : wsdlFiles) {
-            WadlOption wsdlOption = generateWsdlOptionFromFile(wsdl, defaultOptions, defaultOutputDir);
-            if (wsdlOption != null) {
-                wsdlOptions.add(wsdlOption);
+        List<File> wadlFiles = getWadlFiles(wadlBasedir, includes, excludes);
+        List<WadlOption> wadlOptions = new ArrayList<WadlOption>();
+        for (File wadl : wadlFiles) {
+            WadlOption wadlOption = generateWadlOptionFromFile(wadl, defaultOptions, defaultOutputDir);
+            if (wadlOption != null) {
+                wadlOptions.add(wadlOption);
             }
         }
-        return wsdlOptions;
+        return wadlOptions;
     }
 
     private static String joinWithComma(String[] arr) {
@@ -123,7 +124,7 @@ public final class OptionLoader {
         return str.toString();
     }
 
-    private static List<File> getWsdlFiles(File dir, String includes[], String excludes[])
+    private static List<File> getWadlFiles(File dir, String includes[], String excludes[])
         throws MojoExecutionException {
 
         List<String> exList = new ArrayList<String>();
@@ -144,7 +145,7 @@ public final class OptionLoader {
     }
 
 
-    protected static WadlOption generateWsdlOptionFromFile(final File wadl, final Option defaultOptions,
+    protected static WadlOption generateWadlOptionFromFile(final File wadl, final Option defaultOptions,
                                                            File defaultOutputDir)
         throws MojoExecutionException {
 
@@ -161,21 +162,48 @@ public final class OptionLoader {
             return null;
         }
 
-        final WadlOption wsdlOption = new WadlOption();
+        final WadlOption wadlOption = new WadlOption();
         final String wadlName = wadlFileName.substring(0, idx);
 
+        final String[] options = readOptionsFromFile(wadl.getParentFile(), wadlName);
+        if (options.length > 0) {
+            wadlOption.getExtraargs().addAll(Arrays.asList(options));
+        }
+        
         List<File> bindingFiles = FileUtils.getFiles(wadl.getParentFile(), wadlName + WADL_BINDINGS);
         if (bindingFiles != null) {
             for (File binding : bindingFiles) {
-                wsdlOption.addBindingFile(binding);
+                wadlOption.addBindingFile(binding);
             }
         }
-        wsdlOption.setWadl(wadl.toURI().toString());
-
-        if (wsdlOption.getOutputDir() == null) {
-            wsdlOption.setOutputDir(defaultOutputDir);
+        wadlOption.setWadl(wadl.toURI().toString());
+        
+        if (wadlOption.getOutputDir() == null) {
+            wadlOption.setOutputDir(defaultOutputDir);
         }
 
-        return wsdlOption;
+        return wadlOption;
+    }
+    
+    private static String[] readOptionsFromFile(File dir, String wsdlName) throws MojoExecutionException {
+        String[] noOptions = new String[] {};
+        List<File> files = FileUtils.getFiles(dir, wsdlName + WADL_OPTIONS); 
+        if (files.size() <= 0) {
+            return noOptions;
+        }
+        File optionsFile = files.iterator().next();
+        if (optionsFile == null || !optionsFile.exists()) {
+            return noOptions;
+        }
+        try {
+            List<String> lines = FileUtils.readLines(optionsFile);
+            if (lines.size() <= 0) {
+                return noOptions;
+            }
+            return lines.iterator().next().split(" ");
+        } catch (Exception e) {
+            throw new MojoExecutionException("Error reading options from file "
+                                             + optionsFile.getAbsolutePath(), e);
+        }
     }
 }

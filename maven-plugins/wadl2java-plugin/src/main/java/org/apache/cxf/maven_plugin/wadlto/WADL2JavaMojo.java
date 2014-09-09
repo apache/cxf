@@ -71,16 +71,11 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     }
 
     public void execute() throws MojoExecutionException {
-        if (includes == null) {
-            includes = new String[] {
-                "*.wadl"
-            };
-        }
         File classesDir = new File(classesDirectory);
         classesDir.mkdirs();
         markerDirectory.mkdirs();
 
-        List<WadlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
+        List<WadlOption> effectiveWsdlOptions = createWadlOptionsFromScansAndExplicitWadlOptions(classesDir);
 
         if (effectiveWsdlOptions.size() == 0) {
             getLog().info("Nothing to generate");
@@ -129,12 +124,22 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
      * @return effective WsdlOptions
      * @throws MojoExecutionException
      */
-    private List<WadlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions() 
+    private List<WadlOption> createWadlOptionsFromScansAndExplicitWadlOptions(File classesDir) 
         throws MojoExecutionException {
         List<WadlOption> effectiveOptions = new ArrayList<WadlOption>();
         
         mergeOptions(effectiveOptions);
         downloadRemoteDocs(effectiveOptions);
+        if (effectiveOptions.isEmpty()) {
+            if (includes == null) {
+                includes = new String[] {
+                    "*.wadl"
+                };
+            }
+            File defaultRoot = wadlRoot != null && wadlRoot.exists() ? wadlRoot : testWadlRoot;
+            effectiveOptions.addAll(
+                OptionLoader.loadWadlOptionsFromFile(defaultRoot, includes, excludes, null, classesDir));
+        }
         return effectiveOptions;
     }
     

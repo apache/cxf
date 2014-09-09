@@ -32,7 +32,7 @@ import java.util.Set;
 public class ClasspathScanner {
     public static final String ALL_FILES = "**/*";
     public static final String ALL_CLASS_FILES = ALL_FILES + ".class";
-    public static final String ALL_PACKAGES = "*";
+    public static final String WILDCARD = "*";
     public static final String CLASSPATH_URL_SCHEME = "classpath:";
     
     static final ClasspathScanner HELPER;
@@ -120,7 +120,19 @@ public class ClasspathScanner {
      */
     public static List<URL> findResources(String basePackage, String extension) 
         throws IOException {
-        return findResources(Collections.singletonList(basePackage), extension);
+        return findResources(basePackage, extension, null);
+    }
+    
+    /**
+     * Scans list of base packages for all resources with the given extension. 
+     * @param basePackage base package 
+     * @param extension the extension matching resources needs to have
+     * @return list of all discovered resource URLs 
+     * @throws IOException resource is not accessible
+     */
+    public static List<URL> findResources(String basePackage, String extension, ClassLoader loader) 
+        throws IOException {
+        return findResources(Collections.singletonList(basePackage), extension, loader);
     }
     
     /**
@@ -146,7 +158,7 @@ public class ClasspathScanner {
         final Set<String> basePackages = new HashSet<String>(values.length);
         for (final String value : values) {
             final String trimmed = value.trim();
-            if (trimmed.equals(ClasspathScanner.ALL_PACKAGES)) {
+            if (trimmed.equals(WILDCARD)) {
                 basePackages.clear();
                 basePackages.add(trimmed);
                 break;

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -48,6 +49,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -89,7 +91,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     MavenProject project;
 
     /**
-     * Default options to be used when a wsdl has not had it's options explicitly specified.
+     * Default options to be used when a wadl has not had it's options explicitly specified.
      * 
      * @parameter
      */
@@ -107,7 +109,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
     /**
      * Use the compile classpath rather than the test classpath for execution useful if the test dependencies
-     * clash with those of wsdl2java
+     * clash with those of wadl2java
      * 
      * @parameter expression="${cxf.useCompileClasspath}" default-value="false"
      */
@@ -115,16 +117,16 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     
     
     /**
-     * Disables the scanning of the wsdlRoot/testWsdlRoot directories configured above.
-     * By default, we scan for *.wsdl (see include/exclude params as well) in the wsdlRoot
-     * directories and run wsdl2java on all the wsdl's we find.    This disables that scan
-     * and requires an explicit wsdlOption to be set for each wsdl that needs to be processed.
+     * Disables the scanning of the wadlRoot/testWadlRoot directories configured above.
+     * By default, we scan for *.wadl (see include/exclude params as well) in the wadlRoot
+     * directories and run wadl2java on all the wadl's we find.    This disables that scan
+     * and requires an explicit wadlOption to be set for each wadl that needs to be processed.
      * @parameter expression="${cxf.disableDirectoryScan}" default-value="false"
      */
     boolean disableDirectoryScan;
 
     /**
-     * By default all maven dependencies of type "wsdl" are added to the effective wsdlOptions. Setting this
+     * By default all maven dependencies of type "wadl" are added to the effective wadlOptions. Setting this
      * parameter to true disables this functionality
      * 
      * @parameter expression="${cxf.disableDependencyScan}" default-value="false"
@@ -132,15 +134,15 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     boolean disableDependencyScan;
 
     /**
-     * A list of wsdl files to include. Can contain ant-style wildcards and double wildcards. Defaults to
-     * *.wsdl
+     * A list of wadl files to include. Can contain ant-style wildcards and double wildcards. Defaults to
+     * *.wadl
      * 
      * @parameter
      */
     String includes[];
 
     /**
-     * A list of wsdl files to exclude. Can contain ant-style wildcards and double wildcards.
+     * A list of wadl files to exclude. Can contain ant-style wildcards and double wildcards.
      * 
      * @parameter
      */
@@ -234,15 +236,17 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      */
     private String additionalJvmArgs;
     
+    private ClassLoader resourceClassLoader;
+    
     /**
-     * Merge WsdlOptions that point to the same file by adding the extraargs to the first option and deleting
+     * Merge WadlOptions that point to the same file by adding the extraargs to the first option and deleting
      * the second from the options list
      * 
      * @param options
      */
     
     @SuppressWarnings("unchecked")
-    private Artifact resolveRemoteWsdlArtifact(List<?> remoteRepos, Artifact artifact)
+    private Artifact resolveRemoteWadlArtifact(List<?> remoteRepos, Artifact artifact)
         throws MojoExecutionException {
         
         /**
@@ -269,7 +273,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         try {
             artifactResolver.resolve(artifact, remoteRepos, localRepository);
         } catch (ArtifactResolutionException e) {
-            throw new MojoExecutionException("Error downloading wsdl artifact.", e);
+            throw new MojoExecutionException("Error downloading wadl artifact.", e);
         } catch (ArtifactNotFoundException e) {
             throw new MojoExecutionException("Resource can not be found.", e);
         }
@@ -283,21 +287,21 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
             remoteRepos = ProjectUtils.buildArtifactRepositories(repositories, artifactRepositoryFactory,
                                                                  mavenSession.getContainer());
         } catch (InvalidRepositoryException e) {
-            throw new MojoExecutionException("Error build repositories for remote wsdls", e);
+            throw new MojoExecutionException("Error build repositories for remote wadls", e);
         }
         
         for (WadlOption option : effectiveOptions) {
-            DocumentArtifact wsdlA = option.getWadlArtifact();
-            if (wsdlA == null) {
+            DocumentArtifact wadlA = option.getWadlArtifact();
+            if (wadlA == null) {
                 return;
             }
-            Artifact wsdlArtifact = artifactFactory.createArtifact(wsdlA.getGroupId(), wsdlA.getArtifactId(),
-                                                                   wsdlA.getVersion(),
-                                                                   Artifact.SCOPE_COMPILE, wsdlA.getType());
-            wsdlArtifact = resolveRemoteWsdlArtifact(remoteRepos, wsdlArtifact);
-            if (wsdlArtifact != null) {
-                String path = wsdlArtifact.getFile().getAbsolutePath();
-                getLog().info("Resolved WSDL artifact to file " + path);
+            Artifact wadlArtifact = artifactFactory.createArtifact(wadlA.getGroupId(), wadlA.getArtifactId(),
+                                                                   wadlA.getVersion(),
+                                                                   Artifact.SCOPE_COMPILE, wadlA.getType());
+            wadlArtifact = resolveRemoteWadlArtifact(remoteRepos, wadlArtifact);
+            if (wadlArtifact != null) {
+                String path = wadlArtifact.getFile().getAbsolutePath();
+                getLog().info("Resolved WADL artifact to file " + path);
                 option.setWadl(path);
             }
         }
@@ -341,18 +345,19 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
             File outputDirFile = option.getOutputDir();
             outputDirFile.mkdirs();
             URI basedir = project.getBasedir().toURI();
-            URI wadlURI = option.getWadlURI(basedir);
-            File doneFile = getDoneFile(basedir, wadlURI);
-
-            if (!shouldRun(option, doneFile, wadlURI)) {
-                continue;
+            for (URI wadlURI : option.getWadlURIs(basedir, getResourceLoader())) {
+                File doneFile = getDoneFile(basedir, wadlURI);
+    
+                if (!shouldRun(option, doneFile, wadlURI)) {
+                    continue;
+                }
+                doneFile.delete();
+                
+                toDo.add(option);
+                
+                wargs.add(option.generateCommandLine(outputDirFile, basedir, wadlURI, getLog()
+                                                                   .isDebugEnabled()));
             }
-            doneFile.delete();
-            
-            toDo.add(option);
-            
-            wargs.add(option.generateCommandLine(outputDirFile, basedir, wadlURI, getLog()
-                                                               .isDebugEnabled()));
         }
         if (wargs.isEmpty()) {
             return;
@@ -382,13 +387,14 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
                 }
             }
             URI basedir = project.getBasedir().toURI();
-            URI wadlURI = option.getWadlURI(basedir);
-            File doneFile = getDoneFile(basedir, wadlURI);
-            try {
-                doneFile.createNewFile();
-            } catch (Throwable e) {
-                getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
-                getLog().debug(e);
+            for (URI wadlURI : option.getWadlURIs(basedir, getResourceLoader())) {
+                File doneFile = getDoneFile(basedir, wadlURI);
+                try {
+                    doneFile.createNewFile();
+                } catch (Throwable e) {
+                    getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
+                    getLog().debug(e);
+                }
             }
         }
     }
@@ -411,60 +417,91 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         }
     }
 
+    private ClassLoader getResourceLoader() throws MojoExecutionException {
+        if (resourceClassLoader == null) {
+            try {
+                List<?> runtimeClasspathElements = project.getRuntimeClasspathElements();
+                List<?> resources = project.getResources();
+                List<?> testResources = project.getTestResources();
+                URL[] runtimeUrls = new URL[runtimeClasspathElements.size() + resources.size() + testResources.size()];
+                for (int i = 0; i < runtimeClasspathElements.size(); i++) {
+                    String element = (String)runtimeClasspathElements.get(i);
+                    runtimeUrls[i] = new File(element).toURI().toURL();
+                }
+                for (int i = 0, j = runtimeClasspathElements.size(); i < resources.size(); i++, j++) {
+                    Resource r = (Resource)resources.get(i);
+                    runtimeUrls[j] = new File(r.getDirectory()).toURI().toURL();
+                }
+                for (int i = 0, j = runtimeClasspathElements.size() + resources.size(); i < testResources.size();
+                    i++, j++) {
+                    Resource r = (Resource)testResources.get(i);
+                    runtimeUrls[j] = new File(r.getDirectory()).toURI().toURL();
+                }
+                resourceClassLoader = new URLClassLoader(runtimeUrls, Thread.currentThread()
+                    .getContextClassLoader());
+            } catch (Exception e) {
+                throw new MojoExecutionException(e.getMessage(), e);
+            }
+        }
+        return resourceClassLoader;
+    }
+    
     protected Bus callCodeGenerator(WadlOption option, 
                               Bus bus,
                               Set<URI> classPath) throws MojoExecutionException {
         File outputDirFile = option.getOutputDir();
         outputDirFile.mkdirs();
         URI basedir = project.getBasedir().toURI();
-        URI wadlURI = option.getWadlURI(basedir);
-        File doneFile = getDoneFile(basedir, wadlURI);
-
-        if (!shouldRun(option, doneFile, wadlURI)) {
-            return bus;
-        }
-        doneFile.delete();
-
-        List<String> list = option.generateCommandLine(outputDirFile, basedir, wadlURI, getLog()
-                                                           .isDebugEnabled());
-        String[] args = list.toArray(new String[list.size()]);
-        getLog().debug("Calling wadl2java with args: " + Arrays.toString(args));
         
-        if (!"false".equals(fork)) {
-            Set<URI> artifactsPath = new LinkedHashSet<URI>();
-            for (Artifact a : pluginArtifacts) {
-                File file = a.getFile();
-                if (file == null) {
-                    throw new MojoExecutionException("Unable to find file for artifact "
-                                                     + a.getGroupId() + ":" + a.getArtifactId()
-                                                     + ":" + a.getVersion());
-                }
-                artifactsPath.add(file.toURI());
+        for (URI wadlURI : option.getWadlURIs(basedir, getResourceLoader())) {
+            File doneFile = getDoneFile(basedir, wadlURI);
+    
+            if (!shouldRun(option, doneFile, wadlURI)) {
+                return bus;
             }
-            addPluginArtifact(artifactsPath);
-            artifactsPath.addAll(classPath);
+            doneFile.delete();
+    
+            List<String> list = option.generateCommandLine(outputDirFile, basedir, wadlURI, getLog()
+                                                               .isDebugEnabled());
+            String[] args = list.toArray(new String[list.size()]);
+            getLog().debug("Calling wadl2java with args: " + Arrays.toString(args));
             
-            runForked(artifactsPath, WADLToJava.class, args);
-
-        } else {
-            if (bus == null) {
-                bus = BusFactory.newInstance().createBus();
-                BusFactory.setThreadDefaultBus(bus);
+            if (!"false".equals(fork)) {
+                Set<URI> artifactsPath = new LinkedHashSet<URI>();
+                for (Artifact a : pluginArtifacts) {
+                    File file = a.getFile();
+                    if (file == null) {
+                        throw new MojoExecutionException("Unable to find file for artifact "
+                                                         + a.getGroupId() + ":" + a.getArtifactId()
+                                                         + ":" + a.getVersion());
+                    }
+                    artifactsPath.add(file.toURI());
+                }
+                addPluginArtifact(artifactsPath);
+                artifactsPath.addAll(classPath);
+                
+                runForked(artifactsPath, WADLToJava.class, args);
+    
+            } else {
+                if (bus == null) {
+                    bus = BusFactory.newInstance().createBus();
+                    BusFactory.setThreadDefaultBus(bus);
+                }
+                try {
+                    new WADLToJava(args).run(new ToolContext());
+                } catch (Throwable e) {
+                    getLog().debug(e);
+                    throw new MojoExecutionException(e.getMessage(), e);
+                }  
             }
+            
+    
             try {
-                new WADLToJava(args).run(new ToolContext());
+                doneFile.createNewFile();
             } catch (Throwable e) {
+                getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
                 getLog().debug(e);
-                throw new MojoExecutionException(e.getMessage(), e);
-            }  
-        }
-        
-
-        try {
-            doneFile.createNewFile();
-        } catch (Throwable e) {
-            getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
-            getLog().debug(e);
+            }
         }
         return bus;
     }
@@ -481,7 +518,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     }
 
     private void runForked(Set<URI> classPath, Class<?> cls, String[] args) throws MojoExecutionException {
-        getLog().info("Running wsdl2java in fork mode...");
+        getLog().info("Running wadl2java in fork mode...");
 
         Commandline cmd = new Commandline();
         cmd.getShell().setQuotedArgumentsEnabled(true); // for JVM args
@@ -565,7 +602,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         if (file != null) {
             file.delete();
         }
-        if (StringUtils.isNotEmpty(err.getOutput()) && err.getOutput().contains("WSDL2Java Error")) {
+        if (StringUtils.isNotEmpty(err.getOutput()) && err.getOutput().contains("WADL2Java Error")) {
             StringBuffer msg = new StringBuffer();
             msg.append(err.getOutput());
             msg.append('\n');
@@ -575,15 +612,15 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
     }
 
-    private File getDoneFile(URI basedir, URI wsdlURI) {
-        String doneFileName = wsdlURI.toString();
+    private File getDoneFile(URI basedir, URI wadlURI) {
+        String doneFileName = wadlURI.toString();
         
         // Strip the basedir from the doneFileName
         if (doneFileName.startsWith(basedir.toString())) {
             doneFileName = doneFileName.substring(basedir.toString().length());
         }
 
-        // If URL to WSDL, replace ? and & since they're invalid chars for file names
+        // If URL to WADL, replace ? and & since they're invalid chars for file names
         // Not to mention slashes.
         doneFileName = doneFileName.replace('?', '_').replace('&', '_').replace('/', '_').replace('\\', '_')
             .replace(':', '_');
@@ -592,20 +629,20 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     }
 
     /**
-     * Determine if code should be generated from the given wsdl
+     * Determine if code should be generated from the given wadl
      * 
-     * @param wsdlOption
+     * @param wadlOption
      * @param doneFile
-     * @param wsdlURI
+     * @param wadlURI
      * @return
      */
-    private boolean shouldRun(WadlOption wsdlOption, File doneFile, URI wsdlURI) {
+    private boolean shouldRun(WadlOption wadlOption, File doneFile, URI wadlURI) {
         long timestamp = 0;
-        if ("file".equals(wsdlURI.getScheme())) {
-            timestamp = new File(wsdlURI).lastModified();
+        if ("file".equals(wadlURI.getScheme())) {
+            timestamp = new File(wadlURI).lastModified();
         } else {
             try {
-                timestamp = wsdlURI.toURL().openConnection().getDate();
+                timestamp = wadlURI.toURL().openConnection().getDate();
             } catch (Exception e) {
                 // ignore
             }
@@ -616,7 +653,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         } else if (timestamp > doneFile.lastModified()) {
             doWork = true;
         } else {
-            File files[] = wsdlOption.getDependencies();
+            File files[] = wadlOption.getDependencies();
             if (files != null) {
                 for (int z = 0; z < files.length; ++z) {
                     if (files[z].lastModified() > doneFile.lastModified()) {

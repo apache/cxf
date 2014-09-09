@@ -70,11 +70,10 @@ class SpringClasspathScanner extends ClasspathScanner {
         }
         
         for (final String basePackage: basePackages) {
-            final boolean scanAllPackages = basePackage.equals(ALL_PACKAGES);
-            
+            final boolean scanAllPackages = basePackage.equals(WILDCARD);
             final String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX 
-                + (scanAllPackages ? "" : ClassUtils.convertClassNameToResourcePath(basePackage)) 
-                + ALL_CLASS_FILES;
+                + (scanAllPackages ? "" : basePackage.contains(WILDCARD) ? basePackage 
+                    : ClassUtils.convertClassNameToResourcePath(basePackage)) + ALL_CLASS_FILES;
             
             final Resource[] resources = resolver.getResources(packageSearchPath);    
             
@@ -136,7 +135,7 @@ class SpringClasspathScanner extends ClasspathScanner {
         ResourcePatternResolver resolver = getResolver(loader);
         
         for (final String basePackage: basePackages) {
-            final boolean scanAllPackages = basePackage.equals(ALL_PACKAGES);
+            final boolean scanAllPackages = basePackage.equals(WILDCARD);
             
             String theBasePackage = basePackage;
             if (theBasePackage.startsWith(CLASSPATH_URL_SCHEME)) {
@@ -144,8 +143,8 @@ class SpringClasspathScanner extends ClasspathScanner {
             }
             
             final String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX 
-                + (scanAllPackages ? "" : ClassUtils.convertClassNameToResourcePath(theBasePackage)) 
-                + ALL_FILES + "." + extension;
+                + (scanAllPackages ? "" : basePackage.contains(WILDCARD) ? basePackage 
+                    : ClassUtils.convertClassNameToResourcePath(theBasePackage)) + ALL_FILES + "." + extension;
             
             final Resource[] resources = resolver.getResources(packageSearchPath);                        
             for (final Resource resource: resources) {
