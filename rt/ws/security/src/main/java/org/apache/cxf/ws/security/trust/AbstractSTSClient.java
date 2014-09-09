@@ -58,7 +58,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
-import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
@@ -627,7 +626,6 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         if (client != null) {
             return;
         }
-        bus.getExtension(Configurer.class).configureBean(name, this);
 
         if (wsdlLocation != null) {
             WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlLocation, serviceName);
