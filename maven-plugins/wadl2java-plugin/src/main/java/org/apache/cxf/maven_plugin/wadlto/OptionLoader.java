@@ -85,8 +85,10 @@ public final class OptionLoader {
      * @return list of one WadlOption object for each wadl found
      * @throws MojoExecutionException
      */
-    public static List<WadlOption> loadWadlOptionsFromFile(File wadlBasedir, String includes[],
-                                                            String excludes[], Option defaultOptions,
+    public static List<WadlOption> loadWadlOptionsFromFile(File wadlBasedir, 
+                                                           String includes[],
+                                                            String excludes[], 
+                                                            Option defaultOptions,
                                                             File defaultOutputDir)
         throws MojoExecutionException {
 
@@ -145,7 +147,8 @@ public final class OptionLoader {
     }
 
 
-    protected static WadlOption generateWadlOptionFromFile(final File wadl, final Option defaultOptions,
+    protected static WadlOption generateWadlOptionFromFile(final File wadl, 
+                                                           final Option defaultOptions,
                                                            File defaultOutputDir)
         throws MojoExecutionException {
 
@@ -163,6 +166,11 @@ public final class OptionLoader {
         }
 
         final WadlOption wadlOption = new WadlOption();
+        if (defaultOptions != null) {
+            wadlOption.merge(defaultOptions);
+        }
+        
+        
         final String wadlName = wadlFileName.substring(0, idx);
 
         final String[] options = readOptionsFromFile(wadl.getParentFile(), wadlName);
