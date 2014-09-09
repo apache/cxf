@@ -173,7 +173,19 @@ public class TikaContentExtractor {
             if (context == null) {
                 context = new ParseContext();
             }
-            parser.parse(in, handler, metadata, context);
+            try {
+                parser.parse(in, handler, metadata, context);
+            } catch (Exception ex) {
+                // Starting from Tika 1.6 PDFParser (with other parsers to be updated in the future) will skip 
+                // the content processing if the content handler is null. This can be used to optimize the 
+                // extraction process. If we get an exception with a null handler then a given parser is still 
+                // not ready to accept null handlers so lets retry with IgnoreContentHandler.
+                if (handler == null) {
+                    parser.parse(in, new IgnoreContentHandler(), metadata, context);
+                } else {
+                    throw ex;
+                }
+            }
             return new TikaContent(handler, metadata, mediaType);
         } catch (final IOException ex) {
             LOG.log(Level.WARNING, "Unable to extract media type from input stream", ex);
@@ -187,8 +199,7 @@ public class TikaContentExtractor {
     }
     
     TikaContent extract(final InputStream in, boolean extractContent) {
-        final ToTextContentHandler handler = extractContent 
-            ? new ToTextContentHandler() : new IgnoreContentHandler();
+        final ToTextContentHandler handler = extractContent ? new ToTextContentHandler() : null;
         return extract(in, handler, null);
     }
     
@@ -210,7 +221,7 @@ public class TikaContentExtractor {
          *         to parse the content  
          */
         public String getContent() {
-            return contentHandler.toString();
+            return contentHandler == null ? null : contentHandler.toString();
         }
         /**
          * Return the metadata
