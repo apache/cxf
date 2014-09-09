@@ -30,6 +30,7 @@ import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
+import org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter;
 
 public class Server {
 
@@ -48,6 +49,7 @@ public class Server {
         sf.setProvider(new MultipartProvider());
         sf.setProvider(new SearchContextProvider());
         sf.setProvider(new JsrJsonpProvider());
+        sf.setProvider(new CrossOriginResourceSharingFilter());
         sf.create();
     }
 

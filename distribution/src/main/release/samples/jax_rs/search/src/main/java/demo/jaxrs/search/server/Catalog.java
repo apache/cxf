@@ -62,6 +62,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.ext.search.lucene.LuceneQueryVisitor;
 import org.apache.cxf.jaxrs.ext.search.tika.LuceneDocumentMetadata;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaLuceneContentExtractor;
+import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -84,8 +85,6 @@ import org.apache.tika.parser.pdf.PDFParser;
 
 @Path("/catalog")
 public class Catalog {
-    private static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER = "Access-Control-Allow-Origin";
-    
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());    
     private final Directory directory = new RAMDirectory();
     private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);    
@@ -101,6 +100,7 @@ public class Catalog {
     }
     
     @POST
+    @CrossOriginResourceSharing(allowAllOrigins = true)
     @Consumes("multipart/form-data")
     public void addBook(@Suspended final AsyncResponse response, @Context final UriInfo uri, 
             final MultipartBody body)  {
@@ -119,29 +119,26 @@ public class Catalog {
                         
                         try {
                             if (exists(source)) {
-                                response.resume(Response.status(Status.CONFLICT)
-                                        .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build());
+                                response.resume(Response.status(Status.CONFLICT).build());
                                 return;
                             }
 
                             final byte[] content = IOUtils.readBytesFromStream(handler.getInputStream());
                             storeAndIndex(metadata, content);
                         } catch (final Exception ex) {
-                            response.resume(Response.serverError()
-                                    .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build());  
+                            response.resume(Response.serverError().build());  
                         } 
                         
                         if (response.isSuspended()) {
                             response.resume(Response
                                     .created(uri.getRequestUriBuilder().path(source).build())
-                                    .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build());
+                                    .build());
                         }
                     }                       
                 }              
                 
                 if (response.isSuspended()) {
-                    response.resume(Response.status(Status.BAD_REQUEST)
-                            .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build());
+                    response.resume(Response.status(Status.BAD_REQUEST).build());
                 }
             }
         });
@@ -176,6 +173,7 @@ public class Catalog {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @CrossOriginResourceSharing(allowAllOrigins = true)
     @Path("/search")
     public Response findBook(@Context SearchContext searchContext, 
             @Context final UriInfo uri) throws IOException {
@@ -209,7 +207,7 @@ public class Catalog {
                 }
             }
             
-            return Response.ok(builder.build()).header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*").build();
+            return Response.ok(builder.build()).build();
         } finally {
             reader.close();
         }
