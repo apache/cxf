@@ -14,14 +14,18 @@
 
 <body>
 	<div class="container">
+		<div class="fluent-container" id="error">
+			<div class="alert alert-danger hide" role="alert" id="error-message"></div>	    	
+	    </div>
+	
 	    <form id="form" class="form-upload" role="form" enctype="multipart/form-data" method="post" action="http://localhost:9000/catalog">
             <h2 class="form-upload-heading">Please select a PDF file</h2>
             <div class="form-group">
-                <input id="file" name="file" type="file" multiple=true class="file"></button>
+                <input id="file" name="file" type="file" multiple="true" class="file"></input>
             </div>
         </form>
         
-        <form id="from-search" role="search" method="get" action="http://localhost:9000/catalog/search">
+        <form id="form-search" role="search" method="get" action="http://localhost:9000/catalog/search">
             <h2 class="form-upload-heading">Query the Catalog</h2>
 		    <div class="input-group add-on">
 		        <input id="search-query" type="text" class="form-control" placeholder="Search">		    
@@ -36,8 +40,25 @@
     </div> <!-- /container -->
     
     <script type="text/javascript">
+        function handleError(request, status, error, form) {
+			$( "#error-message" ).removeClass('hide');
+			
+			if ( request.status === undefined || request.status === 0 ) {
+				$( "#error-message" ).html( "Unable to send request to the server: " + $(form).attr("action") );
+			} else {
+				if( request.status == 500 ) {
+					$( "#error-message" ).html( 'Internal server error.' );
+				} else if( request.status == 409 ) {
+					$( "#error-message" ).html( 'Document with such name already exists.' );
+				} else if( request.status == 400 ) {
+					$( "#error-message" ).html( 'No documents for upload, please select at least one.' );
+				}
+			}
+        };
+    
     	$( "#form" ).submit(function(e) {    		
-    		var formData = new FormData($(this)[0]);
+    		var formData = new FormData( $(this)[0] );
+    		$( "#error-message" ).addClass('hide');    		
 
     		$.ajax({
     			url:$(this).attr("action"),
@@ -46,6 +67,9 @@
     			async: false,
     			success: function (data) {
     			    $('#file').fileinput('clear');
+    			},
+    			error: function (request, status, error) {
+    				handleError(request, status, error, "#form");
     			},
 	    		cache: false,
     			contentType: false,
@@ -56,8 +80,9 @@
 	        return false;
 	    });
     	
-    	$( "#from-search" ).submit(function(e) {    		
+    	$( "#form-search" ).submit(function(e) {    		
     		var query = $( "#search-query" ).val();
+    		$( "#error-message" ).addClass('hide');
     		$( "#results" ).html("");
     		
     		if( query !== "" ) {
@@ -80,7 +105,7 @@
 	    				$.each(data, function (index, value) {
 	    					table += "\
 	    					<tr>\
-	    		               <td>" + value.source + "</td>\
+	    		                <td>" + value.source + "</td>\
 	    		                <td>" + value.score + "</td>\
 	    		                <td><a href='" + value.url + "'>Open</a></td>\
 	    		            </tr>";
@@ -92,6 +117,9 @@
 	    	    		
 	    				$( "#results" ).html(table);
 	    		
+	    			},
+	    			error: function (request, status, error) {
+	    				handleError(request, status, error, "#form-search");
 	    			},
 		    		cache: false,
 	    			contentType: false,
