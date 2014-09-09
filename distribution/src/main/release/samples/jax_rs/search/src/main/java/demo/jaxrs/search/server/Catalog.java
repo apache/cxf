@@ -135,8 +135,7 @@ public class Catalog {
                         } 
                         
                         if (response.isSuspended()) {
-                            response.resume(Response
-                                    .created(uri.getRequestUriBuilder().path(source).build())
+                            response.resume(Response.created(uri.getRequestUriBuilder().path(source).build())
                                     .build());
                         }
                     }                       
