@@ -116,6 +116,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     private TypeConverter typeConverter;
     private boolean attributesToElements;
     private boolean writeNullAsString = true;
+    private boolean escapeForwardSlashesAlways;
     
     @Override
     public void setAttributesToElements(boolean value) {
@@ -544,6 +545,10 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             config.setIgnoreEmptyArrayValues(ignoreEmpty);
         }
         
+        if (escapeForwardSlashesAlways) {
+            config.setEscapeForwardSlashAlways(escapeForwardSlashesAlways);
+        }
+        
         
         boolean dropRootInJsonStream = dropRootNeeded && !dropElementsInXmlStreamProp;
         if (dropRootInJsonStream) {
@@ -676,5 +681,9 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             }
         }
         return null;
+    }
+
+    public void setEscapeForwardSlashesAlways(boolean escape) {
+        this.escapeForwardSlashesAlways = escape;
     }
 }
