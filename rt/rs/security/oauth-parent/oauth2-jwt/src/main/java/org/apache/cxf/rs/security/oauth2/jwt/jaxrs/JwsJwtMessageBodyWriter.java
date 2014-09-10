@@ -29,6 +29,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.rs.security.oauth2.jws.JwsJwtCompactProducer;
+import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtConstants;
+import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtToken;
 
 public class JwsJwtMessageBodyWriter  extends AbstractJwsWriterProvider 
@@ -49,6 +52,9 @@ public class JwsJwtMessageBodyWriter  extends AbstractJwsWriterProvider
                         MultivaluedMap<String, Object> headers, OutputStream os) throws IOException,
         WebApplicationException {
         JwsJwtCompactProducer p = new JwsJwtCompactProducer(token);
-        writeJws(p, os);
+        JwtHeaders jwtHeaders = new JwtHeaders();
+        JwsSignatureProvider sigProvider = getInitializedSigProvider(jwtHeaders);
+        jwtHeaders.setContentType(JwtConstants.TYPE_JWT);
+        writeJws(p, sigProvider, os);
     }
 }

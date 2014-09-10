@@ -177,5 +177,19 @@ public enum Algorithm {
         }
         return javaName;
     }
-    
+    public static boolean isAesKeyWrap(String algo) {
+        return JwtConstants.A128KW_ALGO.equals(algo)
+               || JwtConstants.A192KW_ALGO.equals(algo)
+               || JwtConstants.A256KW_ALGO.equals(algo);
+    }
+    public static boolean isAesGcmKeyWrap(String algo) {
+        return JwtConstants.A128GCM_ALGO.equals(algo)
+               || JwtConstants.A192GCMKW_ALGO.equals(algo)
+               || JwtConstants.A256GCMKW_ALGO.equals(algo);
+    }
+    public static boolean isHmacSign(String algo) {
+        return JwtConstants.HMAC_SHA_256_ALGO.equals(algo)
+            || JwtConstants.HMAC_SHA_384_ALGO.equals(algo)
+            || JwtConstants.HMAC_SHA_512_ALGO.equals(algo); 
+    }
 }

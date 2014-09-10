@@ -32,6 +32,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jws.JwsOutputStream;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignature;
+import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.jwt.JwtTokenReaderWriter;
@@ -45,20 +46,14 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     private JwtHeadersWriter writer = new JwtTokenReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
+        //ctx.setMediaType(JAXRSUtils.toMediaType(JwtConstants.MEDIA_TYPE_JOSE_JSON));
+        JwtHeaders headers = new JwtHeaders();
+        JwsSignatureProvider sigProvider = getInitializedSigProvider(headers);
+        setContentTypeIfNeeded(headers, ctx);
+        
         OutputStream actualOs = ctx.getOutputStream();
-        String ctString = null;
-        if (contentTypeRequired) {
-            MediaType mt = ctx.getMediaType();
-            if (mt != null) {
-                ctString = JAXRSUtils.mediaTypeToString(mt);
-            }
-        }
         if (useJwsOutputStream) {
-            JwtHeaders headers = new JwtHeaders();
-            JwsSignature jwsSignature = getInitializedSigProvider().createJwsSignature(headers);
-            if (ctString != null) {
-                headers.setContentType(ctString);
-            }
+            JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
             JwsOutputStream jwsStream = new JwsOutputStream(actualOs, jwsSignature);
             byte[] headerBytes = writer.headersToJson(headers).getBytes("UTF-8");
             Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
@@ -73,15 +68,11 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             CachedOutputStream cos = new CachedOutputStream(); 
             ctx.setOutputStream(cos);
             ctx.proceed();
-            
-            JwtHeaders headers = new JwtHeaders();
-            if (ctString != null) {
-                headers.setContentType(ctString);
-            }
             JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), "UTF-8"));
-            writeJws(p, actualOs);
+            writeJws(p, sigProvider, actualOs);
         }
     }
+    
     public void setContentTypeRequired(boolean contentTypeRequired) {
         this.contentTypeRequired = contentTypeRequired;
     }
@@ -92,5 +83,12 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     public void setWriter(JwtHeadersWriter writer) {
         this.writer = writer;
     }
-        
+    private void setContentTypeIfNeeded(JwtHeaders headers, WriterInterceptorContext ctx) {    
+        if (contentTypeRequired) {
+            MediaType mt = ctx.getMediaType();
+            if (mt != null) {
+                headers.setContentType(JAXRSUtils.mediaTypeToString(mt));
+            }
+        }
+    }
 }

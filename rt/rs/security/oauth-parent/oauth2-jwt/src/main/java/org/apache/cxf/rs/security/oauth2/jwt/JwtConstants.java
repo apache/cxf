@@ -41,6 +41,7 @@ public final class JwtConstants {
     public static final String TYPE_JWT = "JWT";
     public static final String TYPE_JOSE = "JOSE";
     public static final String TYPE_JOSE_JSON = "JOSE+JSON";
+    public static final String MEDIA_TYPE_JOSE_JSON = "application/jose+json";
     
     public static final String CLAIM_ISSUER = "iss";
     public static final String CLAIM_SUBJECT = "sub";

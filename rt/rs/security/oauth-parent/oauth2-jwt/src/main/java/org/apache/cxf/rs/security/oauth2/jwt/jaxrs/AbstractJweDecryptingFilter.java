@@ -31,6 +31,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.oauth2.jwe.AesGcmWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.JweCryptoProperties;
 import org.apache.cxf.rs.security.oauth2.jwe.JweDecryptionOutput;
@@ -85,18 +86,21 @@ public class AbstractJweDecryptingFilter {
                     keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(jwk.toRSAPrivateKey());
                 } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
                     SecretKey key = jwk.toSecretKey();
-                    // TODO: Introduce an algo family check
-                    if (Algorithm.A128KW.getJwtName().equals(jwk.getAlgorithm())) {
+                    if (Algorithm.isAesKeyWrap(jwk.getAlgorithm())) {
                         keyDecryptionProvider = new AesWrapKeyDecryptionAlgorithm(key);
-                    }
+                    } else if (Algorithm.isAesGcmKeyWrap(jwk.getAlgorithm())) {
+                        keyDecryptionProvider = new AesGcmWrapKeyDecryptionAlgorithm(key);
+                    } 
                     // etc
                 } else {
                     // TODO: support elliptic curve keys
-                    throw new SecurityException();
                 }
             } else {
                 keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(
                     (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER));
+            }
+            if (keyDecryptionProvider == null) {
+                throw new SecurityException();
             }
             return new WrappedKeyJweDecryption(keyDecryptionProvider, cryptoProperties, null);
         } catch (SecurityException ex) {
