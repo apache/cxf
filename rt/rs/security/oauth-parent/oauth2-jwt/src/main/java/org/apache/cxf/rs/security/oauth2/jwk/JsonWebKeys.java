@@ -83,14 +83,35 @@ public class JsonWebKeys extends AbstractJwtObject {
         }
         Map<String, List<JsonWebKey>> map = new LinkedHashMap<String, List<JsonWebKey>>();
         for (JsonWebKey key : keys) {
-            String keyType = (String)key.getProperty(propertyName);
-            if (keyType != null) {
-                List<JsonWebKey> list = map.get(keyType);
+            String propValue = (String)key.getProperty(propertyName);
+            if (propValue != null) {
+                List<JsonWebKey> list = map.get(propValue);
                 if (list == null) {
                     list = new LinkedList<JsonWebKey>();
-                    map.put(keyType, list);
+                    map.put(propValue, list);
                 }
                 list.add(key);
+            }
+        }
+        return map;
+    }
+    public Map<String, List<JsonWebKey>> getKeyOperationMap() {
+        List<JsonWebKey> keys = getKeys();
+        if (keys == null) {
+            return Collections.emptyMap();
+        }
+        Map<String, List<JsonWebKey>> map = new LinkedHashMap<String, List<JsonWebKey>>();
+        for (JsonWebKey key : keys) {
+            List<String> ops = key.getKeyOperation();
+            if (ops != null) {
+                for (String op : ops) {
+                    List<JsonWebKey> list = map.get(op);
+                    if (list == null) {
+                        list = new LinkedList<JsonWebKey>();
+                        map.put(op, list);
+                    }
+                    list.add(key);
+                }
             }
         }
         return map;

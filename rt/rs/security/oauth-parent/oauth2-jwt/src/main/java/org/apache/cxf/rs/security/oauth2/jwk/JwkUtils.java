@@ -36,9 +36,9 @@ public final class JwkUtils {
         
     }
     public static JsonWebKeys loadPersistJwkSet(Message m, Properties props) {
-        return loadPersistJwkSet(m, props, new DefaultJwkSetReaderWriter());
+        return loadPersistJwkSet(m, props, new DefaultJwkReaderWriter());
     }
-    public static JsonWebKeys loadPersistJwkSet(Message m, Properties props, JwkSetReaderWriter reader) {
+    public static JsonWebKeys loadPersistJwkSet(Message m, Properties props, JwkReaderWriter reader) {
         JsonWebKeys jwkSet = (JsonWebKeys)m.getExchange().get(props.get(CryptoUtils.RSSEC_KEY_STORE_FILE));
         if (jwkSet == null) {
             jwkSet = loadJwkSet(props, m.getExchange().getBus(), reader);
@@ -47,9 +47,9 @@ public final class JwkUtils {
         return jwkSet;
     }
     public static JsonWebKeys loadJwkSet(Properties props, Bus bus) {
-        return loadJwkSet(props, bus, new DefaultJwkSetReaderWriter());
+        return loadJwkSet(props, bus, new DefaultJwkReaderWriter());
     }
-    public static JsonWebKeys loadJwkSet(Properties props, Bus bus, JwkSetReaderWriter reader) {
+    public static JsonWebKeys loadJwkSet(Properties props, Bus bus, JwkReaderWriter reader) {
         String keyStoreLoc = props.getProperty(CryptoUtils.RSSEC_KEY_STORE_FILE);
         try {
             InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
