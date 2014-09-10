@@ -131,7 +131,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
             String keyEncryptionAlgo = null;
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
-                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props);
+                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
                 keyEncryptionAlgo = jwk.getAlgorithm();
                 // TODO: Put it into some factory code
                 if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {

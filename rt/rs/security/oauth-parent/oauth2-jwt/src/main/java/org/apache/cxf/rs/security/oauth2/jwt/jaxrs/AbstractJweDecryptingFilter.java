@@ -81,7 +81,7 @@ public class AbstractJweDecryptingFilter {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 //TODO: Private JWK sets can be JWE encrypted
-                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props);
+                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
                 if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
                     keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(jwk.toRSAPrivateKey());
                 } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
