@@ -761,6 +761,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         final List<Integer> actions = new ArrayList<Integer>(2);
         actions.add(WSConstants.SIGN);
         actions.add(WSConstants.UT_SIGN);
+        actions.add(WSConstants.ST_SIGNED);
         List<WSSecurityEngineResult> signedResults = 
             WSSecurityUtil.fetchAllActionResults(results, actions);
         for (WSSecurityEngineResult result : signedResults) {
