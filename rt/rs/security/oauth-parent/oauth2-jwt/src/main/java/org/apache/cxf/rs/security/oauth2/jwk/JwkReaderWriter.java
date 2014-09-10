@@ -19,7 +19,9 @@
 package org.apache.cxf.rs.security.oauth2.jwk;
 
 
-public interface JwkSetReaderWriter {
+public interface JwkReaderWriter {
+    String jwkToJson(JsonWebKey jwk);
+    JsonWebKey jsonToJwk(String jwkJson);
     String jwkSetToJson(JsonWebKeys jwkSet);
     JsonWebKeys jsonToJwkSet(String jwkSetJson);
 }

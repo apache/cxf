@@ -165,7 +165,7 @@ public class JsonWebKeyTest extends Assert {
     public JsonWebKeys readKeySet(String fileName) throws Exception {
         InputStream is = JsonWebKeyTest.class.getResourceAsStream(fileName);
         String s = IOUtils.readStringFromStream(is);
-        JwkSetReaderWriter reader = new DefaultJwkSetReaderWriter();
+        JwkReaderWriter reader = new DefaultJwkReaderWriter();
         return reader.jsonToJwkSet(s);
     }
 }

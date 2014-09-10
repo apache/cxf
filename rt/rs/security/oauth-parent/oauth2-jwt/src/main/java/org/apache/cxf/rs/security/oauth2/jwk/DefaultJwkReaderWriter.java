@@ -23,8 +23,8 @@ import org.apache.cxf.rs.security.oauth2.jwt.AbstractJwtObjectReaderWriter;
 
 
 
-public class DefaultJwkSetReaderWriter extends AbstractJwtObjectReaderWriter
-    implements JwkSetReaderWriter {
+public class DefaultJwkReaderWriter extends AbstractJwtObjectReaderWriter
+    implements JwkReaderWriter {
     @Override
     public String jwkSetToJson(JsonWebKeys jwks) {
         return toJson(jwks);
@@ -34,5 +34,15 @@ public class DefaultJwkSetReaderWriter extends AbstractJwtObjectReaderWriter
         JsonWebKeys jwks = new JsonWebKeys();
         fromJsonInternal(jwks, jwksJson);
         return jwks;
+    }
+    @Override
+    public String jwkToJson(JsonWebKey jwk) {
+        return toJson(jwk);
+    }
+    @Override
+    public JsonWebKey jsonToJwk(String jwkJson) {
+        JsonWebKey jwk = new JsonWebKey();
+        fromJsonInternal(jwk, jwkJson);
+        return jwk;
     }
 }
