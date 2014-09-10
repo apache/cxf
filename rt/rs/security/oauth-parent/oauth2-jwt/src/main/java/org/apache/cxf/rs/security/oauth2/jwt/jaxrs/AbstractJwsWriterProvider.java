@@ -66,7 +66,7 @@ public class AbstractJwsWriterProvider {
             String rsaSignatureAlgo = null;
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 //TODO: Private JWK sets can be JWE encrypted
-                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props);
+                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_SIGN);
                 rsaSignatureAlgo = jwk.getAlgorithm();
                 if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
                     theSigProvider = new PrivateKeyJwsSignatureProvider(jwk.toRSAPrivateKey());

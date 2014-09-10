@@ -19,8 +19,6 @@
 package org.apache.cxf.rs.security.oauth2.jwk;
 
 import java.io.InputStream;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.Properties;
 
@@ -58,27 +56,34 @@ public final class JwkUtils {
             throw new SecurityException(ex);
         }
     }
-    public static RSAPublicKey loadPublicKey(Message m, Properties props) {
-        JsonWebKey jwkKey = loadJsonWebKey(m, props);
-        return jwkKey != null ? jwkKey.toRSAPublicKey() : null;
-    }
-    public static RSAPrivateKey loadPrivateKey(Message m, Properties props) {
-        JsonWebKey jwkKey = loadJsonWebKey(m, props);
-        return jwkKey != null ? jwkKey.toRSAPrivateKey() : null;
-    }
     public static JsonWebKey loadJsonWebKey(Message m, Properties props) {
-        JsonWebKeys jwkSet = loadPersistJwkSet(m, props);
-        JsonWebKey jwkKey = null;
-        String kid = props.getProperty(CryptoUtils.RSSEC_KEY_STORE_ALIAS);
-        if (kid == null) {
-            List<JsonWebKey> keys = jwkSet.getRsaKeys();
-            if (keys != null && keys.size() == 1) {
-                jwkKey = keys.get(0);
-            }
-        } else {
-            jwkKey = jwkSet.getKey(kid);
-        }
-        
-        return jwkKey;
+        return loadJsonWebKey(m, props, null);
     }
+    public static JsonWebKey loadJsonWebKey(Message m, Properties props,
+                                            String keyOper) {
+        JsonWebKeys jwkSet = loadPersistJwkSet(m, props);
+        String kid = props.getProperty(CryptoUtils.RSSEC_KEY_STORE_ALIAS);
+        if (kid == null && keyOper != null) {
+            String keyIdProp = null;
+            if (keyOper.equals(JsonWebKey.KEY_OPER_ENCRYPT)) {
+                keyIdProp = CryptoUtils.RSSEC_KEY_STORE_ALIAS + ".jwe";
+            } else if (keyOper.equals(JsonWebKey.KEY_OPER_SIGN)
+                       || keyOper.equals(JsonWebKey.KEY_OPER_VERIFY)) {
+                keyIdProp = CryptoUtils.RSSEC_KEY_STORE_ALIAS + ".jws";
+            }
+            if (keyIdProp != null) {
+                kid = props.getProperty(keyIdProp);
+            }
+        }
+        if (kid != null) {
+            return jwkSet.getKey(kid);
+        } else if (keyOper != null) {
+            List<JsonWebKey> keys = jwkSet.getKeyUseMap().get(keyOper);
+            if (keys != null && keys.size() == 1) {
+                return keys.get(0);
+            }
+        }
+        return null;
+    }
+    
 }

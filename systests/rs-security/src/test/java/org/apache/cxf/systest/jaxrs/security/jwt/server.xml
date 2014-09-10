@@ -153,7 +153,7 @@ under the License.
             <ref bean="jwsOutFilter"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jws.properties"/>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jweaescbchmac">

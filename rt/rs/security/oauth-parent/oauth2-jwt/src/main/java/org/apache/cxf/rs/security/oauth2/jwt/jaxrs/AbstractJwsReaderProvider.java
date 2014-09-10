@@ -71,7 +71,7 @@ public class AbstractJwsReaderProvider {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             JwsSignatureVerifier theVerifier = null;
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
-                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props);
+                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_VERIFY);
                 if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
                     theVerifier = new PublicKeyJwsSignatureVerifier(jwk.toRSAPublicKey());
                 } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType()) 
