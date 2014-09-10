@@ -28,9 +28,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.oauth2.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.oauth2.jwk.JwkUtils;
+import org.apache.cxf.rs.security.oauth2.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProperties;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.jws.PublicKeyJwsSignatureVerifier;
+import org.apache.cxf.rs.security.oauth2.jwt.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJwsReaderProvider {
@@ -66,15 +68,25 @@ public class AbstractJwsReaderProvider {
         }
         Bus bus = m.getExchange().getBus();
         try {
-            RSAPublicKey pk = null;
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            JwsSignatureVerifier theVerifier = null;
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props);
-                pk = jwk.toRSAPublicKey();
+                if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
+                    theVerifier = new PublicKeyJwsSignatureVerifier(jwk.toRSAPublicKey());
+                } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType()) 
+                    && Algorithm.isHmacSign(jwk.getAlgorithm())) {
+                    theVerifier = 
+                        new HmacJwsSignatureProvider((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
+                } else {
+                    // TODO: support elliptic curve keys
+                }
+                
             } else {
-                pk = (RSAPublicKey)CryptoUtils.loadPublicKey(m, props);
+                theVerifier = new PublicKeyJwsSignatureVerifier(
+                                  (RSAPublicKey)CryptoUtils.loadPublicKey(m, props));
             }
-            return new PublicKeyJwsSignatureVerifier(pk);
+            return theVerifier;
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {

@@ -195,4 +195,5 @@ public class JsonWebKey extends AbstractJwtObject {
                                                Algorithm.toJavaName(getAlgorithm()));
     }
     
+    
 }

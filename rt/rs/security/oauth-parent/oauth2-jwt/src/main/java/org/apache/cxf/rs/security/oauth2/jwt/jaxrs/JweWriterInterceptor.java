@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.oauth2.jwe.AesGcmWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jwe.JweEncryptionProvider;
@@ -68,6 +69,9 @@ public class JweWriterInterceptor implements WriterInterceptor {
     private JwtHeadersWriter writer = new JwtTokenReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
+        
+        //ctx.setMediaType(JAXRSUtils.toMediaType(JwtConstants.MEDIA_TYPE_JOSE_JSON));
+        
         OutputStream actualOs = ctx.getOutputStream();
         
         JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
@@ -134,19 +138,21 @@ public class JweWriterInterceptor implements WriterInterceptor {
                     keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(jwk.toRSAPublicKey());
                 } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
                     SecretKey key = jwk.toSecretKey();
-                    // TODO: Introduce an algo family check
-                    if (Algorithm.A128KW.getJwtName().equals(keyEncryptionAlgo)) {
+                    if (Algorithm.isAesKeyWrap(keyEncryptionAlgo)) {
                         keyEncryptionProvider = new AesWrapKeyEncryptionAlgorithm(key, keyEncryptionAlgo);
+                    } else if (Algorithm.isAesGcmKeyWrap(keyEncryptionAlgo)) {
+                        keyEncryptionProvider = new AesGcmWrapKeyEncryptionAlgorithm(key, keyEncryptionAlgo);
                     }
-                    // etc
                 } else {
                     // TODO: support elliptic curve keys
-                    throw new SecurityException();
                 }
                 
             } else {
                 keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(
                     (RSAPublicKey)CryptoUtils.loadPublicKey(m, props));
+            }
+            if (keyEncryptionProvider == null) {
+                throw new SecurityException();
             }
             if (keyEncryptionAlgo == null) {
                 keyEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP);
