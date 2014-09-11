@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +71,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
     protected List<Object> entityProviders = new LinkedList<Object>();
+    private Comparator<?> providerComparator;
     
     protected AbstractJAXRSFactoryBean(JAXRSServiceFactoryBean serviceFactory) {
         this.serviceFactory = serviceFactory;
@@ -318,6 +320,9 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     }
     
     protected void setupFactory(ProviderFactory factory, Endpoint ep) { 
+        if (providerComparator != null) {
+            factory.setProviderComparator(providerComparator);
+        }
         if (entityProviders != null) {
             factory.setUserProviders(entityProviders); 
         }
@@ -420,6 +425,10 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (resources != null) {
             serviceFactory.setUserResourcesWithServiceClass(resources, sClasses);
         }
+    }
+
+    public void setProviderComparator(Comparator<?> providerComparator) {
+        this.providerComparator = providerComparator;
     }
     
     

@@ -116,6 +116,7 @@ public abstract class ProviderFactory {
     private Bus bus;
     
     private ProviderFactory baseFactory;
+    private Comparator<?> providerComparator;
     
     protected ProviderFactory(ProviderFactory baseFactory, Bus bus) {
         this.baseFactory = baseFactory;
@@ -595,11 +596,26 @@ public abstract class ProviderFactory {
      * x/y;q=1.0 < x/y;q=0.7.
      */    
     private void sortReaders() {
-        Collections.sort(messageReaders, new MessageBodyReaderComparator());
+        if (providerComparator == null) {
+            Collections.sort(messageReaders, new MessageBodyReaderComparator());
+        } else {
+            doCustomSort(messageReaders);
+        }
+    }
+    private <T> void sortWriters() {
+        if (providerComparator == null) {
+            Collections.sort(messageWriters, new MessageBodyWriterComparator());
+        } else {
+            doCustomSort(messageWriters);
+        }
     }
     
-    private void sortWriters() {
-        Collections.sort(messageWriters, new MessageBodyWriterComparator());
+    private <T> void doCustomSort(List<?> listOfProviders) {
+        @SuppressWarnings("unchecked")
+        List<T> theProviders = (List<T>)messageReaders;
+        @SuppressWarnings("unchecked")
+        Comparator<? super T> theComparator = (Comparator<? super T>)providerComparator;
+        Collections.sort((List<T>)theProviders, theComparator);
     }
     
     private void sortContextResolvers() {
@@ -1242,5 +1258,13 @@ public abstract class ProviderFactory {
             }
         }
         return null;
+    }
+
+    public Comparator<?> getProviderComparator() {
+        return providerComparator;
+    }
+
+    public void setProviderComparator(Comparator<?> providerComparator) {
+        this.providerComparator = providerComparator;
     }
 }
