@@ -14,6 +14,14 @@
           {"kty":"oct",
           "alg":"HS256",
           "k":"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow",
-          "kid":"HMACKey"} 
+          "kid":"HMACKey"},
+          
+          {"kty":"EC",
+          "crv":"P-256",
+          "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+          "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+          "d":"870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
+          "use":"enc",
+          "kid":"ECKey"} 
        ]
      }

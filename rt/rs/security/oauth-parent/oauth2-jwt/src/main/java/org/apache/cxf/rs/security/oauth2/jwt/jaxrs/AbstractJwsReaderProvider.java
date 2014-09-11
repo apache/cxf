@@ -78,8 +78,8 @@ public class AbstractJwsReaderProvider {
                     && Algorithm.isHmacSign(jwk.getAlgorithm())) {
                     theVerifier = 
                         new HmacJwsSignatureProvider((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-                } else {
-                    // TODO: support elliptic curve keys
+                } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
+                    theVerifier = new PublicKeyJwsSignatureVerifier(jwk.toECPublicKey());
                 }
                 
             } else {

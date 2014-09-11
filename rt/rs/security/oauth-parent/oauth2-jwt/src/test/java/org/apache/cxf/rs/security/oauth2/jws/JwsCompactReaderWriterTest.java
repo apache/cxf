@@ -209,10 +209,14 @@ public class JwsCompactReaderWriterTest extends Assert {
         JwtHeaders headers = new JwtHeaders();
         headers.setAlgorithm(Algorithm.SHA256withECDSA.getJwtName());
         JwsCompactProducer jws = initSpecJwtTokenWriter(headers);
-        ECPrivateKey privateKey = CryptoUtils.getECPrivateKey(EC_PRIVATE_KEY_ENCODED);
+        ECPrivateKey privateKey = CryptoUtils.getECPrivateKey(JsonWebKey.EC_CURVE_P256,
+                                                              EC_PRIVATE_KEY_ENCODED);
         jws.signWith(new EcDsaJwsSignatureProvider(privateKey));
         String signedJws = jws.getSignedEncodedJws();
-        ECPublicKey publicKey = CryptoUtils.getECPublicKey(EC_X_POINT_ENCODED, EC_Y_POINT_ENCODED);
+        
+        ECPublicKey publicKey = CryptoUtils.getECPublicKey(JsonWebKey.EC_CURVE_P256,
+                                                           EC_X_POINT_ENCODED, 
+                                                           EC_Y_POINT_ENCODED);
         JwsJwtCompactConsumer jwsConsumer = new JwsJwtCompactConsumer(signedJws);
         assertTrue(jwsConsumer.verifySignatureWith(new PublicKeyJwsSignatureVerifier(publicKey)));
         JwtToken token = jwsConsumer.getJwtToken();
