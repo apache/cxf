@@ -49,6 +49,9 @@ public class SamlCallbackHandler implements CallbackHandler {
     private String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
     private CERT_IDENTIFIER keyInfoIdentifier = CERT_IDENTIFIER.X509_CERT;
     private ConditionsBean conditions;
+    private String cryptoAlias = "alice";
+    private String cryptoPassword = "password";
+    private String cryptoPropertiesFile = "alice.properties";
     
     public SamlCallbackHandler() {
         //
@@ -113,15 +116,32 @@ public class SamlCallbackHandler implements CallbackHandler {
                 attributeBean.setAttributeValues(Collections.singletonList("system-user"));
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+<<<<<<< HEAD
+=======
+                
+                try {
+                    Crypto crypto = CryptoFactory.getInstance(cryptoPropertiesFile);
+                    callback.setIssuerCrypto(crypto);
+                    callback.setIssuerKeyName(cryptoAlias);
+                    callback.setIssuerKeyPassword(cryptoPassword);
+                    callback.setSignAssertion(signAssertion);
+                } catch (WSSecurityException e) {
+                    throw new IOException(e);
+                }
+>>>>>>> a797797... Fixing tests following WSS4J upgrades + adding some SAML Subject Confirmation Method tests
             }
         }
     }
     
     protected KeyInfoBean createKeyInfo() throws Exception {
         Crypto crypto = 
+<<<<<<< HEAD
             CryptoFactory.getInstance("org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+=======
+            CryptoFactory.getInstance(cryptoPropertiesFile);
+>>>>>>> a797797... Fixing tests following WSS4J upgrades + adding some SAML Subject Confirmation Method tests
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("alice");
+        cryptoType.setAlias(cryptoAlias);
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         
         KeyInfoBean keyInfo = new KeyInfoBean();
@@ -141,6 +161,30 @@ public class SamlCallbackHandler implements CallbackHandler {
 
     public void setConditions(ConditionsBean conditions) {
         this.conditions = conditions;
+    }
+
+    public String getCryptoAlias() {
+        return cryptoAlias;
+    }
+
+    public void setCryptoAlias(String cryptoAlias) {
+        this.cryptoAlias = cryptoAlias;
+    }
+
+    public String getCryptoPassword() {
+        return cryptoPassword;
+    }
+
+    public void setCryptoPassword(String cryptoPassword) {
+        this.cryptoPassword = cryptoPassword;
+    }
+
+    public String getCryptoPropertiesFile() {
+        return cryptoPropertiesFile;
+    }
+
+    public void setCryptoPropertiesFile(String cryptoPropertiesFile) {
+        this.cryptoPropertiesFile = cryptoPropertiesFile;
     }
     
 }
