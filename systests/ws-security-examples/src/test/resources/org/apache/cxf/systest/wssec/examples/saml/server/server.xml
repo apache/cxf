@@ -42,6 +42,10 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+    
+    <bean id="allowUnsignedBearerAssertions" class="org.apache.ws.security.validate.SamlAssertionValidator">
+        <property name="requireBearerSignature" value="false" />
+    </bean>
 
     <jaxws:endpoint 
        id="Bearer"
@@ -52,6 +56,7 @@
        implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
        wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
        <jaxws:properties>
+           <entry key="ws-security.saml1.validator" value-ref="allowUnsignedBearerAssertions"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
@@ -131,6 +136,7 @@
            <entry key="ws-security.signature.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+           <entry key="ws-security.saml2.validator" value-ref="allowUnsignedBearerAssertions"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     

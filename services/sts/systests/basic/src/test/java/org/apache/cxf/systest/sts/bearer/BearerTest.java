@@ -24,28 +24,12 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
-<<<<<<< HEAD
-import org.w3c.dom.Element;
-
-=======
->>>>>>> a797797... Fixing tests following WSS4J upgrades + adding some SAML Subject Confirmation Method tests
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-<<<<<<< HEAD
-import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
-
-=======
->>>>>>> a797797... Fixing tests following WSS4J upgrades + adding some SAML Subject Confirmation Method tests
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -116,60 +100,6 @@ public class BearerTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    @org.junit.Test
-<<<<<<< HEAD
-    public void testSAML2UnsignedBearer() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BearerTest.class.getResource("cxf-unsigned-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = BearerTest.class.getResource("DoubleIt.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2BearerPort");
-        DoubleItPortType transportSaml2Port = 
-            service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportSaml2Port, PORT);
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
-        }
-        
-        //
-        // Create a SAML2 Bearer Assertion and add it to the TokenStore so that the
-        // IssuedTokenInterceptorProvider does not invoke on the STS
-        //
-        Client client = ClientProxy.getClient(transportSaml2Port);
-        Endpoint ep = client.getEndpoint();
-        String id = "1234";
-        ep.getEndpointInfo().setProperty(TokenStore.class.getName(), new MemoryTokenStore());
-        ep.getEndpointInfo().setProperty(SecurityConstants.TOKEN_ID, id);
-        TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
-
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(new Saml2CallbackHandler());
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Element assertionElement = assertion.toDOM(db.newDocument());
-        
-        SecurityToken tok = new SecurityToken(id);
-        tok.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-        tok.setToken(assertionElement);
-        store.add(tok);
-        
-        doubleIt(transportSaml2Port, 50);
-        
-        ((java.io.Closeable)transportSaml2Port).close();
-        bus.shutdown(true);
-    }
-    
-    @org.junit.Test
-=======
->>>>>>> a797797... Fixing tests following WSS4J upgrades + adding some SAML Subject Confirmation Method tests
     public void testSAML2BearerNoBinding() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

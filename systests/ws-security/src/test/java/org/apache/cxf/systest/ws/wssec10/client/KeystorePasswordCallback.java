@@ -46,6 +46,8 @@ public class KeystorePasswordCallback implements CallbackHandler {
                 pc.setPassword("password");
             } else if ("bob".equals(pc.getIdentifier())) {
                 pc.setPassword("password");
+            } else if ("morpit".equals(pc.getIdentifier())) {
+                pc.setPassword("password");
             } else {
                 pc.setPassword("abcd!1234");
             }

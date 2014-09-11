@@ -20,8 +20,6 @@
 package org.apache.cxf.systest.ws.saml.subjectconf;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -30,33 +28,22 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for the validation rules associated with various Subject Confirmation
  * methods. 
  */
-@RunWith(value = org.junit.runners.Parameterized.class)
 public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
-    static final String STAX_PORT = allocatePort(StaxServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
     
-    final TestParam test;
-    
-    public SamlSubjectConfTest(TestParam type) {
-        this.test = type;
-    }
-
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -65,20 +52,6 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Server.class, true)
         );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxServer.class, true)
-        );
-    }
-    
-    @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
-       
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(STAX_PORT, false)},
-        });
     }
     
     @org.junit.AfterClass
@@ -106,33 +79,34 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Successful call
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         
         callbackHandler.setCryptoAlias("morpit");
-        callbackHandler.setCryptoPassword("password");
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
-        
         ((BindingProvider)port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
         );
+        
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.self-sign-saml-assertion", "true");
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.callback-handler", 
+            "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+        ((BindingProvider)port).getRequestContext().put("ws-security.signature.username", "morpit");
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.signature.properties", "morpit.properties");
+     
         int result = port.doubleIt(25);
         assertTrue(result == 50);
         
         // Don't sign the Assertion
-        callbackHandler = new SamlCallbackHandler(true, false);
-        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        
-        callbackHandler.setCryptoAlias("morpit");
-        callbackHandler.setCryptoPassword("password");
-        callbackHandler.setCryptoPropertiesFile("morpit.properties");
-        
         ((BindingProvider)port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
-        );
+            "ws-security.self-sign-saml-assertion", "false");
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a unsigned assertion");
@@ -160,14 +134,23 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
         );
         
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.self-sign-saml-assertion", "true");
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.callback-handler", 
+            "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+        ((BindingProvider)port).getRequestContext().put("ws-security.signature.username", "alice");
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.signature.properties", "alice.properties");
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a non matching cert (SAML -> TLS)");
@@ -194,26 +177,35 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Successful call
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         
         callbackHandler.setCryptoAlias("morpit");
-        callbackHandler.setCryptoPassword("password");
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
         
         ((BindingProvider)port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
         );
+        
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.self-sign-saml-assertion", "true");
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.callback-handler", 
+            "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+        ((BindingProvider)port).getRequestContext().put("ws-security.signature.username", "morpit");
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.signature.properties", "morpit.properties");
+
         try {
             port.doubleIt(25);
             fail("Failure expected on no client auth");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
@@ -237,10 +229,10 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Successful call
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, false);
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
         ((BindingProvider)port).getRequestContext().put(
@@ -268,10 +260,10 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Successful call
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, false);
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
         ((BindingProvider)port).getRequestContext().put(
@@ -307,19 +299,28 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Successful call
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         
         callbackHandler.setCryptoAlias("morpit");
-        callbackHandler.setCryptoPassword("password");
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
         
         ((BindingProvider)port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
         );
+        
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.self-sign-saml-assertion", "true");
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.callback-handler", 
+            "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+        ((BindingProvider)port).getRequestContext().put("ws-security.signature.username", "morpit");
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.signature.properties", "morpit.properties");
+                                                    
         int result = port.doubleIt(25);
         assertTrue(result == 50);
 
@@ -342,10 +343,10 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Successful call
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, false);
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         
         ((BindingProvider)port).getRequestContext().put(
@@ -378,10 +379,10 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Successful call
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, false);
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true);
         callbackHandler.setConfirmationMethod("urn:oasis:names:tc:SAML:2.0:cm:custom");
         
         ((BindingProvider)port).getRequestContext().put(
@@ -398,7 +399,5 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
-    
    
 }

@@ -156,6 +156,19 @@
      
     </jaxws:endpoint> 
     
+    <bean id="allowUnsignedBearerAssertions" class="org.apache.ws.security.validate.SamlAssertionValidator">
+        <property name="requireBearerSignature" value="false" />
+    </bean>
+    
+    <bean id="saml2QName" class="javax.xml.namespace.QName">
+        <constructor-arg index="0" value="urn:oasis:names:tc:SAML:2.0:assertion"/>
+        <constructor-arg index="1" value="Assertion"/>
+    </bean>
+    
+    <util:map id="validators">
+        <entry key-ref="saml2QName" value-ref="allowUnsignedBearerAssertions"/>
+    </util:map>
+
     <jaxws:endpoint 
        id="SamlToken"
        address="http://localhost:${testutil.ports.Server}/DoubleItSamlToken" 
@@ -169,6 +182,7 @@
                <constructor-arg>
                    <map>
                         <entry key="action" value="SAMLTokenUnsigned"/> 
+                        <entry key="wss4j.validator.map" value-ref="validators"/> 
                    </map>
                </constructor-arg>
            </bean>

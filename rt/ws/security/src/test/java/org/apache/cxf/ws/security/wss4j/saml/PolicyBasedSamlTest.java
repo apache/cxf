@@ -22,22 +22,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-<<<<<<< HEAD
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.wss4j.AbstractPolicySecurityTest;
-import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
-=======
 import org.w3c.dom.Document;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.AbstractPolicySecurityTest;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
-import org.apache.wss4j.dom.validate.SamlAssertionValidator;
-import org.apache.wss4j.policy.SP12Constants;
->>>>>>> a797797... Fixing tests following WSS4J upgrades + adding some SAML Subject Confirmation Method tests
+import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.junit.Test;
 
 /**

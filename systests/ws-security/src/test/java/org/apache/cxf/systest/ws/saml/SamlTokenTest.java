@@ -151,11 +151,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml1Port, PORT2);
         
-<<<<<<< HEAD
-=======
-        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(false, true);
-        samlCallbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
->>>>>>> a797797... Fixing tests following WSS4J upgrades + adding some SAML Subject Confirmation Method tests
         ((BindingProvider)saml1Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
@@ -645,7 +640,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
         
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
