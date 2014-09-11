@@ -25,9 +25,15 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+    
+    <bean id="allowUnsignedBearerAssertions" class="org.apache.wss4j.stax.validate.SamlTokenValidatorImpl">
+        <property name="requireBearerSignature" value="false" />
+    </bean>
+    
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Bearer" address="http://localhost:${testutil.ports.StaxServer}/DoubleItSamlBearer" serviceName="s:DoubleItService" endpointName="s:DoubleItBearerPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="ws-security.enable.streaming" value="true"/>
+            <entry key="ws-security.saml1.validator" value-ref="allowUnsignedBearerAssertions"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TLSSenderVouches" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItSamlTLSSenderVouches" serviceName="s:DoubleItService" endpointName="s:DoubleItTLSSenderVouchesPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
@@ -67,6 +73,7 @@
             <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
+            <entry key="ws-security.saml2.validator" value-ref="allowUnsignedBearerAssertions"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TLSSenderVouchesSaml2" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItSamlTLSSenderVouchesSaml2" serviceName="s:DoubleItService" endpointName="s:DoubleItTLSSenderVouchesSaml2Port" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
