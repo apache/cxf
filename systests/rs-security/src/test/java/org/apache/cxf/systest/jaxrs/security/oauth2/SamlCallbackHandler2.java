@@ -31,6 +31,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+<<<<<<< HEAD
 import org.apache.cxf.rs.security.saml.assertion.Claim;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.ActionBean;
@@ -42,6 +43,23 @@ import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+=======
+import org.apache.cxf.rt.security.claims.SAMLClaim;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.bean.ActionBean;
+import org.apache.wss4j.common.saml.bean.AttributeBean;
+import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
+import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
+import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean.Decision;
+import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+>>>>>>> e7cf4fe... Fixing jax-rs SAML failures
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 
@@ -132,6 +150,17 @@ public class SamlCallbackHandler2 implements CallbackHandler {
                 
                 attrBean.setSamlAttributes(claims);
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+                
+                try {
+                    Crypto crypto = 
+                        CryptoFactory.getInstance("org/apache/cxf/systest/jaxrs/security/alice.properties");
+                    callback.setIssuerCrypto(crypto);
+                    callback.setIssuerKeyName("alice");
+                    callback.setIssuerKeyPassword("password");
+                    callback.setSignAssertion(true);
+                } catch (WSSecurityException e) {
+                    throw new IOException(e);
+                }
             }
         }
     }
