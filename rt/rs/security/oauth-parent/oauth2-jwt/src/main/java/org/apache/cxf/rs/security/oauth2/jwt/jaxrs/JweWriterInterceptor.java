@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.oauth2.jwe.AesCbcHmacJweEncryption;
 import org.apache.cxf.rs.security.oauth2.jwe.AesGcmWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.JweCompactProducer;
@@ -157,15 +158,19 @@ public class JweWriterInterceptor implements WriterInterceptor {
             if (keyEncryptionAlgo == null) {
                 keyEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP);
             }
-            
-            JweHeaders headers = new JweHeaders(keyEncryptionAlgo,
-                                                props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP));
+            String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
+            JweHeaders headers = new JweHeaders(keyEncryptionAlgo, contentEncryptionAlgo);
             String compression = props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP);
             if (compression != null) {
                 headers.setZipAlgorithm(compression);
             }
-            
-            return new WrappedKeyJweEncryption(headers, keyEncryptionProvider);
+            boolean isAesHmac = Algorithm.isAesCbcHmac(contentEncryptionAlgo);
+            if (isAesHmac) { 
+                return new AesCbcHmacJweEncryption(
+                    keyEncryptionAlgo, contentEncryptionAlgo, keyEncryptionProvider);
+            } else {
+                return new WrappedKeyJweEncryption(headers, keyEncryptionProvider);
+            }
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {

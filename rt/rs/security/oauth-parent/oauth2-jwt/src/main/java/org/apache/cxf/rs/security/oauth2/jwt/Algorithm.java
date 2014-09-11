@@ -192,4 +192,9 @@ public enum Algorithm {
             || JwtConstants.HMAC_SHA_384_ALGO.equals(algo)
             || JwtConstants.HMAC_SHA_512_ALGO.equals(algo); 
     }
+    public static boolean isAesCbcHmac(String algo) {
+        return JwtConstants.A128CBC_HS256_ALGO.equals(algo)
+            || JwtConstants.A192CBC_HS384_ALGO.equals(algo)
+            || JwtConstants.A256CBC_HS512_ALGO.equals(algo); 
+    }
 }

@@ -31,6 +31,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.oauth2.jwe.AesCbcHmacJweDecryption;
 import org.apache.cxf.rs.security.oauth2.jwe.AesGcmWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.oauth2.jwe.JweCryptoProperties;
@@ -48,7 +49,7 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 public class AbstractJweDecryptingFilter {
     private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
     private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
-        
+    private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";    
     private JweDecryptionProvider decryption;
     private JweCryptoProperties cryptoProperties;
     private String defaultMediaType;
@@ -91,7 +92,6 @@ public class AbstractJweDecryptingFilter {
                     } else if (Algorithm.isAesGcmKeyWrap(jwk.getAlgorithm())) {
                         keyDecryptionProvider = new AesGcmWrapKeyDecryptionAlgorithm(key);
                     } 
-                    // etc
                 } else {
                     // TODO: support elliptic curve keys
                 }
@@ -102,7 +102,14 @@ public class AbstractJweDecryptingFilter {
             if (keyDecryptionProvider == null) {
                 throw new SecurityException();
             }
-            return new WrappedKeyJweDecryption(keyDecryptionProvider, cryptoProperties, null);
+            String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
+            boolean isAesHmac = Algorithm.isAesCbcHmac(contentEncryptionAlgo);
+            if (isAesHmac) { 
+                return new AesCbcHmacJweDecryption(keyDecryptionProvider);
+            } else {
+                return new WrappedKeyJweDecryption(keyDecryptionProvider, cryptoProperties, null);
+            }
+            
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {
