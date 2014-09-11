@@ -51,6 +51,9 @@ public class SamlCallbackHandler implements CallbackHandler {
     private CERT_IDENTIFIER keyInfoIdentifier = CERT_IDENTIFIER.X509_CERT;
     private boolean signAssertion;
     private ConditionsBean conditions;
+    private String cryptoAlias = "alice";
+    private String cryptoPassword = "password";
+    private String cryptoPropertiesFile = "alice.properties";
     
     public SamlCallbackHandler() {
         //
@@ -122,11 +125,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
                 
                 try {
-                    String file = "alice.properties";
-                    Crypto crypto = CryptoFactory.getInstance(file);
+                    Crypto crypto = CryptoFactory.getInstance(cryptoPropertiesFile);
                     callback.setIssuerCrypto(crypto);
-                    callback.setIssuerKeyName("alice");
-                    callback.setIssuerKeyPassword("password");
+                    callback.setIssuerKeyName(cryptoAlias);
+                    callback.setIssuerKeyPassword(cryptoPassword);
                     callback.setSignAssertion(signAssertion);
                 } catch (WSSecurityException e) {
                     throw new IOException(e);
@@ -137,9 +139,9 @@ public class SamlCallbackHandler implements CallbackHandler {
     
     protected KeyInfoBean createKeyInfo() throws Exception {
         Crypto crypto = 
-            CryptoFactory.getInstance("alice.properties");
+            CryptoFactory.getInstance(cryptoPropertiesFile);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("alice");
+        cryptoType.setAlias(cryptoAlias);
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         
         KeyInfoBean keyInfo = new KeyInfoBean();
@@ -167,6 +169,30 @@ public class SamlCallbackHandler implements CallbackHandler {
 
     public void setConditions(ConditionsBean conditions) {
         this.conditions = conditions;
+    }
+
+    public String getCryptoAlias() {
+        return cryptoAlias;
+    }
+
+    public void setCryptoAlias(String cryptoAlias) {
+        this.cryptoAlias = cryptoAlias;
+    }
+
+    public String getCryptoPassword() {
+        return cryptoPassword;
+    }
+
+    public void setCryptoPassword(String cryptoPassword) {
+        this.cryptoPassword = cryptoPassword;
+    }
+
+    public String getCryptoPropertiesFile() {
+        return cryptoPropertiesFile;
+    }
+
+    public void setCryptoPropertiesFile(String cryptoPropertiesFile) {
+        this.cryptoPropertiesFile = cryptoPropertiesFile;
     }
     
 }

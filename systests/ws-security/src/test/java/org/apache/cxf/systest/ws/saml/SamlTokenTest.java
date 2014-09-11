@@ -198,7 +198,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(saml1Port);
         }
         
-        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(false);
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(false, true);
         samlCallbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
         ((BindingProvider)saml1Port).getRequestContext().put(
             "ws-security.saml-callback-handler", samlCallbackHandler
@@ -797,7 +797,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(saml2Port);
         }
         
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
