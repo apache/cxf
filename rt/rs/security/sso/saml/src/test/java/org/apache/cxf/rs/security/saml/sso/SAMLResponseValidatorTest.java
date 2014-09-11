@@ -254,68 +254,6 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
             marshalledResponse, issuerCrypto, new KeystorePasswordCallback()
         );
     }
-<<<<<<< HEAD
-=======
-    
-    @org.junit.Test
-    public void testSignedResponseNoKeyInfo() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
-            SAML2PResponseComponentBuilder.createStatus(
-                SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
-            );
-        Response response = 
-            SAML2PResponseComponentBuilder.createSAMLResponse(
-                "http://cxf.apache.org/saml", "http://cxf.apache.org/issuer", status
-            );
-        
-        // Create an AuthenticationAssertion
-        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
-        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
-        callbackHandler.setIssuer("http://cxf.apache.org/issuer");
-        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
-        
-        Crypto issuerCrypto = new Merlin();
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        ClassLoader loader = Loader.getClassLoader(SAMLResponseValidatorTest.class);
-        InputStream input = Merlin.loadInputStream(loader, "alice.jks");
-        keyStore.load(input, "password".toCharArray());
-        ((Merlin)issuerCrypto).setKeyStore(keyStore);
-        
-        response.getAssertions().add(assertion.getSaml2());
-        signResponse(response, "alice", "password", issuerCrypto, false);
-        
-        Element policyElement = OpenSAMLUtil.toDom(response, doc);
-        doc.appendChild(policyElement);
-        assertNotNull(policyElement);
-        
-        Response marshalledResponse = (Response)OpenSAMLUtil.fromDom(policyElement);
-        
-        // Validate the Response
-        SAMLProtocolResponseValidator validator = new SAMLProtocolResponseValidator();
-        validator.setKeyInfoMustBeAvailable(false);
-        try {
-            validator.validateSamlResponse(marshalledResponse, null, new KeystorePasswordCallback());
-            fail("Expected failure on no Signature Crypto");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-        
-        // Validate the Response
-        validator.validateSamlResponse(
-            marshalledResponse, issuerCrypto, new KeystorePasswordCallback()
-        );
-    }
->>>>>>> e7cf4fe... Fixing jax-rs SAML failures
-
     
     /**
      * Sign a SAML Response
