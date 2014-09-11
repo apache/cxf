@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -43,6 +45,7 @@ public class SearchContextImpl implements SearchContext {
     public static final String SEARCH_QUERY = "_search";
     public static final String SHORT_SEARCH_QUERY = "_s";
     public static final String CUSTOM_SEARCH_PARSER_PROPERTY = "search.parser";
+    public static final String CUSTOM_SEARCH_PARSER_CLASS_PROPERTY = "search.parser.class";
     public static final String CUSTOM_SEARCH_QUERY_PARAM_NAME = "search.query.parameter.name";
     private static final String USE_PLAIN_QUERY_PARAMETERS = "search.use.plain.queries";
     private static final String USE_ALL_QUERY_COMPONENT = "search.use.all.query.component";
@@ -210,6 +213,19 @@ public class SearchContextImpl implements SearchContext {
             beanProps = beanProperties;
         }
         
+        String parserClassProp = (String) message.getContextualProperty(CUSTOM_SEARCH_PARSER_CLASS_PROPERTY);
+        if (parserClassProp != null) {
+            try {
+                final Class<?> parserClass = ClassLoaderUtils.loadClass(parserClassProp, SearchContextImpl.class);
+                final Constructor<?> constructor = parserClass.getConstructor(Class.class, Map.class, Map.class);
+                @SuppressWarnings("unchecked")
+                SearchConditionParser<T> customParser = 
+                    (SearchConditionParser<T>)constructor.newInstance(cls, props, beanProps);
+                return customParser;
+            } catch (Exception ex) {
+                throw new SearchParseException(ex);
+            }
+        }
         return new FiqlParser<T>(cls, props, beanProps); 
     }
     
