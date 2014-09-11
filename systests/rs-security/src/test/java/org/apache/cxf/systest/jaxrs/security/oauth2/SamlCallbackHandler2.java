@@ -32,6 +32,9 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rt.security.claims.SAMLClaim;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
@@ -137,6 +140,17 @@ public class SamlCallbackHandler2 implements CallbackHandler {
                 
                 attrBean.setSamlAttributes(claims);
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+                
+                try {
+                    Crypto crypto = 
+                        CryptoFactory.getInstance("org/apache/cxf/systest/jaxrs/security/alice.properties");
+                    callback.setIssuerCrypto(crypto);
+                    callback.setIssuerKeyName("alice");
+                    callback.setIssuerKeyPassword("password");
+                    callback.setSignAssertion(true);
+                } catch (WSSecurityException e) {
+                    throw new IOException(e);
+                }
             }
         }
     }

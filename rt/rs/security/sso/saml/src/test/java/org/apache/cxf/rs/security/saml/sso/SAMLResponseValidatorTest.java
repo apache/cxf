@@ -80,7 +80,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
-        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
@@ -119,7 +119,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
-        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
@@ -163,7 +163,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
-        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
@@ -221,7 +221,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
-        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
@@ -278,7 +278,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
-        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
