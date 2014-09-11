@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.jwk;
 
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
@@ -190,6 +192,18 @@ public class JsonWebKey extends AbstractJwtObject {
                                                 encodedCrtCoefficient);
         }
     }
+    public ECPublicKey toECPublicKey() {
+        String eCurve = (String)super.getValue(EC_CURVE);
+        String encodedXCoord = (String)super.getValue(EC_X_COORDINATE);
+        String encodedYCoord = (String)super.getValue(EC_Y_COORDINATE);
+        return CryptoUtils.getECPublicKey(eCurve, encodedXCoord, encodedYCoord);
+    }
+    public ECPrivateKey toECPrivateKey() {
+        String eCurve = (String)super.getValue(EC_CURVE);
+        String encodedPrivateKey = (String)super.getValue(EC_PRIVATE_KEY);
+        return CryptoUtils.getECPrivateKey(eCurve, encodedPrivateKey);
+    }
+    
     public SecretKey toSecretKey() {
         return CryptoUtils.createSecretKeySpec((String)getProperty(OCTET_KEY_VALUE), 
                                                Algorithm.toJavaName(getAlgorithm()));

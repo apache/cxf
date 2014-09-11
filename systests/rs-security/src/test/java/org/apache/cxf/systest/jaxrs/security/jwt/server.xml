@@ -156,6 +156,19 @@ under the License.
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwsjwkec">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/jws.ec.public.properties"/>
+            <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/jws.ec.private.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jweaescbchmac">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>

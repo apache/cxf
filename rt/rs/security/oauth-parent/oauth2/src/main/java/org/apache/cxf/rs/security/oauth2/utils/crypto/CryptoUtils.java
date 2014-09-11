@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.Principal;
@@ -357,17 +358,16 @@ public final class CryptoUtils {
         }    
     }
     
-    public static ECPrivateKey getECPrivateKey(String encodedPrivateKey) {
+    public static ECPrivateKey getECPrivateKey(String curve, String encodedPrivateKey) {
         try {
-            return getECPrivateKey(decodeSequence(encodedPrivateKey));
+            return getECPrivateKey(curve, decodeSequence(encodedPrivateKey));
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
     }
-    public static ECPrivateKey getECPrivateKey(byte[] privateKey) {
+    public static ECPrivateKey getECPrivateKey(String curve, byte[] privateKey) {
         try {
-            ECParameterSpec params = getECParameterSpec();
-
+            ECParameterSpec params = getECParameterSpec(curve, true);
             ECPrivateKeySpec keySpec = new ECPrivateKeySpec(
                                            new BigInteger(1, privateKey), params);
             KeyFactory kf = KeyFactory.getInstance("EC");
@@ -377,24 +377,30 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }    
     }
-    private static ECParameterSpec getECParameterSpec() throws Exception {
+    private static ECParameterSpec getECParameterSpec(String curve, boolean isPrivate) 
+        throws Exception {
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
-        ECGenParameterSpec kpgparams = new ECGenParameterSpec("secp256r1");
+        ECGenParameterSpec kpgparams = new ECGenParameterSpec("sec"
+                                                              + curve.toLowerCase().replace("-", "")
+                                                              + "r1");
         kpg.initialize(kpgparams);
-        return ((ECPublicKey) kpg.generateKeyPair().getPublic()).getParams();
+        KeyPair pair = kpg.generateKeyPair();
+        return isPrivate ? ((ECPublicKey) pair.getPublic()).getParams()
+            : ((ECPrivateKey) pair.getPrivate()).getParams();
     }
     
-    public static ECPublicKey getECPublicKey(String encodedXPoint, String encodedYPoint) {
+    public static ECPublicKey getECPublicKey(String curve, String encodedXPoint, String encodedYPoint) {
         try {
-            return getECPublicKey(decodeSequence(encodedXPoint),
+            return getECPublicKey(curve,
+                                  decodeSequence(encodedXPoint),
                                   decodeSequence(encodedYPoint));
         } catch (Exception ex) { 
             throw new SecurityException(ex);
         }
     }
-    public static ECPublicKey getECPublicKey(byte[] xPoint, byte[] yPoint) {
+    public static ECPublicKey getECPublicKey(String curve, byte[] xPoint, byte[] yPoint) {
         try {
-            ECParameterSpec params = getECParameterSpec();
+            ECParameterSpec params = getECParameterSpec(curve, false);
 
             ECPoint ecPoint = new ECPoint(new BigInteger(1, xPoint),
                                           new BigInteger(1, yPoint));

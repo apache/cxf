@@ -158,7 +158,30 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
-    
+    @Test
+    public void testJwsJwkEC() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjwkec";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress(address);
+        List<Object> providers = new LinkedList<Object>();
+        JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
+        jwsWriter.setUseJwsOutputStream(true);
+        providers.add(jwsWriter);
+        providers.add(new JwsClientResponseFilter());
+        bean.setProviders(providers);
+        bean.getProperties(true).put("rs.security.signature.out.properties", 
+            "org/apache/cxf/systest/jaxrs/security/jws.ec.private.properties");
+        bean.getProperties(true).put("rs.security.signature.in.properties", 
+            "org/apache/cxf/systest/jaxrs/security/jws.ec.public.properties");
+        BookStore bs = bean.create(BookStore.class);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
     private void doTestJweJwsRsa(String address, 
                                  JwsSignatureProvider jwsSigProvider) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();

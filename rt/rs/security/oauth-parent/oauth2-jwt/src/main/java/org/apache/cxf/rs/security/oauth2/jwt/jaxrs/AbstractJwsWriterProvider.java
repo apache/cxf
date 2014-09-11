@@ -31,6 +31,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.oauth2.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.oauth2.jwk.JwkUtils;
+import org.apache.cxf.rs.security.oauth2.jws.EcDsaJwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.oauth2.jws.JwsSignatureProvider;
@@ -74,8 +75,8 @@ public class AbstractJwsWriterProvider {
                     && Algorithm.isHmacSign(rsaSignatureAlgo)) {
                     theSigProvider = 
                         new HmacJwsSignatureProvider((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-                } else {
-                    // TODO: support elliptic curve keys
+                } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
+                    theSigProvider = new EcDsaJwsSignatureProvider(jwk.toECPrivateKey());
                 }
             } else {
                 RSAPrivateKey pk = (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, 
