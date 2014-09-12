@@ -19,16 +19,16 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>cxf-parent</artifactId>
-        <groupId>org.apache.cxf</groupId>
-        <version>3.0.2-SNAPSHOT</version>
-        <relativePath>../../parent/pom.xml</relativePath>
+        <artifactId>cxf-systests-jibx</artifactId>
+        <groupId>org.apache.cxf.systests</groupId>
+        <version>3.1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.systests</groupId>
-    <artifactId>cxf-systests-databinding</artifactId>
-    <name>Apache CXF Databinding System Tests</name>
-    <description>Apache CXF Databinding System Tests</description>
+    <artifactId>cxf-systests-databinding-jibx</artifactId>
+    <name>Apache CXF Data Binding JiBX System Tests</name>
+    <description>Apache CXF Data Binding JiBX System Tests</description>
     <url>http://cxf.apache.org</url>
     <properties>
         <hello.world.binding.file>hello_world.xml</hello.world.binding.file>
@@ -83,29 +83,41 @@
                             </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/xmlbeans/hello_world.wsdl</wsdl>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/jibx/hello_world.wsdl</wsdl>
                                     <frontEnd>cxf</frontEnd>
-                                    <dataBinding>xmlbeans</dataBinding>
+                                    <dataBinding>jibx</dataBinding>
                                 </wsdlOption>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/xmlbeans/doc_lit_bare.wsdl</wsdl>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/jibx/doc_lit_bare.wsdl</wsdl>
                                     <frontEnd>cxf</frontEnd>
-                                    <dataBinding>xmlbeans</dataBinding>
-                                </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/source/hello_world.wsdl</wsdl>
-                                    <frontEnd>cxf</frontEnd>
-                                    <dataBinding>domsource</dataBinding>
-                                </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/source/doc_lit_bare.wsdl</wsdl>
-                                    <frontEnd>cxf</frontEnd>
-                                    <dataBinding>domsource</dataBinding>
+                                    <dataBinding>jibx</dataBinding>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jibx</groupId>
+                <artifactId>maven-jibx-plugin</artifactId>
+                <version>${cxf.jibx.version}</version>
+                <configuration>
+                    <directory>target/generated/src/test/java/jibx_bindings</directory>
+                    <!--load>true</load-->
+                    <!--validate>true</validate-->
+                    <!--verify>true</verify-->
+                    <includes>
+                        <include>${hello.world.binding.file}</include>
+                        <include>${doc.lit.bare.binding.file}</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-bind</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -126,16 +138,6 @@
                 <hello.world.binding.file>none</hello.world.binding.file>
                 <doc.lit.bare.binding.file>none</doc.lit.bare.binding.file>
             </properties>
-        </profile>
-        <profile>
-            <id>async</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-transports-http-hc</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
     <dependencies>
@@ -161,17 +163,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-js</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-databinding-aegis</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -210,16 +202,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-local</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-addr</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-security</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -267,21 +249,6 @@
             <artifactId>FastInfoset</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>rhino</groupId>
-            <artifactId>js</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jettison</groupId>
-            <artifactId>jettison</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.0</version>
@@ -302,17 +269,6 @@
         <dependency>
             <groupId>org.jibx</groupId>
             <artifactId>jibx-tools</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.msv</groupId>
-            <artifactId>msv-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.java.dev.msv</groupId>
-                    <artifactId>msv-testharness</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
