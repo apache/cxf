@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
@@ -278,4 +279,63 @@ public class ClaimUtils {
         return processedClaim;
     }
 
+    /**
+     * This function is especially useful if multi values from a claim are stored within a single value entry.
+     * 
+     * For example multi user roles could all be stored in a single value element separated by comma:
+     * USER,MANAGER,ADMIN 
+     * The result of this function will provide a claim with three distinct values: 
+     * USER and MANAGER and ADMIN.
+     * 
+     * @param processedClaim claim containing multi-values in a single value entry
+     * @param delimiter Delimiter to split multi-values into single values
+     * @return Returns a Processed Claim containing only single values per value entry
+     */
+    public ProcessedClaim singleToMultiValue(ProcessedClaim processedClaim, String delimiter) {
+        if (processedClaim != null && processedClaim.getValues() != null) {
+            List<Object> oldValues = processedClaim.getValues();
+            List<Object> newValues = new ArrayList<Object>();
+            for (Object value : oldValues) {
+                String multivalue = value.toString();
+                StringTokenizer st = new StringTokenizer(multivalue, delimiter);
+                while (st.hasMoreTokens()) {
+                    newValues.add(st.nextToken());
+                }
+            }
+            processedClaim.getValues().clear();
+            processedClaim.getValues().addAll(newValues);
+        }
+        return processedClaim;
+    }
+    
+    /**
+     * This function is especially useful if values from multiple claim values need to be condensed into a
+     * single value element. 
+     * 
+     * For example a user has three roles: USER and MANAGER and ADMIN. If ',' is used as a delimiter, 
+     * then this method would provide the following claim with only a single value looking like this:
+     * USER,MANAGER,ADMIN
+     * 
+     * @param processedClaim claim containing multi-values
+     * @param delimiter Delimiter to concatenate multi-values into a single value
+     * @return Returns a Processed Claim containing only one single value
+     */
+    public ProcessedClaim multiToSingleValue(ProcessedClaim processedClaim, String delimiter) {
+        if (processedClaim != null && processedClaim.getValues() != null) {
+            List<Object> oldValues = processedClaim.getValues();
+            boolean first = true;
+            StringBuilder sb = new StringBuilder();
+            for (Object value : oldValues) {
+                if (first) {
+                    sb.append(value);
+                    first = false;
+                } else {
+                    sb.append(delimiter).append(value);
+                }
+            }
+            processedClaim.getValues().clear();
+            processedClaim.getValues().add(sb.toString());
+        }
+        return processedClaim;
+    }
 }
