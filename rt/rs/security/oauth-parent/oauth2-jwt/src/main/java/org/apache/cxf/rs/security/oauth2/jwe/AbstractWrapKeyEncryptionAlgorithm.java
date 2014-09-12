@@ -73,23 +73,23 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
     protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweHeaders headers) {
         return null;
     }
-    private static String checkAlgorithm(Set<String> supportedAlgorithms, String algo) {
+    protected String checkAlgorithm(String algo) {
         if (algo != null && !supportedAlgorithms.contains(algo)) {
             throw new SecurityException();
         }
         return algo;
     }
-    private void checkAlgorithms(JweHeaders headers, String defaultAlgo) {
+    protected void checkAlgorithms(JweHeaders headers, String defaultAlgo) {
         String providedAlgo = headers.getKeyEncryptionAlgorithm();
         if ((providedAlgo == null && defaultAlgo == null)
             || (providedAlgo != null && defaultAlgo != null && !providedAlgo.equals(defaultAlgo))) {
             throw new SecurityException();
         }
         if (providedAlgo != null) {
-            checkAlgorithm(supportedAlgorithms, providedAlgo);
-        } else {
-            checkAlgorithms(headers, defaultAlgo);
+            checkAlgorithm(providedAlgo);
+        } else if (defaultAlgo != null) {
             headers.setKeyEncryptionAlgorithm(defaultAlgo);
+            checkAlgorithm(defaultAlgo);
         }
     }
     

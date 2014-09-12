@@ -49,6 +49,10 @@ public enum Algorithm {
     A128GCMKW(JwtConstants.A128GCMKW_ALGO, "AES/GCM/NoPadding", 128),
     A192GCMKW(JwtConstants.A192GCMKW_ALGO, "AES/GCM/NoPadding", 192),
     A256GCMKW(JwtConstants.A256GCMKW_ALGO, "AES/GCM/NoPadding", 256),
+    PBES2_HS256_A128KW(JwtConstants.PBES2_HS256_A128KW_ALGO, "AESWrap", 128),
+    PBES2_HS384_A192KW(JwtConstants.PBES2_HS384_A192KW_ALGO, "AESWrap", 192),
+    PBES2_HS512_A256KW(JwtConstants.PBES2_HS512_A256KW_ALGO, "AESWrap", 256),
+    
     // Content Encryption
     A128GCM(JwtConstants.A128GCM_ALGO, "AES/GCM/NoPadding", 128),
     A192GCM(JwtConstants.A192GCM_ALGO, "AES/GCM/NoPadding", 192),
@@ -124,6 +128,9 @@ public enum Algorithm {
         JWT_TO_JAVA_NAMES.put(JwtConstants.A128CBC_HS256_ALGO, AES_CBC_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.A192CBC_HS384_ALGO, AES_CBC_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JwtConstants.A256CBC_HS512_ALGO, AES_CBC_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.PBES2_HS256_A128KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.PBES2_HS384_A192KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JwtConstants.PBES2_HS512_A256KW_ALGO, AES_WRAP_ALGO_JAVA);
     }
     private final String jwtName;
     private final String javaName;

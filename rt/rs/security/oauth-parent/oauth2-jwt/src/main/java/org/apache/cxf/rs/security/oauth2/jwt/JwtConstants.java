@@ -72,6 +72,9 @@ public final class JwtConstants {
     public static final String A128GCMKW_ALGO = "A128GCMKW";
     public static final String A192GCMKW_ALGO = "A192GCMKW";
     public static final String A256GCMKW_ALGO = "A256GCMKW";
+    public static final String PBES2_HS256_A128KW_ALGO = "PBES2-HS256+A128KW";
+    public static final String PBES2_HS384_A192KW_ALGO = "PBES2-HS384+A192KW";
+    public static final String PBES2_HS512_A256KW_ALGO = "PBES2-HS512+A256KW";
     // Content Encryption
     public static final String A128CBC_HS256_ALGO = "A128CBC-HS256";
     public static final String A192CBC_HS384_ALGO = "A192CBC-HS384";
