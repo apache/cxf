@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -35,8 +34,6 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.type_test.doc.TestNumberList;
-import org.apache.type_test.doc.TestQNameList;
 import org.apache.type_test.doc.TypeTestPortType;
 import org.apache.type_test.rpc.SOAPService;
 import org.apache.type_test.types1.AnyURIEnum;
@@ -2089,11 +2086,6 @@ public abstract class AbstractTypeTestClient
             return;
         }
         if (testDocLiteral || testXMLBinding) {
-            if (TestNumberList.class.getDeclaredField("x").getAnnotation(XmlSchemaType.class) != null) {
-                //Bug in JAXB 2.2.10 where this annotation is being generated incorrectly for some
-                //lists
-                return;
-            }
             List<Integer> x = Arrays.asList(1, 2, 3);
             List<Integer> yOrig = Arrays.asList(10, 100, 1000);
             Holder<List<Integer>> y = new Holder<List<Integer>>(yOrig);
@@ -2132,14 +2124,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("QNameList")) {
             return;
         }
-        if (testDocLiteral || testXMLBinding) {
-            if (TestQNameList.class.getDeclaredField("x").getAnnotation(XmlSchemaType.class) != null) {
-                //Bug in JAXB 2.2.10 where this annotation is being generated incorrectly for some
-                //lists
-                return;
-            }
-            
-            
+        if (testDocLiteral || testXMLBinding) {            
             List<QName> x = Arrays.asList(new QName("http://schemas.iona.com/type_test", "testqname1"),
                                           new QName("http://schemas.iona.com/type_test", "testqname2"),
                                           new QName("http://schemas.iona.com/type_test", "testqname3"));
