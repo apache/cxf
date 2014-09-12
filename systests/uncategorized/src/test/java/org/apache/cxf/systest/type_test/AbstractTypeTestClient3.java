@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPElement;
@@ -34,7 +33,6 @@ import javax.xml.ws.Holder;
 
 import org.w3c.dom.Element;
 
-import org.apache.type_test.doc.TestAnonEnumList;
 import org.apache.type_test.types1.DerivedChoiceBaseArray;
 import org.apache.type_test.types1.DerivedChoiceBaseChoice;
 import org.apache.type_test.types1.DerivedChoiceBaseStruct;
@@ -2258,11 +2256,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return;
         }
         if (testDocLiteral || testXMLBinding) {
-            if (TestAnonEnumList.class.getDeclaredField("x").getAnnotation(XmlSchemaType.class) != null) {
-                //Bug in JAXB 2.2.10 where this annotation is being generated incorrectly for some
-                //lists
-                return;
-            }
             List<Short> x = Arrays.asList((short)10, (short)100);
             List<Short> yOrig = Arrays.asList((short)1000, (short)10);
 
