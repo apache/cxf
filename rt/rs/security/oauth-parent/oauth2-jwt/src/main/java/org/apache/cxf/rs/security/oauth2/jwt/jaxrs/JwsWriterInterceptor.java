@@ -87,7 +87,11 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
             if (mt != null) {
-                headers.setContentType(JAXRSUtils.mediaTypeToString(mt));
+                if ("application".equals(mt.getType())) {
+                    headers.setContentType(mt.getSubtype());
+                } else {
+                    headers.setContentType(JAXRSUtils.mediaTypeToString(mt));
+                }
             }
         }
     }

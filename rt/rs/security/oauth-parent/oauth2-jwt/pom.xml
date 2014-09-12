@@ -40,7 +40,8 @@
          <groupId>org.bouncycastle</groupId>
          <artifactId>bcprov-ext-jdk15on</artifactId>
          <version>1.50</version>
-         <scope>test</scope>
+         <scope>provided</scope>
+         <optional>true</optional> 
         </dependency>
         <!--test dependencies-->
         <dependency>

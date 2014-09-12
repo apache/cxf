@@ -81,7 +81,11 @@ public class JweWriterInterceptor implements WriterInterceptor {
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
             if (mt != null) {
-                ctString = JAXRSUtils.mediaTypeToString(mt);
+                if ("application".equals(mt.getType())) {
+                    ctString = mt.getSubtype();
+                } else {
+                    ctString = JAXRSUtils.mediaTypeToString(mt);
+                }
             }
         }
         

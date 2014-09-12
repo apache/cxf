@@ -35,4 +35,12 @@ public final class JwtUtils {
         }
         return contentType;
     }
+    public static String expandContentType(String contentType) {
+        int paramIndex = contentType.indexOf(';');
+        String typeWithoutParams = paramIndex == -1 ? contentType : contentType.substring(0, paramIndex);
+        if (typeWithoutParams.indexOf('/') == -1) {
+            contentType = "application/" + contentType;
+        }
+        return contentType;
+    }
 }
