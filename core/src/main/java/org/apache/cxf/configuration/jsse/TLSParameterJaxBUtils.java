@@ -330,7 +330,7 @@ public final class TLSParameterJaxBUtils {
 
         String alg = tmc.isSetFactoryAlgorithm()
                      ? tmc.getFactoryAlgorithm()
-                     : KeyManagerFactory.getDefaultAlgorithm();
+                     : TrustManagerFactory.getDefaultAlgorithm();
 
         TrustManagerFactory fac =
                      tmc.isSetProvider()
