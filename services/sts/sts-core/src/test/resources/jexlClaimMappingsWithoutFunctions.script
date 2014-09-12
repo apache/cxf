@@ -113,6 +113,34 @@
     		targetClaims.add(c);
     	}
     }
+	
+	// Claim value delimiter
+	var single2multi = new("org.apache.cxf.sts.claims.Claim");
+    single2multi.claimType = new("java.net.URI", "http://my.schema.org/identity/claims/single2multi");
+    single2multi.values.add("Value1,Value2,Value3");
+	var newValues = new("java.util.ArrayList");
+	var multiValueArray = single2multi.values[0].split(",");
+    for (v : multiValueArray) {
+    	newValues.add(v);
+    }
+    single2multi.values = newValues;
+    targetClaims.add(single2multi);
+	
+	var multi2single = new("org.apache.cxf.sts.claims.Claim");
+    multi2single.claimType = new("java.net.URI", "http://my.schema.org/identity/claims/multi2single");
+    multi2single.values.add("Value1");
+	multi2single.values.add("Value2");
+	multi2single.values.add("Value3");
+	var newValue = "";
+	var newValues = new("java.util.ArrayList");
+    for (v : multi2single.values) {
+    	newValue = newValue + "," + v;
+    }
+	newValues.add(newValue.substring(1));
+    multi2single.values = newValues;
+    targetClaims.add(multi2single);
+	
+
     
     // Set correct issuer
     for (c : targetClaims) {

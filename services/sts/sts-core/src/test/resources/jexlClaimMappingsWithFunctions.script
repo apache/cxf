@@ -48,9 +48,16 @@
     var emailClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mail';
     var emailClaim = claims:get(sourceClaims, emailClaimType);
     
+	// Claim value delimiter
+    var singleValue = claims:create("http://my.schema.org/identity/claims/single2multi", "Value1,Value2,Value3");
+    claims:singleToMultiValue(singleValue, ",");
+	var multiValue = claims:create("http://my.schema.org/identity/claims/multi2single", "Value1", "Value2", "Value3");
+    claims:multiToSingleValue(multiValue, ",");
+	
     // Collect claims for new token
     claims:add(targetClaims, mappedRoles, mergedClaim, idpClaim);
     claims:add(targetClaims, uppercaseClaim, lowercaseClaim, wrappedUppercaseClaim, emailClaim);
+	claims:add(targetClaims, singleValue, multiValue);
     
     // Set correct issuer
     claims:updateIssuer(targetClaims, claimsParameters.stsProperties.issuer);

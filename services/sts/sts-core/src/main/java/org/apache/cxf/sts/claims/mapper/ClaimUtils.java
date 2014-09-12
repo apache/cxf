@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.cxf.sts.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimCollection;
@@ -278,4 +279,62 @@ public class ClaimUtils {
         return claim;
     }
 
+    /**
+     * This function is especially useful if multi values from a claim are stored within a single value entry.
+     * 
+     * For example multi user roles could all be stored in a single value element separated by comma:
+     * USER,MANAGER,ADMIN 
+     * The result of this function will provide a claim with three distinct values: 
+     * USER and MANAGER and ADMIN.
+     * 
+     * @param claim claim containing multi-values in a single value entry
+     * @param delimiter Delimiter to split multi-values into single values
+     * @return Returns a Processed Claim containing only single values per value entry
+     */
+    public Claim singleToMultiValue(Claim claim, String delimiter) {
+        if (claim != null && claim.getValues() != null) {
+            List<String> oldValues = claim.getValues();
+            List<String> newValues = new ArrayList<String>();
+            for (String multivalue : oldValues) {
+                StringTokenizer st = new StringTokenizer(multivalue, delimiter);
+                while (st.hasMoreTokens()) {
+                    newValues.add(st.nextToken());
+                }
+            }
+            claim.getValues().clear();
+            claim.getValues().addAll(newValues);
+        }
+        return claim;
+    }
+    
+    /**
+     * This function is especially useful if values from multiple claim values need to be condensed into a
+     * single value element. 
+     * 
+     * For example a user has three roles: USER and MANAGER and ADMIN. If ',' is used as a delimiter, 
+     * then this method would provide the following claim with only a single value looking like this:
+     * USER,MANAGER,ADMIN
+     * 
+     * @param claim claim containing multi-values
+     * @param delimiter Delimiter to concatenate multi-values into a single value
+     * @return Returns a Processed Claim containing only one single value
+     */
+    public Claim multiToSingleValue(Claim claim, String delimiter) {
+        if (claim != null && claim.getValues() != null) {
+            List<String> oldValues = claim.getValues();
+            boolean first = true;
+            StringBuilder sb = new StringBuilder();
+            for (String value : oldValues) {
+                if (first) {
+                    sb.append(value);
+                    first = false;
+                } else {
+                    sb.append(delimiter).append(value);
+                }
+            }
+            claim.getValues().clear();
+            claim.getValues().add(sb.toString());
+        }
+        return claim;
+    }
 }
