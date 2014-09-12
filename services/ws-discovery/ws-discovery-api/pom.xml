@@ -80,7 +80,14 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-	            <version>${project.version}</version>
+                <version>${project.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-bug986</artifactId>
+                        <version>${cxf.xjc-utils.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -91,6 +98,9 @@
                             </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
+                                    <xjcargs>
+                                        <xjcarg>-Xbug986</xjcarg>
+                                    </xjcargs>
                                     <wsdl>${basedir}/src/main/resources/org/apache/cxf/ws/discovery/wsdl/wsdd-discovery-1.1-wsdl-os.wsdl</wsdl>
                                     <extraargs>
                                         <extraArg>-p</extraArg>
