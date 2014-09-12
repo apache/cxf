@@ -51,6 +51,14 @@ public class JexlClaimsMapper implements ClaimsMapper {
         functions.put("claims", new ClaimUtils());
         jexl.setFunctions(functions);
     }
+    
+    public JexlClaimsMapper(String script) throws IOException {
+        this();
+
+        if (script != null) {
+            setScript(script);
+        }
+    }
 
     public ProcessedClaimCollection mapClaims(String sourceRealm, ProcessedClaimCollection sourceClaims,
         String targetRealm, ClaimsParameters parameters) {

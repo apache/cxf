@@ -165,6 +165,30 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         assertEquals(1, claim.getValues().size());
         assertEquals("test@apache.com", claim.getValues().get(0));
     }
+    
+    @Test
+    public void testSingleToMultiValue() throws IOException {
+        ProcessedClaimCollection result = jcm.mapClaims("A", createClaimCollection(), "B", createProperties());
+
+        assertNotNull(result);
+        ProcessedClaim claim = findClaim(result, "http://my.schema.org/identity/claims/single2multi");
+        assertNotNull(claim);
+        assertNotNull(claim.getValues());
+        assertEquals(3, claim.getValues().size());
+        assertEquals("Value2", claim.getValues().get(1));
+    }
+
+    @Test
+    public void testMultiToSingleValue() throws IOException {
+        ProcessedClaimCollection result = jcm.mapClaims("A", createClaimCollection(), "B", createProperties());
+
+        assertNotNull(result);
+        ProcessedClaim claim = findClaim(result, "http://my.schema.org/identity/claims/multi2single");
+        assertNotNull(claim);
+        assertNotNull(claim.getValues());
+        assertEquals(1, claim.getValues().size());
+        assertEquals("Value1,Value2,Value3", claim.getValues().get(0));
+    }
 
     @SuppressWarnings("unchecked")
     protected ProcessedClaimCollection createClaimCollection() {
@@ -220,5 +244,5 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         }
         return null;
     }
-
+    
 }
