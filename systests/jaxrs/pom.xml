@@ -35,7 +35,7 @@
         <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
         <cxf.surefire.fork.vmargs>-XX:MaxPermSize=192m</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-XX:MaxPermSize=192m</cxf.server.launcher.vmargs>
-        
+
     </properties>
     <dependencies>
         <dependency>
@@ -49,12 +49,12 @@
         </dependency>
         <dependency>
             <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>            
-        </dependency>          
+            <artifactId>javax.json-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
-        </dependency>             
+        </dependency>
         <!--
           <dependency>
             <groupId>org.apache.bval</groupId>
@@ -155,7 +155,7 @@
             <artifactId>jetty-jaas</artifactId>
             <version>${cxf.jetty9.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
@@ -391,7 +391,7 @@
             <artifactId>spring-security-web</artifactId>
             <version>3.2.0.RELEASE</version>
             <scope>test</scope>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -472,8 +472,8 @@
             <exclusions>
             	<exclusion>
             		<groupId>org.apache.poi</groupId>
-            		<artifactId>poi-ooxml</artifactId>            	
-            	</exclusion>       
+            		<artifactId>poi-ooxml</artifactId>
+            	</exclusion>
             </exclusions>
         </dependency>
     </dependencies>
@@ -487,41 +487,6 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jibx</groupId>
-                <artifactId>jibx-maven-plugin</artifactId>
-                <version>${cxf.jibx.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-java-code-from-schema</id>
-                        <goals>
-                            <goal>schema-codegen</goal>
-                        </goals>
-                        <configuration>
-                            <schemaLocation>src/test/resources/jibx</schemaLocation>
-                            <schemaBindingDirectory>target/generated/src/main/java</schemaBindingDirectory>
-                            <options>
-                                <package>org.apache.cxf.systest.jaxrs.codegen.jibx</package>
-                            </options>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>compile-binding</id>
-                        <goals>
-                            <goal>bind</goal>
-                        </goals>
-                        <configuration>
-                            <schemaBindingDirectory>target/generated/src/main/java</schemaBindingDirectory>
-                            <includeSchemaBindings>
-                                <includeSchemaBindings>binding.xml</includeSchemaBindings>
-                            </includeSchemaBindings>
-                            <load>true</load>
-                            <validate>true</validate>
-                            <verify>true</verify>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
