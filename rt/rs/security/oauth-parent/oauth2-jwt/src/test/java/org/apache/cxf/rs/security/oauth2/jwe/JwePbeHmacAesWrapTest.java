@@ -49,8 +49,30 @@ public class JwePbeHmacAesWrapTest extends Assert {
             new PbesHmacAesWrapKeyEncryptionAlgorithm(password, JwtConstants.PBES2_HS256_A128KW_ALGO);
         JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers, keyEncryption);
         String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
-        assertNotNull(jweContent);
-
+        
+        PbesHmacAesWrapKeyDecryptionAlgorithm keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
+        JweDecryptionProvider decryption = new AesCbcHmacJweDecryption(keyDecryption);
+        String decryptedText = decryption.decrypt(jweContent).getContentText();
+        assertEquals(specPlainText, decryptedText);
+        
+    }
+    @Test
+    public void testEncryptDecryptPbesHmacAesWrapAesGcm() throws Exception {
+        final String specPlainText = "Live long and prosper.";
+        JweHeaders headers = new JweHeaders();
+        headers.setAlgorithm(JwtConstants.PBES2_HS256_A128KW_ALGO);
+        headers.setContentEncryptionAlgorithm(Algorithm.A128GCM.getJwtName());
+        final String password = "Thus from my lips, by yours, my sin is purged."; 
+        KeyEncryptionAlgorithm keyEncryption = 
+            new PbesHmacAesWrapKeyEncryptionAlgorithm(password, JwtConstants.PBES2_HS256_A128KW_ALGO);
+        JweEncryptionProvider encryption = 
+            new WrappedKeyJweEncryption(headers, keyEncryption);
+        String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
+        PbesHmacAesWrapKeyDecryptionAlgorithm keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
+        JweDecryptionProvider decryption = new WrappedKeyJweDecryption(keyDecryption, null, null);
+        String decryptedText = decryption.decrypt(jweContent).getContentText();
+        assertEquals(specPlainText, decryptedText);
+        
     }
 }
 

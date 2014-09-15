@@ -81,11 +81,9 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
     
     @Override
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {
-        int keySize = DERIVED_KEY_SIZE_MAP.get(keyAlgoJwt);
-        byte[] saltInput = createSaltInputValue(keySize);
-        PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(createShaDigest());
-        gen.init(password, saltInput, pbesCount);
-        byte[] derivedKey = ((KeyParameter) gen.generateDerivedParameters(keySize * 8)).getKey();
+        int keySize = getKeySize(keyAlgoJwt);
+        byte[] saltInput = CryptoUtils.generateSecureRandomBytes(keySize);
+        byte[] derivedKey = createDerivedKey(keyAlgoJwt, keySize, password, saltInput, pbesCount);
         
         headers.setHeader("p2s", Base64UrlUtility.encode(saltInput));
         headers.setHeader("p2c", Integer.valueOf(pbesCount));
@@ -101,46 +99,51 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
         };
         return aesWrap.getEncryptedContentEncryptionKey(headers, cek);
         
+        
     }
-    
-    private Digest createShaDigest() {
+    static int getKeySize(String keyAlgoJwt) {
+        return DERIVED_KEY_SIZE_MAP.get(keyAlgoJwt);
+    }
+    static byte[] createDerivedKey(String keyAlgoJwt, int keySize,
+                                   byte[] password, byte[] saltInput, int pbesCount) {
+        byte[] saltValue = createSaltValue(keyAlgoJwt, saltInput);
+        Digest digest = null;
         int macSigSize = PBES_HMAC_MAP.get(keyAlgoJwt);
         if (macSigSize == 256) { 
-            return new SHA256Digest();
+            digest = new SHA256Digest();
         } else if (macSigSize == 384) {
-            return new SHA384Digest();
+            digest = new SHA384Digest();
         } else {
-            return new SHA512Digest();
+            digest = new SHA512Digest();
         }
-            
-        
+        PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(digest);
+        gen.init(password, saltValue, pbesCount);
+        return ((KeyParameter) gen.generateDerivedParameters(keySize * 8)).getKey();
     }
     
-    private byte[] createSaltInputValue(int keySize) {
+    
+    private static byte[] createSaltValue(String keyAlgoJwt, byte[] saltInput) {
         byte[] algoBytes = stringToBytes(keyAlgoJwt);
-        
-        
-        byte[] saltInput = CryptoUtils.generateSecureRandomBytes(keySize);
-        byte[] saltValue = new byte[algoBytes.length + 1 + keySize];
+        byte[] saltValue = new byte[algoBytes.length + 1 + saltInput.length];
         System.arraycopy(algoBytes, 0, saltValue, 0, algoBytes.length);
         saltValue[algoBytes.length] = 0;
         System.arraycopy(saltInput, 0, saltValue, algoBytes.length + 1, saltInput.length);
         return saltValue;
     }
-    private static String validateKeyAlgorithm(String algo) {
+    static String validateKeyAlgorithm(String algo) {
         if (!SUPPORTED_ALGORITHMS.contains(algo)) {
             throw new SecurityException();
         }
         return algo;
     }
-    private static int validatePbesCount(int count) {
+    static int validatePbesCount(int count) {
         if (count < 1000) {
             throw new SecurityException();
         }
         return count;
     }    
     
-    private static byte[] stringToBytes(String str) {
+    static byte[] stringToBytes(String str) {
         try {
             return str.getBytes("UTF-8");
         } catch (UnsupportedEncodingException ex) {

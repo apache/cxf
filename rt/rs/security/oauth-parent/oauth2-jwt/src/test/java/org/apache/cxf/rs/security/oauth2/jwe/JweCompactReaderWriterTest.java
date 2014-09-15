@@ -205,22 +205,5 @@ public class JweCompactReaderWriterTest extends Assert {
         }
         return key;
     }
-    
-    @Test
-    public void testEncryptDecryptPbesHmacAesWrapA128CBCHS256() throws Exception {
-        final String specPlainText = "Live long and prosper.";
-        JweHeaders headers = new JweHeaders();
-        headers.setAlgorithm(JwtConstants.PBES2_HS256_A128KW_ALGO);
-        headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
-        final String password = "Thus from my lips, by yours, my sin is purged."; 
-        KeyEncryptionAlgorithm keyEncryption = 
-            new PbesHmacAesWrapKeyEncryptionAlgorithm(password,
-                                                      4096,
-                                                      JwtConstants.PBES2_HS256_A128KW_ALGO);
-        JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers, keyEncryption);
-        String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
-        
-        System.out.println(jweContent);
-    }
 }
 
