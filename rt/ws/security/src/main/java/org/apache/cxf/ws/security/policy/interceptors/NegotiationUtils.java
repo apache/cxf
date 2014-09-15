@@ -275,11 +275,13 @@ final class NegotiationUtils {
                             getTokenStore(message).add(token);
                         }
                     }
-                    final SecurityContext sc = token.getSecurityContext();
-                    if (sc != null) {
-                        message.put(SecurityContext.class, sc);
+                    if (token != null) {
+                        final SecurityContext sc = token.getSecurityContext();
+                        if (sc != null) {
+                            message.put(SecurityContext.class, sc);
+                        }
+                        return true;
                     }
-                    return true;
                 }
             }
         }
