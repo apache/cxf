@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -208,9 +209,16 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             }
         }        
         private List<Object> createBeans(Collection<Class<?>> classes) {
+            AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
             final List< Object > providers = new ArrayList< Object >();
             for (final Class< ? > clazz: classes) {
-                providers.add(context.getAutowireCapableBeanFactory().createBean(clazz));
+                Object bean = null;
+                try {
+                    bean = beanFactory.createBean(clazz, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+                } catch (Exception ex) {
+                    bean = beanFactory.createBean(clazz);
+                }
+                providers.add(bean);
             }
             return providers;
         }
