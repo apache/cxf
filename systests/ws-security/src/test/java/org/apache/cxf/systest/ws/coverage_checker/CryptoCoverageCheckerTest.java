@@ -560,6 +560,54 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testWSAddressingOptionalSignatureParts() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItWSAPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+        
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put("action", "Timestamp Signature");
+        outProps.put("signaturePropFile", "alice.properties");
+        outProps.put("user", "alice");
+        outProps.put("passwordCallbackClass", 
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
+        outProps.put("optionalSignatureParts",
+                     "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
+                     + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
+                     + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;"
+                     + "{}{http://www.w3.org/2005/08/addressing}ReplyTo;");
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
+        
+        WSS4JStaxOutInterceptor staxOutInterceptor = null;
+        WSS4JOutInterceptor outInterceptor = null;
+        if (test.isStreaming()) {
+            staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
+            bus.getOutInterceptors().add(staxOutInterceptor);
+        } else {
+            outInterceptor = new WSS4JOutInterceptor(outProps);
+            bus.getOutInterceptors().add(outInterceptor);
+        }
+        
+        port.doubleIt(25);
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
     // Here the service is sending an secured message back to the client. For a server Fault 
     // message it returns the original fault, as the CryptoCoverageChecker is configured not 
     // to check a fault (see CXF-4954)
