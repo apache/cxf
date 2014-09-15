@@ -40,6 +40,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ApplicationContext;
@@ -131,9 +132,17 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
                     if (classes.get(Path.class).size() > 1) {
                         throw new NoUniqueBeanDefinitionException(Path.class, classes.get(Path.class).size(), 
                             "More than one service class (@Path) has been discovered");
-                    } else {                      
+                    } else {
+                        AutowireCapableBeanFactory beanFactory = ctx.getAutowireCapableBeanFactory();
                         for (final Class< ? > providerClass: classes.get(Provider.class)) {
-                            setProvider(ctx.getAutowireCapableBeanFactory().createBean(providerClass));
+                            Object bean = null;
+                            try {
+                                bean = beanFactory.createBean(providerClass, 
+                                                       AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+                            } catch (Exception ex) {
+                                bean = beanFactory.createBean(providerClass);
+                            }
+                            setProvider(bean);
                         }
                         
                         for (final Class< ? > serviceClass: classes.get(Path.class)) {                        
