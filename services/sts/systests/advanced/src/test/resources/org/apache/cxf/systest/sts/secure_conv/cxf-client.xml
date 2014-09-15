@@ -49,6 +49,12 @@
             <entry key="ws-security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+        </jaxws:properties>
+    </jaxws:client>
+    
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>

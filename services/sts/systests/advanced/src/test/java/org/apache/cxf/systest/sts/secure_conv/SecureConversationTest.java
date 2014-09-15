@@ -110,6 +110,27 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    @org.junit.Test
+    public void testSecureConversationSupporting() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SecureConversationTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SecureConversationTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSupportingPort");
+        DoubleItPortType transportPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportPort, PORT);
+
+        doubleIt(transportPort, 25);
+        
+        bus.shutdown(true);
+    }
+    
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertTrue(resp == 2 * numToDouble);

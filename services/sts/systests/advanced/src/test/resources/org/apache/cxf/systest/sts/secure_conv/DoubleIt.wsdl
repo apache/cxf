@@ -49,12 +49,31 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItTransportSupportingBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItBindingTransportSupportingPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItTransportSecureConvPort" binding="tns:DoubleItTransportSecureConvBinding">
             <soap:address location="https://localhost:8081/doubleit/services/doubleittransportsecureconv"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSymmetricSecureConvPort" binding="tns:DoubleItSymmetricSecureConvBinding">
             <soap:address location="http://localhost:8082/doubleit/services/doubleitsymmetricsecureconv"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItTransportSupportingPort" 
+                   binding="tns:DoubleItTransportSupportingBinding">
+            <soap:address location="https://localhost:8081/doubleit/services/doubleittransportsupporting"/>
         </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItBindingTransportSecureConvPolicy">
@@ -223,6 +242,48 @@
                         <sp:IncludeTimestamp/>
                     </wsp:Policy>
                 </sp:SymmetricBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItBindingTransportSupportingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <wsam:Addressing wsp:Optional="false">
+                    <wsp:Policy/>
+                </wsam:Addressing>
+                <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:SupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:SecureConversationToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                                <sp:BootstrapPolicy>
+                                    <wsp:Policy />
+                                </sp:BootstrapPolicy>
+                            </wsp:Policy>
+                        </sp:SecureConversationToken>
+                    </wsp:Policy>
+                </sp:SupportingTokens>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
