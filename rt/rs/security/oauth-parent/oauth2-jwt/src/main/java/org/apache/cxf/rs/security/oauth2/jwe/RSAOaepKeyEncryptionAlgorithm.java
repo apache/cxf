@@ -29,12 +29,6 @@ public class RSAOaepKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgo
     private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
         Arrays.asList(Algorithm.RSA_OAEP.getJwtName(),
                       Algorithm.RSA_OAEP_256.getJwtName()));
-    public RSAOaepKeyEncryptionAlgorithm(RSAPublicKey publicKey) {
-        this(publicKey, null, true);
-    }
-    public RSAOaepKeyEncryptionAlgorithm(RSAPublicKey publicKey, boolean wrap) {
-        this(publicKey, null, wrap);
-    }
     public RSAOaepKeyEncryptionAlgorithm(RSAPublicKey publicKey, String jweAlgo) {
         this(publicKey, jweAlgo, true);
     }

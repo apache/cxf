@@ -140,7 +140,8 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 keyEncryptionAlgo = jwk.getAlgorithm();
                 // TODO: Put it into some factory code
                 if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-                    keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(jwk.toRSAPublicKey());
+                    keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(jwk.toRSAPublicKey(),
+                                                getKeyEncryptionAlgo(props, keyEncryptionAlgo));
                 } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
                     SecretKey key = jwk.toSecretKey();
                     if (Algorithm.isAesKeyWrap(keyEncryptionAlgo)) {
@@ -154,16 +155,16 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 
             } else {
                 keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(
-                    (RSAPublicKey)CryptoUtils.loadPublicKey(m, props));
+                    (RSAPublicKey)CryptoUtils.loadPublicKey(m, props), 
+                    getKeyEncryptionAlgo(props, keyEncryptionAlgo));
             }
             if (keyEncryptionProvider == null) {
                 throw new SecurityException();
             }
-            if (keyEncryptionAlgo == null) {
-                keyEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP);
-            }
+            
             String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
-            JweHeaders headers = new JweHeaders(keyEncryptionAlgo, contentEncryptionAlgo);
+            JweHeaders headers = new JweHeaders(getKeyEncryptionAlgo(props, keyEncryptionAlgo), 
+                                                contentEncryptionAlgo);
             String compression = props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP);
             if (compression != null) {
                 headers.setZipAlgorithm(compression);
@@ -181,7 +182,9 @@ public class JweWriterInterceptor implements WriterInterceptor {
             throw new SecurityException(ex);
         }
     }
-
+    private String getKeyEncryptionAlgo(Properties props, String algo) {
+        return algo == null ? props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP) : algo;
+    }
     public void setUseJweOutputStream(boolean useJweOutputStream) {
         this.useJweOutputStream = useJweOutputStream;
     }
