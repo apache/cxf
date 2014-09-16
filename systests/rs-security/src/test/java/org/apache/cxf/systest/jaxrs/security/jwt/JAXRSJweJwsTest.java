@@ -124,7 +124,14 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         assertEquals("book", text);
     }
     @Test
-    public void testJweJwkAesWrapAndAesCbcHMac() throws Exception {
+    public void testJweJwkAesCbcHMacInlineSet() throws Exception {
+        doTestJweJwkAesCbcHMac("org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.inlineset.properties");
+    }
+    @Test
+    public void testJweJwkAesCbcHMacInlineSingleKey() throws Exception {
+        doTestJweJwkAesCbcHMac("org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.inlinejwk.properties");
+    }
+    private void doTestJweJwkAesCbcHMac(String propFile) throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkaescbchmac";
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
@@ -139,8 +146,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         providers.add(jweWriter);
         providers.add(new JweClientResponseFilter());
         bean.setProviders(providers);
-        bean.getProperties(true).put("rs.security.encryption.properties",
-                                     "org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.properties");
+        bean.getProperties(true).put("rs.security.encryption.properties", propFile);
+        PrivateKeyPasswordProvider provider = new PrivateKeyPasswordProviderImpl();
+        bean.getProperties(true).put("rs.security.key.password.provider", provider);
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
         assertEquals("book", text);

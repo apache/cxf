@@ -52,9 +52,9 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         AES_CEK_SIZE_MAP.put(Algorithm.A256CBC_HS512.getJwtName(), 64);
     }
     public AesCbcHmacJweEncryption(String keyAlgo, 
-                                   String celAlgoJwt, 
+                                   String cekAlgoJwt, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
-        this(new JweHeaders(keyAlgo, validateCekAlgorithm(celAlgoJwt)), 
+        this(new JweHeaders(keyAlgo, validateCekAlgorithm(cekAlgoJwt)), 
              null, null, keyEncryptionAlgorithm);
     }
     public AesCbcHmacJweEncryption(JweHeaders headers, 

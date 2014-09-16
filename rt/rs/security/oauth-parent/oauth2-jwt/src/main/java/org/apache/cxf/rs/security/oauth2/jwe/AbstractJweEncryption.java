@@ -141,22 +141,21 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     }
     
     private JweEncryptionInternal getInternalState(String contentType) {
-        JweHeaders theHeaders = headers;
-        if (contentType != null) {
-            theHeaders = new JweHeaders(theHeaders.asMap());
-            theHeaders.setContentType(contentType);
-        }
-        
         byte[] theCek = getContentEncryptionKey();
-        String contentEncryptionAlgoJavaName = Algorithm.toJavaName(theHeaders.getContentEncryptionAlgorithm());
+        String contentEncryptionAlgoJavaName = Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
-        keyProps.setCompressionSupported(compressionRequired(theHeaders));
+        keyProps.setCompressionSupported(compressionRequired(headers));
         
         byte[] theIv = contentEncryptionAlgo.getInitVector();
         AlgorithmParameterSpec specParams = getAlgorithmParameterSpec(theIv);
         keyProps.setAlgoSpec(specParams);
         byte[] jweContentEncryptionKey = getEncryptedContentEncryptionKey(theCek);
         
+        JweHeaders theHeaders = headers;
+        if (contentType != null) {
+            theHeaders = new JweHeaders(theHeaders.asMap());
+            theHeaders.setContentType(contentType);
+        }
         byte[] additionalEncryptionParam = getAAD(theHeaders);
         keyProps.setAdditionalData(additionalEncryptionParam);
         
