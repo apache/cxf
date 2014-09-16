@@ -141,4 +141,31 @@ public class JwtHeaders extends AbstractJwtObject {
     public Object getHeader(String name) {
         return getValue(name);
     }
+    
+    public JwtHeaders setIntegerHeader(String name, Integer value) {
+        setValue(name, value);
+        return this;
+    }
+    
+    public Integer getIntegerHeader(String name) {
+        Object value = getValue(name);
+        if (value != null) {
+            return value instanceof Integer ? (Integer)value : Integer.parseInt(value.toString());
+        } else {
+            return null;
+        }
+    }
+    public JwtHeaders setLongHeader(String name, Long value) {
+        setValue(name, value);
+        return this;
+    }
+    
+    public Long getLongHeader(String name) {
+        Object value = getValue(name);
+        if (value != null) {
+            return value instanceof Long ? (Long)value : Long.parseLong(value.toString());
+        } else {
+            return null;
+        }
+    }
 }
