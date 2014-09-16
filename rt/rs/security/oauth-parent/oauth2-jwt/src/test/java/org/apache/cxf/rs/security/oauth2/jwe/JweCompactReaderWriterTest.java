@@ -173,11 +173,12 @@ public class JweCompactReaderWriterTest extends Assert {
         } else {
             jwtKeyName = Algorithm.toJwtName(key.getAlgorithm(), key.getEncoded().length * 8);
         }
-        RSAJweEncryption encryptor = new RSAJweEncryption(publicKey, 
-                                                          Algorithm.RSA_OAEP.getJwtName(),
-                                                        key, 
-                                                        jwtKeyName, 
-                                                        INIT_VECTOR_A1);
+        JweEncryptionProvider encryptor = new WrappedKeyJweEncryption(
+                                                        new JweHeaders(Algorithm.RSA_OAEP.getJwtName(), jwtKeyName),  
+                                                        key.getEncoded(), 
+                                                        INIT_VECTOR_A1,
+                                                        new RSAOaepKeyEncryptionAlgorithm(publicKey, 
+                                                            Algorithm.RSA_OAEP.getJwtName()));
         return encryptor.encrypt(content.getBytes("UTF-8"), null);
     }
     private String encryptContentDirect(SecretKey key, String content) throws Exception {
@@ -187,7 +188,7 @@ public class JweCompactReaderWriterTest extends Assert {
     private void decrypt(String jweContent, String plainContent, boolean unwrap) throws Exception {
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1, 
                                                                 RSA_PRIVATE_EXPONENT_ENCODED_A1);
-        RSAJweDecryption decryptor = new RSAJweDecryption(privateKey, unwrap);
+        JweDecryptionProvider decryptor = new WrappedKeyJweDecryption(new RSAOaepKeyDecryptionAlgorithm(privateKey));
         String decryptedText = decryptor.decrypt(jweContent).getContentText();
         assertEquals(decryptedText, plainContent);
     }
