@@ -95,7 +95,7 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
         byte[] derivedKey = createDerivedKey(keyAlgoJwt, keySize, password, saltInput, pbesCount);
         
         headers.setHeader("p2s", Base64UrlUtility.encode(saltInput));
-        headers.setHeader("p2c", Integer.valueOf(pbesCount));
+        headers.setIntegerHeader("p2c", pbesCount);
         
         final String aesAlgoJwt = PBES_AES_MAP.get(keyAlgoJwt);
         KeyEncryptionAlgorithm aesWrap = new AesWrapKeyEncryptionAlgorithm(derivedKey, aesAlgoJwt) {
