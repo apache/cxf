@@ -78,6 +78,7 @@ public final class CryptoUtils {
     public static final String RSSEC_KEY_STORE_ALIAS = "rs.security.keystore.alias";
     public static final String RSSEC_KEY_STORE_FILE = "rs.security.keystore.file";
     public static final String RSSEC_PRINCIPAL_NAME = "rs.security.principal.name";
+    public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";
     public static final String RSSEC_SIG_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
     public static final String RSSEC_DECRYPT_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
         

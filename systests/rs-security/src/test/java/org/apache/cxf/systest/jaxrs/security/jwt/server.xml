@@ -136,6 +136,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.properties"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwshmac">

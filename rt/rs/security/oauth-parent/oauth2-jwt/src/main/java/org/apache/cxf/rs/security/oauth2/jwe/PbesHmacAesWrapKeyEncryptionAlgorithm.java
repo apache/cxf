@@ -19,6 +19,9 @@
 package org.apache.cxf.rs.security.oauth2.jwe;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,6 +72,12 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
     }
     public PbesHmacAesWrapKeyEncryptionAlgorithm(String password, int pbesCount, String keyAlgoJwt) {
         this(stringToBytes(password), pbesCount, keyAlgoJwt);
+    }
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(char[] password, String keyAlgoJwt) {
+        this(password, 4096, keyAlgoJwt);
+    }
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(char[] password, int pbesCount, String keyAlgoJwt) {
+        this(charsToBytes(password), pbesCount, keyAlgoJwt);
     }
     public PbesHmacAesWrapKeyEncryptionAlgorithm(byte[] password, String keyAlgoJwt) {
         this(password, 4096, keyAlgoJwt);
@@ -149,6 +158,12 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
         } catch (UnsupportedEncodingException ex) {
             throw new SecurityException(ex);
         }
+    }
+    static byte[] charsToBytes(char[] chars) {
+        ByteBuffer bb = Charset.forName("UTF-8").encode(CharBuffer.wrap(chars));
+        byte[] b = new byte[bb.remaining()];
+        bb.get(b);
+        return b;
     }
     
 }

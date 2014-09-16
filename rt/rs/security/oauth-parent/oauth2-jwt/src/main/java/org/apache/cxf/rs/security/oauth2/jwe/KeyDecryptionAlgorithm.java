@@ -19,6 +19,6 @@
 package org.apache.cxf.rs.security.oauth2.jwe;
 
 
-interface KeyDecryptionAlgorithm {
+public interface KeyDecryptionAlgorithm {
     byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer);
 }
