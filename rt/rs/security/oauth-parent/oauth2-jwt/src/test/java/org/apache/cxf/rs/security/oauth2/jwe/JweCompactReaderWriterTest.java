@@ -175,7 +175,7 @@ public class JweCompactReaderWriterTest extends Assert {
         }
         JweEncryptionProvider encryptor = new WrappedKeyJweEncryption(
                                                         new JweHeaders(Algorithm.RSA_OAEP.getJwtName(), jwtKeyName),  
-                                                        key.getEncoded(), 
+                                                        key == null ? null : key.getEncoded(), 
                                                         INIT_VECTOR_A1,
                                                         new RSAOaepKeyEncryptionAlgorithm(publicKey, 
                                                             Algorithm.RSA_OAEP.getJwtName()));
