@@ -60,7 +60,18 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return byte[].class.isAssignableFrom(type)
                || InputStream.class.isAssignableFrom(type)
-               || Reader.class.isAssignableFrom(type);
+               || Reader.class.isAssignableFrom(type)
+               || StreamingOutput.class.isAssignableFrom(type);
+    }
+
+    private static final class ReadingStreamingOutput implements StreamingOutput {
+        private final InputStream inputStream;
+        private ReadingStreamingOutput(InputStream inputStream) {
+            this.inputStream = inputStream;
+        }
+        public void write(OutputStream outputStream) throws IOException {
+            IOUtils.copy(inputStream, outputStream);
+        }        
     }
 
     public T readFrom(Class<T> clazz, Type genericType, Annotation[] annotations, MediaType type, 
@@ -80,6 +91,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                 } else {
                     return clazz.cast(IOUtils.toString(is, enc).getBytes(enc));
                 }
+            }
+            if (StreamingOutput.class.isAssignableFrom(clazz)) {
+                return clazz.cast(new ReadingStreamingOutput(is));
             }
         } catch (ClassCastException e) {
             String msg = "Unsupported class: " + clazz.getName();
