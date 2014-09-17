@@ -43,7 +43,6 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaContent;
 import org.apache.ws.commons.schema.XmlSchemaContentModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
@@ -54,6 +53,7 @@ import org.apache.ws.commons.schema.extensions.ExtensionRegistry;
 import org.apache.ws.commons.schema.resolver.URIResolver;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 import org.apache.ws.commons.schema.utils.NamespacePrefixList;
+import org.apache.ws.commons.schema.utils.XmlSchemaObjectBase;
 
 /**
  * Wrapper class for XmlSchemaCollection that deals with various quirks and bugs.
@@ -312,7 +312,7 @@ public class SchemaCollection {
         }
     }
     private void addCrossImports(XmlSchema schema, XmlSchemaAll all) {
-        for (XmlSchemaObject seqMember : all.getItems()) {
+        for (XmlSchemaObjectBase seqMember : all.getItems()) {
             if (seqMember instanceof XmlSchemaElement) {
                 addElementCrossImportsElement(schema, (XmlSchemaElement)seqMember);
             }
@@ -320,7 +320,7 @@ public class SchemaCollection {
     }
 
     private void addCrossImports(XmlSchema schema, XmlSchemaChoice choice) {
-        for (XmlSchemaObject seqMember : choice.getItems()) {
+        for (XmlSchemaObjectBase seqMember : choice.getItems()) {
             if (seqMember instanceof XmlSchemaElement) {
                 addElementCrossImportsElement(schema, (XmlSchemaElement)seqMember);
             }
