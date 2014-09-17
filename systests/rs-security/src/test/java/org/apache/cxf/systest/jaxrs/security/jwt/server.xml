@@ -46,41 +46,41 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jwt.BookStore"/>
-    <bean id="jweInFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweContainerRequestFilter"/>
-    <bean id="jweOutFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweWriterInterceptor"/>
+    <bean id="jweInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter"/>
+    <bean id="jweOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor"/>
     
-    <bean id="aesWrapEncryptionAlgo" class="org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyEncryptionAlgorithm">
+    <bean id="aesWrapEncryptionAlgo" class="org.apache.cxf.rs.security.jose.jwe.AesWrapKeyEncryptionAlgorithm">
         <constructor-arg value="GawgguFyGrWKav7AX4VKUg"/>
         <constructor-arg value="A128KW"/>
     </bean>
-    <bean id="aesCbcHmacEncryption" class="org.apache.cxf.rs.security.oauth2.jwe.AesCbcHmacJweEncryption">
+    <bean id="aesCbcHmacEncryption" class="org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption">
         <constructor-arg value="A128KW"/>
         <constructor-arg value="A128CBC-HS256"/>
         <constructor-arg ref="aesWrapEncryptionAlgo"/>
     </bean>
     
-    <bean id="aesWrapDecryptionAlgo" class="org.apache.cxf.rs.security.oauth2.jwe.AesWrapKeyDecryptionAlgorithm">
+    <bean id="aesWrapDecryptionAlgo" class="org.apache.cxf.rs.security.jose.jwe.AesWrapKeyDecryptionAlgorithm">
         <constructor-arg value="GawgguFyGrWKav7AX4VKUg"/>
     </bean>
-    <bean id="aesCbcHmacDecryption" class="org.apache.cxf.rs.security.oauth2.jwe.AesCbcHmacJweDecryption">
+    <bean id="aesCbcHmacDecryption" class="org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption">
         <constructor-arg ref="aesWrapDecryptionAlgo"/>
     </bean>
     
-    <bean id="jweInAesCbcHmacFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweContainerRequestFilter">
+    <bean id="jweInAesCbcHmacFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter">
         <property name="decryptionProvider" ref="aesCbcHmacDecryption"/>
     </bean>
-    <bean id="jweOutAesCbcHmacFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JweWriterInterceptor">
+    <bean id="jweOutAesCbcHmacFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor">
         <property name="encryptionProvider" ref="aesCbcHmacEncryption"/>
     </bean>
     
-    <bean id="hmacSigVerifier" class="org.apache.cxf.rs.security.oauth2.jws.HmacJwsSignatureProvider">
+    <bean id="hmacSigVerifier" class="org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider">
         <constructor-arg value="AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"/>
     </bean>
-    <bean id="jwsHmacInFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JwsContainerRequestFilter">
+    <bean id="jwsHmacInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter">
        <property name="signatureVerifier" ref="hmacSigVerifier"/>
     </bean>
-    <bean id="jwsInFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JwsContainerRequestFilter"/>
-    <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.oauth2.jwt.jaxrs.JwsWriterInterceptor"/>
+    <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter"/>
+    <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor"/>
     <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jwt.PrivateKeyPasswordProviderImpl"/>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsa">
         <jaxrs:serviceBeans>

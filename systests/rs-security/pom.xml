@@ -78,7 +78,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-security-oauth2-jwt</artifactId>
+            <artifactId>cxf-rt-rs-security-oauth2-jose</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
