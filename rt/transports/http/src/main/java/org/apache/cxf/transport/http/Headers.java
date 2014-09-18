@@ -66,7 +66,7 @@ public class Headers {
     public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
     public static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
     public static final String HTTP_HEADERS_LINK = "Link";
-    
+    private static final TimeZone TIME_ZONE_GMT = TimeZone.getTimeZone("GMT");
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
     
     /**
@@ -490,10 +490,8 @@ public class Headers {
     }
 
     public static SimpleDateFormat getHttpDateFormat() {
-        SimpleDateFormat dateFormat = 
-            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-        TimeZone tZone = TimeZone.getTimeZone("GMT");
-        dateFormat.setTimeZone(tZone);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+        dateFormat.setTimeZone(TIME_ZONE_GMT);
         return dateFormat;
     }
     
