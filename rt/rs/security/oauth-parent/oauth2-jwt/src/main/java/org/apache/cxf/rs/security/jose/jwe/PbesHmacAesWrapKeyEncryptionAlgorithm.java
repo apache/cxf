@@ -99,7 +99,7 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
         
         final String aesAlgoJwt = PBES_AES_MAP.get(keyAlgoJwt);
         KeyEncryptionAlgorithm aesWrap = new AesWrapKeyEncryptionAlgorithm(derivedKey, aesAlgoJwt) {
-            protected void checkAlgorithms(JweHeaders headers, String defaultAlgo) {
+            protected void checkAlgorithms(JweHeaders headers) {
                 // complete
             }
             protected String getKeyEncryptionAlgoJava(JweHeaders headers) {
@@ -164,6 +164,10 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
         byte[] b = new byte[bb.remaining()];
         bb.get(b);
         return b;
+    }
+    @Override
+    public String getAlgorithm() {
+        return keyAlgoJwt;
     }
     
 }

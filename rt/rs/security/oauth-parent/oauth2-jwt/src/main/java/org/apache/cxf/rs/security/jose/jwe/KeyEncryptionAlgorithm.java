@@ -20,5 +20,6 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 
 public interface KeyEncryptionAlgorithm {
+    String getAlgorithm();
     byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek);
 }

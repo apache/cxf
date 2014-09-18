@@ -86,9 +86,7 @@ public final class JwkUtils {
     private static JweEncryptionProvider createDefaultEncryption(char[] password) {
         KeyEncryptionAlgorithm keyEncryption = 
             new PbesHmacAesWrapKeyEncryptionAlgorithm(password, Algorithm.PBES2_HS256_A128KW.getJwtName());
-        return new AesCbcHmacJweEncryption(Algorithm.PBES2_HS256_A128KW.getJwtName(),
-                                           Algorithm.A128CBC_HS256.getJwtName(),
-                                           keyEncryption);
+        return new AesCbcHmacJweEncryption(Algorithm.A128CBC_HS256.getJwtName(), keyEncryption);
     }
     private static JweDecryptionProvider createDefaultDecryption(char[] password) {
         KeyDecryptionAlgorithm keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);

@@ -20,8 +20,6 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.crypto.SecretKey;
-
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
@@ -31,17 +29,20 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
     private byte[] cek;
     private byte[] iv;
     private AtomicInteger providedIvUsageCount;
-    protected AbstractContentEncryptionAlgorithm(SecretKey key, byte[] iv) { 
-        this(key.getEncoded(), iv);    
-    }
-    protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv) { 
+    private String algorithm;
+    
+    protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv, String algo) { 
         this.cek = cek;
         this.iv = iv;
         if (iv != null && iv.length > 0) {
             providedIvUsageCount = new AtomicInteger();
         }    
+        this.algorithm = algo;
     }
-    
+    @Override
+    public String getAlgorithm() { 
+        return algorithm;
+    }
     public byte[] getContentEncryptionKey(JweHeaders headers) {
         return cek;
     }

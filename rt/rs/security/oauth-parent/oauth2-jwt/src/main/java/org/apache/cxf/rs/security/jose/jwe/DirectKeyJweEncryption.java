@@ -28,7 +28,7 @@ public class DirectKeyJweEncryption extends AbstractJweEncryption {
                                                 cek.getEncoded().length * 8)), cek.getEncoded(), iv);
     }
     public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
-        this(headers, new AesGcmContentEncryptionAlgorithm(cek, iv));
+        this(headers, new AesGcmContentEncryptionAlgorithm(cek, iv, headers.getContentEncryptionAlgorithm()));
     }
     public DirectKeyJweEncryption(JweHeaders headers, ContentEncryptionAlgorithm ceAlgo) {
         super(headers, ceAlgo, new DirectKeyEncryptionAlgorithm());

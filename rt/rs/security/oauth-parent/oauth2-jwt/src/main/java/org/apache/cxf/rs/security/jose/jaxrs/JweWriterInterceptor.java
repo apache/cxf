@@ -41,6 +41,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption;
+import org.apache.cxf.rs.security.jose.jwe.AesGcmContentEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesGcmWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
@@ -171,10 +172,11 @@ public class JweWriterInterceptor implements WriterInterceptor {
             }
             boolean isAesHmac = Algorithm.isAesCbcHmac(contentEncryptionAlgo);
             if (isAesHmac) { 
-                return new AesCbcHmacJweEncryption(
-                    keyEncryptionAlgo, contentEncryptionAlgo, keyEncryptionProvider);
+                return new AesCbcHmacJweEncryption(contentEncryptionAlgo, keyEncryptionProvider);
             } else {
-                return new WrappedKeyJweEncryption(headers, keyEncryptionProvider);
+                return new WrappedKeyJweEncryption(headers, 
+                                                   keyEncryptionProvider,
+                                                   new AesGcmContentEncryptionAlgorithm(contentEncryptionAlgo));
             }
         } catch (SecurityException ex) {
             throw ex;

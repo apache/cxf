@@ -288,8 +288,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         final String cekEncryptionKey = "GawgguFyGrWKav7AX4VKUg";
         AesWrapKeyEncryptionAlgorithm keyEncryption = 
             new AesWrapKeyEncryptionAlgorithm(cekEncryptionKey, Algorithm.A128KW.getJwtName());
-        jweWriter.setEncryptionProvider(new AesCbcHmacJweEncryption(Algorithm.A128KW.getJwtName(), 
-                                                                    Algorithm.A128CBC_HS256.getJwtName(),
+        jweWriter.setEncryptionProvider(new AesCbcHmacJweEncryption(Algorithm.A128CBC_HS256.getJwtName(),
                                                                     keyEncryption));
         
         // reader 

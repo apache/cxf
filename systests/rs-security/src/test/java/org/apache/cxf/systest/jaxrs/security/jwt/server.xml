@@ -54,7 +54,6 @@ under the License.
         <constructor-arg value="A128KW"/>
     </bean>
     <bean id="aesCbcHmacEncryption" class="org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption">
-        <constructor-arg value="A128KW"/>
         <constructor-arg value="A128CBC-HS256"/>
         <constructor-arg ref="aesWrapEncryptionAlgo"/>
     </bean>
