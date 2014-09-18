@@ -26,7 +26,6 @@ import java.util.Properties;
 import java.util.zip.DeflaterOutputStream;
 
 import javax.annotation.Priority;
-import javax.crypto.SecretKey;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -42,13 +41,12 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption;
 import org.apache.cxf.rs.security.jose.jwe.AesGcmContentEncryptionAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.AesGcmWrapKeyEncryptionAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionState;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweOutputStream;
+import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jwe.KeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.RSAOaepKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.WrappedKeyJweEncryption;
@@ -138,21 +136,8 @@ public class JweWriterInterceptor implements WriterInterceptor {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
-                keyEncryptionAlgo = jwk.getAlgorithm();
-                // TODO: Put it into some factory code
-                if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-                    keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(jwk.toRSAPublicKey(),
-                                                getKeyEncryptionAlgo(props, keyEncryptionAlgo));
-                } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
-                    SecretKey key = jwk.toSecretKey();
-                    if (Algorithm.isAesKeyWrap(keyEncryptionAlgo)) {
-                        keyEncryptionProvider = new AesWrapKeyEncryptionAlgorithm(key, keyEncryptionAlgo);
-                    } else if (Algorithm.isAesGcmKeyWrap(keyEncryptionAlgo)) {
-                        keyEncryptionProvider = new AesGcmWrapKeyEncryptionAlgorithm(key, keyEncryptionAlgo);
-                    }
-                } else {
-                    // TODO: support elliptic curve keys
-                }
+                keyEncryptionAlgo = getKeyEncryptionAlgo(props, jwk.getAlgorithm());
+                keyEncryptionProvider = JweUtils.getKeyEncryptionAlgorithm(jwk, keyEncryptionAlgo);
                 
             } else {
                 keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(

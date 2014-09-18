@@ -29,13 +29,11 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
-import org.apache.cxf.rs.security.jose.jws.EcDsaJwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
+import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.PrivateKeyJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
@@ -66,30 +64,19 @@ public class AbstractJwsWriterProvider {
             JwsSignatureProvider theSigProvider = null; 
             String rsaSignatureAlgo = null;
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
-                //TODO: Private JWK sets can be JWE encrypted
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_SIGN);
-                rsaSignatureAlgo = jwk.getAlgorithm();
-                if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-                    theSigProvider = new PrivateKeyJwsSignatureProvider(jwk.toRSAPrivateKey());
-                } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType()) 
-                    && Algorithm.isHmacSign(rsaSignatureAlgo)) {
-                    theSigProvider = 
-                        new HmacJwsSignatureProvider((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-                } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
-                    theSigProvider = new EcDsaJwsSignatureProvider(jwk.toECPrivateKey());
-                }
+                rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
+                theSigProvider = JwsUtils.getSignatureProvider(jwk, rsaSignatureAlgo);
             } else {
+                rsaSignatureAlgo = getSignatureAlgo(props, null);
                 RSAPrivateKey pk = (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, 
                                                               CryptoUtils.RSSEC_SIG_KEY_PSWD_PROVIDER);
                 theSigProvider = new PrivateKeyJwsSignatureProvider(pk);
             }
-            if (rsaSignatureAlgo == null) {
-                rsaSignatureAlgo = props.getProperty(JSON_WEB_SIGNATURE_ALGO_PROP);
-            }
-            headers.setAlgorithm(rsaSignatureAlgo);
             if (theSigProvider == null) {
                 throw new SecurityException();
             }
+            headers.setAlgorithm(rsaSignatureAlgo);
             return theSigProvider;
         } catch (SecurityException ex) {
             throw ex;
@@ -101,5 +88,8 @@ public class AbstractJwsWriterProvider {
         throws IOException {
         p.signWith(theSigProvider);
         IOUtils.copy(new ByteArrayInputStream(p.getSignedEncodedJws().getBytes("UTF-8")), os);
+    }
+    private String getSignatureAlgo(Properties props, String algo) {
+        return algo == null ? props.getProperty(JSON_WEB_SIGNATURE_ALGO_PROP) : algo;
     }
 }

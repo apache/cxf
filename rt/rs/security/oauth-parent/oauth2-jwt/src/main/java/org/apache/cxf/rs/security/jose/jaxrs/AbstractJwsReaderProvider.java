@@ -26,18 +26,19 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
-import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProperties;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
+import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.PublicKeyJwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJwsReaderProvider {
     private static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
     private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
+    private static final String JSON_WEB_SIGNATURE_ALGO_PROP = "rs.security.jws.content.signature.algorithm";
+    
     
     private JwsSignatureVerifier sigVerifier;
     private JwsSignatureProperties sigProperties;
@@ -70,17 +71,11 @@ public class AbstractJwsReaderProvider {
         try {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             JwsSignatureVerifier theVerifier = null;
+            String rsaSignatureAlgo = null;
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_VERIFY);
-                if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-                    theVerifier = new PublicKeyJwsSignatureVerifier(jwk.toRSAPublicKey());
-                } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType()) 
-                    && Algorithm.isHmacSign(jwk.getAlgorithm())) {
-                    theVerifier = 
-                        new HmacJwsSignatureProvider((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-                } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
-                    theVerifier = new PublicKeyJwsSignatureVerifier(jwk.toECPublicKey());
-                }
+                rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
+                theVerifier = JwsUtils.getSignatureVerifier(jwk, rsaSignatureAlgo);
                 
             } else {
                 theVerifier = new PublicKeyJwsSignatureVerifier(
@@ -102,5 +97,7 @@ public class AbstractJwsReaderProvider {
         this.defaultMediaType = defaultMediaType;
     }
     
-    
+    private String getSignatureAlgo(Properties props, String algo) {
+        return algo == null ? props.getProperty(JSON_WEB_SIGNATURE_ALGO_PROP) : algo;
+    }
 }
