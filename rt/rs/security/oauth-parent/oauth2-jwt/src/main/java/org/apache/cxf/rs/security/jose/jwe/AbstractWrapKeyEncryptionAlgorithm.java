@@ -48,8 +48,12 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
         this.supportedAlgorithms = supportedAlgorithms;
     }
     @Override
+    public String getAlgorithm() {
+        return algorithm;
+    }
+    @Override
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {
-        checkAlgorithms(headers, algorithm);
+        checkAlgorithms(headers);
         KeyProperties secretKeyProperties = new KeyProperties(getKeyEncryptionAlgoJava(headers));
         AlgorithmParameterSpec spec = getAlgorithmParameterSpec(headers); 
         if (spec != null) {
@@ -79,17 +83,17 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
         }
         return algo;
     }
-    protected void checkAlgorithms(JweHeaders headers, String defaultAlgo) {
+    protected void checkAlgorithms(JweHeaders headers) {
         String providedAlgo = headers.getKeyEncryptionAlgorithm();
-        if ((providedAlgo == null && defaultAlgo == null)
-            || (providedAlgo != null && defaultAlgo != null && !providedAlgo.equals(defaultAlgo))) {
+        if ((providedAlgo == null && algorithm == null)
+            || (providedAlgo != null && algorithm != null && !providedAlgo.equals(algorithm))) {
             throw new SecurityException();
         }
         if (providedAlgo != null) {
             checkAlgorithm(providedAlgo);
-        } else if (defaultAlgo != null) {
-            headers.setKeyEncryptionAlgorithm(defaultAlgo);
-            checkAlgorithm(defaultAlgo);
+        } else if (algorithm != null) {
+            headers.setKeyEncryptionAlgorithm(algorithm);
+            checkAlgorithm(algorithm);
         }
     }
     

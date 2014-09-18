@@ -51,11 +51,10 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         AES_CEK_SIZE_MAP.put(Algorithm.A192CBC_HS384.getJwtName(), 48);
         AES_CEK_SIZE_MAP.put(Algorithm.A256CBC_HS512.getJwtName(), 64);
     }
-    public AesCbcHmacJweEncryption(String keyAlgo, 
-                                   String cekAlgoJwt, 
+    public AesCbcHmacJweEncryption(String cekAlgoJwt, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
-        this(new JweHeaders(keyAlgo, validateCekAlgorithm(cekAlgoJwt)), 
-             null, null, keyEncryptionAlgorithm);
+        this(new JweHeaders(keyEncryptionAlgorithm.getAlgorithm(), cekAlgoJwt), null, null, 
+             keyEncryptionAlgorithm);
     }
     public AesCbcHmacJweEncryption(JweHeaders headers, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
@@ -70,8 +69,11 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
                                    byte[] iv, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm,
                                    JwtHeadersWriter writer) {
-        super(headers, new AesCbcContentEncryptionAlgorithm(cek, iv), keyEncryptionAlgorithm, writer);
-        validateCekAlgorithm(headers.getContentEncryptionAlgorithm());
+        super(headers, 
+              new AesCbcContentEncryptionAlgorithm(cek, iv, 
+                                                   validateCekAlgorithm(headers.getContentEncryptionAlgorithm())),
+              keyEncryptionAlgorithm, writer);
+        
     }
     @Override
     protected byte[] getActualCek(byte[] theCek, String algoJwt) {
@@ -166,8 +168,8 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
     }
     
     private static class AesCbcContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
-        public AesCbcContentEncryptionAlgorithm(byte[] cek, byte[] iv) { 
-            super(cek, iv);    
+        public AesCbcContentEncryptionAlgorithm(byte[] cek, byte[] iv, String algo) { 
+            super(cek, iv, algo);    
         }
         @Override
         public AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] theIv) {

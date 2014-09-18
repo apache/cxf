@@ -173,12 +173,11 @@ public class JweCompactReaderWriterTest extends Assert {
         } else {
             jwtKeyName = Algorithm.toJwtName(key.getAlgorithm(), key.getEncoded().length * 8);
         }
-        JweEncryptionProvider encryptor = new WrappedKeyJweEncryption(
-                                                        new JweHeaders(Algorithm.RSA_OAEP.getJwtName(), jwtKeyName),  
-                                                        key == null ? null : key.getEncoded(), 
-                                                        INIT_VECTOR_A1,
-                                                        new RSAOaepKeyEncryptionAlgorithm(publicKey, 
-                                                            Algorithm.RSA_OAEP.getJwtName()));
+        KeyEncryptionAlgorithm keyEncryptionAlgo = new RSAOaepKeyEncryptionAlgorithm(publicKey, 
+                                                       Algorithm.RSA_OAEP.getJwtName()); 
+        ContentEncryptionAlgorithm contentEncryptionAlgo = 
+            new AesGcmContentEncryptionAlgorithm(key == null ? null : key.getEncoded(), INIT_VECTOR_A1, jwtKeyName);
+        JweEncryptionProvider encryptor = new WrappedKeyJweEncryption(keyEncryptionAlgo, contentEncryptionAlgo);
         return encryptor.encrypt(content.getBytes("UTF-8"), null);
     }
     private String encryptContentDirect(SecretKey key, String content) throws Exception {

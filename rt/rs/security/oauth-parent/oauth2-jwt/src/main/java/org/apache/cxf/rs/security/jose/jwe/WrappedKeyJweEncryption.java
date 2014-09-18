@@ -21,20 +21,26 @@ package org.apache.cxf.rs.security.jose.jwe;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
 
 public class WrappedKeyJweEncryption extends AbstractJweEncryption {
-    public WrappedKeyJweEncryption(JweHeaders headers, 
-                                   KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
-        this(headers, null, null, keyEncryptionAlgorithm);
+    public WrappedKeyJweEncryption(KeyEncryptionAlgorithm keyEncryptionAlgorithm,
+                                   ContentEncryptionAlgorithm contentEncryptionAlgo) {
+        this(keyEncryptionAlgorithm, contentEncryptionAlgo, null);
     }
-    public WrappedKeyJweEncryption(JweHeaders headers, byte[] cek, 
-                                   byte[] iv, KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
-        this(headers, cek, iv, keyEncryptionAlgorithm, null);
-    }
-    public WrappedKeyJweEncryption(JweHeaders headers, 
-                                   byte[] cek, 
-                                   byte[] iv, 
-                                   KeyEncryptionAlgorithm keyEncryptionAlgorithm,
+    public WrappedKeyJweEncryption(KeyEncryptionAlgorithm keyEncryptionAlgorithm,
+                                   ContentEncryptionAlgorithm contentEncryptionAlgo,
                                    JwtHeadersWriter writer) {
-        super(headers, new AesGcmContentEncryptionAlgorithm(cek, iv), keyEncryptionAlgorithm, writer);
+        this(new JweHeaders(keyEncryptionAlgorithm.getAlgorithm(), contentEncryptionAlgo.getAlgorithm()), 
+             keyEncryptionAlgorithm, contentEncryptionAlgo, writer);
+    }
+    public WrappedKeyJweEncryption(JweHeaders headers, 
+                                   KeyEncryptionAlgorithm keyEncryptionAlgorithm,
+                                   ContentEncryptionAlgorithm contentEncryptionAlgo) {
+        this(headers, keyEncryptionAlgorithm, contentEncryptionAlgo, null);
+    }
+    public WrappedKeyJweEncryption(JweHeaders headers, 
+                                   KeyEncryptionAlgorithm keyEncryptionAlgorithm,
+                                   ContentEncryptionAlgorithm contentEncryptionAlgo,
+                                   JwtHeadersWriter writer) {
+        super(headers, contentEncryptionAlgo, keyEncryptionAlgorithm, writer);
     }
     
     

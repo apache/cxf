@@ -26,4 +26,9 @@ public class DirectKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
         }
         return new byte[0];
     }
+
+    @Override
+    public String getAlgorithm() {
+        return null;
+    }
 }
