@@ -18,20 +18,12 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.Map;
 
-import javax.crypto.SecretKey;
-
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJwtObject;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
 public class JsonWebKey extends AbstractJwtObject {
@@ -164,50 +156,5 @@ public class JsonWebKey extends AbstractJwtObject {
     public Object getProperty(String name) {
         return super.getValue(name);
     }
-    
-    public RSAPublicKey toRSAPublicKey() {
-        String encodedModulus = (String)super.getValue(RSA_MODULUS);
-        String encodedPublicExponent = (String)super.getValue(RSA_PUBLIC_EXP);
-        return CryptoUtils.getRSAPublicKey(encodedModulus, encodedPublicExponent);
-    }
-    public RSAPrivateKey toRSAPrivateKey() {
-        String encodedModulus = (String)super.getValue(RSA_MODULUS);
-        String encodedPrivateExponent = (String)super.getValue(RSA_PRIVATE_EXP);
-        String encodedPrimeP = (String)super.getValue(RSA_FIRST_PRIME_FACTOR);
-        if (encodedPrimeP == null) {
-            return CryptoUtils.getRSAPrivateKey(encodedModulus, encodedPrivateExponent);
-        } else {
-            String encodedPublicExponent = (String)super.getValue(RSA_PUBLIC_EXP);
-            String encodedPrimeQ = (String)super.getValue(RSA_SECOND_PRIME_FACTOR);
-            String encodedPrimeExpP = (String)super.getValue(RSA_FIRST_PRIME_CRT);
-            String encodedPrimeExpQ = (String)super.getValue(RSA_SECOND_PRIME_CRT);
-            String encodedCrtCoefficient = (String)super.getValue(RSA_FIRST_CRT_COEFFICIENT);
-            return CryptoUtils.getRSAPrivateKey(encodedModulus, 
-                                                encodedPublicExponent,
-                                                encodedPrivateExponent,
-                                                encodedPrimeP,
-                                                encodedPrimeQ,
-                                                encodedPrimeExpP,
-                                                encodedPrimeExpQ,
-                                                encodedCrtCoefficient);
-        }
-    }
-    public ECPublicKey toECPublicKey() {
-        String eCurve = (String)super.getValue(EC_CURVE);
-        String encodedXCoord = (String)super.getValue(EC_X_COORDINATE);
-        String encodedYCoord = (String)super.getValue(EC_Y_COORDINATE);
-        return CryptoUtils.getECPublicKey(eCurve, encodedXCoord, encodedYCoord);
-    }
-    public ECPrivateKey toECPrivateKey() {
-        String eCurve = (String)super.getValue(EC_CURVE);
-        String encodedPrivateKey = (String)super.getValue(EC_PRIVATE_KEY);
-        return CryptoUtils.getECPrivateKey(eCurve, encodedPrivateKey);
-    }
-    
-    public SecretKey toSecretKey() {
-        return CryptoUtils.createSecretKeySpec((String)getProperty(OCTET_KEY_VALUE), 
-                                               Algorithm.toJavaName(getAlgorithm()));
-    }
-    
     
 }

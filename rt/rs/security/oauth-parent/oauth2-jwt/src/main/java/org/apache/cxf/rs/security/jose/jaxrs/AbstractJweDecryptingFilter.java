@@ -23,8 +23,6 @@ import java.io.InputStream;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.Properties;
 
-import javax.crypto.SecretKey;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -33,14 +31,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
-import org.apache.cxf.rs.security.jose.jwe.AesGcmWrapKeyDecryptionAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweCryptoProperties;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
+import org.apache.cxf.rs.security.jose.jwe.JweUtils;
+import org.apache.cxf.rs.security.jose.jwe.KeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.RSAOaepKeyDecryptionAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.WrappedKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.WrappedKeyJweDecryption;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
@@ -78,23 +75,11 @@ public class AbstractJweDecryptingFilter {
         }
         Bus bus = m.getExchange().getBus();
         try {
-            WrappedKeyDecryptionAlgorithm keyDecryptionProvider = null;
+            KeyDecryptionAlgorithm keyDecryptionProvider = null;
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
-                //TODO: Private JWK sets can be JWE encrypted
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
-                if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-                    keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(jwk.toRSAPrivateKey());
-                } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
-                    SecretKey key = jwk.toSecretKey();
-                    if (Algorithm.isAesKeyWrap(jwk.getAlgorithm())) {
-                        keyDecryptionProvider = new AesWrapKeyDecryptionAlgorithm(key);
-                    } else if (Algorithm.isAesGcmKeyWrap(jwk.getAlgorithm())) {
-                        keyDecryptionProvider = new AesGcmWrapKeyDecryptionAlgorithm(key);
-                    } 
-                } else {
-                    // TODO: support elliptic curve keys
-                }
+                keyDecryptionProvider = JweUtils.getKeyDecryptionAlgorithm(jwk);
             } else {
                 keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(
                     (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER));
