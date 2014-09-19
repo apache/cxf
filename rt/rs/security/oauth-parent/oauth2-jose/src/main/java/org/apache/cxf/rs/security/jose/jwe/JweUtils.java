@@ -65,4 +65,18 @@ public final class JweUtils {
         }
         return keyDecryptionProvider;
     }
+    public static ContentEncryptionAlgorithm getContentEncryptionAlgorithm(JsonWebKey jwk) {
+        return getContentEncryptionAlgorithm(jwk, null);
+    }
+    public static ContentEncryptionAlgorithm getContentEncryptionAlgorithm(JsonWebKey jwk, String defaultAlgorithm) {
+        String ctEncryptionAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
+        ContentEncryptionAlgorithm contentEncryptionProvider = null;
+        if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
+            SecretKey key = JwkUtils.toSecretKey(jwk);
+            if (Algorithm.isAesGcm(ctEncryptionAlgo)) {
+                contentEncryptionProvider = new AesGcmContentEncryptionAlgorithm(key, null, ctEncryptionAlgo);
+            }
+        }
+        return contentEncryptionProvider;
+    }
 }

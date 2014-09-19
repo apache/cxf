@@ -192,9 +192,14 @@ public enum Algorithm {
                || JwtConstants.A256KW_ALGO.equals(algo);
     }
     public static boolean isAesGcmKeyWrap(String algo) {
-        return JwtConstants.A128GCM_ALGO.equals(algo)
+        return JwtConstants.A128GCMKW_ALGO.equals(algo)
                || JwtConstants.A192GCMKW_ALGO.equals(algo)
                || JwtConstants.A256GCMKW_ALGO.equals(algo);
+    }
+    public static boolean isAesGcm(String algo) {
+        return JwtConstants.A128GCM_ALGO.equals(algo)
+               || JwtConstants.A192GCM_ALGO.equals(algo)
+               || JwtConstants.A256GCM_ALGO.equals(algo);
     }
     public static boolean isHmacSign(String algo) {
         return JwtConstants.HMAC_SHA_256_ALGO.equals(algo)
