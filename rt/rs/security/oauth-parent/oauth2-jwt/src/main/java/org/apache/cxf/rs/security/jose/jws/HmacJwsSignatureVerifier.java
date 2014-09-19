@@ -20,10 +20,6 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.crypto.Mac;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
@@ -31,24 +27,18 @@ import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
 
-public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
-    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.HmacSHA256.getJwtName(),
-                      Algorithm.HmacSHA384.getJwtName(),
-                      Algorithm.HmacSHA512.getJwtName())); 
+public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     private byte[] key;
     private AlgorithmParameterSpec hmacSpec;
     
-    public HmacJwsSignatureProvider(byte[] key, String algo) {
-        this(key, null, algo);
+    public HmacJwsSignatureVerifier(byte[] key) {
+        this(key, null);
     }
-    public HmacJwsSignatureProvider(byte[] key, AlgorithmParameterSpec spec, String algo) {
-        super(SUPPORTED_ALGORITHMS, algo);
+    public HmacJwsSignatureVerifier(byte[] key, AlgorithmParameterSpec spec) {
         this.key = key;
         this.hmacSpec = spec;
     }
-    public HmacJwsSignatureProvider(String encodedKey, String algo) {
-        super(SUPPORTED_ALGORITHMS, algo);
+    public HmacJwsSignatureVerifier(String encodedKey) {
         try {
             this.key = Base64UrlUtility.decode(encodedKey);
         } catch (Base64Exception ex) {
@@ -56,22 +46,17 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
         }
     }
     
-    protected JwsSignature doCreateJwsSignature(JwtHeaders headers) {
-        final Mac mac = HmacUtils.getInitializedMac(key, Algorithm.toJavaName(headers.getAlgorithm()),
-                                                    hmacSpec);
-        return new JwsSignature() {
-
-            @Override
-            public void update(byte[] src, int off, int len) {
-                mac.update(src, off, len);
-            }
-
-            @Override
-            public byte[] sign() {
-                return mac.doFinal();
-            }
-            
-        };
+    @Override
+    public boolean verify(JwtHeaders headers, String unsignedText, byte[] signature) {
+        byte[] expected = computeMac(headers, unsignedText);
+        return Arrays.equals(expected, signature);
     }
-
+    
+    private byte[] computeMac(JwtHeaders headers, String text) {
+        return HmacUtils.computeHmac(key, 
+                                     Algorithm.toJavaName(headers.getAlgorithm()),
+                                     hmacSpec,
+                                     text);
+    }
+    
 }

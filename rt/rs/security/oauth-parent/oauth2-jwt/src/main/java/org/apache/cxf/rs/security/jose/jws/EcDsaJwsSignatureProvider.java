@@ -33,13 +33,14 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
                       Algorithm.SHA384withECDSA.getJwtName(),
                       Algorithm.SHA512withECDSA.getJwtName())); 
     
-    public EcDsaJwsSignatureProvider(ECPrivateKey key) {
-        this(key, null);
+    public EcDsaJwsSignatureProvider(ECPrivateKey key, String algo) {
+        this(key, null, algo);
     }
-    public EcDsaJwsSignatureProvider(ECPrivateKey key, AlgorithmParameterSpec spec) {
-        this(key, null, spec);
+    public EcDsaJwsSignatureProvider(ECPrivateKey key, AlgorithmParameterSpec spec, String algo) {
+        this(key, null, spec, algo);
     }
-    public EcDsaJwsSignatureProvider(ECPrivateKey key, SecureRandom random, AlgorithmParameterSpec spec) {
-        super(key, random, spec, SUPPORTED_ALGORITHMS);
+    public EcDsaJwsSignatureProvider(ECPrivateKey key, SecureRandom random, AlgorithmParameterSpec spec, 
+                                     String algo) {
+        super(key, random, spec, SUPPORTED_ALGORITHMS, algo);
     }
 }

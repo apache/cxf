@@ -33,13 +33,16 @@ public final class JwsUtils {
         String rsaSignatureAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         JwsSignatureProvider theSigProvider = null;
         if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-            theSigProvider = new PrivateKeyJwsSignatureProvider(JwkUtils.toRSAPrivateKey(jwk));
+            theSigProvider = new PrivateKeyJwsSignatureProvider(JwkUtils.toRSAPrivateKey(jwk),
+                                                                rsaSignatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType()) 
             && Algorithm.isHmacSign(rsaSignatureAlgo)) {
             theSigProvider = 
-                new HmacJwsSignatureProvider((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
+                new HmacJwsSignatureProvider((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE),
+                                             rsaSignatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
-            theSigProvider = new EcDsaJwsSignatureProvider(JwkUtils.toECPrivateKey(jwk));
+            theSigProvider = new EcDsaJwsSignatureProvider(JwkUtils.toECPrivateKey(jwk),
+                                                           rsaSignatureAlgo);
         }
         return theSigProvider;
     }
@@ -51,7 +54,7 @@ public final class JwsUtils {
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType()) 
             && Algorithm.isHmacSign(rsaSignatureAlgo)) {
             theVerifier = 
-                new HmacJwsSignatureProvider((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
+                new HmacJwsSignatureVerifier((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
         } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
             theVerifier = new PublicKeyJwsSignatureVerifier(JwkUtils.toECPublicKey(jwk));
         }
