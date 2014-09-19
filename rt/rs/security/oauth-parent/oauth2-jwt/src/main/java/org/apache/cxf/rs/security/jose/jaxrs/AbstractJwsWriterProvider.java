@@ -71,7 +71,7 @@ public class AbstractJwsWriterProvider {
                 rsaSignatureAlgo = getSignatureAlgo(props, null);
                 RSAPrivateKey pk = (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, 
                                                               CryptoUtils.RSSEC_SIG_KEY_PSWD_PROVIDER);
-                theSigProvider = new PrivateKeyJwsSignatureProvider(pk);
+                theSigProvider = new PrivateKeyJwsSignatureProvider(pk, rsaSignatureAlgo);
             }
             if (theSigProvider == null) {
                 throw new SecurityException();

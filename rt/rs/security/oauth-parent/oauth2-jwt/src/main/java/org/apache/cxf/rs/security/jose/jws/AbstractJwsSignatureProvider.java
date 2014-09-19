@@ -24,10 +24,11 @@ import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
     private Set<String> supportedAlgorithms;
-    private String defaultJwtAlgorithm;
+    private String algorithm;
     
-    protected AbstractJwsSignatureProvider(Set<String> supportedAlgorithms) {
+    protected AbstractJwsSignatureProvider(Set<String> supportedAlgorithms, String algo) {
         this.supportedAlgorithms = supportedAlgorithms;
+        this.algorithm = algo;
     }
     
     protected JwtHeaders prepareHeaders(JwtHeaders headers) {
@@ -38,11 +39,15 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         if (algo != null) {
             checkAlgorithm(algo);
         } else {
-            headers.setAlgorithm(defaultJwtAlgorithm);
+            checkAlgorithm(algorithm);
+            headers.setAlgorithm(algorithm);
         }
         return headers;
     }
-    
+    @Override
+    public String getAlgorithm() {
+        return algorithm;    
+    }
     @Override
     public JwsSignature createJwsSignature(JwtHeaders headers) {
         return doCreateJwsSignature(prepareHeaders(headers));
@@ -50,13 +55,11 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     
     protected abstract JwsSignature doCreateJwsSignature(JwtHeaders headers);
     
-    public void setDefaultJwtAlgorithm(String algo) {
-        this.defaultJwtAlgorithm = algo;
-    }
-    protected void checkAlgorithm(String algo) {
+    protected String checkAlgorithm(String algo) {
         if (algo == null || !supportedAlgorithms.contains(algo)) {
             throw new SecurityException();
         }
+        return algo;
     }
 
 }

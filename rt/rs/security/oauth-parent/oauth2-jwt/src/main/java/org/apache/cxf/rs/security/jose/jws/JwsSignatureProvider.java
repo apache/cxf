@@ -21,5 +21,6 @@ package org.apache.cxf.rs.security.jose.jws;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 
 public interface JwsSignatureProvider {
+    String getAlgorithm();
     JwsSignature createJwsSignature(JwtHeaders headers);
 }

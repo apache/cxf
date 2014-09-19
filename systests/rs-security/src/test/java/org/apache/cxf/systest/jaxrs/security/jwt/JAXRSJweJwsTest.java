@@ -161,8 +161,8 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJweRsaJwsHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwshmac";
-        HmacJwsSignatureProvider hmacProvider = new HmacJwsSignatureProvider(ENCODED_MAC_KEY);
-        hmacProvider.setDefaultJwtAlgorithm(Algorithm.HmacSHA256.getJwtName());
+        HmacJwsSignatureProvider hmacProvider = 
+            new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName());
         doTestJweJwsRsa(address, hmacProvider);
     }
     
