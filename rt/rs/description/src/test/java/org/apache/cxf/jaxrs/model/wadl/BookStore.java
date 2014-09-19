@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.model.wadl;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
@@ -82,7 +83,8 @@ public class BookStore implements BookDescription {
     
     @GET 
     @Produces("text/plain")
-    public String getName(@PathParam("id") Long id, @QueryParam("") QueryBean query) {
+    public String getName(@PathParam("id") Long id, @BeanParam TheBeanParam beanParam, 
+                          @QueryParam("") QueryBean query) {
         return "store";
     }
     
@@ -171,6 +173,25 @@ public class BookStore implements BookDescription {
     @XMLName(value = "{http://books}thesuperbook2", prefix = "p1")
     public Book2 getBook2() {
         return new Book2();
+    }
+    
+    public static class TheBeanParam {
+        private int a;
+        private int b;
+        public int getA() {
+            return a;
+        }
+        @PathParam("a")
+        public void setA(int a) {
+            this.a = a;
+        }
+        public int getB() {
+            return b;
+        }
+        @QueryParam("b")
+        public void setB(int b) {
+            this.b = b;
+        }
     }
     
     public static class QueryBean {
