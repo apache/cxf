@@ -4,9 +4,10 @@ JAX-RS Search Demo
 The demo shows a basic usage of search extension with REST based Web Services using 
 JAX-RS 2.0 (JSR-339). The REST server provides the following services: 
 
-A RESTful catalog service is provided on URL http://localhost:9000/catalog. 
+A RESTful catalog service is provided on URL http://localhost:9000/jaxrs/catalog 
+A web browser demo is available at: http://localhost:9000/browser
 
-A HTTP GET request to URL http://localhost:9000/catalog
+A HTTP GET request to URL http://localhost:9000/jaxrs/catalog
 returns all the documents currently stored and managed (in JSON format):
 
 [
@@ -14,29 +15,29 @@ returns all the documents currently stored and managed (in JSON format):
     "JavaWebSocketAPI_1.0_Final.pdf"
 ]
 
-A HTTP POST request to URL http://localhost:9000/catalog
+A HTTP POST request to URL http://localhost:9000/jaxrs/catalog
 uploads document and stores it.
 
-A HTTP GET request to URL http://localhost:9000/catalog/search?$filter=<query>
+A HTTP GET request to URL http://localhost:9000/jaxrs/catalog/search?$filter=<query>
 searches the relevant documents which match the query and returns them (in JSON format):
 
 [
     {
         "source":"JavaWebSocketAPI_1.0_Final.pdf",
         "score":0.07321092486381531,
-        "url":"http://localhost:9000/catalog/JavaWebSocketAPI_1.0_Final.pdf"
+        "url":"http://localhost:9000/jaxrs/catalog/JavaWebSocketAPI_1.0_Final.pdf"
     },
     {
         "source":"jsr339-jaxrs-2.0-final-spec.pdf",
         "score":0.03448590263724327,
-        "url":"http://localhost:9000/catalog/jsr339-jaxrs-2.0-final-spec.pdf"
+        "url":"http://localhost:9000/jaxrs/catalog/jsr339-jaxrs-2.0-final-spec.pdf"
     }
 ]
 
-A HTTP GET request to URL http://localhost:9000/catalog/<document> returns the
+A HTTP GET request to URL http://localhost:9000/jaxrs/catalog/<document> returns the
 original document content (in  binary form).
 
-A HTTP DELETE request to URL http://localhost:9000/catalog removes all documents
+A HTTP DELETE request to URL http://localhost:9000/jaxrs/catalog removes all documents
 from the catalog.
 
 Building and running the demo using Maven

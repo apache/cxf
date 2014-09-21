@@ -94,6 +94,10 @@ public class Catalog {
     private final ExecutorService executor = Executors.newFixedThreadPool(
         Runtime.getRuntime().availableProcessors());
     
+    public Catalog() throws IOException {
+        this(new Storage());
+    }
+    
     public Catalog(final Storage storage) throws IOException {
         this.storage = storage;
         this.visitor = createVisitor();

@@ -19,38 +19,59 @@
 
 package demo.jaxrs.search.server;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.ext.search.SearchBean;
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
-import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
+import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 public class Server {
 
     protected Server() throws Exception {
-        final Storage storage = new Storage();
-        final Map< String, Object > properties = new HashMap< String, Object >();        
-        properties.put("search.query.parameter.name", "$filter");
-        properties.put("search.parser", new FiqlParser< SearchBean >(SearchBean.class));
-        properties.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy/MM/dd");
+        org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(9000);
+        
+        // Register and map the dispatcher servlet
+        final ServletHolder servletHolder = new ServletHolder(new CXFNonSpringJaxrsServlet());
+        final ServletContextHandler context = new ServletContextHandler();      
+        context.setContextPath("/");
+        context.addServlet(servletHolder, "/jaxrs/*");     
+        
+        servletHolder.setInitParameter("jaxrs.serviceClasses", Catalog.class.getName());
+        servletHolder.setInitParameter("jaxrs.properties", StringUtils.join(
+            new String[] {
+                "search.query.parameter.name=$filter",
+                SearchUtils.DATE_FORMAT_PROPERTY + "=yyyy/MM/dd"
+            }, " ")            
+        );
+        servletHolder.setInitParameter("jaxrs.providers", StringUtils.join(
+            new String[] {
+                MultipartProvider.class.getName(),
+                SearchContextProvider.class.getName(),
+                JsrJsonpProvider.class.getName(),
+                CrossOriginResourceSharingFilter.class.getName()
+            }, ",") 
+        );                
+        
+        // Configuring all static web resource
+        final ServletHolder staticHolder = new ServletHolder(new DefaultServlet());
+        final ServletContextHandler htmls = new ServletContextHandler();
+        htmls.setContextPath("/browser");
+        htmls.addServlet(staticHolder, "/*");
+        htmls.setResourceBase(getClass().getResource("/browser").toURI().toString());
 
-        final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setProperties(properties);
-        sf.setResourceClasses(Catalog.class);
-        sf.setResourceProvider(Catalog.class, new SingletonResourceProvider(new Catalog(storage)));
-        sf.setAddress("http://localhost:9000/");
-        sf.setProvider(new MultipartProvider());
-        sf.setProvider(new SearchContextProvider());
-        sf.setProvider(new JsrJsonpProvider());
-        sf.setProvider(new CrossOriginResourceSharingFilter());
-        sf.create();
+        final HandlerList handlers = new HandlerList();
+        handlers.addHandler(htmls);
+        handlers.addHandler(context);        
+        
+        server.setHandler(handlers);
+        server.start();
+        server.join();
     }
 
     public static void main(String args[]) throws Exception {
