@@ -34,7 +34,8 @@ import org.apache.cxf.ws.transfer.Put;
 import org.apache.cxf.ws.transfer.PutResponse;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.dialect.Dialect;
-import org.apache.cxf.ws.transfer.dialect.FragmentDialect;
+import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialect;
+import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialectConstants;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
@@ -60,6 +61,7 @@ public class ResourceLocal implements Resource {
 
     public ResourceLocal() {
         dialects = new HashMap<String, Dialect>();
+        dialects.put(FragmentDialectConstants.FRAGMENT_2011_03_IRI, new FragmentDialect());
     }
     
     public ResourceManager getManager() {

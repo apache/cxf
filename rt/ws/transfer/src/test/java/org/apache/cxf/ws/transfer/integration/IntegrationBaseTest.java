@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import java.io.PrintWriter;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -111,6 +112,7 @@ public class IntegrationBaseTest {
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_FACTORY_ADDRESS);
         factory.setServiceBean(implementor);
+        
         return factory.create();
     }
     
@@ -129,6 +131,12 @@ public class IntegrationBaseTest {
         ResourceRemote implementor = new ResourceRemote();
         implementor.setManager(manager);
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        
+        Map<String, Object> props = factory.getProperties(true);
+        props.put("jaxb.additionalContextClasses",
+                org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType.class);
+        factory.setProperties(props);
+        
         factory.setBus(bus);
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_REMOTE_MANAGER_ADDRESS);
@@ -140,6 +148,12 @@ public class IntegrationBaseTest {
         ResourceLocal implementor = new ResourceLocal();
         implementor.setManager(manager);
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        
+        Map<String, Object> props = factory.getProperties(true);
+        props.put("jaxb.additionalContextClasses",
+                org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType.class);
+        factory.setProperties(props);
+        
         factory.setBus(bus);
         factory.setServiceClass(Resource.class);
         factory.setAddress(RESOURCE_LOCAL_ADDRESS);

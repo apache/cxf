@@ -113,6 +113,8 @@ public class ResourceFactoryImpl implements ResourceFactory {
     private CreateResponse createLocally(Create body, ResourceReference ref) {
         Representation representation = body.getRepresentation();
         if (body.getDialect() != null && !body.getDialect().isEmpty()) {
+            System.out.println(body.getDialect());
+            System.out.println(dialects.containsKey(body.getDialect()));
             if (dialects.containsKey(body.getDialect())) {
                 Dialect dialect = dialects.get(body.getDialect());
                 representation = dialect.processCreate(body);

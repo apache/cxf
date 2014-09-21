@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.transfer.shared;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,6 +31,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -47,6 +51,8 @@ public final class TransferTools {
     private static Document document;
     
     private static Transformer transformer;
+    
+    private static XPathFactory xPathFactory;
     
     private TransferTools() {
         
@@ -99,6 +105,17 @@ public final class TransferTools {
         }
     }
     
+    public static String transform(Source source) {
+        try {
+            StringWriter writer = new StringWriter();
+            Result result = new StreamResult(writer);
+            getTransformer().transform(source, result);
+            return writer.toString();
+        } catch (TransformerException ex) {
+            throw new RuntimeException("Exception occured during serialization of the XML.", ex);
+        }
+    }
+    
     private static DocumentBuilder getDocumentBuilder() {
         if (documentBuilder == null) {
             try {
@@ -132,5 +149,16 @@ public final class TransferTools {
             }
         }
         return transformer;
+    }
+    
+    private static XPathFactory getXPathFactory() {
+        if (xPathFactory == null) {
+            xPathFactory = XPathFactory.newInstance();
+        }
+        return xPathFactory;
+    }
+    
+    public static XPath getXPath() {
+        return getXPathFactory().newXPath();
     }
 }
