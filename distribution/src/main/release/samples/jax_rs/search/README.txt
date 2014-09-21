@@ -5,7 +5,7 @@ The demo shows a basic usage of search extension with REST based Web Services us
 JAX-RS 2.0 (JSR-339). The REST server provides the following services: 
 
 A RESTful catalog service is provided on URL http://localhost:9000/jaxrs/catalog 
-A web browser demo is available at: http://localhost:9000/browser
+A web browser demo is available at: http://localhost:9000/catalog
 
 A HTTP GET request to URL http://localhost:9000/jaxrs/catalog
 returns all the documents currently stored and managed (in JSON format):

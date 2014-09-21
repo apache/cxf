@@ -61,7 +61,7 @@ public class Server {
         // Configuring all static web resource
         final ServletHolder staticHolder = new ServletHolder(new DefaultServlet());
         final ServletContextHandler htmls = new ServletContextHandler();
-        htmls.setContextPath("/browser");
+        htmls.setContextPath("/catalog");
         htmls.addServlet(staticHolder, "/*");
         htmls.setResourceBase(getClass().getResource("/browser").toURI().toString());
 
