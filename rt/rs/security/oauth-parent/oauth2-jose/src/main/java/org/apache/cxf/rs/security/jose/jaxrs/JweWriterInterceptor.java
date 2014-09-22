@@ -52,6 +52,7 @@ import org.apache.cxf.rs.security.jose.jwe.RSAOaepKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.WrappedKeyJweEncryption;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
@@ -70,8 +71,6 @@ public class JweWriterInterceptor implements WriterInterceptor {
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         
-        //ctx.setMediaType(JAXRSUtils.toMediaType(JwtConstants.MEDIA_TYPE_JOSE_JSON));
-        
         OutputStream actualOs = ctx.getOutputStream();
         
         JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
@@ -88,7 +87,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
             }
         }
         
-        
+        ctx.setMediaType(JAXRSUtils.toMediaType(JwtConstants.MEDIA_TYPE_JOSE_JSON));
         if (useJweOutputStream) {
             JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(ctString);
             try {

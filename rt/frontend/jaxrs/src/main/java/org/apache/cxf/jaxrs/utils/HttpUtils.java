@@ -226,6 +226,9 @@ public final class HttpUtils {
     }
     
     public static void convertHeaderValuesToString(Map<String, List<Object>> headers, boolean delegateOnly) {
+        if (headers == null) {
+            return;
+        }
         RuntimeDelegate rd = getOtherRuntimeDelegate();
         if (rd == null && delegateOnly) {
             return;

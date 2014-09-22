@@ -33,6 +33,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsOutputStream;
 import org.apache.cxf.rs.security.jose.jws.JwsSignature;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
@@ -46,11 +47,10 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     private JwtHeadersWriter writer = new JwtTokenReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
-        //ctx.setMediaType(JAXRSUtils.toMediaType(JwtConstants.MEDIA_TYPE_JOSE_JSON));
         JwtHeaders headers = new JwtHeaders();
         JwsSignatureProvider sigProvider = getInitializedSigProvider(headers);
         setContentTypeIfNeeded(headers, ctx);
-        
+        ctx.setMediaType(JAXRSUtils.toMediaType(JwtConstants.MEDIA_TYPE_JOSE_JSON));
         OutputStream actualOs = ctx.getOutputStream();
         if (useJwsOutputStream) {
             JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
@@ -86,7 +86,8 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     private void setContentTypeIfNeeded(JwtHeaders headers, WriterInterceptorContext ctx) {    
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
-            if (mt != null) {
+            if (mt != null 
+                && !JAXRSUtils.mediaTypeToString(mt).equals(JwtConstants.MEDIA_TYPE_JOSE_JSON)) {
                 if ("application".equals(mt.getType())) {
                     headers.setContentType(mt.getSubtype());
                 } else {

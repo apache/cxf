@@ -700,6 +700,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         @Override
         public void filter(ClientRequestContext context) throws IOException {
             context.getHeaders().putSingle("Simple", "simple");
+            context.getHeaders().putSingle("Content-Type", MediaType.APPLICATION_XML_TYPE);
         }
     }
     
