@@ -42,7 +42,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ContextResolver;
@@ -61,7 +60,6 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
-import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
@@ -169,27 +167,18 @@ public abstract class ProviderFactory {
         boolean isRequestor = MessageUtils.isRequestor(m);
         Message requestMessage = isRequestor ? m.getExchange().getOutMessage() 
                                              : m.getExchange().getInMessage();
-        HttpHeaders requestHeaders = new HttpHeadersImpl(requestMessage);
-        MediaType mt = null;
         
         Message responseMessage = isRequestor ? m.getExchange().getInMessage() 
                                               : m.getExchange().getOutMessage();
+        Object ctProperty = null;
         if (responseMessage != null) {
-            Object ctProperty = responseMessage.get(Message.CONTENT_TYPE);
-            if (ctProperty == null) {
-                List<MediaType> accepts = requestHeaders.getAcceptableMediaTypes();
-                if (accepts.size() > 0) {
-                    mt = accepts.get(0);
-                }
-            } else {
-                mt = JAXRSUtils.toMediaType(ctProperty.toString());
-            }
+            ctProperty = responseMessage.get(Message.CONTENT_TYPE);
         } else {
-            mt = requestHeaders.getMediaType();
+            ctProperty = requestMessage.get(Message.CONTENT_TYPE);
         }
-        
-        return createContextResolver(contextType, m,
-               mt == null ? MediaType.WILDCARD_TYPE : mt);
+        MediaType mt = ctProperty != null ? JAXRSUtils.toMediaType(ctProperty.toString())
+            : MediaType.WILDCARD_TYPE;
+        return createContextResolver(contextType, m, mt);
         
     }
     

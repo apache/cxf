@@ -420,18 +420,6 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
-    public void testCustomResolverOut() throws Exception {
-        ProviderFactory pf = ServerProviderFactory.getInstance();
-        pf.registerUserProvider(new JAXBContextProvider());
-        pf.registerUserProvider(new JAXBContextProvider2());
-        Message message = prepareMessage("text/xml+c", "text/xml+a");
-        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
-        assertFalse(cr instanceof ProviderFactory.ContextResolverProxy);
-        assertTrue("JAXBContext ContextProvider can not be found", 
-                   cr instanceof JAXBContextProvider);
-    }
-    
-    @Test
     public void testCustomResolverProxy() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new JAXBContextProvider());
@@ -457,6 +445,7 @@ public class ProviderFactoryTest extends Assert {
         } else {
             headers.put("Content-Type", Collections.singletonList(contentType));
         }
+        message.put("Content-Type", contentType);
         message.setExchange(exchange);
         return message;
     }
