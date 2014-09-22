@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.interfaces.ECPrivateKey;
@@ -53,6 +54,12 @@ public final class JwkUtils {
     private JwkUtils() {
         
     }
+    public static JsonWebKey readJwkKey(InputStream is) throws IOException {
+        return new DefaultJwkReaderWriter().jsonToJwk(IOUtils.readStringFromStream(is));
+    }
+    public static JsonWebKeys readJwkSet(InputStream is) throws IOException {
+        return new DefaultJwkReaderWriter().jsonToJwkSet(IOUtils.readStringFromStream(is));
+    }
     public static JsonWebKey readJwkKey(String jwkJson) {
         return new DefaultJwkReaderWriter().jsonToJwk(jwkJson);
     }
@@ -83,6 +90,17 @@ public final class JwkUtils {
     public static JsonWebKeys decryptJwkSet(String jsonJwkSet, JweDecryptionProvider jwe, JwkReaderWriter reader) {
         return reader.jsonToJwkSet(jwe.decrypt(jsonJwkSet).getContentText());
     }
+    public static JsonWebKeys decryptJwkSet(InputStream is, char[] password) throws IOException {
+        return decryptJwkSet(is, password, new DefaultJwkReaderWriter());
+    }
+    public static JsonWebKeys decryptJwkSet(InputStream is, char[] password, JwkReaderWriter reader) 
+        throws IOException {
+        return decryptJwkSet(is, createDefaultDecryption(password), reader);
+    }
+    public static JsonWebKeys decryptJwkSet(InputStream is, JweDecryptionProvider jwe, JwkReaderWriter reader)
+        throws IOException {
+        return reader.jsonToJwkSet(jwe.decrypt(IOUtils.readStringFromStream(is)).getContentText());
+    }
     public static String encryptJwkKey(JsonWebKey jwk, char[] password) {
         return encryptJwkKey(jwk, password, new DefaultJwkReaderWriter());
     }
@@ -100,6 +118,17 @@ public final class JwkUtils {
     }
     public static JsonWebKey decryptJwkKey(String jsonJwkKey, JweDecryptionProvider jwe, JwkReaderWriter reader) {
         return reader.jsonToJwk(jwe.decrypt(jsonJwkKey).getContentText());
+    }
+    public static JsonWebKey decryptJwkKey(InputStream is, char[] password) throws IOException {
+        return decryptJwkKey(is, password, new DefaultJwkReaderWriter());
+    }
+    public static JsonWebKey decryptJwkKey(InputStream is, char[] password, JwkReaderWriter reader) 
+        throws IOException {
+        return decryptJwkKey(is, createDefaultDecryption(password), reader);
+    }
+    public static JsonWebKey decryptJwkKey(InputStream is, JweDecryptionProvider jwe, JwkReaderWriter reader) 
+        throws IOException {
+        return reader.jsonToJwk(jwe.decrypt(IOUtils.readStringFromStream(is)).getContentText());
     }
     private static JweEncryptionProvider createDefaultEncryption(char[] password) {
         KeyEncryptionAlgorithm keyEncryption = 
