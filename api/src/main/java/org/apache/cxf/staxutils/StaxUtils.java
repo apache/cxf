@@ -2152,7 +2152,7 @@ public final class StaxUtils {
                 }
             }
             if (maxAttributeCount != null) {
-                setProperty(reader, "com.ctc.wstx.maxAttributeCount", maxAttributeCount);
+                setProperty(reader, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount);
             }
             if (maxAttributeSize != null) {
                 setProperty(reader, "com.ctc.wstx.maxAttributeSize", maxAttributeSize);
