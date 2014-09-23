@@ -67,7 +67,7 @@ public class BookStore implements BookDescription {
     @Descriptions({ 
         @Description(value = "Get Books", target = DocTarget.METHOD)
     })
-    public List<Book> getBooks(@PathParam("id") Long id) {
+    public List<Book> getBooks(@PathParam("id") Long id, @BeanParam TheBeanParam beanParam) {
         return Collections.emptyList();
     }
     
@@ -181,7 +181,7 @@ public class BookStore implements BookDescription {
         public int getA() {
             return a;
         }
-        @HeaderParam("a")
+        @PathParam("a")
         public void setA(int a) {
             this.a = a;
         }
