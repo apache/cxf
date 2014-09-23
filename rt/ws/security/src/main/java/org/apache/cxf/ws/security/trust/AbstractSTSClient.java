@@ -1255,6 +1255,11 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     }
 
     protected X509Certificate getCert(Crypto crypto) throws Exception {
+        if (crypto == null) {
+            throw new Fault("No Crypto token properties are available to retrieve a certificate", 
+                            LOG);
+        }
+        
         String alias = (String)getProperty(SecurityConstants.STS_TOKEN_USERNAME);
         if (alias == null) {
             alias = crypto.getDefaultX509Identifier();
