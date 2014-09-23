@@ -212,6 +212,9 @@ public class UriInfoImpl implements UriInfo {
         if (path.startsWith("/") && address.endsWith("/")) {
             address = address.substring(0, address.length() - 1);
         }
+        if (!path.isEmpty() && !path.startsWith("/") && !address.endsWith("/")) {
+            address = address + "/";
+        }
         return address + path;
     }
 }
