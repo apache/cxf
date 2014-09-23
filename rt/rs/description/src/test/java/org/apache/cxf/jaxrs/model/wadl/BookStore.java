@@ -181,7 +181,7 @@ public class BookStore implements BookDescription {
         public int getA() {
             return a;
         }
-        @PathParam("a")
+        @HeaderParam("a")
         public void setA(int a) {
             this.a = a;
         }
