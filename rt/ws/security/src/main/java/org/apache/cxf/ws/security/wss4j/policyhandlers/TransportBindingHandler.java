@@ -523,10 +523,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
             if (crypto == null) {
                 LOG.fine("No signature Crypto properties are available");
-                Exception ex = new Exception("No signature Crypto properties are available");
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, ex
-                );
+                throw new WSSecurityException("No signature Crypto properties are available");
             }
             
             String uname = crypto.getX509Identifier(secTok.getX509Certificate());
