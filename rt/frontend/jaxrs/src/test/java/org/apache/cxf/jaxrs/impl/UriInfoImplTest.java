@@ -215,11 +215,16 @@ public class UriInfoImplTest extends Assert {
                                         null);
         assertEquals("Wrong absolute path", "http://localhost:8080/baz/bar", 
                      u.getAbsolutePath().toString());
+        
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/", "/bar"),
                                         null);
         assertEquals("Wrong absolute path", "http://localhost:8080/baz/bar", 
                      u.getAbsolutePath().toString());
         
+        u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "bar"),
+                            null);
+        assertEquals("Wrong absolute path", "http://localhost:8080/baz/bar",
+                     u.getAbsolutePath().toString());
     }
     
     @Test
