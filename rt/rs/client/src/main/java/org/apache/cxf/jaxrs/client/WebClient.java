@@ -982,19 +982,15 @@ public class WebClient extends AbstractClient {
     
     private MultivaluedMap<String, String> prepareHeaders(Class<?> responseClass, Object body) {
         MultivaluedMap<String, String> headers = getHeaders();
-        boolean contentTypeNotSet = headers.getFirst(HttpHeaders.CONTENT_TYPE) == null;
-        if (contentTypeNotSet) {
-            String ct = "*/*";
-            if (body != null) { 
-                ct = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED 
-                                          : MediaType.APPLICATION_XML;
-            }
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, ct);
+        if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null && body != null) {
+            String contentType = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED 
+                                     : MediaType.APPLICATION_XML;
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, contentType);
         }
         
         if (responseClass != null && responseClass != Response.class 
             && headers.getFirst(HttpHeaders.ACCEPT) == null) {
-            headers.putSingle(HttpHeaders.ACCEPT, JAXRSUtils.mediaTypeToString(MediaType.APPLICATION_XML_TYPE));
+            headers.putSingle(HttpHeaders.ACCEPT, MediaType.WILDCARD);
         }
         return headers;
     }
