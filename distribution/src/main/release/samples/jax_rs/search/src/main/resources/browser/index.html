@@ -18,14 +18,14 @@
 			<div class="alert alert-danger hide" role="alert" id="error-message"></div>	    	
 	    </div>
 	
-	    <form id="form" class="form-upload" role="form" enctype="multipart/form-data" method="post" action="http://localhost:9000/jaxrs/catalog">
+	    <form id="form" class="form-upload" role="form" enctype="multipart/form-data" method="post" action="http://localhost:9000/catalog">
             <h2 class="form-upload-heading">Please select a PDF file</h2>
             <div class="form-group">
                 <input id="file" name="file" type="file" multiple="true" class="file"></input>
             </div>
         </form>
         
-        <form id="form-search" role="search" method="get" action="http://localhost:9000/jaxrs/catalog/search">
+        <form id="form-search" role="search" method="get" action="http://localhost:9000/catalog/search">
             <h2 class="form-upload-heading">Query the Catalog</h2>
 		    <div class="input-group add-on">
 		        <input id="search-query" type="text" class="form-control" placeholder="Search">		    

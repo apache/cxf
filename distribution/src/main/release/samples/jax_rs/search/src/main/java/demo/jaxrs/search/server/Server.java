@@ -26,7 +26,6 @@ import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -35,13 +34,21 @@ public class Server {
 
     protected Server() throws Exception {
         org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(9000);
-        
+
+        // Configuring all static web resource
+        final ServletHolder staticHolder = new ServletHolder(new DefaultServlet());
         // Register and map the dispatcher servlet
         final ServletHolder servletHolder = new ServletHolder(new CXFNonSpringJaxrsServlet());
         final ServletContextHandler context = new ServletContextHandler();      
         context.setContextPath("/");
-        context.addServlet(servletHolder, "/jaxrs/*");     
+        context.addServlet(staticHolder, "/static/*");
+        context.addServlet(servletHolder, "/*");  
+        context.setResourceBase(getClass().getResource("/browser").toURI().toString());
         
+        servletHolder.setInitParameter("redirects-list", 
+            "/ /index.html /js/fileinput.min.js /css/fileinput.min.css");
+        servletHolder.setInitParameter("redirect-servlet-name", staticHolder.getName());
+        servletHolder.setInitParameter("redirect-attributes", "javax.servlet.include.request_uri");
         servletHolder.setInitParameter("jaxrs.serviceClasses", Catalog.class.getName());
         servletHolder.setInitParameter("jaxrs.properties", StringUtils.join(
             new String[] {
@@ -57,19 +64,8 @@ public class Server {
                 CrossOriginResourceSharingFilter.class.getName()
             }, ",") 
         );                
-        
-        // Configuring all static web resource
-        final ServletHolder staticHolder = new ServletHolder(new DefaultServlet());
-        final ServletContextHandler htmls = new ServletContextHandler();
-        htmls.setContextPath("/catalog");
-        htmls.addServlet(staticHolder, "/*");
-        htmls.setResourceBase(getClass().getResource("/browser").toURI().toString());
-
-        final HandlerList handlers = new HandlerList();
-        handlers.addHandler(htmls);
-        handlers.addHandler(context);        
-        
-        server.setHandler(handlers);
+                
+        server.setHandler(context);
         server.start();
         server.join();
     }

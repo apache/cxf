@@ -37,7 +37,7 @@ public final class Client {
     }
 
     public static void main(String args[]) throws Exception {               
-        final String url = "http://localhost:9000/jaxrs/catalog";
+        final String url = "http://localhost:9000/catalog";
         final HttpClient httpClient = new HttpClient();
                         
         uploadToCatalog(url, httpClient, "jsr339-jaxrs-2.0-final-spec.pdf");
