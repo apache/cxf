@@ -685,6 +685,41 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Book book = store.getBookWithSpace("123");
         assertEquals(123L, book.getId());
+        assertEquals("CXF in Action", book.getName());
+    }
+    
+    @Test
+    public void testBookWithSpaceProxyPathUrlEncoded() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress("http://localhost:" + PORT);
+        bean.setProperties(Collections.<String, Object>singletonMap("url.encode.client.parameters", Boolean.TRUE));
+        BookStore store = bean.create(BookStore.class);
+        Book book = store.getBookWithSemicolon("123;:");
+        assertEquals(123L, book.getId());
+        assertEquals("CXF in Action%3B%3A", book.getName());
+    }
+    
+    @Test
+    public void testBookWithSpaceProxyPathUrlEncodedSemicolonOnly() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress("http://localhost:" + PORT);
+        bean.getProperties(true).put("url.encode.client.parameters", "true");
+        bean.getProperties(true).put("url.encode.client.parameters.list", ";");
+        BookStore store = bean.create(BookStore.class);
+        Book book = store.getBookWithSemicolon("123;:");
+        assertEquals(123L, book.getId());
+        assertEquals("CXF in Action%3B:", book.getName());
+    }
+    
+    @Test
+    public void testBookWithSpaceProxyNonEncodedSemicolon() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT,
+                                                    BookStore.class);
+        Book book = store.getBookWithSemicolon("123;");
+        assertEquals(123L, book.getId());
+        assertEquals("CXF in Action;", book.getName());
     }
     
     @Test
@@ -2139,14 +2174,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testAddBookEmptyContent() throws Exception {
-        Response r = WebClient.create("http://localhost:" + PORT + "/bookstore/books").post(null);
+        Response r = WebClient.create("http://localhost:" + PORT + "/bookstore/books")
+            .type("*/*").post(null);
         assertEquals(400, r.getStatus());
     }
     
     @Test
     public void testAddBookEmptyContentWithNullable() throws Exception {
-        Book defaultBook = 
-            WebClient.create("http://localhost:" + PORT + "/bookstore/books/null").post(null, Book.class);
+        Book defaultBook = WebClient.create("http://localhost:" + PORT + "/bookstore/books/null")
+            .type("*/*").post(null, Book.class);
         assertEquals("Default Book", defaultBook.getName());
     }
     

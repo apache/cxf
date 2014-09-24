@@ -21,6 +21,7 @@ package org.apache.cxf.common.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -43,6 +44,22 @@ public final class UrlUtils {
         
     }
 
+    public static String urlEncode(String value) {
+        
+        return urlEncode(value, "UTF-8");
+    }
+    
+    public static String urlEncode(String value, String enc) {
+        
+        try {
+            value = URLEncoder.encode(value, enc);
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        return value;
+    }
+    
     /**
      * Decodes using URLDecoder - use when queries or form post values are decoded
      * @param value value to decode

@@ -46,6 +46,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
@@ -925,6 +926,20 @@ public class BookStore {
     @Produces("application/xml")
     public Book getBookWithSpace(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
+    }
+    
+    @GET
+    @Path("/thebooks/{bookId}/")
+    @Produces("application/xml")
+    public Book getBookWithSemicolon(@Encoded @PathParam("bookId") String id) {
+        Book b = new Book();
+        b.setId(Long.valueOf(id.substring(0, 3)));
+        b.setName("CXF in Action" + id.substring(3));
+        String absPath = ui.getAbsolutePath().toString();
+        if (absPath.contains("123;")) {
+            b.setName(b.getName() + ";");
+        }
+        return b;
     }
     
     @GET

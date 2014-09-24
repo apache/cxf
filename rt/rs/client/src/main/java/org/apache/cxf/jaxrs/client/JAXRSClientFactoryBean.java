@@ -18,14 +18,19 @@
  */
 package org.apache.cxf.jaxrs.client;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
@@ -368,6 +373,26 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         }
         ClientProviderFactory factory = ClientProviderFactory.createInstance(getBus()); 
         setupFactory(factory, ep);
+        
+        final Map<String, Object> theProperties = super.getProperties();
+        final boolean encodeClientParameters = PropertyUtils.isTrue(theProperties, "url.encode.client.parameters");
+        if (encodeClientParameters) {
+            final String encodeClientParametersList = theProperties == null ? null 
+                : (String)getProperties().get("url.encode.client.parameters.list");
+            factory.registerUserProvider(new ParamConverterProvider() {
+
+                @SuppressWarnings("unchecked")
+                @Override
+                public <T> ParamConverter<T> getConverter(Class<T> cls, Type t, Annotation[] anns) {
+                    if (cls == String.class) {
+                        return (ParamConverter<T>)new UrlEncodingParamConverter(encodeClientParametersList);
+                    } else {
+                        return null;
+                    }
+                }
+            
+            });
+        }
         getBus().setProperty(ClientProviderFactory.class.getName(), factory);
         
 
