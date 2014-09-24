@@ -48,6 +48,13 @@ public class AddNumberImpl implements AddNumbersPortType {
     }
 
     int execute(int number1, int number2) throws AddNumbersFault_Exception {
+        if (number1 == 5092) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                //ignore
+            }
+        }
         if (number1 < 0 || number2 < 0) {
             AddNumbersFault fb = new AddNumbersFault();
             fb.setDetail("Negative numbers cant be added!");

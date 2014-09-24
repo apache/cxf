@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Response;
@@ -43,6 +44,7 @@ import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersResponse;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersService;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 
@@ -52,6 +54,7 @@ import org.junit.Test;
 
 public class WSAPureWsdlTest extends AbstractWSATestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String PORT2 = allocatePort(Server.class, 1);
     
     private final QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/",
                                                 "AddNumbersService");
@@ -66,6 +69,66 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
+    @Test
+    public void testBasicInvocationTimeouts() throws Exception {
+        AddNumbersPortType port = getPort();
+
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                                                        "http://localhost:" + PORT + "/jaxws/add");
+        HTTPConduit conduit = (HTTPConduit)((Client)port).getConduit();
+        conduit.getClient().setConnectionTimeout(25);
+        conduit.getClient().setReceiveTimeout(10);
+        
+        try {
+            //read timeout
+            port.addNumbersAsync(5092, 25).get();
+            fail("should have failed");
+        } catch (Exception t) {
+            //expected
+            assertTrue(t.getCause().toString(), t.getCause() instanceof  java.net.SocketTimeoutException);
+        }
+        
+        AsyncHandler<AddNumbersResponse> handler = new AsyncHandler<AddNumbersResponse>() {
+            public void handleResponse(Response<AddNumbersResponse> res) {
+                //System.out.println("in handle response");
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+        };
+        synchronized (handler) {
+            port.addNumbersAsync(5092,  25, handler);
+            handler.wait(1000);
+        }
+        
+        try {
+            //connection timeout
+            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                                                            "http://localhost:" + PORT2 + "/jaxws/add");
+            port.addNumbersAsync(25, 25).get();
+            fail("should have failed");
+        } catch (Exception t) {
+            //expected
+            assertTrue(t.getCause().getCause().toString(),
+                       t.getCause().getCause() instanceof  java.net.ConnectException);
+        }
+        synchronized (handler) {
+            port.addNumbersAsync(25,  25, handler);
+            handler.wait(1000);
+        }
+        MAPCodec mp = getMAPCodec((Client)port);
+        assertEquals(0, mp.getUncorrelatedExchanges().size());
+    }
+    
+    MAPCodec getMAPCodec(Client port) {
+        for (Interceptor<? extends Message> f : port.getOutInterceptors()) {
+            if (f instanceof MAPCodec) {
+                return (MAPCodec)f;
+            }
+        }
+        return null;
+    }
+    
     @Test
     public void testBasicInvocation() throws Exception {
         ByteArrayOutputStream input = setupInLogging();
