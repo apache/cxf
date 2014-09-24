@@ -93,4 +93,17 @@ public class MemoryTokenStoreTest extends org.junit.Assert {
         store.remove(token2.getId());
         assertTrue(store.getTokenIdentifiers().size() == 0);
     }
+    
+    @org.junit.Test
+    public void testTokenExpiry() {
+        SecurityToken token = new SecurityToken();
+        
+        Date expires = new Date();
+        expires.setTime(expires.getTime() + (5L * 60L * 1000L));
+        token.setExpires(expires);
+        
+        assertFalse(token.isExpired());
+        assertFalse(token.isAboutToExpire(100L));
+        assertTrue(token.isAboutToExpire((5L * 60L * 1000L) + 1L));
+    }
 }
