@@ -570,6 +570,18 @@ public final class SecurityConstants {
      * client credentials.
      */
     public static final String DELEGATED_CREDENTIAL = "ws-security.delegated.credential";
+    
+    /**
+     * This is the value in seconds within which a token is considered to be expired by the
+     * client. When a cached token (from a STS) is retrieved by the client, it is considered
+     * to be expired if it will expire in a time less than the value specified by this tag.
+     * This prevents token expiry when the message is en route / being processed by the
+     * service. When the token is found to be expired then it will be renewed via the STS.
+     * 
+     * The default value is 10 (seconds). Specify 0 to avoid this check.
+     */
+    public static final String STS_TOKEN_IMMINENT_EXPIRY_VALUE =
+        "ws-security.sts.token.imminent-expiry-value";
 
     //
     // Internal tags
@@ -602,7 +614,7 @@ public final class SecurityConstants {
             SAML_ONE_TIME_USE_CACHE_INSTANCE, ENABLE_STREAMING_SECURITY, RETURN_SECURITY_ERROR,
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
             DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
-            KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM
+            KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
