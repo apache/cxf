@@ -558,7 +558,7 @@ public final class SecurityConstants {
      * This prevents token expiry when the message is en route / being processed by the
      * service. When the token is found to be expired then it will be renewed via the STS.
      * 
-     * The default value is 10 (seconds). Specify 0 to avoid this check.
+     * The default value is 0 (seconds), meaning that this functionality is disabled by default.
      */
     public static final String STS_TOKEN_IMMINENT_EXPIRY_VALUE =
         "ws-security.sts.token.imminent-expiry-value";

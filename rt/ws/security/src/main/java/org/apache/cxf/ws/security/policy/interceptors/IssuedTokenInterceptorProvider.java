@@ -390,7 +390,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         ) {
             String imminentExpiryValue = 
                 (String)message.getContextualProperty(SecurityConstants.STS_TOKEN_IMMINENT_EXPIRY_VALUE);
-            long imminentExpiry = 10L;
+            long imminentExpiry = 0L;
             if (imminentExpiryValue != null) {
                 imminentExpiry = Long.parseLong(imminentExpiryValue);
             }

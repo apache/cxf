@@ -182,6 +182,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
         ((BindingProvider)port).getRequestContext().put("thread.local.request.context", "true");
+        ((BindingProvider)port).getRequestContext().put("ws-security.sts.token.imminent-expiry-value", "10");
         updateAddressPort(port, PORT);
         
         // Make a successful invocation
