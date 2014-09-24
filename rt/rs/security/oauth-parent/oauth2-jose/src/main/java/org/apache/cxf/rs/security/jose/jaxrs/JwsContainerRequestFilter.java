@@ -27,6 +27,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
@@ -40,7 +41,10 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(context.getEntityStream()), 
                                                       getSigProperties());
-        p.verifySignatureWith(theSigVerifier);
+        if (!p.verifySignatureWith(theSigVerifier)) {
+            context.abortWith(JAXRSUtils.toResponse(400));
+            return;
+        }
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));

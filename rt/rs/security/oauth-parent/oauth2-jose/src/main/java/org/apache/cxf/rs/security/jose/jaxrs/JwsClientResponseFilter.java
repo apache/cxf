@@ -38,7 +38,9 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(res.getEntityStream()), 
                                                       getSigProperties());
-        p.verifySignatureWith(theSigVerifier);
+        if (!p.verifySignatureWith(theSigVerifier)) {
+            throw new SecurityException();
+        }
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));
         res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
