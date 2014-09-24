@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.ws.security.tokenstore;
 
+import java.util.Date;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -67,5 +69,18 @@ public class MemoryTokenStoreTest extends org.junit.Assert {
         store.remove(token1.getId());
         store.remove(token2.getId());
         assertTrue(store.getTokenIdentifiers().size() == 0);
+    }
+    
+    @org.junit.Test
+    public void testTokenExpiry() {
+        SecurityToken token = new SecurityToken();
+        
+        Date expires = new Date();
+        expires.setTime(expires.getTime() + (5L * 60L * 1000L));
+        token.setExpires(expires);
+        
+        assertFalse(token.isExpired());
+        assertFalse(token.isAboutToExpire(100L));
+        assertTrue(token.isAboutToExpire((5L * 60L * 1000L) + 1L));
     }
 }
