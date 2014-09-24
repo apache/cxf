@@ -51,6 +51,8 @@ public final class Client {
         search(url, httpClient, "ct==Java");        
         search(url, httpClient, "ct==WebSockets");
         
+        search(url, httpClient, "ct==jaxrs,source==*jaxrs*");
+        
         delete(url, httpClient);
     }
 

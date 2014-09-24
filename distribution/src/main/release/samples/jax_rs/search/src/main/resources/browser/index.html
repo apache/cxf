@@ -86,8 +86,12 @@
     		$( "#results" ).html("");
     		
     		if( query !== "" ) {
+    			var encodedQuery = encodeURIComponent( query );
+    			var encodedWildcardsQuery = encodeURIComponent( "*" + query + "*" );
+    			var filter = "ct==" + encodedQuery + ",source==" + encodedWildcardsQuery; 
+
 	    		$.ajax({
-	    			url: $(this).attr("action") + "?$filter=ct=="  + encodeURIComponent( query ),
+	    			url: $(this).attr("action") + "?$filter=" + filter,
 	    			type: 'GET',
 	    			async: false,
 	    			success: function (data) {
