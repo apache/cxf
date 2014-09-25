@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
@@ -68,6 +69,10 @@ public class JwsCompactProducer {
             throw new IllegalStateException("Signature is not available");
         }
         return getUnsignedEncodedJws() + "." + (noSignature ? "" : signature);
+    }
+    
+    public String signWith(JsonWebKey jwk) {
+        return signWith(JwsUtils.getSignatureProvider(jwk));
     }
     
     public String signWith(JwsSignatureProvider signer) { 

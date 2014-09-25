@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.cxf.common.util.Base64Exception;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeadersReader;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReader;
@@ -95,6 +96,9 @@ public class JwsCompactConsumer {
             throw new SecurityException();
         }
         return true;
+    }
+    public boolean verifySignatureWith(JsonWebKey key) {
+        return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
     }
     private void enforceJweSignatureProperties() {
         if (props != null) {
