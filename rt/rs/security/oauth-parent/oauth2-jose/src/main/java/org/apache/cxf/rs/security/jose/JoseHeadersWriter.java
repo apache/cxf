@@ -16,12 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwt;
+package org.apache.cxf.rs.security.jose;
 
-
-
-public interface JwtHeadersWriter {
+public interface JoseHeadersWriter {
     
-    String headersToJson(JwtHeaders headers);
+    String headersToJson(JoseHeaders headers);
     
 }

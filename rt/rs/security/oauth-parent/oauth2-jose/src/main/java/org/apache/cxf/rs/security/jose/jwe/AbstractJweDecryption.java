@@ -21,10 +21,10 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 
+import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeadersReader;
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersReader;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
@@ -32,9 +32,9 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
     private JweCryptoProperties props;
     private KeyDecryptionAlgorithm keyDecryptionAlgo;
     private ContentDecryptionAlgorithm contentDecryptionAlgo;
-    private JwtHeadersReader reader = new JwtTokenReaderWriter();
+    private JoseHeadersReader reader = new JoseHeadersReaderWriter();
     protected AbstractJweDecryption(JweCryptoProperties props, 
-                                    JwtHeadersReader theReader,
+                                    JoseHeadersReader theReader,
                                     KeyDecryptionAlgorithm keyDecryptionAlgo,
                                     ContentDecryptionAlgorithm contentDecryptionAlgo) {
         this.props = props;
@@ -68,7 +68,7 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
         AlgorithmParameterSpec spec = getContentEncryptionCipherSpec(consumer);
         keyProperties.setAlgoSpec(spec);
         boolean compressionSupported = 
-            JwtConstants.DEFLATE_ZIP_ALGORITHM.equals(consumer.getJweHeaders().getZipAlgorithm());
+            JoseConstants.DEFLATE_ZIP_ALGORITHM.equals(consumer.getJweHeaders().getZipAlgorithm());
         keyProperties.setCompressionSupported(compressionSupported);
         byte[] actualCek = getActualCek(cek, consumer.getJweHeaders().getContentEncryptionAlgorithm());
         Key secretKey = CryptoUtils.createSecretKeySpec(actualCek, keyProperties.getKeyAlgo());

@@ -21,10 +21,12 @@ package org.apache.cxf.rs.security.jose.jwt;
 
 import java.util.Map;
 
+import org.apache.cxf.rs.security.jose.AbstractJoseObject;
 
 
 
-public class JwtClaims extends AbstractJwtObject {
+
+public class JwtClaims extends AbstractJoseObject {
     
     public JwtClaims() {
     }

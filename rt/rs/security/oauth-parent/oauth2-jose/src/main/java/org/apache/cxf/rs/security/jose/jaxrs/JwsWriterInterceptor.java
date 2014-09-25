@@ -29,14 +29,15 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsOutputStream;
 import org.apache.cxf.rs.security.jose.jws.JwsSignature;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlOutputStream;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
@@ -44,13 +45,13 @@ import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
     private boolean contentTypeRequired = true;
     private boolean useJwsOutputStream;
-    private JwtHeadersWriter writer = new JwtTokenReaderWriter();
+    private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
-        JwtHeaders headers = new JwtHeaders();
+        JwsHeaders headers = new JwsHeaders();
         JwsSignatureProvider sigProvider = getInitializedSigProvider(headers);
         setContentTypeIfNeeded(headers, ctx);
-        ctx.setMediaType(JAXRSUtils.toMediaType(JwtConstants.MEDIA_TYPE_JOSE_JSON));
+        ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON));
         OutputStream actualOs = ctx.getOutputStream();
         if (useJwsOutputStream) {
             JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
@@ -80,14 +81,14 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     public void setUseJwsOutputStream(boolean useJwsOutputStream) {
         this.useJwsOutputStream = useJwsOutputStream;
     }
-    public void setWriter(JwtHeadersWriter writer) {
+    public void setWriter(JoseHeadersWriter writer) {
         this.writer = writer;
     }
     private void setContentTypeIfNeeded(JwtHeaders headers, WriterInterceptorContext ctx) {    
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
             if (mt != null 
-                && !JAXRSUtils.mediaTypeToString(mt).equals(JwtConstants.MEDIA_TYPE_JOSE_JSON)) {
+                && !JAXRSUtils.mediaTypeToString(mt).equals(JoseConstants.MEDIA_TYPE_JOSE_JSON)) {
                 if ("application".equals(mt.getType())) {
                     headers.setContentType(mt.getSubtype());
                 } else {

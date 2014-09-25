@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
+import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 
-public interface JwtTokenReader extends JwtHeadersReader {
+
+public interface JwtTokenReader extends JoseHeadersReader {
     JwtClaims fromJsonClaims(String jsonClaims);
     JwtToken fromJson(JwtTokenJson jsonPair);
 }

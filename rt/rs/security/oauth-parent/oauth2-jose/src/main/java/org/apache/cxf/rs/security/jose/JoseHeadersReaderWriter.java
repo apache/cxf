@@ -16,10 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jws;
+package org.apache.cxf.rs.security.jose;
 
 
-public interface JwsSignatureProvider {
-    String getAlgorithm();
-    JwsSignature createJwsSignature(JwsHeaders headers);
+
+
+
+public class JoseHeadersReaderWriter extends AbstractJoseObjectReaderWriter
+    implements JoseHeadersReader, JoseHeadersWriter {
+    @Override
+    public String headersToJson(JoseHeaders headers) {
+        return toJson(headers);
+    }
+    
+    @Override
+    public JoseHeaders fromJsonHeaders(String headersJson) {
+        JoseHeaders headers = new JoseHeaders();
+        fromJsonInternal(headers, headersJson);
+        return headers;
+    }
+    
 }

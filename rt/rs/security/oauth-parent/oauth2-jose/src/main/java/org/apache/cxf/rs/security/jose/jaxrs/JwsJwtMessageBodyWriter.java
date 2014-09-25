@@ -28,9 +28,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 
@@ -54,7 +54,7 @@ public class JwsJwtMessageBodyWriter  extends AbstractJwsWriterProvider
         JwsJwtCompactProducer p = new JwsJwtCompactProducer(token);
         JwtHeaders jwtHeaders = new JwtHeaders();
         JwsSignatureProvider sigProvider = getInitializedSigProvider(jwtHeaders);
-        jwtHeaders.setContentType(JwtConstants.TYPE_JWT);
+        jwtHeaders.setContentType(JoseConstants.TYPE_JWT);
         writeJws(p, sigProvider, os);
     }
 }

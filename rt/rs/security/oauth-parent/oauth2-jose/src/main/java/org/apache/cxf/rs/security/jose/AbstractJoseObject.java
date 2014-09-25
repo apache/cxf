@@ -17,19 +17,19 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.jose.jwt;
+package org.apache.cxf.rs.security.jose;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class AbstractJwtObject {
+public abstract class AbstractJoseObject {
     protected Map<String, Object> values = new LinkedHashMap<String, Object>();
     
-    protected AbstractJwtObject() {
+    protected AbstractJoseObject() {
         
     }
     
-    protected AbstractJwtObject(Map<String, Object> values) {
+    protected AbstractJoseObject(Map<String, Object> values) {
         this.values = values;
     }
     
@@ -55,7 +55,7 @@ public abstract class AbstractJwtObject {
     }
     
     public boolean equals(Object obj) {
-        return obj instanceof AbstractJwtObject && ((AbstractJwtObject)obj).values.equals(this.values);
+        return obj instanceof AbstractJoseObject && ((AbstractJoseObject)obj).values.equals(this.values);
     }
     
 }

@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
+import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 
 
-public interface JwtTokenWriter extends JwtHeadersWriter {
+
+public interface JwtTokenWriter extends JoseHeadersWriter {
     
     String claimsToJson(JwtClaims claims);
     JwtTokenJson tokenToJson(JwtToken token);

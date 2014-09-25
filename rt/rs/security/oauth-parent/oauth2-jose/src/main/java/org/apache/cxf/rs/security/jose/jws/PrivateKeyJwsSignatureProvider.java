@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider {
@@ -60,7 +59,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
         this.random = random;
         this.signatureSpec = spec;
     }
-    protected JwsSignature doCreateJwsSignature(JwtHeaders headers) {
+    protected JwsSignature doCreateJwsSignature(JwsHeaders headers) {
         final Signature s = CryptoUtils.getSignature(key, 
                                                      Algorithm.toJavaName(headers.getAlgorithm()),
                                                      random,

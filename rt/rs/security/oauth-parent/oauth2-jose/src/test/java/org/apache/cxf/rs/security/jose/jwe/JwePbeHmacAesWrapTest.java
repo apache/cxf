@@ -20,8 +20,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.Security;
 
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.After;
@@ -42,11 +42,11 @@ public class JwePbeHmacAesWrapTest extends Assert {
     public void testEncryptDecryptPbesHmacAesWrapA128CBCHS256() throws Exception {
         final String specPlainText = "Live long and prosper.";
         JweHeaders headers = new JweHeaders();
-        headers.setAlgorithm(JwtConstants.PBES2_HS256_A128KW_ALGO);
+        headers.setAlgorithm(JoseConstants.PBES2_HS256_A128KW_ALGO);
         headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
         final String password = "Thus from my lips, by yours, my sin is purged."; 
         KeyEncryptionAlgorithm keyEncryption = 
-            new PbesHmacAesWrapKeyEncryptionAlgorithm(password, JwtConstants.PBES2_HS256_A128KW_ALGO);
+            new PbesHmacAesWrapKeyEncryptionAlgorithm(password, JoseConstants.PBES2_HS256_A128KW_ALGO);
         JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers, keyEncryption);
         String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
         
@@ -60,11 +60,11 @@ public class JwePbeHmacAesWrapTest extends Assert {
     public void testEncryptDecryptPbesHmacAesWrapAesGcm() throws Exception {
         final String specPlainText = "Live long and prosper.";
         JweHeaders headers = new JweHeaders();
-        headers.setAlgorithm(JwtConstants.PBES2_HS256_A128KW_ALGO);
+        headers.setAlgorithm(JoseConstants.PBES2_HS256_A128KW_ALGO);
         headers.setContentEncryptionAlgorithm(Algorithm.A128GCM.getJwtName());
         final String password = "Thus from my lips, by yours, my sin is purged."; 
         KeyEncryptionAlgorithm keyEncryption = 
-            new PbesHmacAesWrapKeyEncryptionAlgorithm(password, JwtConstants.PBES2_HS256_A128KW_ALGO);
+            new PbesHmacAesWrapKeyEncryptionAlgorithm(password, JoseConstants.PBES2_HS256_A128KW_ALGO);
         JweEncryptionProvider encryption = new WrappedKeyJweEncryption(headers, 
                                                                        keyEncryption,
             new AesGcmContentEncryptionAlgorithm(Algorithm.A128GCM.getJwtName()));

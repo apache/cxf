@@ -20,8 +20,6 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import java.util.Set;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
-
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
     private Set<String> supportedAlgorithms;
     private String algorithm;
@@ -31,9 +29,9 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         this.algorithm = algo;
     }
     
-    protected JwtHeaders prepareHeaders(JwtHeaders headers) {
+    protected JwsHeaders prepareHeaders(JwsHeaders headers) {
         if (headers == null) {
-            headers = new JwtHeaders();
+            headers = new JwsHeaders();
         }
         String algo = headers.getAlgorithm();
         if (algo != null) {
@@ -49,11 +47,11 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         return algorithm;    
     }
     @Override
-    public JwsSignature createJwsSignature(JwtHeaders headers) {
+    public JwsSignature createJwsSignature(JwsHeaders headers) {
         return doCreateJwsSignature(prepareHeaders(headers));
     }
     
-    protected abstract JwsSignature doCreateJwsSignature(JwtHeaders headers);
+    protected abstract JwsSignature doCreateJwsSignature(JwsHeaders headers);
     
     protected String checkAlgorithm(String algo) {
         if (algo == null || !supportedAlgorithms.contains(algo)) {

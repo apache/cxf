@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwt;
+package org.apache.cxf.rs.security.jose;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,16 +28,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 
 
-public class AbstractJwtObjectReaderWriter {
+
+public class AbstractJoseObjectReaderWriter {
     private static final Set<String> DATE_PROPERTIES = 
         new HashSet<String>(Arrays.asList(JwtConstants.CLAIM_EXPIRY, 
                                           JwtConstants.CLAIM_ISSUED_AT, 
                                           JwtConstants.CLAIM_NOT_BEFORE));
     private boolean format;
     
-    protected String toJson(AbstractJwtObject jwt) {
+    protected String toJson(AbstractJoseObject jwt) {
         StringBuilder sb = new StringBuilder();
         toJsonInternal(sb, jwt.asMap());
         return sb.toString();
@@ -70,8 +72,8 @@ public class AbstractJwtObjectReaderWriter {
     
     @SuppressWarnings("unchecked")
     protected void toJsonInternal(StringBuilder sb, Object value, boolean hasNext) {
-        if (AbstractJwtObject.class.isAssignableFrom(value.getClass())) {
-            sb.append(toJson((AbstractJwtObject)value));
+        if (AbstractJoseObject.class.isAssignableFrom(value.getClass())) {
+            sb.append(toJson((AbstractJoseObject)value));
         } else if (value.getClass().isArray()) {
             toJsonInternal(sb, (Object[])value);
         } else if (Collection.class.isAssignableFrom(value.getClass())) {
@@ -100,13 +102,13 @@ public class AbstractJwtObjectReaderWriter {
         }
     }
         
-    protected void fromJsonInternal(AbstractJwtObject jwt, String json) {
+    protected void fromJsonInternal(AbstractJoseObject jwt, String json) {
         String theJson = json.trim();
         Map<String, Object> values = readJwtObjectAsMap(theJson.substring(1, theJson.length() - 1));
         fromJsonInternal(jwt, values);
     }
     
-    protected void fromJsonInternal(AbstractJwtObject jwt, Map<String, Object> values) {
+    protected void fromJsonInternal(AbstractJoseObject jwt, Map<String, Object> values) {
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             jwt.setValue(entry.getKey(), entry.getValue());
         }

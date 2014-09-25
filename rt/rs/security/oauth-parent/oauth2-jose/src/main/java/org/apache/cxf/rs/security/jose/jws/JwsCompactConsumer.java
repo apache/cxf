@@ -21,16 +21,15 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.cxf.common.util.Base64Exception;
+import org.apache.cxf.rs.security.jose.JoseHeadersReader;
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersReader;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReader;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 public class JwsCompactConsumer {
-    private JwtHeadersReader reader = new JwtTokenReaderWriter();
+    private JoseHeadersReader reader = new JoseHeadersReaderWriter();
     private String encodedSequence;
     private String encodedSignature;
     private String headersJson;
@@ -45,7 +44,7 @@ public class JwsCompactConsumer {
     public JwsCompactConsumer(String encodedJws, JwtTokenReader r) {
         this(encodedJws, null, r);
     }
-    public JwsCompactConsumer(String encodedJws, JwsSignatureProperties props, JwtHeadersReader r) {
+    public JwsCompactConsumer(String encodedJws, JwsSignatureProperties props, JoseHeadersReader r) {
         if (r != null) {
             this.reader = r;
         }
@@ -87,12 +86,12 @@ public class JwsCompactConsumer {
     public byte[] getDecodedSignature() {
         return encodedSignature.isEmpty() ? new byte[]{} : decode(encodedSignature);
     }
-    public JwtHeaders getJwtHeaders() {
-        return getReader().fromJsonHeaders(headersJson);
+    public JwsHeaders getJwsHeaders() {
+        return new JwsHeaders(getReader().fromJsonHeaders(headersJson).asMap());
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         enforceJweSignatureProperties();
-        if (!validator.verify(getJwtHeaders(), getUnsignedEncodedPayload(), getDecodedSignature())) {
+        if (!validator.verify(getJwsHeaders(), getUnsignedEncodedPayload(), getDecodedSignature())) {
             throw new SecurityException();
         }
         return true;
@@ -113,7 +112,7 @@ public class JwsCompactConsumer {
         }
         
     }
-    protected JwtHeadersReader getReader() {
+    protected JoseHeadersReader getReader() {
         return reader;
     }
     private static byte[] decode(String encoded) {

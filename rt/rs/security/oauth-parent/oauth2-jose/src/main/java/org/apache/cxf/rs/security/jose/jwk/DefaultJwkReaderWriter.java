@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
-import org.apache.cxf.rs.security.jose.jwt.AbstractJwtObjectReaderWriter;
+import org.apache.cxf.rs.security.jose.AbstractJoseObjectReaderWriter;
 
 
 
 
-public class DefaultJwkReaderWriter extends AbstractJwtObjectReaderWriter
+public class DefaultJwkReaderWriter extends AbstractJoseObjectReaderWriter
     implements JwkReaderWriter {
     @Override
     public String jwkSetToJson(JsonWebKeys jwks) {

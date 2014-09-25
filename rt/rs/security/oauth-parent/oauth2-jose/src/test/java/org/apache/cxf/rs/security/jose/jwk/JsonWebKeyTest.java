@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactConsumer;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.Assert;
@@ -173,13 +173,13 @@ public class JsonWebKeyTest extends Assert {
         assertEquals(AES_SECRET_VALUE, key.getProperty(JsonWebKey.OCTET_KEY_VALUE));
         assertEquals(AES_KID_VALUE, key.getKid());
         assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
-        assertEquals(JwtConstants.A128KW_ALGO, key.getAlgorithm());
+        assertEquals(JoseConstants.A128KW_ALGO, key.getAlgorithm());
     }
     private void validateSecretHmacKey(JsonWebKey key) {
         assertEquals(HMAC_SECRET_VALUE, key.getProperty(JsonWebKey.OCTET_KEY_VALUE));
         assertEquals(HMAC_KID_VALUE, key.getKid());
         assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
-        assertEquals(JwtConstants.HMAC_SHA_256_ALGO, key.getAlgorithm());
+        assertEquals(JoseConstants.HMAC_SHA_256_ALGO, key.getAlgorithm());
     }
     
     private void validatePublicRsaKey(JsonWebKey key) {
@@ -187,7 +187,7 @@ public class JsonWebKeyTest extends Assert {
         assertEquals(RSA_PUBLIC_EXP_VALUE, key.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
         assertEquals(RSA_KID_VALUE, key.getKid());
         assertEquals(JsonWebKey.KEY_TYPE_RSA, key.getKeyType());
-        assertEquals(JwtConstants.RS_SHA_256_ALGO, key.getAlgorithm());
+        assertEquals(JoseConstants.RS_SHA_256_ALGO, key.getAlgorithm());
     }
     private void validatePrivateRsaKey(JsonWebKey key) {
         validatePublicRsaKey(key);

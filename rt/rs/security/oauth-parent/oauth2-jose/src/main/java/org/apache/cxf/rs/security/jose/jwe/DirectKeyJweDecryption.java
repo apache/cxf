@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.Key;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersReader;
+import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 
 public class DirectKeyJweDecryption extends AbstractJweDecryption {
     public DirectKeyJweDecryption(Key contentDecryptionKey) {    
@@ -30,13 +30,13 @@ public class DirectKeyJweDecryption extends AbstractJweDecryption {
         this(contentDecryptionKey, props, null);
     }
     public DirectKeyJweDecryption(Key contentDecryptionKey, JweCryptoProperties props, 
-                                  JwtHeadersReader reader) {    
+                                  JoseHeadersReader reader) {    
         this(contentDecryptionKey, props, reader,
              new AesGcmContentDecryptionAlgorithm());
     }
     public DirectKeyJweDecryption(Key contentDecryptionKey, 
                                   JweCryptoProperties props, 
-                                  JwtHeadersReader reader,
+                                  JoseHeadersReader reader,
                                   ContentDecryptionAlgorithm cipherProps) {    
         super(props, reader, new DirectKeyDecryptionAlgorithm(contentDecryptionKey),
               cipherProps);

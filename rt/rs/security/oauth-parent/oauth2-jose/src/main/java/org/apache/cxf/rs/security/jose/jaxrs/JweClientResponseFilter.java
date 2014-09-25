@@ -26,8 +26,8 @@ import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 
+import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
-import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 @Priority(Priorities.JWE_CLIENT_READ_PRIORITY)
 public class JweClientResponseFilter extends AbstractJweDecryptingFilter implements ClientResponseFilter {
@@ -37,7 +37,7 @@ public class JweClientResponseFilter extends AbstractJweDecryptingFilter impleme
         byte[] bytes = out.getContent();
         res.setEntityStream(new ByteArrayInputStream(bytes));
         res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
-        String ct = JwtUtils.checkContentType(out.getHeaders().getContentType(), getDefaultMediaType());
+        String ct = JoseUtils.checkContentType(out.getHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             res.getHeaders().putSingle("Content-Type", ct);
         }

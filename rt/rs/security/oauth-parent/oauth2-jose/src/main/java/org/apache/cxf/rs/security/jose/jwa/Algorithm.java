@@ -22,46 +22,45 @@ package org.apache.cxf.rs.security.jose.jwa;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
-
+import org.apache.cxf.rs.security.jose.JoseConstants;
 
 
 
 public enum Algorithm {
     // Signature
-    HmacSHA256(JwtConstants.HMAC_SHA_256_ALGO, 256),
-    HmacSHA384(JwtConstants.HMAC_SHA_384_ALGO, 384),
-    HmacSHA512(JwtConstants.HMAC_SHA_512_ALGO, 512),
+    HmacSHA256(JoseConstants.HMAC_SHA_256_ALGO, 256),
+    HmacSHA384(JoseConstants.HMAC_SHA_384_ALGO, 384),
+    HmacSHA512(JoseConstants.HMAC_SHA_512_ALGO, 512),
     
-    SHA256withRSA(JwtConstants.RS_SHA_256_ALGO, 256),
-    SHA384withRSA(JwtConstants.RS_SHA_384_ALGO, 384),
-    SHA512withRSA(JwtConstants.RS_SHA_512_ALGO, 512),
+    SHA256withRSA(JoseConstants.RS_SHA_256_ALGO, 256),
+    SHA384withRSA(JoseConstants.RS_SHA_384_ALGO, 384),
+    SHA512withRSA(JoseConstants.RS_SHA_512_ALGO, 512),
     
-    SHA256withECDSA(JwtConstants.ES_SHA_256_ALGO, 256),
-    SHA384withECDSA(JwtConstants.ES_SHA_384_ALGO, 384),
-    SHA512withECDSA(JwtConstants.ES_SHA_512_ALGO, 512),
+    SHA256withECDSA(JoseConstants.ES_SHA_256_ALGO, 256),
+    SHA384withECDSA(JoseConstants.ES_SHA_384_ALGO, 384),
+    SHA512withECDSA(JoseConstants.ES_SHA_512_ALGO, 512),
     
     // Key Encryption
-    RSA_OAEP(JwtConstants.RSA_OAEP_ALGO, "RSA/ECB/OAEPWithSHA-1AndMGF1Padding", -1),
-    RSA_OAEP_256(JwtConstants.RSA_OAEP_256_ALGO, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", -1),
-    RSA_1_5(JwtConstants.RSA_1_5_ALGO, "RSA/ECB/PKCS1Padding", -1),
-    A128KW(JwtConstants.A128KW_ALGO, "AESWrap", 128),
-    A192KW(JwtConstants.A192KW_ALGO, "AESWrap", 192),
-    A256KW(JwtConstants.A256KW_ALGO, "AESWrap", 256),
-    A128GCMKW(JwtConstants.A128GCMKW_ALGO, "AES/GCM/NoPadding", 128),
-    A192GCMKW(JwtConstants.A192GCMKW_ALGO, "AES/GCM/NoPadding", 192),
-    A256GCMKW(JwtConstants.A256GCMKW_ALGO, "AES/GCM/NoPadding", 256),
-    PBES2_HS256_A128KW(JwtConstants.PBES2_HS256_A128KW_ALGO, "AESWrap", 128),
-    PBES2_HS384_A192KW(JwtConstants.PBES2_HS384_A192KW_ALGO, "AESWrap", 192),
-    PBES2_HS512_A256KW(JwtConstants.PBES2_HS512_A256KW_ALGO, "AESWrap", 256),
+    RSA_OAEP(JoseConstants.RSA_OAEP_ALGO, "RSA/ECB/OAEPWithSHA-1AndMGF1Padding", -1),
+    RSA_OAEP_256(JoseConstants.RSA_OAEP_256_ALGO, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", -1),
+    RSA_1_5(JoseConstants.RSA_1_5_ALGO, "RSA/ECB/PKCS1Padding", -1),
+    A128KW(JoseConstants.A128KW_ALGO, "AESWrap", 128),
+    A192KW(JoseConstants.A192KW_ALGO, "AESWrap", 192),
+    A256KW(JoseConstants.A256KW_ALGO, "AESWrap", 256),
+    A128GCMKW(JoseConstants.A128GCMKW_ALGO, "AES/GCM/NoPadding", 128),
+    A192GCMKW(JoseConstants.A192GCMKW_ALGO, "AES/GCM/NoPadding", 192),
+    A256GCMKW(JoseConstants.A256GCMKW_ALGO, "AES/GCM/NoPadding", 256),
+    PBES2_HS256_A128KW(JoseConstants.PBES2_HS256_A128KW_ALGO, "AESWrap", 128),
+    PBES2_HS384_A192KW(JoseConstants.PBES2_HS384_A192KW_ALGO, "AESWrap", 192),
+    PBES2_HS512_A256KW(JoseConstants.PBES2_HS512_A256KW_ALGO, "AESWrap", 256),
     
     // Content Encryption
-    A128GCM(JwtConstants.A128GCM_ALGO, "AES/GCM/NoPadding", 128),
-    A192GCM(JwtConstants.A192GCM_ALGO, "AES/GCM/NoPadding", 192),
-    A256GCM(JwtConstants.A256GCM_ALGO, "AES/GCM/NoPadding", 256),
-    A128CBC_HS256(JwtConstants.A128CBC_HS256_ALGO, "AES/CBC/PKCS7Padding", 128),
-    A192CBC_HS384(JwtConstants.A192CBC_HS384_ALGO, "AES/CBC/PKCS7Padding", 192),
-    A256CBC_HS512(JwtConstants.A256CBC_HS512_ALGO, "AES/CBC/PKCS7Padding", 256);
+    A128GCM(JoseConstants.A128GCM_ALGO, "AES/GCM/NoPadding", 128),
+    A192GCM(JoseConstants.A192GCM_ALGO, "AES/GCM/NoPadding", 192),
+    A256GCM(JoseConstants.A256GCM_ALGO, "AES/GCM/NoPadding", 256),
+    A128CBC_HS256(JoseConstants.A128CBC_HS256_ALGO, "AES/CBC/PKCS7Padding", 128),
+    A192CBC_HS384(JoseConstants.A192CBC_HS384_ALGO, "AES/CBC/PKCS7Padding", 192),
+    A256CBC_HS512(JoseConstants.A256CBC_HS512_ALGO, "AES/CBC/PKCS7Padding", 256);
     
     public static final String HMAC_SHA_256_JAVA = "HmacSHA256";
     public static final String HMAC_SHA_384_JAVA = "HmacSHA384";
@@ -84,55 +83,55 @@ public enum Algorithm {
     private static final Map<String, String> JWT_TO_JAVA_NAMES;
     static {
         JAVA_TO_JWT_NAMES = new HashMap<String, String>();
-        JAVA_TO_JWT_NAMES.put(HMAC_SHA_256_JAVA, JwtConstants.HMAC_SHA_256_ALGO);
-        JAVA_TO_JWT_NAMES.put(HMAC_SHA_384_JAVA, JwtConstants.HMAC_SHA_384_ALGO);
-        JAVA_TO_JWT_NAMES.put(HMAC_SHA_512_JAVA, JwtConstants.HMAC_SHA_512_ALGO);
-        JAVA_TO_JWT_NAMES.put(RS_SHA_256_JAVA, JwtConstants.RS_SHA_256_ALGO);
-        JAVA_TO_JWT_NAMES.put(RS_SHA_384_JAVA, JwtConstants.RS_SHA_384_ALGO);
-        JAVA_TO_JWT_NAMES.put(RS_SHA_512_JAVA, JwtConstants.RS_SHA_512_ALGO);
-        JAVA_TO_JWT_NAMES.put(ES_SHA_256_JAVA, JwtConstants.ES_SHA_256_ALGO);
-        JAVA_TO_JWT_NAMES.put(ES_SHA_384_JAVA, JwtConstants.ES_SHA_384_ALGO);
-        JAVA_TO_JWT_NAMES.put(ES_SHA_512_JAVA, JwtConstants.ES_SHA_512_ALGO);
-        JAVA_TO_JWT_NAMES.put(RSA_OAEP_ALGO_JAVA, JwtConstants.RSA_OAEP_ALGO);
-        JAVA_TO_JWT_NAMES.put(RSA_OAEP_256_ALGO_JAVA, JwtConstants.RSA_OAEP_256_ALGO);
-        JAVA_TO_JWT_NAMES.put(RSA_1_5_ALGO_JAVA, JwtConstants.RSA_1_5_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_GCM_ALGO_JAVA, JwtConstants.A256GCM_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_GCM_ALGO_JAVA, JwtConstants.A192GCM_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_GCM_ALGO_JAVA, JwtConstants.A128GCM_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_WRAP_ALGO_JAVA, JwtConstants.A128KW_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_WRAP_ALGO_JAVA, JwtConstants.A192KW_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_WRAP_ALGO_JAVA, JwtConstants.A256KW_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JwtConstants.A128CBC_HS256_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JwtConstants.A192CBC_HS384_ALGO);
-        JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JwtConstants.A256CBC_HS512_ALGO);
+        JAVA_TO_JWT_NAMES.put(HMAC_SHA_256_JAVA, JoseConstants.HMAC_SHA_256_ALGO);
+        JAVA_TO_JWT_NAMES.put(HMAC_SHA_384_JAVA, JoseConstants.HMAC_SHA_384_ALGO);
+        JAVA_TO_JWT_NAMES.put(HMAC_SHA_512_JAVA, JoseConstants.HMAC_SHA_512_ALGO);
+        JAVA_TO_JWT_NAMES.put(RS_SHA_256_JAVA, JoseConstants.RS_SHA_256_ALGO);
+        JAVA_TO_JWT_NAMES.put(RS_SHA_384_JAVA, JoseConstants.RS_SHA_384_ALGO);
+        JAVA_TO_JWT_NAMES.put(RS_SHA_512_JAVA, JoseConstants.RS_SHA_512_ALGO);
+        JAVA_TO_JWT_NAMES.put(ES_SHA_256_JAVA, JoseConstants.ES_SHA_256_ALGO);
+        JAVA_TO_JWT_NAMES.put(ES_SHA_384_JAVA, JoseConstants.ES_SHA_384_ALGO);
+        JAVA_TO_JWT_NAMES.put(ES_SHA_512_JAVA, JoseConstants.ES_SHA_512_ALGO);
+        JAVA_TO_JWT_NAMES.put(RSA_OAEP_ALGO_JAVA, JoseConstants.RSA_OAEP_ALGO);
+        JAVA_TO_JWT_NAMES.put(RSA_OAEP_256_ALGO_JAVA, JoseConstants.RSA_OAEP_256_ALGO);
+        JAVA_TO_JWT_NAMES.put(RSA_1_5_ALGO_JAVA, JoseConstants.RSA_1_5_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_GCM_ALGO_JAVA, JoseConstants.A256GCM_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_GCM_ALGO_JAVA, JoseConstants.A192GCM_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_GCM_ALGO_JAVA, JoseConstants.A128GCM_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_WRAP_ALGO_JAVA, JoseConstants.A128KW_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_WRAP_ALGO_JAVA, JoseConstants.A192KW_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_WRAP_ALGO_JAVA, JoseConstants.A256KW_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JoseConstants.A128CBC_HS256_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JoseConstants.A192CBC_HS384_ALGO);
+        JAVA_TO_JWT_NAMES.put(AES_CBC_ALGO_JAVA, JoseConstants.A256CBC_HS512_ALGO);
         JWT_TO_JAVA_NAMES = new HashMap<String, String>();
-        JWT_TO_JAVA_NAMES.put(JwtConstants.HMAC_SHA_256_ALGO, HMAC_SHA_256_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.HMAC_SHA_384_ALGO, HMAC_SHA_384_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.HMAC_SHA_512_ALGO, HMAC_SHA_512_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.RS_SHA_256_ALGO, RS_SHA_256_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.RS_SHA_384_ALGO, RS_SHA_384_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.RS_SHA_512_ALGO, RS_SHA_512_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.ES_SHA_256_ALGO, ES_SHA_256_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.ES_SHA_384_ALGO, ES_SHA_384_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.ES_SHA_512_ALGO, ES_SHA_512_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_OAEP_ALGO, RSA_OAEP_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_OAEP_256_ALGO, RSA_OAEP_256_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.RSA_1_5_ALGO, RSA_1_5_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A128KW_ALGO, AES_WRAP_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A192KW_ALGO, AES_WRAP_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A256KW_ALGO, AES_WRAP_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A256GCM_ALGO, AES_GCM_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A192GCM_ALGO, AES_GCM_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A128GCM_ALGO, AES_GCM_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A256GCMKW_ALGO, AES_GCM_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A192GCMKW_ALGO, AES_GCM_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A128GCMKW_ALGO, AES_GCM_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A128CBC_HS256_ALGO, AES_CBC_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A192CBC_HS384_ALGO, AES_CBC_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.A256CBC_HS512_ALGO, AES_CBC_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.PBES2_HS256_A128KW_ALGO, AES_WRAP_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.PBES2_HS384_A192KW_ALGO, AES_WRAP_ALGO_JAVA);
-        JWT_TO_JAVA_NAMES.put(JwtConstants.PBES2_HS512_A256KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.HMAC_SHA_256_ALGO, HMAC_SHA_256_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.HMAC_SHA_384_ALGO, HMAC_SHA_384_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.HMAC_SHA_512_ALGO, HMAC_SHA_512_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.RS_SHA_256_ALGO, RS_SHA_256_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.RS_SHA_384_ALGO, RS_SHA_384_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.RS_SHA_512_ALGO, RS_SHA_512_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.ES_SHA_256_ALGO, ES_SHA_256_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.ES_SHA_384_ALGO, ES_SHA_384_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.ES_SHA_512_ALGO, ES_SHA_512_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.RSA_OAEP_ALGO, RSA_OAEP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.RSA_OAEP_256_ALGO, RSA_OAEP_256_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.RSA_1_5_ALGO, RSA_1_5_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A128KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A192KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A256KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A256GCM_ALGO, AES_GCM_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A192GCM_ALGO, AES_GCM_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A128GCM_ALGO, AES_GCM_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A256GCMKW_ALGO, AES_GCM_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A192GCMKW_ALGO, AES_GCM_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A128GCMKW_ALGO, AES_GCM_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A128CBC_HS256_ALGO, AES_CBC_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A192CBC_HS384_ALGO, AES_CBC_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.A256CBC_HS512_ALGO, AES_CBC_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.PBES2_HS256_A128KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.PBES2_HS384_A192KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.PBES2_HS512_A256KW_ALGO, AES_WRAP_ALGO_JAVA);
     }
     private final String jwtName;
     private final String javaName;
@@ -187,28 +186,28 @@ public enum Algorithm {
         return javaName;
     }
     public static boolean isAesKeyWrap(String algo) {
-        return JwtConstants.A128KW_ALGO.equals(algo)
-               || JwtConstants.A192KW_ALGO.equals(algo)
-               || JwtConstants.A256KW_ALGO.equals(algo);
+        return JoseConstants.A128KW_ALGO.equals(algo)
+               || JoseConstants.A192KW_ALGO.equals(algo)
+               || JoseConstants.A256KW_ALGO.equals(algo);
     }
     public static boolean isAesGcmKeyWrap(String algo) {
-        return JwtConstants.A128GCMKW_ALGO.equals(algo)
-               || JwtConstants.A192GCMKW_ALGO.equals(algo)
-               || JwtConstants.A256GCMKW_ALGO.equals(algo);
+        return JoseConstants.A128GCMKW_ALGO.equals(algo)
+               || JoseConstants.A192GCMKW_ALGO.equals(algo)
+               || JoseConstants.A256GCMKW_ALGO.equals(algo);
     }
     public static boolean isAesGcm(String algo) {
-        return JwtConstants.A128GCM_ALGO.equals(algo)
-               || JwtConstants.A192GCM_ALGO.equals(algo)
-               || JwtConstants.A256GCM_ALGO.equals(algo);
+        return JoseConstants.A128GCM_ALGO.equals(algo)
+               || JoseConstants.A192GCM_ALGO.equals(algo)
+               || JoseConstants.A256GCM_ALGO.equals(algo);
     }
     public static boolean isHmacSign(String algo) {
-        return JwtConstants.HMAC_SHA_256_ALGO.equals(algo)
-            || JwtConstants.HMAC_SHA_384_ALGO.equals(algo)
-            || JwtConstants.HMAC_SHA_512_ALGO.equals(algo); 
+        return JoseConstants.HMAC_SHA_256_ALGO.equals(algo)
+            || JoseConstants.HMAC_SHA_384_ALGO.equals(algo)
+            || JoseConstants.HMAC_SHA_512_ALGO.equals(algo); 
     }
     public static boolean isAesCbcHmac(String algo) {
-        return JwtConstants.A128CBC_HS256_ALGO.equals(algo)
-            || JwtConstants.A192CBC_HS384_ALGO.equals(algo)
-            || JwtConstants.A256CBC_HS512_ALGO.equals(algo); 
+        return JoseConstants.A128CBC_HS256_ALGO.equals(algo)
+            || JoseConstants.A192CBC_HS384_ALGO.equals(algo)
+            || JoseConstants.A256CBC_HS512_ALGO.equals(algo); 
     }
 }

@@ -18,8 +18,15 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.util.Map;
 
-public interface JwsSignatureProvider {
-    String getAlgorithm();
-    JwsSignature createJwsSignature(JwsHeaders headers);
+import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
+
+public class JwsHeaders extends JwtHeaders {
+    public JwsHeaders() {
+    }
+    
+    public JwsHeaders(Map<String, Object> values) {
+        super(values);
+    }
 }

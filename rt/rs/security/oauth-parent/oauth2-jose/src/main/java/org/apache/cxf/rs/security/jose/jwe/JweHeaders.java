@@ -22,15 +22,15 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
+import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 
 
 
-public class JweHeaders extends JwtHeaders {
+public class JweHeaders extends JoseHeaders {
     
     public JweHeaders() {
     }
@@ -56,7 +56,7 @@ public class JweHeaders extends JwtHeaders {
         }
         setContentEncryptionAlgorithm(ctEncAlgo);
         if (deflate) {
-            setZipAlgorithm(JwtConstants.DEFLATE_ZIP_ALGORITHM);
+            setZipAlgorithm(JoseConstants.DEFLATE_ZIP_ALGORITHM);
         }
     }
     
@@ -69,26 +69,26 @@ public class JweHeaders extends JwtHeaders {
     }
     
     public void setContentEncryptionAlgorithm(String type) {
-        setHeader(JwtConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM, type);
+        setHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM, type);
     }
     
     public String getContentEncryptionAlgorithm() {
-        return (String)getHeader(JwtConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM);
+        return (String)getHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM);
     }
     
     public void setZipAlgorithm(String type) {
-        setHeader(JwtConstants.JWE_HEADER_ZIP_ALGORITHM, type);
+        setHeader(JoseConstants.JWE_HEADER_ZIP_ALGORITHM, type);
     }
     
     public String getZipAlgorithm() {
-        return (String)getHeader(JwtConstants.JWE_HEADER_ZIP_ALGORITHM);
+        return (String)getHeader(JoseConstants.JWE_HEADER_ZIP_ALGORITHM);
     }
     
     @Override
-    public JwtHeaders setHeader(String name, Object value) {
-        return (JwtHeaders)super.setHeader(name, value);
+    public JoseHeaders setHeader(String name, Object value) {
+        return (JoseHeaders)super.setHeader(name, value);
     }
-    public byte[] toCipherAdditionalAuthData(JwtHeadersWriter writer) { 
+    public byte[] toCipherAdditionalAuthData(JoseHeadersWriter writer) { 
         return toCipherAdditionalAuthData(writer.headersToJson(this));
     }
     public static byte[] toCipherAdditionalAuthData(String headersJson) { 

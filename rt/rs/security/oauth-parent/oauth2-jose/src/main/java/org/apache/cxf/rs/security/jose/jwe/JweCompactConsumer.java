@@ -22,8 +22,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersReader;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseHeadersReader;
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 
@@ -35,9 +35,9 @@ public class JweCompactConsumer {
     private byte[] authTag;
     private JweHeaders jweHeaders;
     public JweCompactConsumer(String jweContent) {
-        this(jweContent, new JwtTokenReaderWriter());
+        this(jweContent, new JoseHeadersReaderWriter());
     }
-    public JweCompactConsumer(String jweContent, JwtHeadersReader reader) {
+    public JweCompactConsumer(String jweContent, JoseHeadersReader reader) {
         String[] parts = jweContent.split("\\.");
         if (parts.length != 5) {
             throw new SecurityException("5 JWE parts are expected");

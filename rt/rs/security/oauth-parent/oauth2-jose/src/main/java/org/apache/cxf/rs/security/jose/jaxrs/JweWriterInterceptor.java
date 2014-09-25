@@ -38,6 +38,9 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption;
 import org.apache.cxf.rs.security.jose.jwe.AesGcmContentEncryptionAlgorithm;
@@ -52,9 +55,6 @@ import org.apache.cxf.rs.security.jose.jwe.RSAOaepKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.WrappedKeyJweEncryption;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 @Priority(Priorities.JWE_WRITE_PRIORITY)
@@ -67,7 +67,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
     private JweEncryptionProvider encryptionProvider;
     private boolean contentTypeRequired = true;
     private boolean useJweOutputStream;
-    private JwtHeadersWriter writer = new JwtTokenReaderWriter();
+    private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         
@@ -87,7 +87,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
             }
         }
         
-        ctx.setMediaType(JAXRSUtils.toMediaType(JwtConstants.MEDIA_TYPE_JOSE_JSON));
+        ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON));
         if (useJweOutputStream) {
             JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(ctString);
             try {
@@ -175,7 +175,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
         this.useJweOutputStream = useJweOutputStream;
     }
 
-    public void setWriter(JwtHeadersWriter writer) {
+    public void setWriter(JoseHeadersWriter writer) {
         this.writer = writer;
     }
 

@@ -23,17 +23,17 @@ import java.security.spec.AlgorithmParameterSpec;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private JweHeaders headers;
-    private JwtHeadersWriter writer;
+    private JoseHeadersWriter writer;
     private ContentEncryptionAlgorithm contentEncryptionAlgo;
     private KeyEncryptionAlgorithm keyEncryptionAlgo;
     
@@ -45,11 +45,11 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected AbstractJweEncryption(JweHeaders headers, 
                                     ContentEncryptionAlgorithm contentEncryptionAlgo, 
                                     KeyEncryptionAlgorithm keyEncryptionAlgo,
-                                    JwtHeadersWriter writer) {
+                                    JoseHeadersWriter writer) {
         this.headers = headers;
         this.writer = writer;
         if (this.writer == null) {
-            this.writer = new JwtTokenReaderWriter();
+            this.writer = new JoseHeadersReaderWriter();
         }
         this.keyEncryptionAlgo = keyEncryptionAlgo;
         this.contentEncryptionAlgo = contentEncryptionAlgo;
@@ -110,7 +110,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
                                       DEFAULT_AUTH_TAG_LENGTH);
     }
     
-    protected JwtHeadersWriter getJwtHeadersWriter() {
+    protected JoseHeadersWriter getJwtHeadersWriter() {
         return writer;
     }
     protected JweHeaders getJweHeaders() {
@@ -169,7 +169,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         return state;
     }
     private boolean compressionRequired(JweHeaders theHeaders) {
-        return JwtConstants.DEFLATE_ZIP_ALGORITHM.equals(theHeaders.getZipAlgorithm());
+        return JoseConstants.DEFLATE_ZIP_ALGORITHM.equals(theHeaders.getZipAlgorithm());
     }
     protected KeyEncryptionAlgorithm getKeyEncryptionAlgo() {
         return keyEncryptionAlgo;

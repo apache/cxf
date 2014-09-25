@@ -18,15 +18,14 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 
 
-public class JwtTokenReaderWriter extends AbstractJwtObjectReaderWriter
+
+public class JwtTokenReaderWriter extends JoseHeadersReaderWriter
     implements JwtTokenReader, JwtTokenWriter {
-    @Override
-    public String headersToJson(JwtHeaders headers) {
-        return toJson(headers);
-    }
+    
 
     @Override
     public String claimsToJson(JwtClaims claims) {
@@ -40,13 +39,6 @@ public class JwtTokenReaderWriter extends AbstractJwtObjectReaderWriter
     }
     
     @Override
-    public JwtHeaders fromJsonHeaders(String headersJson) {
-        JwtHeaders headers = new JwtHeaders();
-        fromJsonInternal(headers, headersJson);
-        return headers;
-    }
-    
-    @Override
     public JwtClaims fromJsonClaims(String claimsJson) {
         JwtClaims claims = new JwtClaims();
         fromJsonInternal(claims, claimsJson);
@@ -55,7 +47,7 @@ public class JwtTokenReaderWriter extends AbstractJwtObjectReaderWriter
     }
     
     private JwtToken fromJson(String headersJson, String claimsJson) {
-        JwtHeaders headers = fromJsonHeaders(headersJson);
+        JwtHeaders headers = new JwtHeaders(fromJsonHeaders(headersJson));
         JwtClaims claims = fromJsonClaims(claimsJson);
         return new JwtToken(headers, claims);
     }

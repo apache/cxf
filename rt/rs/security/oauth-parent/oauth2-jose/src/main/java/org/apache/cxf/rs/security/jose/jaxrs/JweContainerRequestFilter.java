@@ -26,8 +26,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
+import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
-import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 @PreMatching
 @Priority(Priorities.JWE_SERVER_READ_PRIORITY)
@@ -38,7 +38,7 @@ public class JweContainerRequestFilter extends AbstractJweDecryptingFilter imple
         byte[] bytes = out.getContent();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
-        String ct = JwtUtils.checkContentType(out.getHeaders().getContentType(), getDefaultMediaType());
+        String ct = JoseUtils.checkContentType(out.getHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
         }

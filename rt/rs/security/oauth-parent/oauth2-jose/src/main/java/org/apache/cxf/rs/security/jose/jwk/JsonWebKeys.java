@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.rs.security.jose.jwt.AbstractJwtObject;
+import org.apache.cxf.rs.security.jose.AbstractJoseObject;
 
-public class JsonWebKeys extends AbstractJwtObject {
+public class JsonWebKeys extends AbstractJoseObject {
     public static final String KEYS_PROPERTY = "keys";
     public List<JsonWebKey> getKeys() {
         List<?> list = (List<?>)super.getValue(KEYS_PROPERTY);
