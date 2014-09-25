@@ -46,6 +46,9 @@ public final class JwsUtils {
         }
         return theSigProvider;
     }
+    public static JwsSignatureVerifier getSignatureVerifier(JsonWebKey jwk) {
+        return getSignatureVerifier(jwk, null);
+    }
     public static JwsSignatureVerifier getSignatureVerifier(JsonWebKey jwk, String defaultAlgorithm) {
         String rsaSignatureAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         JwsSignatureVerifier theVerifier = null;
