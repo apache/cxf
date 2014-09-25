@@ -19,12 +19,23 @@
 
 package org.apache.cxf.ws.security.wss4j.saml;
 
+<<<<<<< HEAD
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SamlAssertionValidator;
+=======
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+>>>>>>> 3e21a02... Some changes to how the security context is populated
 
 /**
  * A trivial custom Validator for a SAML Assertion. It makes sure that the issuer is 
@@ -35,6 +46,7 @@ public class CustomSamlValidator extends SamlAssertionValidator {
     
     private boolean requireSAML1Assertion = true;
     private boolean requireSenderVouches = true;
+    private boolean requireBearer;
     
     public void setRequireSAML1Assertion(boolean requireSAML1Assertion) {
         this.requireSAML1Assertion = requireSAML1Assertion;
@@ -42,6 +54,10 @@ public class CustomSamlValidator extends SamlAssertionValidator {
     
     public void setRequireSenderVouches(boolean requireSenderVouches) {
         this.requireSenderVouches = requireSenderVouches;
+    }
+    
+    public void setRequireBearer(boolean requireBearer) {
+        this.requireBearer = requireBearer;
     }
     
     @Override
@@ -67,8 +83,16 @@ public class CustomSamlValidator extends SamlAssertionValidator {
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
         if (requireSenderVouches && !OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
+<<<<<<< HEAD
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         } else if (!requireSenderVouches 
+=======
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        } else if (requireBearer && !(SAML2Constants.CONF_BEARER.equals(confirmationMethod)
+            || SAML1Constants.CONF_BEARER.equals(confirmationMethod))) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        } else if (!requireBearer && !requireSenderVouches 
+>>>>>>> 3e21a02... Some changes to how the security context is populated
             && !OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }

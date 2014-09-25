@@ -274,8 +274,10 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains("Wrong SAML Version"));
         }
         
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler();
+        samlCallbackHandler.setSignAssertion(true);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            "ws-security.saml-callback-handler", samlCallbackHandler
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
@@ -495,11 +497,23 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
         
+<<<<<<< HEAD
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
+=======
+        // This test only works for DOM
+        if (!test.isStreaming() && PORT.equals(test.getPort())) {
+            SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler();
+            ((BindingProvider)saml2Port).getRequestContext().put(
+                "ws-security.saml-callback-handler", samlCallbackHandler
+            );
+            int result = saml2Port.doubleIt(25);
+            assertTrue(result == 50);
+        }
+>>>>>>> 3e21a02... Some changes to how the security context is populated
         
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
@@ -740,6 +754,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         SamlRoleCallbackHandler roleCallbackHandler = 
             new SamlRoleCallbackHandler();
+        roleCallbackHandler.setSignAssertion(true);
         roleCallbackHandler.setRoleName("manager");
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", roleCallbackHandler
