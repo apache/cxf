@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwt;
+package org.apache.cxf.rs.security.jose;
 
-public final class JwtUtils {
-    private JwtUtils() {
+public final class JoseUtils {
+    private JoseUtils() {
         
     }
     

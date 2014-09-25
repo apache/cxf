@@ -25,9 +25,9 @@ import java.security.interfaces.RSAPublicKey;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactReaderWriterTest;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -120,13 +120,13 @@ public class JweCompactReaderWriterTest extends Assert {
     public void testEncryptDecryptAesGcmWrapA128CBCHS256() throws Exception {
         final String specPlainText = "Live long and prosper.";
         JweHeaders headers = new JweHeaders();
-        headers.setAlgorithm(JwtConstants.A128GCMKW_ALGO);
+        headers.setAlgorithm(JoseConstants.A128GCMKW_ALGO);
         headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
         
         byte[] cekEncryptionKey = Base64UrlUtility.decode(KEY_ENCRYPTION_KEY_A3);
         
         AesGcmWrapKeyEncryptionAlgorithm keyEncryption = 
-            new AesGcmWrapKeyEncryptionAlgorithm(cekEncryptionKey, JwtConstants.A128GCMKW_ALGO);
+            new AesGcmWrapKeyEncryptionAlgorithm(cekEncryptionKey, JoseConstants.A128GCMKW_ALGO);
         JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers,
                                                            CONTENT_ENCRYPTION_KEY_A3, 
                                                            INIT_VECTOR_A3,

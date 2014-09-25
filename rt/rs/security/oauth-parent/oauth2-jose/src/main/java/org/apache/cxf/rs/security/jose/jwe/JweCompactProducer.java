@@ -22,7 +22,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
@@ -41,7 +42,7 @@ public class JweCompactProducer {
     }
     
     public JweCompactProducer(JweHeaders headers,
-                       JwtHeadersWriter writer,
+                       JoseHeadersWriter writer,
                        byte[] encryptedContentEncryptionKey,
                        byte[] cipherInitVector,
                        byte[] encryptedContentNoTag,
@@ -73,7 +74,7 @@ public class JweCompactProducer {
              cipherInitVector, encryptedContentWithTag, authTagLengthBits);
     }
     public JweCompactProducer(JweHeaders headers,
-                       JwtHeadersWriter writer,
+                       JoseHeadersWriter writer,
                        byte[] encryptedContentEncryptionKey,
                        byte[] cipherInitVector,
                        byte[] encryptedContentWithTag,
@@ -91,7 +92,7 @@ public class JweCompactProducer {
         
     }
     public static String startJweContent(JweHeaders headers,
-                                                JwtHeadersWriter writer, 
+                                                JoseHeadersWriter writer, 
                                                 byte[] encryptedContentEncryptionKey,
                                                 byte[] cipherInitVector) {
         return startJweContent(new StringBuilder(), 
@@ -99,7 +100,7 @@ public class JweCompactProducer {
     }
     public static StringBuilder startJweContent(StringBuilder sb,
                                         JweHeaders headers,
-                                        JwtHeadersWriter writer, 
+                                        JoseHeadersWriter writer, 
                                         byte[] encryptedContentEncryptionKey,
                                         byte[] cipherInitVector) {
         return startJweContent(sb, 
@@ -108,8 +109,8 @@ public class JweCompactProducer {
                                cipherInitVector);
     }
     private static String getHeadersJson(JweHeaders headers,
-                                         JwtHeadersWriter writer) {
-        writer = writer == null ? new JwtTokenReaderWriter() : writer;
+                                         JoseHeadersWriter writer) {
+        writer = writer == null ? new JoseHeadersReaderWriter() : writer;
         return writer.headersToJson(headers);
         
     }
@@ -131,7 +132,7 @@ public class JweCompactProducer {
     
     public static void startJweContent(OutputStream os,
                                        JweHeaders headers,
-                                       JwtHeadersWriter writer, 
+                                       JoseHeadersWriter writer, 
                                        byte[] encryptedContentEncryptionKey,
                                        byte[] cipherInitVector) throws IOException {
         writer = writer == null ? new JwtTokenReaderWriter() : writer;

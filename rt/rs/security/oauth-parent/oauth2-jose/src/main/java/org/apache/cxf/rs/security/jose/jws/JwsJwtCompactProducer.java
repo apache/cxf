@@ -39,7 +39,7 @@ public class JwsJwtCompactProducer extends JwsCompactProducer {
         this(new JwtToken(headers, claims), w);
     }
     public JwsJwtCompactProducer(JwtToken token, JwtTokenWriter w) {
-        super(token.getHeaders(), w, serializeClaims(token.getClaims(), w));
+        super(new JwsHeaders(token.getHeaders().asMap()), w, serializeClaims(token.getClaims(), w));
     }
     
     private static String serializeClaims(JwtClaims claims, JwtTokenWriter writer) {

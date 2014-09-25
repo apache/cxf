@@ -29,8 +29,8 @@ import java.util.Set;
 import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
 
+import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
 
 public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
@@ -68,7 +68,7 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
                                    byte[] cek, 
                                    byte[] iv, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm,
-                                   JwtHeadersWriter writer) {
+                                   JoseHeadersWriter writer) {
         super(headers, 
               new AesCbcContentEncryptionAlgorithm(cek, iv, 
                                                    validateCekAlgorithm(headers.getContentEncryptionAlgorithm())),

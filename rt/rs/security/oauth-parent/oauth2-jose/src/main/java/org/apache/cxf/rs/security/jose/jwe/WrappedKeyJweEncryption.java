@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
+import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 
 public class WrappedKeyJweEncryption extends AbstractJweEncryption {
     public WrappedKeyJweEncryption(KeyEncryptionAlgorithm keyEncryptionAlgorithm,
@@ -27,7 +27,7 @@ public class WrappedKeyJweEncryption extends AbstractJweEncryption {
     }
     public WrappedKeyJweEncryption(KeyEncryptionAlgorithm keyEncryptionAlgorithm,
                                    ContentEncryptionAlgorithm contentEncryptionAlgo,
-                                   JwtHeadersWriter writer) {
+                                   JoseHeadersWriter writer) {
         this(new JweHeaders(keyEncryptionAlgorithm.getAlgorithm(), contentEncryptionAlgo.getAlgorithm()), 
              keyEncryptionAlgorithm, contentEncryptionAlgo, writer);
     }
@@ -39,7 +39,7 @@ public class WrappedKeyJweEncryption extends AbstractJweEncryption {
     public WrappedKeyJweEncryption(JweHeaders headers, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm,
                                    ContentEncryptionAlgorithm contentEncryptionAlgo,
-                                   JwtHeadersWriter writer) {
+                                   JoseHeadersWriter writer) {
         super(headers, contentEncryptionAlgo, keyEncryptionAlgorithm, writer);
     }
     

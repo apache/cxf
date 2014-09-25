@@ -28,9 +28,9 @@ import javax.ws.rs.container.PreMatching;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
-import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 @PreMatching
 @Priority(Priorities.JWS_SERVER_READ_PRIORITY)
@@ -49,7 +49,7 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
         
-        String ct = JwtUtils.checkContentType(p.getJwtHeaders().getContentType(), getDefaultMediaType());
+        String ct = JoseUtils.checkContentType(p.getJwsHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
         }

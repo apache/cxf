@@ -27,10 +27,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
@@ -102,7 +102,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     
     @Test
     public void testWriteReadJwsUnsigned() throws Exception {
-        JwtHeaders headers = new JwtHeaders(JwtConstants.PLAIN_TEXT_ALGO);
+        JwtHeaders headers = new JwtHeaders(JoseConstants.PLAIN_TEXT_ALGO);
         
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("https://jwt-idp.example.com");
@@ -128,7 +128,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         assertTrue(jws.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY)));
         JwtToken token = jws.getJwtToken();
         JwtHeaders headers = token.getHeaders();
-        assertEquals(JwtConstants.TYPE_JWT, headers.getType());
+        assertEquals(JoseConstants.TYPE_JWT, headers.getType());
         assertEquals(Algorithm.HmacSHA256.getJwtName(), headers.getAlgorithm());
         validateSpecClaim(token.getClaims());
     }
@@ -154,7 +154,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     private void doTestWriteJwsWithJwkSignedByMac(Object jsonWebKey) throws Exception {
         JwtHeaders headers = new JwtHeaders(Algorithm.HmacSHA256.getJwtName());
         
-        headers.setHeader(JwtConstants.HEADER_JSON_WEB_KEY, jsonWebKey);
+        headers.setHeader(JoseConstants.HEADER_JSON_WEB_KEY, jsonWebKey);
         
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("joe");
@@ -174,7 +174,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         assertTrue(jws.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY)));
         JwtToken token = jws.getJwtToken();
         JwtHeaders headers = token.getHeaders();
-        assertEquals(JwtConstants.TYPE_JWT, headers.getType());
+        assertEquals(JoseConstants.TYPE_JWT, headers.getType());
         assertEquals(Algorithm.HmacSHA256.getJwtName(), headers.getAlgorithm());
         
         JsonWebKey key = headers.getJsonWebKey();

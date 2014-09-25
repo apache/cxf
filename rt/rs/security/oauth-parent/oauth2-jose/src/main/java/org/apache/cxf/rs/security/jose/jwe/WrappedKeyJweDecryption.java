@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.Key;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersReader;
+import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 
 public class WrappedKeyJweDecryption extends AbstractJweDecryption {
     public WrappedKeyJweDecryption(Key cekDecryptionKey) {    
@@ -37,7 +37,7 @@ public class WrappedKeyJweDecryption extends AbstractJweDecryption {
         this(cekDecryptionKey, unwrap, props, null);
     }
     public WrappedKeyJweDecryption(Key cekDecryptionKey, boolean unwrap,
-                                   JweCryptoProperties props, JwtHeadersReader reader) {    
+                                   JweCryptoProperties props, JoseHeadersReader reader) {    
         this(new WrappedKeyDecryptionAlgorithm(cekDecryptionKey, unwrap),
              props, reader);
     }
@@ -45,11 +45,11 @@ public class WrappedKeyJweDecryption extends AbstractJweDecryption {
         this(keyDecryptionAlgo, null, null);
     }
     public WrappedKeyJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                   JweCryptoProperties props, JwtHeadersReader reader) {    
+                                   JweCryptoProperties props, JoseHeadersReader reader) {    
         this(keyDecryptionAlgo, props, reader, new AesGcmContentDecryptionAlgorithm());
     }
     public WrappedKeyJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                   JweCryptoProperties props, JwtHeadersReader reader,
+                                   JweCryptoProperties props, JoseHeadersReader reader,
                                    ContentDecryptionAlgorithm cipherProps) {    
         super(props, reader, keyDecryptionAlgo, cipherProps);
     }

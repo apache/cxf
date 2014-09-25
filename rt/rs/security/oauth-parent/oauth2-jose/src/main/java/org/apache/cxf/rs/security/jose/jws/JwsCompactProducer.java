@@ -19,16 +19,15 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeadersWriter;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 public class JwsCompactProducer {
-    private JwtHeadersWriter writer = new JwtTokenReaderWriter();
-    private JwtHeaders headers;
+    private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
+    private JwsHeaders headers;
     private String plainJwsPayload;
     private String signature;
     private String plainRep;
@@ -36,19 +35,19 @@ public class JwsCompactProducer {
     public JwsCompactProducer(String plainJwsPayload) {
         this(null, null, plainJwsPayload);
     }
-    public JwsCompactProducer(JwtHeaders headers, String plainJwsPayload) {
+    public JwsCompactProducer(JwsHeaders headers, String plainJwsPayload) {
         this(headers, null, plainJwsPayload);
     }
-    public JwsCompactProducer(JwtHeaders headers, JwtHeadersWriter w, String plainJwsPayload) {
+    public JwsCompactProducer(JwsHeaders headers, JoseHeadersWriter w, String plainJwsPayload) {
         this.headers = headers;
         if (w != null) {
             this.writer = w;
         }
         this.plainJwsPayload = plainJwsPayload;
     }
-    public JwtHeaders getHeaders() {
+    public JwsHeaders getHeaders() {
         if (headers == null) {
-            headers = new JwtHeaders();
+            headers = new JwsHeaders();
         }
         return headers;
     }
@@ -101,7 +100,7 @@ public class JwsCompactProducer {
         this.signature = sig;
     }
     private boolean isPlainText() {
-        return JwtConstants.PLAIN_TEXT_ALGO.equals(getAlgorithm());
+        return JoseConstants.PLAIN_TEXT_ALGO.equals(getAlgorithm());
     }
     private String getAlgorithm() {
         return getHeaders().getAlgorithm();

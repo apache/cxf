@@ -22,21 +22,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.rs.security.jose.jwt.AbstractJwtObject;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
+import org.apache.cxf.rs.security.jose.AbstractJoseObject;
+import org.apache.cxf.rs.security.jose.JoseConstants;
 
 
-public class JsonWebKey extends AbstractJwtObject {
+public class JsonWebKey extends AbstractJoseObject {
     
     public static final String KEY_TYPE = "kty";
     public static final String PUBLIC_KEY_USE = "use";
     public static final String KEY_OPERATIONS = "key_ops";
-    public static final String KEY_ALGO = JwtConstants.HEADER_ALGORITHM;
-    public static final String KEY_ID = JwtConstants.HEADER_KEY_ID;
-    public static final String X509_URL = JwtConstants.HEADER_X509_URL;
-    public static final String X509_CHAIN = JwtConstants.HEADER_X509_CHAIN;
-    public static final String X509_THUMBPRINT = JwtConstants.HEADER_X509_THUMBPRINT;
-    public static final String X509_THUMBPRINT_SHA256 = JwtConstants.HEADER_X509_THUMBPRINT_SHA256;
+    public static final String KEY_ALGO = JoseConstants.HEADER_ALGORITHM;
+    public static final String KEY_ID = JoseConstants.HEADER_KEY_ID;
+    public static final String X509_URL = JoseConstants.HEADER_X509_URL;
+    public static final String X509_CHAIN = JoseConstants.HEADER_X509_CHAIN;
+    public static final String X509_THUMBPRINT = JoseConstants.HEADER_X509_THUMBPRINT;
+    public static final String X509_THUMBPRINT_SHA256 = JoseConstants.HEADER_X509_THUMBPRINT_SHA256;
     
     public static final String KEY_TYPE_RSA = "RSA";
     public static final String RSA_MODULUS = "n";

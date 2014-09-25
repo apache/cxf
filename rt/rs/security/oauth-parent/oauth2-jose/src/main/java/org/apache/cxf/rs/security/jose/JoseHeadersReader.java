@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwt;
+package org.apache.cxf.rs.security.jose;
 
 
-public interface JwtHeadersReader {
-    JwtHeaders fromJsonHeaders(String jsonHeaders);
+public interface JoseHeadersReader {
+    JoseHeaders fromJsonHeaders(String jsonHeaders);
 }
