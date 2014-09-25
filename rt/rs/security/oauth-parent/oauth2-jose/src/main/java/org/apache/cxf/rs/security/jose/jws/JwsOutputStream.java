@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
+import org.apache.cxf.common.util.Base64UrlUtility;
 
 public class JwsOutputStream extends FilterOutputStream {
     private boolean flushed;

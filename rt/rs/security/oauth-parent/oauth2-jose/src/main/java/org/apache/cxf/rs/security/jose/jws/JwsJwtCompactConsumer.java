@@ -27,16 +27,10 @@ import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 public class JwsJwtCompactConsumer extends JwsCompactConsumer {
     private JwtToken token;
     public JwsJwtCompactConsumer(String encodedJws) {
-        this(encodedJws, null, null);
-    }
-    public JwsJwtCompactConsumer(String encodedJws, JwsSignatureProperties props) {
-        this(encodedJws, props, null);
+        this(encodedJws, null);
     }
     public JwsJwtCompactConsumer(String encodedJws, JwtTokenReader r) {
-        this(encodedJws, null, r);
-    }
-    public JwsJwtCompactConsumer(String encodedJws, JwsSignatureProperties props, JwtTokenReader r) {
-        super(encodedJws, props, r == null ? new JwtTokenReaderWriter() : r);
+        super(encodedJws, r == null ? new JwtTokenReaderWriter() : r);
     }
     public JwtTokenJson getDecodedJsonToken() {
         return new JwtTokenJson(getDecodedJsonHeaders(), getDecodedJwsPayload());

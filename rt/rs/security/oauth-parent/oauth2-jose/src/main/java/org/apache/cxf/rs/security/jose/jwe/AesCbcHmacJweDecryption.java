@@ -27,12 +27,11 @@ import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 
 public class AesCbcHmacJweDecryption extends AbstractJweDecryption {
     public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo) {
-        this(keyDecryptionAlgo, null, null);
+        this(keyDecryptionAlgo, null);
     }
     public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                   JweCryptoProperties props, 
                                    JoseHeadersReader reader) {
-        super(props, reader, keyDecryptionAlgo, new AesCbcContentDecryptionAlgorithm());
+        super(reader, keyDecryptionAlgo, new AesCbcContentDecryptionAlgorithm());
     }
     protected JweDecryptionOutput doDecrypt(JweCompactConsumer consumer, byte[] cek) {
         validateAuthenticationTag(consumer, cek);

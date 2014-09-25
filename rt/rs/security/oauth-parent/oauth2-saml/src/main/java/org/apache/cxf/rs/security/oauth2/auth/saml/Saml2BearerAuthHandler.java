@@ -29,6 +29,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Base64Exception;
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
@@ -37,7 +38,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.saml.SamlOAuthValidator;
-import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.saml.AbstractSamlInHandler;
 import org.apache.cxf.rs.security.saml.SAMLUtils;

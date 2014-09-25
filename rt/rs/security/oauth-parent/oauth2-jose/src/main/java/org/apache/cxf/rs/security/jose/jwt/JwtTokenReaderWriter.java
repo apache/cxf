@@ -47,7 +47,7 @@ public class JwtTokenReaderWriter extends JoseHeadersReaderWriter
     }
     
     private JwtToken fromJson(String headersJson, String claimsJson) {
-        JwtHeaders headers = new JwtHeaders(fromJsonHeaders(headersJson));
+        JwtHeaders headers = fromJsonHeaders(headersJson);
         JwtClaims claims = fromJsonClaims(claimsJson);
         return new JwtToken(headers, claims);
     }
@@ -55,5 +55,10 @@ public class JwtTokenReaderWriter extends JoseHeadersReaderWriter
     @Override
     public JwtToken fromJson(JwtTokenJson pair) {
         return fromJson(pair.getHeadersJson(), pair.getClaimsJson());
+    }
+    
+    @Override
+    public JwtHeaders fromJsonHeaders(String jsonHeaders) {
+        return new JwtHeaders(super.fromJsonHeaders(jsonHeaders)); 
     }
 }

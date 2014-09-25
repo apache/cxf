@@ -22,10 +22,10 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
-import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 
 
@@ -33,6 +33,10 @@ import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 public class JweHeaders extends JoseHeaders {
     
     public JweHeaders() {
+    }
+    
+    public JweHeaders(JoseHeaders headers) {
+        super(headers.asMap());
     }
     
     public JweHeaders(Map<String, Object> values) {

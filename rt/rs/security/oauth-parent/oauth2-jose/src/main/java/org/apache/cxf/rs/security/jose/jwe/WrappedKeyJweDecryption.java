@@ -29,28 +29,21 @@ public class WrappedKeyJweDecryption extends AbstractJweDecryption {
     public WrappedKeyJweDecryption(Key cekDecryptionKey, boolean unwrap) {    
         this(cekDecryptionKey, unwrap, null);
     }
-    public WrappedKeyJweDecryption(Key cekDecryptionKey, JweCryptoProperties props) {
-        this(cekDecryptionKey, true, props);
-    }
     public WrappedKeyJweDecryption(Key cekDecryptionKey, boolean unwrap,
-                                  JweCryptoProperties props) {    
-        this(cekDecryptionKey, unwrap, props, null);
-    }
-    public WrappedKeyJweDecryption(Key cekDecryptionKey, boolean unwrap,
-                                   JweCryptoProperties props, JoseHeadersReader reader) {    
+                                   JoseHeadersReader reader) {    
         this(new WrappedKeyDecryptionAlgorithm(cekDecryptionKey, unwrap),
-             props, reader);
+             reader);
     }
     public WrappedKeyJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo) {    
-        this(keyDecryptionAlgo, null, null);
+        this(keyDecryptionAlgo, null);
     }
     public WrappedKeyJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                   JweCryptoProperties props, JoseHeadersReader reader) {    
-        this(keyDecryptionAlgo, props, reader, new AesGcmContentDecryptionAlgorithm());
+                                   JoseHeadersReader reader) {    
+        this(keyDecryptionAlgo, reader, new AesGcmContentDecryptionAlgorithm());
     }
     public WrappedKeyJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                   JweCryptoProperties props, JoseHeadersReader reader,
+                                   JoseHeadersReader reader,
                                    ContentDecryptionAlgorithm cipherProps) {    
-        super(props, reader, keyDecryptionAlgo, cipherProps);
+        super(reader, keyDecryptionAlgo, cipherProps);
     }
 }
