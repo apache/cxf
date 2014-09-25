@@ -28,7 +28,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
-import org.apache.cxf.rs.security.jose.jws.JwsSignatureProperties;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.PublicKeyJwsSignatureVerifier;
@@ -41,21 +40,12 @@ public class AbstractJwsReaderProvider {
     
     
     private JwsSignatureVerifier sigVerifier;
-    private JwsSignatureProperties sigProperties;
     private String defaultMediaType;
     
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
         this.sigVerifier = signatureVerifier;
     }
 
-    public void setSignatureProperties(JwsSignatureProperties signatureProperties) {
-        this.sigProperties = signatureProperties;
-    }
-    
-    public JwsSignatureProperties getSigProperties() {
-        return sigProperties;
-    }
-    
     protected JwsSignatureVerifier getInitializedSigVerifier() {
         if (sigVerifier != null) {
             return sigVerifier;    

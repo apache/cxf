@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.common.util;
 
 /**
  * Base64 URL Encoding/Decoding utility.
@@ -30,9 +30,6 @@ package org.apache.cxf.rs.security.oauth2.utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-
-import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.common.util.Base64Utility;
 
 
 public final class Base64UrlUtility {

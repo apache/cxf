@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
+import org.apache.cxf.common.util.Base64UrlUtility;
 
 public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     private byte[] password;

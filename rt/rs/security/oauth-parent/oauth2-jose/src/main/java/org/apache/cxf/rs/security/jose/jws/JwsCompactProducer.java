@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
-import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 
 public class JwsCompactProducer {
     private JoseHeadersWriter writer = new JoseHeadersReaderWriter();

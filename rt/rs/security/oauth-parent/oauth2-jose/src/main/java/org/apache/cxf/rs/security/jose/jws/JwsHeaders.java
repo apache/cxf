@@ -20,10 +20,15 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import java.util.Map;
 
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 
 public class JwsHeaders extends JwtHeaders {
     public JwsHeaders() {
+    }
+    
+    public JwsHeaders(JoseHeaders headers) {
+        super(headers.asMap());
     }
     
     public JwsHeaders(Map<String, Object> values) {

@@ -16,7 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwe;
+package org.apache.cxf.rs.security.jose.jws;
 
-public class JweCryptoProperties {
+import java.security.PublicKey;
+import java.security.spec.AlgorithmParameterSpec;
+
+public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
+    public EcDsaJwsSignatureVerifier(PublicKey key) {
+        this(key, null);
+    }
+    public EcDsaJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec) {
+        super(key, spec);
+    }
 }

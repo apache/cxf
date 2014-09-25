@@ -29,15 +29,12 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public abstract class AbstractJweDecryption implements JweDecryptionProvider {
-    private JweCryptoProperties props;
     private KeyDecryptionAlgorithm keyDecryptionAlgo;
     private ContentDecryptionAlgorithm contentDecryptionAlgo;
     private JoseHeadersReader reader = new JoseHeadersReaderWriter();
-    protected AbstractJweDecryption(JweCryptoProperties props, 
-                                    JoseHeadersReader theReader,
+    protected AbstractJweDecryption(JoseHeadersReader theReader,
                                     KeyDecryptionAlgorithm keyDecryptionAlgo,
                                     ContentDecryptionAlgorithm contentDecryptionAlgo) {
-        this.props = props;
         if (theReader != null) {
             reader = theReader;
         }
@@ -58,7 +55,6 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
     }
     
     protected JweDecryptionOutput doDecrypt(JweCompactConsumer consumer) {
-        consumer.enforceJweCryptoProperties(props);
         byte[] cek = getContentEncryptionKey(consumer);
         return doDecrypt(consumer, cek);
     }

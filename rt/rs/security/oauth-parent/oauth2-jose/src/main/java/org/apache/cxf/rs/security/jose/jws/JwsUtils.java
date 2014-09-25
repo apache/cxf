@@ -59,7 +59,7 @@ public final class JwsUtils {
             theVerifier = 
                 new HmacJwsSignatureVerifier((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
         } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
-            theVerifier = new PublicKeyJwsSignatureVerifier(JwkUtils.toECPublicKey(jwk));
+            theVerifier = new EcDsaJwsSignatureVerifier(JwkUtils.toECPublicKey(jwk));
         }
         return theVerifier;
     }

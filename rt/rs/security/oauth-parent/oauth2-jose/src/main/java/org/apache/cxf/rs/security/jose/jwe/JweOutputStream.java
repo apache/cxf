@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
 
 import javax.crypto.Cipher;
 
-import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
+import org.apache.cxf.common.util.Base64UrlUtility;
 
 public class JweOutputStream extends FilterOutputStream {
     private Cipher encryptingCipher;

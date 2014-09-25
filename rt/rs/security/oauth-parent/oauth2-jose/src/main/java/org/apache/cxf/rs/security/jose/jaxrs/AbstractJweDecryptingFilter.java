@@ -31,7 +31,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
-import org.apache.cxf.rs.security.jose.jwe.JweCryptoProperties;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
@@ -48,7 +47,6 @@ public class AbstractJweDecryptingFilter {
     private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
     private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";    
     private JweDecryptionProvider decryption;
-    private JweCryptoProperties cryptoProperties;
     private String defaultMediaType;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
         JweDecryptionProvider theDecryptor = getInitializedDecryptionProvider();
@@ -92,7 +90,7 @@ public class AbstractJweDecryptingFilter {
             if (isAesHmac) { 
                 return new AesCbcHmacJweDecryption(keyDecryptionProvider);
             } else {
-                return new WrappedKeyJweDecryption(keyDecryptionProvider, cryptoProperties, null);
+                return new WrappedKeyJweDecryption(keyDecryptionProvider);
             }
             
         } catch (SecurityException ex) {
@@ -101,10 +99,6 @@ public class AbstractJweDecryptingFilter {
             throw new SecurityException(ex);
         }
         
-    }
-
-    public void setCryptoProperties(JweCryptoProperties cryptoProperties) {
-        this.cryptoProperties = cryptoProperties;
     }
 
     public String getDefaultMediaType() {

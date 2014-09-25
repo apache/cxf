@@ -26,19 +26,14 @@ public class DirectKeyJweDecryption extends AbstractJweDecryption {
     public DirectKeyJweDecryption(Key contentDecryptionKey) {    
         this(contentDecryptionKey, null);
     }
-    public DirectKeyJweDecryption(Key contentDecryptionKey, JweCryptoProperties props) {    
-        this(contentDecryptionKey, props, null);
-    }
-    public DirectKeyJweDecryption(Key contentDecryptionKey, JweCryptoProperties props, 
-                                  JoseHeadersReader reader) {    
-        this(contentDecryptionKey, props, reader,
-             new AesGcmContentDecryptionAlgorithm());
+    public DirectKeyJweDecryption(Key contentDecryptionKey, JoseHeadersReader reader) {    
+        this(contentDecryptionKey, reader, new AesGcmContentDecryptionAlgorithm());
     }
     public DirectKeyJweDecryption(Key contentDecryptionKey, 
-                                  JweCryptoProperties props, 
                                   JoseHeadersReader reader,
                                   ContentDecryptionAlgorithm cipherProps) {    
-        super(props, reader, new DirectKeyDecryptionAlgorithm(contentDecryptionKey),
+        super(reader, 
+              new DirectKeyDecryptionAlgorithm(contentDecryptionKey),
               cipherProps);
     }
     

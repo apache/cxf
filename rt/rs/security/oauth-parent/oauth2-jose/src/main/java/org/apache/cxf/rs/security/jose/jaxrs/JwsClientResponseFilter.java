@@ -36,8 +36,7 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
-        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(res.getEntityStream()), 
-                                                      getSigProperties());
+        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
         if (!p.verifySignatureWith(theSigVerifier)) {
             throw new SecurityException();
         }

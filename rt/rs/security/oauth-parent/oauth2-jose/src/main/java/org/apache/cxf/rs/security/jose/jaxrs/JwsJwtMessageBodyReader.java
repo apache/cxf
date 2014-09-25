@@ -46,8 +46,7 @@ public class JwsJwtMessageBodyReader extends AbstractJwsReaderProvider
                              MultivaluedMap<String, String> headers, InputStream is) throws IOException,
         WebApplicationException {
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
-        JwsJwtCompactConsumer p = new JwsJwtCompactConsumer(IOUtils.readStringFromStream(is), 
-                                                      getSigProperties());
+        JwsJwtCompactConsumer p = new JwsJwtCompactConsumer(IOUtils.readStringFromStream(is));
         p.verifySignatureWith(theSigVerifier);
         return p.getJwtToken();
     }
