@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.saml;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
@@ -35,6 +37,7 @@ public class CustomSamlValidator extends SamlAssertionValidator {
     
     private boolean requireSAML1Assertion = true;
     private boolean requireSenderVouches = true;
+    private boolean requireBearer;
     
     public void setRequireSAML1Assertion(boolean requireSAML1Assertion) {
         this.requireSAML1Assertion = requireSAML1Assertion;
@@ -42,6 +45,10 @@ public class CustomSamlValidator extends SamlAssertionValidator {
     
     public void setRequireSenderVouches(boolean requireSenderVouches) {
         this.requireSenderVouches = requireSenderVouches;
+    }
+    
+    public void setRequireBearer(boolean requireBearer) {
+        this.requireBearer = requireBearer;
     }
     
     @Override
@@ -68,7 +75,10 @@ public class CustomSamlValidator extends SamlAssertionValidator {
         }
         if (requireSenderVouches && !OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-        } else if (!requireSenderVouches 
+        } else if (requireBearer && !(SAML2Constants.CONF_BEARER.equals(confirmationMethod)
+            || SAML1Constants.CONF_BEARER.equals(confirmationMethod))) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        } else if (!requireBearer && !requireSenderVouches 
             && !OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }

@@ -342,8 +342,10 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                        || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
         }
         
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler();
+        samlCallbackHandler.setSignAssertion(true);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            "ws-security.saml-callback-handler", samlCallbackHandler
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
@@ -584,8 +586,9 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         // This test only works for DOM
         if (!test.isStreaming() && PORT.equals(test.getPort())) {
+            SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler();
             ((BindingProvider)saml2Port).getRequestContext().put(
-                "ws-security.saml-callback-handler", new SamlCallbackHandler()
+                "ws-security.saml-callback-handler", samlCallbackHandler
             );
             int result = saml2Port.doubleIt(25);
             assertTrue(result == 50);
@@ -913,6 +916,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         SamlRoleCallbackHandler roleCallbackHandler = 
             new SamlRoleCallbackHandler();
+        roleCallbackHandler.setSignAssertion(true);
         roleCallbackHandler.setRoleName("manager");
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", roleCallbackHandler
