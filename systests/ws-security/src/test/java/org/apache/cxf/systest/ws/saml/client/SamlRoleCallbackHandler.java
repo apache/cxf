@@ -47,13 +47,9 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
     private static final String ROLE_URI = 
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
     private boolean saml2 = true;
-    private String confirmationMethod = SAML2Constants.CONF_BEARER;
+    private String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
     private CERT_IDENTIFIER keyInfoIdentifier = CERT_IDENTIFIER.X509_CERT;
     private String roleName;
-    private boolean signAssertion;
-    private String cryptoAlias = "alice";
-    private String cryptoPassword = "password";
-    private String cryptoPropertiesFile = "alice.properties";
     
     public SamlRoleCallbackHandler() {
         //
@@ -126,16 +122,6 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
                 attributeBean.setAttributeValues(Collections.singletonList(roleName));
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
-                
-                try {
-                    Crypto crypto = CryptoFactory.getInstance(cryptoPropertiesFile);
-                    callback.setIssuerCrypto(crypto);
-                    callback.setIssuerKeyName(cryptoAlias);
-                    callback.setIssuerKeyPassword(cryptoPassword);
-                    callback.setSignAssertion(signAssertion);
-                } catch (Exception ex) {
-                    throw new IOException("Problem creating KeyInfo: " +  ex.getMessage());
-                }
             }
         }
     }
@@ -166,7 +152,4 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
         this.roleName = roleName;
     }
     
-    public void setSignAssertion(boolean signAssertion) {
-        this.signAssertion = signAssertion;
-    }
 }

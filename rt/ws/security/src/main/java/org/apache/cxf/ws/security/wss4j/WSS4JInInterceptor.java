@@ -20,13 +20,8 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
 import java.security.Principal;
-<<<<<<< HEAD
-=======
-import java.security.Provider;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
->>>>>>> 3e21a02... Some changes to how the security context is populated
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -77,10 +72,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.interceptors.NegotiationUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-<<<<<<< HEAD
-import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -91,31 +83,12 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.NoOpValidator;
 import org.apache.ws.security.validate.Validator;
-=======
-import org.apache.wss4j.common.cache.ReplayCache;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.dom.processor.Processor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.dom.validate.NoOpValidator;
-import org.apache.wss4j.dom.validate.Validator;
->>>>>>> 3e21a02... Some changes to how the security context is populated
 
 /**
  * Performs WS-Security inbound actions.
@@ -582,31 +555,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     msg.put(SecurityContext.class, context);
                     break;
                 }
-<<<<<<< HEAD
-                Object receivedAssertion = null;
-                if (o.get(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL) != null) {
-                    msg.put(SecurityConstants.DELEGATED_CREDENTIAL, 
-                            o.get(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL));
-                }
-                
-                List<String> roles = null;
-                if (o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION) != null) {
-                    String roleAttributeName = (String)msg.getContextualProperty(
-                            SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
-                    if (roleAttributeName == null || roleAttributeName.length() == 0) {
-                        roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
-                    }
-                    receivedAssertion = o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                    roles = SAMLUtils.parseRolesInAssertion(receivedAssertion, roleAttributeName);
-                    SAMLSecurityContext context = createSecurityContext(p, roles);
-                    context.setIssuer(SAMLUtils.getIssuer(receivedAssertion));
-                    context.setAssertionElement(SAMLUtils.getAssertionElement(receivedAssertion));
-                    msg.put(SecurityContext.class, context);
-                } else {
-                    msg.put(SecurityContext.class, createSecurityContext(p));
-                }
-                break;
-=======
             }
         }
     }
@@ -615,7 +563,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         SoapMessage msg, Subject subject, Principal p, boolean useJAASSubject,
         WSSecurityEngineResult wsResult, boolean utWithCallbacks
     ) {
-        if (subject != null && !(p instanceof KerberosPrincipal) && useJAASSubject) {
+        if ((subject != null) && !(p instanceof KerberosPrincipal) && useJAASSubject) {
             String roleClassifier = 
                 (String)msg.getContextualProperty(SecurityConstants.SUBJECT_ROLE_CLASSIFIER);
             if (roleClassifier != null && !"".equals(roleClassifier)) {
@@ -633,35 +581,27 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (!utWithCallbacks) {
                 WSS4JTokenConverter.convertToken(msg, p);
             }
-            Object receivedAssertion = wsResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            if (receivedAssertion == null) {
-                receivedAssertion = wsResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
-            }
+            Object receivedAssertion = null;
             if (wsResult.get(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL) != null) {
                 msg.put(SecurityConstants.DELEGATED_CREDENTIAL, 
                         wsResult.get(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL));
             }
             
-            if (receivedAssertion instanceof SamlAssertionWrapper) {
+            List<String> roles = null;
+            if (wsResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION) != null) {
                 String roleAttributeName = (String)msg.getContextualProperty(
                         SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
                 if (roleAttributeName == null || roleAttributeName.length() == 0) {
                     roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                 }
-                
-                ClaimCollection claims = 
-                    SAMLUtils.getClaims((SamlAssertionWrapper)receivedAssertion);
-                Set<Principal> roles = 
-                    SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
-                
-                SAMLSecurityContext context = 
-                    new SAMLSecurityContext(p, roles, claims);
+                receivedAssertion = wsResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                roles = SAMLUtils.parseRolesInAssertion(receivedAssertion, roleAttributeName);
+                SAMLSecurityContext context = createSecurityContext(p, roles);
                 context.setIssuer(SAMLUtils.getIssuer(receivedAssertion));
                 context.setAssertionElement(SAMLUtils.getAssertionElement(receivedAssertion));
                 return context;
             } else {
                 return createSecurityContext(p);
->>>>>>> 3e21a02... Some changes to how the security context is populated
             }
         }
         

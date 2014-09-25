@@ -388,18 +388,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
     public void testSaml2TokenWithRoles() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
-<<<<<<< HEAD
-        outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
-        
-=======
-        outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        outProperties.put(WSHandlerConstants.USER, "alice");
-        outProperties.put("password", "password");
-        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
->>>>>>> 3e21a02... Some changes to how the security context is populated
+        outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_bearer.properties");
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        callbackHandler.setSignAssertion(true);
         callbackHandler.setStatement(Statement.ATTR);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         
@@ -411,7 +402,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         inProperties.put(
             WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED 
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(false);
@@ -438,15 +429,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assertTrue(sc.isUserInRole("admin"));
         
         WSSecurityEngineResult actionResult =
-<<<<<<< HEAD
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-=======
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
-        SamlAssertionWrapper receivedAssertion = 
-            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
->>>>>>> 3e21a02... Some changes to how the security context is populated
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
         assertTrue(receivedAssertion.isSigned());
     }
@@ -459,18 +444,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
     public void testSaml2TokenWithRolesSingleValue() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
-<<<<<<< HEAD
-        outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
-        
-=======
-        outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        outProperties.put(WSHandlerConstants.USER, "alice");
-        outProperties.put("password", "password");
-        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
->>>>>>> 3e21a02... Some changes to how the security context is populated
+        outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_bearer.properties");
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler(false);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        callbackHandler.setSignAssertion(true);
         callbackHandler.setStatement(Statement.ATTR);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         
@@ -482,7 +458,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         inProperties.put(
             WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED 
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(false);
@@ -509,15 +485,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assertTrue(sc.isUserInRole("admin"));
         
         WSSecurityEngineResult actionResult =
-<<<<<<< HEAD
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-=======
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
-        SamlAssertionWrapper receivedAssertion = 
-            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
->>>>>>> 3e21a02... Some changes to how the security context is populated
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
         assertTrue(receivedAssertion.isSigned());
     }
@@ -530,18 +500,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
     public void testSaml1TokenWithRoles() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
-<<<<<<< HEAD
-        outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
-        
-=======
-        outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        outProperties.put(WSHandlerConstants.USER, "alice");
-        outProperties.put("password", "password");
-        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
->>>>>>> 3e21a02... Some changes to how the security context is populated
+        outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_bearer.properties");
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-        callbackHandler.setSignAssertion(true);
         callbackHandler.setStatement(Statement.ATTR);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
         
@@ -553,7 +514,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         inProperties.put(
             WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED 
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(true);
@@ -580,15 +541,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assertTrue(sc.isUserInRole("admin"));
         
         WSSecurityEngineResult actionResult =
-<<<<<<< HEAD
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-=======
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
-        SamlAssertionWrapper receivedAssertion = 
-            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
->>>>>>> 3e21a02... Some changes to how the security context is populated
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
         assertTrue(receivedAssertion.isSigned());
     }

@@ -23,7 +23,6 @@ import java.util.List;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.opensaml.saml2.core.Assertion;
@@ -31,8 +30,7 @@ import org.opensaml.saml2.core.AttributeStatement;
 
 /**
  * This class does some trivial validation of a received SAML Assertion. It checks that it is
- * a SAML 2 Assertion, and checks the issuer name and confirmation method, and that it has
- * an Attribute Statement. 
+ * a SAML 2 Assertion, and checks the issuer name and that it has an Attribute Statement. 
  */
 public class CustomSaml2Validator extends SamlAssertionValidator {
     
@@ -42,12 +40,6 @@ public class CustomSaml2Validator extends SamlAssertionValidator {
         AssertionWrapper assertion = validatedCredential.getAssertion();
         
         if (!"sts".equals(assertion.getIssuerString())) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
-        }
-        
-        String confirmationMethod = assertion.getConfirmationMethods().get(0);
-        if (!(OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)
-            || OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod))) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
         
