@@ -45,9 +45,7 @@ import javax.inject.Inject;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.karaf.features.FeaturesService;
-
 import org.junit.Assert;
-
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.ProbeBuilder;
 import org.ops4j.pax.exam.TestProbeBuilder;
@@ -69,6 +67,7 @@ import static org.ops4j.pax.exam.CoreOptions.when;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 
 /**
  * 
@@ -138,7 +137,8 @@ public class CXFOSGiTestSupport {
                              .name("Apache Karaf")
                              .useDeployFolder(false)
                              .unpackDirectory(new File("target/paxexam/")),
-                         features(cxfUrl, "cxf-core", "cxf-jaxws"),
+                         keepRuntimeFolder(),
+                         features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-jaxrs"),                         
                          systemProperty("java.awt.headless").value("true"),
                          when(testUtils).useOptions(mavenBundle()
                                                     .groupId("org.apache.cxf")
