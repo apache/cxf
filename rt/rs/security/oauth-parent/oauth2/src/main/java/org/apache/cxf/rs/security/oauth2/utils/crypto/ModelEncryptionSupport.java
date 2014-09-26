@@ -330,8 +330,8 @@ public final class ModelEncryptionSupport {
         c.setApplicationLogoUri(getStringPart(parts[6]));
         c.setApplicationCertificates(parseSimpleList(parts[7]));
         c.setAllowedGrantTypes(parseSimpleList(parts[8]));
-        c.setRegisteredScopes(parseSimpleList(parts[9]));
-        c.setRedirectUris(parseSimpleList(parts[10]));
+        c.setRedirectUris(parseSimpleList(parts[9]));
+        c.setRegisteredScopes(parseSimpleList(parts[10]));
         c.setRegisteredAudiences(parseSimpleList(parts[11]));
         c.setProperties(parseSimpleMap(parts[12]));
         c.setSubject(recreateUserSubject(parts[13]));
