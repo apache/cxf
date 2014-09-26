@@ -140,7 +140,21 @@
     multi2single.values = newValues;
     targetClaims.add(multi2single);
 	
-
+	// Claim filter
+	var filterClaim = new("org.apache.cxf.sts.claims.ProcessedClaim");
+    filterClaim.claimType = new("java.net.URI", "http://my.schema.org/identity/claims/filter");
+    filterClaim.values.add("different");
+	filterClaim.values.add("match");
+	filterClaim.values.add("second_match");
+	filterClaim.values.add("other");
+	var newValues = new("java.util.ArrayList");
+    for (v : filterClaim.values) {
+    	if (v.toString().matches(".*match")) {
+    		newValues.add(v);
+    	}
+    }
+    filterClaim.values = newValues;
+    targetClaims.add(filterClaim);
     
     // Set correct issuer
     for (c : targetClaims) {

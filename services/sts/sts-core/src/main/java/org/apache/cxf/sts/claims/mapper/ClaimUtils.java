@@ -154,6 +154,33 @@ public class ClaimUtils {
 
     /**
      * @param claims Collection of claims containing claims with claim types of listed <code>claimType</code>
+     * @param processedClaim Claim containing arbitrary values 
+     * @param filter Regex filter to be used to match with claim values
+     * @return Returns a claim containing only values from the processedClaim which matched the provided filter
+     */
+    public Claim filterValues(Claim claim, String filter) {
+
+        if (claim != null) {
+            List<String> values = claim.getValues();
+            List<String> filteredValues = new ArrayList<String>();
+
+            if (values == null || filter == null) {
+                claim.setValues(filteredValues);
+                return claim;
+            }
+
+            for (String value : values) {
+                if (value != null && value.matches(filter)) {
+                    filteredValues.add(value);
+                }
+            }
+            claim.setValues(filteredValues);
+        }
+        return claim;
+    }
+
+    /**
+     * @param processedClaims Collection of claims containing claims with claim types of listed <code>claimType</code>
      *            array
      * @param targetClaimType claim type URI of merged result claim
      * @param delimiter Delimiter added between multiple claim types. Value can be <code>null</code>.
