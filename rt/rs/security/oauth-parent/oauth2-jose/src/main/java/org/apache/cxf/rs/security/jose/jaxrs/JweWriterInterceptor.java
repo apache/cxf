@@ -44,6 +44,8 @@ import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption;
 import org.apache.cxf.rs.security.jose.jwe.AesGcmContentEncryptionAlgorithm;
+import org.apache.cxf.rs.security.jose.jwe.ContentEncryptionAlgorithm;
+import org.apache.cxf.rs.security.jose.jwe.DirectKeyJweEncryption;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionState;
@@ -133,34 +135,44 @@ public class JweWriterInterceptor implements WriterInterceptor {
             KeyEncryptionAlgorithm keyEncryptionProvider = null;
             String keyEncryptionAlgo = null;
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
+            ContentEncryptionAlgorithm ctEncryptionProvider = null;
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
                 keyEncryptionAlgo = getKeyEncryptionAlgo(props, jwk.getAlgorithm());
-                keyEncryptionProvider = JweUtils.getKeyEncryptionAlgorithm(jwk, keyEncryptionAlgo);
+                if ("direct".equals(keyEncryptionAlgo)) {
+                    contentEncryptionAlgo = getContentEncryptionAlgo(props, jwk.getAlgorithm());
+                    ctEncryptionProvider = JweUtils.getContentEncryptionAlgorithm(jwk, contentEncryptionAlgo);
+                } else {
+                    keyEncryptionProvider = JweUtils.getKeyEncryptionAlgorithm(jwk, keyEncryptionAlgo);
+                }
                 
             } else {
                 keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(
                     (RSAPublicKey)CryptoUtils.loadPublicKey(m, props), 
                     getKeyEncryptionAlgo(props, keyEncryptionAlgo));
             }
-            if (keyEncryptionProvider == null) {
+            if (keyEncryptionProvider == null && ctEncryptionProvider == null) {
                 throw new SecurityException();
             }
             
-            String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
+            
             JweHeaders headers = new JweHeaders(getKeyEncryptionAlgo(props, keyEncryptionAlgo), 
                                                 contentEncryptionAlgo);
             String compression = props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP);
             if (compression != null) {
                 headers.setZipAlgorithm(compression);
             }
-            boolean isAesHmac = Algorithm.isAesCbcHmac(contentEncryptionAlgo);
-            if (isAesHmac) { 
-                return new AesCbcHmacJweEncryption(contentEncryptionAlgo, keyEncryptionProvider);
+            if (keyEncryptionProvider != null) {
+                if (Algorithm.isAesCbcHmac(contentEncryptionAlgo)) { 
+                    return new AesCbcHmacJweEncryption(contentEncryptionAlgo, keyEncryptionProvider);
+                } else {
+                    return new WrappedKeyJweEncryption(headers, 
+                                                       keyEncryptionProvider,
+                                                       new AesGcmContentEncryptionAlgorithm(contentEncryptionAlgo));
+                }
             } else {
-                return new WrappedKeyJweEncryption(headers, 
-                                                   keyEncryptionProvider,
-                                                   new AesGcmContentEncryptionAlgorithm(contentEncryptionAlgo));
+                return new DirectKeyJweEncryption(ctEncryptionProvider);
             }
         } catch (SecurityException ex) {
             throw ex;
@@ -170,6 +182,9 @@ public class JweWriterInterceptor implements WriterInterceptor {
     }
     private String getKeyEncryptionAlgo(Properties props, String algo) {
         return algo == null ? props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP) : algo;
+    }
+    private String getContentEncryptionAlgo(Properties props, String algo) {
+        return algo == null ? props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP) : algo;
     }
     public void setUseJweOutputStream(boolean useJweOutputStream) {
         this.useJweOutputStream = useJweOutputStream;
