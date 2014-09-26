@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -78,13 +79,21 @@ public class JwsCompactConsumer {
         return encodedSignature.isEmpty() ? new byte[]{} : decode(encodedSignature);
     }
     public JwsHeaders getJwsHeaders() {
-        return new JwsHeaders(getReader().fromJsonHeaders(headersJson));
-    }
-    public boolean verifySignatureWith(JwsSignatureVerifier validator) {
-        if (!validator.verify(getJwsHeaders(), getUnsignedEncodedPayload(), getDecodedSignature())) {
+        JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
+        if (joseHeaders.getHeaderUpdateCount() != null) { 
             throw new SecurityException();
         }
-        return true;
+        return new JwsHeaders(joseHeaders);
+    }
+    public boolean verifySignatureWith(JwsSignatureVerifier validator) {
+        try {
+            if (validator.verify(getJwsHeaders(), getUnsignedEncodedPayload(), getDecodedSignature())) {
+                return true;
+            }
+        } catch (SecurityException ex) {
+            // ignore
+        }
+        return false;
     }
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
