@@ -42,6 +42,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>3.1.0</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
             <scope>test</scope>
@@ -72,6 +78,7 @@
             <artifactId>easymock</artifactId>
             <scope>test</scope>
         </dependency>
+        
     </dependencies>
     <build>
         <plugins>

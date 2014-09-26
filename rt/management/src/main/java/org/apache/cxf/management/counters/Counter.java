@@ -28,4 +28,6 @@ public interface Counter extends ManagedComponent {
     void increase(MessageHandlingTimeRecorder mhtr);  
         
     Number getNumInvocations();
+    
+    boolean isEnabled();
 }

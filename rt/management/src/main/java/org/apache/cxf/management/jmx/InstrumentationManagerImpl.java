@@ -127,15 +127,8 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         usePlatformMBeanServer = flag;
     }
 
-    @PostConstruct     
+    @Deprecated
     public void register() {    
-        if (null != bus) {
-            bus.setExtension(this, InstrumentationManager.class);
-            BusLifeCycleManager blcm = bus.getExtension(BusLifeCycleManager.class);
-            if (null != blcm) {
-                blcm.registerLifeCycleListener(this);
-            }    
-        }
     }
     
     @PostConstruct     
@@ -199,6 +192,14 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                 }
             }
         }
+
+        if (null != bus) {
+            bus.setExtension(this, InstrumentationManager.class);
+            BusLifeCycleManager blcm = bus.getExtension(BusLifeCycleManager.class);
+            if (null != blcm) {
+                blcm.registerLifeCycleListener(this);
+            }    
+        }        
     }
     
     private ObjectName getDelegateName() throws JMException {

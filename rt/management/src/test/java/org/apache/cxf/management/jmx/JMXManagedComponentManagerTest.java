@@ -134,7 +134,6 @@ public class JMXManagedComponentManagerTest extends Assert {
         this.manager.setEnabled(true);
         this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         this.manager.setServer(server);
-        this.manager.register();
         this.manager.init();
         
         ObjectName name = this.registerStandardMBean("yo!");
@@ -168,7 +167,6 @@ public class JMXManagedComponentManagerTest extends Assert {
         this.manager.setEnabled(true);
         this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         this.manager.setServer(server);
-        this.manager.register();
         this.manager.init();
         
         name = this.registerStandardMBean("yoyo!");

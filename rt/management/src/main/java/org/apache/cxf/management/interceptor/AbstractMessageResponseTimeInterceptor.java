@@ -32,7 +32,6 @@ import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.counters.Counter;
 import org.apache.cxf.management.counters.CounterRepository;
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
-import org.apache.cxf.management.counters.ResponseTimeCounter;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
@@ -153,7 +152,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             return false;
         }
         ObjectName serviceCounterName = getServiceCounterName(ex);
-        ResponseTimeCounter serviceCounter = (ResponseTimeCounter)counterRepo.getCounter(serviceCounterName);
+        Counter serviceCounter = counterRepo.getCounter(serviceCounterName);
         //If serviceCounter is null, we need to wait ResponseTimeOutInterceptor to create it , hence set to true
         if (serviceCounter == null || serviceCounter.isEnabled()) {
             return true;

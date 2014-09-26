@@ -14,7 +14,28 @@
                 the specific language governing permissions and limitations under the
                 License.
         -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd                 http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd                 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd                 http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd                 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd ">
+    
+    <cxf:bus name="cxf"/>
+    
+    <bean id="org.apache.cxf.management.InstrumentationManager" class="org.apache.cxf.management.jmx.InstrumentationManagerImpl"
+        init-method="init">
+        <property name="enabled" value="true"/>
+        <property name="usePlatformMBeanServer" value="true"/>
+        <property name="bus" ref="cxf"/>
+    </bean>
+    <bean id="org.apache.cxf.management.counters.CounterRepository" class="org.apache.cxf.management.counters.CounterRepository">
+        <property name="bus" ref="cxf"/>
+        
+    </bean>
+    <bean id="org.apache.cxf.management.codahale.Metrics" class="org.apache.cxf.management.codahale.Metrics">
+        <property name="bus" ref="cxf"/>
+        
+    </bean>
+    
+    
     <!-- HTTP Endpoint -->
     <jaxws:endpoint xmlns:customer="http://customerservice.example.com/" id="CustomerServiceHTTP" address="http://localhost:9090/CustomerServicePort" serviceName="customer:CustomerServiceService" endpointName="customer:CustomerServiceEndpoint" implementor="com.example.customerservice.server.CustomerServiceImpl">
         <jaxws:features>
