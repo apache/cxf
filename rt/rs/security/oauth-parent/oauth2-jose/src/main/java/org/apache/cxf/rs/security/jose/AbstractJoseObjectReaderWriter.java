@@ -104,18 +104,13 @@ public class AbstractJoseObjectReaderWriter {
         
     protected void fromJsonInternal(AbstractJoseObject jwt, String json) {
         String theJson = json.trim();
-        Map<String, Object> values = readJwtObjectAsMap(theJson.substring(1, theJson.length() - 1));
-        fromJsonInternal(jwt, values);
+        JoseObjectSettable joseObject = new JoseObjectSettable(jwt);
+        readJwtObjectAsMap(joseObject, theJson.substring(1, theJson.length() - 1));
     }
     
-    protected void fromJsonInternal(AbstractJoseObject jwt, Map<String, Object> values) {
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
-            jwt.setValue(entry.getKey(), entry.getValue());
-        }
-    }
     
-    protected Map<String, Object> readJwtObjectAsMap(String json) {
-        Map<String, Object> values = new LinkedHashMap<String, Object>();
+    
+    protected void readJwtObjectAsMap(Settable values, String json) {
         for (int i = 0; i < json.length(); i++) {
             if (isWhiteSpace(json.charAt(i))) {
                 continue;
@@ -133,7 +128,9 @@ public class AbstractJoseObjectReaderWriter {
             if (json.charAt(sepIndex + j) == '{') {
                 int closingIndex = getClosingIndex(json, '{', '}', sepIndex + j);
                 String newJson = json.substring(sepIndex + j + 1, closingIndex);
-                values.put(name, readJwtObjectAsMap(newJson));
+                MapSettable nextMap = new MapSettable();
+                readJwtObjectAsMap(nextMap, newJson);
+                values.put(name, nextMap.map);
                 i = closingIndex + 1;
             } else if (json.charAt(sepIndex + j) == '[') {
                 int closingIndex = getClosingIndex(json, '[', ']', sepIndex + j);
@@ -151,7 +148,6 @@ public class AbstractJoseObjectReaderWriter {
             }
             
         }
-        return values;
     }
     protected List<Object> readJwtObjectAsList(String json) {
         List<Object> values = new LinkedList<Object>();
@@ -161,7 +157,9 @@ public class AbstractJoseObjectReaderWriter {
             }
             if (json.charAt(i) == '{') {
                 int closingIndex = getClosingIndex(json, '{', '}', i);
-                values.add(readJwtObjectAsMap(json.substring(i + 1, closingIndex)));
+                MapSettable nextMap = new MapSettable();
+                readJwtObjectAsMap(nextMap, json.substring(i + 1, closingIndex));
+                values.add(nextMap.map);
                 i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, i);
@@ -208,7 +206,25 @@ public class AbstractJoseObjectReaderWriter {
         this.format = format;
     }
 
-    
+    private interface Settable {
+        void put(String key, Object value);
+    }
+    private static class MapSettable implements Settable {
+        private Map<String, Object> map = new LinkedHashMap<String, Object>();
+        public void put(String key, Object value) {
+            map.put(key, value);
+        }
+        
+    }
+    private static class JoseObjectSettable implements Settable {
+        private AbstractJoseObject jose;
+        public JoseObjectSettable(AbstractJoseObject jose) {
+            this.jose = jose;
+        }
+        public void put(String key, Object value) {
+            jose.setValue(key, value);
+        }
+    }
 
     
 }

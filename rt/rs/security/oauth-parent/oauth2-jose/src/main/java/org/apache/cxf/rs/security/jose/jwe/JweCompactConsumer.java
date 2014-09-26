@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
@@ -49,7 +50,12 @@ public class JweCompactConsumer {
             
             encryptedContent = Base64UrlUtility.decode(parts[3]);
             authTag = Base64UrlUtility.decode(parts[4]);
-            jweHeaders = new JweHeaders(reader.fromJsonHeaders(headersJson));
+            JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
+            if (joseHeaders.getHeaderUpdateCount() != null) { 
+                throw new SecurityException();
+            }
+            jweHeaders = new JweHeaders(joseHeaders);
+            
         } catch (Base64Exception ex) {
             throw new SecurityException(ex);
         }
