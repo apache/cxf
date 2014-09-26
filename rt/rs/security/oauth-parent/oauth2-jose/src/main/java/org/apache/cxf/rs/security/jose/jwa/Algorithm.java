@@ -185,6 +185,10 @@ public enum Algorithm {
         }
         return javaName;
     }
+    public static boolean isRsaOaep(String algo) {
+        return JoseConstants.RSA_OAEP_ALGO.equals(algo)
+               || JoseConstants.RSA_OAEP_256_ALGO.equals(algo);
+    }
     public static boolean isAesKeyWrap(String algo) {
         return JoseConstants.A128KW_ALGO.equals(algo)
                || JoseConstants.A192KW_ALGO.equals(algo)
@@ -200,14 +204,24 @@ public enum Algorithm {
                || JoseConstants.A192GCM_ALGO.equals(algo)
                || JoseConstants.A256GCM_ALGO.equals(algo);
     }
+    public static boolean isAesCbcHmac(String algo) {
+        return JoseConstants.A128CBC_HS256_ALGO.equals(algo)
+            || JoseConstants.A192CBC_HS384_ALGO.equals(algo)
+            || JoseConstants.A256CBC_HS512_ALGO.equals(algo); 
+    }
     public static boolean isHmacSign(String algo) {
         return JoseConstants.HMAC_SHA_256_ALGO.equals(algo)
             || JoseConstants.HMAC_SHA_384_ALGO.equals(algo)
             || JoseConstants.HMAC_SHA_512_ALGO.equals(algo); 
     }
-    public static boolean isAesCbcHmac(String algo) {
-        return JoseConstants.A128CBC_HS256_ALGO.equals(algo)
-            || JoseConstants.A192CBC_HS384_ALGO.equals(algo)
-            || JoseConstants.A256CBC_HS512_ALGO.equals(algo); 
+    public static boolean isRsaShaSign(String algo) {
+        return JoseConstants.RS_SHA_256_ALGO.equals(algo)
+            || JoseConstants.RS_SHA_384_ALGO.equals(algo)
+            || JoseConstants.RS_SHA_512_ALGO.equals(algo); 
+    }
+    public static boolean isEcDsaSign(String algo) {
+        return JoseConstants.ES_SHA_256_ALGO.equals(algo)
+            || JoseConstants.ES_SHA_384_ALGO.equals(algo)
+            || JoseConstants.ES_SHA_512_ALGO.equals(algo); 
     }
 }

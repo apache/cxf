@@ -181,18 +181,20 @@ public class JweCompactReaderWriterTest extends Assert {
         return encryptor.encrypt(content.getBytes("UTF-8"), null);
     }
     private String encryptContentDirect(SecretKey key, String content) throws Exception {
-        DirectKeyJweEncryption encryptor = new DirectKeyJweEncryption(key, INIT_VECTOR_A1);
+        DirectKeyJweEncryption encryptor = new DirectKeyJweEncryption(
+            new AesGcmContentEncryptionAlgorithm(key, INIT_VECTOR_A1, JoseConstants.A128GCM_ALGO));
         return encryptor.encrypt(content.getBytes("UTF-8"), null);
     }
     private void decrypt(String jweContent, String plainContent, boolean unwrap) throws Exception {
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1, 
                                                                 RSA_PRIVATE_EXPONENT_ENCODED_A1);
-        JweDecryptionProvider decryptor = new WrappedKeyJweDecryption(new RSAOaepKeyDecryptionAlgorithm(privateKey));
+        JweDecryptionProvider decryptor = new WrappedKeyJweDecryption(new RSAOaepKeyDecryptionAlgorithm(privateKey),
+                                                                      new AesGcmContentDecryptionAlgorithm());
         String decryptedText = decryptor.decrypt(jweContent).getContentText();
         assertEquals(decryptedText, plainContent);
     }
     private void decryptDirect(SecretKey key, String jweContent, String plainContent) throws Exception {
-        DirectKeyJweDecryption decryptor = new DirectKeyJweDecryption(key);
+        DirectKeyJweDecryption decryptor = new DirectKeyJweDecryption(key, new AesGcmContentDecryptionAlgorithm());
         String decryptedText = decryptor.decrypt(jweContent).getContentText();
         assertEquals(decryptedText, plainContent);
     }

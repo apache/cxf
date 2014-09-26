@@ -23,11 +23,9 @@ import java.security.Key;
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 
 public class DirectKeyJweDecryption extends AbstractJweDecryption {
-    public DirectKeyJweDecryption(Key contentDecryptionKey) {    
-        this(contentDecryptionKey, null);
-    }
-    public DirectKeyJweDecryption(Key contentDecryptionKey, JoseHeadersReader reader) {    
-        this(contentDecryptionKey, reader, new AesGcmContentDecryptionAlgorithm());
+    public DirectKeyJweDecryption(Key contentDecryptionKey, 
+                                  ContentDecryptionAlgorithm cipherProps) {
+        this(contentDecryptionKey, null, cipherProps);
     }
     public DirectKeyJweDecryption(Key contentDecryptionKey, 
                                   JoseHeadersReader reader,

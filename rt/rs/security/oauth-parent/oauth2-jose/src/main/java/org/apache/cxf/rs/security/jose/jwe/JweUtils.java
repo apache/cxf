@@ -50,15 +50,20 @@ public final class JweUtils {
         return keyEncryptionProvider;
     }
     public static KeyDecryptionAlgorithm getKeyDecryptionAlgorithm(JsonWebKey jwk) {
+        return getKeyDecryptionAlgorithm(jwk, null);
+    }
+    public static KeyDecryptionAlgorithm getKeyDecryptionAlgorithm(JsonWebKey jwk, String defaultAlgorithm) {
+        String keyEncryptionAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         KeyDecryptionAlgorithm keyDecryptionProvider = null;
         if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-            keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(JwkUtils.toRSAPrivateKey(jwk));
+            keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(JwkUtils.toRSAPrivateKey(jwk), 
+                                                                      keyEncryptionAlgo);
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
             SecretKey key = JwkUtils.toSecretKey(jwk);
             if (Algorithm.isAesKeyWrap(jwk.getAlgorithm())) {
-                keyDecryptionProvider = new AesWrapKeyDecryptionAlgorithm(key);
+                keyDecryptionProvider = new AesWrapKeyDecryptionAlgorithm(key, keyEncryptionAlgo);
             } else if (Algorithm.isAesGcmKeyWrap(jwk.getAlgorithm())) {
-                keyDecryptionProvider = new AesGcmWrapKeyDecryptionAlgorithm(key);
+                keyDecryptionProvider = new AesGcmWrapKeyDecryptionAlgorithm(key, keyEncryptionAlgo);
             } 
         } else {
             // TODO: support elliptic curve keys

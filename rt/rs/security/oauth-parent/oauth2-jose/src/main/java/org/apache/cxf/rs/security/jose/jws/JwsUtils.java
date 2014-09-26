@@ -53,13 +53,13 @@ public final class JwsUtils {
         String rsaSignatureAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         JwsSignatureVerifier theVerifier = null;
         if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-            theVerifier = new PublicKeyJwsSignatureVerifier(JwkUtils.toRSAPublicKey(jwk));
+            theVerifier = new PublicKeyJwsSignatureVerifier(JwkUtils.toRSAPublicKey(jwk), rsaSignatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType()) 
             && Algorithm.isHmacSign(rsaSignatureAlgo)) {
             theVerifier = 
-                new HmacJwsSignatureVerifier((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
+                new HmacJwsSignatureVerifier((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE), rsaSignatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
-            theVerifier = new EcDsaJwsSignatureVerifier(JwkUtils.toECPublicKey(jwk));
+            theVerifier = new EcDsaJwsSignatureVerifier(JwkUtils.toECPublicKey(jwk), rsaSignatureAlgo);
         }
         return theVerifier;
     }

@@ -85,7 +85,8 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
         return contentDecryptionAlgo.getAdditionalAuthenticationData(consumer.getDecodedJsonHeaders());
     }
     protected byte[] getEncryptedContentWithAuthTag(JweCompactConsumer consumer) {
-        return contentDecryptionAlgo.getEncryptedSequence(consumer.getEncryptedContent(), 
+        return contentDecryptionAlgo.getEncryptedSequence(consumer.getJweHeaders(),
+                                                          consumer.getEncryptedContent(), 
                                                           getEncryptionAuthenticationTag(consumer));
     }
     protected byte[] getContentEncryptionCipherInitVector(JweCompactConsumer consumer) { 

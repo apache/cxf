@@ -25,14 +25,29 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AesWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public AesWrapKeyDecryptionAlgorithm(String encodedKey) {    
-        this(CryptoUtils.decodeSequence(encodedKey));
+        this(encodedKey, null);
+    }
+    public AesWrapKeyDecryptionAlgorithm(String encodedKey, String supportedAlgo) {    
+        this(CryptoUtils.decodeSequence(encodedKey), supportedAlgo);
     }
     public AesWrapKeyDecryptionAlgorithm(byte[] secretKey) {    
-        this(CryptoUtils.createSecretKeySpec(secretKey, Algorithm.AES_WRAP_ALGO_JAVA));
+        this(secretKey, null);
     }
-    public AesWrapKeyDecryptionAlgorithm(SecretKey secretKey) {    
-        super(secretKey, true);
+    public AesWrapKeyDecryptionAlgorithm(byte[] secretKey, String supportedAlgo) {    
+        this(CryptoUtils.createSecretKeySpec(secretKey, Algorithm.AES_WRAP_ALGO_JAVA), supportedAlgo);
     }
-    
+    public AesWrapKeyDecryptionAlgorithm(SecretKey secretKey) {
+        this(secretKey, null);
+    }
+    public AesWrapKeyDecryptionAlgorithm(SecretKey secretKey, String supportedAlgo) {    
+        super(secretKey, supportedAlgo);
+    }
+    @Override
+    protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
+        super.validateKeyEncryptionAlgorithm(keyAlgo);
+        if (!Algorithm.isAesKeyWrap(keyAlgo)) {
+            throw new SecurityException();
+        }
+    }
     
 }

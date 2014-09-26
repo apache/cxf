@@ -20,14 +20,26 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.interfaces.RSAPrivateKey;
 
+import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+
 public class RSAOaepKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public RSAOaepKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {    
-        this(privateKey, true);
+        this(privateKey, null);
     }
-    public RSAOaepKeyDecryptionAlgorithm(RSAPrivateKey privateKey, boolean unwrap) {    
-        super(privateKey, unwrap);
+    public RSAOaepKeyDecryptionAlgorithm(RSAPrivateKey privateKey, String supportedAlgo) {    
+        this(privateKey, supportedAlgo, true);
+    }
+    public RSAOaepKeyDecryptionAlgorithm(RSAPrivateKey privateKey, String supportedAlgo, boolean unwrap) {    
+        super(privateKey, supportedAlgo, unwrap);
     }
     protected int getKeyCipherBlockSize() {
         return ((RSAPrivateKey)getCekDecryptionKey()).getModulus().toByteArray().length;
+    }
+    @Override
+    protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
+        super.validateKeyEncryptionAlgorithm(keyAlgo);
+        if (!Algorithm.isRsaOaep(keyAlgo)) {
+            throw new SecurityException();
+        }
     }
 }

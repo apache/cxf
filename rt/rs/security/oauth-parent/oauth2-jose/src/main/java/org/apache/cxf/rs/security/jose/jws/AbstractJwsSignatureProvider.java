@@ -18,14 +18,11 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
-import java.util.Set;
 
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
-    private Set<String> supportedAlgorithms;
     private String algorithm;
     
-    protected AbstractJwsSignatureProvider(Set<String> supportedAlgorithms, String algo) {
-        this.supportedAlgorithms = supportedAlgorithms;
+    protected AbstractJwsSignatureProvider(String algo) {
         this.algorithm = algo;
     }
     
@@ -53,11 +50,10 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     
     protected abstract JwsSignature doCreateJwsSignature(JwsHeaders headers);
     
-    protected String checkAlgorithm(String algo) {
-        if (algo == null || !supportedAlgorithms.contains(algo)) {
+    protected void checkAlgorithm(String algo) {
+        if (algo == null) {
             throw new SecurityException();
         }
-        return algo;
     }
 
 }

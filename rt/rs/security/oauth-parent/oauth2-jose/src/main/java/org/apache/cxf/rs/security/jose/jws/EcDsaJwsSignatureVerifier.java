@@ -21,11 +21,20 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 
+import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+
 public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     public EcDsaJwsSignatureVerifier(PublicKey key) {
         this(key, null);
     }
-    public EcDsaJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec) {
-        super(key, spec);
+    public EcDsaJwsSignatureVerifier(PublicKey key, String supportedAlgo) {
+        this(key, null, supportedAlgo);
+    }
+    public EcDsaJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, String supportedAlgo) {
+        super(key, spec, supportedAlgo);
+    }
+    @Override
+    protected boolean isValidAlgorithmFamily(String algo) {
+        return Algorithm.isEcDsaSign(algo);
     }
 }

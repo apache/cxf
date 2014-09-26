@@ -20,11 +20,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.nio.ByteBuffer;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
@@ -34,10 +31,6 @@ import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
 
 public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
-    private static final Set<String> SUPPORTED_CEK_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.A128CBC_HS256.getJwtName(),
-                      Algorithm.A192CBC_HS384.getJwtName(),
-                      Algorithm.A256CBC_HS512.getJwtName()));
     private static final Map<String, String> AES_HMAC_MAP;
     private static final Map<String, Integer> AES_CEK_SIZE_MAP;
     static {
@@ -159,7 +152,6 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
             public byte[] getTag() {
                 return signAndGetTag(macState);
             }
-            
         };
     }
     
@@ -188,7 +180,7 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
     }
     
     private static String validateCekAlgorithm(String cekAlgo) {
-        if (!SUPPORTED_CEK_ALGORITHMS.contains(cekAlgo)) {
+        if (!Algorithm.isAesCbcHmac(cekAlgo)) {
             throw new SecurityException();
         }
         return cekAlgo;

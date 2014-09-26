@@ -18,13 +18,27 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+
 
 
 public class AesGcmContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
     implements ContentDecryptionAlgorithm {
+    private String supportedAlgo; 
+    public AesGcmContentDecryptionAlgorithm() {
+        this(null);
+    }
+    public AesGcmContentDecryptionAlgorithm(String supportedAlgo) {
+        this.supportedAlgo = supportedAlgo;
+    }
 
     @Override
-    public byte[] getEncryptedSequence(byte[] cipher, byte[] authTag) {
+    public byte[] getEncryptedSequence(JweHeaders headers, byte[] cipher, byte[] authTag) {
+        String algo = headers.getContentEncryptionAlgorithm();
+        if (!Algorithm.isAesGcm(algo)
+            || supportedAlgo != null && !supportedAlgo.equals(algo)) {
+            throw new SecurityException();
+        }
         return JweCompactConsumer.getCipherWithAuthTag(cipher, authTag);
     }
 }

@@ -23,18 +23,11 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider {
-    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.SHA256withRSA.getJwtName(),
-                      Algorithm.SHA384withRSA.getJwtName(),
-                      Algorithm.SHA512withRSA.getJwtName())); 
     private PrivateKey key;
     private SecureRandom random; 
     private AlgorithmParameterSpec signatureSpec;
@@ -47,14 +40,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
     }
     public PrivateKeyJwsSignatureProvider(PrivateKey key, SecureRandom random, 
                                           AlgorithmParameterSpec spec, String algo) {
-        this(key, random, spec, SUPPORTED_ALGORITHMS, algo);
-    }
-    protected PrivateKeyJwsSignatureProvider(PrivateKey key, 
-                                             SecureRandom random, 
-                                             AlgorithmParameterSpec spec,
-                                             Set<String> supportedAlgorithms,
-                                             String algo) {
-        super(supportedAlgorithms, algo);
+        super(algo);
         this.key = key;
         this.random = random;
         this.signatureSpec = spec;
@@ -86,6 +72,16 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
             
         };
     }
+    @Override
+    protected void checkAlgorithm(String algo) {
+        super.checkAlgorithm(algo);
+        if (!isValidAlgorithmFamily(algo)) {
+            throw new SecurityException();
+        }
+    }
     
+    protected boolean isValidAlgorithmFamily(String algo) {
+        return Algorithm.isRsaShaSign(algo);
+    }
 
 }
