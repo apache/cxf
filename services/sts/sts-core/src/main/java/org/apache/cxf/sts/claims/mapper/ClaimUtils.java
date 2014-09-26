@@ -61,7 +61,7 @@ public class ClaimUtils {
     }
 
     /**
-     * @param claimTypeURI claim type URI
+     * @param processedClaimTypeURI claim type URI
      * @param values values of created claim. Can be null if no values shall be added to claim.
      * @return Returns new claim with provided claim type and values
      */
@@ -77,8 +77,8 @@ public class ClaimUtils {
     }
 
     /**
-     * @param claims Collection of multiple claims with different claim types
-     * @param claimType URI of claim type to be selected from claim collection
+     * @param processedClaims Collection of multiple claims with different claim types
+     * @param processedClaimType URI of claim type to be selected from claim collection
      * @return Returns first claim from claims collection matching the provided claimType
      */
     public ProcessedClaim get(ProcessedClaimCollection processedClaims, String processedClaimType) {
@@ -94,7 +94,7 @@ public class ClaimUtils {
     }
 
     /**
-     * @param claims Collection of claims to be mapped to a differnt claim type
+     * @param processedClaims Collection of claims to be mapped to a differnt claim type
      * @param map Map of old:new claim types
      * @param keepUnmapped if set to false only claims with a claim type contained in the map will be
      *            returned. If set to false claims with an unmapped claim type will also be returned.
@@ -122,7 +122,7 @@ public class ClaimUtils {
     }
 
     /**
-     * @param claim Claim providing values to be mapped
+     * @param processedClaim Claim providing values to be mapped
      * @param map Map of old:new mapping values
      * @param keepUnmapped if set to false only values contained in the map will be returned. If set to true,
      *            values not contained in the map will also remain in the returned claim.
@@ -151,13 +151,13 @@ public class ClaimUtils {
         }
         return processedClaim;
     }
-
+    
     /**
-     * @param claims Collection of claims containing claims with claim types of listed <code>claimType</code>
+     * @param processedClaims Collection of claims containing claims with claim types of listed <code>claimType</code>
      *            array
      * @param targetClaimType claim type URI of merged result claim
      * @param delimiter Delimiter added between multiple claim types. Value can be <code>null</code>.
-     * @param claimType URIs of claim types to be merged. Merging will be in the same order as the provided
+     * @param processedClaimType URIs of claim types to be merged. Merging will be in the same order as the provided
      *            claim type URIs. If a claim type is not found in the collection this claim type will be
      *            omitted.
      * @return Returns merged claim of all found claim types
@@ -191,8 +191,8 @@ public class ClaimUtils {
     }
 
     /**
-     * @param claim Claim to be updated
-     * @param claimTypeURI URI as String to be set as claim type in provided claim
+     * @param processedClaim Claim to be updated
+     * @param processedClaimTypeURI URI as String to be set as claim type in provided claim
      * @return Returns updated claim
      */
     public ProcessedClaim setType(ProcessedClaim processedClaim, String processedClaimTypeURI) {
@@ -206,7 +206,7 @@ public class ClaimUtils {
      * was already set before, the original issuer will not be updated. All claims will be updated to have the
      * provided issuer name be set as the claim issuer.
      * 
-     * @param claims Collection of claims to be updated
+     * @param processedClaims Collection of claims to be updated
      * @param issuerName Issuer to be set for all claims within the collection
      * @return Returns updated claim collection
      */
@@ -221,7 +221,7 @@ public class ClaimUtils {
     }
 
     /**
-     * @param claim values of this claim will be transformed to uppercase format
+     * @param processedClaim values of this claim will be transformed to uppercase format
      * @return Returns claim with values all in uppercase format
      */
     public ProcessedClaim upperCaseValues(ProcessedClaim processedClaim) {
@@ -238,7 +238,7 @@ public class ClaimUtils {
     }
 
     /**
-     * @param claim values of this claim will be transformed to lowercase format
+     * @param processedClaim values of this claim will be transformed to lowercase format
      * @return Returns claim with values all in lowercase format
      */
     public ProcessedClaim lowerCaseValues(ProcessedClaim processedClaim) {
@@ -255,7 +255,7 @@ public class ClaimUtils {
     }
 
     /**
-     * @param claim Claim providing values to be wrapped
+     * @param processedClaim Claim providing values to be wrapped
      * @param prefix Prefix to be added to each claim value. Can be null.
      * @param suffix Suffix to be appended to each claim value. Can be null.
      * @return Returns the provided claim with wrapped values
