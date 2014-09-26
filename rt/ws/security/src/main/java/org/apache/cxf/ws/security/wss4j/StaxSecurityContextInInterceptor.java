@@ -38,8 +38,6 @@ import org.apache.cxf.rt.security.saml.SAMLUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.KeyValueTokenSecurityEvent;
@@ -48,7 +46,9 @@ import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.wss4j.stax.securityToken.SubjectAndPrincipalSecurityToken;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenUsage;
 
 /**
  * This interceptor handles parsing the StaX WS-Security results (events) + sets up the
@@ -85,7 +85,13 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
     
     private void doResults(SoapMessage msg, List<SecurityEvent> incomingSecurityEventList) throws WSSecurityException {
         for (SecurityEvent event : incomingSecurityEventList) {
-            SubjectAndPrincipalSecurityToken token = getSubjectPrincipalToken(event);
+            
+            SubjectAndPrincipalSecurityToken token = null;
+            try {
+                token = getSubjectPrincipalToken(event);
+            } catch (XMLSecurityException ex) {
+                // proceed
+            }
             if (token != null) {
                 Principal p = token.getPrincipal();
                 Subject subject = token.getSubject();
@@ -107,7 +113,7 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                         msg.put(SecurityContext.class, new DefaultSecurityContext(subject));
                     }
                     break;
-                } else if (p != null && isSecurityContextPrincipal(p, incomingSecurityEventList)) {
+                } else if (p != null) {
 
                     Object receivedAssertion = null;
                     
@@ -140,37 +146,71 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
         }
     }
     
-
-    /**
-     * Checks if a given WSS4J Principal can be represented as a user principal
-     * inside SecurityContext. Example, UsernameToken or PublicKey principals can
-     * be used to facilitate checking the user roles, etc.
-     */
-    private boolean isSecurityContextPrincipal(Principal p, List<SecurityEvent> incomingSecurityEventList) {
-        
-        boolean derivedKeyPrincipal = p instanceof WSDerivedKeyTokenPrincipal;
-        if (derivedKeyPrincipal || p instanceof CustomTokenPrincipal) {
-            // If it is a derived key principal or a Custom Token Principal then let it 
-            // be a SecurityContext principal only if no other principals are available.
-            return incomingSecurityEventList.size() > 1 ? false : true;
-        } else {
-            return true;
-        }
-    }
-    
-    private SubjectAndPrincipalSecurityToken getSubjectPrincipalToken(SecurityEvent event) {
+    private SubjectAndPrincipalSecurityToken getSubjectPrincipalToken(
+        SecurityEvent event
+    ) throws XMLSecurityException {
         if (event.getSecurityEventType() == WSSecurityEventConstants.UsernameToken) {
             return ((UsernameTokenSecurityEvent)event).getSecurityToken();
-        } else if (event.getSecurityEventType() == WSSecurityEventConstants.SamlToken) {
+        } else if (event.getSecurityEventType() == WSSecurityEventConstants.SamlToken
+            && isSamlEventSigned((SamlTokenSecurityEvent)event)) {
             return ((SamlTokenSecurityEvent)event).getSecurityToken();
-        } else if (event.getSecurityEventType() == WSSecurityEventConstants.X509Token) {
+        } else if (event.getSecurityEventType() == WSSecurityEventConstants.X509Token
+            && isUsedForPublicKeySignature(((X509TokenSecurityEvent)event).getSecurityToken())) {
             return ((X509TokenSecurityEvent)event).getSecurityToken();
-        } else if (event.getSecurityEventType() == WSSecurityEventConstants.KeyValueToken) {
+        } else if (event.getSecurityEventType() == WSSecurityEventConstants.KeyValueToken
+            && isUsedForPublicKeySignature(((KeyValueTokenSecurityEvent)event).getSecurityToken())) {
             return ((KeyValueTokenSecurityEvent)event).getSecurityToken();
         } else if (event.getSecurityEventType() == WSSecurityEventConstants.KerberosToken) {
             return ((KerberosTokenSecurityEvent)event).getSecurityToken();
         }
         return null;
+    }
+    
+    private boolean isUsedForPublicKeySignature(
+        SubjectAndPrincipalSecurityToken token
+    ) throws XMLSecurityException {
+        if (token == null) {
+            return false;
+        }
+        
+        // Check first of all that the token is used for Signature
+        List<TokenUsage> tokenUsages = token.getTokenUsages();
+        boolean usedForSignature = false;
+        
+        if (tokenUsages != null) {
+            for (TokenUsage usage : tokenUsages) {
+                if ("MainSignature".equals(usage.getName())) {
+                    usedForSignature = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!usedForSignature) {
+            return false;
+        }
+        
+        // Now check that a PublicKey/X509Certificate was used
+        if (token.getPublicKey() != null 
+            || (token.getX509Certificates() != null && token.getX509Certificates().length > 0)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private boolean isSamlEventSigned(SamlTokenSecurityEvent event) {
+        if (event == null) {
+            return false;
+        }
+        
+        if (event.getSecurityToken() != null 
+            && event.getSecurityToken().getSamlAssertionWrapper() != null
+            && event.getSecurityToken().getSamlAssertionWrapper().isSigned()) {
+            return true;
+        }
+        
+        return false;
     }
     
     private SecurityContext createSecurityContext(final Principal p) {
