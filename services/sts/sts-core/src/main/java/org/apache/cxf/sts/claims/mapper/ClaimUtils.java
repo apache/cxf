@@ -153,6 +153,32 @@ public class ClaimUtils {
     }
     
     /**
+     * @param processedClaim Claim containing arbitrary values 
+     * @param filter Regex filter to be used to match with claim values
+     * @return Returns a claim containing only values from the processedClaim which matched the provided filter
+     */
+    public ProcessedClaim filterValues(ProcessedClaim processedClaim, String filter) {
+
+        if (processedClaim != null) {
+            List<Object> values = processedClaim.getValues();
+            List<Object> filteredValues = new ArrayList<Object>();
+
+            if (values == null || filter == null) {
+                processedClaim.setValues(filteredValues);
+                return processedClaim;
+            }
+
+            for (Object value : values) {
+                if (value != null && value.toString().matches(filter)) {
+                    filteredValues.add(value);
+                }
+            }
+            processedClaim.setValues(filteredValues);
+        }
+        return processedClaim;
+    }
+
+    /**
      * @param processedClaims Collection of claims containing claims with claim types of listed <code>claimType</code>
      *            array
      * @param targetClaimType claim type URI of merged result claim

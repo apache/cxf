@@ -53,11 +53,15 @@
     claims:singleToMultiValue(singleValue, ",");
 	var multiValue = claims:create("http://my.schema.org/identity/claims/multi2single", "Value1", "Value2", "Value3");
     claims:multiToSingleValue(multiValue, ",");
+    
+    // Claim filter
+    var filterClaim = claims:create("http://my.schema.org/identity/claims/filter", "different", "match", "second_match", "other");
+    claims:filterValues(filterClaim, ".*match");
 	
     // Collect claims for new token
     claims:add(targetClaims, mappedRoles, mergedClaim, idpClaim);
     claims:add(targetClaims, uppercaseClaim, lowercaseClaim, wrappedUppercaseClaim, emailClaim);
-	claims:add(targetClaims, singleValue, multiValue);
+	claims:add(targetClaims, singleValue, multiValue, filterClaim);
     
     // Set correct issuer
     claims:updateIssuer(targetClaims, claimsParameters.stsProperties.issuer);
