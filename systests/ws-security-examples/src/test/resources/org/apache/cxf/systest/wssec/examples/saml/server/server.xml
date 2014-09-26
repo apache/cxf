@@ -53,7 +53,7 @@
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItBearerPort"
        xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItImpl"
        wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
        <jaxws:properties>
            <entry key="ws-security.saml1.validator" value-ref="allowUnsignedBearerAssertions"/>
