@@ -37,12 +37,12 @@
 
     // Claim value updates
     var uppercaseClaim = claims:create("http://my.schema.org/identity/claims/uppercase", "Value", "Value2");
-    claims:upperCaseValues(uppercaseClaim);
+    uppercaseClaim = claims:upperCaseValues(uppercaseClaim);
     var lowercaseClaim = claims:create("http://my.schema.org/identity/claims/lowercase", "Value", "Value2");
-    claims:lowerCaseValues(lowercaseClaim);
+    lowercaseClaim = claims:lowerCaseValues(lowercaseClaim);
     var wrappedUppercaseClaim = claims:create("http://my.schema.org/identity/claims/wrappedUppercase", "Value");
-    claims:wrapValues(wrappedUppercaseClaim, "Prefix_", "_Suffix");
-    claims:upperCaseValues(wrappedUppercaseClaim);
+    wrappedUppercaseClaim = claims:wrapValues(wrappedUppercaseClaim, "Prefix_", "_Suffix");
+    wrappedUppercaseClaim = claims:upperCaseValues(wrappedUppercaseClaim);
 
     // Simple claim copy
     var emailClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mail';
@@ -50,21 +50,21 @@
     
 	// Claim value delimiter
     var singleValue = claims:create("http://my.schema.org/identity/claims/single2multi", "Value1,Value2,Value3");
-    claims:singleToMultiValue(singleValue, ",");
+    singleValue = claims:singleToMultiValue(singleValue, ",");
 	var multiValue = claims:create("http://my.schema.org/identity/claims/multi2single", "Value1", "Value2", "Value3");
-    claims:multiToSingleValue(multiValue, ",");
+    multiValue = claims:multiToSingleValue(multiValue, ",");
     
     // Claim filter
-    var filterClaim = claims:create("http://my.schema.org/identity/claims/filter", "different", "match", "second_match", "other");
-    claims:filterValues(filterClaim, ".*match");
+    var unfilterClaim = claims:create("http://my.schema.org/identity/claims/filter", "different", "match", "second_match", "other");
+    var filterClaim = claims:filterValues(unfilterClaim, ".*match");
 	
     // Collect claims for new token
-    claims:add(targetClaims, mappedRoles, mergedClaim, idpClaim);
-    claims:add(targetClaims, uppercaseClaim, lowercaseClaim, wrappedUppercaseClaim, emailClaim);
-	claims:add(targetClaims, singleValue, multiValue, filterClaim);
+    targetClaims = claims:add(targetClaims, mappedRoles, mergedClaim, idpClaim);
+    targetClaims = claims:add(targetClaims, uppercaseClaim, lowercaseClaim, wrappedUppercaseClaim, emailClaim);
+	targetClaims = claims:add(targetClaims, singleValue, multiValue, filterClaim);
     
     // Set correct issuer
-    claims:updateIssuer(targetClaims, claimsParameters.stsProperties.issuer);
+    targetClaims = claims:updateIssuer(targetClaims, claimsParameters.stsProperties.issuer);
     
     // Return new claims
     return targetClaims;

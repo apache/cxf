@@ -29,35 +29,48 @@ import java.util.StringTokenizer;
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 
+/**
+ * This claim util class provides methods to make the handling of claims and claim values easier. The input
+ * claims (and their values) shall be treated as immutable. All util methods return a clone of the
+ * provided claim containing the desired claim update.
+ */
 public class ClaimUtils {
 
     /**
-     * @param targetCollection Collection that should be used to add further claims to
+     * @param collection Collection that should be used to add further claims to
      * @param claims Claims to be added to the provided collection
-     * @return Returns provided collection including provided claims
+     * @return Returns clone of the provided collection including additional claims
      */
-    public ProcessedClaimCollection add(ProcessedClaimCollection targetCollection, ProcessedClaim... claims) {
-        for (ProcessedClaim c : claims) {
-            if (c != null) {
-                targetCollection.add(c);
+    public ProcessedClaimCollection add(ProcessedClaimCollection collection, ProcessedClaim... claims) {
+        ProcessedClaimCollection resultClaimCollection = null;
+        if (collection != null) {
+            resultClaimCollection = (ProcessedClaimCollection)collection.clone();
+            for (ProcessedClaim c : claims) {
+                if (c != null) {
+                    resultClaimCollection.add(c);
+                }
             }
         }
-        return targetCollection;
+        return resultClaimCollection;
     }
 
     /**
-     * @param targetCollection Collection that should be used to add claims from the other provided claim
+     * @param collection Collection that should be used to add claims from the other provided claim
      *            collections
      * @param claimCollections All claims contained within the provided collections will be added to the
      *            targetCollection
-     * @return Returns claim collection containing all claims that have been provided
+     * @return Returns a clone of the provided collection containing all claims from all other claimCollections
      */
-    public ProcessedClaimCollection add(ProcessedClaimCollection targetCollection,
+    public ProcessedClaimCollection add(ProcessedClaimCollection collection,
         ProcessedClaimCollection... claimCollections) {
-        for (ProcessedClaimCollection cc : claimCollections) {
-            targetCollection.addAll(cc);
+        ProcessedClaimCollection resultClaimCollection = null;
+        if (collection != null) {
+            resultClaimCollection = (ProcessedClaimCollection)collection.clone();
+            for (ProcessedClaimCollection cc : claimCollections) {
+                resultClaimCollection.addAll(cc);
+            }
         }
-        return targetCollection;
+        return resultClaimCollection;
     }
 
     /**
@@ -94,7 +107,7 @@ public class ClaimUtils {
     }
 
     /**
-     * @param processedClaims Collection of claims to be mapped to a differnt claim type
+     * @param processedClaims Collection of claims to be mapped to a different claim type
      * @param map Map of old:new claim types
      * @param keepUnmapped if set to false only claims with a claim type contained in the map will be
      *            returned. If set to false claims with an unmapped claim type will also be returned.
@@ -122,6 +135,10 @@ public class ClaimUtils {
     }
 
     /**
+     * Mapping all values from the given claim according to the provided map. Input claims will not be
+     * modified. Result claim will be a clone of the provided claims just with different (mapped) claim
+     * values.
+     * 
      * @param processedClaim Claim providing values to be mapped
      * @param map Map of old:new mapping values
      * @param keepUnmapped if set to false only values contained in the map will be returned. If set to true,
@@ -129,14 +146,15 @@ public class ClaimUtils {
      * @return Returns the provided claim with mapped values
      */
     public ProcessedClaim mapValues(ProcessedClaim processedClaim, Map<Object, Object> mapping, boolean keepUnmapped) {
-
+        ProcessedClaim resultClaim = null;
         if (processedClaim != null) {
-            List<Object> values = processedClaim.getValues();
+            resultClaim = processedClaim.clone();
+            List<Object> values = resultClaim.getValues();
             List<Object> mappedValues = new ArrayList<Object>();
 
             if (values == null || mapping == null || mapping.size() == 0) {
-                processedClaim.setValues(mappedValues);
-                return processedClaim;
+                resultClaim.setValues(mappedValues);
+                return resultClaim;
             }
 
             for (Object value : values) {
@@ -147,25 +165,31 @@ public class ClaimUtils {
                     mappedValues.add(value);
                 }
             }
-            processedClaim.setValues(mappedValues);
+            resultClaim.setValues(mappedValues);
         }
-        return processedClaim;
+        return resultClaim;
     }
-    
+
     /**
-     * @param processedClaim Claim containing arbitrary values 
+     * Filtering all values from the given claim according to the provided regex filter. Input claims will not
+     * be modified. Result claim will be a clone of the provided claims just possible fewer (filtered) claim
+     * values.
+     * 
+     * @param processedClaim Claim containing arbitrary values
      * @param filter Regex filter to be used to match with claim values
-     * @return Returns a claim containing only values from the processedClaim which matched the provided filter
+     * @return Returns a claim containing only values from the processedClaim which matched the provided
+     *         filter
      */
     public ProcessedClaim filterValues(ProcessedClaim processedClaim, String filter) {
-
+        ProcessedClaim resultClaim = null;
         if (processedClaim != null) {
-            List<Object> values = processedClaim.getValues();
+            resultClaim = processedClaim.clone();
+            List<Object> values = resultClaim.getValues();
             List<Object> filteredValues = new ArrayList<Object>();
 
             if (values == null || filter == null) {
-                processedClaim.setValues(filteredValues);
-                return processedClaim;
+                resultClaim.setValues(filteredValues);
+                return resultClaim;
             }
 
             for (Object value : values) {
@@ -173,19 +197,22 @@ public class ClaimUtils {
                     filteredValues.add(value);
                 }
             }
-            processedClaim.setValues(filteredValues);
+            resultClaim.setValues(filteredValues);
         }
-        return processedClaim;
+        return resultClaim;
     }
 
     /**
-     * @param processedClaims Collection of claims containing claims with claim types of listed <code>claimType</code>
-     *            array
+     * Merges the first value (only) from different claim types in a collection to a new claim type separated
+     * by the provided delimiter.
+     * 
+     * @param processedClaims Collection of claims containing claims with claim types of listed
+     *            <code>claimType</code> array
      * @param targetClaimType claim type URI of merged result claim
      * @param delimiter Delimiter added between multiple claim types. Value can be <code>null</code>.
-     * @param processedClaimType URIs of claim types to be merged. Merging will be in the same order as the provided
-     *            claim type URIs. If a claim type is not found in the collection this claim type will be
-     *            omitted.
+     * @param processedClaimType URIs of claim types to be merged. Merging will be in the same order as the
+     *            provided claim type URIs. If a claim type is not found in the collection this claim type
+     *            will be omitted.
      * @return Returns merged claim of all found claim types
      */
     public ProcessedClaim merge(ProcessedClaimCollection processedClaims, String targetClaimType, String delimiter,
@@ -222,7 +249,9 @@ public class ClaimUtils {
      * @return Returns updated claim
      */
     public ProcessedClaim setType(ProcessedClaim processedClaim, String processedClaimTypeURI) {
-        processedClaim.setClaimType(URI.create(processedClaimTypeURI));
+        if (processedClaim != null && processedClaimTypeURI != null) {
+            processedClaim.setClaimType(URI.create(processedClaimTypeURI));
+        }
         return processedClaim;
     }
 
@@ -234,57 +263,71 @@ public class ClaimUtils {
      * 
      * @param processedClaims Collection of claims to be updated
      * @param issuerName Issuer to be set for all claims within the collection
-     * @return Returns updated claim collection
+     * @return Returns a new claim collection with clones of updated claims
      */
     public ProcessedClaimCollection updateIssuer(ProcessedClaimCollection processedClaims, String newIssuer) {
-        for (ProcessedClaim c : processedClaims) {
-            if (c.getOriginalIssuer() == null) {
-                c.setOriginalIssuer(c.getIssuer());
+        ProcessedClaimCollection resultClaimCollection = null;
+        if (processedClaims != null) {
+            resultClaimCollection = new ProcessedClaimCollection();
+            for (ProcessedClaim c : processedClaims) {
+                ProcessedClaim newClaim = c.clone();
+                if (newClaim.getOriginalIssuer() == null) {
+                    newClaim.setOriginalIssuer(newClaim.getIssuer());
+                }
+                newClaim.setIssuer(newIssuer);
+                resultClaimCollection.add(newClaim);
             }
-            c.setIssuer(newIssuer);
         }
-        return processedClaims;
+        return resultClaimCollection;
     }
 
     /**
-     * @param processedClaim values of this claim will be transformed to uppercase format
-     * @return Returns claim with values all in uppercase format
+     * @param processedClaim values of this claim will be used for result claim
+     * @return Returns clone of the provided claim with values all in uppercase format
      */
     public ProcessedClaim upperCaseValues(ProcessedClaim processedClaim) {
-        if (processedClaim != null && processedClaim.getValues() != null) {
-            List<Object> oldValues = processedClaim.getValues();
-            List<Object> newValues = new ArrayList<Object>();
-            for (Object value : oldValues) {
-                newValues.add(value.toString().toUpperCase());
+        ProcessedClaim resultClaim = null;
+        if (processedClaim != null) {
+            resultClaim = processedClaim.clone();
+            if (resultClaim.getValues() != null) {
+                List<Object> oldValues = resultClaim.getValues();
+                List<Object> newValues = new ArrayList<Object>();
+                for (Object value : oldValues) {
+                    newValues.add(value.toString().toUpperCase());
+                }
+                resultClaim.getValues().clear();
+                resultClaim.getValues().addAll(newValues);
             }
-            processedClaim.getValues().clear();
-            processedClaim.getValues().addAll(newValues);
         }
-        return processedClaim;
+        return resultClaim;
     }
 
     /**
-     * @param processedClaim values of this claim will be transformed to lowercase format
-     * @return Returns claim with values all in lowercase format
+     * @param processedClaim values of this claim will be used for result claim
+     * @return Returns clone of provided claim with values all in lowercase format
      */
     public ProcessedClaim lowerCaseValues(ProcessedClaim processedClaim) {
-        if (processedClaim != null && processedClaim.getValues() != null) {
-            List<Object> oldValues = processedClaim.getValues();
-            List<Object> newValues = new ArrayList<Object>();
-            for (Object value : oldValues) {
-                newValues.add(value.toString().toLowerCase());
+        ProcessedClaim resultClaim = null;
+        if (processedClaim != null) {
+            resultClaim = processedClaim.clone();
+            if (resultClaim.getValues() != null) {
+                List<Object> oldValues = resultClaim.getValues();
+                List<Object> newValues = new ArrayList<Object>();
+                for (Object value : oldValues) {
+                    newValues.add(value.toString().toLowerCase());
+                }
+                resultClaim.getValues().clear();
+                resultClaim.getValues().addAll(newValues);
             }
-            processedClaim.getValues().clear();
-            processedClaim.getValues().addAll(newValues);
         }
-        return processedClaim;
+        return resultClaim;
     }
 
     /**
      * @param processedClaim Claim providing values to be wrapped
      * @param prefix Prefix to be added to each claim value. Can be null.
      * @param suffix Suffix to be appended to each claim value. Can be null.
-     * @return Returns the provided claim with wrapped values
+     * @return Returns a clone of the the provided claim with wrapped values
      */
     public ProcessedClaim wrapValues(ProcessedClaim processedClaim, String prefix, String suffix) {
         prefix = (prefix == null)
@@ -293,75 +336,83 @@ public class ClaimUtils {
         suffix = (suffix == null)
             ? ""
             : suffix;
-        if (processedClaim != null && processedClaim.getValues() != null) {
-            List<Object> oldValues = processedClaim.getValues();
-            List<Object> newValues = new ArrayList<Object>();
-            for (Object value : oldValues) {
-                newValues.add(prefix + value.toString() + suffix);
+        ProcessedClaim resultClaim = null;
+        if (processedClaim != null) {
+            resultClaim = processedClaim.clone();
+            if (resultClaim.getValues() != null) {
+                List<Object> oldValues = resultClaim.getValues();
+                List<Object> newValues = new ArrayList<Object>();
+                for (Object value : oldValues) {
+                    newValues.add(prefix + value.toString() + suffix);
+                }
+                resultClaim.getValues().clear();
+                resultClaim.getValues().addAll(newValues);
             }
-            processedClaim.getValues().clear();
-            processedClaim.getValues().addAll(newValues);
         }
-        return processedClaim;
+        return resultClaim;
     }
 
     /**
      * This function is especially useful if multi values from a claim are stored within a single value entry.
-     * 
      * For example multi user roles could all be stored in a single value element separated by comma:
-     * USER,MANAGER,ADMIN 
-     * The result of this function will provide a claim with three distinct values: 
-     * USER and MANAGER and ADMIN.
+     * USER,MANAGER,ADMIN The result of this function will provide a claim with three distinct values: USER
+     * and MANAGER and ADMIN.
      * 
      * @param processedClaim claim containing multi-values in a single value entry
      * @param delimiter Delimiter to split multi-values into single values
-     * @return Returns a Processed Claim containing only single values per value entry
+     * @return Returns a clone of the provided claim containing only single values per value entry
      */
     public ProcessedClaim singleToMultiValue(ProcessedClaim processedClaim, String delimiter) {
-        if (processedClaim != null && processedClaim.getValues() != null) {
-            List<Object> oldValues = processedClaim.getValues();
-            List<Object> newValues = new ArrayList<Object>();
-            for (Object value : oldValues) {
-                String multivalue = value.toString();
-                StringTokenizer st = new StringTokenizer(multivalue, delimiter);
-                while (st.hasMoreTokens()) {
-                    newValues.add(st.nextToken());
+        ProcessedClaim resultClaim = null;
+        if (processedClaim != null) {
+            resultClaim = processedClaim.clone();
+            if (resultClaim.getValues() != null) {
+                List<Object> oldValues = resultClaim.getValues();
+                List<Object> newValues = new ArrayList<Object>();
+                for (Object value : oldValues) {
+                    String multivalue = value.toString();
+                    StringTokenizer st = new StringTokenizer(multivalue, delimiter);
+                    while (st.hasMoreTokens()) {
+                        newValues.add(st.nextToken());
+                    }
                 }
+                resultClaim.getValues().clear();
+                resultClaim.getValues().addAll(newValues);
             }
-            processedClaim.getValues().clear();
-            processedClaim.getValues().addAll(newValues);
         }
-        return processedClaim;
+        return resultClaim;
     }
-    
+
     /**
      * This function is especially useful if values from multiple claim values need to be condensed into a
-     * single value element. 
-     * 
-     * For example a user has three roles: USER and MANAGER and ADMIN. If ',' is used as a delimiter, 
-     * then this method would provide the following claim with only a single value looking like this:
-     * USER,MANAGER,ADMIN
+     * single value element. For example a user has three roles: USER and MANAGER and ADMIN. If ',' is used as
+     * a delimiter, then this method would provide the following claim with only a single value looking like
+     * this: USER,MANAGER,ADMIN
      * 
      * @param processedClaim claim containing multi-values
      * @param delimiter Delimiter to concatenate multi-values into a single value
-     * @return Returns a Processed Claim containing only one single value
+     * @return Returns a clone of the provided claim containing only one single value
      */
     public ProcessedClaim multiToSingleValue(ProcessedClaim processedClaim, String delimiter) {
-        if (processedClaim != null && processedClaim.getValues() != null) {
-            List<Object> oldValues = processedClaim.getValues();
-            boolean first = true;
-            StringBuilder sb = new StringBuilder();
-            for (Object value : oldValues) {
-                if (first) {
-                    sb.append(value);
-                    first = false;
-                } else {
-                    sb.append(delimiter).append(value);
+        ProcessedClaim resultClaim = null;
+        if (processedClaim != null) {
+            resultClaim = processedClaim.clone();
+            if (resultClaim.getValues() != null) {
+                List<Object> oldValues = resultClaim.getValues();
+                boolean first = true;
+                StringBuilder sb = new StringBuilder();
+                for (Object value : oldValues) {
+                    if (first) {
+                        sb.append(value);
+                        first = false;
+                    } else {
+                        sb.append(delimiter).append(value);
+                    }
                 }
+                resultClaim.getValues().clear();
+                resultClaim.getValues().add(sb.toString());
             }
-            processedClaim.getValues().clear();
-            processedClaim.getValues().add(sb.toString());
         }
-        return processedClaim;
+        return resultClaim;
     }
 }
