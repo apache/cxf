@@ -191,10 +191,10 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
     
     @Test
     public void testValueFilter() throws IOException {
-        ProcessedClaimCollection result = jcm.mapClaims("A", createClaimCollection(), "B", createProperties());
+        ClaimCollection result = jcm.mapClaims("A", createClaimCollection(), "B", createProperties());
 
         assertNotNull(result);
-        ProcessedClaim claim = findClaim(result, "http://my.schema.org/identity/claims/filter");
+        Claim claim = findClaim(result, "http://my.schema.org/identity/claims/filter");
         assertEquals(2, claim.getValues().size());
         assertTrue(claim.getValues().contains("match"));
         assertTrue(claim.getValues().contains("second_match"));
