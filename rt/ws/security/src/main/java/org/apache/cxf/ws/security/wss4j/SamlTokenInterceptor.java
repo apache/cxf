@@ -144,15 +144,16 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                             }
                         }
                         
-                        Principal principal = 
-                            (Principal)samlResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                        message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, principal);                   
-                        
-                        SecurityContext sc = message.get(SecurityContext.class);
-                        if (sc == null || sc.getUserPrincipal() == null) {
-                            message.put(SecurityContext.class, new DefaultSecurityContext(principal, null));
+                        if (signed) {
+                            Principal principal = 
+                                (Principal)samlResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                            message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, principal);                   
+                            
+                            SecurityContext sc = message.get(SecurityContext.class);
+                            if (sc == null || sc.getUserPrincipal() == null) {
+                                message.put(SecurityContext.class, new DefaultSecurityContext(principal, null));
+                            }
                         }
-
                     }
                 } catch (WSSecurityException ex) {
                     throw new Fault(ex);
