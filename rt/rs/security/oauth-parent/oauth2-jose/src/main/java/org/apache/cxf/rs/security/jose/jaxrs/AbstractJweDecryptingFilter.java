@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.Properties;
 
+import javax.crypto.SecretKey;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -32,6 +34,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.AesGcmContentDecryptionAlgorithm;
+import org.apache.cxf.rs.security.jose.jwe.DirectKeyJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
@@ -77,27 +80,35 @@ public class AbstractJweDecryptingFilter {
         try {
             KeyDecryptionAlgorithm keyDecryptionProvider = null;
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
+            String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
+            SecretKey ctDecryptionKey = null;
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
-                keyDecryptionProvider = JweUtils.getKeyDecryptionAlgorithm(jwk,
-                                                                           getKeyEncryptionAlgo(props, 
-                                                                                                jwk.getAlgorithm()));
+                String keyEncryptionAlgo = getKeyEncryptionAlgo(props, jwk.getAlgorithm());
+                if ("direct".equals(keyEncryptionAlgo)) {
+                    contentEncryptionAlgo = getContentEncryptionAlgo(props, contentEncryptionAlgo);
+                    ctDecryptionKey = JweUtils.getContentDecryptionSecretKey(jwk, contentEncryptionAlgo);
+                } else {
+                    keyDecryptionProvider = JweUtils.getKeyDecryptionAlgorithm(jwk, keyEncryptionAlgo);
+                }
             } else {
                 keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(
                     (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER));
             }
-            if (keyDecryptionProvider == null) {
+            if (keyDecryptionProvider == null && ctDecryptionKey == null) {
                 throw new SecurityException();
             }
-            String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
-            boolean isAesHmac = Algorithm.isAesCbcHmac(contentEncryptionAlgo);
-            if (isAesHmac) { 
-                return new AesCbcHmacJweDecryption(keyDecryptionProvider, contentEncryptionAlgo);
+            if (keyDecryptionProvider != null) {
+                if (Algorithm.isAesCbcHmac(contentEncryptionAlgo)) { 
+                    return new AesCbcHmacJweDecryption(keyDecryptionProvider, contentEncryptionAlgo);
+                } else {
+                    return new WrappedKeyJweDecryption(keyDecryptionProvider, 
+                                                       new AesGcmContentDecryptionAlgorithm(contentEncryptionAlgo));
+                }
             } else {
-                return new WrappedKeyJweDecryption(keyDecryptionProvider, 
-                                                   new AesGcmContentDecryptionAlgorithm(contentEncryptionAlgo));
+                return new DirectKeyJweDecryption(ctDecryptionKey, 
+                                                  new AesGcmContentDecryptionAlgorithm(contentEncryptionAlgo));
             }
-            
         } catch (SecurityException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -109,7 +120,9 @@ public class AbstractJweDecryptingFilter {
     private String getKeyEncryptionAlgo(Properties props, String algo) {
         return algo == null ? props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP) : algo;
     }
-
+    private String getContentEncryptionAlgo(Properties props, String algo) {
+        return algo == null ? props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP) : algo;
+    }
     public String getDefaultMediaType() {
         return defaultMediaType;
     }
