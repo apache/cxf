@@ -39,7 +39,6 @@ public class JexlClaimsMapper implements ClaimsMapper {
     private static final Logger LOG = LogUtils.getL7dLogger(JexlClaimsMapper.class);
 
     JexlEngine jexl = new JexlEngine();
-    JexlContext context = new MapContext();
     private Script script;
 
     public JexlClaimsMapper() {
@@ -62,6 +61,7 @@ public class JexlClaimsMapper implements ClaimsMapper {
 
     public ProcessedClaimCollection mapClaims(String sourceRealm, ProcessedClaimCollection sourceClaims,
         String targetRealm, ClaimsParameters parameters) {
+        JexlContext context = new MapContext();
         context.set("sourceClaims", sourceClaims);
         context.set("targetClaims", new ProcessedClaimCollection());
         context.set("sourceRealm", sourceRealm);
