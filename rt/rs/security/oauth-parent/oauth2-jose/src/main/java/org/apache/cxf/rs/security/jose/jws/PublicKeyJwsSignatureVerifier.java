@@ -28,12 +28,18 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     private PublicKey key;
     private AlgorithmParameterSpec signatureSpec;
+    private String supportedAlgo;
+    
     public PublicKeyJwsSignatureVerifier(PublicKey key) {
         this(key, null);
     }
-    public PublicKeyJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec) {
+    public PublicKeyJwsSignatureVerifier(PublicKey key, String supportedAlgorithm) {
+        this(key, null, supportedAlgorithm);
+    }
+    public PublicKeyJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, String supportedAlgo) {
         this.key = key;
         this.signatureSpec = spec;
+        this.supportedAlgo = supportedAlgo;
     }
     @Override
     public boolean verify(JwtHeaders headers, String unsignedText, byte[] signature) {
@@ -41,12 +47,22 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
             return CryptoUtils.verifySignature(unsignedText.getBytes("UTF-8"), 
                                                signature, 
                                                key, 
-                                               Algorithm.toJavaName(headers.getAlgorithm()),
+                                               Algorithm.toJavaName(checkAlgorithm(headers.getAlgorithm())),
                                                signatureSpec);
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
-    
+    protected String checkAlgorithm(String algo) {
+        if (algo == null 
+            || !isValidAlgorithmFamily(algo)
+            || supportedAlgo != null && !supportedAlgo.equals(algo)) {
+            throw new SecurityException();
+        }
+        return algo;
+    }
+    protected boolean isValidAlgorithmFamily(String algo) {
+        return Algorithm.isRsaShaSign(algo);
+    }
 
 }

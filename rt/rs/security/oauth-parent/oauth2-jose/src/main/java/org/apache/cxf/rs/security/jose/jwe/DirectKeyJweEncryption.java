@@ -18,17 +18,11 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import javax.crypto.SecretKey;
-
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public class DirectKeyJweEncryption extends AbstractJweEncryption {
-    public DirectKeyJweEncryption(SecretKey cek, byte[] iv) {
-        this(new JweHeaders(Algorithm.toJwtName(cek.getAlgorithm(),
-                                                cek.getEncoded().length * 8)), cek.getEncoded(), iv);
-    }
-    public DirectKeyJweEncryption(JweHeaders headers, byte[] cek, byte[] iv) {
-        this(headers, new AesGcmContentEncryptionAlgorithm(cek, iv, headers.getContentEncryptionAlgorithm()));
+    
+    public DirectKeyJweEncryption(ContentEncryptionAlgorithm ceAlgo) {
+        this(new JweHeaders(ceAlgo.getAlgorithm()), ceAlgo);
     }
     public DirectKeyJweEncryption(JweHeaders headers, ContentEncryptionAlgorithm ceAlgo) {
         super(headers, ceAlgo, new DirectKeyEncryptionAlgorithm());

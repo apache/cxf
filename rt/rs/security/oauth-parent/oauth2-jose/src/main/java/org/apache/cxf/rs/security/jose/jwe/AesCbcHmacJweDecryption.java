@@ -24,14 +24,21 @@ import java.util.Arrays;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
+import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public class AesCbcHmacJweDecryption extends AbstractJweDecryption {
+    private String supportedAlgo;
     public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo) {
         this(keyDecryptionAlgo, null);
     }
+    public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo, String supportedAlgo) {
+        this(keyDecryptionAlgo, supportedAlgo, null);
+    }
     public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
+                                   String supportedAlgo,
                                    JoseHeadersReader reader) {
         super(reader, keyDecryptionAlgo, new AesCbcContentDecryptionAlgorithm());
+        this.supportedAlgo = null;
     }
     protected JweDecryptionOutput doDecrypt(JweCompactConsumer consumer, byte[] cek) {
         validateAuthenticationTag(consumer, cek);
@@ -39,6 +46,7 @@ public class AesCbcHmacJweDecryption extends AbstractJweDecryption {
     }
     @Override
     protected byte[] getActualCek(byte[] theCek, String algoJwt) {
+        validateCekAlgorithm(algoJwt);
         return AesCbcHmacJweEncryption.doGetActualCek(theCek, algoJwt);
     }
     protected void validateAuthenticationTag(JweCompactConsumer consumer, byte[] theCek) {
@@ -67,9 +75,15 @@ public class AesCbcHmacJweDecryption extends AbstractJweDecryption {
             return null;
         }
         @Override
-        public byte[] getEncryptedSequence(byte[] cipher, byte[] authTag) {
+        public byte[] getEncryptedSequence(JweHeaders headers, byte[] cipher, byte[] authTag) {
             return cipher;
         }
     }
-    
+    private String validateCekAlgorithm(String cekAlgo) {
+        if (!Algorithm.isAesCbcHmac(cekAlgo) 
+            || supportedAlgo != null && !supportedAlgo.equals(cekAlgo)) {
+            throw new SecurityException();
+        }
+        return cekAlgo;
+    }
 }

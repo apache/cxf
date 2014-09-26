@@ -31,6 +31,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
+import org.apache.cxf.rs.security.jose.jwe.AesGcmContentDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
@@ -45,6 +46,7 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 public class AbstractJweDecryptingFilter {
     private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
     private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
+    private static final String JSON_WEB_ENCRYPTION_KEY_ALGO_PROP = "rs.security.jwe.key.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";    
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
@@ -77,7 +79,9 @@ public class AbstractJweDecryptingFilter {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
-                keyDecryptionProvider = JweUtils.getKeyDecryptionAlgorithm(jwk);
+                keyDecryptionProvider = JweUtils.getKeyDecryptionAlgorithm(jwk,
+                                                                           getKeyEncryptionAlgo(props, 
+                                                                                                jwk.getAlgorithm()));
             } else {
                 keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(
                     (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER));
@@ -88,9 +92,10 @@ public class AbstractJweDecryptingFilter {
             String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
             boolean isAesHmac = Algorithm.isAesCbcHmac(contentEncryptionAlgo);
             if (isAesHmac) { 
-                return new AesCbcHmacJweDecryption(keyDecryptionProvider);
+                return new AesCbcHmacJweDecryption(keyDecryptionProvider, contentEncryptionAlgo);
             } else {
-                return new WrappedKeyJweDecryption(keyDecryptionProvider);
+                return new WrappedKeyJweDecryption(keyDecryptionProvider, 
+                                                   new AesGcmContentDecryptionAlgorithm(contentEncryptionAlgo));
             }
             
         } catch (SecurityException ex) {
@@ -99,6 +104,10 @@ public class AbstractJweDecryptingFilter {
             throw new SecurityException(ex);
         }
         
+    }
+    
+    private String getKeyEncryptionAlgo(Properties props, String algo) {
+        return algo == null ? props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP) : algo;
     }
 
     public String getDefaultMediaType() {

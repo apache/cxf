@@ -19,9 +19,6 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.crypto.Mac;
 
@@ -31,10 +28,6 @@ import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
 
 public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
-    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.HmacSHA256.getJwtName(),
-                      Algorithm.HmacSHA384.getJwtName(),
-                      Algorithm.HmacSHA512.getJwtName())); 
     private byte[] key;
     private AlgorithmParameterSpec hmacSpec;
     
@@ -42,12 +35,12 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
         this(key, null, algo);
     }
     public HmacJwsSignatureProvider(byte[] key, AlgorithmParameterSpec spec, String algo) {
-        super(SUPPORTED_ALGORITHMS, algo);
+        super(algo);
         this.key = key;
         this.hmacSpec = spec;
     }
     public HmacJwsSignatureProvider(String encodedKey, String algo) {
-        super(SUPPORTED_ALGORITHMS, algo);
+        super(algo);
         try {
             this.key = Base64UrlUtility.decode(encodedKey);
         } catch (Base64Exception ex) {
@@ -72,5 +65,11 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
             
         };
     }
-
+    @Override
+    protected void checkAlgorithm(String algo) {
+        super.checkAlgorithm(algo);
+        if (!Algorithm.isHmacSign(algo)) {
+            throw new SecurityException();
+        }
+    }
 }

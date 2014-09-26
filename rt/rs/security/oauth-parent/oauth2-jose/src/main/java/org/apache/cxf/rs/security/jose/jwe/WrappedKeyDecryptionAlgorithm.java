@@ -28,11 +28,16 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     private Key cekDecryptionKey;
     private boolean unwrap;
+    private String supportedAlgo;
     public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey) {    
-        this(cekDecryptionKey, true);
+        this(cekDecryptionKey, null);
     }
-    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, boolean unwrap) {    
+    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, String supportedAlgo) {    
+        this(cekDecryptionKey, supportedAlgo, true);
+    }
+    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, String supportedAlgo, boolean unwrap) {    
         this.cekDecryptionKey = cekDecryptionKey;
+        this.supportedAlgo = supportedAlgo;
         this.unwrap = unwrap;
     }
     public byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer) {
@@ -60,7 +65,13 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
         return -1;
     }
     protected String getKeyEncryptionAlgorithm(JweCompactConsumer consumer) {
-        return Algorithm.toJavaName(consumer.getJweHeaders().getKeyEncryptionAlgorithm());
+        String keyAlgo = consumer.getJweHeaders().getKeyEncryptionAlgorithm();
+        return Algorithm.toJavaName(keyAlgo);
+    }
+    protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
+        if (keyAlgo == null || supportedAlgo != null && supportedAlgo.equals(keyAlgo)) {
+            throw new SecurityException();
+        }
     }
     protected String getContentEncryptionAlgorithm(JweCompactConsumer consumer) {
         return Algorithm.toJavaName(consumer.getJweHeaders().getContentEncryptionAlgorithm());

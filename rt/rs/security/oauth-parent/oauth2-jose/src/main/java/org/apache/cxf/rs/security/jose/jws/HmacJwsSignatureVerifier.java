@@ -30,20 +30,29 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
 public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     private byte[] key;
     private AlgorithmParameterSpec hmacSpec;
+    private String supportedAlgo;
     
     public HmacJwsSignatureVerifier(byte[] key) {
         this(key, null);
     }
     public HmacJwsSignatureVerifier(byte[] key, AlgorithmParameterSpec spec) {
+        this(key, spec, null);
+    }
+    public HmacJwsSignatureVerifier(byte[] key, AlgorithmParameterSpec spec, String supportedAlgo) {
         this.key = key;
         this.hmacSpec = spec;
+        this.supportedAlgo = supportedAlgo;
     }
     public HmacJwsSignatureVerifier(String encodedKey) {
+        this(encodedKey, null);
+    }
+    public HmacJwsSignatureVerifier(String encodedKey, String supportedAlgo) {
         try {
             this.key = Base64UrlUtility.decode(encodedKey);
         } catch (Base64Exception ex) {
             throw new SecurityException();
         }
+        this.supportedAlgo = supportedAlgo;
     }
     
     @Override
@@ -54,9 +63,17 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     
     private byte[] computeMac(JwtHeaders headers, String text) {
         return HmacUtils.computeHmac(key, 
-                                     Algorithm.toJavaName(headers.getAlgorithm()),
+                                     Algorithm.toJavaName(checkAlgorithm(headers.getAlgorithm())),
                                      hmacSpec,
                                      text);
     }
     
+    protected String checkAlgorithm(String algo) {
+        if (algo == null 
+            || !Algorithm.isHmacSign(algo)
+            || supportedAlgo != null && !supportedAlgo.equals(algo)) {
+            throw new SecurityException();
+        }
+        return algo;
+    }
 }

@@ -21,18 +21,10 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.security.SecureRandom;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
-    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.SHA256withECDSA.getJwtName(),
-                      Algorithm.SHA384withECDSA.getJwtName(),
-                      Algorithm.SHA512withECDSA.getJwtName())); 
-    
     public EcDsaJwsSignatureProvider(ECPrivateKey key, String algo) {
         this(key, null, algo);
     }
@@ -41,6 +33,10 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
     }
     public EcDsaJwsSignatureProvider(ECPrivateKey key, SecureRandom random, AlgorithmParameterSpec spec, 
                                      String algo) {
-        super(key, random, spec, SUPPORTED_ALGORITHMS, algo);
+        super(key, random, spec, algo);
+    }
+    @Override
+    protected boolean isValidAlgorithmFamily(String algo) {
+        return Algorithm.isEcDsaSign(algo);
     }
 }

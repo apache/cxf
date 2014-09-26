@@ -28,13 +28,22 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey) {    
-        this(CryptoUtils.decodeSequence(encodedKey));
+        this(encodedKey, null);
+    }
+    public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey, String supportedAlgo) {    
+        this(CryptoUtils.decodeSequence(encodedKey), supportedAlgo);
     }
     public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey) {    
-        this(CryptoUtils.createSecretKeySpec(secretKey, Algorithm.AES_ALGO_JAVA));
+        this(secretKey, null);
+    }
+    public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey, String supportedAlgo) {    
+        this(CryptoUtils.createSecretKeySpec(secretKey, Algorithm.AES_ALGO_JAVA), supportedAlgo);
     }
     public AesGcmWrapKeyDecryptionAlgorithm(SecretKey secretKey) {    
-        super(secretKey, true);
+        this(secretKey, null);
+    }
+    public AesGcmWrapKeyDecryptionAlgorithm(SecretKey secretKey, String supportedAlgo) {    
+        super(secretKey, supportedAlgo);
     }
     @Override
     protected byte[] getEncryptedContentEncryptionKey(JweCompactConsumer consumer) {
@@ -52,6 +61,12 @@ public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgori
             return Base64UrlUtility.decode(ivHeader.toString());
         } catch (Exception ex) {
             throw new SecurityException(ex);
+        }
+    }
+    protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
+        super.validateKeyEncryptionAlgorithm(keyAlgo);
+        if (!Algorithm.isAesGcmKeyWrap(keyAlgo)) {
+            throw new SecurityException();
         }
     }
 }

@@ -18,10 +18,6 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
@@ -29,10 +25,6 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
 public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
-    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.A128GCM.getJwtName(),
-                      Algorithm.A192GCM.getJwtName(),
-                      Algorithm.A256GCM.getJwtName()));
     private static final int DEFAULT_IV_SIZE = 96;
     public AesGcmContentEncryptionAlgorithm(String algo) {
         this((byte[])null, null, algo);
@@ -50,7 +42,7 @@ public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionA
         return DEFAULT_IV_SIZE;
     }
     private static String checkAlgorithm(String algo) {
-        if (SUPPORTED_ALGORITHMS.contains(algo)) {       
+        if (Algorithm.isAesGcm(algo)) {       
             return algo;
         }
         throw new SecurityException();

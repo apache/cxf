@@ -20,5 +20,5 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 
 interface ContentDecryptionAlgorithm extends ContentEncryptionCipherProperties {
-    byte[] getEncryptedSequence(byte[] cipher, byte[] authTag);
+    byte[] getEncryptedSequence(JweHeaders headers, byte[] cipher, byte[] authTag);
 }
