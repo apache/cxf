@@ -257,7 +257,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         Relationship rs = new Relationship();
         JexlClaimsMapper claimsMapper = new JexlClaimsMapper();
         try {
-            claimsMapper.setScript("src/test/resources/jexlIssueSamlClaimsTest.script");
+            claimsMapper.setScript("jexlIssueSamlClaimsTest.script");
         } catch (IOException e) {
             fail(e.getMessage());
         }
