@@ -41,7 +41,8 @@ public final class Client {
         final HttpClient httpClient = new HttpClient();
                         
         uploadToCatalog(url, httpClient, "jsr339-jaxrs-2.0-final-spec.pdf");
-        uploadToCatalog(url, httpClient, "JavaWebSocketAPI_1.0_Final.pdf");              
+        uploadToCatalog(url, httpClient, "JavaWebSocketAPI_1.0_Final.pdf");
+        uploadToCatalog(url, httpClient, "apache-cxf-tika-lucene.odt");
         
         list(url, httpClient);        
         
@@ -52,6 +53,7 @@ public final class Client {
         search(url, httpClient, "ct==WebSockets");
         
         search(url, httpClient, "ct==jaxrs,source==*jaxrs*");
+        search(url, httpClient, "ct==tika");
         
         delete(url, httpClient);
     }

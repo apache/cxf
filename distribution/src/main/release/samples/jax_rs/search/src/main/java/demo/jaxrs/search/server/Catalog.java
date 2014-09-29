@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,11 +83,15 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.parser.odf.OpenDocumentParser;
 import org.apache.tika.parser.pdf.PDFParser;
 
 @Path("/catalog")
 public class Catalog {
-    private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());    
+    private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(
+        Arrays.< Parser >asList(new PDFParser(), new OpenDocumentParser()), 
+        new LuceneDocumentMetadata());    
     private final Directory directory = new RAMDirectory();
     private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);    
     private final Storage storage; 
