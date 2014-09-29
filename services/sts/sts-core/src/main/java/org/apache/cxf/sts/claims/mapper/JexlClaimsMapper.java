@@ -21,6 +21,7 @@ package org.apache.cxf.sts.claims.mapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -29,6 +30,7 @@ import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
 import org.apache.commons.jexl2.Script;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimsMapper;
@@ -38,19 +40,19 @@ public class JexlClaimsMapper implements ClaimsMapper {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JexlClaimsMapper.class);
 
-    JexlEngine jexl = new JexlEngine();
+    private JexlEngine jexlEngine = new JexlEngine();
     private Script script;
 
     public JexlClaimsMapper() {
         // jexl.setCache(512);
         // jexl.setLenient(false);
-        jexl.setSilent(false);
-        
+        jexlEngine.setSilent(false);
+
         Map<String, Object> functions = new HashMap<String, Object>();
         functions.put("claims", new ClaimUtils());
-        jexl.setFunctions(functions);
+        jexlEngine.setFunctions(functions);
     }
-    
+
     public JexlClaimsMapper(String script) throws IOException {
         this();
 
@@ -86,8 +88,21 @@ public class JexlClaimsMapper implements ClaimsMapper {
         this.script = script;
     }
 
-    public void setScript(String scriptPath) throws IOException {
-        this.script = jexl.createScript(new File(scriptPath));
+    public void setScript(String scriptLocation) throws IOException {
+        URL resource = ClassLoaderUtils.getResource(scriptLocation, this.getClass());
+        if (resource == null) {
+            throw new IllegalArgumentException("Script resource not found!");
+        }
+        
+        this.script = jexlEngine.createScript(new File(resource.getPath()));
+    }
+
+    public JexlEngine getJexlEngine() {
+        return jexlEngine;
+    }
+
+    public void setJexlEngine(JexlEngine jexl) {
+        this.jexlEngine = jexl;
     }
 
 }
