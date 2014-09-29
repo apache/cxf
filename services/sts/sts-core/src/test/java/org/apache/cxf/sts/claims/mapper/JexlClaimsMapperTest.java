@@ -48,9 +48,9 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
     public static Collection<Object[]> data() {
         Object[][] data = new Object[][] {
             {
-                "src/test/resources/jexlClaimMappingsWithoutFunctions.script"
+                "jexlClaimMappingsWithoutFunctions.script"
             }, {
-                "src/test/resources/jexlClaimMappingsWithFunctions.script"
+                "jexlClaimMappingsWithFunctions.script"
             }
         };
         return Arrays.asList(data);
