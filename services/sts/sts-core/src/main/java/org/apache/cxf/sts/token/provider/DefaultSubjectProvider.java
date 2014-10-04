@@ -21,8 +21,11 @@ package org.apache.cxf.sts.token.provider;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -173,8 +176,9 @@ public class DefaultSubjectProvider implements SubjectProvider {
             if (stsProperties.isValidateUseKey() && stsProperties.getSignatureCrypto() != null) {
                 if (receivedKey.getX509Cert() != null) {
                     try {
+                        Collection<Pattern> constraints = Collections.emptyList();
                         stsProperties.getSignatureCrypto().verifyTrust(
-                            new X509Certificate[]{receivedKey.getX509Cert()}, false, null);
+                            new X509Certificate[]{receivedKey.getX509Cert()}, false, constraints);
                     } catch (WSSecurityException e) {
                         LOG.log(Level.FINE, "Error in trust validation of UseKey: ", e);
                         throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);
