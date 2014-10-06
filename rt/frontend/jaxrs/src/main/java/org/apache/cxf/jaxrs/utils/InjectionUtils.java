@@ -1268,10 +1268,21 @@ public final class InjectionUtils {
         } else if (cls.isPrimitive()) {
             return PrimitiveUtils.read(value, cls);
         } else if (cls.isEnum()) {
-            if (m == null || !MessageUtils.getContextualBoolean(m, ENUM_CONVERSION_CASE_SENSITIVE, false)) {
-                value = value.toUpperCase();
+            if (m != null && !MessageUtils.getContextualBoolean(m, ENUM_CONVERSION_CASE_SENSITIVE, false)) {
+                obj = invokeValueOf(value.toUpperCase(), cls);
             }
-            return invokeValueOf(value, cls);
+            if (obj == null) {
+                try {
+                    obj = invokeValueOf(value, cls);
+                } catch (RuntimeException ex) {
+                    if (m == null) {
+                        obj = invokeValueOf(value.toUpperCase(), cls);
+                    } else {
+                        throw ex;
+                    }
+                }
+            }
+            return obj;
         } else {
             try {
                 Constructor<?> c = cls.getConstructor(new Class<?>[]{String.class});
