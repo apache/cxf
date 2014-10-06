@@ -16,11 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.common.util;
 
 import java.io.OutputStream;
-
-import org.apache.cxf.common.util.Base64OutputStream;
 
 public class Base64UrlOutputStream extends Base64OutputStream {
 
