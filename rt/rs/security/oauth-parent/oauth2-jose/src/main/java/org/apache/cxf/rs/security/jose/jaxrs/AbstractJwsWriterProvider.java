@@ -36,7 +36,6 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.PrivateKeyJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJwsWriterProvider {
     private static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
@@ -63,14 +62,14 @@ public class AbstractJwsWriterProvider {
             Properties props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
             JwsSignatureProvider theSigProvider = null; 
             String rsaSignatureAlgo = null;
-            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
+            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_SIGN);
                 rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
                 theSigProvider = JwsUtils.getSignatureProvider(jwk, rsaSignatureAlgo);
             } else {
                 rsaSignatureAlgo = getSignatureAlgo(props, null);
-                RSAPrivateKey pk = (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, 
-                                                              CryptoUtils.RSSEC_SIG_KEY_PSWD_PROVIDER);
+                RSAPrivateKey pk = (RSAPrivateKey)KeyManagementUtils.loadPrivateKey(m, props, 
+                    KeyManagementUtils.RSSEC_SIG_KEY_PSWD_PROVIDER);
                 theSigProvider = new PrivateKeyJwsSignatureProvider(pk, rsaSignatureAlgo);
             }
             if (theSigProvider == null) {

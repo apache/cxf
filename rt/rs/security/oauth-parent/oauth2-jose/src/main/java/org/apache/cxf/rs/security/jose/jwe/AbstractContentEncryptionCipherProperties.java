@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
+import org.apache.cxf.common.util.crypto.CryptoUtils;
 
 
 public abstract class AbstractContentEncryptionCipherProperties implements ContentEncryptionCipherProperties {

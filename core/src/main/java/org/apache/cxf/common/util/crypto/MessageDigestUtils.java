@@ -16,13 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.utils;
+package org.apache.cxf.common.util.crypto;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 /**
  * The utility Message Digest generator which can be used for generating
@@ -38,15 +36,11 @@ public final class MessageDigestUtils {
         
     }
         
-    public static String generate(byte[] input) throws OAuthServiceException {
+    public static String generate(byte[] input) {
         return generate(input, ALGO_MD5);
     }   
     
-    public static String generate(byte[] input, String algo) throws OAuthServiceException {    
-        if (input == null) {
-            throw new OAuthServiceException("You have to pass input to Token Generator");
-        }
-
+    public static String generate(byte[] input, String algo) {    
         try {
             byte[] messageDigest = createDigest(input, algo);
             StringBuffer hexString = new StringBuffer();
@@ -56,7 +50,7 @@ public final class MessageDigestUtils {
 
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new OAuthServiceException("server_error", e);
+            throw new SecurityException(e);
         }
     }
 
@@ -64,9 +58,9 @@ public final class MessageDigestUtils {
         try {
             return createDigest(input.getBytes("UTF-8"), algo);
         } catch (UnsupportedEncodingException e) {
-            throw new OAuthServiceException("server_error", e);
+            throw new SecurityException(e);
         } catch (NoSuchAlgorithmException e) {
-            throw new OAuthServiceException("server_error", e);
+            throw new SecurityException(e);
         }   
     }
     

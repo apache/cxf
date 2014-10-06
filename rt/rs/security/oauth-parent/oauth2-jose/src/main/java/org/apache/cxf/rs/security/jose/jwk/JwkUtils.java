@@ -32,9 +32,12 @@ import java.util.Properties;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
+import org.apache.cxf.rs.security.jose.jaxrs.PrivateKeyPasswordProvider;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption;
@@ -44,8 +47,6 @@ import org.apache.cxf.rs.security.jose.jwe.KeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.KeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyEncryptionAlgorithm;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.PrivateKeyPasswordProvider;
 
 public final class JwkUtils {
     public static final String JWK_KEY_STORE_TYPE = "jwk";
@@ -144,10 +145,10 @@ public final class JwkUtils {
     }
     public static JsonWebKeys loadJwkSet(Message m, Properties props, PrivateKeyPasswordProvider cb, 
                                          JwkReaderWriter reader) {
-        JsonWebKeys jwkSet = (JsonWebKeys)m.getExchange().get(props.get(CryptoUtils.RSSEC_KEY_STORE_FILE));
+        JsonWebKeys jwkSet = (JsonWebKeys)m.getExchange().get(props.get(KeyManagementUtils.RSSEC_KEY_STORE_FILE));
         if (jwkSet == null) {
             jwkSet = loadJwkSet(props, m.getExchange().getBus(), cb, reader);
-            m.getExchange().put((String)props.get(CryptoUtils.RSSEC_KEY_STORE_FILE), jwkSet);
+            m.getExchange().put((String)props.get(KeyManagementUtils.RSSEC_KEY_STORE_FILE), jwkSet);
         }
         return jwkSet;
     }
@@ -162,7 +163,7 @@ public final class JwkUtils {
     }
     public static JsonWebKeys loadJwkSet(Properties props, Bus bus, JweDecryptionProvider jwe, JwkReaderWriter reader) {
         String keyContent = null;
-        String keyStoreLoc = props.getProperty(CryptoUtils.RSSEC_KEY_STORE_FILE);
+        String keyStoreLoc = props.getProperty(KeyManagementUtils.RSSEC_KEY_STORE_FILE);
         if (keyStoreLoc != null) {
             try {
                 InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
@@ -193,23 +194,24 @@ public final class JwkUtils {
     }
     public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper, JwkReaderWriter reader) {
         PrivateKeyPasswordProvider cb = 
-            (PrivateKeyPasswordProvider)m.getContextualProperty(CryptoUtils.RSSEC_KEY_PSWD_PROVIDER);
+            (PrivateKeyPasswordProvider)m.getContextualProperty(KeyManagementUtils.RSSEC_KEY_PSWD_PROVIDER);
         if (cb == null && keyOper != null) {
-            String propName = keyOper.equals(JsonWebKey.KEY_OPER_SIGN) ? CryptoUtils.RSSEC_SIG_KEY_PSWD_PROVIDER
-                : keyOper.equals(JsonWebKey.KEY_OPER_ENCRYPT) ? CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER : null;
+            String propName = keyOper.equals(JsonWebKey.KEY_OPER_SIGN) ? KeyManagementUtils.RSSEC_SIG_KEY_PSWD_PROVIDER
+                : keyOper.equals(JsonWebKey.KEY_OPER_ENCRYPT) 
+                ? KeyManagementUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER : null;
             if (propName != null) {
                 cb = (PrivateKeyPasswordProvider)m.getContextualProperty(propName);
             }
         }
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
-        String kid = props.getProperty(CryptoUtils.RSSEC_KEY_STORE_ALIAS);
+        String kid = props.getProperty(KeyManagementUtils.RSSEC_KEY_STORE_ALIAS);
         if (kid == null && keyOper != null) {
             String keyIdProp = null;
             if (keyOper.equals(JsonWebKey.KEY_OPER_ENCRYPT)) {
-                keyIdProp = CryptoUtils.RSSEC_KEY_STORE_ALIAS + ".jwe";
+                keyIdProp = KeyManagementUtils.RSSEC_KEY_STORE_ALIAS + ".jwe";
             } else if (keyOper.equals(JsonWebKey.KEY_OPER_SIGN)
                        || keyOper.equals(JsonWebKey.KEY_OPER_VERIFY)) {
-                keyIdProp = CryptoUtils.RSSEC_KEY_STORE_ALIAS + ".jws";
+                keyIdProp = KeyManagementUtils.RSSEC_KEY_STORE_ALIAS + ".jws";
             }
             if (keyIdProp != null) {
                 kid = props.getProperty(keyIdProp);

@@ -27,11 +27,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.ModelEncryptionSupport;
 
 public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvider 

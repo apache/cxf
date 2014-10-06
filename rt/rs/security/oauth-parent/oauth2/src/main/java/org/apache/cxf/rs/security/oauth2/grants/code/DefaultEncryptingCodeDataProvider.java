@@ -25,10 +25,10 @@ import java.util.Set;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.oauth2.provider.DefaultEncryptingOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.ModelEncryptionSupport;
 
 public class DefaultEncryptingCodeDataProvider extends DefaultEncryptingOAuthDataProvider 

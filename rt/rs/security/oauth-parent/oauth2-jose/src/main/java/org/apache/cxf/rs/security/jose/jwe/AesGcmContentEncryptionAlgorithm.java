@@ -20,8 +20,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
 public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {

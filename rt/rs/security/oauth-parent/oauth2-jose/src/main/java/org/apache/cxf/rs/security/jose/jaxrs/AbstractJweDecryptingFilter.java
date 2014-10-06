@@ -44,7 +44,6 @@ import org.apache.cxf.rs.security.jose.jwe.RSAOaepKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.WrappedKeyJweDecryption;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJweDecryptingFilter {
     private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
@@ -82,7 +81,7 @@ public class AbstractJweDecryptingFilter {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
             SecretKey ctDecryptionKey = null;
-            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
+            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
                 String keyEncryptionAlgo = getKeyEncryptionAlgo(props, jwk.getAlgorithm());
                 if ("direct".equals(keyEncryptionAlgo)) {
@@ -93,7 +92,8 @@ public class AbstractJweDecryptingFilter {
                 }
             } else {
                 keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(
-                    (RSAPrivateKey)CryptoUtils.loadPrivateKey(m, props, CryptoUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER));
+                    (RSAPrivateKey)KeyManagementUtils.loadPrivateKey(
+                        m, props, KeyManagementUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER));
             }
             if (keyDecryptionProvider == null && ctDecryptionKey == null) {
                 throw new SecurityException();

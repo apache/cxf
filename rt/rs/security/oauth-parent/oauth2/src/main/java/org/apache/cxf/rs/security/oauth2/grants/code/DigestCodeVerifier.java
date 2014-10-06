@@ -19,7 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
-import org.apache.cxf.rs.security.oauth2.utils.MessageDigestUtils;
+import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 
 public class DigestCodeVerifier implements CodeVerifierTransformer {
 

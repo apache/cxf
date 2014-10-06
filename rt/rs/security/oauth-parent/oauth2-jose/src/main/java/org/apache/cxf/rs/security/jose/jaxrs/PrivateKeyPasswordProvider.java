@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.utils.crypto;
+package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.util.Properties;
 

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.utils.crypto;
+package org.apache.cxf.common.util.crypto;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -33,7 +33,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.Base64Utility;
-import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 public final class HmacUtils {
     
@@ -58,9 +57,9 @@ public final class HmacUtils {
         try {
             return provider == null ? Mac.getInstance(macAlgoJavaName) : Mac.getInstance(macAlgoJavaName, provider);
         } catch (NoSuchAlgorithmException e) {
-            throw new OAuthServiceException(e);
+            throw new SecurityException(e);
         } catch (NoSuchProviderException e) {
-            throw new OAuthServiceException(e);
+            throw new SecurityException(e);
         }
     }
     
@@ -68,7 +67,7 @@ public final class HmacUtils {
         try {
             return Mac.getInstance(macAlgoJavaName, provider);
         } catch (NoSuchAlgorithmException e) {
-            throw new OAuthServiceException(e);
+            throw new SecurityException(e);
         }
     }
     
@@ -90,7 +89,7 @@ public final class HmacUtils {
         try {
             return computeHmac(key.getBytes("UTF-8"), hmac, data);
         } catch (UnsupportedEncodingException e) {
-            throw new OAuthServiceException(e);
+            throw new SecurityException(e);
         }
     }
     
@@ -126,9 +125,9 @@ public final class HmacUtils {
                 hmac.init(secretKey, spec);
             }
         } catch (InvalidKeyException e) {
-            throw new OAuthServiceException(e);
+            throw new SecurityException(e);
         } catch (InvalidAlgorithmParameterException e) {
-            throw new OAuthServiceException(e);
+            throw new SecurityException(e);
         }
     }
     
@@ -137,7 +136,7 @@ public final class HmacUtils {
             KeyGenerator keyGen = KeyGenerator.getInstance(algo);
             return Base64Utility.encode(keyGen.generateKey().getEncoded());
         } catch (NoSuchAlgorithmException e) {
-            throw new OAuthServiceException(e);
+            throw new SecurityException(e);
         }
     }
     

@@ -29,6 +29,7 @@ import java.util.UUID;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.rs.security.oauth2.common.Client;

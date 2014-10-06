@@ -29,6 +29,8 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
