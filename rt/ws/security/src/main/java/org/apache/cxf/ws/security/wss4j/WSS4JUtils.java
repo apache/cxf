@@ -120,7 +120,7 @@ public final class WSS4JUtils {
     private static URL getConfigFileURL(Message message) {
         Object o = message.getContextualProperty(SecurityConstants.CACHE_CONFIG_FILE);
         if (o == null) {
-            o = "cxf-ehcache.xml";
+            o = "/cxf-ehcache.xml";
         }
         
         if (o instanceof String) {
