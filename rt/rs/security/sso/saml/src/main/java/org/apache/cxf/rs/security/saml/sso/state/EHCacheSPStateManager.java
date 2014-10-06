@@ -45,7 +45,7 @@ public class EHCacheSPStateManager implements SPStateManager {
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final String REQUEST_CACHE_KEY = "cxf.samlp.request.state.cache";
     public static final String RESPONSE_CACHE_KEY = "cxf.samlp.response.state.cache";
-    private static final String DEFAULT_CONFIG_URL = "cxf-samlp-ehcache.xml";
+    private static final String DEFAULT_CONFIG_URL = "/cxf-samlp-ehcache.xml";
     
     private Ehcache requestCache;
     private Ehcache responseCache;
