@@ -31,7 +31,6 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.PublicKeyJwsSignatureVerifier;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class AbstractJwsReaderProvider {
     private static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
@@ -62,14 +61,14 @@ public class AbstractJwsReaderProvider {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             JwsSignatureVerifier theVerifier = null;
             String rsaSignatureAlgo = null;
-            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
+            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_VERIFY);
                 rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
                 theVerifier = JwsUtils.getSignatureVerifier(jwk, rsaSignatureAlgo);
                 
             } else {
                 theVerifier = new PublicKeyJwsSignatureVerifier(
-                                  (RSAPublicKey)CryptoUtils.loadPublicKey(m, props));
+                                  (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props));
             }
             return theVerifier;
         } catch (SecurityException ex) {

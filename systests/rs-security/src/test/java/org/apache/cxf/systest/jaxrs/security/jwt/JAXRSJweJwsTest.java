@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.jose.jaxrs.JweClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
+import org.apache.cxf.rs.security.jose.jaxrs.PrivateKeyPasswordProvider;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption;
@@ -41,7 +42,6 @@ import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.PrivateKeyPasswordProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 

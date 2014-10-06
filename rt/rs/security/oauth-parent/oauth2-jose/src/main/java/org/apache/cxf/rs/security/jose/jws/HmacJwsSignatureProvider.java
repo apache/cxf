@@ -24,8 +24,8 @@ import javax.crypto.Mac;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.HmacUtils;
 
 public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
     private byte[] key;

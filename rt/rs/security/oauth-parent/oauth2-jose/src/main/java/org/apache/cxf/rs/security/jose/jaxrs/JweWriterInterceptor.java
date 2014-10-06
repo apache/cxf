@@ -57,7 +57,6 @@ import org.apache.cxf.rs.security.jose.jwe.RSAOaepKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.WrappedKeyJweEncryption;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 @Priority(Priorities.JWE_WRITE_PRIORITY)
 public class JweWriterInterceptor implements WriterInterceptor {
@@ -137,7 +136,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
             Properties props = ResourceUtils.loadProperties(propLoc, bus);
             String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
             ContentEncryptionAlgorithm ctEncryptionProvider = null;
-            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(CryptoUtils.RSSEC_KEY_STORE_TYPE))) {
+            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
                 keyEncryptionAlgo = getKeyEncryptionAlgo(props, jwk.getAlgorithm());
                 if ("direct".equals(keyEncryptionAlgo)) {
@@ -149,7 +148,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 
             } else {
                 keyEncryptionProvider = new RSAOaepKeyEncryptionAlgorithm(
-                    (RSAPublicKey)CryptoUtils.loadPublicKey(m, props), 
+                    (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props), 
                     getKeyEncryptionAlgo(props, keyEncryptionAlgo));
             }
             if (keyEncryptionProvider == null && ctEncryptionProvider == null) {

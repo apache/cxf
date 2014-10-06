@@ -26,10 +26,10 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactReaderWriterTest;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.AfterClass;

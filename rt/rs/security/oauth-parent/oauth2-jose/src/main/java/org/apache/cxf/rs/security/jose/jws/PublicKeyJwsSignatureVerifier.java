@@ -21,9 +21,9 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 
+import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     private PublicKey key;

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -35,7 +36,6 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
 
 
 public class OAuthDataProviderImpl implements OAuthDataProvider {
@@ -67,8 +67,6 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
         return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
     }
 
-    
-    
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
         return clients.get(clientId);

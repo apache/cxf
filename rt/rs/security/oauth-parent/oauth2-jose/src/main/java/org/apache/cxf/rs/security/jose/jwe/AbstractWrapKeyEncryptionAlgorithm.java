@@ -22,9 +22,9 @@ import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Set;
 
+import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
     private Key keyEncryptionKey;

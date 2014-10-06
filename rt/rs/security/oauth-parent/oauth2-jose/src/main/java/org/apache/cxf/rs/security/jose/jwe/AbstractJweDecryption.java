@@ -21,12 +21,12 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 
+import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.oauth2.utils.crypto.KeyProperties;
 
 public abstract class AbstractJweDecryption implements JweDecryptionProvider {
     private KeyDecryptionAlgorithm keyDecryptionAlgo;
