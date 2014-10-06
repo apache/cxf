@@ -45,7 +45,7 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     public static final String CACHE_KEY = "cxf.samlp.replay.cache";
-    private static final String DEFAULT_CONFIG_URL = "cxf-samlp-ehcache.xml";
+    private static final String DEFAULT_CONFIG_URL = "/cxf-samlp-ehcache.xml";
     
     private Ehcache cache;
     private CacheManager cacheManager;
