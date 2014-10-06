@@ -26,7 +26,6 @@ import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
-import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 public class JwsCompactConsumer {
     private JoseHeadersReader reader = new JoseHeadersReaderWriter();
@@ -46,7 +45,7 @@ public class JwsCompactConsumer {
             if (parts.length == 2 && encodedJws.endsWith(".")) {
                 encodedSignature = "";
             } else {
-                throw new OAuthServiceException("Invalid JWS Compact sequence");
+                throw new SecurityException("Invalid JWS Compact sequence");
             }
         } else {
             encodedSignature = parts[2];
