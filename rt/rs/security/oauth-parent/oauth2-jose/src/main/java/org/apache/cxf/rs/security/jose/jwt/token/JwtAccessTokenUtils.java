@@ -26,6 +26,7 @@ import org.apache.cxf.rs.security.jose.jwe.AesGcmContentEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.ContentEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.DirectKeyJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.DirectKeyJweEncryption;
+import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -45,11 +46,18 @@ public final class JwtAccessTokenUtils {
     public static ServerAccessToken toAccessToken(JwtToken jwt, 
                                                   Client client,
                                                   SecretKey key) {
-        String jwtString = new JwsJwtCompactProducer(jwt)
-                               .signWith(new NoneSignatureProvider());
         ContentEncryptionAlgorithm contentEncryption = 
             new AesGcmContentEncryptionAlgorithm(key, null, Algorithm.A128GCM.getJwtName());
         JweEncryptionProvider jweEncryption = new DirectKeyJweEncryption(contentEncryption);
+        return toAccessToken(jwt, client, jweEncryption);
+        
+    }
+    
+    public static ServerAccessToken toAccessToken(JwtToken jwt, 
+                                                  Client client,
+                                                  JweEncryptionProvider jweEncryption) {
+        String jwtString = new JwsJwtCompactProducer(jwt)
+                               .signWith(new NoneSignatureProvider());
         String tokenId = jweEncryption.encrypt(getBytes(jwtString), null);
         Long issuedAt = jwt.getClaims().getIssuedAt();
         Long notBefore = jwt.getClaims().getNotBefore();
@@ -71,6 +79,9 @@ public final class JwtAccessTokenUtils {
         DirectKeyJweDecryption jweDecryption = 
             new DirectKeyJweDecryption(key, 
                 new AesGcmContentDecryptionAlgorithm(Algorithm.A128GCM.getJwtName()));
+        return fromAccessTokenId(tokenId, jweDecryption);
+    }
+    public static JwtToken fromAccessTokenId(String tokenId, JweDecryptionProvider jweDecryption) {
         String decrypted = jweDecryption.decrypt(tokenId).getContentText();
         JwsJwtCompactConsumer consumer = new JwsJwtCompactConsumer(decrypted);
         return consumer.getJwtToken();
