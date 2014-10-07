@@ -1,4 +1,4 @@
-Apache CXF 2.6.14 Release Notes
+Apache CXF 2.6.16 Release Notes
 
 1. Overview
 
@@ -34,7 +34,9 @@ User applications may need to add additional dependencies into their
 applications in order to upgrade.
 
 
-2.6.14 fixes over 21 JIRA issues reported by users and the community.
+2.6.16 will be the last release on the 2.6.x line.  This release only
+fixes some problems that were found trying to use 2.6.14 with Java 5.
+
 
 
 
@@ -78,34 +80,7 @@ for caveats when upgrading from CXF 2.5.x to 2.6.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Sub-task
-    * [CXF-5623] - Failed to invoke WSDLToJava - is already defined
-
-** Bug
-    * [CXF-4910] - Bad handling of Schema imports (WSDLGetInterceptor)
-    * [CXF-5550] - CXF JAX-WS frontend DispatchImpl ignores setting of MessageContext.WSDL_OPERATION
-    * [CXF-5572] - EHCacheManagerHolder returning wrong CacheConfiguration
-    * [CXF-5596] - Schema element generated from exception class doesn't honor @XmlElement annotation
-    * [CXF-5598] - Header field name comparison not correct in CrossOriginResourceSharingFilter
-    * [CXF-5601] - Blueprint property placeholder does not work with http conduit configuration.
-    * [CXF-5602] - HttpServletRequestSnapshot is not created for requests with WSA ReplyTo prop set
-    * [CXF-5609] - Won't pass verification of explicit WSS Policy AsymmetricBinding -> Layout -> Policy -> Lax
-    * [CXF-5611] - [joda-time] different versions in maven and feature descriptor
-    * [CXF-5615] - MinResponseTime and AvgResponseTime are not correctly reset
-    * [CXF-5626] - MessageContext is lost when JAX-WS client is invoked from within a JAX-WS endpoint impl
-    * [CXF-5645] - wsp:Optional isn't adhered to for WS-RM policy in WSDL
-    * [CXF-5649] - Enable configuration for JMS message type  to be "byte" when use MTOM
-
-** Improvement
-    * [CXF-5584] - Don't cache IssuedTokens on the service side
-    * [CXF-5586] - Minimize the logging noise of the load-balancing feature
-    * [CXF-5597] - Setup the ResourceResolver for BlueprintBus
-    * [CXF-5610] - Jetty transport should warn the user if the endpoint address conflicts with published service
-    * [CXF-5635] - Optimize Logging interceptors
-    * [CXF-5673] - support xbean asm5 shade
-
-** Task
-    * [CXF-5565] - update to opensaml 2.6.1
+[CXF-5945] CXF 2.6.15 breaks Java SE 5 compatibility
 
 8. Known issues
 
