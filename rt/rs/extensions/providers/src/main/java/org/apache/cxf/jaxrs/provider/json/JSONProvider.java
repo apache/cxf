@@ -38,6 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -514,13 +515,21 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                                           attributesToElements,
                                           typeConverter);
         if (!dropElementsInXmlStream && super.outDropElements != null) {
-            config.setIgnoredElements(outDropElements);
+            try {
+                config.getClass().getMethod("setIgnoredElements", List.class).invoke(config, outDropElements);
+            } catch (Throwable t) {
+                LOG.log(Level.WARNING, "Could not set IgnoredElements. Check the Jettison version.");
+            }
         }
         if (!writeNullAsString) {
             config.setWriteNullAsString(writeNullAsString);
         }
         if (ignoreEmptyArrayValues) {
-            config.setIgnoreEmptyArrayValues(ignoreEmptyArrayValues);
+            try { 
+	        config.getClass().getMethod("setIgnoreEmptyArrayValues", Boolean.TYPE).invoke(config, ignoreEmptyArrayValues);
+            } catch (Throwable t) {
+                LOG.log(Level.WARNING, "Could not set IgnoreEmptyArrayValues. Check the Jettison version.");
+            }
         }
         
         

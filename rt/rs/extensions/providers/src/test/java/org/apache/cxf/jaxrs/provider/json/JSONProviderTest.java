@@ -1016,6 +1016,7 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    @org.junit.Ignore("requires jettison 2.3.5")
     public void testManyTagsEmptyArray() throws Exception {
         JSONProvider<ManyTags> p = new JSONProvider<ManyTags>() {
             protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
