@@ -25,7 +25,6 @@ serviceName = "service_v1",
 endpointInterface = "org.apache.cxf.systest.schemaimport.ServiceV1Port")
 public class ServiceImpl implements ServiceV1Port {
 
-    @Override
     public ResponseType testRequest(RequestType request) {
         System.out.println(request.getRequest().getSomeMeasure());
         ResponseType responseType = new ResponseType();

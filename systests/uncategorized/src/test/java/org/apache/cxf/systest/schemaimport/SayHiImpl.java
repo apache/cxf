@@ -33,7 +33,6 @@ import javax.xml.ws.ResponseWrapper;
             endpointInterface = "org.apache.cxf.systest.schemaimport.SayHi")
 public class SayHiImpl implements SayHi {
 
-    @Override
     @WebResult(name = "return", targetNamespace = "")
     @RequestWrapper(localName = "sayHiArray", 
                     targetNamespace = "http://apache.org/sayHi2", 
@@ -48,7 +47,6 @@ public class SayHiImpl implements SayHi {
         return list;
     }
 
-    @Override
     @WebResult(name = "return", targetNamespace = "http://apache.org/sayHi1")
     @RequestWrapper(localName = "sayHi", 
                     targetNamespace = "http://apache.org/sayHi1", 
