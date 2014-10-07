@@ -58,10 +58,19 @@
     var unfilterClaim = claims:create("http://my.schema.org/identity/claims/filter", "different", "match", "second_match", "other");
     var filterClaim = claims:filterValues(unfilterClaim, ".*match");
 	
+	// Test with claims not available in sourceClaims -> should not result in an error
+    var nullClaim = claims:get(sourceClaims, 'resultShouldBeNull');
+    nullClaim = claims:mapValues(nullClaim, roleMappings, false);
+	nullClaim = claims:upperCaseValues(nullClaim);
+	nullClaim = claims:lowerCaseValues(nullClaim);
+	nullClaim = claims:singleToMultiValue(nullClaim, ",");
+	nullClaim = claims:multiToSingleValue(nullClaim, ",");
+	nullClaim = claims:filterValues(nullClaim, ".*match");
+	
     // Collect claims for new token
     targetClaims = claims:add(targetClaims, mappedRoles, mergedClaim, idpClaim);
     targetClaims = claims:add(targetClaims, uppercaseClaim, lowercaseClaim, wrappedUppercaseClaim, emailClaim);
-	targetClaims = claims:add(targetClaims, singleValue, multiValue, filterClaim);
+	targetClaims = claims:add(targetClaims, singleValue, multiValue, filterClaim, nullClaim);
     
     // Set correct issuer
     targetClaims = claims:updateIssuer(targetClaims, claimsParameters.stsProperties.issuer);
