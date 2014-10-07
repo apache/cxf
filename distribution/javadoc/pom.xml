@@ -370,6 +370,10 @@
             <artifactId>logback-classic</artifactId>
             <version>${cxf.logback.classic.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
