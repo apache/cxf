@@ -688,7 +688,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         bean.setAddress("http://localhost:" + PORT);
         bean.setProperties(Collections.<String, Object>singletonMap("url.encode.client.parameters", Boolean.TRUE));
         BookStore store = bean.create(BookStore.class);
-        Book book = store.getBookWithSemicolon("123;:");
+        Book book = store.getBookWithSemicolon("123;:", "custom;:header");
         assertEquals(123L, book.getId());
         assertEquals("CXF in Action%3B%3A", book.getName());
     }
@@ -701,7 +701,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         bean.getProperties(true).put("url.encode.client.parameters", "true");
         bean.getProperties(true).put("url.encode.client.parameters.list", ";");
         BookStore store = bean.create(BookStore.class);
-        Book book = store.getBookWithSemicolon("123;:");
+        Book book = store.getBookWithSemicolon("123;:", "custom;:header");
         assertEquals(123L, book.getId());
         assertEquals("CXF in Action%3B:", book.getName());
     }
@@ -710,7 +710,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testBookWithSpaceProxyNonEncodedSemicolon() throws Exception {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT,
                                                     BookStore.class);
-        Book book = store.getBookWithSemicolon("123;");
+        Book book = store.getBookWithSemicolon("123;", "custom;:header");
         assertEquals(123L, book.getId());
         assertEquals("CXF in Action;", book.getName());
     }

@@ -872,7 +872,11 @@ public class BookStore {
     @GET
     @Path("/thebooks/{bookId}/")
     @Produces("application/xml")
-    public Book getBookWithSemicolon(@Encoded @PathParam("bookId") String id) {
+    public Book getBookWithSemicolon(@Encoded @PathParam("bookId") String id,
+                                     @HeaderParam("customheader") String custom) {
+        if (!"custom;:header".equals(custom)) {
+            throw new RuntimeException();
+        }
         Book b = new Book();
         b.setId(Long.valueOf(id.substring(0, 3)));
         b.setName("CXF in Action" + id.substring(3));
