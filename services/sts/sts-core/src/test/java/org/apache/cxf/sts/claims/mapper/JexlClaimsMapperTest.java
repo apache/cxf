@@ -200,7 +200,6 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         assertTrue(claim.getValues().contains("second_match"));
     }
 
-    @SuppressWarnings("unchecked")
     protected ClaimCollection createClaimCollection() {
         ClaimCollection cc = new ClaimCollection();
         Claim c = new Claim();
