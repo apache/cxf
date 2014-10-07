@@ -46,12 +46,14 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils; 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -61,6 +63,8 @@ import org.apache.cxf.helpers.IOUtils;
  * Encryption helpers
  */
 public final class CryptoUtils {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(CryptoUtils.class);     
     
     private CryptoUtils() {
     }
@@ -547,7 +551,7 @@ public final class CryptoUtils {
                     Method m = Cipher.class.getMethod("updateAAD", new Class[]{byte[].class});
                     m.invoke(c, new Object[]{keyProps.getAdditionalData()});
                 } catch (NoSuchMethodException ex) {
-                    throw new SecurityException(ex);
+                    LOG.fine(ex.getMessage()); 
                 }
             }
             return c;
