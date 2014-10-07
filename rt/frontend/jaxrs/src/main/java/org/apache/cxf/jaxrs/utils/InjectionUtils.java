@@ -1296,7 +1296,7 @@ public final class InjectionUtils {
         } else if (cls.isPrimitive()) {
             return PrimitiveUtils.read(value, cls);
         } else if (cls.isEnum()) {
-            if (m != null && MessageUtils.getContextualBoolean(m, ENUM_CONVERSION_CASE_SENSITIVE, true)) {
+            if (m != null && !MessageUtils.getContextualBoolean(m, ENUM_CONVERSION_CASE_SENSITIVE, false)) {
                 obj = invokeValueOf(value.toUpperCase(), cls);
             }
             if (obj == null) {
