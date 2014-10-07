@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
@@ -43,6 +45,7 @@ import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 
@@ -384,7 +387,9 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                 @SuppressWarnings("unchecked")
                 @Override
                 public <T> ParamConverter<T> getConverter(Class<T> cls, Type t, Annotation[] anns) {
-                    if (cls == String.class) {
+                    if (cls == String.class
+                        && AnnotationUtils.getAnnotation(anns, HeaderParam.class) == null
+                        && AnnotationUtils.getAnnotation(anns, CookieParam.class) == null) {
                         return (ParamConverter<T>)new UrlEncodingParamConverter(encodeClientParametersList);
                     } else {
                         return null;
