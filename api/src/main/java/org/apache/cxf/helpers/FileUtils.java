@@ -80,11 +80,6 @@ public final class FileUtils {
                                    + " is not writable, please set java.io.tempdir"
                                    + " to a writable directory");
         }
-        if (checkExists.getUsableSpace() < 1024 * 1024) {
-            LogUtils.getL7dLogger(FileUtils.class).warning("The directory " + s + " has very "
-                                                           + "little usable temporary space.  Operations"
-                                                           + " requiring temporary files may fail.");
-        }
         File f = new File(checkExists, "cxf-tmp-" + x);
         int count = 0;
         while (!f.mkdir()) {

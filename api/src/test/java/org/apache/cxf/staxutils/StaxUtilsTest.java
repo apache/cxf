@@ -343,32 +343,6 @@ public class StaxUtilsTest extends Assert {
     }
 
     @Test
-    public void testDefaultPrefixInRootElementWithJDKInternalCopyTransformer() throws Exception {
-        TransformerFactory trf = null;
-        try {
-            trf = TransformerFactory
-                .newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            String xml = "<root xmlns=\"urn:org.apache.cxf:test\">Text</root>";
-            StringReader stringReader = new StringReader(xml);
-            StreamSource source = new StreamSource(stringReader);
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(source);
-            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
-            StaxSource staxSource = new StaxSource(reader);
-            Transformer transformer = trf.newTransformer(new StreamSource(getTestStream("./resources/copy.xsl")));
-            System.out.println("Used transformer: " + transformer.getClass().getName());
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.transform(staxSource, new StreamResult(baos));
-            writer.flush();
-            baos.flush();
-            assertThat(new String(baos.toByteArray()), equalTo(xml));
-        } catch (Throwable throwable) {
-            // ignore on non Sun/Oracle JDK
-            return;
-        }
-    }
-
-    @Test
     public void testCXF3193() throws Exception {
         String testString = "<a:elem1 xmlns:a=\"test\" xmlns:b=\"test\" a:attr1=\"value\"/>";
         CachingXmlEventWriter writer = new CachingXmlEventWriter();
