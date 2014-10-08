@@ -23,15 +23,16 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 
 public class SampleServlet extends CXFNonSpringJaxrsServlet {
 
     private static final long serialVersionUID = -1531317723099896635L;
 
     @Override
-    protected Application createApplicationInstance(String appClassName, ServletConfig servletConfig) 
+    protected ApplicationInfo createApplicationInstance(String appClassName, ServletConfig servletConfig) 
         throws ServletException {
-        return new SampleApplication();
+        return new ApplicationInfo(new SampleApplication(), super.getBus());
     }
 
 }
