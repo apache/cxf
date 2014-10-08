@@ -450,7 +450,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         
         for (String cName : classNames) {
-            ApplicationInfo providerApp = createApplicationInstance(cName, servletConfig);
+            ApplicationInfo providerApp = createApplicationInfo(cName, servletConfig);
             
             JAXRSServerFactoryBean bean = ResourceUtils.createApplication(providerApp.getProvider(), 
                                                 ignoreApplicationPath,
@@ -467,8 +467,17 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
     }
     
-    protected ApplicationInfo createApplicationInstance(String appClassName, ServletConfig servletConfig) 
+    protected Application createApplicationInstance(String appClassName, ServletConfig servletConfig)
         throws ServletException {
+        return null;
+    }
+    protected ApplicationInfo createApplicationInfo(String appClassName, ServletConfig servletConfig) 
+        throws ServletException {
+        
+        Application customApp = createApplicationInstance(appClassName, servletConfig);
+        if (customApp != null) {
+            return new ApplicationInfo(customApp, getBus());
+        }
         Map<String, List<String>> props = new HashMap<String, List<String>>();
         appClassName = getClassNameAndProperties(appClassName, props);
         Class<?> appClass = loadApplicationClass(appClassName);
