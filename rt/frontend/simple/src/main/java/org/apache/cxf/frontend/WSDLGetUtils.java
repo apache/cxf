@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
@@ -52,9 +53,7 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.xml.sax.InputSource;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
@@ -156,6 +155,7 @@ public class WSDLGetUtils {
         } catch (WSDLQueryException wex) {
             throw wex;
         } catch (Exception wex) {
+            LOG.log(Level.SEVERE, wex.getMessage(), wex);
             throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                                                      LOG,
                                                      base), wex);

@@ -58,6 +58,7 @@ public class BinaryDataProviderTest extends Assert {
         assertTrue(p.isReadable(byte[].class, null, null, null)
                    && p.isReadable(InputStream.class, null, null, null)
                    && !p.isReadable(File.class, null, null, null)
+                   && p.isReadable(StreamingOutput.class, null, null, null)
                    && !p.isReadable(int[].class, null, null, null));
     }
     
@@ -83,6 +84,16 @@ public class BinaryDataProviderTest extends Assert {
                                       new MetadataMap<String, Object>(),
                                       new ByteArrayInputStream("hi".getBytes()));
         assertEquals(IOUtils.toString(r), "hi");
+
+        StreamingOutput so = (StreamingOutput)p.readFrom(StreamingOutput.class, StreamingOutput.class, 
+                                      new Annotation[]{}, 
+                                      MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+                                      new MetadataMap<String, Object>(),
+                                      new ByteArrayInputStream("hi".getBytes()));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        so.write(baos);
+        bytes = baos.toByteArray();
+        assertTrue(Arrays.equals(new String("hi").getBytes(), bytes));
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })

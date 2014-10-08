@@ -529,6 +529,10 @@
                         </sp:SamlToken>
                     </wsp:Policy>
                 </sp:SignedSupportingTokens>
+                <!-- Just check that SignedElements actually works here -->
+                <sp:SignedElements xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:XPath xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:saml1="urn:oasis:names:tc:SAML:1.0:assertion">/soap:Envelope/soap:Header/wsse:Security/saml1:Assertion</sp:XPath>
+                </sp:SignedElements>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>

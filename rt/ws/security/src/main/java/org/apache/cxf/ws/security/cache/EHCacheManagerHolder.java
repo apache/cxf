@@ -138,7 +138,7 @@ public final class EHCacheManagerHolder {
     }
 
     private static CacheManager findDefaultCacheManager(Bus bus) {
-        String defaultConfigFile = "cxf-ehcache.xml";
+        String defaultConfigFile = "/cxf-ehcache.xml";
         URL configFileURL = null;
         String busId = "";
         if (bus != null) {

@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * This represents a Claim that has been processed by a ClaimsHandler instance.
  */
-public class Claim implements Serializable {
+public class Claim implements Serializable, Cloneable {
 
     /**
      * 
@@ -40,6 +40,27 @@ public class Claim implements Serializable {
     private transient Principal principal;
     private List<String> values = new ArrayList<String>(1);
 
+    public Claim() {
+    }
+    
+    /**
+     * Create a clone of the provided claim.
+     * 
+     * @param claim Claim to be cloned. Value cannot be null.
+     */
+    public Claim(Claim claim) {
+        if (claim == null) {
+            throw new IllegalArgumentException("Claim cannot be null");
+        }
+        if (claim.claimType != null) {
+            claimType = URI.create(claim.claimType.toString());
+        }
+        issuer = claim.issuer;
+        originalIssuer = claim.originalIssuer;
+        values.addAll(claim.values);
+        principal = claim.principal;
+    }
+    
     public String getIssuer() {
         return issuer;
     }
@@ -101,5 +122,91 @@ public class Claim implements Serializable {
         }
         throw new IllegalStateException("Claim has multiple values");
     }
+    
+    @Override
+    public Claim clone() {
+        try {
+            super.clone(); // Checkstyle requires this call
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return new Claim(this);
+    }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((claimType == null)
+            ? 0
+            : claimType.hashCode());
+        result = prime * result + ((issuer == null)
+            ? 0
+            : issuer.hashCode());
+        result = prime * result + ((originalIssuer == null)
+            ? 0
+            : originalIssuer.hashCode());
+        result = prime * result + ((values == null)
+            ? 0
+            : values.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Claim)) {
+            return false;
+        }
+        Claim other = (Claim)obj;
+        if (claimType == null) {
+            if (other.claimType != null) {
+                return false;
+            }
+        } else if (!claimType.equals(other.claimType)) {
+            return false;
+        }
+        if (issuer == null) {
+            if (other.issuer != null) {
+                return false;
+            }
+        } else if (!issuer.equals(other.issuer)) {
+            return false;
+        }
+        if (originalIssuer == null) {
+            if (other.originalIssuer != null) {
+                return false;
+            }
+        } else if (!originalIssuer.equals(other.originalIssuer)) {
+            return false;
+        }
+        if (values == null) {
+            if (other.values != null) {
+                return false;
+            }
+        } else if (!values.equals(other.values)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Claim [values=");
+        builder.append(values);
+        builder.append(", claimType=");
+        builder.append(claimType);
+        builder.append(", issuer=");
+        builder.append(issuer);
+        builder.append(", originalIssuer=");
+        builder.append(originalIssuer);
+        builder.append(", principal=");
+        builder.append(principal);
+        builder.append("]");
+        return builder.toString();
+    }
+    
 }

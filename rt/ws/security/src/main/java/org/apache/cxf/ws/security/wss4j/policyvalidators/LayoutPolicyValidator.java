@@ -126,7 +126,8 @@ public class LayoutPolicyValidator {
         for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> sl = 
                 CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
-            if (sl == null) {
+            Integer actInt = (Integer)signedResult.get(WSSecurityEngineResult.TAG_ACTION);
+            if (sl == null || WSConstants.ST_SIGNED == actInt) {
                 continue;
             }
 

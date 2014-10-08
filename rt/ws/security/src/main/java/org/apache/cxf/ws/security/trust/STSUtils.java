@@ -22,12 +22,12 @@ package org.apache.cxf.ws.security.trust;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
+import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
@@ -92,9 +92,27 @@ public final class STSUtils {
     }
     
     public static STSClient getClient(Message message, String type, IssuedToken itok) {
-        // Find out first if we have an EPR to get the STS Address (possibly via WS-MEX)
+        // Retrieve or create the STSClient
+        STSClient client = (STSClient)message
+            .getContextualProperty(SecurityConstants.STS_CLIENT);
+        if (client == null) {
+            client = createSTSClient(message, type);
+            Bus bus = message.getExchange().get(Bus.class);
+            
+            // Check for the "default" case first
+            bus.getExtension(Configurer.class).configureBean("default.sts-client", client);
+            
+            // Check for Endpoint specific case next
+            if (client.getBeanName() != null) {
+                bus.getExtension(Configurer.class).configureBean(client.getBeanName(), client);
+            }
+        }
+        
+        
+        // Find out if we have an EPR to get the STS Address (possibly via WS-MEX)
         if (itok != null && itok.getIssuerEpr() != null && message != null) {
             EndpointReferenceType epr = itok.getIssuerEpr();
+
             String mexLocation = findMEXLocation(epr);
             // Configure via WS-MEX
             if (mexLocation != null
@@ -102,45 +120,28 @@ public final class STSUtils {
                                                      SecurityConstants.PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
                                                      false)) {
                 // WS-MEX call. So now either get the WS-MEX specific STSClient or else create one
-                STSClient client = (STSClient)message
+                STSClient wsMexClient = (STSClient)message
                     .getContextualProperty(SecurityConstants.STS_CLIENT + ".wsmex");
-                if (client == null) {
-                    client = createSTSClient(message, type);
+                if (wsMexClient == null) {
+                    wsMexClient = createSTSClient(message, type);
                 }
-                client.configureViaEPR(epr, false);
-                return client;
-            } else if (configureViaEPR(message, type, epr)) {
+                wsMexClient.configureViaEPR(epr, false);
+                return wsMexClient;
+            } else if (configureViaEPR(client, epr)) {
                 // Only use WS-MEX here if the pre-configured STSClient has no location/wsdllocation
                 boolean useEPRWSAAddrAsMEXLocation = 
                     !Boolean.valueOf((String)message.getContextualProperty(
                         SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
                 
-                STSClient client = (STSClient)message
-                    .getContextualProperty(SecurityConstants.STS_CLIENT);
-                if (client == null) {
-                    client = createSTSClient(message, type);
-                }
                 client.configureViaEPR(epr, useEPRWSAAddrAsMEXLocation);
                 return client;
             }
         }
         
-        // Not a WS-MEX call
-        STSClient client = (STSClient)message
-            .getContextualProperty(SecurityConstants.STS_CLIENT);
-        if (client == null) {
-            client = createSTSClient(message, type);
-        }
-        
         return client;
     }
-        
-    public static boolean configureViaEPR(Message message, String type, EndpointReferenceType epr) {
-        STSClient client = (STSClient)message
-            .getContextualProperty(SecurityConstants.STS_CLIENT);
-        if (epr != null && client == null) {
-            return true;
-        } else if (epr != null && client != null && client.getLocation() == null && client.getWsdlLocation() == null) {
+    public static boolean configureViaEPR(STSClient client, EndpointReferenceType epr) {
+        if (epr != null && client.getLocation() == null && client.getWsdlLocation() == null) {
             return true;
         }
             

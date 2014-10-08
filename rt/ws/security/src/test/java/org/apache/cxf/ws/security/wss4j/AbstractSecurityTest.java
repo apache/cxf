@@ -90,7 +90,11 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
         part.setContent(new DOMSource(doc));
         saajMsg.saveChanges();
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
+        // Hack to create the context map
+        MessageImpl message = new MessageImpl();
+        message.getContextualProperty("XYZ");
+        
+        SoapMessage msg = new SoapMessage(message);
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(msg);
         msg.setContent(SOAPMessage.class, saajMsg);

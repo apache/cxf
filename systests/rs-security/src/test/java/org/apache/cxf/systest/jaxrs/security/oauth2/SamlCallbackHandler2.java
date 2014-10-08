@@ -31,6 +31,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+
 import org.apache.cxf.rs.security.saml.assertion.Claim;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.ActionBean;
@@ -42,6 +43,7 @@ import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 
@@ -132,6 +134,7 @@ public class SamlCallbackHandler2 implements CallbackHandler {
                 
                 attrBean.setSamlAttributes(claims);
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+                
             }
         }
     }

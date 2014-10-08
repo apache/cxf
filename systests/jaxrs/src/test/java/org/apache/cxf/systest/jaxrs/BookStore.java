@@ -46,6 +46,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
@@ -869,6 +870,24 @@ public class BookStore {
     }
     
     @GET
+    @Path("/thebooks/{bookId}/")
+    @Produces("application/xml")
+    public Book getBookWithSemicolon(@Encoded @PathParam("bookId") String id,
+                                     @HeaderParam("customheader") String custom) {
+        if (!"custom;:header".equals(custom)) {
+            throw new RuntimeException();
+        }
+        Book b = new Book();
+        b.setId(Long.valueOf(id.substring(0, 3)));
+        b.setName("CXF in Action" + id.substring(3));
+        String absPath = ui.getAbsolutePath().toString();
+        if (absPath.contains("123;")) {
+            b.setName(b.getName() + ";");
+        }
+        return b;
+    }
+    
+    @GET
     @Path("/books/search")
     @Produces("application/xml")
     public Book getBook(@Context SearchContext searchContext) 
@@ -998,10 +1017,15 @@ public class BookStore {
     public JAXBElement<Book> echoBookElement(JAXBElement<Book> element) throws Exception {
         return element;
     }
+    @POST
+    @Path("/books/echo")
+    public Book echoBookElement(Book element) throws Exception {
+        return element;
+    }
     
     @SuppressWarnings("unchecked")
     @POST
-    @Path("/books/element/echo")
+    @Path("/books/element/echo/wildcard")
     public JAXBElement<? super Book> echoBookElementWildcard(JAXBElement<? extends Book> element) 
         throws Exception {
         return (JAXBElement<? super Book>)element;
@@ -1345,6 +1369,14 @@ public class BookStore {
     @Produces("text/plain")
     public Response echoBookNameAndHeader3(String name) {
         return echoBookNameAndHeader(httpHeaders.getRequestHeader("customheader").get(0), name);
+    }
+    
+    @POST
+    @Path("/booksecho202")
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    public Response echoBookName202(String name) {
+        return Response.accepted(name).build();
     }
         
     

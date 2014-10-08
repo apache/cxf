@@ -44,8 +44,11 @@ import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -59,6 +62,21 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServer20.class, true));
+    }
+    
+    @Test
+    public void testEchoBookElement() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        JAXBElement<Book> element = store.echoBookElement(new JAXBElement<Book>(new QName("", "Book"),
+                                     Book.class,
+                                     new Book("CXF", 123L)));
+        Book book = element.getValue();
+        assertEquals(123L, book.getId());
+        assertEquals("CXF", book.getName());
+        
+        Book book2 = store.echoBookElement(new Book("CXF3", 128L));
+        assertEquals(130L, book2.getId());
+        assertEquals("CXF3", book2.getName());
     }
     
     @Test

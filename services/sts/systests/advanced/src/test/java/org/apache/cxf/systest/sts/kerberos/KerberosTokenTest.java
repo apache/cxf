@@ -42,6 +42,7 @@ import org.junit.BeforeClass;
  * user principal "alice" (keytab in "/etc/alice.keytab"), and host service "bob@service.ws.apache.org" 
  * (keytab in "/etc/bob.keytab").
  */
+@org.junit.Ignore
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
@@ -74,7 +75,6 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

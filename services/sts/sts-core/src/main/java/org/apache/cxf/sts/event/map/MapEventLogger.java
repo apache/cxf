@@ -74,7 +74,11 @@ public class MapEventLogger implements MapEventListener {
             }
         }
         Exception ex = (Exception) map.get(KEYS.EXCEPTION.name());
-        LOG.log(this.logLevel, builder.toString(), ex);
+        if (logStacktrace) {
+            LOG.log(this.logLevel, builder.toString(), ex);
+        } else {
+            LOG.log(this.logLevel, builder.toString());
+        }
     }
 
     private String format(Object value) {

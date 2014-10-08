@@ -491,28 +491,17 @@ public class JettyHTTPServerEngine
                                             getThreadingParameters().getMaxThreads(),
                                             acc));
             }
-            if (pool instanceof QueuedThreadPool) {
-                QueuedThreadPool pl = (QueuedThreadPool)pool;
-                if (getThreadingParameters().isSetMinThreads()) {
-                    pl.setMinThreads(getThreadingParameters().getMinThreads());
-                }
-                if (getThreadingParameters().isSetMaxThreads()) {
-                    pl.setMaxThreads(getThreadingParameters().getMaxThreads());
-                }
-            } else {
-                try {
-                    if (getThreadingParameters().isSetMinThreads()) {
-                        pool.getClass().getMethod("setMinThreads", Integer.TYPE)
-                            .invoke(pool, getThreadingParameters().getMinThreads());
-                    }
-                    if (getThreadingParameters().isSetMaxThreads()) {
-                        pool.getClass().getMethod("setMaxThreads", Integer.TYPE)
-                            .invoke(pool, getThreadingParameters().getMaxThreads());
-                    }
-                } catch (Throwable t) {
-                    //ignore - this won't happen for Jetty 7.1 - 7.2 and 7.3 and newer 
-                    //will be instanceof QueuedThreadPool above
-                }
+            if (!(pool instanceof QueuedThreadPool)) {
+                throw new Fault(new Message("NOT_A_QUEUED_THREAD_POOL", LOG, pool.getClass()));
+            }
+            if (getThreadingParameters().isThreadNamePrefixSet()) {
+                ((QueuedThreadPool) pool).setName(getThreadingParameters().getThreadNamePrefix());
+            }
+            if (getThreadingParameters().isSetMinThreads()) {
+                ((QueuedThreadPool) pool).setMinThreads(getThreadingParameters().getMinThreads());
+            }
+            if (getThreadingParameters().isSetMaxThreads()) {
+                ((QueuedThreadPool) pool).setMaxThreads(getThreadingParameters().getMaxThreads());
             }
         }
     }

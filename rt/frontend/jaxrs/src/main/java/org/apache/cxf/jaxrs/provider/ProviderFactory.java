@@ -1417,7 +1417,7 @@ public final class ProviderFactory {
             nameBinding = DEFAULT_FILTER_NAME_BINDING 
                 + ori.getClassResourceInfo().getServiceClass().getName()
                 + "."
-                + ori.getMethodToInvoke().getName()
+                + ori.getMethodToInvoke().toString()
                 + ":dynamic";
         }
         

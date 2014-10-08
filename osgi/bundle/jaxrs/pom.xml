@@ -24,13 +24,13 @@
     <packaging>bundle</packaging>
     <name>Apache CXF JAX-RS Bundle Jar</name>
     <description>Apache CXF JAX-RS Bundle Jar</description>
-    <version>2.7.13-SNAPSHOT</version>
+    <version>2.7.14-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-parent</artifactId>
-        <version>2.7.13-SNAPSHOT</version>
+        <version>2.7.14-SNAPSHOT</version>
     </parent>
     <properties>
          <bundle.symbolic.name>${project.groupId}.bundle-jaxrs</bundle.symbolic.name>
@@ -77,7 +77,11 @@
             <artifactId>cxf-rt-rs-extension-search</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-cors</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
               <groupId>com.sun.xml.fastinfoset</groupId>
               <artifactId>FastInfoset</artifactId>

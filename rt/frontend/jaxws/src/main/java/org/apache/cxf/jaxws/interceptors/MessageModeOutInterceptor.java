@@ -202,16 +202,18 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
     }
     private void validateFaultDetail(Element detail, Schema schema, BindingOperationInfo bop) throws Exception {
-        Element el = DOMUtils.getFirstElement(detail);
-        while (el != null) {
-            QName qn = DOMUtils.getElementQName(el);
-            for (BindingFaultInfo bfi : bop.getFaults()) {
-                if (bfi.getFaultInfo().getMessagePartByIndex(0).getConcreteName().equals(qn)) {
-                    //Found a fault with the correct QName, we can validate it
-                    schema.newValidator().validate(new DOMSource(el));
+        if (detail != null) {
+            Element el = DOMUtils.getFirstElement(detail);
+            while (el != null) {
+                QName qn = DOMUtils.getElementQName(el);
+                for (BindingFaultInfo bfi : bop.getFaults()) {
+                    if (bfi.getFaultInfo().getMessagePartByIndex(0).getConcreteName().equals(qn)) {
+                        //Found a fault with the correct QName, we can validate it
+                        schema.newValidator().validate(new DOMSource(el));
+                    }
                 }
+                el = DOMUtils.getNextElement(el);
             }
-            el = DOMUtils.getNextElement(el);
         }
     }
     private void validateFault(SoapMessage message, SOAPFault fault, BindingOperationInfo bop) {

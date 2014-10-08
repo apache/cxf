@@ -388,8 +388,15 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             IssuedToken itok,
             SecurityToken tok
         ) {
+            String imminentExpiryValue = 
+                (String)message.getContextualProperty(SecurityConstants.STS_TOKEN_IMMINENT_EXPIRY_VALUE);
+            long imminentExpiry = 0L;
+            if (imminentExpiryValue != null) {
+                imminentExpiry = Long.parseLong(imminentExpiryValue);
+            }
+            
             // If the token has not expired then we don't need to renew it
-            if (!tok.isExpired()) {
+            if (!(tok.isExpired() || tok.isAboutToExpire(imminentExpiry))) {
                 return tok;
             }
             

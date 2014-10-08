@@ -481,8 +481,10 @@ public class ClientProxyImpl extends AbstractClient implements
                     String propertyName = m.getName().substring(3);
                     Method getter = bean.getClass().getMethod("get" + propertyName, new Class[]{});
                     Object value = getter.invoke(bean, new Object[]{});
-                    String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
-                    values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
+                    if (value != null) { 
+                        String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
+                        values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
+                    }
                 } catch (Throwable t) {
                     // ignore
                 }
@@ -643,7 +645,7 @@ public class ClientProxyImpl extends AbstractClient implements
             }
             Message outMessage = createMessage(body, ori.getHttpMethod(), headers, uri, 
                                                exchange, invocationContext, true);
-            
+            setSupportOnewayResponseProperty(outMessage);
             outMessage.getExchange().setOneWay(ori.isOneway());
             outMessage.setContent(OperationResourceInfo.class, ori);
             setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());

@@ -37,8 +37,8 @@ public class Extension {
     
     protected String className;
     protected ClassLoader classloader;
-    protected Class<?> clazz;
-    protected Class<?> intf;
+    protected volatile Class<?> clazz;
+    protected volatile Class<?> intf;
     protected String interfaceName;
     protected boolean deferred;
     protected Collection<String> namespaces = new ArrayList<String>();
@@ -191,8 +191,13 @@ public class Extension {
         if (notFound) {
             return null;
         }
-        if (clazz == null) {
-            clazz = tryClass(className, cl);
+        if (clazz != null) {
+            return clazz;
+        }
+        synchronized (this) {
+            if (clazz == null) {
+                clazz = tryClass(className, cl);
+            }
         }
         return clazz;
     }
@@ -287,7 +292,11 @@ public class Extension {
         if (intf != null || notFound) {
             return intf;
         }
-        intf = tryClass(interfaceName, cl);
+        synchronized (this) {
+            if (intf == null) {
+                intf = tryClass(interfaceName, cl);
+            }
+        }
         return intf;
     }
     

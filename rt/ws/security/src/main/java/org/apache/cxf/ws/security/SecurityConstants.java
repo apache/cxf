@@ -201,6 +201,21 @@ public final class SecurityConstants {
     public static final String VALIDATE_SAML_SUBJECT_CONFIRMATION = 
         "ws-security.validate.saml.subject.conf";
     
+    /**
+     * Whether to use credential delegation or not in the KerberosClient. If this is set to "true",
+     * then it tries to get a GSSCredential Object from the Message Context using the 
+     * DELEGATED_CREDENTIAL configuration tag below, and then use this to obtain a service ticket.
+     * The default is "false".
+     */
+    public static final String KERBEROS_USE_CREDENTIAL_DELEGATION = 
+        "ws-security.kerberos.use.credential.delegation";
+    
+    /**
+     * Whether the Kerberos username is in servicename form or not. The default is "false".
+     */
+    public static final String KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM = 
+        "ws-security.kerberos.is.username.in.servicename.form";
+    
     //
     // Non-boolean WS-Security Configuration parameters
     //
@@ -528,6 +543,25 @@ public final class SecurityConstants {
      * The default value is "true".
      */
     public static final String SC_FROM_JAAS_SUBJECT = "ws-security.sc.jaas-subject";
+    
+    /**
+     * A delegated credential to use for WS-Security. Currently only a Kerberos GSSCredential
+     * Object is supported. This is used to retrieve a service ticket instead of using the
+     * client credentials.
+     */
+    public static final String DELEGATED_CREDENTIAL = "ws-security.delegated.credential";
+    
+    /**
+     * This is the value in seconds within which a token is considered to be expired by the
+     * client. When a cached token (from a STS) is retrieved by the client, it is considered
+     * to be expired if it will expire in a time less than the value specified by this tag.
+     * This prevents token expiry when the message is en route / being processed by the
+     * service. When the token is found to be expired then it will be renewed via the STS.
+     * 
+     * The default value is 0 (seconds), meaning that this functionality is disabled by default.
+     */
+    public static final String STS_TOKEN_IMMINENT_EXPIRY_VALUE =
+        "ws-security.sts.token.imminent-expiry-value";
 
     //
     // Internal tags
@@ -557,7 +591,9 @@ public final class SecurityConstants {
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
             ASYMMETRIC_SIGNATURE_ALGORITHM, ENABLE_SAML_ONE_TIME_USE_CACHE, SAML_ONE_TIME_USE_CACHE_INSTANCE,
-            CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG
+            CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
+            DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
+            KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

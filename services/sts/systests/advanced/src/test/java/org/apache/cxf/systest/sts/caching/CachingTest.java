@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.sts.caching;
 
 import java.net.URL;
+import java.util.Date;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -36,6 +37,8 @@ import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
@@ -158,6 +161,47 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         } catch (SOAPFaultException ex) {
             // Expected
         }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testImminentExpiry() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CachingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = CachingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
+        DoubleItPortType port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        ((BindingProvider)port).getRequestContext().put("thread.local.request.context", "true");
+        ((BindingProvider)port).getRequestContext().put("ws-security.sts.token.imminent-expiry-value", "10");
+        updateAddressPort(port, PORT);
+        
+        // Make a successful invocation
+        doubleIt(port, 25);
+        
+        Client client = ClientProxy.getClient(port);
+        Endpoint ep = client.getEndpoint();
+        String id = (String)ep.get(SecurityConstants.TOKEN_ID);
+        TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
+        SecurityToken tok = store.getToken(id);
+        assertNotNull(tok);
+        
+        // Make the token "about to expire"
+        Date expiredDate = new Date();
+        expiredDate.setTime(expiredDate.getTime() + 5000L);
+        tok.setExpires(expiredDate);
+        assertTrue(tok.isAboutToExpire(10L));
+        
+        doubleIt(port, 25);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

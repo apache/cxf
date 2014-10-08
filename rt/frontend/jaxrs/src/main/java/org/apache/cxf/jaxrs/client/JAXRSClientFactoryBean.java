@@ -18,14 +18,21 @@
  */
 package org.apache.cxf.jaxrs.client;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
@@ -38,6 +45,8 @@ import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 
@@ -365,7 +374,30 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             client.headers(headers);
         }
         
-        setupFactory(ep);
+        ProviderFactory factory = setupFactory(ep);
+
+        final Map<String, Object> theProperties = super.getProperties();
+        final boolean encodeClientParameters = PropertyUtils.isTrue(theProperties, "url.encode.client.parameters");
+        if (encodeClientParameters) {
+            final String encodeClientParametersList = theProperties == null ? null 
+                : (String)getProperties().get("url.encode.client.parameters.list");
+            factory.registerUserProvider(new ParamConverterProvider() {
+
+                @SuppressWarnings("unchecked")
+                @Override
+                public <T> ParamConverter<T> getConverter(Class<T> cls,
+                    Type t, Annotation[] anns) {
+                    if (cls == String.class
+                        && AnnotationUtils.getAnnotation(anns, HeaderParam.class) == null
+                        && AnnotationUtils.getAnnotation(anns, CookieParam.class) == null) {
+                        return (ParamConverter<T>)new UrlEncodingParamConverter(encodeClientParametersList);
+                    } else {
+                        return null;
+                    }
+                }
+            
+            });
+        }
     }
     
     protected void applyFeatures(AbstractClient client) {

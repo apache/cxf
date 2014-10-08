@@ -93,11 +93,15 @@ public class DefaultSubjectProvider implements SubjectProvider {
         
         Principal principal = null;
         ReceivedToken receivedToken = null;
-        //[TODO] ActAs support
         //TokenValidator in IssueOperation has validated the ReceivedToken
         //if validation was successful, the principal was set in ReceivedToken 
         if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
             receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();    
+            if (receivedToken.getState().equals(STATE.VALID)) {
+                principal = receivedToken.getPrincipal();
+            }
+        } else if (providerParameters.getTokenRequirements().getActAs() != null) {
+            receivedToken = providerParameters.getTokenRequirements().getActAs();
             if (receivedToken.getState().equals(STATE.VALID)) {
                 principal = receivedToken.getPrincipal();
             }

@@ -278,9 +278,10 @@ public class JettyHTTPServerEngineFactory {
             if (LOG.isLoggable(Level.INFO)) {
                 final int min = fallbackThreadingParameters.getMinThreads();
                 final int max = fallbackThreadingParameters.getMaxThreads();
+                final String threadNamePrefix = fallbackThreadingParameters.getThreadNamePrefix();
                 LOG.log(Level.INFO,
                         "FALLBACK_THREADING_PARAMETERS_MSG",
-                        new Object[] {port, min, max});
+                        new Object[] {port, min, max, threadNamePrefix});
             }
             ref.setThreadingParameters(fallbackThreadingParameters);
         }

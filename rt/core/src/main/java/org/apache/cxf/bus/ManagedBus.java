@@ -23,6 +23,7 @@ import javax.management.JMException;
 import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedOperation;
@@ -33,6 +34,7 @@ import org.apache.cxf.management.annotation.ManagedResource;
                  
 public class ManagedBus implements ManagedComponent {
     private static final String TYPE_VALUE = "Bus";
+    private static final String INSTANCE_ID = "managed.bus.instance.id";
     private final Bus bus;
     
     public ManagedBus(Bus b) {
@@ -50,7 +52,11 @@ public class ManagedBus implements ManagedComponent {
         buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(busId).append(',');
         buffer.append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE).append(',');
         // Added the instance id to make the ObjectName unique
-        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(bus.hashCode());
+        String instanceId = (String)bus.getProperties().get(INSTANCE_ID);
+        if (StringUtils.isEmpty(instanceId)) {
+            instanceId = new StringBuffer().append(bus.hashCode()).toString();
+        }
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(instanceId);
         
 
         return new ObjectName(buffer.toString());

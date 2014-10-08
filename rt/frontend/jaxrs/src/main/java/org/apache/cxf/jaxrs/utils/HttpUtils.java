@@ -22,7 +22,6 @@ package org.apache.cxf.jaxrs.utils;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -127,13 +126,7 @@ public final class HttpUtils {
     
     public static String urlEncode(String value, String enc) {
         
-        try {
-            value = URLEncoder.encode(value, enc);
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        }
-        
-        return value;
+        return UrlUtils.urlEncode(value, enc);
     }
     
     public static String pathEncode(String value) {

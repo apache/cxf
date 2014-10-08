@@ -62,6 +62,7 @@ public final class JettySpringTypesFactory {
         ThreadingParameters params = new ThreadingParameters();
         params.setMaxThreads(paramtype.getMaxThreads());
         params.setMinThreads(paramtype.getMinThreads());
+        params.setThreadNamePrefix(paramtype.getThreadNamePrefix());
         return params;
     }
         

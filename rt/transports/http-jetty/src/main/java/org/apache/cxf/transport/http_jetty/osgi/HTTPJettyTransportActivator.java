@@ -161,6 +161,8 @@ public class HTTPJettyTransportActivator
                     p.setMinThreads(Integer.parseInt(v));
                 } else if ("maxThreads".equals(k)) {
                     p.setMaxThreads(Integer.parseInt(v));
+                } else if ("threadNamePrefix".equals(k)) {
+                    p.setThreadNamePrefix(k);
                 }
             }
         }

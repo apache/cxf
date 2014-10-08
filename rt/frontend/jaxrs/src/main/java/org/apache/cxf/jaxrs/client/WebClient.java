@@ -1094,7 +1094,7 @@ public class WebClient extends AbstractClient {
         URI uri = getCurrentURI();
         Message m = createMessage(body, httpMethod, headers, uri, exchange, 
                 invContext, false);
-        
+        setSupportOnewayResponseProperty(m);
         Map<String, Object> reqContext = getRequestContext(m);
         reqContext.put(Message.HTTP_REQUEST_METHOD, httpMethod);
         reqContext.put(REQUEST_CLASS, requestClass);

@@ -2,15 +2,16 @@
 	<grammars />
 	<resources>
 		<resource id="Test" path="/repository">
-
+            <param name="top" style="template" type="xs:string"/>
 			<method name="GET" id="listRepositories">
 				<response>
 					<representation mediaType="application/json" />
 				</response>
 			</method>
 
-			<resource path="{name}">
-				<param name="name" style="template" type="xs:string"/>
+			<resource path="{the-name}">
+				<param name="the-name" style="template" type="xs:string"/>
+				
 				<method name="PUT" id="createRepository" >
 					<request>
 					</request>
@@ -19,7 +20,19 @@
 				</method>
 				<method name="DELETE" id="deleteRepository">
 				</method>
-
+					
+                <method name="POST">
+	                <request>
+	                    <representation mediaType="text/plain">
+	                        <param name="id" style="plain" type="xsd:anyType"/>
+	                    </representation>
+	                </request>
+	                <response>
+	                    <representation mediaType="text/plain">
+	                        <param name="result" style="plain" type="xs:string"/>
+	                    </representation>
+	                </response>
+	            </method>
 			</resource>
 		</resource>
 	</resources>

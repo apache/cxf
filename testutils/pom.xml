@@ -21,7 +21,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-testutils</artifactId>
     <packaging>jar</packaging>
-    <version>2.7.13-SNAPSHOT</version>
+    <version>2.7.14-SNAPSHOT</version>
     <name>Apache CXF Test Utilities</name>
     <description>Apache CXF Test Utilities</description>
     <url>http://cxf.apache.org</url>
@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.7.13-SNAPSHOT</version>
+        <version>2.7.14-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -158,6 +158,13 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-bug986</artifactId>
+                        <version>${cxf.xjc-utils.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -171,6 +178,9 @@
                                 <include>rt-javascript/*.wsdl</include>
                             </includes>
                             <defaultOptions>
+                                <xjcargs>
+                                    <xjcarg>-Xbug986</xjcarg>
+                                </xjcargs>
                                 <!--extraargs>
                                     <extraarg>-verbose</extraarg>
                                 </extraargs-->

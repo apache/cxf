@@ -21,11 +21,14 @@ package org.apache.cxf.ws.security.policy;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.policy.AssertionBuilderLoader;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.PolicyBuilder;
@@ -80,6 +83,8 @@ import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyIntercepto
 
 @NoJSR250Annotations
 public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLoader, AssertionBuilderLoader {
+    private static final Logger LOG = LogUtils.getL7dLogger(WSSecurityPolicyLoader.class);
+
     Bus bus;
     
     public WSSecurityPolicyLoader(Bus b) {
@@ -92,6 +97,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             //as the policy framework will then not find the providers
             //and error out at that point.  If nothing uses ws-securitypolicy
             //no warnings/errors will display
+            LOG.log(Level.FINE, "Could not load or register WS-SecurityPolicy related classes.", t);
         }
     }
     

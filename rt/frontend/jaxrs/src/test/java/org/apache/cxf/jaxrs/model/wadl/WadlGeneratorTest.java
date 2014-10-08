@@ -471,7 +471,9 @@ public class WadlGeneratorTest extends Assert {
         
         // verify root resource starting with "/"
         // must have a single template parameter
-        verifyParameters(resource, 1, new Param("id", "template", "xs:long"));
+        verifyParameters(resource, 2, 
+                         new Param("id", "template", "xs:long"),
+                         new Param("a", "template", "xs:int"));
         
         // must have 4 methods, 2 GETs, POST and PUT
         List<Element> methodEls = getElements(resource, "method", 4);
@@ -584,9 +586,10 @@ public class WadlGeneratorTest extends Assert {
         // check request 
         List<Element> requestEls = getElements(methodEl, "request", 1);
         
-        // 4 parameters are expected
-        verifyParameters(requestEls.get(0), 5, 
-                         new Param("a", "query", "xs:int"),
+        // 6 parameters are expected
+        verifyParameters(requestEls.get(0), 6, 
+                         new Param("b", "query", "xs:int"),
+                         new Param("aProp", "query", "xs:int"),
                          new Param("c.a", "query", "xs:int"),
                          new Param("c.b", "query", "xs:int"),
                          new Param("c.d.a", "query", "xs:boolean"),

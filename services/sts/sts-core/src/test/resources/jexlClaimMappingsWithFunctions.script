@@ -1,0 +1,80 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+{
+    // Role value mapping
+    var roleClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role';
+    var roleClaim = claims:get(sourceClaims, roleClaimType);
+    var roleMappings = { "admin" : "administrator", "manager" : "manager" };
+    var mappedRoles = claims:mapValues(roleClaim, roleMappings, false);
+    
+    // Claim merge
+    var delimiter = ' ';
+    var firstNameClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname';
+    var lastNameClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname';
+    var fullNameClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name';
+    var mergedClaim = claims:merge(sourceClaims, fullNameClaimType, delimiter, firstNameClaimType, lastNameClaimType);
+    
+    // Additional static claim
+    var idpClaim = claims:create("http://schemas.microsoft.com/identity/claims/identityprovider",
+            "https://idp.apache.org/cbb375d-33b-45fa-9bf5-f33bd8721a77/");
+
+    // Claim value updates
+    var uppercaseClaim = claims:create("http://my.schema.org/identity/claims/uppercase", "Value", "Value2");
+    uppercaseClaim = claims:upperCaseValues(uppercaseClaim);
+    var lowercaseClaim = claims:create("http://my.schema.org/identity/claims/lowercase", "Value", "Value2");
+    lowercaseClaim = claims:lowerCaseValues(lowercaseClaim);
+    var wrappedUppercaseClaim = claims:create("http://my.schema.org/identity/claims/wrappedUppercase", "Value");
+    wrappedUppercaseClaim = claims:wrapValues(wrappedUppercaseClaim, "Prefix_", "_Suffix");
+    wrappedUppercaseClaim = claims:upperCaseValues(wrappedUppercaseClaim);
+
+    // Simple claim copy
+    var emailClaimType = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mail';
+    var emailClaim = claims:get(sourceClaims, emailClaimType);
+    
+	// Claim value delimiter
+    var singleValue = claims:create("http://my.schema.org/identity/claims/single2multi", "Value1,Value2,Value3");
+    singleValue = claims:singleToMultiValue(singleValue, ",");
+	var multiValue = claims:create("http://my.schema.org/identity/claims/multi2single", "Value1", "Value2", "Value3");
+    multiValue = claims:multiToSingleValue(multiValue, ",");
+    
+    // Claim filter
+    var unfilterClaim = claims:create("http://my.schema.org/identity/claims/filter", "different", "match", "second_match", "other");
+    var filterClaim = claims:filterValues(unfilterClaim, ".*match");
+	
+	// Test with claims not available in sourceClaims -> should not result in an error
+    var nullClaim = claims:get(sourceClaims, 'resultShouldBeNull');
+    nullClaim = claims:mapValues(nullClaim, roleMappings, false);
+	nullClaim = claims:upperCaseValues(nullClaim);
+	nullClaim = claims:lowerCaseValues(nullClaim);
+	nullClaim = claims:singleToMultiValue(nullClaim, ",");
+	nullClaim = claims:multiToSingleValue(nullClaim, ",");
+	nullClaim = claims:filterValues(nullClaim, ".*match");
+	
+    // Collect claims for new token
+    targetClaims = claims:add(targetClaims, mappedRoles, mergedClaim, idpClaim);
+    targetClaims = claims:add(targetClaims, uppercaseClaim, lowercaseClaim, wrappedUppercaseClaim, emailClaim);
+	targetClaims = claims:add(targetClaims, singleValue, multiValue, filterClaim, nullClaim);
+    
+    // Set correct issuer
+    targetClaims = claims:updateIssuer(targetClaims, claimsParameters.stsProperties.issuer);
+    
+    // Return new claims
+    return targetClaims;
+}

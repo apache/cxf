@@ -118,27 +118,29 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> dataRefs = 
                     CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
-            for (WSDataRef dataRef : dataRefs) {
-                String xpath = dataRef.getXpath();
-                if (xpath != null) {
-                    String[] nodes = StringUtils.split(xpath, "/");
-                    // envelope/Body || envelope/Header/header || envelope/Header/wsse:Security/header
-                    if (nodes.length < 3 || nodes.length > 5) {
-                        return false;
+            if (dataRefs != null) {
+                for (WSDataRef dataRef : dataRefs) {
+                    String xpath = dataRef.getXpath();
+                    if (xpath != null) {
+                        String[] nodes = StringUtils.split(xpath, "/");
+                        // envelope/Body || envelope/Header/header || envelope/Header/wsse:Security/header
+                        if (nodes.length < 3 || nodes.length > 5) {
+                            return false;
+                        }
+                        
+                        if (!(nodes[2].contains("Header") || nodes[2].contains("Body"))) {
+                            return false;
+                        }
+                        
+                        if (nodes.length == 5 && !nodes[3].contains("Security")) {
+                            return false;
+                        }
+                        
+                        if (nodes.length == 4 && nodes[2].contains("Body")) {
+                            return false;
+                        }
+                        
                     }
-                    
-                    if (!(nodes[2].contains("Header") || nodes[2].contains("Body"))) {
-                        return false;
-                    }
-                    
-                    if (nodes.length == 5 && !nodes[3].contains("Security")) {
-                        return false;
-                    }
-                    
-                    if (nodes.length == 4 && nodes[2].contains("Body")) {
-                        return false;
-                    }
-                    
                 }
             }
         }

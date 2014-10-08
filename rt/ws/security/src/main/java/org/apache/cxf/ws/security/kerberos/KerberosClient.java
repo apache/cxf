@@ -29,11 +29,16 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.ietf.jgss.GSSCredential;
 
 /**
  * A class that obtains a ticket from a KDC and wraps it in a SecurityToken object.
@@ -47,6 +52,9 @@ public class KerberosClient implements Configurable {
     private CallbackHandler callbackHandler;
     private String contextName;
     private WSSConfig wssConfig = WSSConfig.getNewInstance();
+    private boolean requestCredentialDelegation;
+    private boolean isUsernameServiceNameForm;
+    private boolean useDelegatedCredential;
 
     @Deprecated
     public KerberosClient(Bus b) {
@@ -126,12 +134,24 @@ public class KerberosClient implements Configurable {
     }
 
     public SecurityToken requestSecurityToken() throws Exception {
+        // See if we have a delegated Credential to use
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        GSSCredential delegatedCredential = null;
+        if (message != null && useDelegatedCredential) {
+            Object obj = message.getContextualProperty(SecurityConstants.DELEGATED_CREDENTIAL);
+            if (obj instanceof GSSCredential) {
+                delegatedCredential = (GSSCredential)obj;
+            }
+        }
+        
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Requesting Kerberos ticket for " + serviceName 
                     + " using JAAS Login Module: " + getContextName());
         }
         KerberosSecurity bst = new KerberosSecurity(DOMUtils.createDocument());
-        bst.retrieveServiceTicket(getContextName(), callbackHandler, serviceName);
+        bst.retrieveServiceTicket(getContextName(), callbackHandler, serviceName,
+                                  isUsernameServiceNameForm, requestCredentialDelegation,
+                                  delegatedCredential);
         bst.addWSUNamespace();
         bst.setID(wssConfig.getIdAllocator().createSecureId("BST-", bst));
         
@@ -147,6 +167,30 @@ public class KerberosClient implements Configurable {
         token.setTokenType(bst.getValueType());
 
         return token;
+    }
+
+    public boolean isUsernameServiceNameForm() {
+        return isUsernameServiceNameForm;
+    }
+
+    public void setUsernameServiceNameForm(boolean usernameServiceNameForm) {
+        this.isUsernameServiceNameForm = usernameServiceNameForm;
+    }
+
+    public boolean isRequestCredentialDelegation() {
+        return requestCredentialDelegation;
+    }
+
+    public void setRequestCredentialDelegation(boolean requestCredentialDelegation) {
+        this.requestCredentialDelegation = requestCredentialDelegation;
+    }
+
+    public boolean isUseDelegatedCredential() {
+        return useDelegatedCredential;
+    }
+
+    public void setUseDelegatedCredential(boolean useDelegatedCredential) {
+        this.useDelegatedCredential = useDelegatedCredential;
     }
 
 }

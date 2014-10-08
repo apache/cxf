@@ -27,6 +27,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
@@ -343,6 +344,18 @@ public class BookServer20 extends AbstractBusTestServerBase {
         }
         
     }
+    public static class PostMatchDynamicEchoBookFilter implements ContainerResponseFilter {
+        private int supplement;
+        public PostMatchDynamicEchoBookFilter(int supplement) {
+            this.supplement = supplement;
+        }
+        @Override
+        public void filter(ContainerRequestContext requestContext,
+                           ContainerResponseContext responseContext) throws IOException {
+            Book book = (Book)responseContext.getEntity();
+            responseContext.setEntity(new Book(book.getName(), book.getId() + supplement), null, null);
+        }
+    }
     
     @BindingPriority(2)
     public static class PostMatchDynamicContainerResponseFilter implements ContainerResponseFilter {
@@ -425,6 +438,13 @@ public class BookServer20 extends AbstractBusTestServerBase {
             configurable.register(new PreMatchDynamicContainerRequestFilter());
             configurable.register(new PostMatchDynamicContainerResponseFilter());
             configurable.register(RESPONSE_FILTER);
+            Method m = resourceInfo.getResourceMethod();
+            if ("echoBookElement".equals(m.getName())) {
+                Class<?> paramType = m.getParameterTypes()[0];
+                if (paramType == Book.class) {
+                    configurable.register(new PostMatchDynamicEchoBookFilter(2));
+                }
+            }
         }
         
     }
