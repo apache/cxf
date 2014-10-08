@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -270,6 +271,8 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         try {
             if (Timestamp.class.isAssignableFrom(valueType)) {
                 return convertToTimestamp(value);
+            } else if (Time.class.isAssignableFrom(valueType)) {
+                return convertToTime(value);
             } else {
                 return convertToDefaultDate(value);
             }
@@ -290,6 +293,11 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
     private Timestamp convertToTimestamp(String value) throws ParseException {
         Date date = convertToDefaultDate(value);
         return new Timestamp(date.getTime());
+    }
+    
+    private Time convertToTime(String value) throws ParseException {
+        Date date = convertToDefaultDate(value);
+        return new Time(date.getTime());
     }
     
     private Date convertToDefaultDate(String value) throws ParseException {
