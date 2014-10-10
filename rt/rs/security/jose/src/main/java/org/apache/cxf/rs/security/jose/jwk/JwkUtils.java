@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jwk;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -55,11 +56,17 @@ public final class JwkUtils {
     private JwkUtils() {
         
     }
+    public static JsonWebKey readJwkKey(URI uri) throws IOException {
+        return readJwkKey(uri.toURL().openStream());
+    }
+    public static JsonWebKeys readJwkSet(URI uri) throws IOException {
+        return readJwkSet(uri.toURL().openStream());
+    }
     public static JsonWebKey readJwkKey(InputStream is) throws IOException {
-        return new DefaultJwkReaderWriter().jsonToJwk(IOUtils.readStringFromStream(is));
+        return readJwkKey(IOUtils.readStringFromStream(is));
     }
     public static JsonWebKeys readJwkSet(InputStream is) throws IOException {
-        return new DefaultJwkReaderWriter().jsonToJwkSet(IOUtils.readStringFromStream(is));
+        return readJwkSet(IOUtils.readStringFromStream(is));
     }
     public static JsonWebKey readJwkKey(String jwkJson) {
         return new DefaultJwkReaderWriter().jsonToJwk(jwkJson);
