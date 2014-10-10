@@ -40,6 +40,9 @@ public class JwsCompactConsumer {
         if (r != null) {
             this.reader = r;
         }
+        if (encodedJws.startsWith("\"") && encodedJws.endsWith("\"")) {
+            encodedJws = encodedJws.substring(1, encodedJws.length() - 1);
+        }
         String[] parts = encodedJws.split("\\.");
         if (parts.length != 3) {
             if (parts.length == 2 && encodedJws.endsWith(".")) {
