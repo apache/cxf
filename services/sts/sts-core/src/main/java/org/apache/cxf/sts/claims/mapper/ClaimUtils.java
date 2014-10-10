@@ -22,8 +22,10 @@ package org.apache.cxf.sts.claims.mapper;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.cxf.sts.claims.ProcessedClaim;
@@ -414,5 +416,44 @@ public class ClaimUtils {
             }
         }
         return resultClaim;
+    }
+    
+    /**
+     * This function removes duplicated values.
+     * 
+     * @param processedClaim claim containing multi-values of which some might be duplicated
+     * @return Returns a clone of the provided claim containing only distinct values
+     */
+    public ProcessedClaim distinctValues(ProcessedClaim processedClaim) {
+        ProcessedClaim resultClaim = null;
+        if (processedClaim != null) {
+            resultClaim = processedClaim.clone();
+            if (resultClaim.getValues() != null) {
+                List<Object> oldValues = resultClaim.getValues();
+                Set<Object> distincValues = new LinkedHashSet<Object>(oldValues);
+                resultClaim.getValues().clear();
+                resultClaim.getValues().addAll(distincValues);
+            }
+        }
+        return resultClaim;
+    }
+    
+    /**
+     * Removes Claims without values.
+     * 
+     * @param processedClaims Collection of claims with and/or without values
+     * @return Returns a collection of claims which contain values only
+     */
+    public ProcessedClaimCollection removeEmptyClaims(ProcessedClaimCollection processedClaims) {
+        ProcessedClaimCollection resultClaimCollection = null;
+        if (processedClaims != null) {
+            resultClaimCollection = new ProcessedClaimCollection();
+            for (ProcessedClaim c : processedClaims) {
+                if (c.getValues() != null && c.getValues().size() > 0) {
+                    resultClaimCollection.add(c);
+                }
+            }
+        }
+        return resultClaimCollection;
     }
 }
