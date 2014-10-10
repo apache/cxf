@@ -177,7 +177,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             if (value.startsWith("\"") && value.endsWith("\"")) {
                 value = value.substring(1, value.length() - 1);
             }
-            map.put(key, value);
+            map.put(key, value.trim());
         }
         
         return map;
