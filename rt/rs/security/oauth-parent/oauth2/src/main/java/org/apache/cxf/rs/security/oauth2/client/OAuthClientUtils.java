@@ -355,11 +355,12 @@ public final class OAuthClientUtils {
                                         HttpRequestProperties httpProps) 
         throws OAuthServiceException {
         // this should all be handled by token specific serializers
-        if (OAuthConstants.BEARER_TOKEN_TYPE.equals(token.getTokenType())) {
+        String tokenType = token.getTokenType().toLowerCase();
+        if (OAuthConstants.BEARER_TOKEN_TYPE.equals(tokenType)) {
             sb.append(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
             sb.append(" ");
             sb.append(token.getTokenKey());
-        } else if (OAuthConstants.HAWK_TOKEN_TYPE.equals(token.getTokenType())) {
+        } else if (OAuthConstants.HAWK_TOKEN_TYPE.equals(tokenType)) {
             if (httpProps == null) {
                 throw new IllegalArgumentException("MAC scheme requires HTTP Request properties");
             }
