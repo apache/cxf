@@ -17,7 +17,7 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation="         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd         ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd         http://www.springframework.org/schema/util         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -59,6 +59,15 @@ under the License.
     <bean id="xmlSigInHandler" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
         <property name="requireSignature" value="true"/>
         <property name="signatureVerificationAlias" value="alice" />
+    </bean>
+    <bean id="xmlSigInHandlerConstraints" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
+        <property name="requireSignature" value="true"/>
+        <property name="signatureVerificationAlias" value="alice" />
+        <property name="subjectConstraints">
+            <util:list>
+                <value>.*CN=bob.*</value>
+            </util:list>
+        </property>
     </bean>
     <bean id="xmlEncInHandler" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
         <property name="decryptionAlias" value="bob" />
@@ -112,6 +121,22 @@ under the License.
         <jaxrs:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
+     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsigconstraints">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="xmlSigInHandlerConstraints"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <ref bean="xmlSigOutHandler"/>
+        </jaxrs:outInterceptors>
+        <jaxrs:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     

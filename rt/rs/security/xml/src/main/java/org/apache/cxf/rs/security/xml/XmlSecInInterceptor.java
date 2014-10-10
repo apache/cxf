@@ -23,9 +23,13 @@ import java.io.InputStream;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -78,6 +82,10 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     private boolean persistSignature = true;
     private boolean requireSignature;
     private boolean requireEncryption;
+    /**
+     * a collection of compiled regular expression patterns for the subject DN
+     */
+    private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
 
     public XmlSecInInterceptor() {
         super(Phase.POST_STREAM);
@@ -289,7 +297,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             
             // validate trust 
             try {
-                new TrustValidator().validateTrust(sigCrypto, cert, publicKey);
+                new TrustValidator().validateTrust(sigCrypto, cert, publicKey, subjectDNPatterns);
             } catch (WSSecurityException e) {
                 throw new XMLSecurityException("empty", "Error during Signature Trust "
                                                + "validation: " + e.getMessage());
@@ -349,6 +357,23 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void setRequireEncryption(boolean requireEncryption) {
         this.requireEncryption = requireEncryption;
+    }
+    
+    /**
+     * Set a list of Strings corresponding to regular expression constraints on the subject DN
+     * of a certificate
+     */
+    public void setSubjectConstraints(List<String> constraints) {
+        if (constraints != null) {
+            subjectDNPatterns = new ArrayList<Pattern>();
+            for (String constraint : constraints) {
+                try {
+                    subjectDNPatterns.add(Pattern.compile(constraint.trim()));
+                } catch (PatternSyntaxException ex) {
+                    throw ex;
+                }
+            }
+        }
     }
     
     /**

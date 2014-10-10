@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.common;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.regex.Pattern;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -30,9 +32,16 @@ import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 public class TrustValidator {
     public void validateTrust(Crypto crypto, X509Certificate cert, PublicKey publicKey) 
         throws WSSecurityException {
+        validateTrust(crypto, cert, publicKey, null);
+    }
+    
+    public void validateTrust(Crypto crypto, X509Certificate cert, PublicKey publicKey,
+                              Collection<Pattern> subjectCertConstraints) 
+        throws WSSecurityException {
         SignatureTrustValidator validator = new SignatureTrustValidator();
         RequestData data = new RequestData();
         data.setSigVerCrypto(crypto);
+        data.setSubjectCertConstraints(subjectCertConstraints);
         
         Credential trustCredential = new Credential();
         trustCredential.setPublicKey(publicKey);
