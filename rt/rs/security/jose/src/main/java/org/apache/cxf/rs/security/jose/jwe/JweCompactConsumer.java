@@ -39,6 +39,9 @@ public class JweCompactConsumer {
         this(jweContent, new JoseHeadersReaderWriter());
     }
     public JweCompactConsumer(String jweContent, JoseHeadersReader reader) {
+        if (jweContent.startsWith("\"") && jweContent.endsWith("\"")) {
+            jweContent = jweContent.substring(1, jweContent.length() - 1);
+        }
         String[] parts = jweContent.split("\\.");
         if (parts.length != 5) {
             throw new SecurityException("5 JWE parts are expected");
