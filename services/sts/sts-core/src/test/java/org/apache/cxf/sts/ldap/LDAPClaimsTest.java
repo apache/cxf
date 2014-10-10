@@ -111,6 +111,65 @@ public class LDAPClaimsTest {
 
     }
 
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testMultiUserBaseDNs() throws Exception {
+        LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandlerMultipleUserBaseDNs");
+
+        String user = props.getProperty("claimUser");
+        Assert.notNull(user, "Property 'claimUser' not configured");
+        String otherUser = props.getProperty("otherClaimUser");
+        Assert.notNull(otherUser, "Property 'otherClaimUser' not configured");
+
+        ClaimCollection requestedClaims = createRequestClaimCollection();
+
+        List<URI> expectedClaims = new ArrayList<URI>();
+        expectedClaims.add(ClaimTypes.FIRSTNAME);
+        expectedClaims.add(ClaimTypes.LASTNAME);
+        expectedClaims.add(ClaimTypes.EMAILADDRESS);
+       
+        // First user
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal(user));
+        ProcessedClaimCollection retrievedClaims = 
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
+
+        Assert.isTrue(
+                      retrievedClaims.size() == expectedClaims.size(), 
+                      "Retrieved number of claims [" + retrievedClaims.size() 
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+        );
+
+        for (ProcessedClaim c : retrievedClaims) {
+            if (expectedClaims.contains(c.getClaimType())) {
+                expectedClaims.remove(c.getClaimType());
+            } else {
+                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
+            }
+        }
+        
+        // Second user
+        params.setPrincipal(new CustomTokenPrincipal(otherUser));
+        retrievedClaims = claimsHandler.retrieveClaimValues(requestedClaims, params);
+
+        expectedClaims.add(ClaimTypes.FIRSTNAME);
+        expectedClaims.add(ClaimTypes.LASTNAME);
+        expectedClaims.add(ClaimTypes.EMAILADDRESS);
+        
+        Assert.isTrue(
+                      retrievedClaims.size() == expectedClaims.size(), 
+                      "Retrieved number of claims [" + retrievedClaims.size() 
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+        );
+
+        for (ProcessedClaim c : retrievedClaims) {
+            if (expectedClaims.contains(c.getClaimType())) {
+                expectedClaims.remove(c.getClaimType());
+            } else {
+                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
+            }
+        }
+    }
 
     @org.junit.Test(expected = STSException.class)
     @org.junit.Ignore

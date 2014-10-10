@@ -51,6 +51,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
     private LdapTemplate ldap;
     private Map<String, String> claimMapping;
     private String userBaseDn;
+    private List<String> userBaseDNs;
     private String delimiter = ";";
     private boolean x500FilterEnabled = true;
     private String objectClass = "person";
@@ -202,14 +203,25 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
             String[] searchAttributes = null;
             searchAttributes = searchAttributeList.toArray(new String[searchAttributeList.size()]);
             
-            ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, this.userBaseDn, this.getObjectClass(),
-                                                            this.getUserNameAttribute(), user, searchAttributes);
+            if (this.userBaseDNs == null || this.userBaseDn != null) {
+                ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, this.userBaseDn, this.getObjectClass(), this
+                    .getUserNameAttribute(), user, searchAttributes);
+            }
+            if (this.userBaseDNs != null && (ldapAttributes == null || ldapAttributes.size() == 0)) {
+                for (String userBase : userBaseDNs) {
+                    ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, userBase, this.getObjectClass(), this
+                        .getUserNameAttribute(), user, searchAttributes);
+                    if (ldapAttributes != null && ldapAttributes.size() > 0) {
+                        break; // User found
+                    }
+                }
+            }
         }
         
         if (ldapAttributes == null || ldapAttributes.size() == 0) {
             //No result
             if (LOG.isLoggable(Level.INFO)) {
-                LOG.finest("User '" + user + "' not found");
+                LOG.info("User '" + user + "' not found");
             }
             return new ProcessedClaimCollection();
         }
@@ -278,8 +290,14 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
     @Override
     public String getHandlerRealm() {
         return realm;
+    }
+
+    public List<String> getUserBaseDNs() {
+        return userBaseDNs;
+    }
+
+    public void setUserBaseDNs(List<String> userBaseDNs) {
+        this.userBaseDNs = userBaseDNs;
     }  
 
 }
-
-
