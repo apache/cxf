@@ -32,6 +32,7 @@ import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -114,7 +115,8 @@ public class JweWriterInterceptor implements WriterInterceptor {
             ctx.setOutputStream(cos);
             ctx.proceed();
             String jweContent = theEncryptionProvider.encrypt(cos.getBytes(), ctString);
-            IOUtils.copy(new ByteArrayInputStream(jweContent.getBytes("UTF-8")), actualOs);
+            IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jweContent)), 
+                         actualOs);
             actualOs.flush();
         }
     }

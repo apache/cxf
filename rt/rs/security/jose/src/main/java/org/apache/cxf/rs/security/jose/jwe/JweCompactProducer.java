@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
@@ -136,7 +137,7 @@ public class JweCompactProducer {
                                        byte[] encryptedContentEncryptionKey,
                                        byte[] cipherInitVector) throws IOException {
         writer = writer == null ? new JwtTokenReaderWriter() : writer;
-        byte[] jsonBytes = writer.headersToJson(headers).getBytes("UTF-8");
+        byte[] jsonBytes = StringUtils.toBytesUTF8(writer.headersToJson(headers));
         Base64UrlUtility.encodeAndStream(jsonBytes, 0, jsonBytes.length, os);
         byte[] dotBytes = new byte[]{'.'};
         os.write(dotBytes);

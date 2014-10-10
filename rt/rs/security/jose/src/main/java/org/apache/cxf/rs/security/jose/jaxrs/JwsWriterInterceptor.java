@@ -29,6 +29,7 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.common.util.Base64UrlOutputStream;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
@@ -56,7 +57,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
         if (useJwsOutputStream) {
             JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
             JwsOutputStream jwsStream = new JwsOutputStream(actualOs, jwsSignature);
-            byte[] headerBytes = writer.headersToJson(headers).getBytes("UTF-8");
+            byte[] headerBytes = StringUtils.toBytesUTF8(writer.headersToJson(headers));
             Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
             jwsStream.write(new byte[]{'.'});
                         

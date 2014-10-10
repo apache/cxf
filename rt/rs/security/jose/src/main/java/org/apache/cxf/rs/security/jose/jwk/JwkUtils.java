@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.jose.jwk;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -33,6 +32,7 @@ import java.util.Properties;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -278,10 +278,6 @@ public final class JwkUtils {
                                                Algorithm.toJavaName(jwk.getAlgorithm()));
     }
     private static byte[] stringToBytes(String str) {
-        try {
-            return str.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new SecurityException(ex);
-        }
+        return StringUtils.toBytesUTF8(str);
     }
 }

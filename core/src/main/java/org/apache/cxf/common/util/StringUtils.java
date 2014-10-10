@@ -20,6 +20,7 @@
 package org.apache.cxf.common.util;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -197,4 +198,22 @@ public final class StringUtils {
             .append(str.substring(1))
             .toString();
     }    
+    
+    public static byte[] toBytesUTF8(String str) {
+        try {
+            return toBytes(str, "UTF-8");
+        } catch (UnsupportedEncodingException ex) { 
+            throw new RuntimeException(ex);
+        }
+    }
+    public static byte[] toBytesASCII(String str) {
+        try {
+            return toBytes(str, "US-ASCII");
+        } catch (UnsupportedEncodingException ex) { 
+            throw new RuntimeException(ex);
+        }
+    }
+    public static byte[] toBytes(String str, String enc) throws UnsupportedEncodingException {
+        return str.getBytes(enc);
+    }
 }
