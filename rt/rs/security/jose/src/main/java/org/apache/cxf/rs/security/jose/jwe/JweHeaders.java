@@ -19,10 +19,10 @@
 
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
@@ -96,11 +96,8 @@ public class JweHeaders extends JoseHeaders {
         return toCipherAdditionalAuthData(writer.headersToJson(this));
     }
     public static byte[] toCipherAdditionalAuthData(String headersJson) { 
-        try {
-            String base64UrlHeadersInJson = Base64UrlUtility.encode(headersJson.getBytes("UTF-8"));
-            return base64UrlHeadersInJson.getBytes("US-ASCII");
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        }
+        byte[] headerBytes = StringUtils.toBytesUTF8(headersJson);
+        String base64UrlHeadersInJson = Base64UrlUtility.encode(headerBytes);
+        return StringUtils.toBytesASCII(base64UrlHeadersInJson);
     }
 }

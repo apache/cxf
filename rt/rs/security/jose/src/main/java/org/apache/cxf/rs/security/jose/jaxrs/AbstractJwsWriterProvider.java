@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.Properties;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -86,7 +87,8 @@ public class AbstractJwsWriterProvider {
     protected void writeJws(JwsCompactProducer p, JwsSignatureProvider theSigProvider, OutputStream os) 
         throws IOException {
         p.signWith(theSigProvider);
-        IOUtils.copy(new ByteArrayInputStream(p.getSignedEncodedJws().getBytes("UTF-8")), os);
+        byte[] bytes = StringUtils.toBytesUTF8(p.getSignedEncodedJws());
+        IOUtils.copy(new ByteArrayInputStream(bytes), os);
     }
     private String getSignatureAlgo(Properties props, String algo) {
         return algo == null ? props.getProperty(JSON_WEB_SIGNATURE_ALGO_PROP) : algo;

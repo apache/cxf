@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -29,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.bouncycastle.crypto.Digest;
@@ -153,11 +153,7 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
     }    
     
     static byte[] stringToBytes(String str) {
-        try {
-            return str.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new SecurityException(ex);
-        }
+        return StringUtils.toBytesUTF8(str);
     }
     static byte[] charsToBytes(char[] chars) {
         ByteBuffer bb = Charset.forName("UTF-8").encode(CharBuffer.wrap(chars));

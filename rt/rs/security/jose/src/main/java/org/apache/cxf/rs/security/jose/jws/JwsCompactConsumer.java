@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
@@ -71,11 +72,7 @@ public class JwsCompactConsumer {
         return jwsPayload;
     }
     public byte[] getDecodedJwsPayloadBytes() {
-        try {
-            return jwsPayload.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new SecurityException(ex);
-        }
+        return StringUtils.toBytesUTF8(jwsPayload);
     }
     public byte[] getDecodedSignature() {
         return encodedSignature.isEmpty() ? new byte[]{} : decode(encodedSignature);

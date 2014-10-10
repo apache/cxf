@@ -76,14 +76,12 @@ public class JwsCompactProducer {
     
     public String signWith(JwsSignatureProvider signer) { 
         JwsSignature worker = signer.createJwsSignature(getHeaders());
-        try {
-            byte[] bytes = getUnsignedEncodedJws().getBytes("UTF-8");
-            worker.update(bytes, 0, bytes.length);
-            signWith(worker.sign());
-            return getSignedEncodedJws();
-        } catch (Exception ex) {
-            throw new SecurityException();
-        }
+        
+        byte[] bytes = StringUtils.toBytesUTF8(getUnsignedEncodedJws());
+        worker.update(bytes, 0, bytes.length);
+        signWith(worker.sign());
+        return getSignedEncodedJws();
+        
     }
     
     public String signWith(String signatureText) {
