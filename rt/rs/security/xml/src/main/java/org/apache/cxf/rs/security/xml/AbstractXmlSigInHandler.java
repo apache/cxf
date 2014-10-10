@@ -22,13 +22,17 @@ package org.apache.cxf.rs.security.xml;
 import java.io.InputStream;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -54,6 +58,10 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
     private boolean persistSignature = true;
     private boolean keyInfoMustBeAvailable = true;
     private SignatureProperties sigProps;
+    /**
+     * a collection of compiled regular expression patterns for the subject DN
+     */
+    private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
     
     public void setRemoveSignature(boolean remove) {
         this.removeSignature = remove;
@@ -144,7 +152,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             }
             
             // validate trust 
-            new TrustValidator().validateTrust(crypto, cert, publicKey);
+            new TrustValidator().validateTrust(crypto, cert, publicKey, subjectDNPatterns);
             if (valid && persistSignature) {
                 message.setContent(XMLSignature.class, signature);
                 message.setContent(Element.class, signedElement);
@@ -370,4 +378,22 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
     public void setKeyInfoMustBeAvailable(boolean use) {
         this.keyInfoMustBeAvailable = use;
     }
+    
+    /**
+     * Set a list of Strings corresponding to regular expression constraints on the subject DN
+     * of a certificate
+     */
+    public void setSubjectConstraints(List<String> constraints) {
+        if (constraints != null) {
+            subjectDNPatterns = new ArrayList<Pattern>();
+            for (String constraint : constraints) {
+                try {
+                    subjectDNPatterns.add(Pattern.compile(constraint.trim()));
+                } catch (PatternSyntaxException ex) {
+                    throw ex;
+                }
+            }
+        }
+    }
+    
 }

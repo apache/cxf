@@ -101,8 +101,45 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         doTestSignatureProxy(address, true, "file:", test.streaming);
     }
     
+    @Test
+    public void testCertConstraints() throws Exception {
+        String address = "https://localhost:" + test.port + "/xmlsigconstraints";
+        
+        // Successful test with "bob"
+        Map<String, Object> newProperties = new HashMap<String, Object>();
+        newProperties.put("ws-security.callback-handler", 
+            "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        newProperties.put("ws-security.signature.username", "bob");
+
+        String cryptoUrl = "org/apache/cxf/systest/jaxrs/security/bob.properties";
+        newProperties.put("ws-security.signature.properties", cryptoUrl);
+        doTestSignatureProxy(address, false, null, test.streaming, newProperties);
+        
+        // Constraint validation fails with "alice"
+        newProperties.clear();
+        newProperties.put("ws-security.callback-handler", 
+            "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        newProperties.put("ws-security.signature.username", "alice");
+
+        cryptoUrl = "org/apache/cxf/systest/jaxrs/security/alice.properties";
+        newProperties.put("ws-security.signature.properties", cryptoUrl);
+        try {
+            doTestSignatureProxy(address, false, null, test.streaming, newProperties);
+            fail("Failure expected on a failing cert constraint");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+    
     private void doTestSignatureProxy(String address, boolean enveloping,
                                       String cryptoUrlPrefix, boolean streaming) throws Exception {
+        doTestSignatureProxy(address, enveloping, cryptoUrlPrefix, 
+                             streaming, new HashMap<String, Object>());
+    }
+    
+    private void doTestSignatureProxy(String address, boolean enveloping,
+                                      String cryptoUrlPrefix, boolean streaming,
+                                      Map<String, Object> properties) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -111,17 +148,19 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.signature.username", "alice");
-        
-        String cryptoUrl = "org/apache/cxf/systest/jaxrs/security/alice.properties";
-        if (cryptoUrlPrefix != null) {
-            cryptoUrl = cryptoUrlPrefix + this.getClass().getResource("/" + cryptoUrl).toURI().getPath();
+        Map<String, Object> newProperties = new HashMap<String, Object>(properties);
+        if (newProperties.isEmpty()) {
+            newProperties.put("ws-security.callback-handler", 
+                           "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+            newProperties.put("ws-security.signature.username", "alice");
+            
+            String cryptoUrl = "org/apache/cxf/systest/jaxrs/security/alice.properties";
+            if (cryptoUrlPrefix != null) {
+                cryptoUrl = cryptoUrlPrefix + this.getClass().getResource("/" + cryptoUrl).toURI().getPath();
+            }
+            newProperties.put("ws-security.signature.properties", cryptoUrl);
         }
-        properties.put("ws-security.signature.properties", cryptoUrl);
-        bean.setProperties(properties);
+        bean.setProperties(newProperties);
         
         if (streaming) {
             XmlSecOutInterceptor sigInterceptor = new XmlSecOutInterceptor();
@@ -137,18 +176,8 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         bean.setServiceClass(BookStore.class);
         
         BookStore store = bean.create(BookStore.class);
-        try {
-            Book book = store.addBook(new Book("CXF", 126L));
-            assertEquals(126L, book.getId());
-        } catch (WebApplicationException ex) {
-            fail(ex.getMessage());
-        } catch (ProcessingException ex) {
-            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
-                fail(ex.getCause().getMessage());
-            } else {
-                fail(ex.getMessage());
-            }
-        }
+        Book book = store.addBook(new Book("CXF", 126L));
+        assertEquals(126L, book.getId());
     }
     
     @Test
