@@ -55,6 +55,8 @@
                 <constructor-arg>
                     <map>
                         <entry key="action" value="UsernameToken"/>
+                        <entry key="addUsernameTokenNonce" value="true"/>
+                        <entry key="addUsernameTokenCreated" value="true"/>
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
                         <entry key="user" value="Alice"/>
                     </map>
