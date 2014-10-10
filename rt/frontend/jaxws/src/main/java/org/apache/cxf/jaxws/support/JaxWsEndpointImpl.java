@@ -123,6 +123,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
     private SOAPHandlerFaultOutInterceptor soapFaultOutInterceptor;
     private LogicalHandlerFaultInInterceptor logicalFaultInInterceptor;
     private SOAPHandlerFaultInInterceptor soapFaultInInterceptor;
+    private boolean handlerInterceptorsAdded;
         
     public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei) throws EndpointException {
         this(bus, s, ei, null, null, null, true);
@@ -534,6 +535,12 @@ public class JaxWsEndpointImpl extends EndpointImpl {
     }
 
     public void addHandlerInterceptors() {
+        if (handlerInterceptorsAdded) {
+            return;
+        } 
+
+        handlerInterceptorsAdded = true;
+
         List<Interceptor<? extends Message>> in = super.getInInterceptors();       
         List<Interceptor<? extends Message>> out = super.getOutInterceptors();
         List<Interceptor<? extends Message>> outFault = super.getOutFaultInterceptors();    
@@ -555,6 +562,12 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         }
     }
     public void removeHandlerInterceptors() {
+        if (!handlerInterceptorsAdded) {
+            return;
+        }
+
+        handlerInterceptorsAdded = false;
+
         List<Interceptor<? extends Message>> in = super.getInInterceptors();       
         List<Interceptor<? extends Message>> out = super.getOutInterceptors();
         List<Interceptor<? extends Message>> outFault = super.getOutFaultInterceptors();    
