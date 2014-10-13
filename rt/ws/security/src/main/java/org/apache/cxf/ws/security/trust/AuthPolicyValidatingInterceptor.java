@@ -20,9 +20,11 @@ package org.apache.cxf.ws.security.trust;
 
 import java.security.Principal;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -31,8 +33,14 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
+import org.apache.cxf.rt.security.saml.SAMLUtils;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -82,14 +90,16 @@ public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Me
             credential = validator.validate(credential, data);
             
             // Create a Principal/SecurityContext
-            Principal p = null;
+            SecurityContext sc = null;
             if (credential != null && credential.getPrincipal() != null) {
-                p = credential.getPrincipal();
+                sc = createSecurityContext(message, credential);
             } else {
-                p = new WSUsernameTokenPrincipalImpl(policy.getUserName(), false);
+                Principal p = new WSUsernameTokenPrincipalImpl(policy.getUserName(), false);
                 ((WSUsernameTokenPrincipalImpl)p).setPassword(policy.getPassword());
+                sc = createSecurityContext(p);
             }
-            message.put(SecurityContext.class, createSecurityContext(p));
+            
+            message.put(SecurityContext.class, sc);
         } catch (Exception ex) {
             throw new Fault(ex);
         }
@@ -117,6 +127,33 @@ public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Me
                 return false;
             }
         };
+    }
+    
+    protected SecurityContext createSecurityContext(Message msg, Credential credential) {
+        SamlAssertionWrapper samlAssertion = credential.getTransformedToken();
+        if (samlAssertion == null) {
+            samlAssertion = credential.getSamlAssertion();
+        }
+        if (samlAssertion != null) {
+            String roleAttributeName = 
+                (String)msg.getContextualProperty(SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+            if (roleAttributeName == null || roleAttributeName.length() == 0) {
+                roleAttributeName = WSS4JInInterceptor.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
+            }
+
+            ClaimCollection claims = 
+                SAMLUtils.getClaims((SamlAssertionWrapper)samlAssertion);
+            Set<Principal> roles = 
+                SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
+
+            SAMLSecurityContext context = 
+                new SAMLSecurityContext(credential.getPrincipal(), roles, claims);
+            context.setIssuer(SAMLUtils.getIssuer(samlAssertion));
+            context.setAssertionElement(SAMLUtils.getAssertionElement(samlAssertion));
+            return context;
+        } else {
+            return createSecurityContext(credential.getPrincipal());
+        }
     }
 
     public void setValidator(Validator validator) {
