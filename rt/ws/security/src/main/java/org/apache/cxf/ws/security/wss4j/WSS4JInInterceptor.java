@@ -583,9 +583,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (!utWithCallbacks) {
                 WSS4JTokenConverter.convertToken(msg, p);
             }
-            Object receivedAssertion = wsResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            Object receivedAssertion = wsResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
             if (receivedAssertion == null) {
-                receivedAssertion = wsResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
+                receivedAssertion = wsResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             }
             if (wsResult.get(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL) != null) {
                 msg.put(SecurityConstants.DELEGATED_CREDENTIAL, 
