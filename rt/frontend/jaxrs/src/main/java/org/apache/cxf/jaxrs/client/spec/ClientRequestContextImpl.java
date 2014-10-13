@@ -105,7 +105,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     public void setEntity(Object entity, Annotation[] anns, MediaType mt) {
         if (mt != null) {
             MultivaluedMap<String, Object> headers = getHeaders();
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, mt);
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, mt.toString());
             m.put(Message.CONTENT_TYPE, mt.toString());
         }
         if (anns != null) {
@@ -126,9 +126,8 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
             } else {
                 type = entity.getClass();
             }
-        }
-        if (type != null) {
             m.put(Type.class, type);
+            m.remove("org.apache.cxf.empty.request");
         }
     }
     

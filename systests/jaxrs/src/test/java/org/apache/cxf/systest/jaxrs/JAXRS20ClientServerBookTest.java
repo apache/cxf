@@ -275,6 +275,16 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         Book book = wc.invoke("DELETE", new Book("book", 555L), Book.class);
         assertEquals(561L, book.getId());
     }
+    @Test
+    public void testReplaceBookMistypedCTAndHttpVerb2() throws Exception {
+        
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/books2/mistyped"; 
+        WebClient wc = WebClient.create(endpointAddress,
+                                        Collections.singletonList(new ReplaceBodyFilter()));
+        wc.accept("text/mistypedxml").header("THEMETHOD", "PUT");
+        Book book = wc.invoke("GET", null, Book.class);
+        assertEquals(561L, book.getId());
+    }
     
     @Test
     public void testPostGetCollectionGenericEntityAndType() throws Exception {
@@ -554,9 +564,12 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             String expectedMethod = null; 
             if (rc.getAcceptableMediaTypes().contains(MediaType.valueOf("text/mistypedxml"))
                 && rc.getHeaders().getFirst("THEMETHOD") != null) {
-                expectedMethod = "DELETE";
+                expectedMethod = MediaType.TEXT_XML_TYPE.equals(rc.getMediaType()) ? "DELETE" : "GET";
                 rc.setUri(URI.create("http://localhost:" + PORT + "/bookstore/books2"));
                 rc.setMethod(rc.getHeaders().getFirst("THEMETHOD").toString());
+                if ("GET".equals(expectedMethod)) {
+                    //rc.getHeaders().putSingle("Content-Type", "text/xml");
+                }
             } else {
                 expectedMethod = "POST";
             }
@@ -565,7 +578,11 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             if (!expectedMethod.equals(method)) {
                 throw new RuntimeException();
             }
-            rc.setEntity(new Book("book", ((Book)rc.getEntity()).getId() + 5), null, null);
+            if ("GET".equals(expectedMethod)) {
+                rc.setEntity(new Book("book", 560L), null, MediaType.TEXT_XML_TYPE);
+            } else {
+                rc.setEntity(new Book("book", ((Book)rc.getEntity()).getId() + 5), null, null);
+            }
         }
 
                 
