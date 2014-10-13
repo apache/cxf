@@ -39,7 +39,10 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * In this test case, a CXF client sends a Username Token via (1-way) TLS to a CXF provider.
- * The provider dispatches the Username Token to an STS for validation (via TLS).
+ * The provider dispatches the Username Token to an STS for validation (via TLS). It also
+ * includes a test where the service provider sends the token for validation using the
+ * WS-Trust "Issue" binding, and sending the token "OnBehalfOf". Roles are also requested, and
+ * access is only granted to the service if the "admin-user" role is in effect.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class UsernameTokenTest extends AbstractBusClientServerTestBase {
@@ -159,6 +162,73 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(message.contains("STS Authentication failed")
                 || message.contains("Validation of security token failed")
                 || message.contains("The security token could not be authenticated or authorized"));
+        }
+        
+        ((java.io.Closeable)transportUTPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testUsernameTokenAuthorization() throws Exception {
+        // Token transformation is not supported for the streaming code
+        if (STAX_PORT.equals(test.getPort())) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportUTAuthorizationPort");
+        DoubleItPortType transportUTPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportUTPort, test.getPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportUTPort);
+        }
+        
+        doubleIt(transportUTPort, 25);
+        
+        ((java.io.Closeable)transportUTPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testUnauthorizedUsernameToken() throws Exception {
+        // Token transformation is not supported for the streaming code
+        if (STAX_PORT.equals(test.getPort())) {
+            return;
+        }
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenTest.class.getResource("cxf-bad-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportUTAuthorizationPort");
+        DoubleItPortType transportUTPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportUTPort, test.getPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportUTPort);
+        }
+        
+        try {
+            doubleIt(transportUTPort, 30);
+            fail("Expected failure on a bad password");
+        } catch (javax.xml.ws.soap.SOAPFaultException fault) {
+            // expected
         }
         
         ((java.io.Closeable)transportUTPort).close();

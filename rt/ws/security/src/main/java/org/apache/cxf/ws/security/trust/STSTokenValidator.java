@@ -19,8 +19,14 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.endpoint.Endpoint;
@@ -30,6 +36,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
+import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -37,11 +44,14 @@ import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 
 /**
- * 
+ * A WSS4J-based Validator to validate a received WS-Security credential by dispatching
+ * it to a STS via WS-Trust. The default binding is "validate", but "issue" using "OnBehalfOf"
+ * is also possible by setting the "useIssueBinding" property.
  */
 public class STSTokenValidator implements Validator {
     private STSSamlAssertionValidator samlValidator = new STSSamlAssertionValidator();
     private boolean alwaysValidateToSts;
+    private boolean useIssueBinding;
     
     public STSTokenValidator() {
     }
@@ -102,8 +112,19 @@ public class STSTokenValidator implements Validator {
             STSClient c = STSUtils.getClient(message, "sts");
             synchronized (c) {
                 System.setProperty("noprint", "true");
-                List<SecurityToken> tokens = c.validateSecurityToken(token);
-                SecurityToken returnedToken = tokens.get(0);
+                
+                SecurityToken returnedToken = null;
+                
+                if (useIssueBinding) {
+                    ElementCallbackHandler callbackHandler = new ElementCallbackHandler(tokenElement);
+                    c.setOnBehalfOf(callbackHandler);
+                    returnedToken = c.requestSecurityToken();
+                    c.setOnBehalfOf(null);
+                } else {
+                    List<SecurityToken> tokens = c.validateSecurityToken(token);
+                    returnedToken = tokens.get(0);
+                }
+                
                 if (returnedToken != token) {
                     SamlAssertionWrapper assertion = new SamlAssertionWrapper(returnedToken.getToken());
                     credential.setTransformedToken(assertion);
@@ -169,4 +190,35 @@ public class STSTokenValidator implements Validator {
         }
         return null;
     }
+
+    public boolean isUseIssueBinding() {
+        return useIssueBinding;
+    }
+
+    public void setUseIssueBinding(boolean useIssueBinding) {
+        this.useIssueBinding = useIssueBinding;
+    }
+    
+    private static class ElementCallbackHandler implements CallbackHandler {
+        
+        private final Element tokenElement;
+        
+        public ElementCallbackHandler(Element tokenElement) {
+            this.tokenElement = tokenElement;
+        }
+        
+        public void handle(Callback[] callbacks)
+            throws IOException, UnsupportedCallbackException {
+            for (int i = 0; i < callbacks.length; i++) {
+                if (callbacks[i] instanceof DelegationCallback) {
+                    DelegationCallback callback = (DelegationCallback) callbacks[i];
+                    
+                    callback.setToken(tokenElement);
+                } else {
+                    throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                }
+            }
+        }
+    }
+
 }

@@ -46,6 +46,50 @@
             </entry>
         </jaxws:properties>
     </jaxws:endpoint>
+    
+    <bean id="authorizationInterceptor" 
+         class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
+       <property name="methodRolesMap">
+           <map>
+               <entry key="doubleIt" value="admin-user"/>
+           </map>
+       </property>
+    </bean>
+    
+    <bean id="claimsCallbackHandlerImpl" 
+          class="org.apache.cxf.systest.sts.claims.ClaimsCallbackHandler"/>
+          
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportutauthorization" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportUTAuthorizationPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server}/doubleit/services/doubleittransportutauthorization" wsdlLocation="org/apache/cxf/systest/sts/usernametoken/DoubleIt.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="ws-security.ut.validator">
+                <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator">
+                    <property name="useIssueBinding" value="true"/>
+                </bean>
+            </entry>
+            <entry key="ws-security.sts.client">
+                <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                    <constructor-arg ref="cxf"/>
+                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport?wsdl"/>
+                    <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                    <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+                    <property name="properties">
+                        <map>
+                            <entry key="ws-security.username" value="bob"/>
+                            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                        </map>
+                    </property>
+                    <property name="claimsCallbackHandler" ref="claimsCallbackHandlerImpl"/>
+                    <property name="tokenType" 
+                              value="http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0"/>
+                </bean>
+            </entry>
+        </jaxws:properties>
+        <jaxws:inInterceptors>
+            <ref bean="authorizationInterceptor"/>
+       </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.Server}">
             <httpj:tlsServerParameters>
