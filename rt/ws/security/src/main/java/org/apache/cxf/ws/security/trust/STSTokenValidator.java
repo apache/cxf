@@ -28,7 +28,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -38,6 +37,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.Credential;
@@ -103,6 +103,7 @@ public class STSTokenValidator implements Validator {
                 SecurityToken transformedToken = getTransformedToken(tokenStore, hash);
                 if (transformedToken != null && !transformedToken.isExpired()) {
                     SamlAssertionWrapper assertion = new SamlAssertionWrapper(transformedToken.getToken());
+                    credential.setPrincipal(new SAMLTokenPrincipalImpl(assertion));
                     credential.setTransformedToken(assertion);
                     return credential;
                 }
@@ -128,6 +129,7 @@ public class STSTokenValidator implements Validator {
                 if (returnedToken != token) {
                     SamlAssertionWrapper assertion = new SamlAssertionWrapper(returnedToken.getToken());
                     credential.setTransformedToken(assertion);
+                    credential.setPrincipal(new SAMLTokenPrincipalImpl(assertion));
                     if (hash != 0) {
                         tokenStore.add(returnedToken);
                         token.setTransformedTokenIdentifier(returnedToken.getId());
