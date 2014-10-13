@@ -139,10 +139,10 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
             } else {
                 type = entity.getClass();
             }
-        }
-        if (type != null) {
             m.put(Type.class, type);
+            m.remove("org.apache.cxf.empty.request");
         }
+        
     }
     
     @Override

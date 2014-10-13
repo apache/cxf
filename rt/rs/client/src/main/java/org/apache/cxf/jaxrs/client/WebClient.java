@@ -96,6 +96,7 @@ public class WebClient extends AbstractClient {
     protected WebClient(ClientState state) {
         super(state);
         cfg.getInInterceptors().add(new ClientAsyncResponseInterceptor());
+        cfg.getOutInterceptors().add(new BodyWriter());
     }
     
     
@@ -1122,7 +1123,6 @@ public class WebClient extends AbstractClient {
         
         if (body != null) {
             m.put(Type.class, inGenericType);
-            m.getInterceptorChain().add(new BodyWriter());
         }
         setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
         return m;
