@@ -310,6 +310,8 @@
                         <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                             <wsp:Policy>
                                 <sp:WssUsernameToken10/>
+                                <sp13:Created/>
+                                <sp13:Nonce/>
                             </wsp:Policy>
                         </sp:UsernameToken>
                     </wsp:Policy>
