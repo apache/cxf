@@ -352,10 +352,10 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                     utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);
                 }
                 
-                if (token.isCreated()) {
+                if (token.isRequireCreated()) {
                     utBuilder.addCreated();
                 }
-                if (token.isNonce()) {
+                if (token.isRequireNonce()) {
                     utBuilder.addNonce();
                 }
                 
