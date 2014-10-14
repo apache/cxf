@@ -97,8 +97,8 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         
         GetResponse response = client.get(request);
         ValueType value = getValue(response.getRepresentation());
-        Assert.assertEquals(1, value.getAny().size());
-        Assert.assertEquals("a", ((Element)value.getAny().get(0)).getLocalName());
+        Assert.assertEquals(1, value.getContent().size());
+        Assert.assertEquals("a", ((Element)value.getContent().get(0)).getLocalName());
         
         resource.destroy();
     }
@@ -122,9 +122,9 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         
         GetResponse response = client.get(request);
         ValueType value = getValue(response.getRepresentation());
-        Assert.assertEquals(1, value.getAny().size());
-        Assert.assertEquals("a", ((Element)value.getAny().get(0)).getLocalName());
-        Assert.assertEquals("www.example.org", ((Element)value.getAny().get(0)).getNamespaceURI());
+        Assert.assertEquals(1, value.getContent().size());
+        Assert.assertEquals("a", ((Element)value.getContent().get(0)).getLocalName());
+        Assert.assertEquals("www.example.org", ((Element)value.getContent().get(0)).getNamespaceURI());
         
         resource.destroy();
     }
@@ -148,7 +148,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         
         GetResponse response = client.get(request);
         ValueType value = getValue(response.getRepresentation());
-        Assert.assertEquals(0, value.getAny().size());
+        Assert.assertEquals(0, value.getContent().size());
         
         resource.destroy();
     }
@@ -172,10 +172,10 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         
         GetResponse response = client.get(request);
         ValueType value = getValue(response.getRepresentation());
-        Assert.assertEquals(3, value.getAny().size());
-        Assert.assertEquals("b", ((Element)value.getAny().get(0)).getLocalName());
-        Assert.assertEquals("b", ((Element)value.getAny().get(1)).getLocalName());
-        Assert.assertEquals("b", ((Element)value.getAny().get(2)).getLocalName());
+        Assert.assertEquals(3, value.getContent().size());
+        Assert.assertEquals("b", ((Element)value.getContent().get(0)).getLocalName());
+        Assert.assertEquals("b", ((Element)value.getContent().get(1)).getLocalName());
+        Assert.assertEquals("b", ((Element)value.getContent().get(2)).getLocalName());
         
         resource.destroy();
     }

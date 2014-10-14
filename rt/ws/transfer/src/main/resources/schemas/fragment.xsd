@@ -14,7 +14,7 @@
   </xs:complexType>
   <xs:element name='Expression' type='tns:ExpressionType'/>
 
-  <xs:complexType name='ValueType'>
+  <xs:complexType name='ValueType' mixed="true">
     <xs:sequence>
       <xs:any namespace='##other' minOccurs='0' maxOccurs='unbounded'/>
     </xs:sequence>

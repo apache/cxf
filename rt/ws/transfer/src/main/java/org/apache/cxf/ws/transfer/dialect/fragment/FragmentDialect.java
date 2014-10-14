@@ -143,7 +143,7 @@ public class FragmentDialect implements Dialect {
         Representation result = new Representation();
         ValueType resultValue = new ValueType();
         for (int i = 0; i < nodeList.getLength(); i++) {
-            resultValue.getAny().add(nodeList.item(i));
+            resultValue.getContent().add(nodeList.item(i));
         }
         ObjectFactory objectFactory = new ObjectFactory();
         result.setAny(objectFactory.createValue(resultValue));
