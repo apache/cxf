@@ -18,12 +18,13 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
-import org.apache.cxf.rs.security.jose.AbstractJoseObjectReaderWriter;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 
 
 
 
-public class DefaultJwkReaderWriter extends AbstractJoseObjectReaderWriter
+
+public class DefaultJwkReaderWriter extends JsonMapObjectReaderWriter
     implements JwkReaderWriter {
     @Override
     public String jwkSetToJson(JsonWebKeys jwks) {
@@ -32,7 +33,7 @@ public class DefaultJwkReaderWriter extends AbstractJoseObjectReaderWriter
     @Override
     public JsonWebKeys jsonToJwkSet(String jwksJson) {
         JsonWebKeys jwks = new JsonWebKeys();
-        fromJsonInternal(jwks, jwksJson);
+        fromJson(jwks, jwksJson);
         return jwks;
     }
     @Override
@@ -42,7 +43,7 @@ public class DefaultJwkReaderWriter extends AbstractJoseObjectReaderWriter
     @Override
     public JsonWebKey jsonToJwk(String jwkJson) {
         JsonWebKey jwk = new JsonWebKey();
-        fromJsonInternal(jwk, jwkJson);
+        fromJson(jwk, jwkJson);
         return jwk;
     }
 }

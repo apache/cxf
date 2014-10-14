@@ -17,19 +17,19 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.jose;
+package org.apache.cxf.jaxrs.provider.json;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class AbstractJoseObject {
+public abstract class AbstractJsonMapObject {
     protected Map<String, Object> values = new LinkedHashMap<String, Object>();
     
-    protected AbstractJoseObject() {
+    protected AbstractJsonMapObject() {
         
     }
     
-    protected AbstractJoseObject(Map<String, Object> values) {
+    protected AbstractJsonMapObject(Map<String, Object> values) {
         this.values = values;
     }
     
@@ -55,7 +55,7 @@ public abstract class AbstractJoseObject {
     }
     
     public boolean equals(Object obj) {
-        return obj instanceof AbstractJoseObject && ((AbstractJoseObject)obj).values.equals(this.values);
+        return obj instanceof AbstractJsonMapObject && ((AbstractJsonMapObject)obj).values.equals(this.values);
     }
     
 }

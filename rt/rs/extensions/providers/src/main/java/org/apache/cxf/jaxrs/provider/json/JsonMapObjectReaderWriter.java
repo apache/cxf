@@ -16,30 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose;
+package org.apache.cxf.jaxrs.provider.json;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 
 
 
-public class AbstractJoseObjectReaderWriter {
-    private static final Set<String> DATE_PROPERTIES = 
-        new HashSet<String>(Arrays.asList(JwtConstants.CLAIM_EXPIRY, 
-                                          JwtConstants.CLAIM_ISSUED_AT, 
-                                          JwtConstants.CLAIM_NOT_BEFORE));
+public class JsonMapObjectReaderWriter {
     private boolean format;
     
-    protected String toJson(AbstractJoseObject jwt) {
+    public String toJson(AbstractJsonMapObject jwt) {
         StringBuilder sb = new StringBuilder();
         toJsonInternal(sb, jwt.asMap());
         return sb.toString();
@@ -72,8 +64,8 @@ public class AbstractJoseObjectReaderWriter {
     
     @SuppressWarnings("unchecked")
     protected void toJsonInternal(StringBuilder sb, Object value, boolean hasNext) {
-        if (AbstractJoseObject.class.isAssignableFrom(value.getClass())) {
-            sb.append(toJson((AbstractJoseObject)value));
+        if (AbstractJsonMapObject.class.isAssignableFrom(value.getClass())) {
+            sb.append(toJson((AbstractJsonMapObject)value));
         } else if (value.getClass().isArray()) {
             toJsonInternal(sb, (Object[])value);
         } else if (Collection.class.isAssignableFrom(value.getClass())) {
@@ -102,15 +94,15 @@ public class AbstractJoseObjectReaderWriter {
         }
     }
         
-    protected void fromJsonInternal(AbstractJoseObject jwt, String json) {
+    public void fromJson(AbstractJsonMapObject jwt, String json) {
         String theJson = json.trim();
-        JoseObjectSettable joseObject = new JoseObjectSettable(jwt);
-        readJwtObjectAsMap(joseObject, theJson.substring(1, theJson.length() - 1));
+        JsonObjectSettable joseObject = new JsonObjectSettable(jwt);
+        readJsonObjectAsSettable(joseObject, theJson.substring(1, theJson.length() - 1));
     }
     
     
     
-    protected void readJwtObjectAsMap(Settable values, String json) {
+    protected void readJsonObjectAsSettable(Settable values, String json) {
         for (int i = 0; i < json.length(); i++) {
             if (isWhiteSpace(json.charAt(i))) {
                 continue;
@@ -129,27 +121,24 @@ public class AbstractJoseObjectReaderWriter {
                 int closingIndex = getClosingIndex(json, '{', '}', sepIndex + j);
                 String newJson = json.substring(sepIndex + j + 1, closingIndex);
                 MapSettable nextMap = new MapSettable();
-                readJwtObjectAsMap(nextMap, newJson);
+                readJsonObjectAsSettable(nextMap, newJson);
                 values.put(name, nextMap.map);
                 i = closingIndex + 1;
             } else if (json.charAt(sepIndex + j) == '[') {
                 int closingIndex = getClosingIndex(json, '[', ']', sepIndex + j);
                 String newJson = json.substring(sepIndex + j + 1, closingIndex);
-                values.put(name, readJwtObjectAsList(newJson));
+                values.put(name, readJwtObjectAsList(name, newJson));
                 i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, sepIndex + j);
-                Object value = readPrimitiveValue(json, sepIndex + j, commaIndex);
-                if (DATE_PROPERTIES.contains(name)) {
-                    value = Long.valueOf(value.toString());
-                }
+                Object value = readPrimitiveValue(name, json, sepIndex + j, commaIndex);
                 values.put(name, value);
                 i = commaIndex + 1;
             }
             
         }
     }
-    protected List<Object> readJwtObjectAsList(String json) {
+    protected List<Object> readJwtObjectAsList(String name, String json) {
         List<Object> values = new LinkedList<Object>();
         for (int i = 0; i < json.length(); i++) {
             if (isWhiteSpace(json.charAt(i))) {
@@ -158,12 +147,12 @@ public class AbstractJoseObjectReaderWriter {
             if (json.charAt(i) == '{') {
                 int closingIndex = getClosingIndex(json, '{', '}', i);
                 MapSettable nextMap = new MapSettable();
-                readJwtObjectAsMap(nextMap, json.substring(i + 1, closingIndex));
+                readJsonObjectAsSettable(nextMap, json.substring(i + 1, closingIndex));
                 values.add(nextMap.map);
                 i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, i);
-                Object value = readPrimitiveValue(json, i, commaIndex);
+                Object value = readPrimitiveValue(name, json, i, commaIndex);
                 values.add(value);
                 i = commaIndex + 1;
             }
@@ -171,7 +160,7 @@ public class AbstractJoseObjectReaderWriter {
         
         return values;
     }
-    protected Object readPrimitiveValue(String json, int from, int to) {
+    protected Object readPrimitiveValue(String name, String json, int from, int to) {
         Object value = json.substring(from, to);
         String valueStr = value.toString().trim(); 
         if (valueStr.startsWith("\"")) {
@@ -216,9 +205,9 @@ public class AbstractJoseObjectReaderWriter {
         }
         
     }
-    private static class JoseObjectSettable implements Settable {
-        private AbstractJoseObject jose;
-        public JoseObjectSettable(AbstractJoseObject jose) {
+    private static class JsonObjectSettable implements Settable {
+        private AbstractJsonMapObject jose;
+        public JsonObjectSettable(AbstractJsonMapObject jose) {
             this.jose = jose;
         }
         public void put(String key, Object value) {

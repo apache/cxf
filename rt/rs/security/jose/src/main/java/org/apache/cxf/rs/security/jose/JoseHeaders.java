@@ -25,9 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.provider.json.AbstractJsonMapObject;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
-public class JoseHeaders extends AbstractJoseObject {
+public class JoseHeaders extends AbstractJsonMapObject {
     private Map<String, Integer> headerUpdateCount;
     public JoseHeaders() {
     }
