@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 
@@ -25,7 +29,10 @@ import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 public class JwtTokenReaderWriter extends JoseHeadersReaderWriter
     implements JwtTokenReader, JwtTokenWriter {
-    
+    private static final Set<String> DATE_PROPERTIES = 
+        new HashSet<String>(Arrays.asList(JwtConstants.CLAIM_EXPIRY, 
+                                          JwtConstants.CLAIM_ISSUED_AT, 
+                                          JwtConstants.CLAIM_NOT_BEFORE));
 
     @Override
     public String claimsToJson(JwtClaims claims) {
@@ -41,7 +48,7 @@ public class JwtTokenReaderWriter extends JoseHeadersReaderWriter
     @Override
     public JwtClaims fromJsonClaims(String claimsJson) {
         JwtClaims claims = new JwtClaims();
-        fromJsonInternal(claims, claimsJson);
+        fromJson(claims, claimsJson);
         return claims;
         
     }
@@ -60,5 +67,14 @@ public class JwtTokenReaderWriter extends JoseHeadersReaderWriter
     @Override
     public JwtHeaders fromJsonHeaders(String jsonHeaders) {
         return new JwtHeaders(super.fromJsonHeaders(jsonHeaders)); 
+    }
+    
+    @Override
+    protected Object readPrimitiveValue(String name, String json, int from, int to) {
+        Object value = super.readPrimitiveValue(name, json, from, to);
+        if (DATE_PROPERTIES.contains(name)) {
+            value = Long.valueOf(value.toString());
+        }
+        return value;
     }
 }

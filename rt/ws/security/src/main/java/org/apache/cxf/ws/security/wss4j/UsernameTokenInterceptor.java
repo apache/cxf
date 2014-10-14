@@ -386,6 +386,13 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                     utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);
                 }
                 
+                if (token.isCreated()) {
+                    utBuilder.addCreated();
+                }
+                if (token.isNonce()) {
+                    utBuilder.addNonce();
+                }
+                
                 utBuilder.setUserInfo(userName, password);
                 return utBuilder;
             } else {

@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.rs.security.jose.AbstractJoseObject;
+import org.apache.cxf.jaxrs.provider.json.AbstractJsonMapObject;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 
 
-public class JsonWebKey extends AbstractJoseObject {
+public class JsonWebKey extends AbstractJsonMapObject {
     
     public static final String KEY_TYPE = "kty";
     public static final String PUBLIC_KEY_USE = "use";
