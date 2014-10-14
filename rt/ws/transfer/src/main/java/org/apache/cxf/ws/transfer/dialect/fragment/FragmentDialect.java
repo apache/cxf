@@ -20,9 +20,10 @@
 package org.apache.cxf.ws.transfer.dialect.fragment;
 
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -45,6 +46,29 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
  * @author Erich Duda
  */
 public class FragmentDialect implements Dialect {
+    
+    private static Pattern qNamePattern;
+    
+    public FragmentDialect() {
+        if (qNamePattern == null) {
+            // See http://www.w3.org/TR/REC-xml-names/#ns-decl
+            // prefix name start char
+            String prefixNameStartChar = "[A-Z]|_|[a-z]|[\\x{c0}-\\x{d6}]|[\\x{d8}-\\x{f6}]|[\\x{f8}-\\x{2ff}]|"
+                                 + "[\\x{370}-\\x{37d}]|[\\x{37f}-\\x{1fff}]|[\\x{200c}-\\x{200d}]|"
+                                 + "[\\x{2070}-\\x{218f}]|[\\x{2c00}-\\x{2fef}]|[\\x{3001}-\\x{d7ff}]|"
+                                 + "[\\x{f900}-\\x{fdcf}]|[\\x{fdf0}-\\x{fffd}]|[\\x{10000}-\\x{effff}]";
+            // xml name start char
+            String nameStartChar = ":|" + prefixNameStartChar;
+            // prefix continue chars
+            String prefixNameChar = "-|\\.|[0-9]|\\x{b7}|[\\x{0300}-\\x{036f}]|[\\x{203f}-\\x{2040}]"
+                                  + "|" + prefixNameStartChar;
+            // xml name continue chars
+            String nameChar = ":|" + prefixNameChar;
+            String qName = String.format("^((%s)(%s)*:)?(%s)(%s)*",
+                                         prefixNameStartChar, prefixNameChar, nameStartChar, nameChar);
+            qNamePattern = Pattern.compile(qName);
+        }
+    }
 
     @Override
     public JAXBElement<ValueType> processGet(Get body, Representation representation) {
@@ -82,6 +106,7 @@ public class FragmentDialect implements Dialect {
     private NodeList processGetQName(final Representation representation, ExpressionType expression) {
         try {
             String expressionStr = getQNameXPathFromExpression(expression);
+            System.out.println("EXPRESSION: " + expressionStr);
             // Evaluate XPath
             XPath xPath = TransferTools.getXPath();
             xPath.setNamespaceContext(new NamespaceContext() {
@@ -115,11 +140,11 @@ public class FragmentDialect implements Dialect {
     
     private String getQNameXPathFromExpression(ExpressionType expression) {
         if (expression.getContent().size() == 1) {
-            try {
-                // It throws IllegalArgumentException if the parameter cannot be parsed as a QName
-                QName qName = QName.valueOf((String) expression.getContent().get(0));
-                return "/node()/" + qName.toString();
-            } catch (IllegalArgumentException ex) {
+            String expressionValue = (String) expression.getContent().get(0);
+            Matcher m = qNamePattern.matcher(expressionValue);
+            if (m.matches()) {
+                return "/node()/" + expressionValue;
+            } else {
                 throw new InvalidExpression();
             }
         } else {
