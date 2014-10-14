@@ -94,7 +94,6 @@ public class WebClient extends AbstractClient {
     protected WebClient(ClientState state) {
         super(state);
         cfg.getInInterceptors().add(new ClientAsyncResponseInterceptor());
-        cfg.getOutInterceptors().add(new BodyWriter());
     }
     
     

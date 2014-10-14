@@ -117,7 +117,6 @@ public class ClientProxyImpl extends AbstractClient implements
         this.isRoot = isRoot;
         this.inheritHeaders = inheritHeaders;
         initValuesMap(varValues);
-        cfg.getOutInterceptors().add(new BodyWriter()); 
     }
     
     private void initValuesMap(Object... varValues) {
