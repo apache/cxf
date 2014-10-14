@@ -106,6 +106,34 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
     
     @Test
+    public void replaceElement2Test() {
+        String content = "<a/>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+        
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.getContent().add("/a");
+        Element replacedElement = TransferTools.createElement("b");
+        ValueType value = new ValueType();
+        value.getContent().add(replacedElement);
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+        
+        PutResponse response = client.put(request);
+        Element rootEl = (Element) response.getRepresentation().getAny();
+        Assert.assertEquals("b", rootEl.getNodeName());
+        
+        resource.destroy();
+    }
+    
+    @Test
     public void replaceTextContentTest() {
         String content = "<root><a>Text</a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
