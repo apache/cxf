@@ -201,6 +201,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
     }
     
     private static ValueType getValue(Representation representation) {
+        @SuppressWarnings("unchecked")
         JAXBElement<ValueType> jaxb = (JAXBElement<ValueType>) representation.getAny();
         return jaxb.getValue();
     }
