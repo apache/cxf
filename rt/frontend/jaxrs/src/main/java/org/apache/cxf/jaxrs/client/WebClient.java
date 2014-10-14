@@ -82,7 +82,7 @@ public class WebClient extends AbstractClient {
     private static final String REQUEST_TYPE = "request.type";
     private static final String RESPONSE_CLASS = "response.class";
     private static final String RESPONSE_TYPE = "response.type";
-    
+    private BodyWriter bodyWriter = new BodyWriter();    
     protected WebClient(String baseAddress) {
         this(convertStringToURI(baseAddress));
     }
@@ -1103,6 +1103,8 @@ public class WebClient extends AbstractClient {
         reqContext.put(RESPONSE_CLASS, responseClass);
         reqContext.put(RESPONSE_TYPE, outGenericType);
         
+        m.getInterceptorChain().add(bodyWriter);
+      
         setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
         return m;
     }

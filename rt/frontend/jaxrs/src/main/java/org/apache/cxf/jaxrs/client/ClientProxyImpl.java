@@ -95,7 +95,7 @@ public class ClientProxyImpl extends AbstractClient implements
     private boolean inheritHeaders;
     private boolean isRoot;
     private Map<String, Object> valuesMap = Collections.emptyMap();
-    
+    private BodyWriter bodyWriter = new BodyWriter();    
     public ClientProxyImpl(URI baseURI,
                            ClassLoader loader,
                            ClassResourceInfo cri, 
@@ -658,6 +658,7 @@ public class ClientProxyImpl extends AbstractClient implements
             if (body != null) {
                 outMessage.put("BODY_INDEX", bodyIndex);
             }
+            outMessage.getInterceptorChain().add(bodyWriter);
     
             Map<String, Object> reqContext = getRequestContext(outMessage);
             reqContext.put(OperationResourceInfo.class.getName(), ori);
