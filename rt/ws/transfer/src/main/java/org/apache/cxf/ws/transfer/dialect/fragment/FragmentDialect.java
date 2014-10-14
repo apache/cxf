@@ -58,8 +58,10 @@ public class FragmentDialect implements Dialect {
         for (Object o : body.getAny()) {
             if (o instanceof JAXBElement && ((JAXBElement)o).getValue() instanceof ExpressionType) {
                 ExpressionType expression = (ExpressionType) ((JAXBElement)o).getValue();
-                if (languages.containsKey(expression.getLanguage())) {
-                    FragmentDialectLanguage language = languages.get(expression.getLanguage());
+                String languageIRI = expression.getLanguage();
+                languageIRI = languageIRI == null ? FragmentDialectConstants.XPATH10_LANGUAGE_IRI : languageIRI;
+                if (languages.containsKey(languageIRI)) {
+                    FragmentDialectLanguage language = languages.get(languageIRI);
                     return generateGetResponse(language.getResourceFragment(representation, expression));
                 } else {
                     throw new UnsupportedLanguage();

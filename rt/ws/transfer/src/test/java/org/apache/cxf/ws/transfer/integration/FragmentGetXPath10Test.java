@@ -102,6 +102,30 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
+    public void getImpliedLanguageTest() {
+        String content = "<root><a><b>Text</b></a></root>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+        
+        ObjectFactory objectFactory = new ObjectFactory();
+        
+        Get request = new Get();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        ExpressionType expression = new ExpressionType();
+        expression.getContent().add("/root/a/b");
+        request.getAny().add(objectFactory.createExpression(expression));
+        
+        GetResponse response = client.get(request);
+        ValueType value = getValue(response);
+        Assert.assertEquals(1, value.getContent().size());
+        Assert.assertEquals("b", ((Element)value.getContent().get(0)).getLocalName());
+        
+        resource.destroy();
+    }
+    
+    @Test
     public void getWithNamespaceTest() {
         String content = "<ns:root xmlns:ns=\"www.example.org\"><ns:a><ns:b>Text</ns:b></ns:a></ns:root>";
         ResourceManager resourceManager = new MemoryResourceManager();
