@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
+import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -177,6 +178,26 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         Assert.assertEquals("b", ((Element)value.getAny().get(2)).getLocalName());
         
         resource.destroy();
+    }
+    
+    @Test(expected = SOAPFaultException.class)
+    public void getWrongQNameTest() {
+        String content = "<root><a><b>Text1</b><b>Text2</b><b>Text3</b></a></root>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+
+        ObjectFactory objectFactory = new ObjectFactory();
+
+        Get request = new Get();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.QNAME_LANGUAGE_IRI);
+        expression.getContent().add("//b");
+        request.getAny().add(objectFactory.createExpression(expression));
+
+        client.get(request);
     }
     
     private static ValueType getValue(Representation representation) {

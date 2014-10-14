@@ -22,6 +22,7 @@ package org.apache.cxf.ws.transfer.dialect.fragment;
 import java.util.Iterator;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -126,9 +127,13 @@ public class FragmentDialect implements Dialect {
     
     private String getXPathFromQName(ExpressionType expression) {
         if (expression.getContent().size() == 1) {
-            // TODO: validate expression
-            String result = (String) expression.getContent().get(0);
-            return "//" + result;
+            try {
+                // It throws IllegalArgumentException if the parameter cannot be parsed as a QName
+                QName qName = QName.valueOf((String) expression.getContent().get(0));
+                return "//" + qName.toString();
+            } catch (IllegalArgumentException ex) {
+                throw new InvalidExpression();
+            }
         } else {
             throw new InvalidExpression();
         }
