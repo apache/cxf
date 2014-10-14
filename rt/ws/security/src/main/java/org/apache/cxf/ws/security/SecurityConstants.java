@@ -209,19 +209,19 @@ public final class SecurityConstants {
     public static final String RETURN_SECURITY_ERROR = "ws-security.return.security.error";
     
     /**
-     * Whether to use credential delegation or not in the KerberosClient. If this is set to "true",
-     * then it tries to get a GSSCredential Object from the Message Context using the 
-     * DELEGATED_CREDENTIAL configuration tag below, and then use this to obtain a service ticket.
-     * The default is "false".
+     * Set this to "false" in order to remove the SOAP mustUnderstand header from security headers generated based on
+     * a WS-SecurityPolicy.
+     *
+     * The default value is "true" which included the SOAP mustUnderstand header.
      */
-    public static final String KERBEROS_USE_CREDENTIAL_DELEGATION = 
-        "ws-security.kerberos.use.credential.delegation";
-    
+    public static final String MUST_UNDERSTAND = "ws-security.must-understand";
+
     /**
-     * Whether the Kerberos username is in servicename form or not. The default is "false".
+     * Set this to "false" if security context must not be created from JAAS Subject.
+     *
+     * The default value is "true".
      */
-    public static final String KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM = 
-        "ws-security.kerberos.is.username.in.servicename.form";
+    public static final String SC_FROM_JAAS_SUBJECT = "ws-security.sc.jaas-subject";
     
     //
     // Non-boolean WS-Security Configuration parameters
@@ -260,25 +260,10 @@ public final class SecurityConstants {
     public static final String SAML_ROLE_ATTRIBUTENAME = "ws-security.saml-role-attributename";
     
     /**
-     * A reference to the KerberosClient class used to obtain a service ticket. 
-     */
-    public static final String KERBEROS_CLIENT = "ws-security.kerberos.client";
-    
-    /**
      * The SpnegoClientAction implementation to use for SPNEGO. This allows the user to plug in
      * a different implementation to obtain a service ticket.
      */
     public static final String SPNEGO_CLIENT_ACTION = "ws-security.spnego.client.action";
-    
-    /**
-     * The JAAS Context name to use for Kerberos.
-     */
-    public static final String KERBEROS_JAAS_CONTEXT_NAME = "ws-security.kerberos.jaas.context";
-    
-    /**
-     * The Kerberos Service Provider Name (spn) to use.
-     */
-    public static final String KERBEROS_SPN = "ws-security.kerberos.spn";
     
     /**
      * This holds a reference to a ReplayCache instance used to cache UsernameToken nonces. The
@@ -372,6 +357,13 @@ public final class SecurityConstants {
      */
     public static final String PASSWORD_ENCRYPTOR_INSTANCE = 
         "ws-security.password.encryptor.instance";
+    
+    /**
+     * A delegated credential to use for WS-Security. Currently only a Kerberos GSSCredential
+     * Object is supported. This is used to retrieve a service ticket instead of using the
+     * client credentials.
+     */
+    public static final String DELEGATED_CREDENTIAL = "ws-security.delegated.credential";
     
     //
     // Validator implementations for validating received security tokens
@@ -550,28 +542,6 @@ public final class SecurityConstants {
     public static final String STS_TOKEN_ON_BEHALF_OF = "ws-security.sts.token.on-behalf-of";
 
     /**
-     * Set this to "false" in order to remove the SOAP mustUnderstand header from security headers generated based on
-     * a WS-SecurityPolicy.
-     *
-     * The default value is "true" which included the SOAP mustUnderstand header.
-     */
-    public static final String MUST_UNDERSTAND = "ws-security.must-understand";
-
-    /**
-     * Set this to "false" if security context must not be created from JAAS Subject.
-     *
-     * The default value is "true".
-     */
-    public static final String SC_FROM_JAAS_SUBJECT = "ws-security.sc.jaas-subject";
-    
-    /**
-     * A delegated credential to use for WS-Security. Currently only a Kerberos GSSCredential
-     * Object is supported. This is used to retrieve a service ticket instead of using the
-     * client credentials.
-     */
-    public static final String DELEGATED_CREDENTIAL = "ws-security.delegated.credential";
-    
-    /**
      * This is the value in seconds within which a token is considered to be expired by the
      * client. When a cached token (from a STS) is retrieved by the client, it is considered
      * to be expired if it will expire in a time less than the value specified by this tag.
@@ -582,6 +552,40 @@ public final class SecurityConstants {
      */
     public static final String STS_TOKEN_IMMINENT_EXPIRY_VALUE =
         "ws-security.sts.token.imminent-expiry-value";
+    
+    //
+    // Kerberos Configuration tags
+    //
+    
+    /**
+     * Whether to use credential delegation or not in the KerberosClient. If this is set to "true",
+     * then it tries to get a GSSCredential Object from the Message Context using the 
+     * DELEGATED_CREDENTIAL configuration tag below, and then use this to obtain a service ticket.
+     * The default is "false".
+     */
+    public static final String KERBEROS_USE_CREDENTIAL_DELEGATION = 
+        "ws-security.kerberos.use.credential.delegation";
+    
+    /**
+     * Whether the Kerberos username is in servicename form or not. The default is "false".
+     */
+    public static final String KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM = 
+        "ws-security.kerberos.is.username.in.servicename.form";
+    
+    /**
+     * The JAAS Context name to use for Kerberos.
+     */
+    public static final String KERBEROS_JAAS_CONTEXT_NAME = "ws-security.kerberos.jaas.context";
+    
+    /**
+     * The Kerberos Service Provider Name (spn) to use.
+     */
+    public static final String KERBEROS_SPN = "ws-security.kerberos.spn";
+    
+    /**
+     * A reference to the KerberosClient class used to obtain a service ticket. 
+     */
+    public static final String KERBEROS_CLIENT = "ws-security.kerberos.client";
 
     //
     // Internal tags
