@@ -308,27 +308,7 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-<<<<<<< HEAD
     
-=======
-    <wsp:Policy wsu:Id="DoubleItPlaintextSupportingPolicy">
-        <wsp:ExactlyOne>
-            <wsp:All>
-                <sp:SupportingTokens>
-                    <wsp:Policy>
-                        <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                            <wsp:Policy>
-                                <sp:WssUsernameToken10/>
-                                <sp13:Created/>
-                                <sp13:Nonce/>
-                            </wsp:Policy>
-                        </sp:UsernameToken>
-                    </wsp:Policy>
-                </sp:SupportingTokens>
-            </wsp:All>
-        </wsp:ExactlyOne>
-    </wsp:Policy>
->>>>>>> df6ca4d... [CXF-6051] - "Support sp13:Nonce + sp13:Created in the UsernameTokenInterceptor"
     <wsp:Policy wsu:Id="DoubleItHashedPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
