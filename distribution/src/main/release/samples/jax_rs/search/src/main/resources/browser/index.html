@@ -102,18 +102,13 @@
     			
     			if( $( "#all" ).is( ":checked" ) ) {
     				contentQuery += "(";
-    				wildcardsQuery += ",(";
 
     				query.split( " " ).forEach( function( entry ) {
     					if( contentQuery.length > 1 ) contentQuery += ";";
-    					if( wildcardsQuery.length > 2 ) wildcardsQuery += ";";
-    					
     					contentQuery += "ct==" + encodeURIComponent( entry );
-    					wildcardsQuery += "source==" + encodeURIComponent( "*" + entry + "*" );
         			} );
 
     				contentQuery += ")";
-    				wildcardsQuery += ")";
     			} else {
     				contentQuery = "ct==" + encodeURIComponent( query );
     			    			
