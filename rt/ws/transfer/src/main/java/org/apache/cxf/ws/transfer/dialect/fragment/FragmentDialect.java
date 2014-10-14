@@ -26,8 +26,10 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.Delete;
@@ -106,7 +108,6 @@ public class FragmentDialect implements Dialect {
     private NodeList processGetQName(final Representation representation, ExpressionType expression) {
         try {
             String expressionStr = getQNameXPathFromExpression(expression);
-            System.out.println("EXPRESSION: " + expressionStr);
             // Evaluate XPath
             XPath xPath = TransferTools.getXPath();
             xPath.setNamespaceContext(new NamespaceContext() {
@@ -153,13 +154,61 @@ public class FragmentDialect implements Dialect {
     }
     
     private Object processGetXPath10(final Representation representation, ExpressionType expression) {
-        throw new UnsupportedOperationException();
+        String expressionStr = getXPathFromExpression(expression);
+        // Evaluate XPath
+        XPath xPath = TransferTools.getXPath();
+        xPath.setNamespaceContext(new NamespaceContext() {
+
+            @Override
+            public String getNamespaceURI(String prefix) {
+                if (prefix != null && !prefix.isEmpty()) {
+                    Element resource = (Element) representation.getAny();
+                    return resource.getAttribute("xmlns:" + prefix);
+                } else {
+                    return null;
+                }
+            }
+
+            @Override
+            public String getPrefix(String string) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public Iterator getPrefixes(String string) {
+                throw new UnsupportedOperationException();
+            }
+        });
+        try {
+            return (Node) xPath.evaluate(
+                expressionStr, representation.getAny(), XPathConstants.NODE);
+        } catch (XPathException ex) {
+            // See https://www.java.net/node/681793
+        }
+
+        try {
+            return (String) xPath.evaluate(
+                expressionStr, representation.getAny(), XPathConstants.STRING);
+        } catch (XPathException ex) {
+            throw new InvalidExpression();
+        }
+    }
+    
+    private String getXPathFromExpression(ExpressionType expression) {
+        if (expression.getContent().size() == 1) {
+            return (String) expression.getContent().get(0);
+        } else {
+            throw new InvalidExpression();
+        }
     }
     
     private JAXBElement<ValueType> generateGetResponse(Object value) {
-        if (value instanceof NodeList) {
-            System.out.println("NodeList Instance");
+        if (value instanceof Node) {
+            return generateGetResponseNode((Node) value);
+        } else if (value instanceof NodeList) {
             return generateGetResponseNodeList((NodeList) value);
+        } else if (value instanceof String) {
+            return generateGetResponseString((String) value);
         }
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createValue(new ValueType());
@@ -173,4 +222,39 @@ public class FragmentDialect implements Dialect {
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createValue(resultValue);
     }
+    
+    private JAXBElement<ValueType> generateGetResponseNode(Node node) {
+        ValueType resultValue = new ValueType();
+        if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
+            Element attrNodeEl = TransferTools.createElementNS(
+                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME
+            );
+            attrNodeEl.setAttribute(
+                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR,
+                node.getNodeName()
+            );
+            attrNodeEl.setTextContent(node.getNodeValue());
+            resultValue.getContent().add(attrNodeEl);
+        } else if (node.getNodeType() == Node.TEXT_NODE) {
+            Element textNodeEl = TransferTools.createElementNS(
+                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                FragmentDialectConstants.FRAGMENT_TEXT_NODE_NAME
+            );
+            textNodeEl.setNodeValue(node.getNodeValue());
+            resultValue.getContent().add(textNodeEl);
+        } else if (node.getNodeType() == Node.ELEMENT_NODE) {
+            resultValue.getContent().add(node);
+        }
+        ObjectFactory objectFactory = new ObjectFactory();
+        return objectFactory.createValue(resultValue);
+    }
+    
+    private JAXBElement<ValueType> generateGetResponseString(String value) {
+        ValueType resultValue = new ValueType();
+        resultValue.getContent().add(value);
+        ObjectFactory objectFactory = new ObjectFactory();
+        return objectFactory.createValue(resultValue);
+    }
+
 }

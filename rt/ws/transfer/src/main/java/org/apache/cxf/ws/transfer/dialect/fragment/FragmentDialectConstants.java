@@ -30,6 +30,12 @@ public final class FragmentDialectConstants {
     
     public static final String XPATH10_LANGUAGE_IRI = "http://www.w3.org/2011/03/ws-fra/XPath10";
     
+    public static final String FRAGMENT_TEXT_NODE_NAME = "TextNode";
+    
+    public static final String FRAGMENT_ATTR_NODE_NAME = "AttributeNode";
+    
+    public static final String FRAGMENT_ATTR_NODE_NAME_ATTR = "name";
+    
     private FragmentDialectConstants() {
         
     }
