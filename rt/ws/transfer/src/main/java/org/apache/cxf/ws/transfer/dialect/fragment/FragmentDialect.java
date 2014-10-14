@@ -241,6 +241,12 @@ public class FragmentDialect implements Dialect {
         } else {
             if (parent != resourceFragment) {
                 parent.removeChild(resourceFragment);
+            } else {
+                // Both parent and resourceFragment are Document
+                Document doc = (Document) parent;
+                if (doc.getDocumentElement() != null) {
+                    doc.removeChild(doc.getDocumentElement());
+                }
             }
         }
         for (Object o : value.getContent()) {
