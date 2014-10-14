@@ -18,11 +18,13 @@
  */
 package org.apache.cxf.rs.security.jose;
 
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 
 
 
 
-public class JoseHeadersReaderWriter extends AbstractJoseObjectReaderWriter
+
+public class JoseHeadersReaderWriter extends JsonMapObjectReaderWriter
     implements JoseHeadersReader, JoseHeadersWriter {
     @Override
     public String headersToJson(JoseHeaders headers) {
@@ -32,7 +34,7 @@ public class JoseHeadersReaderWriter extends AbstractJoseObjectReaderWriter
     @Override
     public JoseHeaders fromJsonHeaders(String headersJson) {
         JoseHeaders headers = new JoseHeaders();
-        fromJsonInternal(headers, headersJson);
+        fromJson(headers, headersJson);
         return headers;
     }
     
