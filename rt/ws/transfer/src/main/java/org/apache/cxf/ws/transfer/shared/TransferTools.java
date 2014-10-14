@@ -78,6 +78,14 @@ public final class TransferTools {
     }
     
     /**
+     * Creates new DOM Document.
+     * @return DOM Document
+     */
+    public static Document createDocument() {
+        return getDocumentBuilder().newDocument();
+    }
+    
+    /**
      * Parse XML document from input and returns Document.
      * @param source
      * @return 

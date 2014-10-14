@@ -64,8 +64,13 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
             }
         });
         try {
-            return (Node) xPath.evaluate(
-                expressionStr, representation.getAny(), XPathConstants.NODE);
+            if (representation.getAny() == null) {
+                return (Node) xPath.evaluate(
+                    expressionStr, TransferTools.createDocument(), XPathConstants.NODE);
+            } else {
+                return (Node) xPath.evaluate(
+                    expressionStr, representation.getAny(), XPathConstants.NODE);
+            }
         } catch (XPathException ex) {
             // See https://www.java.net/node/681793
         }

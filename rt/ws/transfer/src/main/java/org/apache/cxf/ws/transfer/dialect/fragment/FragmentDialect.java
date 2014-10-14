@@ -22,6 +22,8 @@ package org.apache.cxf.ws.transfer.dialect.fragment;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,7 +33,9 @@ import org.apache.cxf.ws.transfer.Get;
 import org.apache.cxf.ws.transfer.Put;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.dialect.Dialect;
+import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
 import org.apache.cxf.ws.transfer.dialect.fragment.faults.UnsupportedLanguage;
+import org.apache.cxf.ws.transfer.dialect.fragment.faults.UnsupportedMode;
 import org.apache.cxf.ws.transfer.dialect.fragment.language.FragmentDialectLanguage;
 import org.apache.cxf.ws.transfer.dialect.fragment.language.FragmentDialectLanguageQName;
 import org.apache.cxf.ws.transfer.dialect.fragment.language.FragmentDialectLanguageXPath10;
@@ -74,7 +78,32 @@ public class FragmentDialect implements Dialect {
 
     @Override
     public Representation processPut(Put body, Representation representation) {
-        throw new UnknownDialect();
+        for (Object o : body.getAny()) {
+            if (o instanceof Fragment) {
+                Fragment fragment = (Fragment) o;
+                ExpressionType expression = fragment.getExpression();
+                ValueType value = fragment.getValue();
+                
+                if (expression == null) {
+                    throw new RuntimeException("wsf:Expression is not present.");
+                }
+                if (value == null) {
+                    throw new RuntimeException("wsf:Value is not present.");
+                }
+                String languageIRI = expression.getLanguage();
+                languageIRI = languageIRI == null ? FragmentDialectConstants.XPATH10_LANGUAGE_IRI : languageIRI;
+                if (languages.containsKey(languageIRI)) {
+                    FragmentDialectLanguage language = languages.get(languageIRI);
+                    Object resourceFragment = language.getResourceFragment(representation, expression);
+                    String mode = expression.getMode();
+                    mode = mode == null ? FragmentDialectConstants.FRAGMENT_MODE_REPLACE : mode;
+                    return modifyRepresentation(resourceFragment, mode, value);
+                } else {
+                    throw new UnsupportedLanguage();
+                }
+            }
+        }
+        throw new RuntimeException("wsf:Fragment is not present.");
     }
 
     @Override
@@ -164,5 +193,99 @@ public class FragmentDialect implements Dialect {
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createValue(resultValue);
     }
+    
+    private Representation modifyRepresentation(
+            Object resourceFragment,
+            String mode,
+            ValueType value) {
+        if (resourceFragment instanceof Node) {
+            return modifyRepresentationMode((Node) resourceFragment, mode, value);
+        } else if (resourceFragment instanceof NodeList) {
+            Representation representation = null;
+            NodeList list = (NodeList) resourceFragment;
+            for (int i = 0; i < list.getLength(); i++) {
+                representation = modifyRepresentationMode(list.item(i), mode, value);
+            }
+            return representation;
+        } else {
+            throw new InvalidExpression();
+        }
+    }
+    
+    private Representation modifyRepresentationMode(
+            Node resourceFragment,
+            String mode,
+            ValueType value) {
+        if (FragmentDialectConstants.FRAGMENT_MODE_REPLACE.equals(mode)) {
+            return modifyRepresentationModeReplace(resourceFragment, value);
+        } else {
+            throw new UnsupportedMode();
+        }
+    }
 
+    private Representation modifyRepresentationModeReplace(
+            Node resourceFragment,
+            ValueType value) {
+        
+        Node parent = null;
+        if (resourceFragment.getNodeType() == Node.ATTRIBUTE_NODE) {
+            parent = ((Attr)resourceFragment).getOwnerElement();
+        } else {
+            parent = resourceFragment.getParentNode();
+        }
+        if (parent == null) {
+            // resourceFragment is Document Node
+            parent = resourceFragment;
+        }
+        if (resourceFragment.getNodeType() == Node.ATTRIBUTE_NODE) {
+            ((Element)parent).removeAttributeNode((Attr)resourceFragment);
+        } else {
+            if (parent != resourceFragment) {
+                parent.removeChild(resourceFragment);
+            }
+        }
+        for (Object o : value.getContent()) {
+            if (o instanceof String) {
+                parent.setTextContent((String) o);
+                Representation representation = new Representation();
+                representation.setAny(parent.getOwnerDocument().getDocumentElement());
+                return representation;
+            } else if (o instanceof Node) {
+                Node node = (Node) o;
+                if (
+                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
+                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
+                ) {
+                    String attrName = ((Element)node).getAttributeNS(
+                        FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                        FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR    
+                    );
+                    String attrValue = node.getTextContent();
+                    if (attrName == null) {
+                        throw new RuntimeException("wsf:AttributeNode@name is not present.");
+                    }
+                    ((Element) parent).setAttributeNS(
+                        FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                        attrName,
+                        attrValue
+                    );
+                    Representation representation = new Representation();
+                    representation.setAny(parent.getOwnerDocument().getDocumentElement());
+                    return representation;
+                } else {
+                    Document ownerDocument = parent.getOwnerDocument();
+                    // parent.getOwnerDocument == null the parent is ownerDocument
+                    ownerDocument = ownerDocument == null ? (Document) parent : ownerDocument;
+                    Node importedNode = ownerDocument.importNode((Node) o, true);
+                    parent.appendChild(importedNode);
+                    Representation representation = new Representation();
+                    representation.setAny(ownerDocument.getDocumentElement());
+                    return representation;
+                }
+            } else {
+                throw new InvalidExpression();
+            }
+        }
+        throw new InvalidExpression();
+    }
 }

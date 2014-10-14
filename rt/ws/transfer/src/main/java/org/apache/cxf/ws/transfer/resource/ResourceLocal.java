@@ -170,13 +170,12 @@ public class ResourceLocal implements Resource {
             } else {
                 throw new UnknownDialect();
             }
-        } else {
-            ValidAndTransformHelper.validationAndTransformation(
-                validators, putRepresentation, storedRepresentation);
         }
+        ValidAndTransformHelper.validationAndTransformation(
+            validators, putRepresentation, storedRepresentation);
         manager.put(refParams, putRepresentation);
         PutResponse response = new PutResponse();
-        response.setRepresentation(body.getRepresentation());
+        response.setRepresentation(putRepresentation);
         return response;
     }
     

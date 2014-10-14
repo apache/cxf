@@ -36,6 +36,16 @@ public final class FragmentDialectConstants {
     
     public static final String FRAGMENT_ATTR_NODE_NAME_ATTR = "name";
     
+    public static final String FRAGMENT_MODE_REPLACE = "http://www.w3.org/2011/03/ws-fra/Modes/Replace";
+    
+    public static final String FRAGMENT_MODE_ADD = "http://www.w3.org/2011/03/ws-fra/Modes/Add";
+    
+    public static final String FRAGMENT_MODE_INSERT_BEFORE = "http://www.w3.org/2011/03/ws-fra/Modes/InsertBefore";
+    
+    public static final String FRAGMENT_MODE_INSERT_AFTER = "http://www.w3.org/2011/03/ws-fra/Modes/InsertAfter";
+    
+    public static final String FRAGMENT_MODE_REMOVE = "http://www.w3.org/2011/03/ws-fra/Modes/Remove";
+    
     private FragmentDialectConstants() {
         
     }

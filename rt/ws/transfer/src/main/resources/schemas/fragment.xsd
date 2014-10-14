@@ -10,6 +10,7 @@
       <xs:any namespace='##other' minOccurs='0' maxOccurs='unbounded'/>
     </xs:sequence>
     <xs:attribute name='Language' type='xs:anyURI' use='optional'/>
+    <xs:attribute name='Mode' type='xs:anyURI' use='optional'/>
     <xs:anyAttribute namespace='##other' processContents='lax'/>
   </xs:complexType>
   <xs:element name='Expression' type='tns:ExpressionType'/>
