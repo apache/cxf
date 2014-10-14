@@ -52,9 +52,9 @@ public class FragmentDialect implements Dialect {
             if (o instanceof JAXBElement && ((JAXBElement)o).getValue() instanceof ExpressionType) {
                 ExpressionType expression = (ExpressionType) ((JAXBElement)o).getValue();
                 if (FragmentDialectConstants.QNAME_LANGUAGE_IRI.equals(expression.getLanguage())) {
-                    return this.processGetQName(representation, expression);
+                    return generateGetResponse(processGetQName(representation, expression));
                 } else if (FragmentDialectConstants.XPATH10_LANGUAGE_IRI.equals(expression.getLanguage())) {
-                    return this.processGetXPath10(representation, expression);
+                    return generateGetResponse(processGetXPath10(representation, expression));
                 } else {
                     throw new UnsupportedLanguage();
                 }
@@ -79,10 +79,9 @@ public class FragmentDialect implements Dialect {
         throw new UnknownDialect();
     }
     
-    private Representation processGetQName(final Representation representation, ExpressionType expression) {
+    private NodeList processGetQName(final Representation representation, ExpressionType expression) {
         try {
-            Representation result = new Representation();
-            String expressionStr = getXPathFromQName(expression);
+            String expressionStr = getQNameXPathFromExpression(expression);
             // Evaluate XPath
             XPath xPath = TransferTools.getXPath();
             xPath.setNamespaceContext(new NamespaceContext() {
@@ -107,25 +106,14 @@ public class FragmentDialect implements Dialect {
                     throw new UnsupportedOperationException();
                 }
             });
-            NodeList xPathResult = (NodeList) xPath.evaluate(
+            return (NodeList) xPath.evaluate(
                     expressionStr, representation.getAny(), XPathConstants.NODESET);
-            ValueType resultValue = new ValueType();
-            for (int i = 0; i < xPathResult.getLength(); i++) {
-                resultValue.getAny().add(xPathResult.item(i));
-            }
-            ObjectFactory objectFactory = new ObjectFactory();
-            result.setAny(objectFactory.createValue(resultValue));
-            return result;
         } catch (XPathExpressionException ex) {
             throw new RuntimeException(ex);
         }
     }
     
-    private Representation processGetXPath10(Representation representation, ExpressionType expression) {
-        throw new UnsupportedOperationException();
-    }
-    
-    private String getXPathFromQName(ExpressionType expression) {
+    private String getQNameXPathFromExpression(ExpressionType expression) {
         if (expression.getContent().size() == 1) {
             try {
                 // It throws IllegalArgumentException if the parameter cannot be parsed as a QName
@@ -139,4 +127,26 @@ public class FragmentDialect implements Dialect {
         }
     }
     
+    private Object processGetXPath10(final Representation representation, ExpressionType expression) {
+        throw new UnsupportedOperationException();
+    }
+    
+    private Representation generateGetResponse(Object value) {
+        if (value instanceof NodeList) {
+            System.out.println("NodeList Instance");
+            return generateGetResponseNodeList((NodeList) value);
+        }
+        return new Representation();
+    }
+    
+    private Representation generateGetResponseNodeList(NodeList nodeList) {
+        Representation result = new Representation();
+        ValueType resultValue = new ValueType();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            resultValue.getAny().add(nodeList.item(i));
+        }
+        ObjectFactory objectFactory = new ObjectFactory();
+        result.setAny(objectFactory.createValue(resultValue));
+        return result;
+    }
 }
