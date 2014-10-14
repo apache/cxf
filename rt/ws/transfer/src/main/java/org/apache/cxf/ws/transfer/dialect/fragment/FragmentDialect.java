@@ -72,8 +72,7 @@ public class FragmentDialect implements Dialect {
                 }
             }
         }
-        // TODO: throw SOAP fault
-        return null;
+        throw new RuntimeException("wsf:Expression is not present.");
     }
 
     @Override
