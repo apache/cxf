@@ -155,7 +155,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
     
     @Test
     public void getMoreValuesTest() {
-        String content = "<root><a><b>Text1</b><b>Text2</b><b>Text3</b></a></root>";
+        String content = "<root><b>Text1</b><b>Text2</b><b>Text3</b></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
@@ -187,16 +187,16 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-
+        
         ObjectFactory objectFactory = new ObjectFactory();
-
+        
         Get request = new Get();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.QNAME_LANGUAGE_IRI);
         expression.getContent().add("//b");
         request.getAny().add(objectFactory.createExpression(expression));
-
+        
         client.get(request);
     }
     

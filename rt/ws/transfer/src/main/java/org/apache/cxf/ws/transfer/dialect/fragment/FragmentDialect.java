@@ -130,7 +130,7 @@ public class FragmentDialect implements Dialect {
             try {
                 // It throws IllegalArgumentException if the parameter cannot be parsed as a QName
                 QName qName = QName.valueOf((String) expression.getContent().get(0));
-                return "//" + qName.toString();
+                return "/node()/" + qName.toString();
             } catch (IllegalArgumentException ex) {
                 throw new InvalidExpression();
             }
