@@ -47,7 +47,7 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
 public class FragmentDialect implements Dialect {
 
     @Override
-    public Representation processGet(Get body, Representation representation) {
+    public JAXBElement<ValueType> processGet(Get body, Representation representation) {
         for (Object o : body.getAny()) {
             if (o instanceof JAXBElement && ((JAXBElement)o).getValue() instanceof ExpressionType) {
                 ExpressionType expression = (ExpressionType) ((JAXBElement)o).getValue();
@@ -131,22 +131,21 @@ public class FragmentDialect implements Dialect {
         throw new UnsupportedOperationException();
     }
     
-    private Representation generateGetResponse(Object value) {
+    private JAXBElement<ValueType> generateGetResponse(Object value) {
         if (value instanceof NodeList) {
             System.out.println("NodeList Instance");
             return generateGetResponseNodeList((NodeList) value);
         }
-        return new Representation();
+        ObjectFactory objectFactory = new ObjectFactory();
+        return objectFactory.createValue(new ValueType());
     }
     
-    private Representation generateGetResponseNodeList(NodeList nodeList) {
-        Representation result = new Representation();
+    private JAXBElement<ValueType> generateGetResponseNodeList(NodeList nodeList) {
         ValueType resultValue = new ValueType();
         for (int i = 0; i < nodeList.getLength(); i++) {
             resultValue.getContent().add(nodeList.item(i));
         }
         ObjectFactory objectFactory = new ObjectFactory();
-        result.setAny(objectFactory.createValue(resultValue));
-        return result;
+        return objectFactory.createValue(resultValue);
     }
 }

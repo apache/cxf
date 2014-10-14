@@ -38,7 +38,7 @@ public interface Dialect {
      * @param representation XML representation stored in the ResourceManager
      * @return Representation, which will be returned in response.
      */
-    Representation processGet(Get body, Representation representation);
+    Object processGet(Get body, Representation representation);
     
     /**
      * Method for processing incoming Put message by Dialect extension.

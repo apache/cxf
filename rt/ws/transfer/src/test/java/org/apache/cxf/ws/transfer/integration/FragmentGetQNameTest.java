@@ -96,7 +96,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         request.getAny().add(objectFactory.createExpression(expression));
         
         GetResponse response = client.get(request);
-        ValueType value = getValue(response.getRepresentation());
+        ValueType value = getValue(response);
         Assert.assertEquals(1, value.getContent().size());
         Assert.assertEquals("a", ((Element)value.getContent().get(0)).getLocalName());
         
@@ -121,7 +121,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         request.getAny().add(objectFactory.createExpression(expression));
         
         GetResponse response = client.get(request);
-        ValueType value = getValue(response.getRepresentation());
+        ValueType value = getValue(response);
         Assert.assertEquals(1, value.getContent().size());
         Assert.assertEquals("a", ((Element)value.getContent().get(0)).getLocalName());
         Assert.assertEquals("www.example.org", ((Element)value.getContent().get(0)).getNamespaceURI());
@@ -147,7 +147,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         request.getAny().add(objectFactory.createExpression(expression));
         
         GetResponse response = client.get(request);
-        ValueType value = getValue(response.getRepresentation());
+        ValueType value = getValue(response);
         Assert.assertEquals(0, value.getContent().size());
         
         resource.destroy();
@@ -171,7 +171,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         request.getAny().add(objectFactory.createExpression(expression));
         
         GetResponse response = client.get(request);
-        ValueType value = getValue(response.getRepresentation());
+        ValueType value = getValue(response);
         Assert.assertEquals(3, value.getContent().size());
         Assert.assertEquals("b", ((Element)value.getContent().get(0)).getLocalName());
         Assert.assertEquals("b", ((Element)value.getContent().get(1)).getLocalName());
@@ -200,9 +200,9 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
         client.get(request);
     }
     
-    private static ValueType getValue(Representation representation) {
+    private static ValueType getValue(GetResponse response) {
         @SuppressWarnings("unchecked")
-        JAXBElement<ValueType> jaxb = (JAXBElement<ValueType>) representation.getAny();
+        JAXBElement<ValueType> jaxb = (JAXBElement<ValueType>) response.getAny().get(0);
         return jaxb.getValue();
     }
     

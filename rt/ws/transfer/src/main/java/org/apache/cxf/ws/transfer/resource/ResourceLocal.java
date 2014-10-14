@@ -119,13 +119,15 @@ public class ResourceLocal implements Resource {
         if (body.getDialect() != null && !body.getDialect().isEmpty()) {
             if (dialects.containsKey(body.getDialect())) {
                 Dialect dialect = dialects.get(body.getDialect());
-                representation = dialect.processGet(body, representation);
+                // Send fragment of resource instead it's representation.
+                response.getAny().add(dialect.processGet(body, representation));
             } else {
                 throw new UnknownDialect();
             }
+        } else {
+            // Send representation obtained from ResourceManager.
+            response.setRepresentation(representation);
         }
-        // Sending response
-        response.setRepresentation(representation);
         return response;
     }
 
