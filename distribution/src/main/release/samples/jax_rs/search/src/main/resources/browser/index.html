@@ -33,6 +33,15 @@
 			    	<button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-search"></i></button>
 			    </div>
 		    </div>
+
+			<div class="btn-group" data-toggle="buttons">
+				<label class="btn btn-primary active"> 
+					<input type="radio" name="options" id="any" />Any keyword (OR)
+				</label> 
+				<label class="btn btn-primary"> 
+					<input type="radio" name="options" id="all" />All keywords (AND)
+				</label> 
+			</div>
 		</form>
 		
 		<div class="fluent-container" id="results">
@@ -40,6 +49,8 @@
     </div> <!-- /container -->
     
     <script type="text/javascript">
+        $( "#any" ).prop( "checked", true );
+    
         function handleError(request, status, error, form) {
 			$( "#error-message" ).removeClass('hide');
 			
@@ -81,14 +92,38 @@
 	    });
     	
     	$( "#form-search" ).submit(function(e) {    		
-    		var query = $( "#search-query" ).val();
+    		var query = $( "#search-query" ).val().trim();
     		$( "#error-message" ).addClass('hide');
     		$( "#results" ).html("");
     		
     		if( query !== "" ) {
-    			var encodedQuery = encodeURIComponent( query );
-    			var encodedWildcardsQuery = encodeURIComponent( "*" + query + "*" );
-    			var filter = "ct==" + encodedQuery + ",source==" + encodedWildcardsQuery; 
+    			var contentQuery = "";
+    			var wildcardsQuery = "";
+    			
+    			if( $( "#all" ).is( ":checked" ) ) {
+    				contentQuery += "(";
+    				wildcardsQuery += ",(";
+
+    				query.split( " " ).forEach( function( entry ) {
+    					if( contentQuery.length > 1 ) contentQuery += ";";
+    					if( wildcardsQuery.length > 2 ) wildcardsQuery += ";";
+    					
+    					contentQuery += "ct==" + encodeURIComponent( entry );
+    					wildcardsQuery += "source==" + encodeURIComponent( "*" + entry + "*" );
+        			} );
+
+    				contentQuery += ")";
+    				wildcardsQuery += ")";
+    			} else {
+    				contentQuery = "ct==" + encodeURIComponent( query );
+    			    			
+    				query.split( " " ).forEach( function( entry ) {    				
+    					wildcardsQuery += ",source==" + encodeURIComponent( "*" + entry + "*" );
+    			    } );
+    			}
+    			
+    			var encodedWildcardsQuery = encodeURIComponent( wildcardsQuery.trim() );
+    			var filter = contentQuery + wildcardsQuery;
 
 	    		$.ajax({
 	    			url: $(this).attr("action") + "?$filter=" + filter,
