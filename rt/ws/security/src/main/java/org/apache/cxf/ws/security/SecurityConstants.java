@@ -530,10 +530,47 @@ public final class SecurityConstants {
     public static final String STS_TOKEN_ON_BEHALF_OF = "ws-security.sts.token.on-behalf-of";
 
     /**
+<<<<<<< HEAD
      * Set this to "false" in order to remove the SOAP mustUnderstand header from security headers generated based on
      * a WS-SecurityPolicy.
      *
      * The default value is "true" which included the SOAP mustUnderstand header.
+=======
+     * This is the value in seconds within which a token is considered to be expired by the
+     * client. When a cached token (from a STS) is retrieved by the client, it is considered
+     * to be expired if it will expire in a time less than the value specified by this tag.
+     * This prevents token expiry when the message is en route / being processed by the
+     * service. When the token is found to be expired then it will be renewed via the STS.
+     * 
+     * The default value is 10 (seconds). Specify 0 to avoid this check.
+     */
+    public static final String STS_TOKEN_IMMINENT_EXPIRY_VALUE =
+        "ws-security.sts.token.imminent-expiry-value";
+    
+    //
+    // Kerberos Configuration tags
+    //
+    
+    /**
+     * Whether to request credential delegation or not in the KerberosClient. If this is set to "true",
+     * then it tries to get a kerberos service ticket that can be used for delegation. The default
+     * is "false".
+     */
+    public static final String KERBEROS_REQUEST_CREDENTIAL_DELEGATION = 
+        "ws-security.kerberos.request.credential.delegation";
+    
+    /**
+     * Whether to use credential delegation or not in the KerberosClient. If this is set to "true",
+     * then it tries to get a GSSCredential Object from the Message Context using the 
+     * DELEGATED_CREDENTIAL configuration tag below, and then use this to obtain a service ticket.
+     * The default is "false".
+     */
+    public static final String KERBEROS_USE_CREDENTIAL_DELEGATION = 
+        "ws-security.kerberos.use.credential.delegation";
+    
+    /**
+     * Whether the Kerberos username is in servicename form or not. The default is "false".
+>>>>>>> 9edc70a... Adding a new JAX-RS property to control Kerberos request delegation
      */
     public static final String MUST_UNDERSTAND = "ws-security.must-understand";
 
@@ -593,7 +630,8 @@ public final class SecurityConstants {
             ASYMMETRIC_SIGNATURE_ALGORITHM, ENABLE_SAML_ONE_TIME_USE_CACHE, SAML_ONE_TIME_USE_CACHE_INSTANCE,
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
             DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
-            KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE
+            KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE,
+            KERBEROS_REQUEST_CREDENTIAL_DELEGATION
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
