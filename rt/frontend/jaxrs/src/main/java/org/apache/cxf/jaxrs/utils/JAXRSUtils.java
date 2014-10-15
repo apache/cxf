@@ -82,7 +82,6 @@ import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
@@ -1039,7 +1038,7 @@ public final class JAXRSUtils {
         }
         Object instance;
         try {
-            instance = ClassLoaderUtils.loadClass(clazz.getName(), JAXRSUtils.class).newInstance();
+            instance = clazz.newInstance();
         } catch (Throwable t) {
             throw ExceptionUtils.toInternalServerErrorException(t, null); 
         }
