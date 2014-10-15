@@ -30,13 +30,13 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.PrivateKeyJwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 
 public class AbstractJwsWriterProvider {
     private static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
@@ -49,7 +49,7 @@ public class AbstractJwsWriterProvider {
         this.sigProvider = signatureProvider;
     }
     
-    protected JwsSignatureProvider getInitializedSigProvider(JwtHeaders headers) {
+    protected JwsSignatureProvider getInitializedSigProvider(JoseHeaders headers) {
         if (sigProvider != null) {
             return sigProvider;    
         } 

@@ -25,6 +25,7 @@ import javax.crypto.Mac;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.crypto.HmacUtils;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
@@ -48,7 +49,7 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
         }
     }
     
-    protected JwsSignature doCreateJwsSignature(JwsHeaders headers) {
+    protected JwsSignature doCreateJwsSignature(JoseHeaders headers) {
         final Mac mac = HmacUtils.getInitializedMac(key, Algorithm.toJavaName(headers.getAlgorithm()),
                                                     hmacSpec);
         return new JwsSignature() {

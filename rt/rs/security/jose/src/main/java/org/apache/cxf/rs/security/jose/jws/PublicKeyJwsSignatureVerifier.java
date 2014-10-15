@@ -23,8 +23,8 @@ import java.security.spec.AlgorithmParameterSpec;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 
 public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     private PublicKey key;
@@ -43,7 +43,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
         this.supportedAlgo = supportedAlgo;
     }
     @Override
-    public boolean verify(JwtHeaders headers, String unsignedText, byte[] signature) {
+    public boolean verify(JoseHeaders headers, String unsignedText, byte[] signature) {
         try {
             return CryptoUtils.verifySignature(StringUtils.toBytesUTF8(unsignedText), 
                                                signature, 

@@ -21,13 +21,14 @@ package org.apache.cxf.rs.security.jose.jws;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactProducer {
     private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
-    private JwsHeaders headers;
+    private JoseHeaders headers;
     private String plainJwsPayload;
     private String signature;
     private String plainRep;
@@ -35,26 +36,26 @@ public class JwsCompactProducer {
     public JwsCompactProducer(String plainJwsPayload) {
         this(null, null, plainJwsPayload);
     }
-    public JwsCompactProducer(JwsHeaders headers, String plainJwsPayload) {
+    public JwsCompactProducer(JoseHeaders headers, String plainJwsPayload) {
         this(headers, null, plainJwsPayload);
     }
-    public JwsCompactProducer(JwsHeaders headers, JoseHeadersWriter w, String plainJwsPayload) {
+    public JwsCompactProducer(JoseHeaders headers, JoseHeadersWriter w, String plainJwsPayload) {
         this.headers = headers;
         if (w != null) {
             this.writer = w;
         }
         this.plainJwsPayload = plainJwsPayload;
     }
-    public JwsHeaders getHeaders() {
+    public JoseHeaders getJoseHeaders() {
         if (headers == null) {
-            headers = new JwsHeaders();
+            headers = new JoseHeaders();
         }
         return headers;
     }
     public String getUnsignedEncodedJws() {
         checkAlgorithm();
         if (plainRep == null) {
-            plainRep = Base64UrlUtility.encode(writer.headersToJson(getHeaders())) 
+            plainRep = Base64UrlUtility.encode(writer.headersToJson(getJoseHeaders())) 
                 + "." 
                 + Base64UrlUtility.encode(plainJwsPayload);
         }
@@ -75,7 +76,7 @@ public class JwsCompactProducer {
     }
     
     public String signWith(JwsSignatureProvider signer) { 
-        JwsSignature worker = signer.createJwsSignature(getHeaders());
+        JwsSignature worker = signer.createJwsSignature(getJoseHeaders());
         
         byte[] bytes = StringUtils.toBytesUTF8(getUnsignedEncodedJws());
         worker.update(bytes, 0, bytes.length);
@@ -101,7 +102,7 @@ public class JwsCompactProducer {
         return JoseConstants.PLAIN_TEXT_ALGO.equals(getAlgorithm());
     }
     private String getAlgorithm() {
-        return getHeaders().getAlgorithm();
+        return getJoseHeaders().getAlgorithm();
     }
     private void checkAlgorithm() {
         if (getAlgorithm() == null) {

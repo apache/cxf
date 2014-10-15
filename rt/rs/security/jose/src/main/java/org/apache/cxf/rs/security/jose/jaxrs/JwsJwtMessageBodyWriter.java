@@ -29,9 +29,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 
 public class JwsJwtMessageBodyWriter  extends AbstractJwsWriterProvider 
@@ -52,7 +52,7 @@ public class JwsJwtMessageBodyWriter  extends AbstractJwsWriterProvider
                         MultivaluedMap<String, Object> headers, OutputStream os) throws IOException,
         WebApplicationException {
         JwsJwtCompactProducer p = new JwsJwtCompactProducer(token);
-        JwtHeaders jwtHeaders = new JwtHeaders();
+        JoseHeaders jwtHeaders = new JoseHeaders();
         JwsSignatureProvider sigProvider = getInitializedSigProvider(jwtHeaders);
         jwtHeaders.setContentType(JoseConstants.TYPE_JWT);
         writeJws(p, sigProvider, os);

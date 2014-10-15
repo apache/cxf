@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import org.apache.cxf.rs.security.jose.JoseHeaders;
+
 
 public interface JwsSignatureProvider {
     String getAlgorithm();
-    JwsSignature createJwsSignature(JwsHeaders headers);
+    JwsSignature createJwsSignature(JoseHeaders headers);
 }
