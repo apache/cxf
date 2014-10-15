@@ -59,11 +59,17 @@ public final class KerberosUtils {
                                               SecurityConstants.KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, 
                                               false);
             
+            boolean requestCredentialDelegation = 
+                MessageUtils.getContextualBoolean(message, 
+                                              SecurityConstants.KERBEROS_REQUEST_CREDENTIAL_DELEGATION, 
+                                              false);
+            
             client.setContextName(jaasContext);
             client.setServiceName(kerberosSpn);
             client.setCallbackHandler(callbackHandler);
             client.setUseDelegatedCredential(useCredentialDelegation);
             client.setUsernameServiceNameForm(isInServiceNameForm);
+            client.setRequestCredentialDelegation(requestCredentialDelegation);
         }
         return client;
     }

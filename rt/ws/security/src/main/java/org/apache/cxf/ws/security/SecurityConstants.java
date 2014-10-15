@@ -558,6 +558,14 @@ public final class SecurityConstants {
     //
     
     /**
+     * Whether to request credential delegation or not in the KerberosClient. If this is set to "true",
+     * then it tries to get a kerberos service ticket that can be used for delegation. The default
+     * is "false".
+     */
+    public static final String KERBEROS_REQUEST_CREDENTIAL_DELEGATION = 
+        "ws-security.kerberos.request.credential.delegation";
+    
+    /**
      * Whether to use credential delegation or not in the KerberosClient. If this is set to "true",
      * then it tries to get a GSSCredential Object from the Message Context using the 
      * DELEGATED_CREDENTIAL configuration tag below, and then use this to obtain a service ticket.
@@ -618,7 +626,8 @@ public final class SecurityConstants {
             SAML_ONE_TIME_USE_CACHE_INSTANCE, ENABLE_STREAMING_SECURITY, RETURN_SECURITY_ERROR,
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
             DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
-            KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE
+            KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE,
+            KERBEROS_REQUEST_CREDENTIAL_DELEGATION
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
