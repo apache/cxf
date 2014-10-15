@@ -43,7 +43,7 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));
         res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
-        String ct = JoseUtils.checkContentType(p.getJwsHeaders().getContentType(), getDefaultMediaType());
+        String ct = JoseUtils.checkContentType(p.getJoseHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             res.getHeaders().putSingle("Content-Type", ct);
         }

@@ -77,16 +77,16 @@ public class JwsCompactConsumer {
     public byte[] getDecodedSignature() {
         return encodedSignature.isEmpty() ? new byte[]{} : decode(encodedSignature);
     }
-    public JwsHeaders getJwsHeaders() {
+    public JoseHeaders getJoseHeaders() {
         JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
         if (joseHeaders.getHeaderUpdateCount() != null) { 
             throw new SecurityException();
         }
-        return new JwsHeaders(joseHeaders);
+        return joseHeaders;
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         try {
-            if (validator.verify(getJwsHeaders(), getUnsignedEncodedPayload(), getDecodedSignature())) {
+            if (validator.verify(getJoseHeaders(), getUnsignedEncodedPayload(), getDecodedSignature())) {
                 return true;
             }
         } catch (SecurityException ex) {

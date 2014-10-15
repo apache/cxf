@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jwt.token;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesGcmContentDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesGcmContentEncryptionAlgorithm;
@@ -28,7 +29,6 @@ import org.apache.cxf.rs.security.jose.jwe.DirectKeyJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.DirectKeyJweEncryption;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
-import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignature;
@@ -94,7 +94,7 @@ public final class JwtAccessTokenUtils {
         }
 
         @Override
-        public JwsSignature createJwsSignature(JwsHeaders headers) {
+        public JwsSignature createJwsSignature(JoseHeaders headers) {
             return new NoneJwsSignature();
         }
         

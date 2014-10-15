@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtHeaders;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 
 public interface JwsSignatureVerifier {
-    boolean verify(JwtHeaders headers, String unsignedText, byte[] signature);
+    boolean verify(JoseHeaders headers, String unsignedText, byte[] signature);
 }

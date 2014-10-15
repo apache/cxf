@@ -18,16 +18,18 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
+import org.apache.cxf.rs.security.jose.JoseHeaders;
+
 
 
 public class JwtToken {
-    private JwtHeaders headers;
+    private JoseHeaders headers;
     private JwtClaims claims;
-    public JwtToken(JwtHeaders headers, JwtClaims claims) {
+    public JwtToken(JoseHeaders headers, JwtClaims claims) {
         this.headers = headers;
         this.claims = claims;
     }
-    public JwtHeaders getHeaders() {
+    public JoseHeaders getHeaders() {
         return headers;
     }
     public JwtClaims getClaims() {

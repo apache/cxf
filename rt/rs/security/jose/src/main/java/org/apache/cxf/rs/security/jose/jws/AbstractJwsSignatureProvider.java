@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import org.apache.cxf.rs.security.jose.JoseHeaders;
+
 
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
     private String algorithm;
@@ -26,9 +28,9 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         this.algorithm = algo;
     }
     
-    protected JwsHeaders prepareHeaders(JwsHeaders headers) {
+    protected JoseHeaders prepareHeaders(JoseHeaders headers) {
         if (headers == null) {
-            headers = new JwsHeaders();
+            headers = new JoseHeaders();
         }
         String algo = headers.getAlgorithm();
         if (algo != null) {
@@ -44,11 +46,11 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         return algorithm;    
     }
     @Override
-    public JwsSignature createJwsSignature(JwsHeaders headers) {
+    public JwsSignature createJwsSignature(JoseHeaders headers) {
         return doCreateJwsSignature(prepareHeaders(headers));
     }
     
-    protected abstract JwsSignature doCreateJwsSignature(JwsHeaders headers);
+    protected abstract JwsSignature doCreateJwsSignature(JoseHeaders headers);
     
     protected void checkAlgorithm(String algo) {
         if (algo == null) {
