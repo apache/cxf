@@ -60,7 +60,7 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
             JwsJwtCompactConsumer jwsReader = getJwsReader(assertion);
             JwtToken jwtToken = jwsReader.getJwtToken();
             super.validateSignature(jwtToken.getHeaders(),
-                                    jwsReader.getUnsignedEncodedPayload(), 
+                                    jwsReader.getUnsignedEncodedSequence(), 
                                     jwsReader.getDecodedSignature());
             
                    
