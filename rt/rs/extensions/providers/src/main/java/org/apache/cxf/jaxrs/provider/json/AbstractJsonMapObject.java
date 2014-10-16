@@ -42,7 +42,7 @@ public abstract class AbstractJsonMapObject {
     }
 
     public Map<String, Object> asMap() {
-        return new LinkedHashMap<String, Object>(values);
+        return values;
     }
     
     protected Long getLongDate(String name) {

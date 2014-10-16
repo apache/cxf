@@ -18,14 +18,11 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
-import java.io.UnsupportedEncodingException;
-
-import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactConsumer {
@@ -54,12 +51,12 @@ public class JwsCompactConsumer {
         } else {
             encodedSignature = parts[2];
         }
-        headersJson = decodeToString(parts[0]);
-        jwsPayload = decodeToString(parts[1]);
+        headersJson = JoseUtils.decodeToString(parts[0]);
+        jwsPayload = JoseUtils.decodeToString(parts[1]);
         encodedSequence = parts[0] + "." + parts[1];
         
     }
-    public String getUnsignedEncodedPayload() {
+    public String getUnsignedEncodedSequence() {
         return encodedSequence;
     }
     public String getEncodedSignature() {
@@ -75,7 +72,7 @@ public class JwsCompactConsumer {
         return StringUtils.toBytesUTF8(jwsPayload);
     }
     public byte[] getDecodedSignature() {
-        return encodedSignature.isEmpty() ? new byte[]{} : decode(encodedSignature);
+        return encodedSignature.isEmpty() ? new byte[]{} : JoseUtils.decode(encodedSignature);
     }
     public JoseHeaders getJoseHeaders() {
         JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
@@ -86,7 +83,7 @@ public class JwsCompactConsumer {
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         try {
-            if (validator.verify(getJoseHeaders(), getUnsignedEncodedPayload(), getDecodedSignature())) {
+            if (validator.verify(getJoseHeaders(), getUnsignedEncodedSequence(), getDecodedSignature())) {
                 return true;
             }
         } catch (SecurityException ex) {
@@ -97,22 +94,9 @@ public class JwsCompactConsumer {
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
     }
-    private static String decodeToString(String encoded) {
-        try {
-            return new String(decode(encoded), "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new SecurityException(ex);
-        }
-        
-    }
+    
     protected JoseHeadersReader getReader() {
         return reader;
     }
-    private static byte[] decode(String encoded) {
-        try {
-            return Base64UrlUtility.decode(encoded);
-        } catch (Base64Exception ex) {
-            throw new SecurityException(ex);
-        }
-    }
+    
 }

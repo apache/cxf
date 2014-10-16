@@ -100,7 +100,12 @@ public class JsonMapObjectReaderWriter {
         readJsonObjectAsSettable(joseObject, theJson.substring(1, theJson.length() - 1));
     }
     
-    
+    public Map<String, Object> fromJson(String json) {
+        String theJson = json.trim();
+        MapSettable nextMap = new MapSettable();
+        readJsonObjectAsSettable(nextMap, theJson.substring(1, theJson.length() - 1));
+        return nextMap.map;
+    }
     
     protected void readJsonObjectAsSettable(Settable values, String json) {
         for (int i = 0; i < json.length(); i++) {

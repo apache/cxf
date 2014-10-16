@@ -33,6 +33,10 @@ public class JoseHeaders extends AbstractJsonMapObject {
     public JoseHeaders() {
     }
     
+    public JoseHeaders(JoseHeaders headers) {
+        this(headers.asMap());
+    }
+    
     public JoseHeaders(Map<String, Object> values) {
         super(values);
     }

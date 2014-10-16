@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose;
 
+import java.io.UnsupportedEncodingException;
+
+import org.apache.cxf.common.util.crypto.CryptoUtils;
+
 public final class JoseUtils {
     private JoseUtils() {
         
@@ -42,5 +46,17 @@ public final class JoseUtils {
             contentType = "application/" + contentType;
         }
         return contentType;
+    }
+    
+    public static String decodeToString(String encoded) {
+        try {
+            return new String(decode(encoded), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new SecurityException(ex);
+        }
+        
+    }
+    public static byte[] decode(String encoded) {
+        return CryptoUtils.decodeSequence(encoded);
     }
 }
