@@ -7,9 +7,9 @@
   to you under the Apache License, Version 2.0 (the
   "License"); you may not use this file except in compliance
   with the License. You may obtain a copy of the License at
- 
+
   http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,7 +22,7 @@
     <feature name="cxf-xkms-client" version="${project.version}">
         <feature>cxf-jaxws</feature>
         <feature>cxf-http</feature>
-        <feature>wss4j</feature>
+        <feature>cxf-ws-security</feature>
         <bundle start-level="40" dependency="true">mvn:net.sf.ehcache/ehcache/${cxf.ehcache.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-common/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-client/${project.version}</bundle>
@@ -42,7 +42,7 @@
             mvn:${project.groupId}/cxf-services-xkms-features/${project.version}/cfg/org.apache.cxf.xkms
         </configfile>
     </feature>
-    
+
     <feature name="cxf-xkms-ldap" version="${project.version}">
         <feature>cxf-xkms-service</feature>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-x509-repo-ldap/${project.version}</bundle>

@@ -50,20 +50,20 @@ public class BasicIntegrationTest {
 
     private static final String HTTP_PORT = "9191";
     private static final String XKMS_ENDPOINT = "http://localhost:" + HTTP_PORT + "/cxf/XKMS";
-    
+
     // Adding apache snapshots as cxf trunk may contain snapshot dependencies
-    private static final String REPOS = "http://repo1.maven.org/maven2@id=central, " 
+    private static final String REPOS = "http://repo1.maven.org/maven2@id=central, "
         + "http://repository.apache.org/content/groups/snapshots-group@snapshots@noreleases@id=apache-snapshots ";
 
     protected MavenArtifactUrlReference karafUrl;
     protected MavenUrlReference xkmsFeatures;
-    
+
     @Inject
     protected XKMSPortType xkmsService;
 
     @Configuration
     public Option[] getConfig() {
-        String karafVersion = System.getProperty("karaf.version", "2.3.6");
+        String karafVersion = System.getProperty("karaf.version", "2.4.0");
         String localRepository = System.getProperty("localRepository");
         karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf")
             .version(karafVersion).type("tar.gz");
@@ -83,16 +83,16 @@ public class BasicIntegrationTest {
             copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
             copy("data/xkms/certificates/crls/wss40CACRL.cer"),
             copy("etc/org.ops4j.pax.logging.cfg"),
-            editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories", REPOS), 
+            editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories", REPOS),
             editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", HTTP_PORT),
             editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg", "xkms.endpoint", XKMS_ENDPOINT),
             when(localRepository != null)
-                .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", 
+                .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                             "org.ops4j.pax.url.mvn.localRepository",
                             localRepository)),
             features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client", "cxf-xkms-ldap"),
             configureConsole().ignoreLocalConsole(),
-            
+
             //KarafDistributionOption.keepRuntimeFolder(),
             //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
