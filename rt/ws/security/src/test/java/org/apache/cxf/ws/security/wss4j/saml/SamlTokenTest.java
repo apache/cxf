@@ -53,7 +53,7 @@ import org.apache.cxf.ws.security.wss4j.AbstractSecurityTest;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.saml.AbstractSAMLCallbackHandler.Statement;
-
+import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
@@ -65,7 +65,6 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 
-
 /**
  * Some tests for creating and processing (signed) SAML Assertions.
  */
@@ -73,12 +72,22 @@ public class SamlTokenTest extends AbstractSecurityTest {
 
     public SamlTokenTest() {
     }
-
+    
     /**
      * This test creates a SAML1 Assertion and sends it in the security header to the provider. 
      */
     @Test
-    public void testSaml1Token() throws Exception {
+    public void testUnsignedSaml1Token() throws Exception {
+        assertNull(testSaml1Token(false));
+    }
+
+    @Test
+    public void testUnsignedSaml1TokenWithPrincipal() throws Exception {
+        SecurityContext ctx = testSaml1Token(true);
+        assertTrue(ctx.getUserPrincipal() instanceof SAMLTokenPrincipal);
+    }
+        
+    private SecurityContext testSaml1Token(boolean allowUnsignedPrincipal) throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
         outProperties.put(
@@ -99,6 +108,10 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security/saml1:Assertion");
 
         Map<String, String> inMessageProperties = new HashMap<String, String>();
+        if (allowUnsignedPrincipal) {
+            inMessageProperties.put(SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, "true");
+        }
+
         inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
         Message message = makeInvocation(outProperties, xpaths, inProperties, inMessageProperties);
         
@@ -111,6 +124,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
         assert !receivedAssertion.isSigned();
+        
+        return message.get(SecurityContext.class);
     }
     
     @Test
