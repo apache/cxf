@@ -168,6 +168,12 @@ public final class SecurityConstants {
     public static final String SELF_SIGN_SAML_ASSERTION = "ws-security.self-sign-saml-assertion";
     
     /**
+     * Whether to allow unsigned saml assertions as SecurityContext Principals. The default is false.
+     */
+    public static final String ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL = 
+            "ws-security.enable.unsigned-saml-assertion.principal";
+    
+    /**
      * Whether to cache UsernameToken nonces. The default value is "true" for message recipients, and 
      * "false" for message initiators. Set it to true to cache for both cases. Set this to "false" to
      * not cache UsernameToken nonces. Note that caching only applies when either a UsernameToken
@@ -602,7 +608,7 @@ public final class SecurityConstants {
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
             DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
             KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE,
-            KERBEROS_REQUEST_CREDENTIAL_DELEGATION
+            KERBEROS_REQUEST_CREDENTIAL_DELEGATION, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

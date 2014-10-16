@@ -523,6 +523,10 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
         results.add(0, rResult);
         
+        Boolean allowUnsignedSamlPrincipals = 
+                MessageUtils.getContextualBoolean(msg, 
+                        SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, false);
+        
         for (int i = wsResult.size() - 1; i >= 0; i--) {
             WSSecurityEngineResult o = wsResult.get(i);
             
@@ -533,10 +537,13 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 .getContextualBoolean(msg, SecurityConstants.SC_FROM_JAAS_SUBJECT, true);
             final Object binarySecurity = o.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
             
-            // UsernameToken, Kerberos, Signed SAML token or XML Signature
+            final boolean isValidSamlToken = action == WSConstants.ST_SIGNED 
+                    || (allowUnsignedSamlPrincipals && action == WSConstants.ST_UNSIGNED);
+            
+            // UsernameToken, Kerberos, SAML token or XML Signature
             if (action == WSConstants.UT || action == WSConstants.UT_NOPASSWORD
                 || (action == WSConstants.BST && binarySecurity instanceof KerberosSecurity)
-                || action == WSConstants.ST_SIGNED || action == WSConstants.SIGN) {
+                || isValidSamlToken || action == WSConstants.SIGN) {
                 
                 if (action == WSConstants.SIGN) {
                     // Check we have a public key / certificate for the signing case
