@@ -69,13 +69,16 @@ public class JsonMapObjectProvider implements MessageBodyReader<JsonMapObject>, 
                                   MultivaluedMap<String, String> headers, InputStream is) throws IOException,
         WebApplicationException {
         String s = IOUtils.readStringFromStream(is);
-        Map<String, Object> jsonMap = handler.fromJson(s);
+        JsonMapObject obj = new JsonMapObject(); 
+        handler.fromJson(obj, s);
         if (cls == JsonMapObject.class) {
-            return new JsonMapObject(jsonMap);
+            return obj;
         } else {
             try {
                 Constructor<?> c = cls.getConstructor(Map.class);
-                return (JsonMapObject)c.newInstance(jsonMap);
+                JsonMapObject actualObj = (JsonMapObject)c.newInstance(obj.asMap());
+                actualObj.updateCount = obj.updateCount;
+                return actualObj;
             } catch (Exception ex) {
                 throw new IOException(ex);
             }
