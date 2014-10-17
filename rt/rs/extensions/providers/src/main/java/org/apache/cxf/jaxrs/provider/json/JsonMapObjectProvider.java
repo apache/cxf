@@ -76,7 +76,8 @@ public class JsonMapObjectProvider implements MessageBodyReader<JsonMapObject>, 
         } else {
             try {
                 Constructor<?> c = cls.getConstructor(Map.class);
-                JsonMapObject actualObj = (JsonMapObject)c.newInstance(obj.asMap());
+                JsonMapObject actualObj = (JsonMapObject)c.newInstance();
+                actualObj.values = obj.values;
                 actualObj.updateCount = obj.updateCount;
                 return actualObj;
             } catch (Exception ex) {

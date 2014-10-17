@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class JsonMapObject {
     Map<String, Integer> updateCount;
-    private Map<String, Object> values = new LinkedHashMap<String, Object>();
+    Map<String, Object> values = new LinkedHashMap<String, Object>();
     public JsonMapObject() {
         
     }
