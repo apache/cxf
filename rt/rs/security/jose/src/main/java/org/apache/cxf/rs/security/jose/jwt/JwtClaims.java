@@ -21,12 +21,12 @@ package org.apache.cxf.rs.security.jose.jwt;
 
 import java.util.Map;
 
-import org.apache.cxf.jaxrs.provider.json.AbstractJsonMapObject;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 
 
 
 
-public class JwtClaims extends AbstractJsonMapObject {
+public class JwtClaims extends JsonMapObject {
     
     public JwtClaims() {
     }
@@ -40,7 +40,7 @@ public class JwtClaims extends AbstractJsonMapObject {
     }
     
     public String getIssuer() {
-        return (String)getValue(JwtConstants.CLAIM_ISSUER);
+        return (String)getClaim(JwtConstants.CLAIM_ISSUER);
     }
     
     public void setSubject(String subject) {
@@ -64,7 +64,7 @@ public class JwtClaims extends AbstractJsonMapObject {
     }
     
     public Long getExpiryTime() {
-        return getLongDate(JwtConstants.CLAIM_EXPIRY);
+        return getLongProperty(JwtConstants.CLAIM_EXPIRY);
     }
     
     public void setNotBefore(Long notBefore) {
@@ -72,7 +72,7 @@ public class JwtClaims extends AbstractJsonMapObject {
     }
     
     public Long getNotBefore() {
-        return getLongDate(JwtConstants.CLAIM_NOT_BEFORE);
+        return getLongProperty(JwtConstants.CLAIM_NOT_BEFORE);
     }
     
     public void setIssuedAt(Long issuedAt) {
@@ -80,11 +80,11 @@ public class JwtClaims extends AbstractJsonMapObject {
     }
     
     public Long getIssuedAt() {
-        return getLongDate(JwtConstants.CLAIM_ISSUED_AT);
+        return getLongProperty(JwtConstants.CLAIM_ISSUED_AT);
     }
     
     public void setTokenId(String id) {
-        setValue(JwtConstants.CLAIM_JWT_ID, id);
+        setClaim(JwtConstants.CLAIM_JWT_ID, id);
     }
     
     public String getTokenId() {
@@ -92,11 +92,11 @@ public class JwtClaims extends AbstractJsonMapObject {
     }
     
     public JwtClaims setClaim(String name, Object value) {
-        setValue(name, value);
+        setProperty(name, value);
         return this;
     }
     
     public Object getClaim(String name) {
-        return getValue(name);
+        return getProperty(name);
     }
 }
