@@ -54,8 +54,8 @@ public class JweCompactConsumer {
             encryptedContent = Base64UrlUtility.decode(parts[3]);
             authTag = Base64UrlUtility.decode(parts[4]);
             JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
-            if (joseHeaders.getHeaderUpdateCount() != null) { 
-                throw new SecurityException();
+            if (joseHeaders.getUpdateCount() != null) { 
+                throw new SecurityException("Duplicate headers have been detected");
             }
             jweHeaders = new JweHeaders(joseHeaders);
             

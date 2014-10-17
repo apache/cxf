@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxrs.provider.json.AbstractJsonMapObject;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 
-public class JsonWebKeys extends AbstractJsonMapObject {
+public class JsonWebKeys extends JsonMapObject {
     public static final String KEYS_PROPERTY = "keys";
     public List<JsonWebKey> getKeys() {
-        List<?> list = (List<?>)super.getValue(KEYS_PROPERTY);
+        List<?> list = (List<?>)super.getProperty(KEYS_PROPERTY);
         if (list != null && !list.isEmpty()) {
             Object first = list.get(0);
             if (first instanceof JsonWebKey) {
@@ -38,7 +38,7 @@ public class JsonWebKeys extends AbstractJsonMapObject {
             } else {
                 List<JsonWebKey> keys = new LinkedList<JsonWebKey>();
                 List<Map<String, Object>> listOfMaps = 
-                    CastUtils.cast((List<?>)super.getValue(KEYS_PROPERTY));
+                    CastUtils.cast((List<?>)super.getProperty(KEYS_PROPERTY));
                 for (Map<String, Object> map : listOfMaps) {
                     keys.add(new JsonWebKey(map));
                 }
@@ -50,7 +50,7 @@ public class JsonWebKeys extends AbstractJsonMapObject {
     }
 
     public void setKeys(List<JsonWebKey> keys) {
-        super.setValue(KEYS_PROPERTY, keys);
+        super.setProperty(KEYS_PROPERTY, keys);
     }
     
     public Map<String, JsonWebKey> getKeyIdMap() {

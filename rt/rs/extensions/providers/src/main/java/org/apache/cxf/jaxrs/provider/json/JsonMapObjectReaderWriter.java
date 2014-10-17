@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.provider.json;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -26,78 +28,92 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.common.util.StringUtils;
+
 
 
 public class JsonMapObjectReaderWriter {
     private boolean format;
     
-    public String toJson(AbstractJsonMapObject jwt) {
+    public String toJson(JsonMapObject obj) {
+        return toJson(obj.asMap());
+    }
+    
+    public String toJson(Map<String, Object> map) {
         StringBuilder sb = new StringBuilder();
-        toJsonInternal(sb, jwt.asMap());
+        toJsonInternal(new StringBuilderOutput(sb), map);
         return sb.toString();
     }
+    
+    public void toJson(JsonMapObject obj, OutputStream os) {
+        toJson(obj.asMap(), os);
+    }
+    
+    public void toJson(Map<String, Object> map, OutputStream os) {
+        toJsonInternal(new StreamOutput(os), map);
+    }
 
-    protected void toJsonInternal(StringBuilder sb, Map<String, Object> map) {
-        sb.append("{");
+    protected void toJsonInternal(Output out, Map<String, Object> map) {
+        out.append("{");
         for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, Object> entry = it.next();
-            sb.append("\"").append(entry.getKey()).append("\"");
-            sb.append(":");
-            toJsonInternal(sb, entry.getValue(), it.hasNext());
+            out.append("\"").append(entry.getKey()).append("\"");
+            out.append(":");
+            toJsonInternal(out, entry.getValue(), it.hasNext());
         }
-        sb.append("}");
+        out.append("}");
     }
     
-    protected void toJsonInternal(StringBuilder sb, Object[] array) {
-        toJsonInternal(sb, Arrays.asList(array));
+    protected void toJsonInternal(Output out, Object[] array) {
+        toJsonInternal(out, Arrays.asList(array));
     }
     
-    protected void toJsonInternal(StringBuilder sb, Collection<?> coll) {
-        sb.append("[");
-        formatIfNeeded(sb);
+    protected void toJsonInternal(Output out, Collection<?> coll) {
+        out.append("[");
+        formatIfNeeded(out);
         for (Iterator<?> iter = coll.iterator(); iter.hasNext();) {
-            toJsonInternal(sb, iter.next(), iter.hasNext());
+            toJsonInternal(out, iter.next(), iter.hasNext());
         }
-        formatIfNeeded(sb);
-        sb.append("]");
+        formatIfNeeded(out);
+        out.append("]");
     }
     
     @SuppressWarnings("unchecked")
-    protected void toJsonInternal(StringBuilder sb, Object value, boolean hasNext) {
-        if (AbstractJsonMapObject.class.isAssignableFrom(value.getClass())) {
-            sb.append(toJson((AbstractJsonMapObject)value));
+    protected void toJsonInternal(Output out, Object value, boolean hasNext) {
+        if (JsonMapObject.class.isAssignableFrom(value.getClass())) {
+            out.append(toJson((JsonMapObject)value));
         } else if (value.getClass().isArray()) {
-            toJsonInternal(sb, (Object[])value);
+            toJsonInternal(out, (Object[])value);
         } else if (Collection.class.isAssignableFrom(value.getClass())) {
-            toJsonInternal(sb, (Collection<?>)value);
+            toJsonInternal(out, (Collection<?>)value);
         } else if (Map.class.isAssignableFrom(value.getClass())) {
-            toJsonInternal(sb, (Map<String, Object>)value);
+            toJsonInternal(out, (Map<String, Object>)value);
         } else {
             if (value.getClass() == String.class) {
-                sb.append("\"");
+                out.append("\"");
             }
-            sb.append(value);
+            out.append(value.toString());
             if (value.getClass() == String.class) {
-                sb.append("\"");
+                out.append("\"");
             }
         }
         if (hasNext) {
-            sb.append(",");
-            formatIfNeeded(sb);
+            out.append(",");
+            formatIfNeeded(out);
         }
         
     }
     
-    protected void formatIfNeeded(StringBuilder sb) {
+    protected void formatIfNeeded(Output out) {
         if (format) {
-            sb.append("\r\n ");
+            out.append("\r\n ");
         }
     }
         
-    public void fromJson(AbstractJsonMapObject jwt, String json) {
+    public void fromJson(JsonMapObject obj, String json) {
         String theJson = json.trim();
-        JsonObjectSettable joseObject = new JsonObjectSettable(jwt);
-        readJsonObjectAsSettable(joseObject, theJson.substring(1, theJson.length() - 1));
+        JsonObjectSettable settable = new JsonObjectSettable(obj);
+        readJsonObjectAsSettable(settable, theJson.substring(1, theJson.length() - 1));
     }
     
     public Map<String, Object> fromJson(String json) {
@@ -211,14 +227,44 @@ public class JsonMapObjectReaderWriter {
         
     }
     private static class JsonObjectSettable implements Settable {
-        private AbstractJsonMapObject jose;
-        public JsonObjectSettable(AbstractJsonMapObject jose) {
-            this.jose = jose;
+        private JsonMapObject obj;
+        public JsonObjectSettable(JsonMapObject obj) {
+            this.obj = obj;
         }
         public void put(String key, Object value) {
-            jose.setValue(key, value);
+            obj.setProperty(key, value);
         }
     }
-
+    private interface Output {
+        Output append(String str);
+    }
+    private class StringBuilderOutput implements Output {
+        private StringBuilder sb;
+        public StringBuilderOutput(StringBuilder sb) {
+            this.sb = sb;
+        }
+        @Override
+        public Output append(String str) {
+            sb.append(str);
+            return this;
+        }
+        
+    }
+    private class StreamOutput implements Output {
+        private OutputStream os;
+        public StreamOutput(OutputStream os) {
+            this.os = os;
+        }
+        @Override
+        public Output append(String str) {
+            try {
+                os.write(StringUtils.toBytesUTF8(str));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            return this;
+        }
+        
+    }
     
 }

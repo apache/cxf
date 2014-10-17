@@ -76,8 +76,8 @@ public class JwsCompactConsumer {
     }
     public JoseHeaders getJoseHeaders() {
         JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
-        if (joseHeaders.getHeaderUpdateCount() != null) { 
-            throw new SecurityException();
+        if (joseHeaders.getUpdateCount() != null) { 
+            throw new SecurityException("Duplicate headers have been detected");
         }
         return joseHeaders;
     }

@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxrs.provider.json.AbstractJsonMapObject;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 
 
-public class JsonWebKey extends AbstractJsonMapObject {
+public class JsonWebKey extends JsonMapObject {
     
     public static final String KEY_TYPE = "kty";
     public static final String PUBLIC_KEY_USE = "use";
@@ -77,84 +77,85 @@ public class JsonWebKey extends AbstractJsonMapObject {
     }
     
     public void setKeyType(String keyType) {
-        super.setValue(KEY_TYPE, keyType);
+        setProperty(KEY_TYPE, keyType);
     }
 
     public String getKeyType() {
-        return (String)super.getValue(KEY_TYPE);
+        return (String)getProperty(KEY_TYPE);
     }
 
     public void setPublicKeyUse(String use) {
-        super.setValue(PUBLIC_KEY_USE, use);
+        setProperty(PUBLIC_KEY_USE, use);
     }
     
     public String getPublicKeyUse() {
-        return (String)super.getValue(PUBLIC_KEY_USE);
+        return (String)getProperty(PUBLIC_KEY_USE);
     }
 
     public void setKeyOperation(List<String> keyOperation) {
-        super.setValue(KEY_OPERATIONS, keyOperation);
+        setProperty(KEY_OPERATIONS, keyOperation);
     }
 
     public List<String> getKeyOperation() {
-        return CastUtils.cast((List<?>)super.getValue(KEY_OPERATIONS));
+        return CastUtils.cast((List<?>)getProperty(KEY_OPERATIONS));
     }
     
     public void setAlgorithm(String algorithm) {
-        super.setValue(KEY_ALGO, algorithm);
+        setProperty(KEY_ALGO, algorithm);
     }
 
     public String getAlgorithm() {
-        return (String)super.getValue(KEY_ALGO);
+        return (String)getProperty(KEY_ALGO);
     }
     
     public void setKid(String kid) {
-        super.setValue(KEY_ID, kid);
+        setProperty(KEY_ID, kid);
     }
 
     public String getKid() {
-        return (String)super.getValue(KEY_ID);
+        return (String)getProperty(KEY_ID);
     }
     
     public void setX509Url(String x509Url) {
-        super.setValue(X509_URL, x509Url);
+        setProperty(X509_URL, x509Url);
     }
     
     public String getX509Url() {
-        return (String)super.getValue(X509_URL);
+        return (String)getProperty(X509_URL);
     }
 
     public void setX509Chain(String x509Chain) {
-        super.setValue(X509_CHAIN, x509Chain);
+        setProperty(X509_CHAIN, x509Chain);
     }
 
     public String getX509Chain() {
-        return (String)super.getValue(X509_CHAIN);
+        return (String)getProperty(X509_CHAIN);
     }
     
     public void setX509Thumbprint(String x509Thumbprint) {
-        super.setValue(X509_THUMBPRINT, x509Thumbprint);
+        setProperty(X509_THUMBPRINT, x509Thumbprint);
     }
     
     public String getX509Thumbprint() {
-        return (String)super.getValue(X509_THUMBPRINT);
+        return (String)getProperty(X509_THUMBPRINT);
     }
     
     public void setX509ThumbprintSHA256(String x509Thumbprint) {
-        super.setValue(X509_THUMBPRINT_SHA256, x509Thumbprint);
+        setProperty(X509_THUMBPRINT_SHA256, x509Thumbprint);
     }
     
     public String getX509ThumbprintSHA256() {
-        return (String)super.getValue(X509_THUMBPRINT_SHA256);
+        return (String)getProperty(X509_THUMBPRINT_SHA256);
     }
     
-    public JsonWebKey setProperty(String name, Object value) {
-        super.setValue(name, value);
+    public JsonWebKey setKeyProperty(String name, Object value) {
+        setProperty(name, value);
         return this;
     }
-    
-    public Object getProperty(String name) {
-        return super.getValue(name);
+    public Object getKeyProperty(String name) {
+        return getProperty(name);
     }
+    
+    
     
 }

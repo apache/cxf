@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxrs.provider.json.AbstractJsonMapObject;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -45,7 +45,7 @@ public class JwsJsonConsumer {
     }
 
     private void prepare() {
-        AbstractJsonMapObject jsonObject = new AbstractJsonMapObject() { };
+        JsonMapObject jsonObject = new JsonMapObject();
         new JsonMapObjectReaderWriter().fromJson(jsonObject, jwsSignedDocument);
         this.encodedJwsPayload = (String)jsonObject.asMap().get("payload");
         

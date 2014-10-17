@@ -19,17 +19,14 @@
 
 package org.apache.cxf.rs.security.jose;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxrs.provider.json.AbstractJsonMapObject;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
-public class JoseHeaders extends AbstractJsonMapObject {
-    private Map<String, Integer> headerUpdateCount;
+public class JoseHeaders extends JsonMapObject {
     public JoseHeaders() {
     }
     
@@ -102,7 +99,7 @@ public class JoseHeaders extends AbstractJsonMapObject {
     }
     
     public String getX509ThumbprintSHA256() {
-        return (String)super.getValue(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
+        return (String)getHeader(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
     }
     
     public void setCritical(List<String> crit) {
@@ -118,7 +115,7 @@ public class JoseHeaders extends AbstractJsonMapObject {
     }
     
     public JsonWebKey getJsonWebKey() {
-        Object jsonWebKey = getValue(JoseConstants.HEADER_JSON_WEB_KEY);
+        Object jsonWebKey = getHeader(JoseConstants.HEADER_JSON_WEB_KEY);
         if (jsonWebKey == null || jsonWebKey instanceof JsonWebKey) {
             return (JsonWebKey)jsonWebKey;
         }  
@@ -127,24 +124,12 @@ public class JoseHeaders extends AbstractJsonMapObject {
     }
     
     public JoseHeaders setHeader(String name, Object value) {
-        setValue(name, value);
+        setProperty(name, value);
         return this;
     }
     
-    protected void setValue(String name, Object value) {
-        if (super.values.containsKey(name)) {
-            if (headerUpdateCount == null) {
-                headerUpdateCount = new LinkedHashMap<String, Integer>();
-            }
-            Integer count = headerUpdateCount.get(name);
-            count = count == null ? 2 : count++;
-            headerUpdateCount.put(name, count);
-        }
-        super.setValue(name, value);
-    }
-    
     public Object getHeader(String name) {
-        return getValue(name);
+        return getProperty(name);
     }
     
     public JoseHeaders setIntegerHeader(String name, Integer value) {
@@ -153,12 +138,7 @@ public class JoseHeaders extends AbstractJsonMapObject {
     }
     
     public Integer getIntegerHeader(String name) {
-        Object value = getHeader(name);
-        if (value != null) {
-            return value instanceof Integer ? (Integer)value : Integer.parseInt(value.toString());
-        } else {
-            return null;
-        }
+        return getIntegerProperty(name);
     }
     public JoseHeaders setLongHeader(String name, Long value) {
         setHeader(name, value);
@@ -166,14 +146,7 @@ public class JoseHeaders extends AbstractJsonMapObject {
     }
     
     public Long getLongHeader(String name) {
-        Object value = getHeader(name);
-        if (value != null) {
-            return value instanceof Long ? (Long)value : Long.parseLong(value.toString());
-        } else {
-            return null;
-        }
+        return getLongProperty(name);
     }
-    public Map<String, Object> getHeaderUpdateCount() {
-        return headerUpdateCount == null ? null : Collections.<String, Object>unmodifiableMap(headerUpdateCount);
-    }
+    
 }
