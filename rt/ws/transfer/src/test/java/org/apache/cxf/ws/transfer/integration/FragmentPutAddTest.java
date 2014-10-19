@@ -21,6 +21,7 @@ package org.apache.cxf.ws.transfer.integration;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -46,7 +47,7 @@ import org.junit.Test;
  *
  * @author Erich Duda
  */
-public class FragmentPutReplaceTest extends IntegrationBaseTest {
+public class FragmentPutAddTest extends IntegrationBaseTest {
     
     private Resource createClient(ReferenceParametersType refParams) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
@@ -76,137 +77,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void replaceElementTest() {
-        String content = "<root><a>Text</a></root>";
-        ResourceManager resourceManager = new MemoryResourceManager();
-        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
-        Server resource = createLocalResource(resourceManager);
-        Resource client = createClient(refParams);
-        
-        Put request = new Put();
-        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
-        Fragment fragment = new Fragment();
-        ExpressionType expression = new ExpressionType();
-        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
-        expression.getContent().add("/root/a");
-        Element replacedElement = TransferTools.createElement("b");
-        replacedElement.setTextContent("Better text");
-        ValueType value = new ValueType();
-        value.getContent().add(replacedElement);
-        fragment.setExpression(expression);
-        fragment.setValue(value);
-        request.getAny().add(fragment);
-        
-        PutResponse response = client.put(request);
-        Element rootEl = (Element) response.getRepresentation().getAny();
-        Assert.assertEquals("b", rootEl.getChildNodes().item(0).getNodeName());
-        Assert.assertEquals("Better text", rootEl.getChildNodes().item(0).getTextContent());
-        
-        resource.destroy();
-    }
-    
-    @Test
-    public void replaceElement2Test() {
-        String content = "<a/>";
-        ResourceManager resourceManager = new MemoryResourceManager();
-        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
-        Server resource = createLocalResource(resourceManager);
-        Resource client = createClient(refParams);
-        
-        Put request = new Put();
-        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
-        Fragment fragment = new Fragment();
-        ExpressionType expression = new ExpressionType();
-        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
-        expression.getContent().add("/a");
-        Element replacedElement = TransferTools.createElement("b");
-        ValueType value = new ValueType();
-        value.getContent().add(replacedElement);
-        fragment.setExpression(expression);
-        fragment.setValue(value);
-        request.getAny().add(fragment);
-        
-        PutResponse response = client.put(request);
-        Element rootEl = (Element) response.getRepresentation().getAny();
-        Assert.assertEquals("b", rootEl.getNodeName());
-        
-        resource.destroy();
-    }
-    
-    @Test
-    public void replaceTextContentTest() {
-        String content = "<root><a>Text</a></root>";
-        ResourceManager resourceManager = new MemoryResourceManager();
-        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
-        Server resource = createLocalResource(resourceManager);
-        Resource client = createClient(refParams);
-        
-        //ObjectFactory objectFactory = new ObjectFactory();
-        
-        Put request = new Put();
-        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
-        Fragment fragment = new Fragment();
-        ExpressionType expression = new ExpressionType();
-        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
-        expression.getContent().add("/root/a/text()");
-        ValueType value = new ValueType();
-        value.getContent().add("Better text");
-        fragment.setExpression(expression);
-        fragment.setValue(value);
-        request.getAny().add(fragment);
-        
-        PutResponse response = client.put(request);
-        Element rootEl = (Element) response.getRepresentation().getAny();
-        Assert.assertEquals("a", rootEl.getChildNodes().item(0).getNodeName());
-        Assert.assertEquals("Better text", rootEl.getChildNodes().item(0).getTextContent());
-        
-        resource.destroy();
-    }
-    
-    @Test
-    public void replaceAttributeTest() {
-        String content = "<root><a foo=\"1\">Text</a></root>";
-        ResourceManager resourceManager = new MemoryResourceManager();
-        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
-        Server resource = createLocalResource(resourceManager);
-        Resource client = createClient(refParams);
-        
-        //ObjectFactory objectFactory = new ObjectFactory();
-        
-        Put request = new Put();
-        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
-        Fragment fragment = new Fragment();
-        ExpressionType expression = new ExpressionType();
-        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
-        expression.getContent().add("/root/a/@foo");
-        Element replacedAttr = TransferTools.createElementNS(
-                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
-                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME
-        );
-        replacedAttr.setAttributeNS(
-                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
-                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR,
-                "bar"
-        );
-        replacedAttr.setTextContent("2");
-        ValueType value = new ValueType();
-        value.getContent().add(replacedAttr);
-        fragment.setExpression(expression);
-        fragment.setValue(value);
-        request.getAny().add(fragment);
-        
-        PutResponse response = client.put(request);
-        Element rootEl = (Element) response.getRepresentation().getAny();
-        Element aEl = (Element) rootEl.getChildNodes().item(0);
-        Assert.assertNotNull(aEl);
-        String attribute = aEl.getAttribute("bar");
-        Assert.assertEquals("2", attribute);
-        
-        resource.destroy();
-    }
-    
-    @Test
-    public void replaceEmptyDocumentTest() {
+    public void addToEmptyDocumentTest() {
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(new Representation());
         Server resource = createLocalResource(resourceManager);
@@ -217,10 +88,11 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         Fragment fragment = new Fragment();
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
         expression.getContent().add("/");
-        Element replacedElement = TransferTools.createElement("a");
+        Element addedElement = TransferTools.createElement("a");
         ValueType value = new ValueType();
-        value.getContent().add(replacedElement);
+        value.getContent().add(addedElement);
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
@@ -232,8 +104,8 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         resource.destroy();
     }
     
-    @Test
-    public void replaceDocumentTest() {
+    @Test(expected = SOAPFaultException.class)
+    public void addToNonEmptyDocumentTest() {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -245,23 +117,22 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         Fragment fragment = new Fragment();
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
         expression.getContent().add("/");
-        Element replacedElement = TransferTools.createElement("b");
+        Element addedElement = TransferTools.createElement("b");
         ValueType value = new ValueType();
-        value.getContent().add(replacedElement);
+        value.getContent().add(addedElement);
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
         
-        PutResponse response = client.put(request);
-        Element rootEl = (Element) response.getRepresentation().getAny();
-        Assert.assertEquals("b", rootEl.getNodeName());
+        client.put(request);
         
         resource.destroy();
     }
     
     @Test
-    public void replaceDocument2Test() {
+    public void addAttributeTest() {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -273,17 +144,97 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         Fragment fragment = new Fragment();
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
-        expression.getContent().add("/*");
-        Element replacedElement = TransferTools.createElement("b");
+        expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
+        expression.getContent().add("/a");
+        Element addedAttr = TransferTools.createElementNS(
+                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME
+        );
+        addedAttr.setAttributeNS(
+                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR,
+                "foo"
+        );
+        addedAttr.setTextContent("1");
         ValueType value = new ValueType();
-        value.getContent().add(replacedElement);
+        value.getContent().add(addedAttr);
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+        
+        PutResponse response = client.put(request);
+        Element aEl = (Element) response.getRepresentation().getAny();
+        String attribute = aEl.getAttribute("foo");
+        Assert.assertEquals("1", attribute);
+        
+        resource.destroy();
+    }
+    
+    @Test(expected = SOAPFaultException.class)
+    public void addExistingAttributeTest() {
+        String content = "<a foo=\"1\"/>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+        
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
+        expression.getContent().add("/a");
+        Element addedAttr = TransferTools.createElementNS(
+                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME
+        );
+        addedAttr.setAttributeNS(
+                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR,
+                "foo"
+        );
+        addedAttr.setTextContent("2");
+        ValueType value = new ValueType();
+        value.getContent().add(addedAttr);
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+        
+        client.put(request);
+        
+        resource.destroy();
+    }
+    
+    @Test
+    public void addSiblingTest() {
+        String content = "<a><b/></a>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+        
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
+        expression.getContent().add("/a");
+        Element addedElement = TransferTools.createElement("c");
+        ValueType value = new ValueType();
+        value.getContent().add(addedElement);
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
         
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
-        Assert.assertEquals("b", rootEl.getNodeName());
+        Element child0 = (Element) rootEl.getChildNodes().item(0);
+        Element child1 = (Element) rootEl.getChildNodes().item(1);
+        Assert.assertEquals("a", rootEl.getNodeName());
+        Assert.assertEquals("b", child0.getNodeName());
+        Assert.assertEquals("c", child1.getNodeName());
         
         resource.destroy();
     }

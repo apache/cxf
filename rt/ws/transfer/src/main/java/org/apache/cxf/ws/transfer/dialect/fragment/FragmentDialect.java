@@ -217,6 +217,8 @@ public class FragmentDialect implements Dialect {
             ValueType value) {
         if (FragmentDialectConstants.FRAGMENT_MODE_REPLACE.equals(mode)) {
             return modifyRepresentationModeReplace(resourceFragment, value);
+        } else if (FragmentDialectConstants.FRAGMENT_MODE_ADD.equals(mode)) {
+            return modifyRepresentationModeAdd(resourceFragment, value);
         } else {
             throw new UnsupportedMode();
         }
@@ -231,6 +233,20 @@ public class FragmentDialect implements Dialect {
         ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
         Node parent = removeNode(resourceFragment);
         addNode(ownerDocument, parent, value);
+        
+        Representation representation = new Representation();
+        representation.setAny(ownerDocument.getDocumentElement());
+        return representation;
+    }
+    
+    private Representation modifyRepresentationModeAdd(
+            Node resourceFragment,
+            ValueType value) {
+        
+        Document ownerDocument = resourceFragment.getOwnerDocument();
+        // if parent.getOwnerDocument == null the parent is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
+        addNode(ownerDocument, resourceFragment, value);
         
         Representation representation = new Representation();
         representation.setAny(ownerDocument.getDocumentElement());
@@ -266,6 +282,9 @@ public class FragmentDialect implements Dialect {
     }
     
     private void addNode(Document ownerDocument, Node parent, ValueType value) {
+        if (ownerDocument == parent && ownerDocument.getDocumentElement() != null) {
+            throw new InvalidExpression();
+        }
         for (Object o : value.getContent()) {
             if (o instanceof String) {
                 parent.setTextContent((String) o);
@@ -283,11 +302,10 @@ public class FragmentDialect implements Dialect {
                     if (attrName == null) {
                         throw new RuntimeException("wsf:AttributeNode@name is not present.");
                     }
-                    ((Element) parent).setAttributeNS(
-                        FragmentDialectConstants.FRAGMENT_2011_03_IRI,
-                        attrName,
-                        attrValue
-                    );
+                    if (((Element) parent).hasAttribute(attrName)) {
+                        throw new InvalidExpression();
+                    }
+                    ((Element) parent).setAttribute(attrName, attrValue);
                 } else {
                     // import the node to the ownerDocument
                     Node importedNode = ownerDocument.importNode((Node) o, true);
