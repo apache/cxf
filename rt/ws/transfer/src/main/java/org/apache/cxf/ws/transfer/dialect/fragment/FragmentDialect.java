@@ -226,6 +226,18 @@ public class FragmentDialect implements Dialect {
             Node resourceFragment,
             ValueType value) {
         
+        Document ownerDocument = resourceFragment.getOwnerDocument();
+        // if parent.getOwnerDocument == null the parent is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
+        Node parent = removeNode(resourceFragment);
+        addNode(ownerDocument, parent, value);
+        
+        Representation representation = new Representation();
+        representation.setAny(ownerDocument.getDocumentElement());
+        return representation;
+    }
+    
+    private Node removeNode(Node resourceFragment) {
         Node parent = null;
         if (resourceFragment.getNodeType() == Node.ATTRIBUTE_NODE) {
             parent = ((Attr)resourceFragment).getOwnerElement();
@@ -249,12 +261,14 @@ public class FragmentDialect implements Dialect {
                 }
             }
         }
+        
+        return parent;
+    }
+    
+    private void addNode(Document ownerDocument, Node parent, ValueType value) {
         for (Object o : value.getContent()) {
             if (o instanceof String) {
                 parent.setTextContent((String) o);
-                Representation representation = new Representation();
-                representation.setAny(parent.getOwnerDocument().getDocumentElement());
-                return representation;
             } else if (o instanceof Node) {
                 Node node = (Node) o;
                 if (
@@ -274,23 +288,14 @@ public class FragmentDialect implements Dialect {
                         attrName,
                         attrValue
                     );
-                    Representation representation = new Representation();
-                    representation.setAny(parent.getOwnerDocument().getDocumentElement());
-                    return representation;
                 } else {
-                    Document ownerDocument = parent.getOwnerDocument();
-                    // parent.getOwnerDocument == null the parent is ownerDocument
-                    ownerDocument = ownerDocument == null ? (Document) parent : ownerDocument;
+                    // import the node to the ownerDocument
                     Node importedNode = ownerDocument.importNode((Node) o, true);
                     parent.appendChild(importedNode);
-                    Representation representation = new Representation();
-                    representation.setAny(ownerDocument.getDocumentElement());
-                    return representation;
                 }
             } else {
                 throw new InvalidExpression();
             }
         }
-        throw new InvalidExpression();
     }
 }
