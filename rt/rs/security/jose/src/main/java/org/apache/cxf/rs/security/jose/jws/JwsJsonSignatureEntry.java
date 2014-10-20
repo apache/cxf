@@ -33,12 +33,16 @@ public class JwsJsonSignatureEntry {
     private String encodedSignature;
     private JwsJsonProtectedHeader protectedHeader;
     private JwsJsonUnprotectedHeader unprotectedHeader;
-    private JoseHeaders unionHeader;
+    private JoseHeaders unionHeaders;
       
     public JwsJsonSignatureEntry(String encodedJwsPayload,
                                  String encodedProtectedHeader,
                                  String encodedSignature,
                                  JwsJsonUnprotectedHeader unprotectedHeader) {
+        if (encodedProtectedHeader == null && unprotectedHeader == null || encodedSignature == null) {
+            throw new SecurityException("Invalid security entry");
+        }
+        
         this.encodedJwsPayload = encodedJwsPayload;
         this.encodedProtectedHeader = encodedProtectedHeader;
         this.encodedSignature = encodedSignature;
@@ -48,14 +52,18 @@ public class JwsJsonSignatureEntry {
         prepare();
     }
     private void prepare() {
-        JoseHeaders joseProtectedHeader = getProtectedHeader().getHeaderEntries();
-        JoseHeaders joseUnprotectedHeader = getUnprotectedHeader().getHeaderEntries();
-        if (!Collections.disjoint(joseProtectedHeader.asMap().keySet(), 
-                                  joseUnprotectedHeader.asMap().keySet())) {
-            throw new SecurityException("Protected and unprotected headers have duplicate values");
+        unionHeaders = new JoseHeaders();
+        
+        if (protectedHeader != null) {
+            unionHeaders.asMap().putAll(protectedHeader.getHeaderEntries().asMap());
         }
-        unionHeader = new JoseHeaders(joseProtectedHeader);
-        unionHeader.asMap().putAll(joseUnprotectedHeader.asMap());
+        if (unprotectedHeader != null) {
+            if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
+                                     unprotectedHeader.getHeaderEntries().asMap().keySet())) {
+                throw new SecurityException("Protected and unprotected headers have duplicate values");
+            }
+            unionHeaders.asMap().putAll(unprotectedHeader.getHeaderEntries().asMap());
+        }
     }
     public String getEncodedJwsPayload() {
         return encodedJwsPayload;
@@ -76,7 +84,7 @@ public class JwsJsonSignatureEntry {
         return unprotectedHeader;
     }
     public JoseHeaders getUnionHeader() {
-        return unionHeader;
+        return unionHeaders;
     }
     public String getEncodedSignature() {
         return encodedSignature;
@@ -99,5 +107,22 @@ public class JwsJsonSignatureEntry {
     }
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
+    }
+    public String toJson() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        if (protectedHeader != null) {
+            sb.append("\"protected\":\"" + protectedHeader.getEncodedHeaderEntries() + "\"");
+        }
+        if (unprotectedHeader != null) {
+            if (protectedHeader != null) {
+                sb.append(",");
+            }
+            sb.append("\"header\":\"" + unprotectedHeader.toJson() + "\"");
+        }
+        sb.append(",");
+        sb.append("\"signature\":\"" + encodedSignature + "\"");
+        sb.append("}");
+        return sb.toString();
     }
 }

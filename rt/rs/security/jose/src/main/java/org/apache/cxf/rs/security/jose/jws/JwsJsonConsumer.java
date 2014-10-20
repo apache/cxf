@@ -60,9 +60,6 @@ public class JwsJsonConsumer {
             @SuppressWarnings("unchecked")
             Map<String, Object> header = (Map<String, Object>)signatureEntry.get("header");
             String signature = (String)signatureEntry.get("signature");
-            if (protectedHeader == null && header == null || signature == null) {
-                throw new SecurityException("Invalid security entry");
-            }
             JwsJsonSignatureEntry signatureObject = 
                 new JwsJsonSignatureEntry(encodedJwsPayload, 
                                           protectedHeader, 
@@ -97,5 +94,7 @@ public class JwsJsonConsumer {
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
     }
-    
+    public JwsJsonProducer toProducer() {
+        return new JwsJsonProducer(getDecodedJwsPayload(), signatureEntries);
+    }
 }

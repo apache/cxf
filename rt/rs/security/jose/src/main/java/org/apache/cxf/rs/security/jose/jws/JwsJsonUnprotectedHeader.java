@@ -53,14 +53,6 @@ public class JwsJsonUnprotectedHeader {
         return headerEntries;
     }
     public String toJson() {
-        // The "header" member MUST be present and contain the value JWS
-        // Unprotected Header when the JWS Unprotected Header value is non-
-        // empty; otherwise, it MUST be absent. This value is represented as
-        // an unencoded JSON object, rather than as a string. These Header
-        // Parameter values are not integrity protected.
-        if (headerEntries == null) {
-            return "";
-        }
-        return "\"header\":" + writer.headersToJson(headerEntries);
+        return writer.headersToJson(headerEntries);
     } 
 }
