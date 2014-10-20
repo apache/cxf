@@ -175,7 +175,7 @@ public class JsonMapObjectReaderWriter {
                 int commaIndex = getCommaIndex(json, i);
                 Object value = readPrimitiveValue(name, json, i, commaIndex);
                 values.add(value);
-                i = commaIndex + 1;
+                i = commaIndex;
             }
         }
         
