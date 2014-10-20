@@ -36,7 +36,6 @@
           this is vulnerable to man-in-the-middle attacks -->
                 <sec:include>.*_EXPORT_.*</sec:include>
                 <sec:include>.*_EXPORT1024_.*</sec:include>
-                <sec:include>.*_WITH_DES_.*</sec:include>
                 <sec:include>.*_WITH_AES_.*</sec:include>
             </sec:cipherSuitesFilter>
         </http:tlsClientParameters>

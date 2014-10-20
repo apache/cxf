@@ -38,7 +38,6 @@
                 <sec:cipherSuitesFilter>
                     <sec:include>.*_EXPORT_.*</sec:include>
                     <sec:include>.*_EXPORT1024_.*</sec:include>
-                    <sec:include>.*_WITH_DES_.*</sec:include>
                     <sec:include>.*_WITH_AES_.*</sec:include>
                 </sec:cipherSuitesFilter>
                 <sec:clientAuthentication want="true" required="false"/>

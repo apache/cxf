@@ -74,7 +74,8 @@ public final class SSLUtils {
         Arrays.asList(new String[] {".*"});
     private static final List<String> DEFAULT_CIPHERSUITE_FILTERS_EXCLUDE =
         Arrays.asList(new String[] {".*_NULL_.*",
-                                    ".*_anon_.*"});
+                                    ".*_anon_.*",
+                                    ".*_DES_.*"});
 
     private SSLUtils() {
     }    
