@@ -968,13 +968,9 @@ public class WebClient extends AbstractClient {
     
     private MultivaluedMap<String, String> prepareHeaders(Class<?> responseClass, Object body) {
         MultivaluedMap<String, String> headers = getHeaders();
-        boolean contentTypeNotSet = headers.getFirst(HttpHeaders.CONTENT_TYPE) == null;
-        if (contentTypeNotSet) {
-            String ct = "*/*";
-            if (body != null) { 
-                ct = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED 
-                                          : MediaType.APPLICATION_XML;
-            }
+        if (body != null && headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
+            String ct = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED 
+                                      : MediaType.APPLICATION_XML;
             headers.putSingle(HttpHeaders.CONTENT_TYPE, ct);
         }
         
