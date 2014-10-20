@@ -671,6 +671,10 @@ public class JettyHTTPServerEngine
     protected SSLContext createSSLContext(SslContextFactory scf) throws Exception  {
         String proto = tlsServerParameters.getSecureSocketProtocol() == null
             ? "TLS" : tlsServerParameters.getSecureSocketProtocol();
+        
+        if (!"SSLv3".equals(proto)) {
+            scf.addExcludeProtocols("SSLv3");
+        }
  
         SSLContext context = tlsServerParameters.getJsseProvider() == null
             ? SSLContext.getInstance(proto)
