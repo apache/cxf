@@ -49,17 +49,8 @@ public class JwsJsonProtectedHeader {
     public Object getHeader(String name) {
         return headerEntries.getHeader(name);
     }
-    public String toJson() {
-        if (headerEntries == null) {
-            return "";
-        }
-        //The "protected" member MUST be present and contain the value
-        // BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected
-        // Header value is non-empty; otherwise, it MUST be absent. These
-        // Header Parameter values are integrity protected.
-        return "\"protected\":\""
-               + Base64UrlUtility.encode(writer.headersToJson(headerEntries))
-               + "\"";
+    public String getEncodedHeaderEntries() {
+        return Base64UrlUtility.encode(writer.headersToJson(headerEntries));
     }
 
 }
