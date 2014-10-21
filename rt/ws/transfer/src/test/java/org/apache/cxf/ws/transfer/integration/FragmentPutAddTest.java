@@ -132,6 +132,34 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
     }
     
     @Test
+    public void addTextElementTest() {
+        String content = "<a>f</a>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+        
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
+        expression.getContent().add("/a");
+        ValueType value = new ValueType();
+        value.getContent().add("oo");
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+        
+        PutResponse response = client.put(request);
+        Element rootEl = (Element) response.getRepresentation().getAny();
+        Assert.assertEquals("foo", rootEl.getTextContent());
+        
+        resource.destroy();
+    }
+    
+    @Test
     public void addAttributeTest() {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
