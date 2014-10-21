@@ -20,12 +20,14 @@ package org.apache.cxf.systest.sts.jaas;
 
 import java.net.URL;
 
+import javax.ws.rs.WebApplicationException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -34,10 +36,12 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * This tests JAAS authentication to the STS. The service has a UsernameToken policy.
- * The client sends a WS-Security UsernameToken, and it is dispatches to the STS for
- * validation via JAAS. The service also asks for a SAML Token with roles enabled in it,
- * and these roles are stored in the security context for authorization.
+ * This tests JAAS authentication to the STS. A Username + Password extracted from either
+ * a WS-Security UsernameToken for the JAX-WS service, or via HTTP/BA for a JAX-RS service, 
+ * is dispatches to the STS for validation via JAAS. 
+ * 
+ * The service also asks for a SAML Token with roles enabled in it, and these roles 
+ * are stored in the security context for authorization.
  */
 public class JAASTest extends AbstractBusClientServerTestBase {
     
@@ -63,6 +67,7 @@ public class JAASTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(STSServer.class, true)
         );
+        
     }
     
     @org.junit.AfterClass
@@ -72,7 +77,7 @@ public class JAASTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    public void testSuccessfulAuthentication() throws Exception {
+    public void testSuccessfulInvocation() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAASTest.class.getResource("cxf-client.xml");
@@ -95,12 +100,122 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         
         doubleIt(utPort, 25);
         
+        // Note that the UsernameToken should be cached for the second invocation
+        doubleIt(utPort, 35);
+        
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testUnsuccessfulAuthentication() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAASTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUTPort");
+        DoubleItPortType utPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.USERNAME, "alice");
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.PASSWORD, "clarinet2");
+        
+        try {
+            doubleIt(utPort, 25);
+            fail("Failure expected on an incorrect password");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testUnsuccessfulAuthorization() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAASTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUTPort");
+        DoubleItPortType utPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.USERNAME, "bob");
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.PASSWORD, "trombone");
+        
+        try {
+            doubleIt(utPort, 25);
+            fail("Failure expected on an incorrect role");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testJAXRSSuccessfulInvocation() throws Exception {
+        doubleIt("alice", "clarinet", false);
+    }
+    
+    @org.junit.Test
+    public void testJAXRSUnsuccessfulAuthentication() throws Exception {
+        doubleIt("alice", "clarinet2", true);
+    }
+    
+    @org.junit.Test
+    public void testJAXRSUnsuccessfulAuthorization() throws Exception {
+        doubleIt("bob", "trombone", true);
     }
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2 , resp);
+    }
+    
+    private static void doubleIt(String username, String password, boolean authFailureExpected) {
+        final String configLocation = "org/apache/cxf/systest/sts/jaas/cxf-client.xml";
+        final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
+        final int numToDouble = 25;  
+       
+        WebClient client = null;
+        if (username != null && password != null) {
+            client = WebClient.create(address, username, password, configLocation);
+        } else {
+            client = WebClient.create(address, configLocation);
+        }
+        client.type("text/plain").accept("text/plain");
+        try {
+            int resp = client.post(numToDouble, Integer.class);
+            if (authFailureExpected) {
+                throw new RuntimeException("Exception expected");
+            }
+            org.junit.Assert.assertEquals(2 * numToDouble, resp);
+        } catch (WebApplicationException ex) {
+            if (!authFailureExpected) {
+                throw new RuntimeException("Unexpected exception");
+            }
+            org.junit.Assert.assertEquals(500, ex.getResponse().getStatus());
+        }
     }
 }

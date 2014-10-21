@@ -50,6 +50,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-client</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -164,6 +170,7 @@
                             <systemPropertyVariables>
                                 <sts.deployment>standalone</sts.deployment>
                                 <java.io.tmpdir>${basedir}/target/tmp</java.io.tmpdir>
+                                <java.security.auth.login.config>src/test/resources/sts.jaas</java.security.auth.login.config>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>

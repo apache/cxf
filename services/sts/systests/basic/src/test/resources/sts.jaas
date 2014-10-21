@@ -1,0 +1,4 @@
+
+sts {
+    org.apache.cxf.ws.security.trust.STSLoginModule required require.roles="true";
+};
