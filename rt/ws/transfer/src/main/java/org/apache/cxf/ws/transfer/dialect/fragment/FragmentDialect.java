@@ -87,7 +87,7 @@ public class FragmentDialect implements Dialect {
                     throw new RuntimeException("wsf:Expression is not present.");
                 }
                 if (value == null) {
-                    throw new RuntimeException("wsf:Value is not present.");
+                    value = new ValueType();
                 }
                 String languageIRI = expression.getLanguage();
                 languageIRI = languageIRI == null ? FragmentDialectConstants.XPATH10_LANGUAGE_IRI : languageIRI;
@@ -215,15 +215,18 @@ public class FragmentDialect implements Dialect {
             Node resourceFragment,
             String mode,
             ValueType value) {
-        if (FragmentDialectConstants.FRAGMENT_MODE_REPLACE.equals(mode)) {
+        switch (mode) {
+        case FragmentDialectConstants.FRAGMENT_MODE_REPLACE:
             return modifyRepresentationModeReplace(resourceFragment, value);
-        } else if (FragmentDialectConstants.FRAGMENT_MODE_ADD.equals(mode)) {
+        case FragmentDialectConstants.FRAGMENT_MODE_ADD:
             return modifyRepresentationModeAdd(resourceFragment, value);
-        } else if (FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE.equals(mode)) {
+        case FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE:
             return modifyRepresentationModeInsertBefore(resourceFragment, value);
-        } else if (FragmentDialectConstants.FRAGMENT_MODE_INSERT_AFTER.equals(mode)) {
+        case FragmentDialectConstants.FRAGMENT_MODE_INSERT_AFTER:
             return modifyRepresentationModeInsertAfter(resourceFragment, value);
-        } else {
+        case FragmentDialectConstants.FRAGMENT_MODE_REMOVE:
+            return modifyRepresentationModeRemove(resourceFragment, value);
+        default:
             throw new UnsupportedMode();
         }
     }
@@ -347,6 +350,23 @@ public class FragmentDialect implements Dialect {
             } else {
                 throw new InvalidExpression();
             }
+        }
+        
+        Representation representation = new Representation();
+        representation.setAny(ownerDocument.getDocumentElement());
+        return representation;
+    }
+    
+    private Representation modifyRepresentationModeRemove(
+            Node resourceFragment,
+            ValueType value) {
+        
+        Document ownerDocument = resourceFragment.getOwnerDocument();
+        // if parent.getOwnerDocument == null the parent is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
+        
+        if (resourceFragment != null) {
+            removeNode(resourceFragment);
         }
         
         Representation representation = new Representation();
