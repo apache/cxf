@@ -219,6 +219,10 @@ public class FragmentDialect implements Dialect {
             return modifyRepresentationModeReplace(resourceFragment, value);
         } else if (FragmentDialectConstants.FRAGMENT_MODE_ADD.equals(mode)) {
             return modifyRepresentationModeAdd(resourceFragment, value);
+        } else if (FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE.equals(mode)) {
+            return modifyRepresentationModeInsertBefore(resourceFragment, value);
+        } else if (FragmentDialectConstants.FRAGMENT_MODE_INSERT_AFTER.equals(mode)) {
+            return modifyRepresentationModeInsertAfter(resourceFragment, value);
         } else {
             throw new UnsupportedMode();
         }
@@ -247,6 +251,103 @@ public class FragmentDialect implements Dialect {
         // if parent.getOwnerDocument == null the parent is ownerDocument
         ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
         addNode(ownerDocument, resourceFragment, value);
+        
+        Representation representation = new Representation();
+        representation.setAny(ownerDocument.getDocumentElement());
+        return representation;
+    }
+    
+    private Representation modifyRepresentationModeInsertBefore(
+            Node resourceFragment,
+            ValueType value) {
+        
+        Document ownerDocument = resourceFragment.getOwnerDocument();
+        // if parent.getOwnerDocument == null the parent is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
+
+        Node parent = resourceFragment.getParentNode();
+        if (parent == null && resourceFragment.getNodeType() != Node.DOCUMENT_NODE) {
+            throw new InvalidExpression();
+        }
+        if (parent == null) {
+            parent = resourceFragment;
+            if (((Document) parent).getDocumentElement() != null) {
+                throw new InvalidExpression();
+            }
+        }
+        
+        for (Object o : value.getContent()) {
+            if (o instanceof Node) {
+                Node node = (Node) o;
+                
+                if (
+                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
+                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
+                ) {
+                    throw new InvalidExpression();
+                }
+                
+                Node importedNode = ownerDocument.importNode(node, true);
+                if (parent.getNodeType() == Node.DOCUMENT_NODE) {
+                    parent.appendChild(importedNode);
+                } else {
+                    parent.insertBefore(importedNode, resourceFragment);
+                }
+            } else {
+                throw new InvalidExpression();
+            }
+        }
+        
+        Representation representation = new Representation();
+        representation.setAny(ownerDocument.getDocumentElement());
+        return representation;
+    }
+    
+    private Representation modifyRepresentationModeInsertAfter(
+            Node resourceFragment,
+            ValueType value) {
+        
+        Document ownerDocument = resourceFragment.getOwnerDocument();
+        // if parent.getOwnerDocument == null the parent is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
+
+        Node parent = resourceFragment.getParentNode();
+        if (parent == null && resourceFragment.getNodeType() != Node.DOCUMENT_NODE) {
+            throw new InvalidExpression();
+        }
+        if (parent == null) {
+            parent = resourceFragment;
+            if (((Document) parent).getDocumentElement() != null) {
+                throw new InvalidExpression();
+            }
+        }
+        
+        for (Object o : value.getContent()) {
+            if (o instanceof Node) {
+                Node node = (Node) o;
+                
+                if (
+                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
+                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
+                ) {
+                    throw new InvalidExpression();
+                }
+                
+                Node importedNode = ownerDocument.importNode(node, true);
+                if (parent.getNodeType() == Node.DOCUMENT_NODE) {
+                    parent.appendChild(importedNode);
+                } else {
+                    Node nextSibling = resourceFragment.getNextSibling();
+                    if (nextSibling == null) {
+                        parent.appendChild(importedNode);
+                    } else {
+                        parent.insertBefore(importedNode, nextSibling);
+                    }
+                }
+            } else {
+                throw new InvalidExpression();
+            }
+        }
         
         Representation representation = new Representation();
         representation.setAny(ownerDocument.getDocumentElement());
