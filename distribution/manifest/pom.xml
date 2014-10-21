@@ -80,6 +80,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-tools-wadlto-jaxrs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-java2ws</artifactId>
             <version>${project.version}</version>
         </dependency>
