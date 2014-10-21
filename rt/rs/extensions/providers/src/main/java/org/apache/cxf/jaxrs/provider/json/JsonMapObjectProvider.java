@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
-import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -75,8 +73,7 @@ public class JsonMapObjectProvider implements MessageBodyReader<JsonMapObject>, 
             return obj;
         } else {
             try {
-                Constructor<?> c = cls.getConstructor(Map.class);
-                JsonMapObject actualObj = (JsonMapObject)c.newInstance();
+                JsonMapObject actualObj = (JsonMapObject)cls.newInstance();
                 actualObj.values = obj.values;
                 actualObj.updateCount = obj.updateCount;
                 return actualObj;
