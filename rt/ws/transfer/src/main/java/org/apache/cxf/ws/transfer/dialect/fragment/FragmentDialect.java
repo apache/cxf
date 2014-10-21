@@ -388,7 +388,7 @@ public class FragmentDialect implements Dialect {
         }
         for (Object o : value.getContent()) {
             if (o instanceof String) {
-                parent.setTextContent((String) o);
+                parent.setTextContent(parent.getTextContent() + ((String) o));
             } else if (o instanceof Node) {
                 Node node = (Node) o;
                 if (
