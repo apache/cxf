@@ -699,8 +699,10 @@ public final class JAXBUtils {
         }
         return classes;
     }
-    
     public static Object createFileCodeWriter(File f) throws JAXBException {
+        return createFileCodeWriter(f, "UTF-8");
+    }
+    public static Object createFileCodeWriter(File f, String encoding) throws JAXBException {
         try {
             Class<?> cls;
             try {
@@ -709,6 +711,14 @@ public final class JAXBUtils {
                 // TODO Auto-generated catch block
                 cls = Class.forName("com.sun.codemodel.internal.writer.FileCodeWriter",
                                     true, getXJCClassLoader());
+            }
+            if (encoding != null) {
+                try {
+                    return cls.getConstructor(File.class, String.class)
+                              .newInstance(f, encoding);
+                } catch (Exception ex) {
+                    // try a single argument constructor
+                }
             }
             return cls.getConstructor(File.class).newInstance(f);
         } catch (Exception ex) {

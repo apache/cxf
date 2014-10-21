@@ -220,6 +220,7 @@ public class SourceGenerator {
     private boolean supportMultipleXmlReps;
     private boolean validateWadl;    
     private SchemaCollection schemaCollection = new SchemaCollection();
+    private String encoding;
     
     public SourceGenerator() {
         this(Collections.<String, String>emptyMap());
@@ -1439,7 +1440,8 @@ public class SourceGenerator {
             file.createNewFile();
             Writer writer = null;
             try {
-                writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+                writer = new OutputStreamWriter(new FileOutputStream(file), 
+                                                encoding == null ? "UTF-8" : encoding);
                 writer.write(content);
                 writer.flush();
             } finally {
@@ -1491,7 +1493,7 @@ public class SourceGenerator {
     
     private void generateClassesFromSchema(JCodeModel codeModel, File src) {
         try {
-            Object writer = JAXBUtils.createFileCodeWriter(src);
+            Object writer = JAXBUtils.createFileCodeWriter(src, encoding == null ? "UTF-8" : encoding);
             codeModel.build(writer);
             generatedTypeClasses = JAXBUtils.getGeneratedClassNames(codeModel);
         } catch (Exception e) {
@@ -1741,6 +1743,10 @@ public class SourceGenerator {
     
     public void setValidateWadl(boolean validateWadl) {
         this.validateWadl = validateWadl;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 
     private static class GrammarInfo {
