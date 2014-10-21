@@ -348,6 +348,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         mout.setInterceptorChain(
              OutgoingChainInterceptor.getOutInterceptorChain(inMessage.getExchange()));
         inMessage.getExchange().setOutMessage(mout);
+        if (r.getStatus() >= Response.Status.BAD_REQUEST.getStatusCode()) {
+            inMessage.getExchange().put("cxf.io.cacheinput", Boolean.FALSE);
+        }
         return mout;
     }
 }
