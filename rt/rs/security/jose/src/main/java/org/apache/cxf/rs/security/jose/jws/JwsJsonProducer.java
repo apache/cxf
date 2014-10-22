@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
@@ -57,6 +59,15 @@ public class JwsJsonProducer {
     }
     public List<JwsJsonSignatureEntry> getSignatureEntries() {
         return Collections.unmodifiableList(signatures);
+    }
+    public MultivaluedMap<String, JwsJsonSignatureEntry> getSignatureEntryMap() {
+        return JwsUtils.getJwsJsonSignatureMap(signatures);
+    }
+    public String signWith(List<JwsSignatureProvider> signers) {
+        for (JwsSignatureProvider signer : signers) {
+            signWith(signer);    
+        }
+        return getJwsJsonSignedDocument(); 
     }
     public String signWith(JwsSignatureProvider signer) {
         JoseHeaders headers = new JoseHeaders();

@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
@@ -27,68 +28,47 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
-import org.apache.cxf.common.util.Base64UrlOutputStream;
-import org.apache.cxf.common.util.Base64UrlUtility;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
-import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
-import org.apache.cxf.rs.security.jose.jws.JwsOutputStream;
-import org.apache.cxf.rs.security.jose.jws.JwsSignature;
+import org.apache.cxf.rs.security.jose.jws.JwsJsonProducer;
+import org.apache.cxf.rs.security.jose.jws.JwsJsonProtectedHeader;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)
-public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
+public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider implements WriterInterceptor {
     private boolean contentTypeRequired = true;
-    private boolean useJwsOutputStream;
-    private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
-        JoseHeaders headers = new JoseHeaders();
-        JwsSignatureProvider sigProvider = getInitializedSigProvider(headers);
-        setContentTypeIfNeeded(headers, ctx);
-        ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE));
+        
+        List<JwsSignatureProvider> sigProviders = getInitializedSigProviders();
         OutputStream actualOs = ctx.getOutputStream();
-        if (useJwsOutputStream) {
-            JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
-            JwsOutputStream jwsStream = new JwsOutputStream(actualOs, jwsSignature);
-            byte[] headerBytes = StringUtils.toBytesUTF8(writer.headersToJson(headers));
-            Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
-            jwsStream.write(new byte[]{'.'});
-                        
-            Base64UrlOutputStream base64Stream = new Base64UrlOutputStream(jwsStream);
-            ctx.setOutputStream(base64Stream);
-            ctx.proceed();
-            base64Stream.flush();
-            jwsStream.flush();
-        } else {
-            CachedOutputStream cos = new CachedOutputStream(); 
-            ctx.setOutputStream(cos);
-            ctx.proceed();
-            JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), "UTF-8"));
-            writeJws(p, sigProvider, actualOs);
+        CachedOutputStream cos = new CachedOutputStream(); 
+        ctx.setOutputStream(cos);
+        ctx.proceed();
+        JwsJsonProducer p = new JwsJsonProducer(new String(cos.getBytes(), "UTF-8"));
+        for (JwsSignatureProvider signer : sigProviders) {
+            JoseHeaders headers = new JoseHeaders();
+            headers.setAlgorithm(signer.getAlgorithm());
+            setContentTypeIfNeeded(headers, ctx);
+            //TODO: support setting public JWK kid property as the unprotected header;
+            //      the property would have to be associated with the individual signer
+            p.signWith(signer, new JwsJsonProtectedHeader(headers), null);    
         }
+        ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON));
+        writeJws(p, actualOs);
     }
     
     public void setContentTypeRequired(boolean contentTypeRequired) {
         this.contentTypeRequired = contentTypeRequired;
     }
     
-    public void setUseJwsOutputStream(boolean useJwsOutputStream) {
-        this.useJwsOutputStream = useJwsOutputStream;
-    }
-    public void setWriter(JoseHeadersWriter writer) {
-        this.writer = writer;
-    }
     private void setContentTypeIfNeeded(JoseHeaders headers, WriterInterceptorContext ctx) {    
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
             if (mt != null 
-                && !JAXRSUtils.mediaTypeToString(mt).equals(JoseConstants.MEDIA_TYPE_JOSE)) {
+                && !JAXRSUtils.mediaTypeToString(mt).equals(JoseConstants.MEDIA_TYPE_JOSE_JSON)) {
                 if ("application".equals(mt.getType())) {
                     headers.setContentType(mt.getSubtype());
                 } else {

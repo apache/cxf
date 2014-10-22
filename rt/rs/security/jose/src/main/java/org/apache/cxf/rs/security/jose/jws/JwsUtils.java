@@ -18,11 +18,23 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.List;
+import java.util.Properties;
+
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public final class JwsUtils {
+    private static final String JSON_WEB_SIGNATURE_ALGO_PROP = "rs.security.jws.content.signature.algorithm";
     private JwsUtils() {
         
     }
@@ -63,5 +75,59 @@ public final class JwsUtils {
         }
         return theVerifier;
     }
-    
+    public static MultivaluedMap<String, JwsJsonSignatureEntry> getJwsJsonSignatureMap(
+        List<JwsJsonSignatureEntry> signatures) {
+        MultivaluedMap<String, JwsJsonSignatureEntry> map = new MetadataMap<String, JwsJsonSignatureEntry>();
+        for (JwsJsonSignatureEntry entry : signatures) {
+            map.add(entry.getUnionHeader().getAlgorithm(), entry);
+        }
+        return map;
+    }
+    public static JwsSignatureProvider loadSignatureProvider(String propLoc, Message m) {
+        Properties props = null;
+        try {
+            props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+        JwsSignatureProvider theSigProvider = null; 
+        String rsaSignatureAlgo = null;
+        if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
+            JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_SIGN);
+            rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
+            theSigProvider = JwsUtils.getSignatureProvider(jwk, rsaSignatureAlgo);
+        } else {
+            rsaSignatureAlgo = getSignatureAlgo(props, null);
+            RSAPrivateKey pk = (RSAPrivateKey)KeyManagementUtils.loadPrivateKey(m, props, 
+                KeyManagementUtils.RSSEC_SIG_KEY_PSWD_PROVIDER);
+            theSigProvider = new PrivateKeyJwsSignatureProvider(pk, rsaSignatureAlgo);
+        }
+        if (theSigProvider == null) {
+            throw new SecurityException();
+        }
+        return theSigProvider;
+    }
+    public static JwsSignatureVerifier loadSignatureVerifier(String propLoc, Message m) {
+        Properties props = null;
+        try {
+            props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+        JwsSignatureVerifier theVerifier = null;
+        String rsaSignatureAlgo = null;
+        if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
+            JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_VERIFY);
+            rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
+            theVerifier = JwsUtils.getSignatureVerifier(jwk, rsaSignatureAlgo);
+            
+        } else {
+            theVerifier = new PublicKeyJwsSignatureVerifier(
+                              (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props));
+        }
+        return theVerifier;
+    }
+    private static String getSignatureAlgo(Properties props, String algo) {
+        return algo == null ? props.getProperty(JSON_WEB_SIGNATURE_ALGO_PROP) : algo;
+    }
 }

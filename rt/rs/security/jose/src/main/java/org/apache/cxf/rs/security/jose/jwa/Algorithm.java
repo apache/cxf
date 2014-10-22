@@ -19,8 +19,11 @@
 
 package org.apache.cxf.rs.security.jose.jwa;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.cxf.rs.security.jose.JoseConstants;
 
@@ -78,6 +81,16 @@ public enum Algorithm {
     public static final String AES_WRAP_ALGO_JAVA = "AESWrap";
     public static final String AES_GCM_ALGO_JAVA = "AES/GCM/NoPadding";
     public static final String AES_CBC_ALGO_JAVA = "AES/CBC/PKCS7Padding";
+    
+    public static final Set<String> HMAC_SIGN_SET = new HashSet<String>(Arrays.asList(JoseConstants.HMAC_SHA_256_ALGO,
+                                                                        JoseConstants.HMAC_SHA_384_ALGO,
+                                                                        JoseConstants.HMAC_SHA_512_ALGO));
+    public static final Set<String> RSA_SHA_SIGN_SET = new HashSet<String>(Arrays.asList(JoseConstants.RS_SHA_256_ALGO,
+                                                                        JoseConstants.RS_SHA_384_ALGO,
+                                                                        JoseConstants.RS_SHA_512_ALGO));
+    public static final Set<String> EC_SHA_SIGN_SET = new HashSet<String>(Arrays.asList(JoseConstants.ES_SHA_256_ALGO,
+                                                                         JoseConstants.ES_SHA_384_ALGO,
+                                                                         JoseConstants.ES_SHA_512_ALGO));
     
     private static final Map<String, String> JAVA_TO_JWT_NAMES;
     private static final Map<String, String> JWT_TO_JAVA_NAMES;
@@ -210,18 +223,13 @@ public enum Algorithm {
             || JoseConstants.A256CBC_HS512_ALGO.equals(algo); 
     }
     public static boolean isHmacSign(String algo) {
-        return JoseConstants.HMAC_SHA_256_ALGO.equals(algo)
-            || JoseConstants.HMAC_SHA_384_ALGO.equals(algo)
-            || JoseConstants.HMAC_SHA_512_ALGO.equals(algo); 
+        return HMAC_SIGN_SET.contains(algo); 
     }
+    
     public static boolean isRsaShaSign(String algo) {
-        return JoseConstants.RS_SHA_256_ALGO.equals(algo)
-            || JoseConstants.RS_SHA_384_ALGO.equals(algo)
-            || JoseConstants.RS_SHA_512_ALGO.equals(algo); 
+        return RSA_SHA_SIGN_SET.contains(algo); 
     }
     public static boolean isEcDsaSign(String algo) {
-        return JoseConstants.ES_SHA_256_ALGO.equals(algo)
-            || JoseConstants.ES_SHA_384_ALGO.equals(algo)
-            || JoseConstants.ES_SHA_512_ALGO.equals(algo); 
+        return EC_SHA_SIGN_SET.contains(algo); 
     }
 }

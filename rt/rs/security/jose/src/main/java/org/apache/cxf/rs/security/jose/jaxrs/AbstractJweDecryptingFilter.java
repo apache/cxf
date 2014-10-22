@@ -20,36 +20,19 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.interfaces.RSAPrivateKey;
-import java.util.Properties;
 
-import javax.crypto.SecretKey;
-
-import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
-import org.apache.cxf.rs.security.jose.jwe.AesGcmContentDecryptionAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.DirectKeyJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
-import org.apache.cxf.rs.security.jose.jwe.KeyDecryptionAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.RSAOaepKeyDecryptionAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.WrappedKeyJweDecryption;
-import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
-import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public class AbstractJweDecryptingFilter {
     private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
     private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
-    private static final String JSON_WEB_ENCRYPTION_KEY_ALGO_PROP = "rs.security.jwe.key.encryption.algorithm";
-    private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";    
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
@@ -75,53 +58,7 @@ public class AbstractJweDecryptingFilter {
         if (propLoc == null) {
             throw new SecurityException();
         }
-        Bus bus = m.getExchange().getBus();
-        try {
-            KeyDecryptionAlgorithm keyDecryptionProvider = null;
-            Properties props = ResourceUtils.loadProperties(propLoc, bus);
-            String contentEncryptionAlgo = props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP);
-            SecretKey ctDecryptionKey = null;
-            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
-                JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
-                String keyEncryptionAlgo = getKeyEncryptionAlgo(props, jwk.getAlgorithm());
-                if ("direct".equals(keyEncryptionAlgo)) {
-                    contentEncryptionAlgo = getContentEncryptionAlgo(props, contentEncryptionAlgo);
-                    ctDecryptionKey = JweUtils.getContentDecryptionSecretKey(jwk, contentEncryptionAlgo);
-                } else {
-                    keyDecryptionProvider = JweUtils.getKeyDecryptionAlgorithm(jwk, keyEncryptionAlgo);
-                }
-            } else {
-                keyDecryptionProvider = new RSAOaepKeyDecryptionAlgorithm(
-                    (RSAPrivateKey)KeyManagementUtils.loadPrivateKey(
-                        m, props, KeyManagementUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER));
-            }
-            if (keyDecryptionProvider == null && ctDecryptionKey == null) {
-                throw new SecurityException();
-            }
-            if (keyDecryptionProvider != null) {
-                if (Algorithm.isAesCbcHmac(contentEncryptionAlgo)) { 
-                    return new AesCbcHmacJweDecryption(keyDecryptionProvider, contentEncryptionAlgo);
-                } else {
-                    return new WrappedKeyJweDecryption(keyDecryptionProvider, 
-                                                       new AesGcmContentDecryptionAlgorithm(contentEncryptionAlgo));
-                }
-            } else {
-                return new DirectKeyJweDecryption(ctDecryptionKey, 
-                                                  new AesGcmContentDecryptionAlgorithm(contentEncryptionAlgo));
-            }
-        } catch (SecurityException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new SecurityException(ex);
-        }
-        
-    }
-    
-    private String getKeyEncryptionAlgo(Properties props, String algo) {
-        return algo == null ? props.getProperty(JSON_WEB_ENCRYPTION_KEY_ALGO_PROP) : algo;
-    }
-    private String getContentEncryptionAlgo(Properties props, String algo) {
-        return algo == null ? props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP) : algo;
+        return JweUtils.loadDecryptionProvider(propLoc, m);
     }
     public String getDefaultMediaType() {
         return defaultMediaType;

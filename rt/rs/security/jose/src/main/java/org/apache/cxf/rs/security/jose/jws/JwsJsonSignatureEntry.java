@@ -95,6 +95,9 @@ public class JwsJsonSignatureEntry {
     public String getUnsignedEncodedSequence() {
         return getEncodedProtectedHeader() + "." + getEncodedJwsPayload();
     }
+    public String getKeyId() {
+        return getUnionHeader().getKeyId();
+    }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         try {
             return validator.verify(getUnionHeader(),
