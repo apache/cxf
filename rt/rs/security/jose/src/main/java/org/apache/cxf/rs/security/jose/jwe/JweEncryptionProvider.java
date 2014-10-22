@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 
 
-public interface JweEncryptionProvider {
+public interface JweEncryptionProvider extends JweKeyProperties {
     String encrypt(byte[] jweContent, String contentType);
     JweEncryptionState createJweEncryptionState(String contentType);
 }

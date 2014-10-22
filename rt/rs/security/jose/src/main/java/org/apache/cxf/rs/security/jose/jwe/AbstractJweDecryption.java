@@ -101,5 +101,12 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
     protected byte[] getActualCek(byte[] theCek, String algoJwt) {
         return theCek;
     }
-    
+    @Override
+    public String getKeyAlgorithm() {
+        return keyDecryptionAlgo.getAlgorithm();
+    }
+    @Override
+    public String getContentAlgorithm() {
+        return contentDecryptionAlgo.getAlgorithm();
+    }
 }
