@@ -19,17 +19,29 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     private byte[] password;
+    private String algo;
     public PbesHmacAesWrapKeyDecryptionAlgorithm(String password) {    
-        this(PbesHmacAesWrapKeyEncryptionAlgorithm.stringToBytes(password));
+        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName());
+    }
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(String password, String algo) {    
+        this(PbesHmacAesWrapKeyEncryptionAlgorithm.stringToBytes(password), algo);
     }
     public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password) {    
-        this(PbesHmacAesWrapKeyEncryptionAlgorithm.charsToBytes(password));
+        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName());
+    }
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password, String algo) {    
+        this(PbesHmacAesWrapKeyEncryptionAlgorithm.charsToBytes(password), algo);
     }
     public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password) {    
+        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName());
+    }
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password, String algo) {    
         this.password = password;
+        this.algo = algo;
     }
     @Override
     public byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer) {
@@ -49,6 +61,10 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgor
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
+    }
+    @Override
+    public String getAlgorithm() {
+        return algo;
     }
     
 }

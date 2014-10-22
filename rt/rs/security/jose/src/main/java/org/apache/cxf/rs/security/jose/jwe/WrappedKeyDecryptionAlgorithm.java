@@ -29,9 +29,6 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     private Key cekDecryptionKey;
     private boolean unwrap;
     private String supportedAlgo;
-    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey) {    
-        this(cekDecryptionKey, null);
-    }
     public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, String supportedAlgo) {    
         this(cekDecryptionKey, supportedAlgo, true);
     }
@@ -81,5 +78,9 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     }
     protected byte[] getEncryptedContentEncryptionKey(JweCompactConsumer consumer) {
         return consumer.getEncryptedContentEncryptionKey();
+    }
+    @Override
+    public String getAlgorithm() {
+        return supportedAlgo;
     }
 }

@@ -36,4 +36,8 @@ public class DirectKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
         }
         return contentDecryptionKey;
     }
+    @Override
+    public String getAlgorithm() {
+        return null;
+    }
 }

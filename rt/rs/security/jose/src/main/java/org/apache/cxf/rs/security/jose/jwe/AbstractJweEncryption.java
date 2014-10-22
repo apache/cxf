@@ -117,6 +117,14 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         return headers;
     }
     @Override
+    public String getKeyAlgorithm() {
+        return keyEncryptionAlgo.getAlgorithm();
+    }
+    @Override
+    public String getContentAlgorithm() {
+        return contentEncryptionAlgo.getAlgorithm();
+    }
+    @Override
     public JweEncryptionState createJweEncryptionState(String contentType) {
         JweEncryptionInternal state = getInternalState(contentType);
         Cipher c = CryptoUtils.initCipher(createCekSecretKey(state), state.keyProps, 

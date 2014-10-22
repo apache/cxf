@@ -22,6 +22,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 
 import org.apache.cxf.common.util.crypto.HmacUtils;
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
@@ -31,6 +32,9 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     private AlgorithmParameterSpec hmacSpec;
     private String supportedAlgo;
     
+    public HmacJwsSignatureVerifier(String encodedKey) {
+        this(JoseUtils.decode(encodedKey), JoseConstants.HMAC_SHA_256_ALGO);
+    }
     public HmacJwsSignatureVerifier(String encodedKey, String supportedAlgo) {
         this(JoseUtils.decode(encodedKey), supportedAlgo);
     }
