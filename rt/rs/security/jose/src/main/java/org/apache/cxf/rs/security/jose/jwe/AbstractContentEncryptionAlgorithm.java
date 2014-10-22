@@ -32,6 +32,7 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
     private String algorithm;
     
     protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv, String algo) { 
+        super(algo);
         this.cek = cek;
         this.iv = iv;
         if (iv != null && iv.length > 0) {

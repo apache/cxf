@@ -26,7 +26,10 @@ import org.apache.cxf.common.util.crypto.CryptoUtils;
 public abstract class AbstractContentEncryptionCipherProperties implements ContentEncryptionCipherProperties {
     private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
-    
+    private String algo;
+    public AbstractContentEncryptionCipherProperties(String algo) {
+        this.algo = algo;
+    }
     public AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] theIv) {
         return CryptoUtils.getContentEncryptionCipherSpec(getAuthTagLen(), theIv);
     }
@@ -35,5 +38,9 @@ public abstract class AbstractContentEncryptionCipherProperties implements Conte
     }
     protected int getAuthTagLen() {
         return authTagLen;
+    }
+    @Override
+    public String getAlgorithm() {
+        return algo;    
     }
 }
