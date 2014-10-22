@@ -57,7 +57,8 @@ import org.apache.wss4j.dom.validate.Credential;
 /**
  * A JAAS LoginModule for authenticating a Username/Password to the STS. The 
  * STSClient object itself must be configured separately and picked up either via 
- * the endpoint name or else as the "default" STSClient.
+ * the endpoint name, the "default" STSClient or as a JAX-WS/JAX-RS property with the
+ * key "ws-security.sts.client".
  */
 public class STSLoginModule implements LoginModule {
     /**
