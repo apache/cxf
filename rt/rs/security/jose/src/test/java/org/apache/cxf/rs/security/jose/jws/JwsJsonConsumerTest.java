@@ -59,13 +59,13 @@ public class JwsJsonConsumerTest extends Assert {
         List<JwsJsonSignatureEntry> sigEntries = consumer.getSignatureEntries();
         assertEquals(2, sigEntries.size());
         // 1st signature
-        String firstKid = (String)sigEntries.get(0).getUnionHeader().getHeader("kid");
+        String firstKid = (String)sigEntries.get(0).getKeyId();
         assertEquals(KID_OF_THE_FIRST_SIGNER, firstKid);
         JsonWebKey rsaKey = jwks.getKey(firstKid);
         assertNotNull(rsaKey);
         assertTrue(sigEntries.get(0).verifySignatureWith(rsaKey));
         // 2nd signature
-        String secondKid = (String)sigEntries.get(1).getUnionHeader().getHeader("kid");
+        String secondKid = (String)sigEntries.get(1).getKeyId();
         assertEquals(KID_OF_THE_SECOND_SIGNER, secondKid);
         JsonWebKey ecKey = jwks.getKey(secondKid);
         assertNotNull(ecKey);

@@ -18,35 +18,52 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
-public class AbstractJwsReaderProvider {
-    private static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
-    private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
+public class AbstractJwsJsonReaderProvider {
+    private static final String RSSEC_SIGNATURE_IN_LIST_PROPS = "rs.security.signature.in.list.properties";
+    private static final String RSSEC_SIGNATURE_LIST_PROPS = "rs.security.signature.list.properties";
     
-    private JwsSignatureVerifier sigVerifier;
+    private List<JwsSignatureVerifier> sigVerifiers;
     private String defaultMediaType;
     
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
-        this.sigVerifier = signatureVerifier;
+        setSignatureVerifiers(Collections.singletonList(signatureVerifier));
+    }
+    public void setSignatureVerifiers(List<JwsSignatureVerifier> signatureVerifiers) {
+        this.sigVerifiers = signatureVerifiers;
     }
 
-    protected JwsSignatureVerifier getInitializedSigVerifier() {
-        if (sigVerifier != null) {
-            return sigVerifier;    
-        } 
-        
+    protected List<JwsSignatureVerifier> getInitializedSigVerifiers() {
+        if (sigVerifiers != null) {
+            return sigVerifiers;    
+        }
         Message m = JAXRSUtils.getCurrentMessage();
-        String propLoc = 
-            (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
-        if (propLoc == null) {
+        Object propLocsProp = 
+            MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_IN_LIST_PROPS, RSSEC_SIGNATURE_LIST_PROPS);
+        if (propLocsProp == null) {
             throw new SecurityException();
         }
-        return JwsUtils.loadSignatureVerifier(propLoc, m);
+        List<String> propLocs = null;
+        if (propLocsProp instanceof String) { 
+            propLocs = Collections.singletonList((String)propLocsProp);
+        } else {
+            propLocs = CastUtils.cast((List<?>)propLocsProp);
+        }
+        List<JwsSignatureVerifier> theSigVerifiers = new LinkedList<JwsSignatureVerifier>();
+        for (String propLoc : propLocs) {
+            theSigVerifiers.add(JwsUtils.loadSignatureVerifier(propLoc, m));
+        }
+        return theSigVerifiers;
     }
 
     public String getDefaultMediaType() {
