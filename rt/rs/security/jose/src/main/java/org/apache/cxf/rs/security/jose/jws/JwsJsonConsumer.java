@@ -94,9 +94,13 @@ public class JwsJsonConsumer {
         return JwsUtils.getJwsJsonSignatureMap(signatureEntries);
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
-        for (JwsJsonSignatureEntry signatureEntry : signatureEntries) {
-            if (signatureEntry.verifySignatureWith(validator)) {
-                return true;
+        List<JwsJsonSignatureEntry> theSignatureEntries = 
+            getSignatureEntryMap().get(validator.getAlgorithm());
+        if (theSignatureEntries != null) {
+            for (JwsJsonSignatureEntry signatureEntry : theSignatureEntries) {
+                if (signatureEntry.verifySignatureWith(validator)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -117,11 +121,15 @@ public class JwsJsonConsumer {
         List<JwsJsonSignatureEntry> validatedSignatures = new LinkedList<JwsJsonSignatureEntry>();
         for (JwsSignatureVerifier validator : validators) {
             boolean validated = false;
-            for (JwsJsonSignatureEntry sigEntry : signatureEntries) {
-                if (sigEntry.verifySignatureWith(validator)) {     
-                    validatedSignatures.add(sigEntry);
-                    validated = true;
-                    break;
+            List<JwsJsonSignatureEntry> theSignatureEntries = 
+                getSignatureEntryMap().get(validator.getAlgorithm());
+            if (theSignatureEntries != null) {
+                for (JwsJsonSignatureEntry sigEntry : theSignatureEntries) {
+                    if (sigEntry.verifySignatureWith(validator)) {     
+                        validatedSignatures.add(sigEntry);
+                        validated = true;
+                        break;
+                    }
                 }
             }
             if (!validated) {
