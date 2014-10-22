@@ -675,6 +675,9 @@ public class JettyHTTPServerEngine
         if (!"SSLv3".equals(proto)) {
             scf.addExcludeProtocols("SSLv3");
         }
+        if (!"SSLv2Hello".equals(proto)) {
+            scf.addExcludeProtocols("SSLv2Hello");
+        }
  
         SSLContext context = tlsServerParameters.getJsseProvider() == null
             ? SSLContext.getInstance(proto)
