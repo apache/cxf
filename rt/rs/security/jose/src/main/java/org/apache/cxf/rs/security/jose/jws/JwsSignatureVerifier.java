@@ -22,4 +22,5 @@ import org.apache.cxf.rs.security.jose.JoseHeaders;
 
 public interface JwsSignatureVerifier {
     boolean verify(JoseHeaders headers, String unsignedText, byte[] signature);
+    String getAlgorithm();
 }

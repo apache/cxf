@@ -122,8 +122,9 @@ public final class JwsUtils {
             theVerifier = JwsUtils.getSignatureVerifier(jwk, rsaSignatureAlgo);
             
         } else {
+            rsaSignatureAlgo = getSignatureAlgo(props, null);
             theVerifier = new PublicKeyJwsSignatureVerifier(
-                              (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props));
+                              (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props), rsaSignatureAlgo);
         }
         return theVerifier;
     }

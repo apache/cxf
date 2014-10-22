@@ -24,9 +24,6 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
-    public EcDsaJwsSignatureVerifier(PublicKey key) {
-        this(key, null);
-    }
     public EcDsaJwsSignatureVerifier(PublicKey key, String supportedAlgo) {
         this(key, null, supportedAlgo);
     }

@@ -72,6 +72,7 @@ under the License.
     
     <bean id="hmacSigVerifier" class="org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureVerifier">
         <constructor-arg value="AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"/>
+        <constructor-arg value="HS256"/>
     </bean>
     <bean id="jwsHmacInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter">
        <property name="signatureVerifier" ref="hmacSigVerifier"/>
