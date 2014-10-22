@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 
 public interface ContentEncryptionAlgorithm extends ContentEncryptionCipherProperties {
-    String getAlgorithm();
     byte[] getInitVector();
     byte[] getContentEncryptionKey(JweHeaders headers);
 }
