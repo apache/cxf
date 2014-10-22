@@ -37,8 +37,8 @@ public class AesCbcHmacJweDecryption extends AbstractJweDecryption {
     public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
                                    String supportedAlgo,
                                    JoseHeadersReader reader) {
-        super(reader, keyDecryptionAlgo, new AesCbcContentDecryptionAlgorithm());
-        this.supportedAlgo = null;
+        super(reader, keyDecryptionAlgo, new AesCbcContentDecryptionAlgorithm(supportedAlgo));
+        this.supportedAlgo = supportedAlgo;
     }
     protected JweDecryptionOutput doDecrypt(JweCompactConsumer consumer, byte[] cek) {
         validateAuthenticationTag(consumer, cek);
@@ -66,6 +66,9 @@ public class AesCbcHmacJweDecryption extends AbstractJweDecryption {
     }
     private static class AesCbcContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
         implements ContentDecryptionAlgorithm {
+        public AesCbcContentDecryptionAlgorithm(String supportedAlgo) {
+            super(supportedAlgo);
+        }
         @Override
         public AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] theIv) {
             return new IvParameterSpec(theIv);

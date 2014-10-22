@@ -24,4 +24,5 @@ import java.security.spec.AlgorithmParameterSpec;
 public interface ContentEncryptionCipherProperties {
     byte[] getAdditionalAuthenticationData(String headersJson);
     AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] iv);
+    String getAlgorithm();
 }

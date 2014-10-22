@@ -71,7 +71,7 @@ public class JwePbeHmacAesWrapTest extends Assert {
         String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
         PbesHmacAesWrapKeyDecryptionAlgorithm keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
         JweDecryptionProvider decryption = new WrappedKeyJweDecryption(keyDecryption, 
-                                                                       new AesGcmContentDecryptionAlgorithm());
+                                               new AesGcmContentDecryptionAlgorithm(JoseConstants.A128GCM_ALGO));
         String decryptedText = decryption.decrypt(jweContent).getContentText();
         assertEquals(specPlainText, decryptedText);
         
