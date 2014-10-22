@@ -129,7 +129,8 @@ public class JwsCompactReaderWriterTest extends Assert {
     @Test
     public void testReadJwsSignedByMacSpecExample() throws Exception {
         JwsJwtCompactConsumer jws = new JwsJwtCompactConsumer(ENCODED_TOKEN_SIGNED_BY_MAC);
-        assertTrue(jws.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY)));
+        assertTrue(jws.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
+                                                                        Algorithm.HmacSHA256.getJwtName())));
         JwtToken token = jws.getJwtToken();
         JoseHeaders headers = token.getHeaders();
         assertEquals(JoseConstants.TYPE_JWT, headers.getType());
@@ -176,7 +177,8 @@ public class JwsCompactReaderWriterTest extends Assert {
     @Test
     public void testReadJwsWithJwkSignedByMac() throws Exception {
         JwsJwtCompactConsumer jws = new JwsJwtCompactConsumer(ENCODED_TOKEN_WITH_JSON_KEY_SIGNED_BY_MAC);
-        assertTrue(jws.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY)));
+        assertTrue(jws.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
+                                                                        Algorithm.HmacSHA256.getJwtName())));
         JwtToken token = jws.getJwtToken();
         JoseHeaders headers = token.getHeaders();
         assertEquals(JoseConstants.TYPE_JWT, headers.getType());
@@ -223,7 +225,8 @@ public class JwsCompactReaderWriterTest extends Assert {
                                                            EC_X_POINT_ENCODED, 
                                                            EC_Y_POINT_ENCODED);
         JwsJwtCompactConsumer jwsConsumer = new JwsJwtCompactConsumer(signedJws);
-        assertTrue(jwsConsumer.verifySignatureWith(new EcDsaJwsSignatureVerifier(publicKey)));
+        assertTrue(jwsConsumer.verifySignatureWith(new EcDsaJwsSignatureVerifier(publicKey,
+                                                   Algorithm.SHA256withECDSA.getJwtName())));
         JwtToken token = jwsConsumer.getJwtToken();
         JoseHeaders headersReceived = token.getHeaders();
         assertEquals(Algorithm.SHA256withECDSA.getJwtName(), headersReceived.getAlgorithm());
@@ -234,7 +237,8 @@ public class JwsCompactReaderWriterTest extends Assert {
     public void testReadJwsSignedByPrivateKey() throws Exception {
         JwsJwtCompactConsumer jws = new JwsJwtCompactConsumer(ENCODED_TOKEN_SIGNED_BY_PRIVATE_KEY);
         RSAPublicKey key = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
-        assertTrue(jws.verifySignatureWith(new PublicKeyJwsSignatureVerifier(key)));
+        assertTrue(jws.verifySignatureWith(new PublicKeyJwsSignatureVerifier(key, 
+                                                                             JoseConstants.RS_SHA_256_ALGO)));
         JwtToken token = jws.getJwtToken();
         JoseHeaders headers = token.getHeaders();
         assertEquals(Algorithm.SHA256withRSA.getJwtName(), headers.getAlgorithm());

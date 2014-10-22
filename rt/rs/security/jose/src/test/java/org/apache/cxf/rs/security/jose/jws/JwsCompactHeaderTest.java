@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -114,21 +116,24 @@ public class JwsCompactHeaderTest extends Assert {
     public void verifyJwsWithMissingAlgHeaderField() throws Exception {
         JwsCompactConsumer jwsConsumer = new JwsCompactConsumer(MISSING_ALG_HEADER_FIELD_IN_JWS);
 
-        assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY)));
+        assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY, 
+                                                                                 Algorithm.HmacSHA256.getJwtName())));
     }
 
     @Test
     public void verifyJwsWithTwoAlgHeaderFieldsBogusFieldFirst() throws Exception {
         JwsCompactConsumer jwsConsumer = new JwsCompactConsumer(TWO_ALG_HEADER_FIELDS_IN_JWS_BOGUS_FIRST);
 
-        assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY)));
+        assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
+                                                                                 Algorithm.HmacSHA256.getJwtName())));
     }
 
     @Test
     public void verifyJwsWithTwoAlgHeaderFieldsBogusFieldLast() throws Exception {
         JwsCompactConsumer jwsConsumer = new JwsCompactConsumer(TWO_ALG_HEADER_FIELDS_IN_JWS_BOGUS_LAST);
 
-        assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY)));
+        assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
+                                                                                 Algorithm.HmacSHA256.getJwtName())));
     }
     
     @Test
@@ -137,9 +142,11 @@ public class JwsCompactHeaderTest extends Assert {
         
         JwsCompactConsumer jwsConsumerAltered = new JwsCompactConsumer(ALG_HEADER_VALUE_NONE_IN_JWS);
 
-        assertTrue(jwsConsumerOriginal.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY)));
+        assertTrue(jwsConsumerOriginal.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
+                                                               Algorithm.HmacSHA256.getJwtName())));
         
-        assertFalse(jwsConsumerAltered.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY)));
+        assertFalse(jwsConsumerAltered.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
+                                                               Algorithm.HmacSHA256.getJwtName())));
     }
 
     

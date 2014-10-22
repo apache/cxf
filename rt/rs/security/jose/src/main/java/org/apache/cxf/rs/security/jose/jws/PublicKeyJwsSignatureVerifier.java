@@ -31,9 +31,6 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     private AlgorithmParameterSpec signatureSpec;
     private String supportedAlgo;
     
-    public PublicKeyJwsSignatureVerifier(PublicKey key) {
-        this(key, null);
-    }
     public PublicKeyJwsSignatureVerifier(PublicKey key, String supportedAlgorithm) {
         this(key, null, supportedAlgorithm);
     }
@@ -57,13 +54,17 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     protected String checkAlgorithm(String algo) {
         if (algo == null 
             || !isValidAlgorithmFamily(algo)
-            || supportedAlgo != null && !supportedAlgo.equals(algo)) {
+            || !algo.equals(supportedAlgo)) {
             throw new SecurityException();
         }
         return algo;
     }
     protected boolean isValidAlgorithmFamily(String algo) {
         return Algorithm.isRsaShaSign(algo);
+    }
+    @Override
+    public String getAlgorithm() {
+        return supportedAlgo;
     }
 
 }
