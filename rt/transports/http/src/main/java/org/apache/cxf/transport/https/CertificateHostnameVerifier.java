@@ -30,14 +30,21 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import javax.naming.InvalidNameException;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
+import javax.security.auth.x500.X500Principal;
 
 /**
  * ************************************************************************
@@ -498,45 +505,33 @@ public interface CertificateHostnameVerifier extends javax.net.ssl.HostnameVerif
             //utility class
         }
         public static String[] getCNs(X509Certificate cert) {
-            List<String> cnList = new LinkedList<String>();
-            /*
-           Sebastian Hauer's original StrictSSLProtocolSocketFactory used
-           getName() and had the following comment:
-
-              Parses a X.500 distinguished name for the value of the
-              "Common Name" field.  This is done a bit sloppy right
-              now and should probably be done a bit more according to
-              <code>RFC 2253</code>.
-
-            I've noticed that toString() seems to do a better job than
-            getName() on these X500Principal objects, so I'm hoping that
-            addresses Sebastian's concern.
-
-            For example, getName() gives me this:
-            1.2.840.113549.1.9.1=#16166a756c6975736461766965734063756362632e636f6d
-
-            whereas toString() gives me this:
-            EMAILADDRESS=juliusdavies@cucbc.com
-
-            Looks like toString() even works with non-ascii domain names!
-            I tested it with "&#x82b1;&#x5b50;.co.jp" and it worked fine.
-           */
-            String subjectPrincipal = cert.getSubjectX500Principal().toString();
-            StringTokenizer st = new StringTokenizer(subjectPrincipal, ",");
-            while (st.hasMoreTokens()) {
-                String tok = st.nextToken();
-                int x = tok.indexOf("CN=");
-                if (x >= 0) {
-                    cnList.add(tok.substring(x + 3));
+            try {
+                final String subjectPrincipal = cert.getSubjectX500Principal().getName(X500Principal.RFC2253);
+                final List<String> cnList = new LinkedList<String>();
+                final LdapName subjectDN = new LdapName(subjectPrincipal);
+                for (final Rdn rds : subjectDN.getRdns()) {
+                    final Attributes attributes = rds.toAttributes();
+                    final Attribute cn = attributes.get("cn");
+                    if (cn != null) {
+                        try {
+                            final Object value = cn.get();
+                            if (value != null) {
+                                cnList.add(value.toString());
+                            }
+                        } catch (NoSuchElementException ignore) {
+                            //ignore
+                        } catch (NamingException ignore) {
+                            //ignore
+                        }
+                    }
                 }
+                if (!cnList.isEmpty()) {
+                    return cnList.toArray(new String[cnList.size()]);
+                }
+            } catch (InvalidNameException ignore) {
+                //ignore
             }
-            if (!cnList.isEmpty()) {
-                String[] cns = new String[cnList.size()];
-                cnList.toArray(cns);
-                return cns;
-            } else {
-                return null;
-            }
+            return null;
         }
 
         /**
