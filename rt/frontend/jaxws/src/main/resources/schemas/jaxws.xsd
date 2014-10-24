@@ -21,13 +21,17 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:beans="http://www.springframework.org/schema/beans"
   xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:pt="http://cxf.apache.org/configuration/parameterized-types" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   targetNamespace="http://cxf.apache.org/jaxws" 
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"  >
 
   <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
   <xsd:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
+  <xsd:import namespace="http://cxf.apache.org/configuration/parameterized-types"
+             schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
+
 
   <xsd:element name="endpoint">
     <xsd:annotation>
@@ -135,7 +139,7 @@
                 with the ref bean which is wrapped by using Spring AOP.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
-          <xsd:attribute name="publish" type="xsd:boolean" default="true">
+          <xsd:attribute name="publish" type="pt:ParameterizedBoolean" default="true">
             <xsd:annotation>
               <xsd:documentation>Specifies if the service should be automatically published.</xsd:documentation>
             </xsd:annotation>
@@ -274,7 +278,7 @@
                 classpath.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
-          <xsd:attribute name="start" type="xsd:boolean" default="true">
+          <xsd:attribute name="start" type="pt:ParameterizedBoolean" default="true">
             <xsd:annotation>
               <xsd:documentation>Specifies if the service should be automatically published.</xsd:documentation>
             </xsd:annotation>
