@@ -71,11 +71,11 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
     @Before
     public void before() {
         ServerFactoryBean serverFactoryBean = getBean(ServerFactoryBean.class, "hw-service-endpoint");
-        hwEndpoint = serverFactoryBean.getServer().getEndpoint();
+        hwEndpoint = serverFactoryBean.create().getEndpoint();
         serverFactoryBean = getBean(ServerFactoryBean.class, "hwg-service-endpoint");
-        hwgEndpoint = serverFactoryBean.getServer().getEndpoint();
+        hwgEndpoint = serverFactoryBean.create().getEndpoint();
         serverFactoryBean = getBean(ServerFactoryBean.class, "dlb-service-endpoint");
-        dlbEndpoint = serverFactoryBean.getServer().getEndpoint();
+        dlbEndpoint = serverFactoryBean.create().getEndpoint();
     }
     
     private String getStringFromURL(URL url) throws IOException {

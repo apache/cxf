@@ -49,7 +49,7 @@ public abstract class JavascriptRhinoTest extends AbstractCXFSpringTest {
         testUtilities.setBus(getBean(Bus.class, "cxf"));
         testUtilities.initializeRhino();
         serverFactoryBean = getBean(ServerFactoryBean.class, serviceEndpointBean);
-        endpoint = serverFactoryBean.getServer().getEndpoint();
+        endpoint = serverFactoryBean.create().getEndpoint();
         // we need to find the implementor.
         rawImplementor = serverFactoryBean.getServiceBean();
 

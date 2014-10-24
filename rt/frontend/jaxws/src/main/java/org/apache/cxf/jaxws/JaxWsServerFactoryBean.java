@@ -209,7 +209,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
             }
 
             Server server = super.create();
-            initializeResourcesAndHandlerChain();
+            initializeResourcesAndHandlerChain(server);
             checkPrivateEndpoint(server.getEndpoint());
             
             return server;
@@ -220,11 +220,11 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
         }
     }
     
-    private synchronized void initializeResourcesAndHandlerChain() {
+    private synchronized void initializeResourcesAndHandlerChain(Server server) {
         if (doInit) {
             try {
                 injectResources(getServiceBean());
-                buildHandlerChain();
+                buildHandlerChain(server);
             } catch (Exception ex) {
                 if (ex instanceof WebServiceException) { 
                     throw (WebServiceException)ex; 
@@ -238,20 +238,22 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     
     /**
      * Obtain handler chain from annotations.
+     * @param server 
      *
      */
-    private void buildHandlerChain() {
+    private void buildHandlerChain(Server server) {
         AnnotationHandlerChainBuilder builder = new AnnotationHandlerChainBuilder();
-        JaxWsServiceFactoryBean sf = (JaxWsServiceFactoryBean)getServiceFactory(); 
         @SuppressWarnings("rawtypes")
         List<Handler> chain = new ArrayList<Handler>(handlers);
         
-        chain.addAll(builder.buildHandlerChainFromClass(getServiceBeanClass(), sf.getEndpointInfo()
-            .getName(), sf.getServiceQName(), this.getBindingId()));
+        chain.addAll(builder.buildHandlerChainFromClass(getServiceBeanClass(),
+                                                        server.getEndpoint().getEndpointInfo().getName(),
+                                                        server.getEndpoint().getService().getName(),
+                                                        this.getBindingId()));
         for (Handler<?> h : chain) {
             injectResources(h);
         }
-        ((JaxWsEndpointImpl)getServer().getEndpoint()).getJaxwsBinding().setHandlerChain(chain);
+        ((JaxWsEndpointImpl)server.getEndpoint()).getJaxwsBinding().setHandlerChain(chain);
     }
     
     /**

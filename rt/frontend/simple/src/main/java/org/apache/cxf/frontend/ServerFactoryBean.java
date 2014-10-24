@@ -75,7 +75,6 @@ import org.apache.cxf.wsdl11.WSDLEndpointFactory;
  * </pre>
  */
 public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
-    private Server server;
     private boolean start = true;
     private Object serviceBean;
     private List<String> schemaLocations;
@@ -129,10 +128,20 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
         return null;
     }
     
+    /**
+     * For subclasses that hold onto the created Server, this will return the singleton server.
+     * Default returns null as the default factories do not hold onto the server and will
+     * create a new one for each call to create();
+     * @return
+     */
+    public Server getServer() {
+        return null;
+    }
 
     public Server create() {
         ClassLoaderHolder orig = null;
         try {
+            Server server = null;
             try {
                 if (bus != null) {
                     ClassLoader loader = bus.getExtension(ClassLoader.class);
@@ -199,7 +208,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                 initializeAnnotationInterceptors(server.getEndpoint(), getServiceClass());
             }
     
-            applyFeatures();
+            applyFeatures(server);
    
             getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED, server, serviceBean,
                                           serviceBean == null 
@@ -218,6 +227,8 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                     throw re;
                 }
             }
+            getServiceFactory().reset();
+
             return server;
         } finally {
             if (orig != null) {
@@ -225,39 +236,14 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             }
         }            
     }
-    public void init() {
-        if (getServer() == null) {
-            ClassLoaderHolder orig = null;
-            try {
-                if (bus != null) {
-                    ClassLoader loader = bus.getExtension(ClassLoader.class);
-                    if (loader != null) {
-                        orig = ClassLoaderUtils.setThreadContextClassloader(loader);
-                    }
-                }
-                create();
-            } finally {
-                if (orig != null) {
-                    orig.reset();
-                }
-            }
-        }
-    }
     
-    public void destroy() {
-        if (getServer() != null) {
-            getServer().destroy();
-            setServer(null);
-        }
-    }
-
     @Override
     protected void initializeServiceFactory() {
         super.initializeServiceFactory();
         getServiceFactory().setSchemaLocations(schemaLocations);
     }
 
-    protected void applyFeatures() {
+    protected void applyFeatures(Server server) {
         if (getFeatures() != null) {
             for (Feature feature : getFeatures()) {
                 feature.initialize(server, getBus());
@@ -270,14 +256,6 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             return new FactoryInvoker(new SingletonFactory(getServiceClass()));
         }
         return new BeanInvoker(getServiceBean());
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
     }
 
     /**

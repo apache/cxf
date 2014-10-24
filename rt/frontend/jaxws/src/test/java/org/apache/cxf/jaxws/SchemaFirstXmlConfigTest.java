@@ -47,6 +47,7 @@ public class SchemaFirstXmlConfigTest extends AbstractJaxWsTest {
 
         JaxWsServerFactoryBean serverFB = (JaxWsServerFactoryBean) ctx.getBean("helloServer");
 
+        assertNotNull(serverFB.getServer());
         Document d = getWSDLDocument(serverFB.getServer());
 
         //XMLUtils.printDOM(d);

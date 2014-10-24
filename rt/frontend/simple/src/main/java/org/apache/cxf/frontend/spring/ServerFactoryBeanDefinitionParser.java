@@ -23,15 +23,16 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -57,6 +58,13 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
         } else {
             mapToProperty(bean, name, val);
         }
+    }
+    protected boolean parseAttribute(Element element, Attr node, 
+                                     ParserContext ctx, BeanDefinitionBuilder bean) {
+        if (!node.getSpecified() && "start".equals(node.getLocalName())) {
+            return false;
+        }
+        return super.parseAttribute(element, node, ctx, bean);
     }
 
     @Override
@@ -114,11 +122,33 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
     public static class SpringServerFactoryBean extends ServerFactoryBean
         implements ApplicationContextAware {
 
+        private Server server;
+
         public SpringServerFactoryBean() {
             super();
         }
         public SpringServerFactoryBean(ReflectionServiceFactoryBean fact) {
             super(fact);
+        }
+        public Server getServer() {
+            return server;
+        }
+        
+        public void init() {
+            create();
+        }
+        @Override
+        public Server create() {
+            if (server == null) {
+                server = super.create();
+            }
+            return server;
+        }
+        public void destroy() {
+            if (server != null) {
+                server.destroy();
+                server = null;
+            }
         }
 
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {

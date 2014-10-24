@@ -83,31 +83,37 @@ public abstract class AbstractBeanDefinitionParser
         boolean setBus = false;
         for (int i = 0; i < atts.getLength(); i++) {
             Attr node = (Attr) atts.item(i);
-            String val = node.getValue();
-            String pre = node.getPrefix();
-            String name = node.getLocalName();
-            String prefix = node.getPrefix();
             
-            // Don't process namespaces
-            if (isNamespace(name, prefix)) {
-                continue;
-            }
-            
-            if ("createdFromAPI".equals(name)) {
-                bean.setAbstract(true);
-            } else if ("abstract".equals(name)) {
-                bean.setAbstract(true);
-            } else if ("depends-on".equals(name)) {
-                bean.addDependsOn(val);
-            } else if ("name".equals(name)) {
-                processNameAttribute(element, ctx, bean, val);
-            } else if ("bus".equals(name)) {
-                setBus = processBusAttribute(element, ctx, bean, val);
-            } else if (!"id".equals(name) && isAttribute(pre, name)) {
-                mapAttribute(bean, element, name, val);
-            }
-        } 
+            setBus |= parseAttribute(element, node, ctx, bean);
+        }
         return setBus;
+    }
+    protected boolean parseAttribute(Element element, Attr node, 
+                                     ParserContext ctx, BeanDefinitionBuilder bean) {
+        String val = node.getValue();
+        String pre = node.getPrefix();
+        String name = node.getLocalName();
+        String prefix = node.getPrefix();
+        
+        // Don't process namespaces
+        if (isNamespace(name, prefix)) {
+            return false;
+        }
+        
+        if ("createdFromAPI".equals(name)) {
+            bean.setAbstract(true);
+        } else if ("abstract".equals(name)) {
+            bean.setAbstract(true);
+        } else if ("depends-on".equals(name)) {
+            bean.addDependsOn(val);
+        } else if ("name".equals(name)) {
+            processNameAttribute(element, ctx, bean, val);
+        } else if ("bus".equals(name)) {
+            return processBusAttribute(element, ctx, bean, val);
+        } else if (!"id".equals(name) && isAttribute(pre, name)) {
+            mapAttribute(bean, element, name, val);
+        }
+        return false;
     }
 
     
