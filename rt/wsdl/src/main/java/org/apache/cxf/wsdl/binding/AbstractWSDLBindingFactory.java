@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.AbstractPropertiesHolder;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -102,6 +103,10 @@ public abstract class AbstractWSDLBindingFactory extends AbstractBindingFactory
                     copyExtensors(bop2.getOutput(), bop.getBindingOutput(), bop2);
                 }
                 for (BindingFault f : cast(bop.getBindingFaults().values(), BindingFault.class)) {
+                    if (StringUtils.isEmpty(f.getName())) {
+                        throw new IllegalArgumentException("wsdl:fault and soap:fault elements"
+                                                           + " must have a name attribute.");
+                    }
                     copyExtensors(bop2.getFault(new QName(service.getTargetNamespace(), f.getName())),
                                   bop.getBindingFault(f.getName()), bop2);
                 }
