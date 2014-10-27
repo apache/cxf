@@ -474,6 +474,9 @@ public class WSDLGetUtils {
                     if (!doneSchemas.containsKey(decodedStart)) {
                         String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                         if (resolvedSchemaLocation == null) {
+                            resolvedSchemaLocation = resolveWithCatalogs(catalogs, imp.getSchemaLocationURI(), base);
+                        }                        
+                        if (resolvedSchemaLocation == null) {
                             try {
                                 //check to see if it's already in a URL format.  If so, leave it.
                                 new URL(start);
@@ -485,6 +488,7 @@ public class WSDLGetUtils {
                         } else {
                             if (doneSchemas.put(decodedStart, imp) == null) {
                                 doneSchemas.put(resolvedSchemaLocation, imp);
+                                doneSchemas.put(imp.getSchemaLocationURI(), imp);
                                 updateSchemaImports(bus, imp.getReferencedSchema(), docBase, doneSchemas, base);
                             }
                         }
