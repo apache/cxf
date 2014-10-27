@@ -6,6 +6,7 @@ A rt/wsdl api
 A rt/rs/description rt/frontend/jaxrs
 A rt/frontend/simple/src/main/java/org/apache/cxf/endpoint/dynamic rt/databinding/jaxb/src/main/java/org/apache/cxf/endpoint/dynamic/
 A core/src/main/java/org/apache/cxf/ws/addressing/EndpointReferenceUtils api/src/main/java/org/apache/cxf/wsdl/EndpointReferenceUtils
+A rt/wsdl/src/main/java/org/apache/cxf/wsdl/binding/AbstractWSDLBindingFactory api/src/main/java/org/apache/cxf/binding/AbstractBindingFactory
 B 0011b05059467fcd6fbeeb859907d69a9d25efe2
 B 003518b1d29250c59493d1b1965303aac8505475
 B 003a0d420dca03b94d5ec111dab645669446a942
