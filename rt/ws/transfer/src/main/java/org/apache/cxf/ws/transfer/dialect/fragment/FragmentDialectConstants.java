@@ -19,8 +19,8 @@
 package org.apache.cxf.ws.transfer.dialect.fragment;
 
 /**
- *
- * @author erich
+ * Helper class for holding of constants.
+ * @author Erich Duda
  */
 public final class FragmentDialectConstants {
     

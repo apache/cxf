@@ -33,8 +33,8 @@ import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
 import org.apache.cxf.ws.transfer.shared.TransferTools;
 
 /**
- *
- * @author erich
+ * Implementation of the QName language.
+ * @author Erich Duda
  */
 public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
 
@@ -64,7 +64,7 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
     @Override
     public Object getResourceFragment(final Representation representation, ExpressionType expression) {
         try {
-            String expressionStr = getQNameXPathFromExpression(expression);
+            String expressionStr = getXPathFromQNameExpression(expression);
             // Evaluate XPath
             XPath xPath = TransferTools.getXPath();
             xPath.setNamespaceContext(new NamespaceContext() {
@@ -96,7 +96,12 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
         }
     }
     
-    private String getQNameXPathFromExpression(ExpressionType expression) {
+    /**
+     * Converts expression in QName language to XPath expression.
+     * @param expression Expression in QName language.
+     * @return Expression in XPath language.
+     */
+    private String getXPathFromQNameExpression(ExpressionType expression) {
         if (expression.getContent().size() == 1) {
             String expressionValue = (String) expression.getContent().get(0);
             Matcher m = qNamePattern.matcher(expressionValue);

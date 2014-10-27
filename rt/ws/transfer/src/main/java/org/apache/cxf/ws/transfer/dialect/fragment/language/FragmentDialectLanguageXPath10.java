@@ -31,8 +31,8 @@ import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
 import org.apache.cxf.ws.transfer.shared.TransferTools;
 
 /**
- *
- * @author erich
+ * Implementation of the XPath 1.0 language.
+ * @author Erich Duda
  */
 public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
 
@@ -83,6 +83,11 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
         }
     }
     
+    /**
+     * Get XPath from the Expression element.
+     * @param expression
+     * @return 
+     */
     private String getXPathFromExpression(ExpressionType expression) {
         if (expression.getContent().size() == 1) {
             return (String) expression.getContent().get(0);

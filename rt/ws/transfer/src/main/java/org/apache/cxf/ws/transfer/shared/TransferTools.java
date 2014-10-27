@@ -113,6 +113,11 @@ public final class TransferTools {
         }
     }
     
+    /**
+     * Transforms DOM Document to its String representation.
+     * @param source
+     * @return 
+     */
     public static String transform(Source source) {
         try {
             StringWriter writer = new StringWriter();

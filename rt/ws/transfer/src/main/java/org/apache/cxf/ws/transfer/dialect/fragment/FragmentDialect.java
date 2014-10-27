@@ -138,6 +138,11 @@ public class FragmentDialect implements Dialect {
         languages.remove(iri);
     }
     
+    /**
+     * Generates Value element, which is returned as response to Get request.
+     * @param value Result of the XPath evaluation.
+     * @return 
+     */
     private JAXBElement<ValueType> generateGetResponse(Object value) {
         if (value instanceof Node) {
             return generateGetResponseNode((Node) value);
@@ -150,6 +155,11 @@ public class FragmentDialect implements Dialect {
         return objectFactory.createValue(new ValueType());
     }
     
+    /**
+     * Generates Value element from NodeList.
+     * @param nodeList
+     * @return 
+     */
     private JAXBElement<ValueType> generateGetResponseNodeList(NodeList nodeList) {
         ValueType resultValue = new ValueType();
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -159,6 +169,11 @@ public class FragmentDialect implements Dialect {
         return objectFactory.createValue(resultValue);
     }
     
+    /**
+     * Generates Value element from Node.
+     * @param node
+     * @return 
+     */
     private JAXBElement<ValueType> generateGetResponseNode(Node node) {
         ValueType resultValue = new ValueType();
         if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
@@ -186,6 +201,11 @@ public class FragmentDialect implements Dialect {
         return objectFactory.createValue(resultValue);
     }
     
+    /**
+     * Generates Value element from String.
+     * @param value
+     * @return 
+     */
     private JAXBElement<ValueType> generateGetResponseString(String value) {
         ValueType resultValue = new ValueType();
         resultValue.getContent().add(value);
@@ -193,6 +213,13 @@ public class FragmentDialect implements Dialect {
         return objectFactory.createValue(resultValue);
     }
     
+    /**
+     * Process Put requests.
+     * @param resourceFragment Result of the XPath evaluation. It can be Node or NodeList.
+     * @param mode Mode defined in the Mode attribute.
+     * @param value Value defined in the Value element.
+     * @return Representation element, which is returned as response.
+     */
     private Representation modifyRepresentation(
             Object resourceFragment,
             String mode,
@@ -211,6 +238,13 @@ public class FragmentDialect implements Dialect {
         }
     }
     
+    /**
+     * Process Put requests.
+     * @param resourceFragment Result of the XPath evaluation.
+     * @param mode Mode defined in the Mode attribute.
+     * @param value Value defined in the Value element.
+     * @return Representation element, which is returned as response.
+     */
     private Representation modifyRepresentationMode(
             Node resourceFragment,
             String mode,
@@ -231,6 +265,12 @@ public class FragmentDialect implements Dialect {
         }
     }
 
+    /**
+     * Process Put requests for Replace mode.
+     * @param resourceFragment Result of the XPath evaluation.
+     * @param value Value defined in the Value element.
+     * @return Representation element, which is returned as response.
+     */
     private Representation modifyRepresentationModeReplace(
             Node resourceFragment,
             ValueType value) {
@@ -246,6 +286,12 @@ public class FragmentDialect implements Dialect {
         return representation;
     }
     
+    /**
+     * Process Put requests for Add mode.
+     * @param resourceFragment Result of the XPath evaluation.
+     * @param value Value defined in the Value element.
+     * @return Representation element, which is returned as response.
+     */
     private Representation modifyRepresentationModeAdd(
             Node resourceFragment,
             ValueType value) {
@@ -260,6 +306,12 @@ public class FragmentDialect implements Dialect {
         return representation;
     }
     
+    /**
+     * Process Put requests for InsertBefore mode.
+     * @param resourceFragment Result of the XPath evaluation.
+     * @param value Value defined in the Value element.
+     * @return Representation element, which is returned as response.
+     */
     private Representation modifyRepresentationModeInsertBefore(
             Node resourceFragment,
             ValueType value) {
@@ -306,6 +358,12 @@ public class FragmentDialect implements Dialect {
         return representation;
     }
     
+    /**
+     * Process Put requests for InsertAfter mode.
+     * @param resourceFragment Result of the XPath evaluation.
+     * @param value Value defined in the Value element.
+     * @return Representation element, which is returned as response.
+     */
     private Representation modifyRepresentationModeInsertAfter(
             Node resourceFragment,
             ValueType value) {
@@ -357,6 +415,12 @@ public class FragmentDialect implements Dialect {
         return representation;
     }
     
+    /**
+     * Process Put requests for Remove mode.
+     * @param resourceFragment Result of the XPath evaluation.
+     * @param value Value defined in the Value element.
+     * @return Representation element, which is returned as response.
+     */
     private Representation modifyRepresentationModeRemove(
             Node resourceFragment,
             ValueType value) {
@@ -374,6 +438,11 @@ public class FragmentDialect implements Dialect {
         return representation;
     }
     
+    /**
+     * Helper method. It removes Node and returns its parent.
+     * @param resourceFragment Node to remove.
+     * @return Parent of removed Node.
+     */
     private Node removeNode(Node resourceFragment) {
         Node parent = null;
         if (resourceFragment.getNodeType() == Node.ATTRIBUTE_NODE) {
@@ -402,6 +471,12 @@ public class FragmentDialect implements Dialect {
         return parent;
     }
     
+    /**
+     * Helper method. It adds new Node as the last child of parent.
+     * @param ownerDocument Document, where the Node is added.
+     * @param parent Parent, where the Node is added.
+     * @param value Value defined in the Value element. It represents newly added Node.
+     */
     private void addNode(Document ownerDocument, Node parent, ValueType value) {
         if (ownerDocument == parent && ownerDocument.getDocumentElement() != null) {
             throw new InvalidExpression();
