@@ -52,6 +52,7 @@ import org.omg.PortableServer.LifespanPolicyValue;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManager;
+import org.omg.PortableServer.POAPackage.ObjectNotActive;
 import org.omg.PortableServer.RequestProcessingPolicyValue;
 import org.omg.PortableServer.Servant;
 import org.omg.PortableServer.ThreadPolicyValue;
@@ -356,6 +357,9 @@ public class CorbaDestination implements MultiplexDestination {
 
             try {
                 bindingPOA.deactivate_object(objectId);
+            } catch (ObjectNotActive ona) {
+                LOG.info("Caught ObjectNotActive exception: " + ona
+                         + " during deactivate_object() call on POA: " + bindingPOA);
             } catch (Exception ex) {
                 throw new CorbaBindingException("Unable to deactivate CORBA servant", ex);
             }
