@@ -972,7 +972,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testBadCustomExceptionMappersHierarchyWithGenerics() throws Exception {
-        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.getInstance();
         BadExceptionMapperA badExceptionMapperA = new BadExceptionMapperA();
         pf.registerUserProvider(badExceptionMapperA);
         BadExceptionMapperB badExceptionMapperB = new BadExceptionMapperB();
@@ -989,7 +989,7 @@ public class ProviderFactoryTest extends Assert {
 
     @Test
     public void testGoodExceptionMappersHierarchyWithGenerics() throws Exception {
-        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.getInstance();
         GoodRuntimeExceptionAMapper runtimeExceptionAMapper = new GoodRuntimeExceptionAMapper();
         pf.registerUserProvider(runtimeExceptionAMapper);
         GoodRuntimeExceptionBMapper runtimeExceptionBMapper = new GoodRuntimeExceptionBMapper();
