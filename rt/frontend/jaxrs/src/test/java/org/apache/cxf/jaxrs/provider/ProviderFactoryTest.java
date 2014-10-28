@@ -969,4 +969,80 @@ public class ProviderFactoryTest extends Assert {
             return Response.status(Status.BAD_REQUEST).entity(exception.getMessage()).build();
         }
     }
+    
+    @Test
+    public void testBadCustomExceptionMappersHierarchyWithGenerics() throws Exception {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        BadExceptionMapperA badExceptionMapperA = new BadExceptionMapperA();
+        pf.registerUserProvider(badExceptionMapperA);
+        BadExceptionMapperB badExceptionMapperB = new BadExceptionMapperB();
+        pf.registerUserProvider(badExceptionMapperB);
+        Object mapperResponse1 = pf.createExceptionMapper(RuntimeExceptionA.class, new MessageImpl());
+        assertSame(badExceptionMapperA, mapperResponse1);
+        Object mapperResponse2 = pf.createExceptionMapper(RuntimeExceptionB.class, new MessageImpl());
+        assertSame(badExceptionMapperB, mapperResponse2);
+        Object mapperResponse3 = pf.createExceptionMapper(RuntimeExceptionAA.class, new MessageImpl());
+        assertSame(badExceptionMapperA, mapperResponse3);
+        Object mapperResponse4 = pf.createExceptionMapper(RuntimeExceptionBB.class, new MessageImpl());
+        assertSame(badExceptionMapperB, mapperResponse4);
+    }
+
+    @Test
+    public void testGoodExceptionMappersHierarchyWithGenerics() throws Exception {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        GoodRuntimeExceptionAMapper runtimeExceptionAMapper = new GoodRuntimeExceptionAMapper();
+        pf.registerUserProvider(runtimeExceptionAMapper);
+        GoodRuntimeExceptionBMapper runtimeExceptionBMapper = new GoodRuntimeExceptionBMapper();
+        pf.registerUserProvider(runtimeExceptionBMapper);
+        Object mapperResponse1 = pf.createExceptionMapper(RuntimeExceptionA.class, new MessageImpl());
+        assertSame(runtimeExceptionAMapper, mapperResponse1);
+        Object mapperResponse2 = pf.createExceptionMapper(RuntimeExceptionB.class, new MessageImpl());
+        assertSame(runtimeExceptionBMapper, mapperResponse2);
+        Object mapperResponse3 = pf.createExceptionMapper(RuntimeExceptionAA.class, new MessageImpl());
+        assertSame(runtimeExceptionAMapper, mapperResponse3);
+        Object mapperResponse4 = pf.createExceptionMapper(RuntimeExceptionBB.class, new MessageImpl());
+        assertSame(runtimeExceptionBMapper, mapperResponse4);
+    }
+    private static class RuntimeExceptionA extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+    }
+    private static class RuntimeExceptionAA extends RuntimeExceptionA {
+        private static final long serialVersionUID = 1L;
+    }
+    private static class RuntimeExceptionB extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+    }
+    private static class RuntimeExceptionBB extends RuntimeExceptionB {
+        private static final long serialVersionUID = 1L;
+    }
+    private static class GoodRuntimeExceptionAMapper implements ExceptionMapper<RuntimeExceptionA> {
+
+        @Override
+        public Response toResponse(RuntimeExceptionA exception) {
+            return null;
+        }
+    }
+    private static class GoodRuntimeExceptionBMapper implements ExceptionMapper<RuntimeExceptionB> {
+
+        @Override
+        public Response toResponse(RuntimeExceptionB exception) {
+            return null;
+        }
+    }
+    public abstract static class BadParentExceptionMapper<T extends Throwable> implements ExceptionMapper<T> {
+    }
+    public static class BadExceptionMapperA extends BadParentExceptionMapper<RuntimeExceptionA> {
+
+        @Override
+        public Response toResponse(RuntimeExceptionA exception) {
+            return null;
+        }
+    }
+    public static class BadExceptionMapperB extends BadParentExceptionMapper<RuntimeExceptionB> {
+
+        @Override
+        public Response toResponse(RuntimeExceptionB exception) {
+            return null;
+        }
+    }
 }

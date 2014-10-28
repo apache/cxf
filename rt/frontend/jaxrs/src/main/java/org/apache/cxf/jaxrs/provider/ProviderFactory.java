@@ -1274,11 +1274,11 @@ public final class ProviderFactory {
     protected static int compareClasses(Class<?> expectedCls, Object o1, Object o2) {
         Class<?> cl1 = ClassHelper.getRealClass(o1); 
         Class<?> cl2 = ClassHelper.getRealClass(o2);
-        
         Type[] types1 = getGenericInterfaces(cl1, expectedCls);
         Type[] types2 = getGenericInterfaces(cl2, expectedCls);
-        
-        if (types1.length == 0 && types2.length > 0) {
+        if (types1.length == 0 && types2.length == 0) {
+            return 0;
+        } else if (types1.length == 0 && types2.length > 0) {
             return 1;
         } else if (types1.length > 0 && types2.length == 0) {
             return -1;
@@ -1304,9 +1304,9 @@ public final class ProviderFactory {
             Type genericSuperType = cls.getGenericSuperclass();
             if (genericSuperType instanceof ParameterizedType) {       
                 Class<?> actualType = InjectionUtils.getActualType(genericSuperType);
-                if (expectedClass == actualType) {
+                if (actualType != null && actualType.isAssignableFrom(expectedClass)) {
                     return new Type[]{genericSuperType};
-                } else if (actualType != null && expectedClass.isAssignableFrom(actualType)) {
+                } else if (expectedClass.isAssignableFrom(actualType)) {
                     return new Type[]{};    
                 }
             }
