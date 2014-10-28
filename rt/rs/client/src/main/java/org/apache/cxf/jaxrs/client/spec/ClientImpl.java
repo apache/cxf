@@ -19,11 +19,12 @@
 package org.apache.cxf.jaxrs.client.spec;
 
 import java.net.URI;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -49,7 +50,8 @@ public class ClientImpl implements Client {
     private Configurable<Client> configImpl;
     private TLSConfiguration secConfig;
     private boolean closed;
-    private Set<WebClient> baseClients = new HashSet<WebClient>();
+    private Set<WebClient> baseClients = 
+        Collections.newSetFromMap(new WeakHashMap<WebClient, Boolean>());
     public ClientImpl(Configuration config,
                       TLSConfiguration secConfig) {
         configImpl = new ClientConfigurableImpl<Client>(this, config);
