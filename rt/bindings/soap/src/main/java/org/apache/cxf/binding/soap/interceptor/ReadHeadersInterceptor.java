@@ -272,7 +272,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
      * out while parsing the stream).
      */
     private static class HeadersProcessor {
-        private static final XMLEventFactory FACTORY = XMLEventFactory.newFactory();
+        private static final XMLEventFactory FACTORY = XMLEventFactory.newInstance();
         private final QName soapVersionHeader;
         private final List<XMLEvent> events = new ArrayList<XMLEvent>(8);
         private StreamToDOMContext context;
