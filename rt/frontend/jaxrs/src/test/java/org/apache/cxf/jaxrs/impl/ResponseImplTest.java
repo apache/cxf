@@ -68,6 +68,16 @@ import org.junit.Test;
 public class ResponseImplTest extends Assert {
     
     @Test
+    public void testReadEntityWithNullOutMessage() {
+        final String str = "ouch";
+
+        Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                  .entity(str)
+                  .build();
+        Assert.assertEquals(str, response.readEntity(String.class));
+    }
+    
+    @Test
     public void testReadBufferedStaxUtils() throws Exception {
         ResponseImpl r = new ResponseImpl(200);
         Source responseSource = readResponseSource(r);

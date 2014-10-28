@@ -354,7 +354,7 @@ public final class ResponseImpl extends Response {
         }
         
         // we need to check for readers even if no IS is set - the readers may still do it
-        List<ReaderInterceptor> readers = ProviderFactory.getInstance(outMessage)
+        List<ReaderInterceptor> readers = outMessage == null ? null : ProviderFactory.getInstance(outMessage)
             .createMessageBodyReaderInterceptor(cls, t, anns, mediaType, outMessage, entityStreamAvailable, null);
         
         if (readers != null) {
