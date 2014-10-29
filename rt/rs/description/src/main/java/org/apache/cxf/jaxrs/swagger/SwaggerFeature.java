@@ -39,6 +39,8 @@ public class SwaggerFeature extends AbstractFeature {
     private String license = "Apache 2.0 License";
     private String licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html";
     private boolean scan = true;
+    
+    
     @Override
     public void initialize(Server server, Bus bus) {
         List<Object> serviceBeans = new ArrayList<Object>();
@@ -78,7 +80,7 @@ public class SwaggerFeature extends AbstractFeature {
     private void calulateDefaultBasePath(Server server) {
         if (getBasePath() == null || getBasePath().length() == 0) {
             String address = server.getEndpoint().getEndpointInfo().getAddress();
-            setBasePath(address + "/api-docs");
+            setBasePath(address);
         }
     }
     public String getResourcePackage() {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="5 seconds">
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>[%level] %d{yyyy-MM-dd HH:mm:ss.SSS} %logger{36} - [%X] %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+	</root>
+	
+	<logger category="com.wordnik.swagger" name="swagger">  
+    	<level name="DEBUG"/>  
+	</logger>
+</configuration>
