@@ -397,7 +397,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getPathInfo() {
-        LOG.log(Level.INFO, "getPathInfo");
         String uri = requestHeaders.get(WebSocketUtils.URI_KEY);
         String servletpath = webSocketHolder.getServletPath(); 
         if (LOG.isLoggable(Level.FINE)) {
@@ -410,7 +409,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getPathTranslated() {
-        LOG.log(Level.INFO, "getPathTranslated");
         String path = getPathInfo();
         String opathtrans = webSocketHolder.getPathTranslated();
         // some container may choose not to return this value
@@ -446,7 +444,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public StringBuffer getRequestURL() {
-        LOG.log(Level.INFO, "getRequestURL");
         StringBuffer sb = webSocketHolder.getRequestURL();
         String ouri = webSocketHolder.getRequestURI();
         String uri = getRequestURI();
