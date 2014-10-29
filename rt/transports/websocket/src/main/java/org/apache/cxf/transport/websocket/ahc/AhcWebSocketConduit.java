@@ -267,18 +267,18 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         //
 
         protected void connect() {
-            LOG.log(Level.INFO, "connecting");
+            LOG.log(Level.FINE, "connecting");
             if (websocket == null) {
                 try {
                     websocket = ahcclient.prepareGet(url.toASCIIString()).execute(
                             new WebSocketUpgradeHandler.Builder()
                             .addWebSocketListener(new AhcWebSocketListener()).build()).get();
-                    LOG.log(Level.INFO, "connected");
+                    LOG.log(Level.FINE, "connected");
                 } catch (Exception e) {
                     LOG.log(Level.SEVERE, "unable to connect", e);
                 }
             } else {
-                LOG.log(Level.INFO, "already connected");
+                LOG.log(Level.FINE, "already connected");
             }
         }
 
@@ -309,14 +309,14 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     protected class AhcWebSocketListener implements WebSocketTextListener, WebSocketByteListener {
 
         public void onOpen(WebSocket ws) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "onOpen({0})", ws);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "onOpen({0})", ws);
             }
         }
 
         public void onClose(WebSocket ws) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "onCose({0})", ws);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "onCose({0})", ws);
             }
         }
 

@@ -66,16 +66,16 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
     @Override
     public void onClose(int closeCode, String message) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "onClose({0}, {1})", new Object[]{closeCode, message});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "onClose({0}, {1})", new Object[]{closeCode, message});
         }
         this.webSocketConnection = null;
     }
 
     @Override
     public void onOpen(Connection connection) {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "onOpen({0}))", connection);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "onOpen({0}))", connection);
         }
         this.webSocketConnection = connection;
     }

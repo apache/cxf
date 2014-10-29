@@ -148,13 +148,13 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     /** {@inheritDoc}*/
     @Override
     public void onOpen(WebSocket webSocket) {
-        LOG.info("onOpen(WebSocket)");
+        LOG.fine("onOpen(WebSocket)");
     }
 
     /** {@inheritDoc}*/
     @Override
     public void onClose(WebSocket webSocket) {
-        LOG.info("onClose(WebSocket)");
+        LOG.fine("onClose(WebSocket)");
         
     }
 
