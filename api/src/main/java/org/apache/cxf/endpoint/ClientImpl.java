@@ -746,7 +746,9 @@ public class ClientImpl
     }
 
     public void onMessage(Message message) {
-
+        if (bus == null) {
+            throw new IllegalStateException("Message received on a Client that has been closed or destroyed.");
+        }
         Endpoint endpoint = message.getExchange().getEndpoint();
         if (endpoint == null) {
             // in this case correlation will occur outside the transport,
