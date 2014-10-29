@@ -333,7 +333,9 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getContextPath() {
-        LOG.log(Level.FINE, "getContextPath -> " + webSocketHolder.getContextPath());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "getContextPath -> " + webSocketHolder.getContextPath());
+        }
         return webSocketHolder.getContextPath();
     }
 
@@ -397,8 +399,10 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     public String getPathInfo() {
         LOG.log(Level.INFO, "getPathInfo");
         String uri = requestHeaders.get(WebSocketUtils.URI_KEY);
-        String servletpath = webSocketHolder.getServletPath();       
-        LOG.log(Level.FINE, "getPathInfo " + servletpath + " " + uri);
+        String servletpath = webSocketHolder.getServletPath(); 
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "getPathInfo " + servletpath + " " + uri);
+        }
         //TODO remove the query string part
         //REVISIT may cache this value in requstHeaders?
         return uri.substring(servletpath.length());
@@ -434,7 +438,9 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getRequestURI() {
-        LOG.log(Level.FINE, "getRequestURI " + requestHeaders.get(WebSocketUtils.URI_KEY));
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "getRequestURI " + requestHeaders.get(WebSocketUtils.URI_KEY));
+        }
         return requestHeaders.get(WebSocketUtils.URI_KEY);
     }
 
