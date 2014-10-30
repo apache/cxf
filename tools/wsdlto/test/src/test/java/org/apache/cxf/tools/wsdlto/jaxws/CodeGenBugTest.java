@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.ServerSocket;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,6 +46,7 @@ import org.apache.cxf.tools.wsdlto.WSDLToJava;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.validator.UniqueBodyValidator;
 import org.apache.cxf.wsdl11.WSDLRuntimeException;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
 import org.junit.Test;
@@ -486,10 +486,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
     @Test
     public void testHelloWorldExternalBindingFile() throws Exception {
-        ServerSocket sock = new ServerSocket(0);
-        int port = sock.getLocalPort();
-        Server server = new Server(port);
-        sock.close();
+        Server server = new Server(0);
 
         ResourceHandler reshandler = new ResourceHandler();
         reshandler.setResourceBase(getLocation("/wsdl2java_wsdl/"));
@@ -497,6 +494,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         // 'add' it.
         server.setHandler(reshandler);
         server.start();
+        int port = ((ServerConnector)server.getConnectors()[0]).getLocalPort();
         env.put(ToolConstants.CFG_WSDLURL, "http://localhost:" 
             + port + "/hello_world.wsdl");
         env.put(ToolConstants.CFG_BINDING, "http://localhost:"
