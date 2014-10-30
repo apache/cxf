@@ -108,6 +108,37 @@ public class JAASTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSuccessfulInvocationWithProperties() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAASTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUTPort2");
+        DoubleItPortType utPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.USERNAME, "alice");
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.PASSWORD, "clarinet");
+        
+        doubleIt(utPort, 25);
+        
+        // Note that the UsernameToken should be cached for the second invocation
+        doubleIt(utPort, 35);
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testUnsuccessfulAuthentication() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -218,4 +249,5 @@ public class JAASTest extends AbstractBusClientServerTestBase {
             org.junit.Assert.assertEquals(500, ex.getResponse().getStatus());
         }
     }
+    
 }

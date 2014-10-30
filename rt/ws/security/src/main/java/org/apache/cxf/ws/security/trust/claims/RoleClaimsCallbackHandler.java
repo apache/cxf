@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.sts.jaas;
+package org.apache.cxf.ws.security.trust.claims;
 
 import java.io.IOException;
 
@@ -29,13 +29,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
 
 /**
  * This CallbackHandler implementation creates a Claims Element for a "role" ClaimType and
  * stores it on the ClaimsCallback object.
  */
-public class ClaimsCallbackHandler implements CallbackHandler {
+public class RoleClaimsCallbackHandler implements CallbackHandler {
     
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
