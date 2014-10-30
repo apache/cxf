@@ -19,11 +19,9 @@
 
 package demo.service;
 
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public class Server {
@@ -38,11 +36,8 @@ public class Server {
          * as a convenience so you do not need to configure your servlet
          * container to see CXF in action!
          */
-        org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server();
+        org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(9002);
 
-        SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(9002);
-        server.setConnectors(new Connector[] {connector});
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/");
