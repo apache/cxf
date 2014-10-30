@@ -114,7 +114,7 @@
         <cxf.jetty.osgi.version>[8.1,10)</cxf.jetty.osgi.version>
         <cxf.jibx.version>1.2.5</cxf.jibx.version>
         <cxf.junit.version>4.11</cxf.junit.version>
-        <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
+        <cxf.maven.core.version>3.0.5</cxf.maven.core.version>
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.0.3</cxf.neethi.version>
         <cxf.netty.version>4.0.19.Final</cxf.netty.version>
@@ -697,6 +697,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
+                <artifactId>maven-compat</artifactId>
+                <version>${cxf.maven.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
                 <artifactId>maven-plugin-api</artifactId>
                 <version>${cxf.maven.core.version}</version>
                 <scope>provided</scope>
@@ -747,18 +752,6 @@
                     <exclusion>
                         <groupId>commons-logging</groupId>
                         <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-project</artifactId>
-                <version>${cxf.maven.core.version}</version>
-                <scope>provided</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

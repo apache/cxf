@@ -76,6 +76,7 @@ public class ClassLoaderSwitcher {
         }
 
         buf.append(File.pathSeparatorChar);
+        @SuppressWarnings("deprecation")
         List<?> artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
         for (Artifact a : CastUtils.cast(artifacts, Artifact.class)) {
             try {

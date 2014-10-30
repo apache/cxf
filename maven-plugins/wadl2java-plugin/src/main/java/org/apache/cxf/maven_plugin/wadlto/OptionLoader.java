@@ -41,7 +41,6 @@ public final class OptionLoader {
     private OptionLoader() {
     }
     
-    @SuppressWarnings("unchecked")
     public static List<WadlOption> loadWsdlOptionsFromDependencies(MavenProject project, 
                                                                    Option defaultOptions, File outputDir) {
         List<WadlOption> options = new ArrayList<WadlOption>();

@@ -84,6 +84,7 @@ public class ClassLoaderSwitcher {
             ret.add(new File(project.getBuild().getOutputDirectory()).toURI());
             buf.append(File.pathSeparatorChar);
         }
+        @SuppressWarnings("deprecation")
         List<?> artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
         for (Artifact a : CastUtils.cast(artifacts, Artifact.class)) {
             try {

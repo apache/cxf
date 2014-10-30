@@ -43,19 +43,15 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectUtils;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
@@ -186,22 +182,6 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * @since 2.4
      */
     private String additionalJvmArgs;
-    /**
-     * The local repository taken from Maven's runtime. Typically $HOME/.m2/repository.
-     * 
-     * @parameter expression="${localRepository}"
-     * @readonly
-     * @required
-     */
-    private ArtifactRepository localRepository;
-    /**
-     * Artifact factory, needed to create artifacts.
-     * 
-     * @component
-     * @readonly
-     * @required
-     */
-    private ArtifactFactory artifactFactory;
 
     /**
      * Sets the Java executable to use when fork parameter is <code>true</code>.
@@ -210,22 +190,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * @since 2.4
      */
     private String javaExecutable;
-    /**
-     * The remote repositories used as specified in your POM.
-     * 
-     * @parameter expression="${project.repositories}"
-     * @readonly
-     * @required
-     */
-    private List<Repository> repositories;
-    /**
-     * Artifact repository factory component.
-     * 
-     * @component
-     * @readonly
-     * @required
-     */
-    private ArtifactRepositoryFactory artifactRepositoryFactory;
+
     /**
      * The Maven session.
      * 
@@ -240,12 +205,20 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * @required
      */
     private ProjectDependenciesResolver projectDependencyResolver;
-     /**
-      * @component
-      * @readonly
-      * @required
-      */
-    private ArtifactResolver artifactResolver;
+    
+    /**
+     * @component
+     * @readonly
+     * @required
+     */
+    private RepositorySystem repositorySystem;
+    
+    /**
+     * @component
+     * @readonly
+     * @required
+     */
+    private MavenSession session;
     
 
     public AbstractCodegenMoho() {
@@ -817,7 +790,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             if (wsdlA == null) {
                 continue;
             }
-            Artifact wsdlArtifact = artifactFactory.createArtifactWithClassifier(wsdlA.getGroupId(),
+            Artifact wsdlArtifact = repositorySystem.createArtifactWithClassifier(wsdlA.getGroupId(),
                                                                         wsdlA.getArtifactId(),
                                                                         wsdlA.getVersion(), 
                                                                         wsdlA.getType(),
@@ -880,7 +853,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     private Artifact resolveAttachedWsdl(Artifact artifact) {
-        List<MavenProject> rProjects = mavenSession.getSortedProjects();
+        List<MavenProject> rProjects = mavenSession.getProjects();
         List<Artifact> artifactList = new ArrayList<Artifact>();
         for (MavenProject rProject : rProjects) {
             List<Artifact> list = CastUtils.cast(rProject.getAttachedArtifacts());
@@ -892,18 +865,17 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     private Artifact resolveArbitraryWsdl(Artifact artifact) {
-        try {
-            @SuppressWarnings("rawtypes")
-            List remoteRepos = ProjectUtils.buildArtifactRepositories(repositories, 
-                                                                      artifactRepositoryFactory,
-                                                                 mavenSession.getContainer());
-            artifactResolver.resolve(artifact, remoteRepos, localRepository);
-        } catch (InvalidRepositoryException e) {
-            getLog().info("Error build repositories for remote wsdls.", e);
-        } catch (AbstractArtifactResolutionException e) {
-            getLog().info("Error resolving arbitrary wsdl artifact.", e);
-        }
-        return artifact;
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+        request.setArtifact(artifact);
+        request.setResolveRoot(true).setResolveTransitively(false);
+        request.setServers(session.getRequest().getServers());
+        request.setMirrors(session.getRequest().getMirrors());
+        request.setProxies(session.getRequest().getProxies());
+        request.setLocalRepository(session.getLocalRepository());
+        request.setRemoteRepositories(session.getRequest().getRemoteRepositories());            
+        ArtifactResolutionResult result = repositorySystem.resolve(request);
+            
+        return result.getOriginatingArtifact();
     }
 
     private Artifact findWsdlArtifact(Artifact targetArtifact, Collection<Artifact> artifactSet) {

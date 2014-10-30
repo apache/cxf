@@ -41,19 +41,14 @@ import org.apache.cxf.maven_plugin.common.ForkOnceCodeGenerator;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wadlto.WADLToJava;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectUtils;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
 import org.codehaus.plexus.archiver.jar.Manifest.Attribute;
@@ -159,42 +154,6 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     String fork;
     
     /**
-     * The local repository taken from Maven's runtime. Typically $HOME/.m2/repository.
-     * 
-     * @parameter expression="${localRepository}"
-     * @readonly
-     * @required
-     */
-    private ArtifactRepository localRepository;
-
-    /**
-     * Artifact factory, needed to create artifacts.
-     * 
-     * @component
-     * @readonly
-     * @required
-     */
-    private ArtifactFactory artifactFactory;
-
-    /**
-     * The remote repositories used as specified in your POM.
-     * 
-     * @parameter expression="${project.repositories}"
-     * @readonly
-     * @required
-     */
-    private List<?> repositories;
-
-    /**
-     * Artifact repository factory component.
-     * 
-     * @component
-     * @readonly
-     * @required
-     */
-    private ArtifactRepositoryFactory artifactRepositoryFactory;
-
-    /**
      * The Maven session.
      * 
      * @parameter expression="${session}"
@@ -202,13 +161,6 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      * @required
      */
     private MavenSession mavenSession;
-
-    /**
-     * @component
-     * @readonly
-     * @required
-     */
-    private ArtifactResolver artifactResolver;
 
     /**
      * The plugin dependencies, needed for the fork mode.
@@ -236,6 +188,14 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      */
     private String additionalJvmArgs;
     
+    /**
+     * @component
+     * @readonly
+     * @required
+     */
+    private RepositorySystem repositorySystem;
+    
+    
     private ClassLoader resourceClassLoader;
     
     /**
@@ -245,15 +205,14 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      * @param options
      */
     
-    @SuppressWarnings("unchecked")
-    private Artifact resolveRemoteWadlArtifact(List<?> remoteRepos, Artifact artifact)
+    private Artifact resolveRemoteWadlArtifact(Artifact artifact)
         throws MojoExecutionException {
         
         /**
          * First try to find the artifact in the reactor projects of the maven session.
          * So an artifact that is not yet built can be resolved
          */
-        List<MavenProject> rProjects = mavenSession.getSortedProjects();
+        List<MavenProject> rProjects = mavenSession.getProjects();
         for (MavenProject rProject : rProjects) {
             if (artifact.getGroupId().equals(rProject.getGroupId())
                 && artifact.getArtifactId().equals(rProject.getArtifactId()) 
@@ -267,38 +226,32 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
             }
         }
         
-        /**
-         * If this did not work resolve the artifact using the artifactResolver
-         */
-        try {
-            artifactResolver.resolve(artifact, remoteRepos, localRepository);
-        } catch (ArtifactResolutionException e) {
-            throw new MojoExecutionException("Error downloading wadl artifact.", e);
-        } catch (ArtifactNotFoundException e) {
-            throw new MojoExecutionException("Resource can not be found.", e);
-        }
-        
-        return artifact;
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+        request.setArtifact(artifact);
+        request.setResolveRoot(true).setResolveTransitively(false);
+        request.setServers(mavenSession.getRequest().getServers());
+        request.setMirrors(mavenSession.getRequest().getMirrors());
+        request.setProxies(mavenSession.getRequest().getProxies());
+        request.setLocalRepository(mavenSession.getLocalRepository());
+        request.setRemoteRepositories(mavenSession.getRequest().getRemoteRepositories());            
+        ArtifactResolutionResult result = repositorySystem.resolve(request);
+            
+        return result.getOriginatingArtifact();
     }
 
     protected void downloadRemoteDocs(List<WadlOption> effectiveOptions) throws MojoExecutionException {
-        List<?> remoteRepos;
-        try {
-            remoteRepos = ProjectUtils.buildArtifactRepositories(repositories, artifactRepositoryFactory,
-                                                                 mavenSession.getContainer());
-        } catch (InvalidRepositoryException e) {
-            throw new MojoExecutionException("Error build repositories for remote wadls", e);
-        }
         
         for (WadlOption option : effectiveOptions) {
             DocumentArtifact wadlA = option.getWadlArtifact();
             if (wadlA == null) {
                 return;
             }
-            Artifact wadlArtifact = artifactFactory.createArtifact(wadlA.getGroupId(), wadlA.getArtifactId(),
-                                                                   wadlA.getVersion(),
-                                                                   Artifact.SCOPE_COMPILE, wadlA.getType());
-            wadlArtifact = resolveRemoteWadlArtifact(remoteRepos, wadlArtifact);
+            Artifact wadlArtifact = repositorySystem.createArtifact(wadlA.getGroupId(),
+                                                                    wadlA.getArtifactId(),
+                                                                    wadlA.getVersion(), 
+                                                                    wadlA.getType());
+
+            wadlArtifact = resolveRemoteWadlArtifact(wadlArtifact);
             if (wadlArtifact != null) {
                 String path = wadlArtifact.getFile().getAbsolutePath();
                 getLog().info("Resolved WADL artifact to file " + path);

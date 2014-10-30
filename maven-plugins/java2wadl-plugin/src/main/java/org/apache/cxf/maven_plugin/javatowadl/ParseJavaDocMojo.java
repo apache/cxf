@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -33,9 +31,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.javadoc.AbstractJavadocMojo;
 import org.apache.maven.plugin.javadoc.options.DocletArtifact;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.reporting.MavenReportException;
-
 import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
@@ -61,7 +57,8 @@ public class ParseJavaDocMojo extends AbstractJavadocMojo {
     /**
      * @component
      */
-    private ArtifactFactory mavenArtifactFactory;
+    @SuppressWarnings("deprecation")
+    private org.apache.maven.artifact.factory.ArtifactFactory mavenArtifactFactory;
 
     /**
      * @component
@@ -71,12 +68,14 @@ public class ParseJavaDocMojo extends AbstractJavadocMojo {
     /**
      * @component
      */
-    private MavenProjectBuilder mavenProjectBuilder;
+    @SuppressWarnings("deprecation")
+    private org.apache.maven.project.MavenProjectBuilder mavenProjectBuilder;
 
     /**
      * @component
      */
-    private ArtifactMetadataSource artifactMetadataSource;
+    @SuppressWarnings("deprecation")
+    private org.apache.maven.artifact.metadata.ArtifactMetadataSource artifactMetadataSource;
 
     /**
      * @component

@@ -31,7 +31,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.corba.WSDLToIDL;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -96,6 +95,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
         buf.append(File.pathSeparatorChar);
 
 
+        @SuppressWarnings("deprecation")
         List<?> artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
         for (Artifact a : CastUtils.cast(artifacts, Artifact.class)) {
             try {
