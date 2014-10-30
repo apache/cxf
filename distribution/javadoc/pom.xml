@@ -279,11 +279,6 @@
             <version>${cxf.jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-websocket</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-runtime</artifactId>
             <version>${cxf.atmosphere.version}</version>
