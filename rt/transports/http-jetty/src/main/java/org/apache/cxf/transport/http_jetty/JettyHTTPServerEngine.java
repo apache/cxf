@@ -349,12 +349,14 @@ public class JettyHTTPServerEngine
             //need an error handler that won't leak information about the exception 
             //back to the client.
             ErrorHandler eh = new ErrorHandler() {
+                @SuppressWarnings("deprecation")
                 public void handle(String target, Request baseRequest, 
                                    HttpServletRequest request, HttpServletResponse response) 
                     throws IOException {
                     String msg = HttpStatus.getMessage(response.getStatus());
                     request.setAttribute(RequestDispatcher.ERROR_MESSAGE, msg);
                     if (response instanceof Response) {
+                        //need to use the deprecated method to support compiling with Jetty 8
                         ((Response)response).setStatus(response.getStatus(), msg);
                     }
                     super.handle(target, baseRequest, request, response);
