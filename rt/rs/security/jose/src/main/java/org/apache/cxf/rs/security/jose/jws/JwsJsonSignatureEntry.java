@@ -121,7 +121,7 @@ public class JwsJsonSignatureEntry {
             if (protectedHeader != null) {
                 sb.append(",");
             }
-            sb.append("\"header\":\"" + unprotectedHeader.toJson() + "\"");
+            sb.append("\"header\":\"" + unprotectedHeader.toJson());
         }
         sb.append(",");
         sb.append("\"signature\":\"" + encodedSignature + "\"");
