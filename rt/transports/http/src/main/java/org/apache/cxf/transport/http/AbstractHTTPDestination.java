@@ -153,7 +153,7 @@ public abstract class AbstractHTTPDestination
         return bus;
     }
 
-    private AuthorizationPolicy getAuthorizationPolicyFromMessage(String credentials, Principal pp) {
+    private AuthorizationPolicy getAuthorizationPolicyFromMessage(String credentials, SecurityContext sc) {
         if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
             return null;
         }
@@ -175,8 +175,8 @@ public abstract class AbstractHTTPDestination
                     }
                 }
                 
-                AuthorizationPolicy policy = pp == null 
-                    ? new AuthorizationPolicy() : new PrincipalAuthorizationPolicy(pp);
+                AuthorizationPolicy policy = sc.getUserPrincipal() == null 
+                    ? new AuthorizationPolicy() : new PrincipalAuthorizationPolicy(sc);
                 policy.setUserName(username);
                 policy.setPassword(password);
                 policy.setAuthorizationType(authType);
@@ -185,9 +185,8 @@ public abstract class AbstractHTTPDestination
                 // Invalid authentication => treat as not authenticated or use the Principal
             }
         } 
-        if (pp != null) {
-            AuthorizationPolicy policy = new PrincipalAuthorizationPolicy(pp);
-            policy.setUserName(pp.getName());
+        if (sc.getUserPrincipal() != null) {
+            AuthorizationPolicy policy = new PrincipalAuthorizationPolicy(sc);
             policy.setAuthorization(credentials);
             policy.setAuthorizationType(authType);
             return policy;
@@ -195,12 +194,21 @@ public abstract class AbstractHTTPDestination
         return null;
     }
     public static final class PrincipalAuthorizationPolicy extends AuthorizationPolicy {
-        final Principal principal;
-        public PrincipalAuthorizationPolicy(Principal p) {
-            principal = p;
+        final SecurityContext sc;
+        public PrincipalAuthorizationPolicy(SecurityContext sc) {
+            this.sc = sc;
         }
         public Principal getPrincipal() {
-            return principal;
+            return sc.getUserPrincipal();
+        }
+        @Override
+        public String getUserName() {
+            String name = super.getUserName();
+            if (name != null) {
+                return name;
+            }
+            Principal pp = getPrincipal();
+            return pp != null ? pp.getName() : null;
         }
     }
     
@@ -345,21 +353,24 @@ public abstract class AbstractHTTPDestination
         }
         inMessage.put(Message.FIXED_PARAMETER_ORDER, isFixedParameterOrder());
         inMessage.put(Message.ASYNC_POST_RESPONSE_DISPATCH, Boolean.TRUE);
-        final Principal pp = req.getUserPrincipal(); 
-        inMessage.put(SecurityContext.class, new SecurityContext() {
+        
+        SecurityContext httpSecurityContext = new SecurityContext() {
             public Principal getUserPrincipal() {
-                return pp;
+                return req.getUserPrincipal();
             }
             public boolean isUserInRole(String role) {
                 return req.isUserInRole(role);
             }
-        });
+        };
+        
+        inMessage.put(SecurityContext.class, httpSecurityContext);
         
         
         Headers headers = new Headers(inMessage);
         headers.copyFromRequest(req);
         String credentials = headers.getAuthorization();
-        AuthorizationPolicy authPolicy = getAuthorizationPolicyFromMessage(credentials, pp);
+        AuthorizationPolicy authPolicy = getAuthorizationPolicyFromMessage(credentials, 
+                                                                           httpSecurityContext);
         inMessage.put(AuthorizationPolicy.class, authPolicy);
         
         propogateSecureSession(req, inMessage);
