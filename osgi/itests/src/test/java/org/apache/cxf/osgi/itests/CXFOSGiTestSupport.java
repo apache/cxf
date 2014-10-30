@@ -138,6 +138,8 @@ public class CXFOSGiTestSupport {
                              .name("Apache Karaf")
                              .useDeployFolder(false)
                              .unpackDirectory(new File("target/paxexam/")),
+                         //DO NOT COMMIT WITH THIS LINE ENABLED!!!
+                         //org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder(),
                          features(cxfUrl, "cxf-core", "cxf-jaxws"),
                          systemProperty("java.awt.headless").value("true"),
                          when(testUtils).useOptions(mavenBundle()
