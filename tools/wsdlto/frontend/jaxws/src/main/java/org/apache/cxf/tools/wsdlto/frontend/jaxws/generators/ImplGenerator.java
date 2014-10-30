@@ -34,6 +34,7 @@ import org.apache.cxf.tools.common.model.JavaModel;
 import org.apache.cxf.tools.common.model.JavaPort;
 import org.apache.cxf.tools.common.model.JavaServiceClass;
 import org.apache.cxf.tools.util.ClassCollector;
+import org.apache.cxf.tools.util.NameUtil;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 
 public class ImplGenerator extends AbstractJAXWSGenerator {
@@ -126,7 +127,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
         }
         String name = nm.get(service + "/" + port);
         if (name == null) {
-            name = intf.getName() + "Impl";
+            name = NameUtil.mangleNameToClassName(intf.getName() + "Impl", true);
             name = mapClassName(intf.getPackageName(), name, penv);
             nm.put(service + "/" + port, name);
         }
