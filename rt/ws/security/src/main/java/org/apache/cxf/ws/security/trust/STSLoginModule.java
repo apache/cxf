@@ -22,6 +22,7 @@ package org.apache.cxf.ws.security.trust;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +39,6 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.helpers.DOMUtils;
@@ -47,6 +47,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.SAMLUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.trust.claims.RoleClaimsCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -55,18 +56,54 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
 
 /**
- * A JAAS LoginModule for authenticating a Username/Password to the STS. The 
- * STSClient object itself must be configured separately and picked up either via 
- * the endpoint name, the "default" STSClient or as a JAX-WS/JAX-RS property with the
- * key "ws-security.sts.client".
+ * A JAAS LoginModule for authenticating a Username/Password to the STS. It can be configured
+ * either by specifying the various options (documented below) in the JAAS configuration, or
+ * else by picking up a CXF STSClient from the CXF bus (either the default one, or else one
+ * that has the same QName as the service name).
  */
 public class STSLoginModule implements LoginModule {
     /**
      * Whether we require roles or not from the STS. If this is not set then the 
      * WS-Trust validate binding is used. If it is set then the issue binding is 
      * used, where the Username + Password credentials are passed via "OnBehalfOf".
+     * In addition, claims are added to the request for the standard "role" ClaimType.
      */
     public static final String REQUIRE_ROLES = "require.roles";
+    
+    /**
+     * The WSDL Location of the STS
+     */
+    public static final String WSDL_LOCATION = "wsdl.location";
+    
+    /**
+     * The Service QName of the STS
+     */
+    public static final String SERVICE_NAME = "service.name";
+    
+    /**
+     * The Endpoint QName of the STS
+     */
+    public static final String ENDPOINT_NAME = "endpoint.name";
+    
+    /**
+     * The default key size to use if using the SymmetricKey KeyType. Defaults to 256.
+     */
+    public static final String KEY_SIZE = "key.size";
+    
+    /**
+     * The key type to use. The default is the standard "Bearer" URI.
+     */
+    public static final String KEY_TYPE = "key.type";
+    
+    /**
+     * The token type to use. The default is the standard SAML 2.0 URI.
+     */
+    public static final String TOKEN_TYPE = "token.type";
+    
+    /**
+     * The WS-Trust namespace to use. The default is the WS-Trust 1.3 namespace.
+     */
+    public static final String WS_TRUST_NAMESPACE = "ws.trust.namespace";
     
     private static final Logger LOG = LogUtils.getL7dLogger(STSLoginModule.class);
     
@@ -74,6 +111,14 @@ public class STSLoginModule implements LoginModule {
     private Subject subject;
     private CallbackHandler callbackHandler;
     private boolean requireRoles;
+    private String wsdlLocation;
+    private String serviceName;
+    private String endpointName;
+    private int keySize;
+    private String keyType = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
+    private String tokenType = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
+    private String namespace;
+    private Map<String, Object> stsClientProperties = new HashMap<String, Object>();
     
     @Override
     public void initialize(Subject subj, CallbackHandler cbHandler, Map<String, ?> sharedState,
@@ -82,6 +127,34 @@ public class STSLoginModule implements LoginModule {
         callbackHandler = cbHandler;
         if (options.containsKey(REQUIRE_ROLES)) {
             requireRoles = Boolean.parseBoolean((String)options.get(REQUIRE_ROLES));
+        }
+        if (options.containsKey(WSDL_LOCATION)) {
+            wsdlLocation = (String)options.get(WSDL_LOCATION);
+        }
+        if (options.containsKey(SERVICE_NAME)) {
+            serviceName = (String)options.get(SERVICE_NAME);
+        }
+        if (options.containsKey(ENDPOINT_NAME)) {
+            endpointName = (String)options.get(ENDPOINT_NAME);
+        }
+        if (options.containsKey(KEY_SIZE)) {
+            keySize = Integer.parseInt((String)options.get(KEY_SIZE));
+        }
+        if (options.containsKey(KEY_TYPE)) {
+            keyType = (String)options.get(KEY_TYPE);
+        }
+        if (options.containsKey(TOKEN_TYPE)) {
+            tokenType = (String)options.get(TOKEN_TYPE);
+        }
+        if (options.containsKey(WS_TRUST_NAMESPACE)) {
+            namespace = (String)options.get(WS_TRUST_NAMESPACE);
+        }
+        
+        stsClientProperties.clear();
+        for (String s : SecurityConstants.ALL_PROPERTIES) {
+            if (options.containsKey(s)) {
+                stsClientProperties.put(s, options.get(s));
+            }
         }
     }
 
@@ -122,6 +195,8 @@ public class STSLoginModule implements LoginModule {
             
             RequestData data = new RequestData();
             Message message = PhaseInterceptorChain.getCurrentMessage();
+            configureSTSClient(message);
+            
             data.setMsgContext(message);
             credential = validator.validate(credential, data);
 
@@ -131,11 +206,44 @@ public class STSLoginModule implements LoginModule {
             // Add roles if a SAML Assertion was returned from the STS
             principals.addAll(getRoles(message, credential));
         } catch (Exception e) {
-            LOG.log(Level.INFO, "User " + user + "authentication failed", e);
+            LOG.log(Level.INFO, "User " + user + " authentication failed", e);
             throw new LoginException("User " + user + " authentication failed: " + e.getMessage());
         }
         
         return true;
+    }
+    
+    private void configureSTSClient(Message msg) {
+        STSClient c = STSUtils.getClient(msg, "sts");
+        if (wsdlLocation != null) {
+            c.setWsdlLocation(wsdlLocation);
+        }
+        if (serviceName != null) {
+            c.setServiceName(serviceName);
+        }
+        if (endpointName != null) {
+            c.setEndpointName(endpointName);
+        }
+        if (keySize > 0) {
+            c.setKeySize(keySize);
+        }
+        if (keyType != null) {
+            c.setKeyType(keyType);
+        }
+        if (tokenType != null) {
+            c.setTokenType(tokenType);
+        }
+        if (namespace != null) {
+            c.setNamespace(namespace);
+        }
+        
+        c.setProperties(stsClientProperties);
+        
+        if (requireRoles && c.getClaimsCallbackHandler() == null) {
+            c.setClaimsCallbackHandler(new RoleClaimsCallbackHandler());
+        }
+        
+        msg.setContextualProperty(SecurityConstants.STS_CLIENT, c);
     }
 
     private UsernameToken convertToToken(String username, String password) 

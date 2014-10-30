@@ -2,3 +2,13 @@
 sts {
     org.apache.cxf.ws.security.trust.STSLoginModule required require.roles="true";
 };
+
+sts_standalone {
+    org.apache.cxf.ws.security.trust.STSLoginModule required 
+    require.roles="true"
+    wsdl.location="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport?wsdl"
+    service.name="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"
+    endpoint.name="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"
+    ws-security.username="bob"
+    ws-security.password="trombone";
+};
