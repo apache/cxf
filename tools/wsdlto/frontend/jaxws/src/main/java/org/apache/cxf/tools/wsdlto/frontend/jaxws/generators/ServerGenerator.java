@@ -119,7 +119,7 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
         }
         String name = nm.get(service + "/" + port);
         if (name == null) {
-            name = port + "Impl";
+            name = NameUtil.mangleNameToClassName(port + "Impl", true);
             name = mapClassName(intf.getPackageName(), name, penv);
             nm.put(service + "/" + port, name);
         }

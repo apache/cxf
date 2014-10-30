@@ -70,7 +70,7 @@ public final class NameUtil {
         return sb.toString();
     }
 
-    private static int nextBreak(String s, int start) {
+    private static int nextBreak(String s, int start, boolean allowUnderscore) {
         int n = s.length();
 
         char c1 = s.charAt(start);
@@ -84,7 +84,7 @@ public final class NameUtil {
 
             switch (ACTION_TABLE[t0 * 5 + t1]) {
             case ACTION_CHECK_PUNCT:
-                if (isPunct(c1)) {
+                if (isPunct(c1) && !(allowUnderscore && c1 == '_')) {
                     return i;
                 }
                 break;
@@ -146,13 +146,15 @@ public final class NameUtil {
         }
     }
 
-
     public static List<String> toWordList(String s) {
+        return toWordList(s, false);
+    }
+    public static List<String> toWordList(String s, boolean allowUnderscore) {
         List<String> ss = new ArrayList<String>();
         int n = s.length();
         for (int i = 0; i < n;) {
             while (i < n) {
-                if (!isPunct(s.charAt(i))) {
+                if ((allowUnderscore && s.charAt(i) == '_') || !isPunct(s.charAt(i))) {
                     break;
                 }
                 i++;
@@ -161,7 +163,7 @@ public final class NameUtil {
                 break;
             }
 
-            int b = nextBreak(s, i);
+            int b = nextBreak(s, i, allowUnderscore);
             String w = (b == -1) ? s.substring(i) : s.substring(i, b);
             ss.add(escape(capitalize(w)));
             if (b == -1) {
@@ -257,6 +259,9 @@ public final class NameUtil {
 
     public static String mangleNameToClassName(String name) {
         return toMixedCaseName(toWordList(name), true);
+    }
+    public static String mangleNameToClassName(String name, boolean allowUnderscores) {
+        return toMixedCaseName(toWordList(name, allowUnderscores), true);
     }
 
     public static String mangleNameToVariableName(String name) {
