@@ -361,6 +361,8 @@
             cxf.wsn.activemq = vm:localhost
             cxf.wsn.rootUrl = http://0.0.0.0:8182
             cxf.wsn.context = /wsn
+            cxf.wsn.activemq.username = karaf
+            cxf.wsn.activemq.password = karaf
         </config>
 
         <feature version="[5.4,6)">activemq</feature>
