@@ -81,7 +81,6 @@ public class BasicIntegrationTest {
             copy("data/xkms/certificates/cas/alice.cer"),
             copy("data/xkms/certificates/dave.cer"),
             copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
-            copy("data/xkms/certificates/crls/wss40CACRL.cer"),
             copy("etc/org.ops4j.pax.logging.cfg"),
             editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories", REPOS),
             editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", HTTP_PORT),
@@ -98,7 +97,7 @@ public class BasicIntegrationTest {
         };
     }
 
-    private Option copy(String path) {
+    protected Option copy(String path) {
         return replaceConfigurationFile(path, new File("src/test/resources/" + path));
     }
 

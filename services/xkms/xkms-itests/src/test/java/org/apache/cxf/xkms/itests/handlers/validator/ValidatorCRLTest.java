@@ -64,6 +64,7 @@ public class ValidatorCRLTest extends BasicIntegrationTest {
     public Option[] getConfig() {
         return new Option[] {
             CoreOptions.composite(super.getConfig()),
+            copy("data/xkms/certificates/crls/wss40CACRL.cer"),
             editConfigurationFilePut("etc/org.apache.cxf.xkms.cfg", "xkms.enableRevocation", "true")
         };
     }
