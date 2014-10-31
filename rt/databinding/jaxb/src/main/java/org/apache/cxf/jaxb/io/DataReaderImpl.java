@@ -29,6 +29,7 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
@@ -41,17 +42,20 @@ import org.apache.cxf.jaxb.JAXBEncoderDecoder;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 
+@SuppressWarnings("rawtypes")
 public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
     JAXBDataBinding databinding;
     boolean unwrapJAXBElement = true;
     ValidationEventHandler veventHandler;
     boolean setEventHandler = true;
+	private final XmlAdapter[] adapters;
     
-    public DataReaderImpl(JAXBDataBinding binding, boolean unwrap) {
+	public DataReaderImpl(JAXBDataBinding binding, boolean unwrap, XmlAdapter[] adapters) {
         super(binding.getContext());
         unwrapJAXBElement = unwrap;
         databinding = binding;
+		this.adapters = adapters;
     }
 
     public Object read(T input) {
@@ -125,6 +129,9 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             }
             um.setSchema(schema);
             um.setAttachmentUnmarshaller(getAttachmentUnmarshaller());
+			for (XmlAdapter adapter : adapters) {
+				um.setAdapter(adapter);
+			}
             return um;
         } catch (JAXBException ex) {
             if (ex instanceof javax.xml.bind.UnmarshalException) {
