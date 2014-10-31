@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.w3c.dom.Element;
-
-import org.apache.cxf.common.security.SimplePrincipal;
+import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.claims.SAMLClaim;
@@ -118,7 +117,7 @@ public final class SAMLUtils {
                     || claim instanceof SAMLClaim && nameFormat.equals(((SAMLClaim)claim).getNameFormat()))) {
                 for (Object claimValue : claim.getValues()) {
                     if (claimValue instanceof String) {
-                        roles.add(new SimplePrincipal((String)claimValue));
+                        roles.add(new SimpleGroup((String)claimValue));
                     }
                 }
                 if (claim.getValues().size() > 1) {

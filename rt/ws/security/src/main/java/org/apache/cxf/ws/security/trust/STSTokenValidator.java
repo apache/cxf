@@ -52,6 +52,8 @@ public class STSTokenValidator implements Validator {
     private STSSamlAssertionValidator samlValidator = new STSSamlAssertionValidator();
     private boolean alwaysValidateToSts;
     private boolean useIssueBinding;
+    private STSClient stsClient;
+    private TokenStore tokenStore;
     
     public STSTokenValidator() {
     }
@@ -98,9 +100,12 @@ public class STSTokenValidator implements Validator {
             }
             token.setToken(tokenElement);
             
-            TokenStore tokenStore = getTokenStore(message);
-            if (tokenStore != null && hash != 0) {
-                SecurityToken transformedToken = getTransformedToken(tokenStore, hash);
+            TokenStore ts = getTokenStore(message);
+            if (ts == null) {
+                ts = tokenStore;
+            }
+            if (ts != null && hash != 0) {
+                SecurityToken transformedToken = getTransformedToken(ts, hash);
                 if (transformedToken != null && !transformedToken.isExpired()) {
                     SamlAssertionWrapper assertion = new SamlAssertionWrapper(transformedToken.getToken());
                     credential.setPrincipal(new SAMLTokenPrincipalImpl(assertion));
@@ -110,7 +115,11 @@ public class STSTokenValidator implements Validator {
             }
             token.setTokenHash(hash);
             
-            STSClient c = STSUtils.getClient(message, "sts");
+            STSClient c = stsClient;
+            if (c == null) {
+                c = STSUtils.getClient(message, "sts");
+            }
+            
             synchronized (c) {
                 System.setProperty("noprint", "true");
                 
@@ -130,10 +139,10 @@ public class STSTokenValidator implements Validator {
                     SamlAssertionWrapper assertion = new SamlAssertionWrapper(returnedToken.getToken());
                     credential.setTransformedToken(assertion);
                     credential.setPrincipal(new SAMLTokenPrincipalImpl(assertion));
-                    if (hash != 0) {
-                        tokenStore.add(returnedToken);
+                    if (hash != 0 && ts != null) {
+                        ts.add(returnedToken);
                         token.setTransformedTokenIdentifier(returnedToken.getId());
-                        tokenStore.add(Integer.toString(hash), token);
+                        ts.add(Integer.toString(hash), token);
                     }
                 }
                 return credential;
@@ -146,6 +155,10 @@ public class STSTokenValidator implements Validator {
     }
     
     static final TokenStore getTokenStore(Message message) {
+        if (message == null) {
+            return null;
+        }
+        
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
             TokenStore tokenStore = 
@@ -182,12 +195,12 @@ public class STSTokenValidator implements Validator {
         return false;
     }
 
-    private SecurityToken getTransformedToken(TokenStore tokenStore, int hash) {
-        SecurityToken recoveredToken = tokenStore.getToken(Integer.toString(hash));
+    private SecurityToken getTransformedToken(TokenStore ts, int hash) {
+        SecurityToken recoveredToken = ts.getToken(Integer.toString(hash));
         if (recoveredToken != null && recoveredToken.getTokenHash() == hash) {
             String transformedTokenId = recoveredToken.getTransformedTokenIdentifier();
             if (transformedTokenId != null) {
-                return tokenStore.getToken(transformedTokenId);
+                return ts.getToken(transformedTokenId);
             }
         }
         return null;
@@ -201,6 +214,22 @@ public class STSTokenValidator implements Validator {
         this.useIssueBinding = useIssueBinding;
     }
     
+    public STSClient getStsClient() {
+        return stsClient;
+    }
+
+    public void setStsClient(STSClient stsClient) {
+        this.stsClient = stsClient;
+    }
+
+    public TokenStore getTokenStore() {
+        return tokenStore;
+    }
+
+    public void setTokenStore(TokenStore tokenStore) {
+        this.tokenStore = tokenStore;
+    }
+
     private static class ElementCallbackHandler implements CallbackHandler {
         
         private final Element tokenElement;
