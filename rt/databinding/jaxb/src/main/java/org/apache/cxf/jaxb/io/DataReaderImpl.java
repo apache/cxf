@@ -49,13 +49,13 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
     boolean unwrapJAXBElement = true;
     ValidationEventHandler veventHandler;
     boolean setEventHandler = true;
-	private final XmlAdapter[] adapters;
+    private final XmlAdapter[] adapters;
     
-	public DataReaderImpl(JAXBDataBinding binding, boolean unwrap, XmlAdapter[] adapters) {
+    public DataReaderImpl(JAXBDataBinding binding, boolean unwrap, XmlAdapter[] adapters) {
         super(binding.getContext());
         unwrapJAXBElement = unwrap;
         databinding = binding;
-		this.adapters = adapters;
+        this.adapters = adapters;
     }
 
     public Object read(T input) {
