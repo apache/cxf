@@ -213,13 +213,6 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      */
     private RepositorySystem repositorySystem;
     
-    /**
-     * @component
-     * @readonly
-     * @required
-     */
-    private MavenSession session;
-    
 
     public AbstractCodegenMoho() {
         super();
@@ -868,11 +861,11 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setArtifact(artifact);
         request.setResolveRoot(true).setResolveTransitively(false);
-        request.setServers(session.getRequest().getServers());
-        request.setMirrors(session.getRequest().getMirrors());
-        request.setProxies(session.getRequest().getProxies());
-        request.setLocalRepository(session.getLocalRepository());
-        request.setRemoteRepositories(session.getRequest().getRemoteRepositories());            
+        request.setServers(mavenSession.getRequest().getServers());
+        request.setMirrors(mavenSession.getRequest().getMirrors());
+        request.setProxies(mavenSession.getRequest().getProxies());
+        request.setLocalRepository(mavenSession.getLocalRepository());
+        request.setRemoteRepositories(mavenSession.getRequest().getRemoteRepositories());            
         ArtifactResolutionResult result = repositorySystem.resolve(request);
             
         return result.getOriginatingArtifact();
