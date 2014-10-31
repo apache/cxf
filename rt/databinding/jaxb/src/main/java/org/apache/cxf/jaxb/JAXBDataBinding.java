@@ -198,7 +198,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;
-	private @SuppressWarnings("rawtypes") XmlAdapter[] adapters;
+    private @SuppressWarnings("rawtypes") XmlAdapter[] adapters;
 
     private boolean unwrapJAXBElement = true;
     private boolean scanPackages = true;
@@ -218,7 +218,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     }
     public JAXBDataBinding(boolean qualified, Map<String, Object> props, @SuppressWarnings("rawtypes") XmlAdapter... adapters) throws JAXBException {
         this(qualified);
-		this.adapters = adapters;
+        this.adapters = adapters;
         if (props != null && props.get("jaxb.additionalContextClasses") != null) {
             Object o = props.get("jaxb.additionalContextClasses");
             if (o instanceof Class) {
