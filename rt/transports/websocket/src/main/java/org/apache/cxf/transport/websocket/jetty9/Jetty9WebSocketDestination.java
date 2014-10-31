@@ -28,6 +28,8 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.logging.Logger;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletConfig;
@@ -37,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
@@ -62,6 +65,7 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
  */
 public class Jetty9WebSocketDestination extends JettyHTTPDestination implements 
     WebSocketDestinationService {
+    private static final Logger LOG = LogUtils.getL7dLogger(Jetty9WebSocketDestination.class);
 
     //REVISIT make these keys configurable
     private String requestIdKey = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
@@ -130,7 +134,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         // make sure the byte array passed to this method is immutable, as the websocket framework
         // may corrupt the byte array after this method is returned (i.e., before the data is returned in
         // the executor's thread.
-        executor.execute(new Runnable() {
+        executeServiceTask(new Runnable() {
             @Override
             public void run() {
                 HttpServletRequest request = null;
@@ -155,6 +159,18 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
 
         });
     }
+
+    private void executeServiceTask(Runnable r) {
+        try {
+            executor.execute(r);
+        } catch (RejectedExecutionException e) {
+            LOG.warning(
+                "Executor queue is full, run the service invocation task in caller thread." 
+                + "  Users can specify a larger executor queue to avoid this.");
+            r.run();
+        }
+    }
+
     private void reportErrorStatus(Session session, int i, HttpServletResponse resp) {
         try {
             resp.sendError(i);
