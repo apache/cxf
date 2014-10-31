@@ -64,7 +64,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     public DataWriterImpl(JAXBDataBinding binding, XmlAdapter[] adapters) {
         super(binding.getContext());
         databinding = binding;
-		this.adapters = adapters;
+        this.adapters = adapters;
     }
     
     public void write(Object obj, T output) {
@@ -184,10 +184,9 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
         }
-		for (XmlAdapter adapter : adapters)
-		{
-			marshaller.setAdapter(adapter);
-		}
+        for (XmlAdapter adapter : adapters) {
+            marshaller.setAdapter(adapter);
+        }
         return marshaller;
     }
     
