@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -84,12 +86,10 @@ public final class JwsUtils {
         return map;
     }
     public static JwsSignatureProvider loadSignatureProvider(String propLoc, Message m) {
-        Properties props = null;
-        try {
-            props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
-        } catch (Exception ex) {
-            throw new SecurityException(ex);
-        }
+        return loadSignatureProvider(propLoc, m, false);
+    }
+    private static JwsSignatureProvider loadSignatureProvider(String propLoc, Message m, boolean ignoreNullProvider) {
+        Properties props = loadProperties(m, propLoc);
         JwsSignatureProvider theSigProvider = null; 
         String rsaSignatureAlgo = null;
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
@@ -102,18 +102,37 @@ public final class JwsUtils {
                 KeyManagementUtils.RSSEC_SIG_KEY_PSWD_PROVIDER);
             theSigProvider = new PrivateKeyJwsSignatureProvider(pk, rsaSignatureAlgo);
         }
-        if (theSigProvider == null) {
+        if (theSigProvider == null && !ignoreNullProvider) {
             throw new SecurityException();
         }
         return theSigProvider;
     }
-    public static JwsSignatureVerifier loadSignatureVerifier(String propLoc, Message m) {
-        Properties props = null;
-        try {
-            props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
-        } catch (Exception ex) {
-            throw new SecurityException(ex);
+    public static List<JwsSignatureProvider> loadSignatureProviders(String propLoc, Message m) {
+        Properties props = loadProperties(m, propLoc);
+        JwsSignatureProvider theSigProvider = loadSignatureProvider(propLoc, m, true);
+        if (theSigProvider != null) {
+            return Collections.singletonList(theSigProvider);
         }
+        List<JwsSignatureProvider> theSigProviders = null; 
+        if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
+            List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, JsonWebKey.KEY_OPER_SIGN);
+            if (jwks != null) {
+                theSigProviders = new ArrayList<JwsSignatureProvider>(jwks.size());
+                for (JsonWebKey jwk : jwks) {
+                    theSigProviders.add(JwsUtils.getSignatureProvider(jwk));
+                }
+            }
+        }
+        if (theSigProviders == null) {
+            throw new SecurityException();
+        }
+        return theSigProviders;
+    }
+    public static JwsSignatureVerifier loadSignatureVerifier(String propLoc, Message m) {
+        return loadSignatureVerifier(propLoc, m, false);
+    }
+    public static JwsSignatureVerifier loadSignatureVerifier(String propLoc, Message m, boolean ignoreNullVerifier) {
+        Properties props = loadProperties(m, propLoc);
         JwsSignatureVerifier theVerifier = null;
         String rsaSignatureAlgo = null;
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
@@ -126,7 +145,38 @@ public final class JwsUtils {
             theVerifier = new PublicKeyJwsSignatureVerifier(
                               (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props), rsaSignatureAlgo);
         }
+        if (theVerifier == null && !ignoreNullVerifier) {
+            throw new SecurityException();
+        }
         return theVerifier;
+    }
+    public static List<JwsSignatureVerifier> loadSignatureVerifiers(String propLoc, Message m) {
+        Properties props = loadProperties(m, propLoc);
+        JwsSignatureVerifier theVerifier = loadSignatureVerifier(propLoc, m, true);
+        if (theVerifier != null) {
+            return Collections.singletonList(theVerifier);
+        }
+        List<JwsSignatureVerifier> theVerifiers = null; 
+        if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
+            List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, JsonWebKey.KEY_OPER_SIGN);
+            if (jwks != null) {
+                theVerifiers = new ArrayList<JwsSignatureVerifier>(jwks.size());
+                for (JsonWebKey jwk : jwks) {
+                    theVerifiers.add(JwsUtils.getSignatureVerifier(jwk));
+                }
+            }
+        }
+        if (theVerifiers == null) {
+            throw new SecurityException();
+        }
+        return theVerifiers;
+    }
+    private static Properties loadProperties(Message m, String propLoc) {
+        try {
+            return ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
     }
     private static String getSignatureAlgo(Properties props, String algo) {
         return algo == null ? props.getProperty(JSON_WEB_SIGNATURE_ALGO_PROP) : algo;

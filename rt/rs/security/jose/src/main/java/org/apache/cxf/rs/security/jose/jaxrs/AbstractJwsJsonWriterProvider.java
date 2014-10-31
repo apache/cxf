@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,14 +60,15 @@ public class AbstractJwsJsonWriterProvider {
             throw new SecurityException();
         }
         List<String> propLocs = null;
-        if (propLocsProp instanceof String) { 
-            propLocs = Collections.singletonList((String)propLocsProp);
+        if (propLocsProp instanceof String) {
+            String[] props = ((String)propLocsProp).split(",");
+            propLocs = Arrays.asList(props);
         } else {
             propLocs = CastUtils.cast((List<?>)propLocsProp);
         }
         List<JwsSignatureProvider> theSigProviders = new LinkedList<JwsSignatureProvider>();
         for (String propLoc : propLocs) {
-            theSigProviders.add(JwsUtils.loadSignatureProvider(propLoc, m));
+            theSigProviders.addAll(JwsUtils.loadSignatureProviders(propLoc, m));
         }
         return theSigProviders;
     }

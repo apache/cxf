@@ -42,6 +42,7 @@ public final class KeyManagementUtils {
     public static final String RSSEC_KEY_STORE_PSWD = "rs.security.keystore.password";
     public static final String RSSEC_KEY_PSWD = "rs.security.key.password";
     public static final String RSSEC_KEY_STORE_ALIAS = "rs.security.keystore.alias";
+    public static final String RSSEC_KEY_STORE_ALIASES = "rs.security.keystore.aliases";
     public static final String RSSEC_KEY_STORE_FILE = "rs.security.keystore.file";
     public static final String RSSEC_PRINCIPAL_NAME = "rs.security.principal.name";
     public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";

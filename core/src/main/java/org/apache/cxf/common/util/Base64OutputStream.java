@@ -65,14 +65,14 @@ public class Base64OutputStream extends FilterOutputStream {
     
     @Override
     public void flush() throws IOException {
-        if (flushed) {
+        if (flushed || lastChunk == null) {
             return;
         }
         try {
             Base64Utility.encodeAndStream(lastChunk, 0, lastChunk.length, urlSafe, out);
             lastChunk = null;
         } catch (Exception ex) {
-            throw new SecurityException();
+            throw new IOException(ex);
         }
         flushed = true;
     }

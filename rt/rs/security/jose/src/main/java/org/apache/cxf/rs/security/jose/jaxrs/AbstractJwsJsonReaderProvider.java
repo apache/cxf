@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,13 +56,14 @@ public class AbstractJwsJsonReaderProvider {
         }
         List<String> propLocs = null;
         if (propLocsProp instanceof String) { 
-            propLocs = Collections.singletonList((String)propLocsProp);
+            String[] props = ((String)propLocsProp).split(",");
+            propLocs = Arrays.asList(props);
         } else {
             propLocs = CastUtils.cast((List<?>)propLocsProp);
         }
         List<JwsSignatureVerifier> theSigVerifiers = new LinkedList<JwsSignatureVerifier>();
         for (String propLoc : propLocs) {
-            theSigVerifiers.add(JwsUtils.loadSignatureVerifier(propLoc, m));
+            theSigVerifiers.addAll(JwsUtils.loadSignatureVerifiers(propLoc, m));
         }
         return theSigVerifiers;
     }
