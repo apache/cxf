@@ -34,6 +34,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 
 import org.apache.cxf.common.i18n.Message;
@@ -50,16 +51,20 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
+@SuppressWarnings("rawtypes")
 public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
 
     ValidationEventHandler veventHandler;
     boolean setEventHandler = true;
     private JAXBDataBinding databinding;
+	
+	private final XmlAdapter[] adapters;
     
-    public DataWriterImpl(JAXBDataBinding binding) {
+    public DataWriterImpl(JAXBDataBinding binding, XmlAdapter[] adapters) {
         super(binding.getContext());
         databinding = binding;
+		this.adapters = adapters;
     }
     
     public void write(Object obj, T output) {
@@ -179,6 +184,10 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
         }
+		for (XmlAdapter adapter : adapters)
+		{
+			marshaller.setAdapter(adapter);
+		}
         return marshaller;
     }
     
