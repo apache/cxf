@@ -64,7 +64,8 @@ public final class JMSWSDLExtensionLoader implements WSDLExtensionLoader {
 
     public void addExtensions(WSDLManager manager, Class<?> parentType, Class<?> elementType) {
         try {
-            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(), parentType, elementType);
+            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(), parentType, elementType, null,
+                                              this.getClass().getClassLoader());
         } catch (JAXBException e) {
             // ignore, won't support XML
         }

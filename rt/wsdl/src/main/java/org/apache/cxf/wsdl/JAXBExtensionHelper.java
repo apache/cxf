@@ -167,13 +167,20 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                                      Class<?> parentType,
                                      Class<?> cls,
                                      String namespace) throws JAXBException {
+        addExtensions(registry, parentType, cls, namespace, cls.getClassLoader());
+    }
+    public static void addExtensions(ExtensionRegistry registry,
+                                     Class<?> parentType,
+                                     Class<?> cls,
+                                     String namespace,
+                                     ClassLoader loader) throws JAXBException {
         
         JAXBExtensionHelper helper = new JAXBExtensionHelper(cls, namespace);
         boolean found = false;
         Class<?> extCls = cls;
         try {
             Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(cls) + ".ObjectFactory",
-                                                   true, cls.getClassLoader());
+                                                   true, loader);
             Method methods[] = ReflectionUtil.getDeclaredMethods(objectFactory);
             for (Method method : methods) {
                 if (method.getParameterTypes().length == 1
@@ -188,7 +195,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                         }
                         QName elementType = new QName(ns, name);
                         if (!ExtensibilityElement.class.isAssignableFrom(extCls)) {
-                            extCls = createExtensionClass(cls, elementType);
+                            extCls = createExtensionClass(cls, elementType, loader);
                             helper.setExtensionClass(extCls);
                         }
                         registry.registerDeserializer(parentType, elementType, helper); 
@@ -225,7 +232,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     }
                     QName elementType = new QName(ns, name);
                     if (!ExtensibilityElement.class.isAssignableFrom(extCls)) {
-                        extCls = createExtensionClass(cls, elementType);
+                        extCls = createExtensionClass(cls, elementType, loader);
                         helper.setExtensionClass(extCls);
                     }
                     registry.registerDeserializer(parentType, elementType, helper); 
@@ -445,11 +452,11 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     };
     
     //CHECKSTYLE:OFF - very complicated ASM code
-    private static Class<?> createExtensionClass(Class<?> cls, QName qname) {
+    private static Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {
         
         String className = ASMHelper.periodToSlashes(cls.getName());
         ASMHelper helper = new ASMHelper();
-        Class<?> extClass = helper.findClass(className + "Extensibility", cls);
+        Class<?> extClass = helper.findClass(className + "Extensibility", loader);
         if (extClass != null) {
             return extClass;
         }
@@ -685,7 +692,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         cw.visitEnd();
 
         byte[] bytes = cw.toByteArray();
-        return helper.loadClass(className + "Extensibility", cls, bytes);
+        return helper.loadClass(className + "Extensibility", loader, bytes);
     }    
 
 }

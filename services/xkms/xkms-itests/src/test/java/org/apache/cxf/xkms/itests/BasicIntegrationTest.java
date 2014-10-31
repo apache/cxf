@@ -92,7 +92,7 @@ public class BasicIntegrationTest {
             features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client", "cxf-xkms-ldap"),
             configureConsole().ignoreLocalConsole(),
 
-            //KarafDistributionOption.keepRuntimeFolder(),
+            //org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder(),
             //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
     }

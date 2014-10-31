@@ -45,7 +45,8 @@ public final class AddressingWSDLExtensionLoader implements WSDLExtensionLoader 
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
                                               parentType, 
-                                              elementType);
+                                              elementType, null,
+                                              this.getClass().getClassLoader());
         } catch (JAXBException e) {
             //ignore, won't support XML
         }
