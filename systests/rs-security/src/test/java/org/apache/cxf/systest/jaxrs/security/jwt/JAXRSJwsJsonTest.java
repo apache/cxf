@@ -28,6 +28,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsJsonClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsJsonWriterInterceptor;
+import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -43,8 +44,21 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testJwsJwkHMac() throws Exception {
+    public void testJwsJsonPlainTextHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
+        BookStore bs = createBookStore(address, "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    @Test
+    public void testJweJsonBookBeanHmac() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjsonhmac";
+        BookStore bs = createBookStore(address, "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
+        Book book = bs.echoBook(new Book("book", 123L));
+        assertEquals("book", book.getName());
+        assertEquals(123L, book.getId());
+    }
+    private BookStore createBookStore(String address, String properties) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJwsJsonTest.class.getResource("client.xml");
@@ -53,14 +67,13 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
         List<Object> providers = new LinkedList<Object>();
-        providers.add(new JwsJsonWriterInterceptor());
+        JwsJsonWriterInterceptor writer = new JwsJsonWriterInterceptor();
+        writer.setUseJwsJsonOutputStream(true);
+        providers.add(writer);
         providers.add(new JwsJsonClientResponseFilter());
         bean.setProviders(providers);
-        bean.getProperties(true).put("rs.security.signature.list.properties", 
-                                     "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
-        BookStore bs = bean.create(BookStore.class);
-        String text = bs.echoText("book");
-        assertEquals("book", text);
+        bean.getProperties(true).put("rs.security.signature.list.properties", properties);
+        return bean.create(BookStore.class);
     }
     
 }

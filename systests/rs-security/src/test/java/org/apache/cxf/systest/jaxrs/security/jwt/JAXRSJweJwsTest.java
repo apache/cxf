@@ -42,6 +42,7 @@ import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
+import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -78,8 +79,21 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         Security.removeProvider(BouncyCastleProvider.class.getName());    
     }
     @Test
-    public void testJweJwkRSA() throws Exception {
+    public void testJweJwkPlainTextRSA() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkrsa";
+        BookStore bs = createBookStore(address);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    @Test
+    public void testJweJwkBookBeanRSA() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejwkrsa";
+        BookStore bs = createBookStore(address);
+        Book book = bs.echoBook(new Book("book", 123L));
+        assertEquals("book", book.getName());
+        assertEquals(123L, book.getId());
+    }
+    private BookStore createBookStore(String address) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -97,10 +111,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
                                      "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
         bean.getProperties(true).put("rs.security.encryption.in.properties",
                                      "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
-        BookStore bs = bean.create(BookStore.class);
-        String text = bs.echoText("book");
-        assertEquals("book", text);
+        return bean.create(BookStore.class);
     }
+    
     @Test
     public void testJweJwkAesWrap() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkaeswrap";

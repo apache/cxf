@@ -49,8 +49,11 @@ public class JwsJsonProtectedHeader {
     public Object getHeader(String name) {
         return headerEntries.getHeader(name);
     }
+    public String toJson() {
+        return writer.headersToJson(headerEntries);
+    }
     public String getEncodedHeaderEntries() {
-        return Base64UrlUtility.encode(writer.headersToJson(headerEntries));
+        return Base64UrlUtility.encode(toJson());
     }
 
 }
