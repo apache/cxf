@@ -20,7 +20,9 @@
 package org.apache.cxf.jaxb;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,14 +38,18 @@ import javax.wsdl.Definition;
 import javax.wsdl.Service;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.logging.LogUtils;
@@ -60,7 +66,6 @@ import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -241,5 +246,81 @@ public class JAXBDataBindingTest extends Assert {
     }
     
     public interface Addressable<T extends AddressEntity<T>> {
-    }    
+    }
+    
+    @Test
+    public void testConfiguredXmlAdapter() throws Exception {
+        Language dutch = new Language("nl_NL", "Dutch");
+        Language americanEnglish = new Language("en_US", "Americanish");
+
+        Person person = new Person(dutch);
+        JAXBDataBinding binding = new JAXBDataBinding(Person.class, Language.class);
+        binding.setConfiguredXmlAdapters(Arrays.<XmlAdapter<?, ?>>asList(new LanguageAdapter(dutch, americanEnglish)));
+        DataWriter<OutputStream> writer = binding.createWriter(OutputStream.class);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        writer.write(person, baos);
+        String output = baos.toString();
+        String xml = "<person motherTongue=\"nl_NL\"/>";
+
+        assertEquals(xml, output);
+
+        DataReader<XMLStreamReader> reader = binding.createReader(XMLStreamReader.class);
+        Person read = (Person) reader.read(XMLInputFactory.newFactory().createXMLStreamReader(new StringReader(xml)));
+
+        assertEquals(dutch, read.getMotherTongue());
+
+    }
+
+    @XmlRootElement
+    public static class Person {
+        @XmlAttribute
+        @XmlJavaTypeAdapter(LanguageAdapter.class)
+        private final Language motherTongue;
+        public Person() {
+            this(null);
+        }
+        public Person(Language motherTongue) {
+            this.motherTongue = motherTongue;
+        }
+        public Language getMotherTongue() {
+            return motherTongue;
+        }
+    }
+
+    public static class Language {
+        private final String code;
+        private final String name;
+        public Language(String code, String name) {
+            this.code = code;
+            this.name = name;
+        }
+        public String getCode() {
+            return code;
+        }
+        public String getName() {
+            return name;
+        }
+    }
+
+    public static class LanguageAdapter extends XmlAdapter<String, Language> {
+
+        private Map<String, Language> knownLanguages = new HashMap<String, Language>();
+
+        public LanguageAdapter(Language... languages) {
+            for (Language language : languages) {
+                knownLanguages.put(language.getCode(), language);
+            }
+        }
+
+        @Override
+        public String marshal(Language language) throws Exception {
+            return language.getCode();
+        }
+
+        @Override
+        public Language unmarshal(String code) throws Exception {
+            return knownLanguages.get(code);
+        }
+
+    }
 }
