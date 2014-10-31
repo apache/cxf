@@ -70,7 +70,9 @@ public final class WSDLExtensionRegister implements WSDLExtensionLoader {
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
                                               parentType, 
-                                              elementType);
+                                              elementType,
+                                              null,
+                                              this.getClass().getClassLoader());
         } catch (JAXBException e) {
             //ignore, won't support CORBA
         }

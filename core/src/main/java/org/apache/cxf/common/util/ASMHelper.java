@@ -41,7 +41,9 @@ public class ASMHelper {
     protected static final Map<Class<?>, String> NONPRIMITIVE_MAP = new HashMap<Class<?>, String>();
     protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<Class<?>, Integer>();
     
-    protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> LOADER_MAP 
+    protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP 
+        = new WeakIdentityHashMap<ClassLoader, WeakReference<TypeHelperClassLoader>>();
+    protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP 
         = new WeakIdentityHashMap<Class<?>, WeakReference<TypeHelperClassLoader>>();
     
     protected static boolean badASM;
@@ -308,8 +310,18 @@ public class ASMHelper {
     }
     
     
-    public Class<?> loadClass(String className, Class<?> clz , byte[] bytes) { 
+    public Class<?> loadClass(String className, Class<?> clz , byte[] bytes) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
+        synchronized (loader) {
+            Class<?> cls = loader.lookupDefinedClass(className);
+            if (cls == null) {
+                return loader.defineClass(className, bytes);
+            }
+            return cls;
+        }
+    }
+    public Class<?> loadClass(String className, ClassLoader l , byte[] bytes) {
+        TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);
             if (cls == null) {
@@ -322,13 +334,28 @@ public class ASMHelper {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
         return loader.lookupDefinedClass(className);
     }
+    public Class<?> findClass(String className, ClassLoader l) { 
+        TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
+        return loader.lookupDefinedClass(className);
+    }
     
-    private static synchronized TypeHelperClassLoader getTypeHelperClassLoader(Class<?> l) {
+    private static synchronized TypeHelperClassLoader getTypeHelperClassLoader(ClassLoader l) {
         WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
         TypeHelperClassLoader ret;
         if (ref == null || ref.get() == null) {
-            ret = new TypeHelperClassLoader(l.getClassLoader());
+            ret = new TypeHelperClassLoader(l);
             LOADER_MAP.put(l, new WeakReference<TypeHelperClassLoader>(ret));
+        } else {
+            ret = ref.get();
+        }
+        return ret;
+    }
+    private static synchronized TypeHelperClassLoader getTypeHelperClassLoader(Class<?> cls) {
+        WeakReference<TypeHelperClassLoader> ref = CLASS_MAP.get(cls);
+        TypeHelperClassLoader ret;
+        if (ref == null || ref.get() == null) {
+            ret = new TypeHelperClassLoader(cls.getClassLoader());
+            CLASS_MAP.put(cls, new WeakReference<TypeHelperClassLoader>(ret));
         } else {
             ret = ref.get();
         }

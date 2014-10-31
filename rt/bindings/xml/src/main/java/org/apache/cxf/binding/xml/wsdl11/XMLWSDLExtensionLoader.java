@@ -56,7 +56,9 @@ public final class XMLWSDLExtensionLoader implements WSDLExtensionLoader {
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
                                               parentType, 
-                                              elementType);
+                                              elementType,
+                                              null,
+                                              XMLWSDLExtensionLoader.class.getClassLoader());
         } catch (JAXBException e) {
             //ignore, won't support XML
         }
