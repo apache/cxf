@@ -34,6 +34,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 
 import org.apache.cxf.common.i18n.Message;
@@ -178,6 +179,9 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             } else {
                 throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
+        }
+        for (XmlAdapter<?, ?> adapter : databinding.getConfiguredXmlAdapters()) {
+            marshaller.setAdapter(adapter);
         }
         return marshaller;
     }
