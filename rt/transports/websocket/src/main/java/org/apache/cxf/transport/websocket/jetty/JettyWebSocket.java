@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -109,7 +110,7 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         // make sure the byte array passed to this method is immutable, as the websocket framework
         // may corrupt the byte array after this method is returned (i.e., before the data is returned in
         // the executor's thread.
-        manager.getExecutor().execute(new Runnable() {
+        executeServiceTask(new Runnable() {
             @Override
             public void run() {
                 HttpServletRequest request = null;
@@ -133,7 +134,18 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             }
         });
     }
-    
+
+    private void executeServiceTask(Runnable r) {
+        try {
+            manager.getExecutor().execute(r);
+        } catch (RejectedExecutionException e) {
+            LOG.warning(
+                "Executor queue is full, run the service invocation task in caller thread." 
+                + "  Users can specify a larger executor queue to avoid this.");
+            r.run();
+        }
+    }
+
     // may want to move this error reporting code to WebSocketServletHolder
     private void reportErrorStatus(HttpServletResponse response, int status) {
         if (response != null) {
