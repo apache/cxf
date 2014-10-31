@@ -20,6 +20,8 @@
 package org.apache.cxf.ws.security.trust;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,14 +41,22 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.w3c.dom.Document;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusException;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
+import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.SAMLUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.EHCacheTokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.trust.claims.RoleClaimsCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -106,8 +116,10 @@ public class STSLoginModule implements LoginModule {
     public static final String WS_TRUST_NAMESPACE = "ws.trust.namespace";
     
     private static final Logger LOG = LogUtils.getL7dLogger(STSLoginModule.class);
+    private static final String TOKEN_STORE_KEY = "sts.login.module.tokenstore";
     
-    private Set<Principal> principals = new HashSet<Principal>();
+    private Set<Principal> roles = new HashSet<Principal>();
+    private Principal userPrincipal;
     private Subject subject;
     private CallbackHandler callbackHandler;
     private boolean requireRoles;
@@ -182,7 +194,8 @@ public class STSLoginModule implements LoginModule {
         }
         String password = new String(tmpPassword);
         
-        principals = new HashSet<Principal>();
+        roles = new HashSet<Principal>();
+        userPrincipal = null;
         
         STSTokenValidator validator = new STSTokenValidator(true);
         validator.setUseIssueBinding(requireRoles);
@@ -195,16 +208,24 @@ public class STSLoginModule implements LoginModule {
             
             RequestData data = new RequestData();
             Message message = PhaseInterceptorChain.getCurrentMessage();
-            configureSTSClient(message);
             
-            data.setMsgContext(message);
+            STSClient stsClient = configureSTSClient(message);
+            if (message != null) {
+                message.setContextualProperty(SecurityConstants.STS_CLIENT, stsClient);
+                data.setMsgContext(message);
+            } else {
+                TokenStore tokenStore = configureTokenStore(message);
+                validator.setStsClient(stsClient);
+                validator.setTokenStore(tokenStore);
+            }
+            
             credential = validator.validate(credential, data);
 
             // Add user principal
-            principals.add(new SimplePrincipal(user));
+            userPrincipal = new SimplePrincipal(user);
             
             // Add roles if a SAML Assertion was returned from the STS
-            principals.addAll(getRoles(message, credential));
+            roles.addAll(getRoles(message, credential));
         } catch (Exception e) {
             LOG.log(Level.INFO, "User " + user + " authentication failed", e);
             throw new LoginException("User " + user + " authentication failed: " + e.getMessage());
@@ -213,8 +234,15 @@ public class STSLoginModule implements LoginModule {
         return true;
     }
     
-    private void configureSTSClient(Message msg) {
-        STSClient c = STSUtils.getClient(msg, "sts");
+    private STSClient configureSTSClient(Message msg) throws BusException, EndpointException {
+        STSClient c = null;
+        if (msg == null) {
+            Bus bus = BusFactory.getDefaultBus(true);
+            c = new STSClient(bus);
+        } else {
+            c = STSUtils.getClient(msg, "sts");
+        }
+        
         if (wsdlLocation != null) {
             c.setWsdlLocation(wsdlLocation);
         }
@@ -243,7 +271,28 @@ public class STSLoginModule implements LoginModule {
             c.setClaimsCallbackHandler(new RoleClaimsCallbackHandler());
         }
         
-        msg.setContextualProperty(SecurityConstants.STS_CLIENT, c);
+        return c;
+    }
+    
+    private TokenStore configureTokenStore(Message msg) throws MalformedURLException {
+        if (msg != null) {
+            return STSTokenValidator.getTokenStore(msg);
+        }
+        
+        if (TokenStoreFactory.isEhCacheInstalled()) {
+            String cfg = "cxf-ehcache.xml";
+            URL url = null;
+            if (url == null) {
+                url = ClassLoaderUtils.getResource(cfg, STSLoginModule.class);
+            }
+            if (url == null) {
+                url = new URL(cfg);
+            }
+            if (url != null) {
+                return new EHCacheTokenStore(TOKEN_STORE_KEY, BusFactory.getDefaultBus(), url);
+            }
+        }
+        return null;
     }
 
     private UsernameToken convertToToken(String username, String password) 
@@ -263,8 +312,11 @@ public class STSLoginModule implements LoginModule {
             samlAssertion = credential.getSamlAssertion();
         }
         if (samlAssertion != null) {
-            String roleAttributeName = 
-                (String)msg.getContextualProperty(SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+            String roleAttributeName = null;
+            if (msg != null) {
+                roleAttributeName = 
+                    (String)msg.getContextualProperty(SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+            }
             if (roleAttributeName == null || roleAttributeName.length() == 0) {
                 roleAttributeName = WSS4JInInterceptor.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
             }
@@ -280,10 +332,11 @@ public class STSLoginModule implements LoginModule {
     
     @Override
     public boolean commit() throws LoginException {
-        if (principals.isEmpty()) {
+        if (userPrincipal == null) {
             return false;
         }
-        subject.getPrincipals().addAll(principals);
+        subject.getPrincipals().add(userPrincipal);
+        subject.getPrincipals().addAll(roles);
         return true;
     }
 
@@ -294,8 +347,10 @@ public class STSLoginModule implements LoginModule {
 
     @Override
     public boolean logout() throws LoginException {
-        subject.getPrincipals().removeAll(principals);
-        principals.clear();
+        subject.getPrincipals().remove(userPrincipal);
+        subject.getPrincipals().removeAll(roles);
+        roles.clear();
+        userPrincipal = null;
         return true;
     }
     
