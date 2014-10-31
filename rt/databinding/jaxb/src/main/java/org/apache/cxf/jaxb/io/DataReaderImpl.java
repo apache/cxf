@@ -129,9 +129,9 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             }
             um.setSchema(schema);
             um.setAttachmentUnmarshaller(getAttachmentUnmarshaller());
-			for (XmlAdapter adapter : adapters) {
-				um.setAdapter(adapter);
-			}
+            for (XmlAdapter adapter : adapters) {
+                um.setAdapter(adapter);
+            }
             return um;
         } catch (JAXBException ex) {
             if (ex instanceof javax.xml.bind.UnmarshalException) {
