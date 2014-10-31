@@ -21,10 +21,8 @@ package demo.jaxrs.server;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -126,7 +124,8 @@ public class CustomerService {
     @GET
     @Path("/monitor")
     @Produces("text/*")
-    public StreamingOutput monitorCustomers(@HeaderParam(WebSocketConstants.DEFAULT_REQUEST_ID_KEY) String reqid) {
+    public StreamingOutput monitorCustomers(@HeaderParam(WebSocketConstants.DEFAULT_REQUEST_ID_KEY)
+                                            String reqid) {
         final String key = reqid == null ? "*" : reqid; 
         return new StreamingOutput() {
             public void write(final OutputStream out) throws IOException, WebApplicationException {
