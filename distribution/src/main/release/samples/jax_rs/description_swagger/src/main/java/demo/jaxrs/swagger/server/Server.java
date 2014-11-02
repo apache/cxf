@@ -42,7 +42,7 @@ public class Server {
         context.setContextPath("/");
         context.addServlet(staticHolder, "/static/*");
         context.addServlet(servletHolder, "/*");  
-        context.setResourceBase(getClass().getResource("/swagger").toURI().toString());
+        context.setResourceBase(getClass().getResource("/META-INF/resources/webjars/swagger-ui/2.0.24").toURI().toString());
         
         servletHolder.setInitParameter("redirects-list", "/ /index.html /.*[.]js /css/.* /images/.* lib/.*");
         servletHolder.setInitParameter("redirect-servlet-name", staticHolder.getName());
