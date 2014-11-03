@@ -19,8 +19,6 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +28,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.Message;
@@ -70,7 +69,7 @@ public class WebApplicationExceptionMapper
         if (flogger == null
             || !flogger.faultOccurred(ex, errorMessage, msg)) {
             Level level = printStackTrace ? Level.WARNING : Level.FINE;
-            LOG.log(level, getStackTrace(ex));
+            LOG.log(level, ExceptionUtils.getStackTrace(ex));
         }
         
         if (doAddMessage) {
@@ -95,12 +94,6 @@ public class WebApplicationExceptionMapper
         return sb.toString();
     }
     
-    private static String getStackTrace(Exception ex) { 
-        StringWriter sw = new StringWriter();
-        ex.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
-    }
-
     /**
      * Control whether to log at WARN or FINE level.
      * Note this property is ignored if a registered {@link FaultListener} 

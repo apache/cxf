@@ -209,7 +209,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-            LOG.warning(getStackTrace(e));
+            LOG.warning(ExceptionUtils.getStackTrace(e));
             throw ExceptionUtils.toBadRequestException(e, null);        
         } finally {
             try {
