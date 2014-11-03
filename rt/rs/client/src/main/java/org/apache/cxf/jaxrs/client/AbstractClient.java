@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import javax.ws.rs.ProcessingException;
@@ -107,7 +108,7 @@ public abstract class AbstractClient implements Client {
         
     protected ClientConfiguration cfg = new ClientConfiguration();
     private ClientState state;
-    
+    private AtomicBoolean closed = new AtomicBoolean(); 
     protected AbstractClient(ClientState initialState) {
         this.state = initialState;
     }
@@ -286,33 +287,36 @@ public abstract class AbstractClient implements Client {
     }
 
     public void close() {
-        if (cfg.getBus() == null) {
-            return;
-        }
-        for (Closeable c : cfg.getEndpoint().getCleanupHooks()) {
-            try {
-                c.close();
-            } catch (IOException e) {
-                //ignore
+        if (closed.compareAndSet(false, true)) {
+            if (cfg.getBus() == null) {
+                return;
             }
-        }
-        ClientLifeCycleManager mgr = cfg.getBus().getExtension(ClientLifeCycleManager.class);
-        if (null != mgr) {
-            mgr.clientDestroyed(new FrontendClientAdapter(getConfiguration()));
-        }
-
-        if (cfg.getConduitSelector() instanceof Closeable) {
-            try {
-                ((Closeable)cfg.getConduitSelector()).close();
-            } catch (IOException e) {
-                //ignore, we're destroying anyway
+            for (Closeable c : cfg.getEndpoint().getCleanupHooks()) {
+                try {
+                    c.close();
+                } catch (IOException e) {
+                    //ignore
+                }
             }
-        } else {
-            cfg.getConduit().close();
+            ClientLifeCycleManager mgr = cfg.getBus().getExtension(ClientLifeCycleManager.class);
+            if (null != mgr) {
+                mgr.clientDestroyed(new FrontendClientAdapter(getConfiguration()));
+            }
+    
+            if (cfg.getConduitSelector() instanceof Closeable) {
+                try {
+                    ((Closeable)cfg.getConduitSelector()).close();
+                } catch (IOException e) {
+                    //ignore, we're destroying anyway
+                }
+            } else {
+                cfg.getConduit().close();
+            }
+            state.reset();
+            state = null;
+            cfg = null;
         }
-        state.reset();
-        state = null;
-        cfg = null;
+        closed = null;
     }
     
     private void possiblyAddHeader(String name, String value) {
@@ -872,7 +876,15 @@ public abstract class AbstractClient implements Client {
             outMessage.put(Message.PROCESS_ONEWAY_RESPONSE, true);
         }
     }
-    
+    private void checkClosed() {
+        if (closed.get()) {
+            throw new IllegalStateException("Client is closed");
+        }
+    }
+    protected void finalize() throws Throwable {
+        super.finalize();
+        close();
+    }
     protected Message createMessage(Object body,
                                     String httpMethod, 
                                     MultivaluedMap<String, String> headers,
@@ -880,6 +892,7 @@ public abstract class AbstractClient implements Client {
                                     Exchange exchange,
                                     Map<String, Object> invocationContext,
                                     boolean proxy) {
+        checkClosed();
         Message m = cfg.getConduitSelector().getEndpoint().getBinding().createMessage();
         m.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         m.put(Message.INBOUND_MESSAGE, Boolean.FALSE);
