@@ -134,7 +134,7 @@ public final class MessageUtils {
     public static Object getContextualProperty(Message m, String propPreferred, String propDefault) {
         Object prop = m.getContextualProperty(propPreferred);
         if (prop == null && propDefault != null) {
-            prop = (String)m.getContextualProperty(propDefault);
+            prop = m.getContextualProperty(propDefault);
         }
         return prop;
     }

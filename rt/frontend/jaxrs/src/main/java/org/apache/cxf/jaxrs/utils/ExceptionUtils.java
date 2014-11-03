@@ -19,6 +19,9 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -32,6 +35,12 @@ public final class ExceptionUtils {
     private static final String  SUPPORT_WAE_SPEC_OPTIMIZATION = "support.wae.spec.optimization";
     
     private ExceptionUtils() {        
+    }
+    
+    public static String getStackTrace(Throwable ex) { 
+        StringWriter sw = new StringWriter();
+        ex.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
     }
     
     public static Class<?> getWebApplicationExceptionClass(Response exResponse,

@@ -22,8 +22,6 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -700,14 +698,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         packageContexts.clear();
     }
     
-    protected static String getStackTrace(Exception ex) { 
-        StringWriter sw = new StringWriter();
-        ex.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
-    }
     //TODO: move these methods into the dedicated utility class
     protected static StringBuilder handleExceptionStart(Exception e) {
-        LOG.warning(getStackTrace(e));
+        LOG.warning(ExceptionUtils.getStackTrace(e));
         StringBuilder sb = new StringBuilder();
         if (e.getMessage() != null) {
             sb.append(e.getMessage()).append(". ");
