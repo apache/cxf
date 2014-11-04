@@ -176,7 +176,7 @@ public class HttpsURLConnectionFactory {
             // The SSLSocketFactoryWrapper enables certain cipher suites
             // from the policy.
             socketFactory = new SSLSocketFactoryWrapper(ctx.getSocketFactory(), cipherSuites,
-                                                        tlsClientParameters.getSecureSocketProtocol());
+                                                        protocol);
             //recalc the hashcode since somet of the above MAY have changed the tlsClientParameters 
             lastTlsHash = tlsClientParameters.hashCode();
         } else {
