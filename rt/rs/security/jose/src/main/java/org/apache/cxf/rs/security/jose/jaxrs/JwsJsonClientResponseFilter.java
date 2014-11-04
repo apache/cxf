@@ -39,7 +39,8 @@ public class JwsJsonClientResponseFilter extends AbstractJwsJsonReaderProvider i
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
         List<JwsSignatureVerifier> theSigVerifiers = getInitializedSigVerifiers();
         JwsJsonConsumer p = new JwsJsonConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
-        if (!p.verifySignatureWith(theSigVerifiers)) {
+        if (isStrictVerification() && p.getSignatureEntries().size() != theSigVerifiers.size()
+            || !p.verifySignatureWith(theSigVerifiers)) {
             throw new SecurityException();
         }
         byte[] bytes = p.getDecodedJwsPayloadBytes();

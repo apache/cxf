@@ -36,6 +36,7 @@ public class AbstractJwsJsonReaderProvider {
     
     private List<JwsSignatureVerifier> sigVerifiers;
     private String defaultMediaType;
+    private boolean strictVerification;
     
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
         setSignatureVerifiers(Collections.singletonList(signatureVerifier));
@@ -74,6 +75,12 @@ public class AbstractJwsJsonReaderProvider {
 
     public void setDefaultMediaType(String defaultMediaType) {
         this.defaultMediaType = defaultMediaType;
+    }
+    public boolean isStrictVerification() {
+        return strictVerification;
+    }
+    public void setStrictVerification(boolean strictVerification) {
+        this.strictVerification = strictVerification;
     }
     
 }

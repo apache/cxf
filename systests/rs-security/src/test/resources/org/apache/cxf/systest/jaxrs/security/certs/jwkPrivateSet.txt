@@ -16,6 +16,11 @@
           "k":"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow",
           "kid":"HMACKey"},
           
+          {"kty":"oct",
+           "alg":"HS512",
+           "k":"SFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC5IUzUxMlNlY3JldEtleVRvU2lnbkNvbnRlbnQuSFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC5IUzUxMlNlY3JldEtleVRvU2lnbkNvbnRlbnQuSFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC5IUzUxMlNlY3JldEtleVRvU2lnbkNvbnRlbnQuSFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC5IUzUxMlNlY3JldEtleVRvU2lnbkNvbnRlbnQuSFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC4",
+           "kid":"HMAC512Key"},
+          
           {"kty":"EC",
           "crv":"P-256",
           "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
