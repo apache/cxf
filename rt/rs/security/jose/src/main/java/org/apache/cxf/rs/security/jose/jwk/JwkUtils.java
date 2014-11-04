@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jwk;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.URI;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -33,6 +34,7 @@ import java.util.Properties;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -260,7 +262,7 @@ public final class JwkUtils {
         }
         return kid;
     }
-    public static PrivateKeyPasswordProvider loadPasswordProvider(Message m, Properties props, String keyOper) {
+    private static PrivateKeyPasswordProvider loadPasswordProvider(Message m, Properties props, String keyOper) {
         PrivateKeyPasswordProvider cb = 
             (PrivateKeyPasswordProvider)m.getContextualProperty(KeyManagementUtils.RSSEC_KEY_PSWD_PROVIDER);
         if (cb == null && keyOper != null) {
@@ -277,6 +279,12 @@ public final class JwkUtils {
         String encodedModulus = (String)jwk.getProperty(JsonWebKey.RSA_MODULUS);
         String encodedPublicExponent = (String)jwk.getProperty(JsonWebKey.RSA_PUBLIC_EXP);
         return CryptoUtils.getRSAPublicKey(encodedModulus, encodedPublicExponent);
+    }
+    public static JsonWebKey fromRSAPublicKey(RSAPublicKey pk) {
+        JsonWebKey jwk = prepareRSAJwk(pk.getModulus());
+        String encodedPublicExponent = Base64UrlUtility.encode(pk.getPublicExponent().toByteArray());
+        jwk.setProperty(JsonWebKey.RSA_PUBLIC_EXP, encodedPublicExponent);
+        return jwk;
     }
     public static RSAPrivateKey toRSAPrivateKey(JsonWebKey jwk) {
         String encodedModulus = (String)jwk.getProperty(JsonWebKey.RSA_MODULUS);
@@ -300,6 +308,19 @@ public final class JwkUtils {
                                                 encodedCrtCoefficient);
         }
     }
+    public static JsonWebKey fromRSAPrivateKey(RSAPrivateKey pk) {
+        JsonWebKey jwk = prepareRSAJwk(pk.getModulus());
+        String encodedPrivateExponent = Base64UrlUtility.encode(pk.getPrivateExponent().toByteArray());
+        jwk.setProperty(JsonWebKey.RSA_PRIVATE_EXP, encodedPrivateExponent);
+        return jwk;
+    }
+    private static JsonWebKey prepareRSAJwk(BigInteger modulus) {
+        JsonWebKey jwk = new JsonWebKey();
+        jwk.setKeyType(JsonWebKey.KEY_TYPE_RSA);
+        String encodedModulus = Base64UrlUtility.encode(modulus.toByteArray());
+        jwk.setProperty(JsonWebKey.RSA_MODULUS, encodedModulus);
+        return jwk;
+    }
     public static ECPublicKey toECPublicKey(JsonWebKey jwk) {
         String eCurve = (String)jwk.getProperty(JsonWebKey.EC_CURVE);
         String encodedXCoord = (String)jwk.getProperty(JsonWebKey.EC_X_COORDINATE);
@@ -316,6 +337,14 @@ public final class JwkUtils {
         return CryptoUtils.createSecretKeySpec((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE), 
                                                Algorithm.toJavaName(jwk.getAlgorithm()));
     }
+    public static JsonWebKey fromSecretKey(SecretKey secretKey) {
+        JsonWebKey jwk = new JsonWebKey();
+        jwk.setKeyType(JsonWebKey.KEY_TYPE_OCTET);
+        String encodedSecretKey = Base64UrlUtility.encode(secretKey.getEncoded());
+        jwk.setProperty(JsonWebKey.OCTET_KEY_VALUE, encodedSecretKey);
+        return jwk;
+    }
+    
     private static byte[] stringToBytes(String str) {
         return StringUtils.toBytesUTF8(str);
     }
