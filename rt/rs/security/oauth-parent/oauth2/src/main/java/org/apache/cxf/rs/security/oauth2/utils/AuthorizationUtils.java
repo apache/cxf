@@ -38,11 +38,18 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 public final class AuthorizationUtils {
     private AuthorizationUtils() {
     }
-    
-    public static String[] getBasicAuthParts(String data) {
+    public static String[] getBasicAuthUserInfo(MessageContext mc) {
+        String[] parts = AuthorizationUtils.getAuthorizationParts(mc);
+        if (parts.length == 2) {
+            return getBasicAuthParts(parts[1]);
+        } else {
+            return null;
+        }
+    }
+    public static String[] getBasicAuthParts(String basicAuthData) {
         String authDecoded = null;
         try {
-            authDecoded = new String(Base64Utility.decode(data));
+            authDecoded = new String(Base64Utility.decode(basicAuthData));
         } catch (Exception ex) {
             throw ExceptionUtils.toNotAuthorizedException(ex, null);
         }
@@ -68,7 +75,8 @@ public final class AuthorizationUtils {
         List<String> headers = mc.getHttpHeaders().getRequestHeader("Authorization");
         if (headers.size() == 1) {
             String[] parts = headers.get(0).split(" ");
-            if (parts.length == 2) {
+            if (parts.length > 0 
+                && (challenges == null || challenges.isEmpty() || challenges.contains(parts[0]))) {
                 return parts;       
             }
         }

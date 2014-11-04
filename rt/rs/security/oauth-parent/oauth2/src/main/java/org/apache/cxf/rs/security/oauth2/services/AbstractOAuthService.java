@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Context;
@@ -44,6 +45,7 @@ public abstract class AbstractOAuthService {
     private OAuthDataProvider dataProvider;
     private boolean blockUnsecureRequests;
     private boolean writeOptionalParameters = true;
+    private Method dataProviderContextMethod;
     
     public void setWriteOptionalParameters(boolean write) {
         writeOptionalParameters = write;
@@ -56,6 +58,13 @@ public abstract class AbstractOAuthService {
     @Context 
     public void setMessageContext(MessageContext context) {
         this.mc = context;    
+        if (dataProviderContextMethod != null) {
+            try {
+                dataProviderContextMethod.invoke(dataProvider, new Object[]{mc});
+            } catch (Throwable t) {
+                throw new RuntimeException(t); 
+            }
+        }
     }
     
     public MessageContext getMessageContext() {
@@ -64,6 +73,13 @@ public abstract class AbstractOAuthService {
 
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
+        try {
+            dataProviderContextMethod = dataProvider.getClass().getMethod("setMessageContext", 
+                                                                          new Class[]{MessageContext.class});
+        } catch (Throwable t) {
+            // ignore
+        }
+        
     }
 
     public OAuthDataProvider getDataProvider() {
