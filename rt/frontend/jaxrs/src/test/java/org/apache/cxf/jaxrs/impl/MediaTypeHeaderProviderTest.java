@@ -36,6 +36,40 @@ public class MediaTypeHeaderProviderTest extends Assert {
     }
     
     @Test
+    public void testTypeWithExtendedParameters() {
+        MediaType mt = MediaType.valueOf("multipart/related;type=application/dicom+xml");
+        
+        assertEquals("multipart", mt.getType());
+        assertEquals("related", mt.getSubtype());
+        Map<String, String> params2 = mt.getParameters();
+        assertEquals(1, params2.size());
+        assertEquals("application/dicom+xml", params2.get("type"));
+    }
+
+    @Test
+    public void testTypeWithExtendedParametersQuote() {
+        MediaType mt = MediaType.valueOf("multipart/related;type=\"application/dicom+xml\"");
+        
+        assertEquals("multipart", mt.getType());
+        assertEquals("related", mt.getSubtype());
+        Map<String, String> params2 = mt.getParameters();
+        assertEquals(1, params2.size());
+        assertEquals("\"application/dicom+xml\"", params2.get("type"));
+    }    
+    
+    @Test
+    public void testTypeWithExtendedAndBoundaryParameter() {
+        MediaType mt = MediaType.valueOf(
+            "multipart/related; type=application/dicom+xml; boundary=\"uuid:b9aecb2a-ab37-48d6-a1cd-b2f4f7fa63cb\"");
+        assertEquals("multipart", mt.getType());
+        assertEquals("related", mt.getSubtype());
+        Map<String, String> params2 = mt.getParameters();
+        assertEquals(2, params2.size());
+        assertEquals("\"uuid:b9aecb2a-ab37-48d6-a1cd-b2f4f7fa63cb\"", params2.get("boundary"));
+        assertEquals("application/dicom+xml", params2.get("type"));
+    }
+    
+    @Test
     public void testSimpleType() {
         MediaType m = MediaType.valueOf("text/html");
         assertEquals("Media type was not parsed correctly", 
