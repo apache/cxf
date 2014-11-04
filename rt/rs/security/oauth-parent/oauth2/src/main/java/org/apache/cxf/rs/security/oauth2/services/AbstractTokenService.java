@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.ClientIdProvider;
+import org.apache.cxf.rs.security.oauth2.provider.ClientSecretVerifier;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -48,6 +49,7 @@ public class AbstractTokenService extends AbstractOAuthService {
     private boolean canSupportPublicClients;
     private boolean writeCustomErrors;
     private ClientIdProvider clientIdProvider;
+    private ClientSecretVerifier clientSecretVerifier;
     
     /**
      * Make sure the client is authenticated
@@ -107,25 +109,34 @@ public class AbstractTokenService extends AbstractOAuthService {
     // Get the Client and check the id and secret
     protected Client getAndValidateClientFromIdAndSecret(String clientId, String clientSecret) {
         Client client = getClient(clientId);
-        if (canSupportPublicClients 
-            && !client.isConfidential() 
-            && client.getClientSecret() == null 
-            && clientSecret == null) {
+        if (!client.getClientId().equals(clientId)) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
+        if (isValidPublicClient(client, clientId, clientSecret)) {
             return client;
         }
-        if (clientSecret == null || client.getClientSecret() == null 
-            || !client.getClientId().equals(clientId) 
-            || !client.getClientSecret().equals(clientSecret)) {
+        if (!client.isConfidential()
+            || clientSecret == null || client.getClientSecret() == null 
+            || !isClientSecretValid(client, clientSecret)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         return client;
     }
+    protected boolean isClientSecretValid(Client client, String clientSecret) {
+        return clientSecretVerifier != null ? clientSecretVerifier.validateClientSecret(client, clientSecret)
+            : client.getClientSecret().equals(clientSecret);
+    }
+    protected boolean isValidPublicClient(Client client, String clientId, String clientSecret) {
+        return canSupportPublicClients 
+            && !client.isConfidential() 
+            && client.getClientSecret() == null 
+            && clientSecret == null;
+    }
     
     protected Client getClientFromBasicAuthScheme() {
-        String[] parts = AuthorizationUtils.getAuthorizationParts(getMessageContext());
-        if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(parts[0])) {
-            String[] authInfo = AuthorizationUtils.getBasicAuthParts(parts[1]);
-            return getAndValidateClientFromIdAndSecret(authInfo[0], authInfo[1]);
+        String[] userInfo = AuthorizationUtils.getBasicAuthUserInfo(getMessageContext());
+        if (userInfo != null && userInfo.length == 2) {
+            return getAndValidateClientFromIdAndSecret(userInfo[0], userInfo[1]);
         } else {
             return null;
         }

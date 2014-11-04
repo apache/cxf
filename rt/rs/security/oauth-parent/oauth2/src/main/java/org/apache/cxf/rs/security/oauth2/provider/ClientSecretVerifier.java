@@ -19,19 +19,19 @@
 
 package org.apache.cxf.rs.security.oauth2.provider;
 
-import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 
 /**
- * ClientIdProvider is responsible for providing a mapping between
- * the authenticated client and its id  
+ * ClientSecretVerifier is responsible for validating a client secret  
  */
-public interface ClientIdProvider {
+public interface ClientSecretVerifier {
 
     /**
-     * Get a client id
+     * Validate a client secret
      * 
-     * @param mc the {@link MessageContext} of this request
-     * @return the client id
+     * @param client the {@link Client} the Client
+     * @param clientSecret the secret
+     * @return true if the secret is valid, false otherwise
      */
-    String getClientId(MessageContext mc);
+    boolean validateClientSecret(Client client, String clientSecret);
 }
