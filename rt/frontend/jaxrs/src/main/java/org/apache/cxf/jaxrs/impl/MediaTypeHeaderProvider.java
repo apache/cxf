@@ -43,7 +43,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     private static final String STRICT_MEDIA_TYPE_CHECK = 
         "org.apache.cxf.jaxrs.mediaTypeCheck.strict";
     private static final Pattern COMPLEX_PARAMETERS = 
-        Pattern.compile("(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w-/]+))");
+        Pattern.compile("(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w-/\\+]+))");
     
     public MediaType fromString(String mType) {
         
