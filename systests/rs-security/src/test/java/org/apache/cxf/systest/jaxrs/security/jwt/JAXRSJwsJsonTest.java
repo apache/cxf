@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs.security.jwt;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,7 +59,31 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
-    private BookStore createBookStore(String address, String properties) throws Exception {
+    
+    @Test
+    public void testJwsJsonBookDoubleHmac() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjsonhmac2";
+        List<String> properties = new ArrayList<String>();
+        properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
+        properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties");
+        BookStore bs = createBookStore(address, properties);
+        Book book = bs.echoBook(new Book("book", 123L));
+        assertEquals("book", book.getName());
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testJwsJsonBookDoubleHmacSinglePropsFile() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjsonhmac2";
+        List<String> properties = new ArrayList<String>();
+        properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac2.properties");
+        BookStore bs = createBookStore(address, properties);
+        Book book = bs.echoBook(new Book("book", 123L));
+        assertEquals("book", book.getName());
+        assertEquals(123L, book.getId());
+    }
+       
+    private BookStore createBookStore(String address, Object properties) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJwsJsonTest.class.getResource("client.xml");

@@ -42,7 +42,9 @@ public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider
         
         List<JwsSignatureVerifier> theSigVerifiers = getInitializedSigVerifiers();
         JwsJsonConsumer p = new JwsJsonConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
-        if (!p.verifySignatureWith(theSigVerifiers)) {
+        
+        if (isStrictVerification() && p.getSignatureEntries().size() != theSigVerifiers.size() 
+            || !p.verifySignatureWith(theSigVerifiers)) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
         }

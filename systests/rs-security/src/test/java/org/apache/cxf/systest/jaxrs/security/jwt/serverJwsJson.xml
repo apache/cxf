@@ -58,5 +58,18 @@ under the License.
             <entry key="rs.security.signature.list.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-json}/jwsjsonhmac2">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.list.properties" 
+            value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties,org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
     
 </beans>

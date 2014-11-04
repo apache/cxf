@@ -94,8 +94,10 @@ public final class JwsUtils {
         String rsaSignatureAlgo = null;
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_SIGN);
-            rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
-            theSigProvider = JwsUtils.getSignatureProvider(jwk, rsaSignatureAlgo);
+            if (jwk != null) {
+                rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
+                theSigProvider = JwsUtils.getSignatureProvider(jwk, rsaSignatureAlgo);
+            }
         } else {
             rsaSignatureAlgo = getSignatureAlgo(props, null);
             RSAPrivateKey pk = (RSAPrivateKey)KeyManagementUtils.loadPrivateKey(m, props, 
@@ -137,8 +139,10 @@ public final class JwsUtils {
         String rsaSignatureAlgo = null;
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_VERIFY);
-            rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
-            theVerifier = JwsUtils.getSignatureVerifier(jwk, rsaSignatureAlgo);
+            if (jwk != null) {
+                rsaSignatureAlgo = getSignatureAlgo(props, jwk.getAlgorithm());
+                theVerifier = JwsUtils.getSignatureVerifier(jwk, rsaSignatureAlgo);
+            }
             
         } else {
             rsaSignatureAlgo = getSignatureAlgo(props, null);
