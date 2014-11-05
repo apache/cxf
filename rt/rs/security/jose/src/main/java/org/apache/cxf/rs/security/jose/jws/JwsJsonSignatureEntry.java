@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.util.Collections;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseUtils;
@@ -110,6 +111,12 @@ public class JwsJsonSignatureEntry {
     }
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
+    }
+    public boolean validateCriticalHeaders() {
+        if (this.getUnprotectedHeader().getHeader(JoseConstants.HEADER_CRITICAL) != null) {
+            return false;
+        }
+        return JwsUtils.validateCriticalHeaders(getUnionHeader());
     }
     public String toJson() {
         StringBuilder sb = new StringBuilder();

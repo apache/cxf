@@ -26,6 +26,8 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -37,6 +39,10 @@ public final class JweUtils {
     private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
     private JweUtils() {
         
+    }
+    public static boolean validatecriticalheaders(JoseHeaders headers) {
+        //TODO: Validate JWE specific constraints
+        return JoseUtils.validateCriticalHeaders(headers);
     }
     public static KeyEncryptionAlgorithm getKeyEncryptionAlgorithm(JsonWebKey jwk) {
         return getKeyEncryptionAlgorithm(jwk, null);

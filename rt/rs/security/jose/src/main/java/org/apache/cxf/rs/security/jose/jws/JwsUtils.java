@@ -30,6 +30,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -39,6 +41,10 @@ public final class JwsUtils {
     private static final String JSON_WEB_SIGNATURE_ALGO_PROP = "rs.security.jws.content.signature.algorithm";
     private JwsUtils() {
         
+    }
+    public static boolean validateCriticalHeaders(JoseHeaders headers) {
+        //TODO: validate JWS specific constraints
+        return JoseUtils.validateCriticalHeaders(headers);
     }
     public static JwsSignatureProvider getSignatureProvider(JsonWebKey jwk) {
         return getSignatureProvider(jwk, null);
