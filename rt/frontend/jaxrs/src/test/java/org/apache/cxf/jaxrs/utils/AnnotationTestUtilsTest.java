@@ -42,7 +42,7 @@ public class AnnotationTestUtilsTest extends Assert {
                                      new Class[]{UriInfo.class});
         assertEquals(0, m.getAnnotations().length);
         assertEquals(0, m.getParameterAnnotations()[0].length);
-        Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(m);
+        Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(Customer.class, m);
         assertNotSame(m, annotatedMethod);
         assertEquals(1, annotatedMethod.getParameterAnnotations()[0].length);
     }
@@ -54,7 +54,7 @@ public class AnnotationTestUtilsTest extends Assert {
             Customer.class.getMethod("getContextResolver", 
                                      new Class[]{});
         assertEquals(0, m.getAnnotations().length);
-        Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(m);
+        Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(Customer.class, m);
         assertSame(m, annotatedMethod);
     }
     

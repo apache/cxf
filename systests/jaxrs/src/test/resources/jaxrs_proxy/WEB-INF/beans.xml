@@ -37,6 +37,7 @@
         <jaxrs:serviceBeans>
             <ref bean="bookstore"/>
             <ref bean="bookstoreInterface"/>
+            <bean class="org.apache.cxf.systest.jaxrs.NameServiceImpl"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="exceptionMapper"/>
