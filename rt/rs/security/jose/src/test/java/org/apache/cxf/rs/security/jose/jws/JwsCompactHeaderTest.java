@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 import org.junit.Assert;
@@ -149,6 +153,51 @@ public class JwsCompactHeaderTest extends Assert {
                                                                Algorithm.HmacSHA256.getJwtName())));
     }
 
+    @Test
+    public void testCriticalHeader() {
+        String payload = "this is a JWS with critical header";
+        String criticalParameter = "criticalParameter";
+        String criticalParameter1 = "criticalParameter1";
+        String criticalParameter2 = "criticalParameter2";
+        String criticalParameter3 = "criticalParameter3";
+        String criticalValue = "criticalValue";
+        String criticalValue1 = "criticalValue1";
+        String criticalValue2 = "criticalValue2";
+        String criticalValue3 = "criticalValue3";
+        JwsCompactProducer producer = new JwsCompactProducer(payload);
+        producer.getJoseHeaders().setAlgorithm(JoseConstants.HMAC_SHA_512_ALGO);
+        List<String> criticalHeader = new ArrayList<String>();
+        criticalHeader.add(criticalParameter1);
+        producer.getJoseHeaders().setCritical(criticalHeader);
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName()));
+        String signedJws = producer.getSignedEncodedJws();
+        JwsCompactConsumer consumer = new JwsCompactConsumer(signedJws);
+        assertFalse(consumer.validateCriticalHeaders());
+        
+        criticalHeader.add(criticalParameter2);
+        criticalHeader.add(criticalParameter3);
+        producer = new JwsCompactProducer(payload);
+        producer.getJoseHeaders().setAlgorithm(JoseConstants.HMAC_SHA_512_ALGO);
+        producer.getJoseHeaders().setCritical(criticalHeader);
+        producer.getJoseHeaders().setHeader(criticalParameter1, criticalValue1);
+        producer.getJoseHeaders().setHeader(criticalParameter2, criticalValue2);
+        producer.getJoseHeaders().setHeader(criticalParameter3, criticalValue3);
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName()));
+        signedJws = producer.getSignedEncodedJws();
+        consumer = new JwsCompactConsumer(signedJws);
+        assertTrue(consumer.validateCriticalHeaders());
     
+        criticalHeader = new ArrayList<String>();
+        criticalHeader.add(criticalParameter);
+        criticalHeader.add(criticalParameter);
+        producer = new JwsCompactProducer(payload);
+        producer.getJoseHeaders().setAlgorithm(JoseConstants.HMAC_SHA_512_ALGO);
+        producer.getJoseHeaders().setHeader(criticalParameter, criticalValue);
+        producer.getJoseHeaders().setCritical(criticalHeader);
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName()));
+        signedJws = producer.getSignedEncodedJws();
+        consumer = new JwsCompactConsumer(signedJws);
+        assertFalse(consumer.validateCriticalHeaders());
+    }
 }
 

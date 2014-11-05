@@ -19,6 +19,9 @@
 package org.apache.cxf.rs.security.jose;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 
@@ -58,5 +61,25 @@ public final class JoseUtils {
     }
     public static byte[] decode(String encoded) {
         return CryptoUtils.decodeSequence(encoded);
+    }
+    
+    public static boolean validateCriticalHeaders(JoseHeaders headers) {
+        List<String> critical = headers.getCritical();
+        if (critical == null) {
+            return true;
+        }
+        // The "crit" value MUST NOT be empty "[]" or contain either duplicate values or "crit"
+        if (critical.isEmpty() 
+            || detectDoubleEntry(critical)
+            || critical.contains(JoseConstants.HEADER_CRITICAL)) {
+            return false;
+        }
+        
+        // Check that the headers contain these critical headers
+        return headers.asMap().keySet().containsAll(critical);
+    }
+    private static boolean detectDoubleEntry(List<?> list) {
+        Set<Object> inputSet = new HashSet<Object>(list);
+        return list.size() > inputSet.size();
     }
 }

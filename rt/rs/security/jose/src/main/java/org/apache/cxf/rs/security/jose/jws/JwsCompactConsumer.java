@@ -94,7 +94,9 @@ public class JwsCompactConsumer {
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
     }
-    
+    public boolean validateCriticalHeaders() {
+        return JwsUtils.validateCriticalHeaders(getJoseHeaders());
+    }
     protected JoseHeadersReader getReader() {
         return reader;
     }
