@@ -88,7 +88,7 @@
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext3" address="https://localhost:${testutil.ports.Server.3}/DoubleItUTPlaintext3" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort3" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ssl/DoubleItSSL.wsdl" depends-on="disallow-tls-via-configuration">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     
