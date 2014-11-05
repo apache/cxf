@@ -87,6 +87,7 @@ public final class JettySslConnectorFactory implements JettyConnectorFactory {
         con.getCxfSslContextFactory().setProvider(tlsServerParameters.getJsseProvider());
         con.setCipherSuites(tlsServerParameters.getCipherSuites());
         con.setCipherSuitesFilter(tlsServerParameters.getCipherSuitesFilter());
+        con.setExcludeProtocols(tlsServerParameters.getExcludeProtocols());
         con.getCxfSslContextFactory().setCertAlias(tlsServerParameters.getCertAlias());
     }
 
