@@ -66,4 +66,30 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+    <httpj:engine-factory id="disallow-tls-via-configuration">
+        <httpj:engine port="${testutil.ports.Server.3}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                </sec:trustManagers>
+                <sec:clientAuthentication want="true" required="false"/>
+                <sec:excludeProtocols>
+                    <sec:excludeProtocol>TLS</sec:excludeProtocol>
+                    <sec:excludeProtocol>TLSv1</sec:excludeProtocol>
+                    <sec:excludeProtocol>TLSv1.1</sec:excludeProtocol>
+                    <sec:excludeProtocol>TLSv1.2</sec:excludeProtocol>
+                </sec:excludeProtocols>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext3" address="https://localhost:${testutil.ports.Server.3}/DoubleItUTPlaintext3" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort3" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ssl/DoubleItSSL.wsdl" depends-on="disallow-tls-via-configuration">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
 </beans>
