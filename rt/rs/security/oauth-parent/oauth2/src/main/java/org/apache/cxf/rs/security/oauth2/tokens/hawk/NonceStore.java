@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 public interface NonceStore {
 
-    void storeNonce(String tokenKey, Nonce nonce, long requestTimeDelta);
+    void initNonceHistory(String tokenKey, Nonce nonce, long requestTimeDelta);
 
     NonceHistory getNonceHistory(String tokenKey);
 }
