@@ -221,4 +221,17 @@
             </entry>
         </jaxws:properties>
     </jaxws:client>
+   <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSymmetricSecureConversationPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.kerberos.client">
+                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
+                    <constructor-arg ref="cxf"/>
+                    <property name="contextName" value="alice"/>
+                    <property name="serviceName" value="bob@service.ws.apache.org"/>
+                </bean>
+            </entry>
+        </jaxws:properties>
+    </jaxws:client>
 </beans>
