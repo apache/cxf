@@ -100,7 +100,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-
+    
     @org.junit.Test
     public void testKerberosOverTransport() throws Exception {
 
@@ -552,4 +552,39 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    
+    @org.junit.Test
+    public void testKerberosOverSymmetricSecureConversation() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = KerberosTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosSymmetricSecureConversationPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        
+        updateAddressPort(kerberosPort, test.getPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
+
+        // TODO Streaming
+        if (!test.isStreaming() && !STAX_PORT.equals(test.getPort())) {
+            kerberosPort.doubleIt(25);
+        }
+        
+        ((java.io.Closeable)kerberosPort).close();
+        bus.shutdown(true);
+    }
 }
