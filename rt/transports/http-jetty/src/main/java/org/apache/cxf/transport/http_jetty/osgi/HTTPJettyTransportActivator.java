@@ -213,6 +213,11 @@ public class HTTPJettyTransportActivator
                     while (st.hasMoreTokens()) {
                         p.getCipherSuites().add(st.nextToken());
                     }
+                }  else if (k.startsWith("excludeProtocols")) {
+                    StringTokenizer st = new StringTokenizer(v, ",");
+                    while (st.hasMoreTokens()) {
+                        p.getExcludeProtocols().add(st.nextToken());
+                    }
                 } else if (k.startsWith("trustManagers.")) {
                     tmt = getTrustManagers(tmt,
                                           k.substring("trustManagers.".length()),

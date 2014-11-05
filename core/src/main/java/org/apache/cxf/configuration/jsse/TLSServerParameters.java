@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.configuration.jsse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.cxf.configuration.security.ClientAuthentication;
 
 /**
@@ -28,6 +31,7 @@ import org.apache.cxf.configuration.security.ClientAuthentication;
 public class TLSServerParameters extends TLSParameterBase {
 
     ClientAuthentication clientAuthentication;
+    List<String> excludeProtocols = new ArrayList<String>();
     
     /**
      * This parameter configures the server side to request and/or
@@ -43,4 +47,22 @@ public class TLSServerParameters extends TLSParameterBase {
     public ClientAuthentication getClientAuthentication() {
         return clientAuthentication;
     }
+    
+    /**
+     * This parameter sets the protocol list to exclude.
+     */
+    public final void setExcludeProtocols(List<String> protocols) {
+        excludeProtocols = protocols;
+    }
+    
+    /**
+     * Returns the protocols to exclude that are associated with this endpoint.
+     */
+    public List<String> getExcludeProtocols() {
+        if (excludeProtocols == null) {
+            excludeProtocols = new ArrayList<String>();
+        }
+        return excludeProtocols;
+    }
+
 }

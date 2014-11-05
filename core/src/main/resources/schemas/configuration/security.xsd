@@ -341,6 +341,18 @@
         </xs:sequence>
     </xs:complexType>
     
+    <xs:complexType name="ExcludeProtocols">
+      <xs:annotation>
+        <xs:documentation>
+        This structure holds a list of protocols that are to be excluded.
+        If this structure is not defined then SSLv3 is excluded by default
+        </xs:documentation>
+      </xs:annotation>
+        <xs:sequence>
+           <xs:element name="excludeProtocol" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
     <xs:complexType name="SecureRandomParameters">
       <xs:annotation>
         <xs:documentation>
@@ -535,6 +547,13 @@
                 <xs:documentation>
                 This element contains the filters of the supported CipherSuites
                 that will be supported and used if available.
+                </xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="excludeProtocols" type="tns:ExcludeProtocols" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                This element contains the the Protocols that will be excluded
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
