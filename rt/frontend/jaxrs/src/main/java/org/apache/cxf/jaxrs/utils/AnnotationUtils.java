@@ -203,52 +203,65 @@ public final class AnnotationUtils {
         return null;
     }
 
-    public static Method getAnnotatedMethod(Method m) {
-        Method annotatedMethod = doGetAnnotatedMethod(m);
+    public static Method getAnnotatedMethod(Class<?> serviceClass, Method m) {
+        Method annotatedMethod = doGetAnnotatedMethod(serviceClass, m);
         return annotatedMethod == null ? m : annotatedMethod;
     }
 
-    private static Method doGetAnnotatedMethod(Method m) {
+    private static Method doGetAnnotatedMethod(Class<?> serviceClass, Method m) {
 
-        if (m == null) {
-            return m;
-        }
-
-        for (Annotation a : m.getAnnotations()) {
-            if (AnnotationUtils.isMethodAnnotation(a)) {
-                return m;
-            }
-        }
-        for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
-            if (isValidParamAnnotations(paramAnnotations)) {
-                LOG.warning("Method " + m.getName() + " in " + m.getDeclaringClass().getName()
-                             + " has no JAX-RS Path or HTTP Method annotations");
-                return m;
-            }
-        }
-
-        Class<?> superC = m.getDeclaringClass().getSuperclass();
-        if (superC != null && Object.class != superC) {
-            try {
-                Method method = doGetAnnotatedMethod(superC.getMethod(m.getName(), m.getParameterTypes()));
-                if (method != null) {
-                    return method;
+        if (m != null) {
+            for (Annotation a : m.getAnnotations()) {
+                if (AnnotationUtils.isMethodAnnotation(a)) {
+                    return m;
                 }
-            } catch (NoSuchMethodException ex) {
-                // ignore
             }
-        }
-        for (Class<?> i : m.getDeclaringClass().getInterfaces()) {
-            try {
-                Method method = doGetAnnotatedMethod(i.getMethod(m.getName(), m.getParameterTypes()));
-                if (method != null) {
-                    return method;
+            for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
+                if (isValidParamAnnotations(paramAnnotations)) {
+                    LOG.warning("Method " + m.getName() + " in " + m.getDeclaringClass().getName()
+                                 + " has no JAX-RS Path or HTTP Method annotations");
+                    return m;
                 }
-            } catch (NoSuchMethodException ex) {
-                // ignore
+            }
+    
+            Class<?> declaringClass = m.getDeclaringClass();
+            Class<?> superC = declaringClass.getSuperclass();
+            if (superC != null && Object.class != superC) {
+                try {
+                    Method method = doGetAnnotatedMethod(serviceClass,
+                                                         superC.getMethod(m.getName(), m.getParameterTypes()));
+                    if (method != null) {
+                        return method;
+                    }
+                } catch (NoSuchMethodException ex) {
+                    // ignore
+                }
+            }
+            for (Class<?> i : declaringClass.getInterfaces()) {
+                try {
+                    Method method = doGetAnnotatedMethod(serviceClass,
+                                                         i.getMethod(m.getName(), m.getParameterTypes()));
+                    if (method != null) {
+                        return method;
+                    }
+                } catch (NoSuchMethodException ex) {
+                    // ignore
+                }
+            }
+            if (declaringClass != serviceClass && !declaringClass.isInterface()) {  
+                for (Class<?> i : serviceClass.getInterfaces()) {
+                    try {
+                        Method method = doGetAnnotatedMethod(serviceClass,
+                                                             i.getMethod(m.getName(), m.getParameterTypes()));
+                        if (method != null) {
+                            return method;
+                        }
+                    } catch (NoSuchMethodException ex) {
+                        // ignore
+                    }
+                }    
             }
         }
-
         return null;
     }
 

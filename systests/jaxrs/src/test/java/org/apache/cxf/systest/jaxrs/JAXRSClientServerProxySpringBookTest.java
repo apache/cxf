@@ -143,6 +143,22 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
 
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
     }
+    @Test
+    public void testGetName() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/test/v1/names/1"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/json");
+        String name = wc.get(String.class);
+        assertEquals("{\"name\":\"Barry\"}", name); 
+    }
+    @Test
+    public void testPutName() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/test/v1/names/1"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.type("application/json").accept("application/json");
+        String id = wc.put(null, String.class);
+        assertEquals("1", id); 
+    }
 
     @Test
     public void testGetBookWithRequestScope() {

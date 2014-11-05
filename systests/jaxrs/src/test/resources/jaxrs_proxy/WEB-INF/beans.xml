@@ -24,6 +24,7 @@
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd"-->
+<<<<<<< HEAD
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:jaxrs="http://cxf.apache.org/jaxrs"
@@ -53,6 +54,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <jaxrs:serviceBeans>
       <ref bean="bookstore"/>
       <ref bean="bookstoreInterface"/>
+      <bean class="org.apache.cxf.systest.jaxrs.NameServiceImpl"/>
     </jaxrs:serviceBeans>
     <jaxrs:providers>
       <ref bean="exceptionMapper"/>
@@ -136,7 +138,6 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 	</aop:config>
 
 	<bean id="simpleLogger" class="org.apache.cxf.systest.jaxrs.SimpleLoggingAspect"/>
-
 </beans>
 <!-- END SNIPPET: beans -->
 

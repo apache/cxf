@@ -1677,7 +1677,7 @@ public class JAXRSUtilsTest extends Assert {
                                      new Class[]{UriInfo.class});
         OperationResourceInfo ori = 
             new OperationResourceInfo(methodToInvoke,
-                                      AnnotationUtils.getAnnotatedMethod(methodToInvoke), cri);
+                AnnotationUtils.getAnnotatedMethod(Customer.class, methodToInvoke), cri);
         ori.setHttpMethod("GET");
         
         Message m = new MessageImpl();

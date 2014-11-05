@@ -273,9 +273,10 @@ public final class ResourceUtils {
 
     private static void evaluateResourceClass(ClassResourceInfo cri, boolean enableStatic) {
         MethodDispatcher md = new MethodDispatcher();
-        for (Method m : cri.getServiceClass().getMethods()) {
+        Class<?> serviceClass = cri.getServiceClass();
+        for (Method m : serviceClass.getMethods()) {
             
-            Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(m);
+            Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(serviceClass, m);
             
             String httpMethod = AnnotationUtils.getHttpMethodValue(annotatedMethod);
             Path path = AnnotationUtils.getMethodAnnotation(annotatedMethod, Path.class);
