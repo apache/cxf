@@ -49,6 +49,7 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
     protected SecureRandom   secureRandom;
     protected List<String>   cipherSuites;
     protected FiltersType    cipherSuitesFilter;
+    protected List<String>   excludeProtocols;
        
     /**
      * Set the cipherSuites
@@ -62,6 +63,13 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
      */
     protected void setCipherSuitesFilter(FiltersType filter) {
         cipherSuitesFilter = filter;
+    }
+    
+    /**
+     * Set the protocols to exclude
+     */
+    protected void setExcludeProtocols(List<String> ps) {
+        excludeProtocols = ps;
     }
     
     /**
@@ -113,8 +121,14 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
             ? "TLS"
                 : getCxfSslContextFactory().getProtocol();
  
-        if (!"SSLv3".equals(proto)) {
+        // Exclude SSLv3 by default unless the protocol is given as SSLv3
+        if (!"SSLv3".equals(proto) 
+            && (excludeProtocols == null || excludeProtocols.isEmpty())) {
             getSslContextFactory().addExcludeProtocols("SSLv3");
+        } else if (excludeProtocols != null) {
+            for (String p : excludeProtocols) {
+                getSslContextFactory().addExcludeProtocols(p);
+            }
         }
 
         SSLContext context = getCxfSslContextFactory().getProvider() == null
