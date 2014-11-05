@@ -674,8 +674,13 @@ public class JettyHTTPServerEngine
         String proto = tlsServerParameters.getSecureSocketProtocol() == null
             ? "TLS" : tlsServerParameters.getSecureSocketProtocol();
         
-        if (!"SSLv3".equals(proto)) {
+        // Exclude SSLv3 by default unless the protocol is given as SSLv3
+        if (!"SSLv3".equals(proto) && tlsServerParameters.getExcludeProtocols().isEmpty()) {
             scf.addExcludeProtocols("SSLv3");
+        } else {
+            for (String p : tlsServerParameters.getExcludeProtocols()) {
+                scf.addExcludeProtocols(p);
+            }
         }
  
         SSLContext context = tlsServerParameters.getJsseProvider() == null

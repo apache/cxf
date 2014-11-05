@@ -31,7 +31,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -39,6 +38,7 @@ import org.apache.cxf.configuration.jsse.TLSServerParametersConfig;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.CipherSuites;
 import org.apache.cxf.configuration.security.ClientAuthentication;
+import org.apache.cxf.configuration.security.ExcludeProtocols;
 import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
@@ -196,6 +196,9 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
             } else if ("cipherSuitesFilter".equals(ename)) {
                 mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                          FiltersType.class);
+            } else if ("excludeProtocols".equals(ename)) {
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         ExcludeProtocols.class);
             } else if ("secureRandomParameters".equals(ename)) {
                 mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                          SecureRandomParameters.class);
