@@ -68,7 +68,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
         List<Element> resourceEls = 
             DOMUtils.getChildrenWithName(resourcesEl, 
                                          WadlGenerator.WADL_NS, "resource");
-        assertEquals(2, resourceEls.size());
+        assertEquals(3, resourceEls.size());
     }
     
     @Test
@@ -169,6 +169,22 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
             .getResourceAsStream("resources/expected_get_book123json.txt");
 
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
+    }
+    @Test
+    public void testGetName() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/test/v1/names/1"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/json");
+        String name = wc.get(String.class);
+        assertEquals("{\"name\":\"Barry\"}", name); 
+    }
+    @Test
+    public void testPutName() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/test/v1/names/1"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.type("application/json").accept("application/json");
+        String id = wc.put(null, String.class);
+        assertEquals("1", id); 
     }
 
     @Test
