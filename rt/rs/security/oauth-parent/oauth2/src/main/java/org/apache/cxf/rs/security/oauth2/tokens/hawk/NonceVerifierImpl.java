@@ -23,7 +23,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 public class NonceVerifierImpl implements NonceVerifier {
     private NonceStore nonceStore;
-    private long allowedWindow; // 2000 ms
+    private long allowedWindow;
 
     public void verifyNonce(String tokenKey, String clientNonceString, String clientTimestampString) 
         throws OAuthServiceException {
@@ -34,26 +34,17 @@ public class NonceVerifierImpl implements NonceVerifier {
         }
         
         long serverClock = System.currentTimeMillis();
-        NonceHistory nonceHistory = nonceStore.getNonceHistory(tokenKey);
-        boolean firstTimeRequest = false;
-        if (nonceHistory == null) {
-            firstTimeRequest = true;
-        }
         long clientTimestamp = Long.valueOf(clientTimestampString);
-        if (firstTimeRequest) {
+        NonceHistory nonceHistory = nonceStore.getNonceHistory(tokenKey);
+        Nonce nonce = new Nonce(clientNonceString, clientTimestamp);
+        if (nonceHistory == null) {
             long requestTimeDelta = serverClock - clientTimestamp;
-            Nonce nonce = new Nonce(clientNonceString, clientTimestamp);
-            nonceStore.storeNonce(tokenKey, nonce, requestTimeDelta);
+            nonceStore.initNonceHistory(tokenKey, nonce, requestTimeDelta);
         } else {
             checkAdjustedRequestTime(serverClock, clientTimestamp, nonceHistory);
-            checkNonceHistory(nonceHistory, clientNonceString, clientTimestamp);
-        }
-    }
-
-    private static void checkNonceHistory(NonceHistory nonceHistory, final String clientNonceString,
-                                          final long ts) throws OAuthServiceException {
-        if (!nonceHistory.findMatchingNonces(clientNonceString, ts).isEmpty()) {
-            throw new OAuthServiceException("Duplicate nonce");
+            if (!nonceHistory.addNonce(nonce)) {
+                throw new OAuthServiceException("Duplicate nonce");
+            }
         }
     }
 

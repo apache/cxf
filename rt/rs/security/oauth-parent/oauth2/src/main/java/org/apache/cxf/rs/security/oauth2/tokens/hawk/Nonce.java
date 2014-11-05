@@ -25,7 +25,7 @@ public class Nonce implements Serializable {
     private static final long serialVersionUID = -6164115071533503490L;
 
     private String nonceString;
-    private long ts;
+    private Long ts;
 
     public Nonce(String nonce, long ts) {
         this.nonceString = nonce;
@@ -38,5 +38,14 @@ public class Nonce implements Serializable {
 
     public long getTs() {
         return ts;
+    }
+    
+    public int hashCode() {
+        return nonceString.hashCode() + 37 * ts.hashCode();
+    }
+    public boolean equals(Object o) {
+        return o instanceof Nonce 
+            && this.nonceString.equals(((Nonce)o).nonceString)
+            && this.ts.equals(((Nonce)o).ts);
     }
 }
