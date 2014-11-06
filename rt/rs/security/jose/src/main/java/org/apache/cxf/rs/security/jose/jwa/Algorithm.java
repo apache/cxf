@@ -213,6 +213,9 @@ public enum Algorithm {
         }
         return javaName;
     }
+    public static boolean isRsa(String algo) {
+        return isRsaOaep(algo) || isRsaShaSign(algo);
+    }
     public static boolean isRsaOaep(String algo) {
         return RSA_OAEP_CEK_SET.contains(algo);
     }
@@ -231,7 +234,13 @@ public enum Algorithm {
     public static boolean isHmacSign(String algo) {
         return HMAC_SIGN_SET.contains(algo); 
     }
-    
+    public static boolean isOctet(String algo) {
+        return isHmacSign(algo)
+            || isAesCbcHmac(algo)
+            || isAesGcm(algo)
+            || isAesGcmKeyWrap(algo)
+            || isAesKeyWrap(algo); 
+    } 
     public static boolean isRsaShaSign(String algo) {
         return RSA_SHA_SIGN_SET.contains(algo); 
     }

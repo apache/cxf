@@ -26,7 +26,6 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 
 public class JweCompactConsumer {
@@ -115,6 +114,6 @@ public class JweCompactConsumer {
         }
     }
     public boolean validateCriticalHeaders() {
-        return JwsUtils.validateCriticalHeaders(getJweHeaders());
+        return JweUtils.validateCriticalHeaders(getJweHeaders());
     }
 }
