@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -348,6 +349,16 @@ public final class OAuthClientUtils {
         StringBuilder sb = new StringBuilder();
         appendTokenData(sb, accessToken, httpProps);  
         return sb.toString();
+    }
+    public static void setAuthorizationHeader(WebClient wc, ClientAccessToken accessToken) {
+        setAuthorizationHeader(wc, accessToken, null);
+    }
+    public static void setAuthorizationHeader(WebClient wc,
+                                              ClientAccessToken accessToken,
+                                              String httpVerb) {
+        wc.replaceHeader(HttpHeaders.AUTHORIZATION, 
+                         createAuthorizationHeader(accessToken, 
+                                                   new HttpRequestProperties(wc, httpVerb)));
     }
     
     private static void appendTokenData(StringBuilder sb, 
