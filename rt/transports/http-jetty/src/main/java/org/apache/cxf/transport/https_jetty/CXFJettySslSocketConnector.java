@@ -121,10 +121,11 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
             ? "TLS"
                 : getCxfSslContextFactory().getProtocol();
  
-        // Exclude SSLv3 by default unless the protocol is given as SSLv3
+        // Exclude SSLv3 + SSLv2Hello by default unless the protocol is given as SSLv3
         if (!"SSLv3".equals(proto) 
             && (excludeProtocols == null || excludeProtocols.isEmpty())) {
             getSslContextFactory().addExcludeProtocols("SSLv3");
+            getSslContextFactory().addExcludeProtocols("SSLv2Hello");
         } else if (excludeProtocols != null) {
             for (String p : excludeProtocols) {
                 getSslContextFactory().addExcludeProtocols(p);
