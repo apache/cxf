@@ -32,7 +32,6 @@ public class JwsCompactProducer {
     private String plainJwsPayload;
     private String signature;
     private String plainRep;
-    
     public JwsCompactProducer(String plainJwsPayload) {
         this(null, null, plainJwsPayload);
     }
