@@ -22,14 +22,16 @@ import java.util.Collections;
 
 import javax.jms.ConnectionFactory;
 
-import org.apache.activemq.spring.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class JmsTestActivator implements BundleActivator {
+    public static final String PORT = TestUtil.getPortNumber(JmsTestActivator.class);
     private Server server;
 
     @Override
@@ -48,7 +50,8 @@ public class JmsTestActivator implements BundleActivator {
     }
 
     private ActiveMQConnectionFactory createConnectionFactory() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+        ActiveMQConnectionFactory connectionFactory 
+            = new ActiveMQConnectionFactory("vm://JmsServiceTest");
         connectionFactory.setUserName("karaf");
         connectionFactory.setPassword("karaf");
         return connectionFactory;

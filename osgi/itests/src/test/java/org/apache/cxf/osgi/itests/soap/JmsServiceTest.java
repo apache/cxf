@@ -23,7 +23,7 @@ import java.util.Collections;
 
 import javax.jms.ConnectionFactory;
 
-import org.apache.activemq.spring.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
@@ -65,7 +65,8 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
     }
 
     private ActiveMQConnectionFactory createConnectionFactory() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+        ActiveMQConnectionFactory connectionFactory 
+            = new ActiveMQConnectionFactory("vm://JmsServiceTest");
         connectionFactory.setUserName("karaf");
         connectionFactory.setPassword("karaf");
         return connectionFactory;
@@ -76,8 +77,8 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
         MavenUrlReference activeMQFeature = maven().groupId("org.apache.activemq")
             .artifactId("activemq-karaf").type("xml").classifier("features").versionAsInProject();
         return new Option[] {
-            cxfBaseConfig(),
-            logLevel(LogLevel.INFO),
+            cxfBaseConfigWithTestUtils(),
+            logLevel(LogLevel.WARN),
             features(activeMQFeature, "activemq-broker-noweb"),
             features(cxfUrl, "cxf-transports-jms"),
             provision(serviceBundle())
