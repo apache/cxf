@@ -94,6 +94,16 @@ public class SoapBindingSelectionTest extends AbstractSimpleFrontendTest {
         
         assertFalse(service1Invoked);
         assertTrue(service2Invoked);
+        
+        server2.stop();
+        server2.start();
+        
+        nd = invoke("http://localhost/Hello", LocalTransportFactory.TRANSPORT_ID, "soap12.xml");
+        assertEquals("http://www.w3.org/2003/05/soap-envelope", getNs(nd));
+        
+        assertFalse(service1Invoked);
+        assertTrue(service2Invoked);
+        
     }
     
     private String getNs(Node nd) {

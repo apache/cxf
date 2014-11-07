@@ -159,11 +159,12 @@ public class ServerImpl implements Server {
         MessageObserver mo = getDestination().getMessageObserver();
         if (mo instanceof MultipleEndpointObserver) {
             ((MultipleEndpointObserver)mo).getEndpoints().remove(endpoint);
-            if (!((MultipleEndpointObserver)mo).getEndpoints().isEmpty()) {
-                return;
+            if (((MultipleEndpointObserver)mo).getEndpoints().isEmpty()) {
+                getDestination().setMessageObserver(null);
             }
-        }
-        getDestination().setMessageObserver(null);
+        } else {
+            getDestination().setMessageObserver(null);
+        } 
         stopped = true;
     }
     
