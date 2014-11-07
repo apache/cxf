@@ -42,21 +42,24 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
     
     public FragmentDialectLanguageQName() {
         if (qNamePattern == null) {
-            // See http://www.w3.org/TR/REC-xml-names/#ns-decl
-            // prefix name start char
-            String prefixNameStartChar = "[A-Z]|_|[a-z]|[\\x{c0}-\\x{d6}]|[\\x{d8}-\\x{f6}]|[\\x{f8}-\\x{2ff}]|"
+            // See http://www.w3.org/TR/REC-xml-names/#NT-PrefixedName
+            // NCNameStartChar
+            // see http://www.w3.org/TR/REC-xml-names/#NT-NCName
+            // and http://www.w3.org/TR/REC-xml/#NT-NameStartChar
+            String ncNameStartChar = "[A-Z]|_|[a-z]|[\\x{c0}-\\x{d6}]|[\\x{d8}-\\x{f6}]|[\\x{f8}-\\x{2ff}]|"
                                  + "[\\x{370}-\\x{37d}]|[\\x{37f}-\\x{1fff}]|[\\x{200c}-\\x{200d}]|"
                                  + "[\\x{2070}-\\x{218f}]|[\\x{2c00}-\\x{2fef}]|[\\x{3001}-\\x{d7ff}]|"
                                  + "[\\x{f900}-\\x{fdcf}]|[\\x{fdf0}-\\x{fffd}]|[\\x{10000}-\\x{effff}]";
-            // xml name start char
-            String nameStartChar = ":|" + prefixNameStartChar;
-            // prefix continue chars
-            String prefixNameChar = "-|\\.|[0-9]|\\x{b7}|[\\x{0300}-\\x{036f}]|[\\x{203f}-\\x{2040}]"
-                                  + "|" + prefixNameStartChar;
-            // xml name continue chars
-            String nameChar = ":|" + prefixNameChar;
-            String qName = String.format("^((%s)(%s)*:)?(%s)(%s)*",
-                                         prefixNameStartChar, prefixNameChar, nameStartChar, nameChar);
+            // NCNameChar
+            // see http://www.w3.org/TR/REC-xml/#NT-NameChar
+            String ncNameChar = ncNameStartChar
+                                 + "|-|\\.|[0-9]|\\x{b7}|[\\x{0300}-\\x{036f}]|[\\x{203f}-\\x{2040}]";
+            // NCName
+            // see http://www.w3.org/TR/REC-xml/#NT-Name
+            String ncName = String.format("(%s)(%s)*", ncNameStartChar, ncNameChar);
+            // QName
+            // see http://www.w3.org/TR/REC-xml-names/#NT-QName
+            String qName = String.format("^((%s):)?(%s)", ncName, ncName);
             qNamePattern = Pattern.compile(qName);
         }
     }
