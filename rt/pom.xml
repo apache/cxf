@@ -65,6 +65,7 @@
         <module>rs/security/jose</module>
         <module>rs/security/oauth-parent</module>
         <module>rs/security/sso/saml</module>
+        <module>rs/security/sso/oidc</module>
         <module>rs/security/cors</module>
         <module>management</module>
         <module>management-web</module>
