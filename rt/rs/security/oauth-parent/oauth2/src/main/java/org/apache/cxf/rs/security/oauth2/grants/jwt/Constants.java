@@ -16,19 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwt.grant;
+package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-
-public class JwtUserSubject extends UserSubject {
-    private static final long serialVersionUID = -1135272749329239037L;
-    private JwtToken token;
-    public JwtUserSubject(String user, JwtToken token) {
-        super(user);
-        this.token = token;
-    }
-    public JwtToken getToken() {
-        return token;
+public final class Constants {
+    public static final String JWT_BEARER_GRANT = "urn:ietf:params:oauth:grant-type:jwt-bearer";
+    public static final String CLIENT_GRANT_ASSERTION_PARAM = "assertion";
+    
+    public static final String CLIENT_AUTH_ASSERTION_PARAM = "client_assertion";
+    public static final String CLIENT_AUTH_ASSERTION_TYPE = "client_assertion_type";
+    public static final String CLIENT_AUTH_JWT_BEARER = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+   
+    
+    private Constants() {
+        
     }
 }
