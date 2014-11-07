@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwt.grant;
+package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
 import org.junit.Assert;
 import org.junit.Test;

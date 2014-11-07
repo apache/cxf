@@ -48,6 +48,10 @@ public final class JwsUtils {
     public static String sign(byte[] key, String algo, String content) {
         return sign(getHmacSignatureProvider(key, algo), content);
     }
+    public static String verifyAndGetContent(RSAPublicKey key, String algo, String content) {
+        JwsCompactConsumer jws = verify(getRSAKeySignatureVerifier(key, algo), content);
+        return jws.getDecodedJwsPayload();
+    }
     public static String verifyAndGetContent(byte[] key, String algo, String content) {
         JwsCompactConsumer jws = verify(getHmacSignatureVerifier(key, algo), content);
         return jws.getDecodedJwsPayload();

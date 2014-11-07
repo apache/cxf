@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwt.token;
+package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesGcmContentDecryptionAlgorithm;
@@ -113,11 +114,6 @@ public final class JwtAccessTokenUtils {
         
     }
     private static byte[] getBytes(String str) {
-        try {
-            return str.getBytes("UTF-8");
-        } catch (Exception ex) {
-            // ignore
-        }
-        return null;
+        return StringUtils.toBytesUTF8(str);
     }
 }
