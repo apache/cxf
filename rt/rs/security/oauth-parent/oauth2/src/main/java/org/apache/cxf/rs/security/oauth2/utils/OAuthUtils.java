@@ -33,7 +33,9 @@ import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.security.LoginSecurityContext;
@@ -186,5 +188,20 @@ public final class OAuthUtils {
             }
         }
         return true;
+    }
+
+    public static ClientAccessToken toClientAccessToken(ServerAccessToken serverToken, boolean supportOptionalParams) {
+        ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
+                                                              serverToken.getTokenKey());
+        clientToken.setRefreshToken(serverToken.getRefreshToken());
+        if (supportOptionalParams) {
+            clientToken.setExpiresIn(serverToken.getExpiresIn());
+            List<OAuthPermission> perms = serverToken.getScopes();
+            if (!perms.isEmpty()) {
+                clientToken.setApprovedScope(OAuthUtils.convertPermissionsToScope(perms));    
+            }
+            clientToken.setParameters(serverToken.getParameters());
+        }
+        return clientToken;
     }
 }

@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
+import org.apache.cxf.rs.security.oauth2.provider.AuthorizationCodeResponseFilter;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.provider.OOBResponseDeliverer;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -50,6 +51,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 public class AuthorizationCodeGrantService extends RedirectionBasedGrantService {
     private boolean canSupportPublicClients;
     private OOBResponseDeliverer oobDeliverer;
+    private AuthorizationCodeResponseFilter codeResponseFilter;
     
     public AuthorizationCodeGrantService() {
         super(OAuthConstants.CODE_RESPONSE_TYPE, OAuthConstants.AUTHORIZATION_CODE_GRANT);
@@ -80,7 +82,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         } catch (OAuthServiceException ex) {
             return createErrorResponse(params, redirectUri, OAuthConstants.ACCESS_DENIED);
         }
-        
+        String grantCode = processCodeGrant(client, grant.getCode());
         if (redirectUri == null) {
             OOBAuthorizationResponse oobResponse = new OOBAuthorizationResponse();
             oobResponse.setClientId(client.getClientId());
@@ -91,11 +93,16 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         } else {
             // return the code by appending it as a query parameter to the redirect URI
             UriBuilder ub = getRedirectUriBuilder(params.getFirst(OAuthConstants.STATE), redirectUri);
-            ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_VALUE, grant.getCode());
+            ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_VALUE, grantCode);
             return Response.seeOther(ub.build()).build();
         }
     }
-    
+    protected String processCodeGrant(Client client, String code) {
+        if (codeResponseFilter != null) {
+            return codeResponseFilter.process(client, code);
+        }
+        return code;
+    }
     protected Response deliverOOBResponse(OOBAuthorizationResponse response) {
         if (oobDeliverer != null) {    
             return oobDeliverer.deliver(response);
@@ -136,6 +143,10 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     
     public void setCanSupportPublicClients(boolean support) {
         this.canSupportPublicClients = support;
+    }
+
+    public void setCodeResponseFilter(AuthorizationCodeResponseFilter filter) {
+        this.codeResponseFilter = filter;
     }
     
     

@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -57,8 +58,7 @@ public class HawkAccessToken extends ServerAccessToken {
                           String tokenKey,
                           long lifetime, 
                           long issuedAt) {
-        super(client, OAuthConstants.HAWK_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
-        this.setExtraParameters(algo, null);
+        this(client, algo, tokenKey, null, lifetime, issuedAt);
     }
     
     public HawkAccessToken(Client client,
@@ -67,7 +67,7 @@ public class HawkAccessToken extends ServerAccessToken {
                           String macKey,
                           long lifetime, 
                           long issuedAt) {
-        super(client, OAuthConstants.HAWK_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
+        super(checkClient(client), OAuthConstants.HAWK_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
         this.setExtraParameters(algo, macKey);
     }
     
@@ -93,5 +93,11 @@ public class HawkAccessToken extends ServerAccessToken {
     
     public String getMacAlgorithm() {
         return super.getParameters().get(OAuthConstants.HAWK_TOKEN_ALGORITHM);
+    }
+    private static Client checkClient(Client c) {
+        if (!c.isConfidential()) {
+            throw new OAuthServiceException("Public clients can not keep a MAC secret");
+        }
+        return c;
     }
 }

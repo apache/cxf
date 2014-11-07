@@ -20,18 +20,22 @@
 package org.apache.cxf.rs.security.oauth2.services;
 
 import java.net.URI;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -49,6 +53,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class ImplicitGrantService extends RedirectionBasedGrantService {
     // For a client to validate that this client is a targeted recipient.
     private boolean reportClientId;
+    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<AccessTokenResponseFilter>();
     
     public ImplicitGrantService() {
         super(OAuthConstants.TOKEN_RESPONSE_TYPE, OAuthConstants.IMPLICIT_GRANT);
@@ -74,42 +79,44 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
         } else {
             token = preAuthorizedToken;
         }
-
+        ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(token, isWriteOptionalParameters());
+        processClientAccessToken(client, clientToken);
    
-       // return the code by appending it as a fragment parameter to the redirect URI
+        // return the token by appending it as a fragment parameter to the redirect URI
         
         StringBuilder sb = getUriWithFragment(redirectUri);
         
-        sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(token.getTokenKey());
+        sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(clientToken.getTokenKey());
         String state = params.getFirst(OAuthConstants.STATE);
         if (state != null) {
             sb.append("&");
             sb.append(OAuthConstants.STATE).append("=").append(state);   
         }
         sb.append("&")
-            .append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(token.getTokenType());
+            .append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(clientToken.getTokenType());
         
         if (isWriteOptionalParameters()) {
             sb.append("&").append(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN)
-                .append("=").append(token.getExpiresIn());
-            // Reporting scope is required if the approved scope is different and
-            // optional - otherwise; lets always report it for now if it is non-empty 
-            List<OAuthPermission> perms = token.getScopes();
-            if (!perms.isEmpty()) {
-                String scope = OAuthUtils.convertPermissionsToScope(perms);
+                .append("=").append(clientToken.getExpiresIn());
+            if (!StringUtils.isEmpty(clientToken.getApprovedScope())) {
                 sb.append("&").append(OAuthConstants.SCOPE).append("=")
-                    .append(HttpUtils.queryEncode(scope));
+                    .append(HttpUtils.queryEncode(clientToken.getApprovedScope()));
             }
-            //TODO: also report other token parameters if any if needed  
+            for (Map.Entry<String, String> entry : clientToken.getParameters().entrySet()) {
+                sb.append("&").append(entry.getKey()).append("=").append(HttpUtils.queryEncode(entry.getValue()));
+            }
         }
         if (reportClientId) {
-            sb.append("&")
-                .append(OAuthConstants.CLIENT_ID).append("=").append(client.getClientId());
+            sb.append("&").append(OAuthConstants.CLIENT_ID).append("=").append(client.getClientId());
         }
         
         return Response.seeOther(URI.create(sb.toString())).build();
     }
-    
+    protected void processClientAccessToken(Client client, ClientAccessToken clientToken) {
+        for (AccessTokenResponseFilter filter : responseHandlers) {
+            filter.process(client, clientToken); 
+        }
+    }
     protected Response createErrorResponse(MultivaluedMap<String, String> params,
                                            String redirectUri,
                                            String error) {
@@ -133,6 +140,14 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
 
     public void setReportClientId(boolean reportClientId) {
         this.reportClientId = reportClientId;
+    }
+    
+    public void setResponseFilters(List<AccessTokenResponseFilter> handlers) {
+        this.responseHandlers = handlers;
+    }
+    
+    public void setResponseFilter(AccessTokenResponseFilter responseHandler) {
+        responseHandlers.add(responseHandler);
     }
 
     @Override

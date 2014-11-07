@@ -49,7 +49,7 @@ public class HawkAccessTokenValidatorTest extends Assert {
     @Test
     public void testValidateAccessToken() throws Exception {
         HawkAccessToken macAccessToken = new HawkAccessToken(new Client("testClientId", "testClientSecret",
-                                                                          false), 
+                                                                          true), 
                                                                           HmacAlgorithm.HmacSHA256, -1);
         HttpServletRequest httpRequest = mockHttpRequest();
         UriInfo uriInfo = mockUriInfo();

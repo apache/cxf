@@ -35,11 +35,11 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
-import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
+import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
@@ -50,6 +50,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 @Path("/token")
 public class AccessTokenService extends AbstractTokenService {
     private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<AccessTokenGrantHandler>();
+    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<AccessTokenResponseFilter>();
     private List<String> audiences = new LinkedList<String>();
     
     /**
@@ -67,7 +68,14 @@ public class AccessTokenService extends AbstractTokenService {
     public void setGrantHandler(AccessTokenGrantHandler handler) {
         grantHandlers.add(handler);
     }
+
+    public void setResponseFilters(List<AccessTokenResponseFilter> handlers) {
+        this.responseHandlers = handlers;
+    }
     
+    public void setResponseFilter(AccessTokenResponseFilter responseHandler) {
+        responseHandlers.add(responseHandler);
+    }
     /**
      * Processes an access token request
      * @param params the form parameters representing the access token grant 
@@ -111,25 +119,19 @@ public class AccessTokenService extends AbstractTokenService {
         }
         
         // Extract the information to be of use for the client
-        ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
-                                                              serverToken.getTokenKey());
-        clientToken.setRefreshToken(serverToken.getRefreshToken());
-        if (isWriteOptionalParameters()) {
-            clientToken.setExpiresIn(serverToken.getExpiresIn());
-            List<OAuthPermission> perms = serverToken.getScopes();
-            if (!perms.isEmpty()) {
-                clientToken.setApprovedScope(OAuthUtils.convertPermissionsToScope(perms));    
-            }
-            clientToken.setParameters(serverToken.getParameters());
-        }
-        
+        ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(serverToken, isWriteOptionalParameters());
+        processClientAccessToken(client, clientToken);    
         // Return it to the client
         return Response.ok(clientToken)
                        .header(HttpHeaders.CACHE_CONTROL, "no-store")
                        .header("Pragma", "no-cache")
                         .build();
     }
-    
+    protected void processClientAccessToken(Client client, ClientAccessToken clientToken) {
+        for (AccessTokenResponseFilter filter : responseHandlers) {
+            filter.process(client, clientToken); 
+        }
+    }
     protected void checkAudience(MultivaluedMap<String, String> params) { 
         if (audiences.isEmpty()) {
             return;
