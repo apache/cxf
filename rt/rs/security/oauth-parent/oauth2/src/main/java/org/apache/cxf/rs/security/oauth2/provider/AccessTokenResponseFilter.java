@@ -20,7 +20,8 @@ package org.apache.cxf.rs.security.oauth2.provider;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 public interface AccessTokenResponseFilter {
-    void process(Client client, ClientAccessToken ct);
+    void process(Client client, ClientAccessToken ct, UserSubject endUser);
 }

@@ -82,7 +82,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         } catch (OAuthServiceException ex) {
             return createErrorResponse(params, redirectUri, OAuthConstants.ACCESS_DENIED);
         }
-        String grantCode = processCodeGrant(client, grant.getCode());
+        String grantCode = processCodeGrant(client, grant.getCode(), grant.getSubject());
         if (redirectUri == null) {
             OOBAuthorizationResponse oobResponse = new OOBAuthorizationResponse();
             oobResponse.setClientId(client.getClientId());
@@ -97,9 +97,9 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             return Response.seeOther(ub.build()).build();
         }
     }
-    protected String processCodeGrant(Client client, String code) {
+    protected String processCodeGrant(Client client, String code, UserSubject endUser) {
         if (codeResponseFilter != null) {
-            return codeResponseFilter.process(client, code);
+            return codeResponseFilter.process(client, code, endUser);
         }
         return code;
     }

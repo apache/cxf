@@ -36,6 +36,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
@@ -120,16 +121,16 @@ public class AccessTokenService extends AbstractTokenService {
         
         // Extract the information to be of use for the client
         ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(serverToken, isWriteOptionalParameters());
-        processClientAccessToken(client, clientToken);    
+        processClientAccessToken(client, clientToken, serverToken.getSubject());    
         // Return it to the client
         return Response.ok(clientToken)
                        .header(HttpHeaders.CACHE_CONTROL, "no-store")
                        .header("Pragma", "no-cache")
                         .build();
     }
-    protected void processClientAccessToken(Client client, ClientAccessToken clientToken) {
+    protected void processClientAccessToken(Client client, ClientAccessToken clientToken, UserSubject endUser) {
         for (AccessTokenResponseFilter filter : responseHandlers) {
-            filter.process(client, clientToken); 
+            filter.process(client, clientToken, endUser); 
         }
     }
     protected void checkAudience(MultivaluedMap<String, String> params) { 

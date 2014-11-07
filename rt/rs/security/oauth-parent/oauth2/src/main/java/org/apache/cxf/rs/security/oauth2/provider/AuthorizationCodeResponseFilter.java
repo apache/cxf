@@ -19,7 +19,8 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 public interface AuthorizationCodeResponseFilter {
-    String process(Client client, String code);
+    String process(Client client, String code, UserSubject endUser);
 }
