@@ -42,6 +42,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -50,6 +51,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
+import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.xmlbeans.SchemaGlobalElement;
 import org.apache.xmlbeans.SchemaProperty;
 import org.apache.xmlbeans.SchemaType;
@@ -144,6 +146,9 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
             if (type == null)  {
                 type = typeLoader.findDocumentType(qn);
             }
+            if (type == null) {
+                return null;
+            }
 
             ret = type.getFullJavaName();
             if (ret.contains("$")) {
@@ -157,6 +162,13 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
             type = typeLoader.findType(qn);
         }
 
+        if (type == null
+            && Constants.URI_2001_SCHEMA_XSD.equals(qn.getNamespaceURI())) {
+            return JAXBUtils.builtInTypeToJavaType(qn.getLocalPart());
+        }
+        if (type == null) {
+            return null;
+        }
         ret = type.getFullJavaName();
         return ret.replace('$', '.');
     }
