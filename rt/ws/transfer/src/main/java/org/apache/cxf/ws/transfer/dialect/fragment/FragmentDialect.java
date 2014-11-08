@@ -19,7 +19,9 @@
 
 package org.apache.cxf.ws.transfer.dialect.fragment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import org.w3c.dom.Attr;
@@ -225,14 +227,16 @@ public class FragmentDialect implements Dialect {
             String mode,
             ValueType value) {
         if (resourceFragment instanceof Node) {
-            return modifyRepresentationMode((Node) resourceFragment, mode, value);
+            List<Node> nodeList = new ArrayList<Node>();
+            nodeList.add((Node) resourceFragment);
+            return modifyRepresentationMode(nodeList, mode, value);
         } else if (resourceFragment instanceof NodeList) {
-            Representation representation = null;
-            NodeList list = (NodeList) resourceFragment;
-            for (int i = 0; i < list.getLength(); i++) {
-                representation = modifyRepresentationMode(list.item(i), mode, value);
+            NodeList rfNodeList = (NodeList) resourceFragment;
+            List<Node> nodeList = new ArrayList<Node>();
+            for (int i = 0; i < rfNodeList.getLength(); i++) {
+                nodeList.add(rfNodeList.item(i));
             }
-            return representation;
+            return modifyRepresentationMode(nodeList, mode, value);
         } else {
             throw new InvalidExpression();
         }
@@ -246,20 +250,20 @@ public class FragmentDialect implements Dialect {
      * @return Representation element, which is returned as response.
      */
     private Representation modifyRepresentationMode(
-            Node resourceFragment,
+            List<Node> nodeList,
             String mode,
             ValueType value) {
         switch (mode) {
         case FragmentDialectConstants.FRAGMENT_MODE_REPLACE:
-            return modifyRepresentationModeReplace(resourceFragment, value);
+            return modifyRepresentationModeReplace(nodeList, value);
         case FragmentDialectConstants.FRAGMENT_MODE_ADD:
-            return modifyRepresentationModeAdd(resourceFragment, value);
+            return modifyRepresentationModeAdd(nodeList, value);
         case FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE:
-            return modifyRepresentationModeInsertBefore(resourceFragment, value);
+            return modifyRepresentationModeInsertBefore(nodeList, value);
         case FragmentDialectConstants.FRAGMENT_MODE_INSERT_AFTER:
-            return modifyRepresentationModeInsertAfter(resourceFragment, value);
+            return modifyRepresentationModeInsertAfter(nodeList, value);
         case FragmentDialectConstants.FRAGMENT_MODE_REMOVE:
-            return modifyRepresentationModeRemove(resourceFragment, value);
+            return modifyRepresentationModeRemove(nodeList, value);
         default:
             throw new UnsupportedMode();
         }
@@ -272,14 +276,25 @@ public class FragmentDialect implements Dialect {
      * @return Representation element, which is returned as response.
      */
     private Representation modifyRepresentationModeReplace(
-            Node resourceFragment,
+            List<Node> nodeList,
             ValueType value) {
         
-        Document ownerDocument = resourceFragment.getOwnerDocument();
-        // if parent.getOwnerDocument == null the parent is ownerDocument
-        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
-        Node parent = removeNode(resourceFragment);
-        addNode(ownerDocument, parent, value);
+        if (nodeList.isEmpty()) {
+            throw new InvalidExpression();
+        }
+        Node firstNode = nodeList.get(0);
+        Document ownerDocument = firstNode.getOwnerDocument();
+        // if firstNode.getOwnerDocument == null the firstNode is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) firstNode : ownerDocument;
+        Node nextSibling = null;
+        Node parent = null;
+        
+        for (Node node : nodeList) {
+            nextSibling = node.getNextSibling();
+            parent = removeNode(node);
+        }
+        
+        addNode(ownerDocument, parent, nextSibling, value);
         
         Representation representation = new Representation();
         representation.setAny(ownerDocument.getDocumentElement());
@@ -293,13 +308,19 @@ public class FragmentDialect implements Dialect {
      * @return Representation element, which is returned as response.
      */
     private Representation modifyRepresentationModeAdd(
-            Node resourceFragment,
+            List<Node> nodeList,
             ValueType value) {
+        if (nodeList.isEmpty()) {
+            throw new InvalidExpression();
+        }
+        Node firstNode = nodeList.get(0);
+        Document ownerDocument = firstNode.getOwnerDocument();
+        // if firstNode.getOwnerDocument == null the firstNode is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) firstNode : ownerDocument;
         
-        Document ownerDocument = resourceFragment.getOwnerDocument();
-        // if parent.getOwnerDocument == null the parent is ownerDocument
-        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
-        addNode(ownerDocument, resourceFragment, value);
+        for (Node node : nodeList) {
+            addNode(ownerDocument, node, null, value);
+        }
         
         Representation representation = new Representation();
         representation.setAny(ownerDocument.getDocumentElement());
@@ -313,44 +334,29 @@ public class FragmentDialect implements Dialect {
      * @return Representation element, which is returned as response.
      */
     private Representation modifyRepresentationModeInsertBefore(
-            Node resourceFragment,
+            List<Node> nodeList,
             ValueType value) {
-        
-        Document ownerDocument = resourceFragment.getOwnerDocument();
-        // if parent.getOwnerDocument == null the parent is ownerDocument
-        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
+        if (nodeList.isEmpty()) {
+            throw new InvalidExpression();
+        }
+        Node firstNode = nodeList.get(0);
+        Document ownerDocument = firstNode.getOwnerDocument();
+        // if firstNode.getOwnerDocument == null the firstNode is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) firstNode : ownerDocument;
 
-        Node parent = resourceFragment.getParentNode();
-        if (parent == null && resourceFragment.getNodeType() != Node.DOCUMENT_NODE) {
+        Node parent = firstNode.getParentNode();
+        if (parent == null && firstNode.getNodeType() != Node.DOCUMENT_NODE) {
             throw new InvalidExpression();
         }
         if (parent == null) {
-            parent = resourceFragment;
+            parent = firstNode;
             if (((Document) parent).getDocumentElement() != null) {
                 throw new InvalidExpression();
             }
         }
         
-        for (Object o : value.getContent()) {
-            if (o instanceof Node) {
-                Node node = (Node) o;
-                
-                if (
-                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
-                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
-                ) {
-                    throw new InvalidExpression();
-                }
-                
-                Node importedNode = ownerDocument.importNode(node, true);
-                if (parent.getNodeType() == Node.DOCUMENT_NODE) {
-                    parent.appendChild(importedNode);
-                } else {
-                    parent.insertBefore(importedNode, resourceFragment);
-                }
-            } else {
-                throw new InvalidExpression();
-            }
+        for (Node node : nodeList) {
+            insertBefore(ownerDocument, parent, node, value);
         }
         
         Representation representation = new Representation();
@@ -365,49 +371,29 @@ public class FragmentDialect implements Dialect {
      * @return Representation element, which is returned as response.
      */
     private Representation modifyRepresentationModeInsertAfter(
-            Node resourceFragment,
+            List<Node> nodeList,
             ValueType value) {
-        
-        Document ownerDocument = resourceFragment.getOwnerDocument();
-        // if parent.getOwnerDocument == null the parent is ownerDocument
-        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
+        if (nodeList.isEmpty()) {
+            throw new InvalidExpression();
+        }
+        Node firstNode = nodeList.get(0);
+        Document ownerDocument = firstNode.getOwnerDocument();
+        // if firstNode.getOwnerDocument == null the firstNode is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) firstNode : ownerDocument;
 
-        Node parent = resourceFragment.getParentNode();
-        if (parent == null && resourceFragment.getNodeType() != Node.DOCUMENT_NODE) {
+        Node parent = firstNode.getParentNode();
+        if (parent == null && firstNode.getNodeType() != Node.DOCUMENT_NODE) {
             throw new InvalidExpression();
         }
         if (parent == null) {
-            parent = resourceFragment;
+            parent = firstNode;
             if (((Document) parent).getDocumentElement() != null) {
                 throw new InvalidExpression();
             }
         }
         
-        for (Object o : value.getContent()) {
-            if (o instanceof Node) {
-                Node node = (Node) o;
-                
-                if (
-                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
-                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
-                ) {
-                    throw new InvalidExpression();
-                }
-                
-                Node importedNode = ownerDocument.importNode(node, true);
-                if (parent.getNodeType() == Node.DOCUMENT_NODE) {
-                    parent.appendChild(importedNode);
-                } else {
-                    Node nextSibling = resourceFragment.getNextSibling();
-                    if (nextSibling == null) {
-                        parent.appendChild(importedNode);
-                    } else {
-                        parent.insertBefore(importedNode, nextSibling);
-                    }
-                }
-            } else {
-                throw new InvalidExpression();
-            }
+        for (Node node : nodeList) {
+            insertAfter(ownerDocument, parent, node, value);
         }
         
         Representation representation = new Representation();
@@ -422,15 +408,18 @@ public class FragmentDialect implements Dialect {
      * @return Representation element, which is returned as response.
      */
     private Representation modifyRepresentationModeRemove(
-            Node resourceFragment,
+            List<Node> nodeList,
             ValueType value) {
+        if (nodeList.isEmpty()) {
+            throw new InvalidExpression();
+        }
+        Node firstNode = nodeList.get(0);
+        Document ownerDocument = firstNode.getOwnerDocument();
+        // if firstNode.getOwnerDocument == null the firstNode is ownerDocument
+        ownerDocument = ownerDocument == null ? (Document) firstNode : ownerDocument;
         
-        Document ownerDocument = resourceFragment.getOwnerDocument();
-        // if parent.getOwnerDocument == null the parent is ownerDocument
-        ownerDocument = ownerDocument == null ? (Document) resourceFragment : ownerDocument;
-        
-        if (resourceFragment != null) {
-            removeNode(resourceFragment);
+        for (Node node : nodeList) {
+            removeNode(node);
         }
         
         Representation representation = new Representation();
@@ -471,13 +460,66 @@ public class FragmentDialect implements Dialect {
         return parent;
     }
     
+    private void insertAfter(Document ownerDocument, Node parent, Node refChild, ValueType value) {
+        for (Object o : value.getContent()) {
+            if (o instanceof Node) {
+                Node node = (Node) o;
+                
+                if (
+                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
+                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
+                ) {
+                    throw new InvalidExpression();
+                }
+                
+                Node importedNode = ownerDocument.importNode(node, true);
+                if (parent.getNodeType() == Node.DOCUMENT_NODE) {
+                    parent.appendChild(importedNode);
+                } else {
+                    Node nextSibling = refChild.getNextSibling();
+                    if (nextSibling == null) {
+                        parent.appendChild(importedNode);
+                    } else {
+                        parent.insertBefore(importedNode, nextSibling);
+                    }
+                }
+            } else {
+                throw new InvalidExpression();
+            }
+        }
+    }
+    
+    private void insertBefore(Document ownerDocument, Node parent, Node refChild, ValueType value) {
+        for (Object o : value.getContent()) {
+            if (o instanceof Node) {
+                Node node = (Node) o;
+                
+                if (
+                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
+                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
+                ) {
+                    throw new InvalidExpression();
+                }
+                
+                Node importedNode = ownerDocument.importNode(node, true);
+                if (parent.getNodeType() == Node.DOCUMENT_NODE) {
+                    parent.appendChild(importedNode);
+                } else {
+                    parent.insertBefore(importedNode, refChild);
+                }
+            } else {
+                throw new InvalidExpression();
+            }
+        }
+    }
+    
     /**
      * Helper method. It adds new Node as the last child of parent.
      * @param ownerDocument Document, where the Node is added.
      * @param parent Parent, where the Node is added.
      * @param value Value defined in the Value element. It represents newly added Node.
      */
-    private void addNode(Document ownerDocument, Node parent, ValueType value) {
+    private void addNode(Document ownerDocument, Node parent, Node nextSibling, ValueType value) {
         if (ownerDocument == parent && ownerDocument.getDocumentElement() != null) {
             throw new InvalidExpression();
         }
@@ -505,7 +547,11 @@ public class FragmentDialect implements Dialect {
                 } else {
                     // import the node to the ownerDocument
                     Node importedNode = ownerDocument.importNode((Node) o, true);
-                    parent.appendChild(importedNode);
+                    if (nextSibling == null) {
+                        parent.appendChild(importedNode);
+                    } else {
+                        parent.insertBefore(importedNode, nextSibling);
+                    }
                 }
             } else {
                 throw new InvalidExpression();

@@ -171,8 +171,6 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
         
-        //ObjectFactory objectFactory = new ObjectFactory();
-        
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -284,6 +282,64 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("b", rootEl.getNodeName());
+        
+        resource.destroy();
+    }
+    
+    @Test
+    public void replaceOneElementTest() {
+        String content = "<a><b/><b/></a>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+        
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.getContent().add("/a/b[1]");
+        Element replacedElement = TransferTools.createElement("c");
+        ValueType value = new ValueType();
+        value.getContent().add(replacedElement);
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+        
+        PutResponse response = client.put(request);
+        Element rootEl = (Element) response.getRepresentation().getAny();
+        Assert.assertEquals("c", ((Element)rootEl.getChildNodes().item(0)).getLocalName());
+        Assert.assertEquals("b", ((Element)rootEl.getChildNodes().item(1)).getLocalName());
+        
+        resource.destroy();
+    }
+    
+    @Test
+    public void replaceAllElementsTest() {
+        String content = "<a><b/><b/></a>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+        
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.getContent().add("/a/b");
+        Element replacedElement = TransferTools.createElement("c");
+        ValueType value = new ValueType();
+        value.getContent().add(replacedElement);
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+        
+        PutResponse response = client.put(request);
+        Element rootEl = (Element) response.getRepresentation().getAny();
+        Assert.assertEquals(1, rootEl.getChildNodes().getLength());
+        Assert.assertEquals("c", ((Element)rootEl.getChildNodes().item(0)).getLocalName());
         
         resource.destroy();
     }

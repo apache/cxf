@@ -25,6 +25,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;
 import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
@@ -64,12 +65,16 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
             }
         });
         try {
-            if (representation.getAny() == null) {
-                return (Node) xPath.evaluate(
-                    expressionStr, TransferTools.createDocument(), XPathConstants.NODE);
+            Object resource = representation.getAny();
+            if (resource == null) {
+                resource = TransferTools.createDocument();
+            }
+            NodeList result = (NodeList) xPath.evaluate(
+                expressionStr, resource, XPathConstants.NODESET);
+            if (checkResultConstraints(result)) {
+                return result;
             } else {
-                return (Node) xPath.evaluate(
-                    expressionStr, representation.getAny(), XPathConstants.NODE);
+                return result.item(0);
             }
         } catch (XPathException ex) {
             // See https://www.java.net/node/681793
@@ -94,5 +99,56 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
         } else {
             throw new InvalidExpression();
         }
+    }
+    
+    /**
+     * Check if result from evaluation of XPath expression fullfils constraints
+     * defined in the specification.
+     * See http://www.w3.org/TR/ws-fragment/#IdResSubset
+     * @param result
+     * @return If the result is true, the server should return all sequence of elements,
+     *         otherwise it should return only the first element.
+     */
+    private boolean checkResultConstraints(NodeList result) {
+        if (result.getLength() > 0) {
+            Node firstNode = result.item(0);
+            if (firstNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element firstEl = (Element) firstNode;
+                // QName attributes
+                String localName = firstEl.getLocalName();
+                String namespace = firstEl.getNamespaceURI();
+                Node parent = firstEl.getParentNode();
+                for (int i = 1; i < result.getLength(); i++) {
+                    Node node = result.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element element = (Element) node;
+                        if (!stringEquals(element.getLocalName(), localName)) {
+                            return false;
+                        }
+                        if (!stringEquals(element.getNamespaceURI(), namespace)) {
+                            return false;
+                        }
+                        if (element.getParentNode() != parent) {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Helper method for equation two strings, which can be nullable.
+     * @param str1
+     * @param str2
+     * @return 
+     */
+    private boolean stringEquals(String str1, String str2) {
+        return str1 == null ? str2 == null : str1.equals(str2);
     }
 }

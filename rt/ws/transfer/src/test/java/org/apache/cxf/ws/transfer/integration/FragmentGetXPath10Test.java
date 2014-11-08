@@ -194,6 +194,33 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
         
         GetResponse response = client.get(request);
         ValueType value = getValue(response);
+        Assert.assertEquals(3, value.getContent().size());
+        Assert.assertEquals("b", ((Element)value.getContent().get(0)).getLocalName());
+        Assert.assertEquals("b", ((Element)value.getContent().get(1)).getLocalName());
+        Assert.assertEquals("b", ((Element)value.getContent().get(2)).getLocalName());
+        
+        resource.destroy();
+    }
+    
+    @Test
+    public void getMoreValues2Test() {
+        String content = "<root><a><b>Text1</b><b>Text2</b><b><b>Text3</b></b></a></root>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+        
+        ObjectFactory objectFactory = new ObjectFactory();
+        
+        Get request = new Get();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.getContent().add("//b");
+        request.getAny().add(objectFactory.createExpression(expression));
+        
+        GetResponse response = client.get(request);
+        ValueType value = getValue(response);
         Assert.assertEquals(1, value.getContent().size());
         Assert.assertEquals("b", ((Element)value.getContent().get(0)).getLocalName());
         
