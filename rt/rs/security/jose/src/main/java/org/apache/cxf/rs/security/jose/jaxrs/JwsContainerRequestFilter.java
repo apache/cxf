@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.annotation.Priority;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -37,7 +38,9 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsContainerRequestFilter extends AbstractJwsReaderProvider implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        
+        if (HttpMethod.GET.equals(context.getMethod())) {
+            return;
+        }
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
         if (!p.verifySignatureWith(theSigVerifier)) {

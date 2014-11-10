@@ -43,16 +43,22 @@ public final class JwsUtils {
         
     }
     public static String sign(RSAPrivateKey key, String algo, String content) {
-        return sign(getRSAKeySignatureProvider(key, algo), content);
+        return sign(key, algo, content, null);
+    }
+    public static String sign(RSAPrivateKey key, String algo, String content, String ct) {
+        return sign(getRSAKeySignatureProvider(key, algo), content, ct);
     }
     public static String sign(byte[] key, String algo, String content) {
-        return sign(getHmacSignatureProvider(key, algo), content);
+        return sign(key, algo, content, null);
     }
-    public static String verifyAndGetContent(RSAPublicKey key, String algo, String content) {
+    public static String sign(byte[] key, String algo, String content, String ct) {
+        return sign(getHmacSignatureProvider(key, algo), content, ct);
+    }
+    public static String verify(RSAPublicKey key, String algo, String content) {
         JwsCompactConsumer jws = verify(getRSAKeySignatureVerifier(key, algo), content);
         return jws.getDecodedJwsPayload();
     }
-    public static String verifyAndGetContent(byte[] key, String algo, String content) {
+    public static String verify(byte[] key, String algo, String content) {
         JwsCompactConsumer jws = verify(getHmacSignatureVerifier(key, algo), content);
         return jws.getDecodedJwsPayload();
     }
@@ -229,8 +235,12 @@ public final class JwsUtils {
         }
         return jws;
     }
-    private static String sign(JwsSignatureProvider jwsSig, String content) {
-        JwsCompactProducer jws = new JwsCompactProducer(content);
+    private static String sign(JwsSignatureProvider jwsSig, String content, String ct) {
+        JoseHeaders headers = new JoseHeaders();
+        if (ct != null) {
+            headers.setContentType(ct);
+        }
+        JwsCompactProducer jws = new JwsCompactProducer(headers, content);
         jws.signWith(jwsSig);
         return jws.getSignedEncodedJws();
     }

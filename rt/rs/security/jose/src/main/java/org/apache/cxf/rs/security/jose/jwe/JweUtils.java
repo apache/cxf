@@ -40,27 +40,44 @@ public final class JweUtils {
     private JweUtils() {
         
     }
-    public String encrypt(RSAPublicKey key, String keyAlgo, String contentAlgo, byte[] content) {
+    public static String encrypt(RSAPublicKey key, String keyAlgo, String contentAlgo, byte[] content) {
+        return encrypt(key, keyAlgo, contentAlgo, content, null);
+    }
+    public static String encrypt(RSAPublicKey key, String keyAlgo, String contentAlgo, byte[] content, String ct) {
         KeyEncryptionAlgorithm keyEncryptionProvider = getRSAKeyEncryptionAlgorithm(key, keyAlgo);
-        return encrypt(keyEncryptionProvider, contentAlgo, content);
+        return encrypt(keyEncryptionProvider, contentAlgo, content, ct);
     }
-    public String encrypt(SecretKey key, String keyAlgo, String contentAlgo, byte[] content) {
-        KeyEncryptionAlgorithm keyEncryptionProvider = getSecretKeyEncryptionAlgorithm(key, keyAlgo);
-        return encrypt(keyEncryptionProvider, contentAlgo, content);
+    public static String encrypt(SecretKey key, String keyAlgo, String contentAlgo, byte[] content) {
+        return encrypt(key, keyAlgo, contentAlgo, content, null);
     }
-    public String encryptDirect(SecretKey key, String contentAlgo, byte[] content) {
+    public static String encrypt(SecretKey key, String keyAlgo, String contentAlgo, byte[] content, String ct) {
+        if (keyAlgo != null) {
+            KeyEncryptionAlgorithm keyEncryptionProvider = getSecretKeyEncryptionAlgorithm(key, keyAlgo);
+            return encrypt(keyEncryptionProvider, contentAlgo, content, ct);
+        } else {
+            return encryptDirect(key, contentAlgo, content, ct);
+        }
+    }
+    public static String encryptDirect(SecretKey key, String contentAlgo, byte[] content) {
+        return encryptDirect(key, contentAlgo, content, null);
+    }
+    public static String encryptDirect(SecretKey key, String contentAlgo, byte[] content, String ct) {
         JweEncryptionProvider jwe = getDirectKeyJweEncryption(key, contentAlgo);
-        return jwe.encrypt(content, null);
+        return jwe.encrypt(content, ct);
     }
-    public byte[] decrypt(RSAPrivateKey key, String keyAlgo, String contentAlgo, String content) {
+    public static byte[] decrypt(RSAPrivateKey key, String keyAlgo, String contentAlgo, String content) {
         KeyDecryptionAlgorithm keyDecryptionProvider = getRSAKeyDecryptionAlgorithm(key, keyAlgo);
         return decrypt(keyDecryptionProvider, contentAlgo, content);
     }
-    public byte[] decrypt(SecretKey key, String keyAlgo, String contentAlgo, String content) {
-        KeyDecryptionAlgorithm keyDecryptionProvider = getSecretKeyDecryptionAlgorithm(key, keyAlgo);
-        return decrypt(keyDecryptionProvider, contentAlgo, content);
+    public static byte[] decrypt(SecretKey key, String keyAlgo, String contentAlgo, String content) {
+        if (keyAlgo != null) {
+            KeyDecryptionAlgorithm keyDecryptionProvider = getSecretKeyDecryptionAlgorithm(key, keyAlgo);
+            return decrypt(keyDecryptionProvider, contentAlgo, content);
+        } else {
+            return decryptDirect(key, contentAlgo, content);
+        }
     }
-    public byte[] decryptDirect(SecretKey key, String contentAlgo, String content) {
+    public static byte[] decryptDirect(SecretKey key, String contentAlgo, String content) {
         JweDecryptionProvider jwe = getDirectKeyJweDecryption(key, contentAlgo);
         return jwe.decrypt(content).getContent();
     }
@@ -160,10 +177,10 @@ public final class JweUtils {
         }
         return null;
     }
-    public static JweEncryptionProvider getDirectKeyJweEncryption(SecretKey key, String algorithm) {
+    public static DirectKeyJweEncryption getDirectKeyJweEncryption(SecretKey key, String algorithm) {
         return new DirectKeyJweEncryption(getContentEncryptionAlgorithm(key, algorithm));
     }
-    public static JweDecryptionProvider getDirectKeyJweDecryption(SecretKey key, String algorithm) {
+    public static DirectKeyJweDecryption getDirectKeyJweDecryption(SecretKey key, String algorithm) {
         return new DirectKeyJweDecryption(key, getContentDecryptionAlgorithm(algorithm));
     }
     public static JweEncryptionProvider loadEncryptionProvider(String propLoc, Message m) {
@@ -305,9 +322,10 @@ public final class JweUtils {
     private static String getContentEncryptionAlgo(Properties props, String algo) {
         return algo == null ? props.getProperty(JSON_WEB_ENCRYPTION_CEK_ALGO_PROP) : algo;
     }
-    private static String encrypt(KeyEncryptionAlgorithm keyEncryptionProvider, String contentAlgo, byte[] content) {
+    private static String encrypt(KeyEncryptionAlgorithm keyEncryptionProvider, 
+                                  String contentAlgo, byte[] content, String ct) {
         JweEncryptionProvider jwe = createJweEncryptionProvider(keyEncryptionProvider, contentAlgo, null);
-        return jwe.encrypt(content, null);
+        return jwe.encrypt(content, ct);
     }
     private static byte[] decrypt(KeyDecryptionAlgorithm keyDecryptionProvider, String contentAlgo, String content) {
         JweDecryptionProvider jwe = createJweDecryptionProvider(keyDecryptionProvider, contentAlgo);

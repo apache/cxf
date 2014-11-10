@@ -54,7 +54,10 @@ public class JweWriterInterceptor implements WriterInterceptor {
     private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
-        
+        if (ctx.getEntity() == null) {
+            ctx.proceed();
+            return;
+        }
         OutputStream actualOs = ctx.getOutputStream();
         
         JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
