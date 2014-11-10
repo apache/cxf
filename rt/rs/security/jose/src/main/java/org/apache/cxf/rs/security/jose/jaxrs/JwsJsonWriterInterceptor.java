@@ -47,7 +47,10 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
     private boolean useJwsOutputStream;
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
-        
+        if (ctx.getEntity() == null) {
+            ctx.proceed();
+            return;
+        }
         List<JwsSignatureProvider> sigProviders = getInitializedSigProviders();
         OutputStream actualOs = ctx.getOutputStream();
         if (useJwsOutputStream) {

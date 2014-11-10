@@ -48,6 +48,10 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
+        if (ctx.getEntity() == null) {
+            ctx.proceed();
+            return;
+        }
         JoseHeaders headers = new JoseHeaders();
         JwsSignatureProvider sigProvider = getInitializedSigProvider(headers);
         setContentTypeIfNeeded(headers, ctx);
