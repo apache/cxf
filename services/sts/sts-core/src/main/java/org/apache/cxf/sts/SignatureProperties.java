@@ -28,7 +28,7 @@ import org.apache.wss4j.dom.WSConstants;
  * or generate a symmetric key in the STS.
  */
 public class SignatureProperties {
-    private String signatureAlgorithm = WSConstants.RSA_SHA1;
+    private String signatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
     private String c14nAlgorithm = WSConstants.C14N_EXCL_OMIT_COMMENTS;
     private List<String> acceptedSignatureAlgorithms = new ArrayList<String>();
     private List<String> acceptedC14nAlgorithms = new ArrayList<String>();
@@ -36,10 +36,11 @@ public class SignatureProperties {
     private long keySize = 256;
     private long minimumKeySize = 128;
     private long maximumKeySize = 512;
-    private String digestAlgorithm = WSConstants.SHA1;
+    private String digestAlgorithm = WSConstants.SHA256;
     
     public SignatureProperties() {
         // Default signature algorithms
+        acceptedSignatureAlgorithms.add(WSConstants.RSA_SHA1);
         acceptedSignatureAlgorithms.add(signatureAlgorithm);
         
         // Default c14n algorithms
