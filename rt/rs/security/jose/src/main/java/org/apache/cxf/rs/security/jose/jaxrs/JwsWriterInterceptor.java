@@ -55,7 +55,6 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
         JoseHeaders headers = new JoseHeaders();
         JwsSignatureProvider sigProvider = getInitializedSigProvider(headers);
         setContentTypeIfNeeded(headers, ctx);
-        ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE));
         OutputStream actualOs = ctx.getOutputStream();
         if (useJwsOutputStream) {
             JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
@@ -67,6 +66,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             Base64UrlOutputStream base64Stream = new Base64UrlOutputStream(jwsStream);
             ctx.setOutputStream(base64Stream);
             ctx.proceed();
+            setJoseMediaType(ctx);
             base64Stream.flush();
             jwsStream.flush();
         } else {
@@ -74,6 +74,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             ctx.setOutputStream(cos);
             ctx.proceed();
             JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), "UTF-8"));
+            setJoseMediaType(ctx);
             writeJws(p, sigProvider, actualOs);
         }
     }
@@ -100,5 +101,9 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
                 }
             }
         }
+    }
+    private void setJoseMediaType(WriterInterceptorContext ctx) {
+        MediaType joseMediaType = JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE);
+        ctx.setMediaType(joseMediaType);
     }
 }

@@ -63,18 +63,15 @@ public class JweWriterInterceptor implements WriterInterceptor {
         JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
         
         String ctString = null;
-        if (contentTypeRequired) {
-            MediaType mt = ctx.getMediaType();
-            if (mt != null) {
-                if ("application".equals(mt.getType())) {
-                    ctString = mt.getSubtype();
-                } else {
-                    ctString = JAXRSUtils.mediaTypeToString(mt);
-                }
+        MediaType contentMediaType = ctx.getMediaType();
+        if (contentTypeRequired && contentMediaType != null) {
+            if ("application".equals(contentMediaType.getType())) {
+                ctString = contentMediaType.getSubtype();
+            } else {
+                ctString = JAXRSUtils.mediaTypeToString(contentMediaType);
             }
         }
         
-        ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE));
         if (useJweOutputStream) {
             JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(ctString);
             try {
@@ -94,16 +91,23 @@ public class JweWriterInterceptor implements WriterInterceptor {
             
             ctx.setOutputStream(jweStream);
             ctx.proceed();
+            setJoseMediaType(ctx);
             jweStream.flush();
         } else {
             CachedOutputStream cos = new CachedOutputStream(); 
             ctx.setOutputStream(cos);
             ctx.proceed();
             String jweContent = theEncryptionProvider.encrypt(cos.getBytes(), ctString);
+            setJoseMediaType(ctx);
             IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jweContent)), 
                          actualOs);
             actualOs.flush();
         }
+    }
+    
+    private void setJoseMediaType(WriterInterceptorContext ctx) {
+        MediaType joseMediaType = JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE);
+        ctx.setMediaType(joseMediaType);
     }
     
     protected JweEncryptionProvider getInitializedEncryptionProvider() {
