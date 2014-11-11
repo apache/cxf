@@ -46,6 +46,7 @@ under the License.
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jwt.BookStore"/>
     <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsJsonContainerRequestFilter"/>
     <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsJsonWriterInterceptor"/>
+    <bean id="jackson" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-json}/jwsjsonhmac">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -53,9 +54,28 @@ under the License.
         <jaxrs:providers>
             <ref bean="jwsInFilter"/>
             <ref bean="jwsOutFilter"/>
+            <ref bean="jackson"/>
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.signature.list.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <bean id="jweInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter"/>
+    <bean id="jweOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor"/>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-json}/jwejwsjsonhmac">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.list.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+            <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-json}/jwsjsonhmac2">

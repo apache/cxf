@@ -21,11 +21,14 @@ package org.apache.cxf.systest.jaxrs.security.jwt;
 
 import java.net.URL;
 import java.security.Security;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
 import javax.crypto.Cipher;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -81,19 +84,21 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJweJwkPlainTextRSA() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkrsa";
-        BookStore bs = createBookStore(address);
+        BookStore bs = createJweBookStore(address, null);
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
     @Test
     public void testJweJwkBookBeanRSA() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkrsa";
-        BookStore bs = createBookStore(address);
+        BookStore bs = createJweBookStore(address,
+                                       Collections.singletonList(new JacksonJsonProvider()));
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
-    private BookStore createBookStore(String address) throws Exception {
+    private BookStore createJweBookStore(String address, 
+                                      List<?> mbProviders) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -106,6 +111,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         jweWriter.setUseJweOutputStream(true);
         providers.add(jweWriter);
         providers.add(new JweClientResponseFilter());
+        if (mbProviders != null) {
+            providers.addAll(mbProviders);
+        }
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.encryption.out.properties", 
                                      "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
@@ -169,19 +177,49 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJweRsaJwsRsa() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwsrsa";
-        doTestJweJwsRsa(address, null);
+        BookStore bs = createJweJwsBookStore(address, null, null);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
     }
     @Test
-    public void testJweRsaJwsHMac() throws Exception {
+    public void testJweRsaJwsPlainTextHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwshmac";
         HmacJwsSignatureProvider hmacProvider = 
             new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName());
-        doTestJweJwsRsa(address, hmacProvider);
+        BookStore bs = createJweJwsBookStore(address, hmacProvider, null);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    @Test
+    public void testJweRsaJwsBookHMac() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejwshmac";
+        HmacJwsSignatureProvider hmacProvider = 
+            new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName());
+        BookStore bs = createJweJwsBookStore(address, hmacProvider,
+                                             Collections.singletonList(new JacksonJsonProvider()));
+        Book book = bs.echoBook(new Book("book", 123L));
+        assertEquals("book", book.getName());
+        assertEquals(123L, book.getId());
     }
     
     @Test
-    public void testJwsJwkHMac() throws Exception {
+    public void testJwsJwkPlainTextHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
+        BookStore bs = createJwsBookStore(address, null);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    @Test
+    public void testJwsJwkBookHMac() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjwkhmac";
+        BookStore bs = createJwsBookStore(address,
+                                       Collections.singletonList(new JacksonJsonProvider()));
+        Book book = bs.echoBook(new Book("book", 123L));
+        assertEquals("book", book.getName());
+        assertEquals(123L, book.getId());
+    }
+    private BookStore createJwsBookStore(String address, 
+                                         List<?> mbProviders) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -194,12 +232,13 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         jwsWriter.setUseJwsOutputStream(true);
         providers.add(jwsWriter);
         providers.add(new JwsClientResponseFilter());
+        if (mbProviders != null) {
+            providers.addAll(mbProviders);
+        }
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.signature.properties", 
-                                     "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
-        BookStore bs = bean.create(BookStore.class);
-        String text = bs.echoText("book");
-        assertEquals("book", text);
+            "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
+        return bean.create(BookStore.class);
     }
     @Test
     public void testJwsJwkEC() throws Exception {
@@ -249,8 +288,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
-    private void doTestJweJwsRsa(String address, 
-                                 JwsSignatureProvider jwsSigProvider) throws Exception {
+    private BookStore createJweJwsBookStore(String address, 
+                                 JwsSignatureProvider jwsSigProvider,
+                                 List<?> mbProviders) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -270,6 +310,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         jwsWriter.setUseJwsOutputStream(true);
         providers.add(jwsWriter);
         providers.add(new JwsClientResponseFilter());
+        if (mbProviders != null) {
+            providers.addAll(mbProviders);
+        }
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.encryption.out.properties", SERVER_JWEJWS_PROPERTIES);
         bean.getProperties(true).put("rs.security.signature.out.properties", CLIENT_JWEJWS_PROPERTIES);
@@ -278,9 +321,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         PrivateKeyPasswordProvider provider = new PrivateKeyPasswordProviderImpl();
         bean.getProperties(true).put("rs.security.signature.key.password.provider", provider);
         bean.getProperties(true).put("rs.security.decryption.key.password.provider", provider);
-        BookStore bs = bean.create(BookStore.class);
-        String text = bs.echoText("book");
-        assertEquals("book", text);
+        return bean.create(BookStore.class);
     }
     
     @Test
