@@ -68,6 +68,7 @@ public class JwsJsonOutputStream extends FilterOutputStream {
             }
         });
         out.write(b, off, len);
+        out.flush();
     }
     @Override
     public void flush() throws IOException {

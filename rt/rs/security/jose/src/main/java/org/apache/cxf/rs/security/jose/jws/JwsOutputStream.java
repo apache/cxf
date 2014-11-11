@@ -47,6 +47,7 @@ public class JwsOutputStream extends FilterOutputStream {
             throw new SecurityException();
         }
         out.write(b, off, len);
+        out.flush();
     }
     @Override
     public void flush() throws IOException {
