@@ -83,16 +83,18 @@ public class JweWriterInterceptor implements WriterInterceptor {
             } catch (IOException ex) {
                 throw new SecurityException(ex);
             }
-            OutputStream jweStream = new JweOutputStream(actualOs, encryption.getCipher(), 
+            OutputStream wrappedStream = null;
+            JweOutputStream jweOutputStream = new JweOutputStream(actualOs, encryption.getCipher(), 
                                                          encryption.getAuthTagProducer());
+            wrappedStream = jweOutputStream;
             if (encryption.isCompressionSupported()) {
-                jweStream = new DeflaterOutputStream(jweStream);
+                wrappedStream = new DeflaterOutputStream(jweOutputStream);
             }
             
-            ctx.setOutputStream(jweStream);
+            ctx.setOutputStream(wrappedStream);
             ctx.proceed();
             setJoseMediaType(ctx);
-            jweStream.flush();
+            jweOutputStream.finalFlush();
         } else {
             CachedOutputStream cos = new CachedOutputStream(); 
             ctx.setOutputStream(cos);

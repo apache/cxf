@@ -145,7 +145,8 @@ public class JweCompactProducer {
                                          encryptedContentEncryptionKey.length, os);
         os.write(dotBytes);
         Base64UrlUtility.encodeAndStream(cipherInitVector, 0, cipherInitVector.length, os);
-        os.write(dotBytes);         
+        os.write(dotBytes);        
+        os.flush();
     }
     
     public String getJweContent() {

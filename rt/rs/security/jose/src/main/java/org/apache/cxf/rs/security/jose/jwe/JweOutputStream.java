@@ -94,7 +94,7 @@ public class JweOutputStream extends FilterOutputStream {
         }
         int rem = finalWrite ? 0 : lenToEncode % 3; 
         Base64UrlUtility.encodeAndStream(theChunk, off, lenToEncode - rem, out);
-        
+        out.flush();
         if (rem > 0) {
             lastEncryptedDataChunk = newArray(theChunk, lenToEncode - rem, rem);
         } else {
@@ -102,8 +102,7 @@ public class JweOutputStream extends FilterOutputStream {
         }
     }
     
-    @Override
-    public void flush() throws IOException {
+    public void finalFlush() throws IOException {
         if (flushed) {
             return;
         }
