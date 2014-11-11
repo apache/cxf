@@ -150,6 +150,10 @@
                     <artifactId>osgi</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.eclipse</groupId>
+                    <artifactId>org.eclipse.osgi</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.apache.karaf</groupId>
                     <artifactId>org.apache.karaf.client</artifactId>
                 </exclusion>
