@@ -208,10 +208,8 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
                 } else {
                     //force loading
                     Collection<?> objs = loc.getBeansOfType(extensionType);
-                    if (objs != null) {
-                        for (Object o : objs) {
-                            extensions.put(extensionType, o);
-                        }
+                    if (objs != null && objs.size() != 0) {
+                        extensions.put(extensionType, objs.iterator().next());
                     }
                     obj = extensions.get(extensionType);
                 }
