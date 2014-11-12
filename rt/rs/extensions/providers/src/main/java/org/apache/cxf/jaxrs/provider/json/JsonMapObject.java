@@ -69,6 +69,14 @@ public class JsonMapObject {
             return null;
         }
     }
+    public Boolean getBooleanProperty(String name) {
+        Object value = getProperty(name);
+        if (value != null) {
+            return value instanceof Boolean ? (Boolean)value : Boolean.parseBoolean(value.toString());
+        } else {
+            return null;
+        }
+    }
     
     public int hashCode() { 
         return values.hashCode();
