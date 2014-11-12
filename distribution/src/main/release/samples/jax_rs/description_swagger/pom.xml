@@ -39,42 +39,73 @@
             <id>server</id>
             <build>
                 <defaultGoal>test</defaultGoal>
-		        <plugins>
-		            <plugin>
-		                <groupId>org.codehaus.mojo</groupId>
-		                <artifactId>exec-maven-plugin</artifactId>
-		                <executions>
-		                    <execution>
-		                        <phase>test</phase>
-		                        <goals>
-		                            <goal>java</goal>
-		                        </goals>
-		                        <configuration>
-		                            <mainClass>demo.jaxrs.swagger.server.Server</mainClass>
-		                        </configuration>
-		                    </execution>
-		                </executions>
-		            </plugin>
-		        </plugins>
-		    </build>
-		</profile>
-	</profiles>
-
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>demo.jaxrs.swagger.server.Server</mainClass>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.9</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.webjars</groupId>
+                                    <artifactId>swagger-ui</artifactId>
+                                    <version>2.0.24</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                    <excludes>**/index.html</excludes>
+                                </artifactItem>                                
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
     <dependencies>
-	    <dependency>
+        <dependency>
             <groupId>com.wordnik</groupId>
-	        <artifactId>swagger-jaxrs_2.10</artifactId>
-	        <exclusions>
-	        	<exclusion>
-	        		 <groupId>javax.ws.rs</groupId>
+            <artifactId>swagger-jaxrs_2.10</artifactId>
+            <exclusions>
+                <exclusion>
+                     <groupId>javax.ws.rs</groupId>
                      <artifactId>jsr311-api</artifactId>
-	        	</exclusion>
-	        </exclusions>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-		  	<groupId>org.webjars</groupId>
-		  	<artifactId>swagger-ui</artifactId>
-		  	<version>2.0.24</version>
+              <groupId>org.webjars</groupId>
+              <artifactId>swagger-ui</artifactId>
+              <version>2.0.24</version>
+              <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javassist</groupId>
@@ -82,15 +113,15 @@
             <version>3.12.1.GA</version>
         </dependency>     
         <dependency>
-		  	<groupId>com.fasterxml.jackson.jaxrs</groupId>
-		  	<artifactId>jackson-jaxrs-json-provider</artifactId>
-		  	<version>2.2.2</version>
-		</dependency>   		
-   		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-   			<artifactId>jackson-core</artifactId>
-   			<version>2.2.2</version>
-   		</dependency>    
+              <groupId>com.fasterxml.jackson.jaxrs</groupId>
+              <artifactId>jackson-jaxrs-json-provider</artifactId>
+              <version>2.2.2</version>
+        </dependency>           
+           <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+               <artifactId>jackson-core</artifactId>
+               <version>2.2.2</version>
+           </dependency>    
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
@@ -125,8 +156,8 @@
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
         <dependency>
-		    <groupId>org.eclipse.jetty</groupId>
-		    <artifactId>jetty-webapp</artifactId>
-		</dependency>		
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+        </dependency>
     </dependencies>
 </project>

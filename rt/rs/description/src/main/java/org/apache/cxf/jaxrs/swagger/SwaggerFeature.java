@@ -33,9 +33,9 @@ public class SwaggerFeature extends AbstractFeature {
     private String resourcePackage;
     private String version = "1.0.0";
     private String basePath;
-    private String title = "Rest sample app";
-    private String description = "This is a app.";
-    private String contact = "freeman.fang@gmail.com";
+    private String title = "Sample REST Application";
+    private String description = "The Application";
+    private String contact = "committer@apache.org";
     private String license = "Apache 2.0 License";
     private String licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html";
     private boolean scan = true;
