@@ -91,6 +91,7 @@
         <module>jms_pubsub</module>
         <module>jax_rs/spring_security</module>
         <module>logbrowser</module>
+        <module>logbrowser-blueprint</module>
         <module>ws_notification</module>
         <module>sts</module>
         <module>corba/bank</module>
