@@ -783,6 +783,51 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     }
     
     @Test
+    public void testPropOrderInException2() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_prop_order2.wsdl");
+        //env.put(ToolConstants.CFG_OUTPUTFILE, "/x1/tmp/exception_prop_order.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.Echo5Impl");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File wsdlFile = new File(output, "exception_prop_order2.wsdl");
+        assertTrue(wsdlFile.exists());
+
+        Document doc = StaxUtils.read(wsdlFile);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        XPathUtils util = new XPathUtils(map);
+
+        Element summary = (Element)util.getValueNode("//xsd:element[@name='summary']", doc);
+        Element from = (Element)util.getValueNode("//xsd:element[@name='from']", doc);
+        Element id = (Element)util.getValueNode("//xsd:element[@name='id']", doc);
+        assertNotNull(summary);
+        assertNotNull(from);
+        assertNotNull(id);
+
+        Node nd = summary.getNextSibling();
+        while (nd != null) {
+            if (nd == from) {
+                from = null;
+            } else if (nd == id) {
+                if (from != null) {
+                    fail("id before from");
+                }
+                id = null;
+            }
+            nd = nd.getNextSibling();
+        }
+        assertNull(id);
+        assertNull(from);
+    }
+
+    @Test
     public void testXmlAccessorOrderInException() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_order.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.OrderEchoImpl");
