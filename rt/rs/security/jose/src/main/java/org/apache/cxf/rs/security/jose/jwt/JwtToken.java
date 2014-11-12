@@ -35,6 +35,12 @@ public class JwtToken {
     public JwtClaims getClaims() {
         return claims;
     }
+    public Object getHeader(String name) {
+        return headers.getHeader(name);
+    }
+    public Object getClaim(String name) {
+        return claims.getClaim(name);
+    }
     public int hashCode() { 
         return headers.hashCode() + 37 * claims.hashCode();
     }

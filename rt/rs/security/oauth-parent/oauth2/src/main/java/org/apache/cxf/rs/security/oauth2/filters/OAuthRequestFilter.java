@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth2.filters;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -64,6 +65,8 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     private boolean useUserSubject;
     private boolean audienceIsEndpointAddress;
     private boolean checkFormData;
+    private List<String> requiredScopes = Collections.emptyList();
+    private boolean allPermissionsMatch;
     
     public void filter(ContainerRequestContext context) {
         validateRequest(JAXRSUtils.getCurrentMessage());
@@ -93,12 +96,15 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         for (OAuthPermission perm : permissions) {
             boolean uriOK = checkRequestURI(req, perm.getUris());
             boolean verbOK = checkHttpVerb(req, perm.getHttpVerbs());
-            if (uriOK && verbOK) {
+            boolean scopeOk = checkScopeProperty(perm.getPermission()); 
+            if (uriOK && verbOK && scopeOk) {
                 matchingPermissions.add(perm);
             }
         }
         
-        if (permissions.size() > 0 && matchingPermissions.isEmpty()) {
+        if (permissions.size() > 0 && matchingPermissions.isEmpty() 
+            || allPermissionsMatch && (matchingPermissions.size() != permissions.size())
+            || !requiredScopes.isEmpty() && requiredScopes.size() != matchingPermissions.size()) {
             String message = "Client has no valid permissions";
             LOG.warning(message);
             throw new WebApplicationException(403);
@@ -150,7 +156,13 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         }
         return foundValidScope;
     }
-    
+    protected boolean checkScopeProperty(String scope) {
+        if (!requiredScopes.isEmpty()) {
+            return requiredScopes.contains(scope);
+        } else {
+            return true;
+        }
+    }
     public void setUseUserSubject(boolean useUserSubject) {
         this.useUserSubject = useUserSubject;
     }
@@ -238,6 +250,14 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         }
         AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         return null;
+    }
+
+    public void setRequiredScopes(List<String> requiredScopes) {
+        this.requiredScopes = requiredScopes;
+    }
+
+    public void setAllPermissionsMatch(boolean allPermissionsMatch) {
+        this.allPermissionsMatch = allPermissionsMatch;
     }
     
 }
