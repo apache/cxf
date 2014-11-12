@@ -18,8 +18,75 @@
  */
 package org.apache.cxf.rs.security.oidc.common;
 
-import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
+import java.util.Map;
 
-public class UserProfile extends JsonMapObject {
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 
+public class UserProfile extends JwtClaims {
+    public static final String NAME_CLAIM = "name";
+    public static final String PROFILE_CLAIM = "profile";
+    public static final String EMAIL_CLAIM = "email";
+    public static final String EMAIL_VERIFIED_CLAIM = "email_verified";
+    public static final String BIRTHDATE_CLAIM = "birthdate";
+    public static final String PHONE_CLAIM = "phone_number";
+    public static final String ADDRESS_CLAIM = "address";
+    public UserProfile() {
+    }
+    
+    public UserProfile(Map<String, Object> claims) {
+        super(claims);
+    }
+    
+    public void setName(String name) {
+        setProperty(NAME_CLAIM, name);
+    }
+    public String getName() {
+        return (String)getProperty(NAME_CLAIM);
+    }
+    public void setProfile(String name) {
+        setProperty(PROFILE_CLAIM, name);
+    }
+    public String getProfile() {
+        return (String)getProperty(PROFILE_CLAIM);
+    }
+    public void setEmail(String name) {
+        setProperty(EMAIL_CLAIM, name);
+    }
+    public String getEmail() {
+        return (String)getProperty(EMAIL_CLAIM);
+    }
+    public void setEmailVerified(Boolean verified) {
+        setProperty(EMAIL_VERIFIED_CLAIM, verified);
+    }
+    public Boolean getEmailVerified() {
+        return getBooleanProperty(EMAIL_VERIFIED_CLAIM);
+    }
+    public void setBirthDate(String date) {
+        setProperty(BIRTHDATE_CLAIM, date);
+    }
+    public String getBirthdate() {
+        return (String)getProperty(BIRTHDATE_CLAIM);
+    }
+    public String getPhoneNumber() {
+        return (String)getProperty(PHONE_CLAIM);
+    }
+    public void setPhoneNumber(String name) {
+        setProperty(PHONE_CLAIM, name);
+    }
+    public UserAddress getUserAddress() {
+        Object value = getProperty(ADDRESS_CLAIM);
+        if (value instanceof UserAddress) {
+            return (UserAddress)value;
+        } else if (value instanceof Map) {
+            Map<String, Object> map = CastUtils.cast((Map<?, ?>)value); 
+            return new UserAddress(map);
+        } else {
+            return null;
+        }
+    }
+    public void setUserAddressNumber(UserAddress address) {
+        setProperty(ADDRESS_CLAIM, address);
+    }
+    
 }
