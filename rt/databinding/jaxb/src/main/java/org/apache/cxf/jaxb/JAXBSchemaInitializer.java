@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -581,7 +582,11 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 }
             }
         }
-
+        // Create element in xsd:sequence for Exception.class
+        if (Exception.class.isAssignableFrom(cls)) {
+            addExceptionMessage(cls, schema, seq);
+        }
+        
         if (propertyOrder != null) {
             if (propertyOrder.length == seq.getItems().size()) {
                 sortItems(seq, propertyOrder);
@@ -599,6 +604,23 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
        
         schemas.addCrossImports();
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
+    }
+    private void addExceptionMessage(Class<?> cls, XmlSchema schema, XmlSchemaSequence seq) {
+        try {
+            //a subclass could mark the message method as transient
+            Method m = cls.getMethod("getMessage");
+            if (!m.isAnnotationPresent(XmlTransient.class)
+                && m.getDeclaringClass().equals(Throwable.class)) {
+                JAXBBeanInfo beanInfo = getBeanInfo(java.lang.String.class);
+                XmlSchemaElement exEle = new XmlSchemaElement(schema, false);
+                exEle.setName("message");
+                exEle.setSchemaTypeName(getTypeName(beanInfo));
+                exEle.setMinOccurs(0);
+                seq.getItems().add(exEle);
+            }
+        } catch (Exception e) {
+            //ignore, just won't have the message element
+        }
     }
     
     private boolean generateGenericType(Type type) {
