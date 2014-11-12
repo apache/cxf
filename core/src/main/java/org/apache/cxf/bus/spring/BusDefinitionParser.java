@@ -168,30 +168,30 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             if (bus == bb) {
                 return;
             }
-            bus = bb;
             if (properties != null) {
-                bus.setProperties(properties);
+                bb.setProperties(properties);
                 properties = null;
             }
             if (!getInInterceptors().isEmpty()) {
-                bus.getInInterceptors().addAll(getInInterceptors());
+                bb.getInInterceptors().addAll(getInInterceptors());
             }
             if (!getOutInterceptors().isEmpty()) {
-                bus.getOutInterceptors().addAll(getOutInterceptors());
+                bb.getOutInterceptors().addAll(getOutInterceptors());
             }
             if (!getInFaultInterceptors().isEmpty()) {
-                bus.getInFaultInterceptors().addAll(getInFaultInterceptors());
+                bb.getInFaultInterceptors().addAll(getInFaultInterceptors());
             }
             if (!getOutFaultInterceptors().isEmpty()) {
-                bus.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
+                bb.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
             }
             if (!StringUtils.isEmpty(id)) {
-                bus.setId(id);
+                bb.setId(id);
             }
             if (features != null) {
-                bus.setFeatures(features);
+                bb.setFeatures(features);
                 features = null;
             }
+            bus = bb;
         }
 
         public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
