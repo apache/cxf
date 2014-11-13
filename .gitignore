@@ -5,6 +5,7 @@
 .DS_Store
 .checkstyle
 .classpath
+.ekstazi
 .pmd
 .pmdruleset
 .pmdruleset.xml
