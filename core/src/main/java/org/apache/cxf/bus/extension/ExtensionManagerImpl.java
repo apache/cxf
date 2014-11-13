@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -56,6 +57,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     private final ClassLoader loader;
     private ResourceManager resourceManager;
     private Map<String, Extension> all = new ConcurrentHashMap<String, Extension>();
+    private List<Extension> ordered = new CopyOnWriteArrayList<Extension>();
     private final Map<Class<?>, Object> activated;
     private final Bus bus;
 
@@ -91,6 +93,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         for (Map.Entry<String, Extension> ext : ExtensionRegistry.getRegisteredExtensions().entrySet()) {
             if (!all.containsKey(ext.getKey())) {
                 all.put(ext.getKey(), ext.getValue());
+                ordered.add(ext.getValue());
             }
         }
     }
@@ -109,10 +112,11 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     }
     public void add(Extension ex) {
         all.put(ex.getName(), ex);
+        ordered.add(ex);
     }
     
     public void initialize() {
-        for (Extension e : all.values()) {
+        for (Extension e : ordered) {
             if (!e.isDeferred() && e.getLoadedObject() == null) {
                 loadAndRegister(e);
             }
@@ -121,18 +125,21 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
 
     public void removeBeansOfNames(List<String> names) {
         for (String s : names) {
-            all.remove(s);
+            Extension ex = all.remove(s);
+            if (ex != null) {
+                ordered.remove(ex);
+            }
         }
     }
     public void activateAll() {
-        for (Extension e : all.values()) {
+        for (Extension e : ordered) {
             if (e.getLoadedObject() == null) {
                 loadAndRegister(e);
             }
         }        
     }
     public <T> void activateAllByType(Class<T> type) {
-        for (Extension e : all.values()) {
+        for (Extension e : ordered) {
             if (e.getLoadedObject() == null) {
                 Class<?> cls = e.getClassObject(loader);
                 if (cls != null && type.isAssignableFrom(cls)) {
@@ -178,6 +185,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                     }
                     if (!all.containsKey(e.getName())) {
                         all.put(e.getName(), e);
+                        ordered.add(e);
                     }
                 }
             } finally {
@@ -292,7 +300,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     }
     public List<String> getBeanNamesOfType(Class<?> type) {
         List<String> ret = new LinkedList<String>();
-        for (Extension ex : all.values()) {
+        for (Extension ex : ordered) {
             Class<?> cls = ex.getClassObject(loader);
             if (cls != null && type.isAssignableFrom(cls)) {
                 synchronized (ex) {
@@ -325,11 +333,13 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                     if (ext.getLoadedObject() == null) {
                         loadAndRegister(ext);
                     }
-                    ret.add(type.cast(ext.getLoadedObject()));
+                    if (ext.getLoadedObject() != null) {
+                        ret.add(type.cast(ext.getLoadedObject()));
+                    }
                 }                
             }
         }
-        for (Extension ex : all.values()) {
+        for (Extension ex : ordered) {
             if (ex != ext) {
                 Class<?> cls = ex.getClassObject(loader);
                 if (cls != null && type.isAssignableFrom(cls)) {
@@ -348,7 +358,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     }
     public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
         boolean loaded = false;
-        for (Extension ex : all.values()) {
+        for (Extension ex : ordered) {
             Class<?> cls = ex.getClassObject(loader);
             if (cls != null 
                 && type.isAssignableFrom(cls)) {
@@ -376,7 +386,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             && ex.getNamespaces().contains(value);
     }
     public void destroyBeans() {
-        for (Extension ex : all.values()) {
+        for (Extension ex : ordered) {
             if (ex.getLoadedObject() != null) {
                 ResourceInjector injector = new ResourceInjector(resourceManager);
                 injector.destroy(ex.getLoadedObject());
