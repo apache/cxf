@@ -337,7 +337,9 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                         if (ex.getLoadedObject() == null) {
                             loadAndRegister(ex);
                         }
-                        ret.add(type.cast(ex.getLoadedObject()));
+                        if (ex.getLoadedObject() != null) {
+                            ret.add(type.cast(ex.getLoadedObject()));
+                        }
                     }                
                 }
             }
