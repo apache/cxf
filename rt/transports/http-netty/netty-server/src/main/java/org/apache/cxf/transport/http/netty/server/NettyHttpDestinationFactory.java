@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http.netty.server;
 
+
 import java.io.IOException;
 
 import org.apache.cxf.Bus;
@@ -30,6 +31,10 @@ import org.apache.cxf.transport.http.HttpDestinationFactory;
 
 @NoJSR250Annotations()
 public class NettyHttpDestinationFactory implements HttpDestinationFactory {
+    
+    public NettyHttpDestinationFactory() {
+        io.netty.util.Version.identify();
+    }
 
     public AbstractHTTPDestination createDestination(EndpointInfo endpointInfo, Bus bus,
                                                      DestinationRegistry registry) throws IOException {
