@@ -16,11 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwe;
+package org.apache.cxf.rs.security.jose.jwt;
 
 
-
-public interface JweEncryptionProvider extends JweKeyProperties {
-    String encrypt(byte[] jweContent, JweHeaders jweHeaders);
-    JweEncryptionState createJweEncryptionState(JweHeaders jweHeaders);
+public final class JwtUtils {
+    private JwtUtils() {
+        
+    }
+    public static String claimsToJson(JwtClaims claims) {
+        return claimsToJson(claims);
+    }
+    public static String claimsToJson(JwtClaims claims, JwtTokenWriter writer) {
+        if (writer == null) {
+            writer = new JwtTokenReaderWriter();
+        }
+        return writer.claimsToJson(claims);
+    }
+    public static JwtClaims jsonToClaims(String json) {
+        return jsonToClaims(json, null);
+    }
+    public static JwtClaims jsonToClaims(String json, JwtTokenReader reader) {
+        if (reader == null) {
+            reader = new JwtTokenReaderWriter();
+        }
+        return reader.fromJsonClaims(json);
+    }
 }

@@ -20,8 +20,8 @@ package org.apache.cxf.rs.security.jose.jws;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenWriter;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 
 public class JwsJwtCompactProducer extends JwsCompactProducer {
@@ -39,13 +39,8 @@ public class JwsJwtCompactProducer extends JwsCompactProducer {
         this(new JwtToken(headers, claims), w);
     }
     public JwsJwtCompactProducer(JwtToken token, JwtTokenWriter w) {
-        super(token.getHeaders(), w, serializeClaims(token.getClaims(), w));
+        super(token.getHeaders(), w, JwtUtils.claimsToJson(token.getClaims(), w));
     }
     
-    private static String serializeClaims(JwtClaims claims, JwtTokenWriter writer) {
-        if (writer == null) {
-            writer = new JwtTokenReaderWriter();
-        }
-        return writer.claimsToJson(claims);
-    }
+    
 }

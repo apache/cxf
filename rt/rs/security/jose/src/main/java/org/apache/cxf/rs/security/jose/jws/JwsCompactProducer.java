@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.interfaces.RSAPrivateKey;
+
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
@@ -71,7 +73,14 @@ public class JwsCompactProducer {
     }
     
     public String signWith(JsonWebKey jwk) {
-        return signWith(JwsUtils.getSignatureProvider(jwk));
+        return signWith(JwsUtils.getSignatureProvider(jwk, headers.getAlgorithm()));
+    }
+    
+    public String signWith(RSAPrivateKey key) {
+        return signWith(JwsUtils.getRSAKeySignatureProvider(key, headers.getAlgorithm()));
+    }
+    public String signWith(byte[] key) {
+        return signWith(JwsUtils.getHmacSignatureProvider(key, headers.getAlgorithm()));
     }
     
     public String signWith(JwsSignatureProvider signer) { 
@@ -79,17 +88,15 @@ public class JwsCompactProducer {
         
         byte[] bytes = StringUtils.toBytesUTF8(getUnsignedEncodedJws());
         worker.update(bytes, 0, bytes.length);
-        signWith(worker.sign());
-        return getSignedEncodedJws();
-        
+        return setSignatureBytes(worker.sign());
     }
     
-    public String signWith(String signatureText) {
+    public String setSignatureText(String signatureText) {
         setEncodedSignature(Base64UrlUtility.encode(signatureText));
         return getSignedEncodedJws();
     }
     
-    public String signWith(byte[] signatureOctets) {
+    public String setSignatureBytes(byte[] signatureOctets) {
         setEncodedSignature(Base64UrlUtility.encode(signatureOctets));
         return getSignedEncodedJws();
     }

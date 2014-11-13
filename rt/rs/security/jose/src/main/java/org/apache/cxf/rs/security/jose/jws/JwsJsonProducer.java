@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.interfaces.RSAPrivateKey;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,6 +81,12 @@ public class JwsJsonProducer {
     }
     public String signWith(JsonWebKey jwk) {
         return signWith(JwsUtils.getSignatureProvider(jwk));
+    }
+    public String signWith(RSAPrivateKey key, String algo) {
+        return signWith(JwsUtils.getRSAKeySignatureProvider(key, algo));
+    }
+    public String signWith(byte[] key, String algo) {
+        return signWith(JwsUtils.getHmacSignatureProvider(key, algo));
     }
     public String signWith(JwsSignatureProvider signer,
                            JwsJsonProtectedHeader protectedHeader,

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -104,6 +105,12 @@ public class JwsJsonConsumer {
             }
         }
         return false;
+    }
+    public boolean verifySignatureWith(RSAPublicKey key, String algo) {
+        return verifySignatureWith(JwsUtils.getRSAKeySignatureVerifier(key, algo));
+    }
+    public boolean verifySignatureWith(byte[] key, String algo) {
+        return verifySignatureWith(JwsUtils.getHmacSignatureVerifier(key, algo));
     }
     public boolean verifySignatureWith(List<JwsSignatureVerifier> validators) {
         try {
