@@ -67,6 +67,7 @@ public class NettyHttpConduitFactory implements HTTPConduitFactory {
     
     UseAsyncPolicy policy;
     public NettyHttpConduitFactory() {
+        io.netty.util.Version.identify();
         Object st = SystemPropertyAction.getPropertyOrNull(USE_POLICY);
         policy = UseAsyncPolicy.getPolicy(st);
     }
