@@ -40,6 +40,7 @@ import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.PrivateKeyPasswordProvider;
@@ -48,6 +49,7 @@ import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
+import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jwe.KeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.KeyEncryptionAlgorithm;
@@ -105,7 +107,8 @@ public final class JwkUtils {
         return encryptJwkSet(jwkSet, createDefaultEncryption(password), writer);
     }
     public static String encryptJwkSet(JsonWebKeys jwkSet, JweEncryptionProvider jwe, JwkReaderWriter writer) {
-        return jwe.encrypt(StringUtils.toBytesUTF8(writer.jwkSetToJson(jwkSet)), "jwk-set+json");
+        return jwe.encrypt(StringUtils.toBytesUTF8(writer.jwkSetToJson(jwkSet)), 
+                           toJweHeaders("jwk-set+json"));
     }
     public static String encryptJwkSet(JsonWebKeys jwkSet, RSAPublicKey key, String keyAlgo, String contentAlgo) {
         return JweUtils.encrypt(key, keyAlgo, contentAlgo, StringUtils.toBytesUTF8(jwkSetToJson(jwkSet)),
@@ -154,7 +157,8 @@ public final class JwkUtils {
         return encryptJwkKey(jwkKey, createDefaultEncryption(password), writer);
     }
     public static String encryptJwkKey(JsonWebKey jwkKey, JweEncryptionProvider jwe, JwkReaderWriter writer) {
-        return jwe.encrypt(StringUtils.toBytesUTF8(writer.jwkToJson(jwkKey)), "jwk+json");
+        return jwe.encrypt(StringUtils.toBytesUTF8(writer.jwkToJson(jwkKey)), 
+                           toJweHeaders("jwk+json"));
     }
     public static String encryptJwkKey(JsonWebKey jwkKey, RSAPublicKey key, String keyAlgo, String contentAlgo) {
         return JweUtils.encrypt(key, keyAlgo, contentAlgo, StringUtils.toBytesUTF8(jwkKeyToJson(jwkKey)),
@@ -414,5 +418,8 @@ public final class JwkUtils {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+    private static JweHeaders toJweHeaders(String ct) {
+        return new JweHeaders(Collections.<String, Object>singletonMap(JoseConstants.HEADER_CONTENT_TYPE, ct));
     }
 }

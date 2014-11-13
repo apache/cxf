@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.zip.DeflaterOutputStream;
 
 import javax.annotation.Priority;
@@ -41,6 +42,7 @@ import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionState;
+import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweOutputStream;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 
@@ -73,7 +75,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
         }
         
         if (useJweOutputStream) {
-            JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(ctString);
+            JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(toJweHeaders(ctString));
             try {
                 JweCompactProducer.startJweContent(actualOs,
                                                    encryption.getHeaders(), 
@@ -99,7 +101,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
             CachedOutputStream cos = new CachedOutputStream(); 
             ctx.setOutputStream(cos);
             ctx.proceed();
-            String jweContent = theEncryptionProvider.encrypt(cos.getBytes(), ctString);
+            String jweContent = theEncryptionProvider.encrypt(cos.getBytes(), toJweHeaders(ctString));
             setJoseMediaType(ctx);
             IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jweContent)), 
                          actualOs);
@@ -136,5 +138,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
     public void setEncryptionProvider(JweEncryptionProvider encryptionProvider) {
         this.encryptionProvider = encryptionProvider;
     }
-    
+    private static JweHeaders toJweHeaders(String ct) {
+        return new JweHeaders(Collections.<String, Object>singletonMap(JoseConstants.HEADER_CONTENT_TYPE, ct));
+    }
 }

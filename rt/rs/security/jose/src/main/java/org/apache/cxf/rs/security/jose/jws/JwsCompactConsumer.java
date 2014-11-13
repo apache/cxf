@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.interfaces.RSAPublicKey;
+
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReader;
@@ -93,6 +95,12 @@ public class JwsCompactConsumer {
     }
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
+    }
+    public boolean verifySignatureWith(RSAPublicKey key, String algo) {
+        return verifySignatureWith(JwsUtils.getRSAKeySignatureVerifier(key, algo));
+    }
+    public boolean verifySignatureWith(byte[] key, String algo) {
+        return verifySignatureWith(JwsUtils.getHmacSignatureVerifier(key, algo));
     }
     public boolean validateCriticalHeaders() {
         return JwsUtils.validateCriticalHeaders(getJoseHeaders());
