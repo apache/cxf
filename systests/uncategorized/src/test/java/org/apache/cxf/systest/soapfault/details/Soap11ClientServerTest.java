@@ -109,7 +109,7 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
             StackTraceElement[] elements = ex.getCause().getStackTrace();
             assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl11", 
                          elements[0].getClassName());
-            assertTrue(ex.getCause().getMessage().endsWith("Test \n cause."));
+            assertTrue(ex.getCause().getCause().getMessage().endsWith("Test \n cause."));
         } 
 
         

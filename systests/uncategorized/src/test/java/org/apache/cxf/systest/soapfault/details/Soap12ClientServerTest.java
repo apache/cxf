@@ -73,6 +73,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
             assertEquals((short)1, detail.getMinor());
             assertEquals("PingMeFault raised by server", ex.getMessage());
             StackTraceElement[] element = ex.getStackTrace();
+            ex.printStackTrace();
             assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl12", element[0].getClassName());
         }
     }

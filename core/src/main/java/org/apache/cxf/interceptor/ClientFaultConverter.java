@@ -260,8 +260,14 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 if (!stackTraceList.isEmpty()) {
                     StackTraceElement[] stackTraceElement = new StackTraceElement[stackTraceList.size()];
                     e.setStackTrace(stackTraceList.toArray(stackTraceElement));
-                }
-                if (cause != null) {
+                } else if (cause != null
+                    && cause.getMessage() != null
+                    && cause.getMessage().startsWith(e.getClass().getName())) {
+                    e.setStackTrace(cause.getStackTrace());
+                    if (cause.getCause() != null) {
+                        e.initCause(cause.getCause());
+                    }
+                } else if (cause != null) {
                     e.initCause(cause);
                 }
             }
@@ -273,7 +279,22 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     private Throwable getCause(Iterator<String> linesIterator, String firstLine) {
         // The actual exception class of the cause might be unavailable at the
         // client -> use a standard throwable to represent the cause.
-        Throwable res = new Throwable(firstLine.substring(firstLine.indexOf(":") + 2));
+        firstLine = firstLine.substring(firstLine.indexOf(":") + 1).trim();
+        Throwable res = null;
+        if (firstLine.indexOf(":") != -1) {
+            String cn = firstLine.substring(0, firstLine.indexOf(":")).trim();
+            if (cn.startsWith("java.lang")) {
+                try {
+                    res = (Throwable)Class.forName(cn).getConstructor(String.class)
+                            .newInstance(firstLine.substring(firstLine.indexOf(":") + 2));
+                } catch (Throwable t) {
+                    //ignore, use the default
+                }
+            }
+        }
+        if (res == null) {
+            res = new Throwable(firstLine);
+        }
         List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
         while (linesIterator.hasNext()) {
             String oneLine = linesIterator.next();
