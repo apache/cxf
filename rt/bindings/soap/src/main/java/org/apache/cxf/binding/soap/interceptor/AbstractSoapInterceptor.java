@@ -79,6 +79,7 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
         if (config && fault.getCause() != null) {
             StringBuilder sb = new StringBuilder();
             Throwable throwable = fault.getCause();
+            sb.append(throwable.getClass().getCanonicalName() + " : " + throwable.getMessage() + "\n");
             while (throwable != null) {
                 for (StackTraceElement ste : throwable.getStackTrace()) {
                     sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName() + "!"
