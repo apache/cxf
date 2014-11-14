@@ -25,6 +25,13 @@ Assuming you have a freshly intalled Apache Karaf-3.x,
 
 4) To generate custom log entry, run some CXF scenarios that write some logs.
 
+Additional features
+5) Open the Log-Browser(PlainView) page by opening file test/resources/index_plain.html in the browser.
+
+6) Click on the Connect button to open a WebSocket connection to the log browser service. 
+Once the connection is open, click on the Subscribe button to subscribe to the logging feed.
+When there are new log entries, they will be pushed to the socket and displayed on the Log text area.
+
 *Note:
 - CXF version 3.0.2 is used in this example, but any verions that include this
 sample code may be used.
