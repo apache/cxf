@@ -154,6 +154,7 @@ public final class JAXRSUtils {
     private static final String PATH_SEGMENT_SEP = "/";
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
     private static final String NO_CONTENT_EXCEPTION = "javax.ws.rs.core.NoContentException";
+    private static final String HTTP_CHARSET_PARAM = "charset"; 
     
     private JAXRSUtils() {        
     }
@@ -1370,6 +1371,10 @@ public final class JAXRSUtils {
                     for (Map.Entry<String, String> entry : userType.getParameters().entrySet()) {
                         String value = requiredType.getParameters().get(entry.getKey());
                         if (value != null && !value.equals(entry.getValue())) {
+                            if (HTTP_CHARSET_PARAM.equals(entry.getKey()) 
+                                && value.equalsIgnoreCase(entry.getValue())) {
+                                continue;
+                            }
                             parametersMatched = false;
                             break;
                         }
