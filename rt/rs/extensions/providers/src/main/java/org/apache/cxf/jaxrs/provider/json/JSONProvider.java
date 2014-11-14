@@ -573,7 +573,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
              writeXsiType && !ignoreNamespaces, config, rootIsArray, theArrayKeys,
              isCollection || dropRootInXmlNeeded, enc);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
-        writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
+        writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces, !writeXsiType);
         return createTransformWriterIfNeeded(writer, os, dropElementsInXmlStreamProp);
     }
     

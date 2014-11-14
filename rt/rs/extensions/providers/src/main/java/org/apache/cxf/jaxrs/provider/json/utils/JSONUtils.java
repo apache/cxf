@@ -42,7 +42,6 @@ import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.DocumentDepthProperties;
 import org.apache.cxf.staxutils.transform.IgnoreNamespacesWriter;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.codehaus.jettison.AbstractXMLStreamWriter;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLInputFactory;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLOutputFactory;
@@ -56,7 +55,7 @@ import org.codehaus.jettison.mapped.TypeConverter;
 public final class JSONUtils {
 
     public static final String XSI_PREFIX = "xsi";
-    public static final String XSI_URI = WSDLConstants.NS_SCHEMA_XSI; 
+    public static final String XSI_URI = "http://www.w3.org/2001/XMLSchema-instance"; 
     
     private JSONUtils() {
     }
@@ -121,8 +120,9 @@ public final class JSONUtils {
     }
     
     public static XMLStreamWriter createIgnoreNsWriterIfNeeded(XMLStreamWriter writer, 
-                                                               boolean ignoreNamespaces) {
-        return ignoreNamespaces ? new IgnoreNamespacesWriter(writer) : writer; 
+                                                               boolean ignoreNamespaces,
+                                                               boolean ignoreXsiAttributes) {
+        return ignoreNamespaces ? new IgnoreNamespacesWriter(writer, ignoreXsiAttributes) : writer; 
     }
     
     private static String getKey(MappedNamespaceConvention convention, QName qname) throws Exception {
@@ -239,7 +239,7 @@ public final class JSONUtils {
         
         public void writeAttribute(String prefix, String uri,
                                    String local, String value) throws XMLStreamException {
-            if (!writeXsiType && "xsi".equals(prefix)
+            if (!writeXsiType && XSI_PREFIX.equals(prefix)
                     && ("type".equals(local) || "nil".equals(local))) {
                 return;
             }

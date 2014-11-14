@@ -102,7 +102,7 @@ public class DataBindingJSONProvider<T> extends DataBindingProvider<T> {
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
              writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement, enc);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
-        return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
+        return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces, !writeXsiType);
     }
     
     @Override

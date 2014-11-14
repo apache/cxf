@@ -136,7 +136,7 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
                                           writeXsiType && !ignoreNamespaces, false, null);
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, 
              writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement, enc);
-        return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
+        return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces, !writeXsiType);
     }
 
     @Override
