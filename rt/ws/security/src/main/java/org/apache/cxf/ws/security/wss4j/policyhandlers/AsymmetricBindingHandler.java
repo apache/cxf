@@ -44,6 +44,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -451,6 +452,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             if (encrToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 try {
                     WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
+                    if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
+                        dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
+                    }
                     
                     if (encrKey == null) {
                         setupEncryptedKey(recToken, encrToken);
@@ -611,6 +615,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             setupEncryptedKey(wrapper, sigToken);
             
             WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+            if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
+                dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
+            }
+            
             dkSign.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
 
             // Set the algo info
