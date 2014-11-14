@@ -58,6 +58,7 @@
               !org.apache.cxf.karaf.commands,
               org.apache.cxf*;version="[3,4)",
               org.apache.karaf.shell*;version="[2.3,5)",
+              org.apache.felix.gogo.commands*;version="[0.6,1)",
               *
                         </Import-Package>
                         <_nouses>true</_nouses>
