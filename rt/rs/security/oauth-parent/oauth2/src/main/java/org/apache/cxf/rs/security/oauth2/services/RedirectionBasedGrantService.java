@@ -108,8 +108,13 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      */
     protected Response startAuthorization(MultivaluedMap<String, String> params) {
         // Make sure the end user has authenticated, check if HTTPS is used
-        SecurityContext sc = getAndValidateSecurityContext();
+        SecurityContext sc = getAndValidateSecurityContext(params);
+        // Create a UserSubject representing the end user 
+        UserSubject userSubject = createUserSubject(sc);
+        return startAuthorization(params, userSubject);
+    }
         
+    protected Response startAuthorization(MultivaluedMap<String, String> params, UserSubject userSubject) {    
         Client client = getClient(params);
         
         // Validate the provided request URI, if any, against the ones Client provided
@@ -137,9 +142,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
         
-        
-        // Create a UserSubject representing the end user 
-        UserSubject userSubject = createUserSubject(sc);
         
         // Request a new grant only if no pre-authorized token is available
         ServerAccessToken preauthorizedToken = getDataProvider().getPreauthorizedToken(
@@ -217,7 +219,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      */
     protected Response completeAuthorization(MultivaluedMap<String, String> params) {
         // Make sure the end user has authenticated, check if HTTPS is used
-        SecurityContext securityContext = getAndValidateSecurityContext();
+        SecurityContext securityContext = getAndValidateSecurityContext(params);
         UserSubject userSubject = createUserSubject(securityContext);
         
         // Make sure the session is valid
@@ -307,7 +309,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                             UserSubject userSubject,
                                             ServerAccessToken preAuthorizedToken);
     
-    private SecurityContext getAndValidateSecurityContext() {
+    protected SecurityContext getAndValidateSecurityContext(MultivaluedMap<String, String> params) {
         SecurityContext securityContext =  
             (SecurityContext)getMessageContext().get(SecurityContext.class.getName());
         if (securityContext == null || securityContext.getUserPrincipal() == null) {

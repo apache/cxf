@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
+import org.apache.cxf.rs.security.oauth2.provider.AuthorizationCodeRequestFilter;
 import org.apache.cxf.rs.security.oauth2.provider.AuthorizationCodeResponseFilter;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.provider.OOBResponseDeliverer;
@@ -51,12 +52,18 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 public class AuthorizationCodeGrantService extends RedirectionBasedGrantService {
     private boolean canSupportPublicClients;
     private OOBResponseDeliverer oobDeliverer;
+    private AuthorizationCodeRequestFilter codeRequestFilter;
     private AuthorizationCodeResponseFilter codeResponseFilter;
     
     public AuthorizationCodeGrantService() {
         super(OAuthConstants.CODE_RESPONSE_TYPE, OAuthConstants.AUTHORIZATION_CODE_GRANT);
     }
-    
+    protected Response startAuthorization(MultivaluedMap<String, String> params, UserSubject userSubject) {
+        if (codeRequestFilter != null) {
+            params = codeRequestFilter.process(params, userSubject);
+        }
+        return super.startAuthorization(params, userSubject);
+    }
     protected Response createGrant(MultivaluedMap<String, String> params,
                                    Client client,
                                    String redirectUri,
@@ -147,6 +154,10 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
 
     public void setCodeResponseFilter(AuthorizationCodeResponseFilter filter) {
         this.codeResponseFilter = filter;
+    }
+
+    public void setCodeRequestFilter(AuthorizationCodeRequestFilter codeRequestFilter) {
+        this.codeRequestFilter = codeRequestFilter;
     }
     
     
