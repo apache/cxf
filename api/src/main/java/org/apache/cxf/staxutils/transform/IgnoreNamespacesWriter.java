@@ -27,7 +27,7 @@ public class IgnoreNamespacesWriter extends DelegatingXMLStreamWriter {
     private static final String XSI_PREFIX = "xsi";
     private boolean ignoreXsiAttributes;
     public IgnoreNamespacesWriter(XMLStreamWriter writer) {
-        this(writer, true);
+        this(writer, false);
     }
     public IgnoreNamespacesWriter(XMLStreamWriter writer, boolean ignoreXsiAttributes) {
         super(writer);
