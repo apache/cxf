@@ -115,7 +115,7 @@ public abstract class AbstractTokenValidator {
         return validateToken(jwtConsumer, jwt, JwsUtils.getSignatureVerifier(key));
     }
     protected JwtToken validateToken(JwsJwtCompactConsumer consumer, JwtToken jwt, JwsSignatureVerifier jws) {
-        if (consumer.verifySignatureWith(jws)) {
+        if (!consumer.verifySignatureWith(jws)) {
             throw new SecurityException("Invalid Signature");
         }
         return jwt;
