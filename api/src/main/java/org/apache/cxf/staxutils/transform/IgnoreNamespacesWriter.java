@@ -24,13 +24,22 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 
 public class IgnoreNamespacesWriter extends DelegatingXMLStreamWriter {
-    
+    private static final String XSI_PREFIX = "xsi";
+    private boolean ignoreXsiAttributes;
     public IgnoreNamespacesWriter(XMLStreamWriter writer) {
+        this(writer, true);
+    }
+    public IgnoreNamespacesWriter(XMLStreamWriter writer, boolean ignoreXsiAttributes) {
         super(writer);
+        this.ignoreXsiAttributes = ignoreXsiAttributes;
     }
 
     public void writeAttribute(String prefix, String uri, 
                                String local, String value) throws XMLStreamException {
+        if (ignoreXsiAttributes && XSI_PREFIX.equals(prefix)
+            && ("type".equals(local) || "nil".equals(local))) {
+            return;
+        }
         super.writeAttribute(local, value);
     }
 
