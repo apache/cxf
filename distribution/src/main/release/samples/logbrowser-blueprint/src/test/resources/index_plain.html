@@ -21,26 +21,29 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>CXF JAX-RS WebSocket Sample</title>  
+<title>CXF Log-Browser using WebSocket (PlainView)</title>  
 </head>
 <body>
-<h2>CXF JAX-RS WebSocket Sample</h2>  
-
+<h2>CXF Log-Browser using WebSocket (PlainView)</h2>  
+<p>The purpose of this page is simply show how the log-feed can be subscribed and the log records are pushed over the WebSocket.</p>
 <div id="output">
-  <div id="config" style="float: left;">
-    <strong>Service Endpoint URL:</strong><br />
-    <input id="wsUri" size="72" style="width: 100%" value="ws://localhost:9000/"/>
+  <div id="config" style="float: left; width: 600px">
+    <strong>Log-Browser Endpoint URL:</strong><br />
+    <input id="wsUri" size="72" style="width: 100%" value="ws://localhost:8181/cxf/samples/logbrowser"/>
     <br/>
     <button id="connect">Connect</button>
     <button id="disconnect">Disconnect</button>
     <br />
     <br />
-    <strong>Request:</strong><br />
-    <textarea id="request" rows="10" cols="72" style="width: 100%;">GET /customerservice/customers/123</textarea>
-    <br/>
-    <button id="send">Send</button>
+    <button id="subscribe">Subscribe</button>
+    <button id="unsubscribe">Unsubscribe</button>
+    <br />
+    <br />
+    <input id="modeatom" type="checkbox" name="mode" value="atom"/>Atom<br/>
+    <br />
+    <br />
   </div>
-  <div id="log" style="float: left; margin-left: 20px; padding-left: 20px; width: 60%; height: 500px; border-left: solid 1px #cccccc;">
+  <div id="log" style="float: left; width: 90%; height: 500px">
     <strong>Log:</strong><br />
     <button id="clearLogBut" style="position: relative; top: 3px;">Clear log</button>
     <div id="consoleLog" style="margin-top: 5px; border: solid 1px #aaaaaa; overflow-y: scroll; height:100%"></div>
@@ -56,10 +59,13 @@
   var disconnectBut = document.getElementById("disconnect");
   disconnectBut.onclick = doDisconnect;
     
-  var request = document.getElementById("request");
+  var subBut = document.getElementById("subscribe");
+  subBut.onclick = doSub;
 
-  var sendBut = document.getElementById("send");
-  sendBut.onclick = doSend;
+  var unsubBut = document.getElementById("unsubscribe");
+  unsubBut.onclick = doUnsub;
+
+  var modeatomCB = document.getElementById("modeatom");
 
   var consoleLog = document.getElementById("consoleLog");
 
@@ -95,6 +101,7 @@
   }
 
   function doDisconnect() {
+    // unsubscribe
     websocket.close()
   }
 
@@ -115,50 +122,82 @@
   }
 
   function onMessage(evt) {
-    writeToLog('<span style="color:blue; font-size:75%; font-style:italic">RECEIVED</span><span style="color: blue"><pre>' + createMessage(evt.data) + '</pre></span>');
+    writeToLog(createMessage(extractBody(evt.data)), true);
   }
 
   function onError(evt) {
     writeToLog('<span style="color:red; font-size:75%; font-style:italic">ERROR</span><span style="color: red;"><pre>' + evt.data + '</pre></span>');
   }
 
-  function doSend(evt) {
-    var reqmsg = document.getElementById("request");
-    writeToLog('<span style="color:green; font-size:75%; font-style:italic">SENT</span><span style="color: green;"><pre>' + createMessage(reqmsg.value) + '</pre></span>');
-    websocket.send(reqmsg.value);
+  function doSub(evt) {
+    var msg = modeatomCB.checked ? "GET /cxf/samples/logbrowser/logs/subscribe" : "GET /cxf/samples/logbrowser/logs/subscribe/alternate"; 
+    writeToLog('<span style="color:green; font-size:75%; font-style:italic">SENT</span><span style="color: green;"><pre>' + createMessage(msg) + '</pre></span>');
+    websocket.send(msg);
+    setGuiSubscribed(true);
+  }
+
+  function doUnsub(evt) {
+    var msg = "GET /cxf/samples/logbrowser/logs/unsubscribe/*";
+    writeToLog('<span style="color:green; font-size:75%; font-style:italic">SENT</span><span style="color: green;"><pre>' + createMessage(msg) + '</pre></span>');
+    websocket.send(msg);
+    setGuiSubscribed(false);
   }
 
   function setGuiConnected(isConnected) {
     wsUri.disabled = isConnected;
     connectBut.disabled = isConnected;
     disconnectBut.disabled = !isConnected;
-    request.disabled = !isConnected;
-    sendBut.disabled = !isConnected;
+    subBut.disabled = !isConnected;
+    unsubBut.disabled = true;
+    modeatomCB.disabled = !isConnected;
   }
 
-  function createMessage(data) {
-    if (typeof data != 'string') {
-      data = arrayBufferToString(data);
-    }
-    return data.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  function setGuiSubscribed(isSubscribed) {
+    subBut.disabled = isSubscribed;
+    unsubBut.disabled = !isSubscribed;
+    modeatomCB.disabled = isSubscribed;
   }
 
-  function arrayBufferToString(buf) {
-    var ba = new Uint8Array(buf);
+  // painfully extracting the body by finding the \n delimiter
+  function extractBody(data) {
+    var ba = new Uint8Array(data);
     var aa = new Array(ba.length);
+    var skipping = true;
+    var maystart = true;
     for (i = 0; i < ba.length; i++) {
+      if (skipping) {
+	    if (ba[i] == 10) {
+          if (maystart) {
+            skipping = false;
+          } else {
+            maystart = true;
+          }
+        } else {
+          if (ba[i] != 13) {
+            maystart = false;
+          }
+          continue;
+        }
+      }
       aa[i] = String.fromCharCode(ba[i]);
     }
     return Array.prototype.slice.call(aa).join("");
   }
 
-  function writeToLog(message) {
-    var pre = document.createElement("p");
+  function createMessage(data) {
+    return data.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  }
+
+  function writeToLog(message, raw) {
+    var pre = document.createElement(raw ? "code" : "p");
     pre.wordWrap = "break-word";
     pre.innerHTML = message;
     consoleLog.appendChild(pre);
-
-    while (consoleLog.childNodes.length > 50) {
+    if (raw) {
+       consoleLog.appendChild(document.createElement("br"));
+       consoleLog.appendChild(document.createElement("br"));
+    }
+    while (consoleLog.childNodes.length > 100) {
       consoleLog.removeChild(consoleLog.firstChild);
     }
     
