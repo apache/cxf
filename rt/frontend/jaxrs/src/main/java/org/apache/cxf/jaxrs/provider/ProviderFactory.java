@@ -910,7 +910,9 @@ public final class ProviderFactory {
     void injectContextProxiesIntoProvider(ProviderInfo<?> pi) {
         if (pi.contextsAvailable()) {
             InjectionUtils.injectContextProxies(pi, pi.getProvider());
-            injectedProviders.add(pi);
+            synchronized (injectedProviders) {
+                injectedProviders.add(pi);
+            }
         }
     }
     
@@ -1153,8 +1155,10 @@ public final class ProviderFactory {
     void clearProxies(Collection<?> ...lists) {
         for (Collection<?> list : lists) {
             Collection<ProviderInfo<?>> l2 = CastUtils.cast(list);
-            for (ProviderInfo<?> pi : l2) {
-                pi.clearThreadLocalProxies();
+            synchronized (l2) {
+                for (ProviderInfo<?> pi : l2) {
+                    pi.clearThreadLocalProxies();
+                }
             }
         }
     }
