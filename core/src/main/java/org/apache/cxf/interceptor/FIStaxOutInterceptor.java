@@ -122,7 +122,7 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                   Boolean.TRUE);
 
             String s = (String)message.get(Message.CONTENT_TYPE);
-            if (s.contains("application/soap+xml")) {
+            if (s != null && s.contains("application/soap+xml")) {
                 s = s.replace("application/soap+xml", "application/soap+fastinfoset");
                 message.put(Message.CONTENT_TYPE, s);
             } else {

@@ -52,9 +52,6 @@ public class JAXRSBinding extends AbstractBasicInterceptorProvider implements Bi
             if (exchange != null) {
                 ct = (String)exchange.get(org.apache.cxf.message.Message.CONTENT_TYPE);
             }
-            if (ct == null) {
-                ct = "text/xml";
-            }
             m.put(org.apache.cxf.message.Message.CONTENT_TYPE, ct);
         }
         return m;
