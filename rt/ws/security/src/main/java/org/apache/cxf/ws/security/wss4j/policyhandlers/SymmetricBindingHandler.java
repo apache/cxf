@@ -398,8 +398,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                           boolean atEnd) {
         try {
             WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
-            if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP12) {
-                dkEncr.setWscVersion(ConversationConstants.VERSION_05_12);
+            if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
+                dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
             }
 
             if (attached && encrTok.getAttachedReference() != null) {
@@ -622,8 +622,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                boolean included) throws WSSecurityException {
         Document doc = saaj.getSOAPPart();
         WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
-        if (policyAbstractTokenWrapper.getToken().getVersion() == SPConstants.SPVersion.SP12) {
-            dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
+        if (policyAbstractTokenWrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
+            dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
         
         //Check for whether the token is attached in the message or not

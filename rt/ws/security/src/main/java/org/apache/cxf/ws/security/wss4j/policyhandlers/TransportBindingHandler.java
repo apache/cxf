@@ -365,6 +365,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             encrKey.appendToHeader(secHeader);
             
             WSSecDKSign dkSig = new WSSecDKSign(wssConfig);
+            if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
+                dkSig.setWscVersion(ConversationConstants.VERSION_05_02);
+            }
             
             dkSig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
             dkSig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
@@ -474,8 +477,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         dkSign.setSignatureAlgorithm(algorithmSuite.getSymmetricSignature());
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
         dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
-        if (token.getVersion() == SPConstants.SPVersion.SP12) {
-            dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
+        if (token.getVersion() == SPConstants.SPVersion.SP11) {
+            dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
         Document doc = saaj.getSOAPPart();
         dkSign.prepare(doc, secHeader);

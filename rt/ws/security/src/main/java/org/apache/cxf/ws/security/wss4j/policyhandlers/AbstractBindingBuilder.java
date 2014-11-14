@@ -1902,8 +1902,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         WSSecDKSign dkSign = new WSSecDKSign(wssConfig);  
         
         //Check whether it is security policy 1.2 and use the secure conversation accordingly
-        if (policyToken.getVersion() == SPConstants.SPVersion.SP12) {
-            dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
+        if (policyToken.getVersion() == SPConstants.SPVersion.SP11) {
+            dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
                       
         //Check for whether the token is attached in the message or not
