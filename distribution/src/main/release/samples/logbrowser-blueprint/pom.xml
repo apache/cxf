@@ -30,25 +30,36 @@
         <relativePath>..</relativePath>
     </parent>
     <build>
-      <plugins>
-	<plugin>
-	    <groupId>org.apache.felix</groupId>
-	    <artifactId>maven-bundle-plugin</artifactId>
-	    <extensions>true</extensions>
-	    <configuration>
-		<instructions>
-		    <Bundle-SymbolicName>${project.groupId}.${project.artifactId};blueprint.aries.xml-validation:=false</Bundle-SymbolicName>
-		    <Import-Package>
-			org.apache.cxf.jaxrs.servlet,
-			org.apache.abdera.parser.stax,
-			org.apache.abdera,
-			com.ctc.wstx.stax,
-			*
-		    </Import-Package>
-		</instructions>
-	    </configuration>
-	</plugin>
-      </plugins>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId};blueprint.aries.xml-validation:=false</Bundle-SymbolicName>
+                        <Import-Package>
+                            org.apache.cxf.jaxrs.servlet,
+                            org.apache.abdera.parser.stax,
+                            org.apache.abdera,
+                            com.ctc.wstx.stax,
+                            org.eclipse.jetty.continuation;resolution:=optional;version="[7.6,9)",
+                            org.eclipse.jetty.websocket;resolution:=optional;version="[7.6,9)",
+                            org.eclipse.jetty.websocket.api;resolution:=optional;version="[9.1,10)",
+                            org.eclipse.jetty.websocket.server;resolution:=optional;version="[9.1,10)",
+                            org.eclipse.jetty.websocket.servlet;resolution:=optional;version="[9.1,10)",
+                            org.apache.catalina;resolution:=optional;version="[6.0,9)",
+                            org.apache.catalina.comet;resolution:=optional;version="[6.0,9)",
+                            org.apache.catalina.connector;resolution:=optional;version="[6.0,9)",
+                            org.apache.catalina.util;resolution:=optional;version="[6.0,9)",
+                            org.apache.catalina.websocket;resolution:=optional;version="[6.0,9)",
+                            org.apache.coyote.http11.upgrade;resolution:=optional,
+                            *
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
     <dependencies>
         <dependency>
@@ -71,11 +82,11 @@
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${project.version}</version>
         </dependency>
-	<dependency>
-	  <groupId>org.apache.cxf</groupId>
-	  <artifactId>cxf-rt-transports-websocket</artifactId>
-	  <version>${project.version}</version>
-	</dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-websocket</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-core</artifactId>
@@ -88,7 +99,7 @@
                     <groupId>org.apache.james</groupId>
                     <artifactId>apache-mime4j-core</artifactId>
                 </exclusion>
-	    </exclusions>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
