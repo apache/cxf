@@ -81,10 +81,9 @@ public class JweCompactReaderWriterTest extends Assert {
     @BeforeClass
     public static void registerBouncyCastleIfNeeded() throws Exception {
         try {
-            // Java 8 apparently has it
             Cipher.getInstance(Algorithm.AES_GCM_ALGO_JAVA);
+            Cipher.getInstance(Algorithm.AES_CBC_ALGO_JAVA);
         } catch (Throwable t) {
-            // Oracle Java 7
             Security.addProvider(new BouncyCastleProvider());    
         }
     }
