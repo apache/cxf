@@ -52,7 +52,7 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
         
         List<ProviderInfo<ClientResponseFilter>> filters = pf.getClientResponseFilters();
         if (!filters.isEmpty()) {
-            ClientRequestContext reqContext = new ClientRequestContextImpl(inMessage.getExchange().getInMessage(),
+            ClientRequestContext reqContext = new ClientRequestContextImpl(inMessage.getExchange().getOutMessage(),
                                                                         true);
             
             ClientResponseContext respContext = new ClientResponseContextImpl(getResponse(inMessage), 
