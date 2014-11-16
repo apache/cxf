@@ -61,6 +61,8 @@ public enum Algorithm {
     A128GCM(JoseConstants.A128GCM_ALGO, "AES/GCM/NoPadding", 128),
     A192GCM(JoseConstants.A192GCM_ALGO, "AES/GCM/NoPadding", 192),
     A256GCM(JoseConstants.A256GCM_ALGO, "AES/GCM/NoPadding", 256),
+    //TODO: default to "AES/CBC/PKCS5Padding" if Cipher "AES/CBC/PKCS7Padding" 
+    // can not be initialized, apparently Java 8 has decided to settle on PKCS5Padding only 
     A128CBC_HS256(JoseConstants.A128CBC_HS256_ALGO, "AES/CBC/PKCS7Padding", 128),
     A192CBC_HS384(JoseConstants.A192CBC_HS384_ALGO, "AES/CBC/PKCS7Padding", 192),
     A256CBC_HS512(JoseConstants.A256CBC_HS512_ALGO, "AES/CBC/PKCS7Padding", 256);
