@@ -836,6 +836,12 @@ public final class JAXBEncoderDecoder {
             
             DepthXMLStreamReader dr = (DepthXMLStreamReader)source;
             XMLStreamReader reader = dr.getReader();
+            
+            // allows the XML Stream Reader to adjust it's behaviour based on the state of the unmarshaller
+            if (reader instanceof UnmarshallerAwareXMLStreamReader) {
+                ((UnmarshallerAwareXMLStreamReader) reader).setUnmarshaller(u);
+            }
+            
             if (u.getSchema() != null) {
                 //validating, but we may need more namespaces
                 reader = findExtraNamespaces(reader);
@@ -844,6 +850,12 @@ public final class JAXBEncoderDecoder {
                 .unmarshal(dr.getReader());
         } else if (source instanceof XMLStreamReader) {
             XMLStreamReader reader = (XMLStreamReader)source;
+            
+            // allows the XML Stream Reader to adjust it's behaviour based on the state of the unmarshaller
+            if (reader instanceof UnmarshallerAwareXMLStreamReader) {
+                ((UnmarshallerAwareXMLStreamReader) reader).setUnmarshaller(u);
+            }
+            
             if (u.getSchema() != null) {
                 //validating, but we may need more namespaces
                 reader = findExtraNamespaces(reader);

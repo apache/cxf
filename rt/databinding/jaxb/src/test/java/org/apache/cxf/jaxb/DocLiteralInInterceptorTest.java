@@ -19,12 +19,14 @@
 
 package org.apache.cxf.jaxb;
 
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -37,6 +39,7 @@ import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -58,6 +61,7 @@ import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
@@ -92,13 +96,38 @@ public class DocLiteralInInterceptorTest extends Assert {
 
     @Test
     public void testInterceptorInboundWrapped() throws Exception {
+        XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
+                getTestStream(getClass(), "resources/GreetMeDocLiteralReq.xml"));
+        
+        testInterceptorInboundWrapped(reader);
+    }
+    
+    @Test
+    public void testInterceptorInboundWrappedDiffNs() throws Exception {
+        XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
+                getTestStream(getClass(), "resources/GreetMeDocLiteralReqDiffNs.xml"));
+        FixNamespacesXMLStreamReader fixNs = new FixNamespacesXMLStreamReader(reader);
+        testInterceptorInboundWrapped(fixNs);
+    }
+    
+    @Test
+    public void testInterceptorInboundWrappedDiffNsNoFix() throws Exception {
+        XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
+                getTestStream(getClass(), "resources/GreetMeDocLiteralReqDiffNs.xml"));
+        try {
+            testInterceptorInboundWrapped(reader);
+        } catch (Fault f) {
+            assertTrue(f.getCause() instanceof UnmarshalException);
+        }
+    }
+    
+    private void testInterceptorInboundWrapped(XMLStreamReader inReader) throws Exception {
         setUpUsingHelloWorld();
 
         //WrappedInInterceptor interceptor = new WrappedInInterceptor();
         DocLiteralInInterceptor interceptor = new DocLiteralInInterceptor();
 
-        message.setContent(XMLStreamReader.class, XMLInputFactory.newInstance()
-            .createXMLStreamReader(getTestStream(getClass(), "resources/GreetMeDocLiteralReq.xml")));
+        message.setContent(XMLStreamReader.class, inReader);
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         // skip the start element of soap body
         StaxUtils.skipToStartOfElement(reader);
