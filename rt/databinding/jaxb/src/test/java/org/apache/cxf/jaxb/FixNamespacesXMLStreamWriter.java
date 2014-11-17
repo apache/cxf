@@ -19,11 +19,24 @@
 
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLStreamWriter;
 
-/*
- * A XML Stream Reader that adjusts it's behaviour based on the state of the unmarshaller.
- */
-public interface UnmarshallerAwareXMLStreamReader {
-    void setUnmarshaller(Unmarshaller unmarshaller);
+import org.codehaus.stax2.util.StreamWriterDelegate;
+
+public class FixNamespacesXMLStreamWriter extends StreamWriterDelegate implements MarshallerAwareXMLWriter {
+    private Marshaller marshaller;
+
+    public FixNamespacesXMLStreamWriter(final XMLStreamWriter delegate) {
+        super(delegate);
+    }
+
+    @Override
+    public void setMarshaller(Marshaller marshaller) {
+        this.marshaller = marshaller;
+    }
+
+    public Marshaller getMarshaller() {
+        return marshaller;
+    }
 }
