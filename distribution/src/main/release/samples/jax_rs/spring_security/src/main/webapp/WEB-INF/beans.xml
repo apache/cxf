@@ -28,16 +28,16 @@
             <bean class="demo.jaxrs.service.SecurityExceptionMapper"/>
         </jaxrs:providers>
     </jaxrs:server>
-<!--
     <bean id="customerservice" class="demo.jaxrs.service.CustomerServiceImpl"/>
--->
+<!--
     <bean id="customerservice" class="demo.jaxrs.service.CustomerServiceSecuredImpl"/>
+-->
     <security:global-method-security secured-annotations="enabled">
-        <security:protect-pointcut expression="execution(* demo.jaxrs.service.CustomerService.getCustomer(*))" access="ROLE_CUSTOMER, ROLE_ADMIN"/>
+        <security:protect-pointcut expression="execution(* demo.jaxrs.service.CustomerService.getCustomer(*))" access="ROLE_CUSTOMER,ROLE_ADMIN"/>
         <security:protect-pointcut expression="execution(* demo.jaxrs.service.CustomerService.addCustomer(*))" access="ROLE_ADMIN"/>
         <security:protect-pointcut expression="execution(* demo.jaxrs.service.CustomerService.updateCustomer(Long,demo.jaxrs.service.Customer))" access="ROLE_ADMIN"/>
         <security:protect-pointcut expression="execution(* demo.jaxrs.service.CustomerService.deleteCustomer(*))" access="ROLE_ADMIN"/>
-        <security:protect-pointcut expression="execution(* demo.jaxrs.service.CustomerService.getOrder(*))" access="ROLE_CUSTOMER, ROLE_ADMIN"/>
+        <security:protect-pointcut expression="execution(* demo.jaxrs.service.CustomerService.getOrder(*))" access="ROLE_CUSTOMER,ROLE_ADMIN"/>
     </security:global-method-security>
     <security:http auto-config="true">
         <security:http-basic/>
