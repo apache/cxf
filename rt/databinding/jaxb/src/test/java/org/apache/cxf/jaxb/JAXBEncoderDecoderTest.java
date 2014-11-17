@@ -66,7 +66,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.apache.hello_world_soap_http.types.StringStruct;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -256,7 +255,7 @@ public class JAXBEncoderDecoderTest extends Assert {
     }
     
     @Test
-    public void testMarshallIntoStax() throws Exception {
+    public void testMarshallIntoStaxStreamWriter() throws Exception {
         GreetMe obj = new GreetMe();
         obj.setRequestType("Hello");
         QName elName = new QName(wrapperAnnotation.targetNamespace(),
@@ -268,11 +267,50 @@ public class JAXBEncoderDecoderTest extends Assert {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLOutputFactory opFactory = XMLOutputFactory.newInstance();
         opFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
-        XMLEventWriter writer = opFactory.createXMLEventWriter(baos);
-
+        FixNamespacesXMLStreamWriter writer = new FixNamespacesXMLStreamWriter(opFactory.createXMLStreamWriter(baos));
+        
+        assertNull(writer.getMarshaller());
+        
+        Marshaller m = context.createMarshaller();
+        JAXBEncoderDecoder.marshall(m, obj, part, writer);
+        assertEquals(m, writer.getMarshaller());
+        writer.flush();
+        writer.close();
+        
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        XMLInputFactory ipFactory = XMLInputFactory.newInstance();
+        XMLEventReader reader = ipFactory.createXMLEventReader(bais);
+        
+        Unmarshaller um = context.createUnmarshaller();        
+        Object val = um.unmarshal(reader, GreetMe.class);
+        assertTrue(val instanceof JAXBElement);
+        val = ((JAXBElement<?>)val).getValue();
+        assertTrue(val instanceof GreetMe);
+        assertEquals(obj.getRequestType(), 
+                     ((GreetMe)val).getRequestType());
+    }
+    
+    @Test
+    public void testMarshallIntoStaxEventWriter() throws Exception {
+        GreetMe obj = new GreetMe();
+        obj.setRequestType("Hello");
+        QName elName = new QName(wrapperAnnotation.targetNamespace(),
+                                 wrapperAnnotation.localName());
+        MessagePartInfo part = new MessagePartInfo(elName, null);
+        part.setElement(true);
+        part.setElementQName(elName);
+                
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XMLOutputFactory opFactory = XMLOutputFactory.newInstance();
+        opFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+        FixNamespacesXMLEventWriter writer = new FixNamespacesXMLEventWriter(opFactory.createXMLEventWriter(baos));
+        assertNull(writer.getMarshaller());
+        
         //STARTDOCUMENT/ENDDOCUMENT is not required
-        //writer.add(eFactory.createStartDocument("utf-8", "1.0"));        
-        JAXBEncoderDecoder.marshall(context.createMarshaller(), obj, part, writer);
+        //writer.add(eFactory.createStartDocument("utf-8", "1.0"));
+        Marshaller m = context.createMarshaller();
+        JAXBEncoderDecoder.marshall(m, obj, part, writer);
+        assertEquals(m, writer.getMarshaller());
         //writer.add(eFactory.createEndDocument());
         writer.flush();
         writer.close();
@@ -293,24 +331,52 @@ public class JAXBEncoderDecoderTest extends Assert {
     }
 
     @Test
-    public void testUnmarshallFromStax() throws Exception {
+    public void testUnmarshallFromStaxStreamReader() throws Exception {
         QName elName = new QName(wrapperAnnotation.targetNamespace(),
                                  wrapperAnnotation.localName());
         MessagePartInfo part = new MessagePartInfo(elName, null);
 
         InputStream is =  getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         XMLInputFactory factory = XMLInputFactory.newInstance();
-        XMLStreamReader reader = 
-            factory.createXMLStreamReader(is);
-
+        XMLStreamReader reader = factory.createXMLStreamReader(is);
+        
         QName[] tags = {SOAP_ENV, SOAP_BODY};
         StaxStreamFilter filter = new StaxStreamFilter(tags);
-        reader = factory.createFilteredReader(reader, filter);
+        FixNamespacesXMLStreamReader filteredReader = new FixNamespacesXMLStreamReader(
+                factory.createFilteredReader(reader, filter));
 
+        assertNull(filteredReader.getUnmarshaller());
+        
         //Remove START_DOCUMENT & START_ELEMENT pertaining to Envelope and Body Tags.
 
         part.setTypeClass(GreetMe.class);
-        Object val = JAXBEncoderDecoder.unmarshall(context.createUnmarshaller(), reader, part, true);
+        Unmarshaller um = context.createUnmarshaller();
+        Object val = JAXBEncoderDecoder.unmarshall(um, filteredReader, part, true);
+        assertEquals(um, filteredReader.getUnmarshaller());
+        assertNotNull(val);
+        assertTrue(val instanceof GreetMe);
+        assertEquals("TestSOAPInputPMessage", 
+                     ((GreetMe)val).getRequestType());
+
+        is.close();
+    }
+    
+    @Test
+    public void testUnmarshallFromStaxEventReader() throws Exception {
+        QName elName = new QName(wrapperAnnotation.targetNamespace(),
+                                 wrapperAnnotation.localName());
+        MessagePartInfo part = new MessagePartInfo(elName, null);
+
+        InputStream is =  getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        FixNamespacesXMLEventReader reader = new FixNamespacesXMLEventReader(factory.createXMLEventReader(is));
+        
+        assertNull(reader.getUnmarshaller());
+
+        part.setTypeClass(GreetMe.class);
+        Unmarshaller um = context.createUnmarshaller();
+        Object val = JAXBEncoderDecoder.unmarshall(um, reader, part, true);
+        assertEquals(um, reader.getUnmarshaller());
         assertNotNull(val);
         assertTrue(val instanceof GreetMe);
         assertEquals("TestSOAPInputPMessage", 

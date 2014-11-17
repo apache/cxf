@@ -20,13 +20,13 @@
 package org.apache.cxf.jaxb;
 
 import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.util.StreamReaderDelegate;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.util.EventReaderDelegate;
 
-public class FixNamespacesXMLStreamReader extends StreamReaderDelegate implements UnmarshallerAwareXMLReader {
+public class FixNamespacesXMLEventReader extends EventReaderDelegate implements UnmarshallerAwareXMLReader {
     private Unmarshaller unmarshaller;
 
-    public FixNamespacesXMLStreamReader(final XMLStreamReader delegate) {
+    public FixNamespacesXMLEventReader(final XMLEventReader delegate) {
         super(delegate);
     }
 
