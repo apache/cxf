@@ -59,9 +59,7 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
 import org.xml.sax.InputSource;
-
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.jaxb.JAXBBeanInfo;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
@@ -193,12 +191,12 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     Class<?> cls;
 
     private Map<String, Object> contextProperties = Collections.emptyMap();
+    private List<XmlAdapter<?, ?>> adapters = Collections.emptyList();
     private Map<String, Object> marshallerProperties = Collections.emptyMap();
     private Map<String, Object> unmarshallerProperties = Collections.emptyMap();
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;
-    private @SuppressWarnings("rawtypes") XmlAdapter[] adapters;
 
     private boolean unwrapJAXBElement = true;
     private boolean scanPackages = true;
@@ -216,9 +214,8 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         contextClasses.addAll(Arrays.asList(classes));
         setContext(createJAXBContext(contextClasses)); //NOPMD - specifically allow this
     }
-    public JAXBDataBinding(boolean qualified, Map<String, Object> props, @SuppressWarnings("rawtypes") XmlAdapter... adapters) throws JAXBException {
+    public JAXBDataBinding(boolean qualified, Map<String, Object> props) throws JAXBException {
         this(qualified);
-        this.adapters = adapters;
         if (props != null && props.get("jaxb.additionalContextClasses") != null) {
             Object o = props.get("jaxb.additionalContextClasses");
             if (o instanceof Class) {
@@ -253,19 +250,19 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         Integer mtomThresholdInt = Integer.valueOf(getMtomThreshold());
         if (c == XMLStreamWriter.class) {
             DataWriterImpl<XMLStreamWriter> r
-                = new DataWriterImpl<XMLStreamWriter>(this, adapters);
+                = new DataWriterImpl<XMLStreamWriter>(this);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == OutputStream.class) {
-            DataWriterImpl<OutputStream> r = new DataWriterImpl<OutputStream>(this, adapters);
+            DataWriterImpl<OutputStream> r = new DataWriterImpl<OutputStream>(this);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == XMLEventWriter.class) {
-            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<XMLEventWriter>(this, adapters);
+            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<XMLEventWriter>(this);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == Node.class) {
-            DataWriterImpl<Node> r = new DataWriterImpl<Node>(this, adapters);
+            DataWriterImpl<Node> r = new DataWriterImpl<Node>(this);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         }
@@ -280,11 +277,11 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     public <T> DataReader<T> createReader(Class<T> c) {
         DataReader<T> dr = null;
         if (c == XMLStreamReader.class) {
-            dr = (DataReader<T>)new DataReaderImpl<XMLStreamReader>(this, unwrapJAXBElement, adapters);
+            dr = (DataReader<T>)new DataReaderImpl<XMLStreamReader>(this, unwrapJAXBElement);
         } else if (c == XMLEventReader.class) {
-            dr = (DataReader<T>)new DataReaderImpl<XMLEventReader>(this, unwrapJAXBElement, adapters);
+            dr = (DataReader<T>)new DataReaderImpl<XMLEventReader>(this, unwrapJAXBElement);
         } else if (c == Node.class) {
-            dr = (DataReader<T>)new DataReaderImpl<Node>(this, unwrapJAXBElement, adapters);
+            dr = (DataReader<T>)new DataReaderImpl<Node>(this, unwrapJAXBElement);
         }
 
         return dr;
@@ -515,6 +512,14 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
      */
     public void setContextProperties(Map<String, Object> contextProperties) {
         this.contextProperties = contextProperties;
+    }
+
+    public List<XmlAdapter<?, ?>> getConfiguredXmlAdapters() {
+        return adapters;
+    }
+
+    public void setConfiguredXmlAdapters(List<XmlAdapter<?, ?>> adapters) {
+        this.adapters = adapters;
     }
 
     /**

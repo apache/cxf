@@ -42,20 +42,17 @@ import org.apache.cxf.jaxb.JAXBEncoderDecoder;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 
-@SuppressWarnings("rawtypes")
 public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
     JAXBDataBinding databinding;
     boolean unwrapJAXBElement = true;
     ValidationEventHandler veventHandler;
     boolean setEventHandler = true;
-    private final XmlAdapter[] adapters;
     
-    public DataReaderImpl(JAXBDataBinding binding, boolean unwrap, XmlAdapter[] adapters) {
+    public DataReaderImpl(JAXBDataBinding binding, boolean unwrap) {
         super(binding.getContext());
         unwrapJAXBElement = unwrap;
         databinding = binding;
-        this.adapters = adapters;
     }
 
     public Object read(T input) {
@@ -129,7 +126,7 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             }
             um.setSchema(schema);
             um.setAttachmentUnmarshaller(getAttachmentUnmarshaller());
-            for (XmlAdapter adapter : adapters) {
+            for (XmlAdapter<?, ?> adapter : databinding.getConfiguredXmlAdapters()) {
                 um.setAdapter(adapter);
             }
             return um;

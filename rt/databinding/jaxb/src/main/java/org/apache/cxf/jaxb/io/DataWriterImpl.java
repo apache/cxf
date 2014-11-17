@@ -51,20 +51,16 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
-@SuppressWarnings("rawtypes")
 public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
 
     ValidationEventHandler veventHandler;
     boolean setEventHandler = true;
     private JAXBDataBinding databinding;
-	
-	private final XmlAdapter[] adapters;
     
-    public DataWriterImpl(JAXBDataBinding binding, XmlAdapter[] adapters) {
+    public DataWriterImpl(JAXBDataBinding binding) {
         super(binding.getContext());
         databinding = binding;
-        this.adapters = adapters;
     }
     
     public void write(Object obj, T output) {
@@ -184,7 +180,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
         }
-        for (XmlAdapter adapter : adapters) {
+        for (XmlAdapter<?, ?> adapter : databinding.getConfiguredXmlAdapters()) {
             marshaller.setAdapter(adapter);
         }
         return marshaller;
