@@ -23,7 +23,9 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
@@ -41,12 +43,12 @@ public class HBaseVisitorTest extends Assert {
     public static final byte[] NAME_QUALIFIER = "name".getBytes();
     
     Table table;
-    @SuppressWarnings("deprecation")
     @Before
     public void setUp() throws Exception {
         try {
             Configuration hBaseConfig =  HBaseConfiguration.create();
-            table = new HTable(hBaseConfig, "books");
+            Connection connection = ConnectionFactory.createConnection(hBaseConfig);
+            table = connection.getTable(TableName.valueOf("books"));
         } catch (Throwable t) {
             t.printStackTrace();
         }
