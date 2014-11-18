@@ -81,11 +81,11 @@ import org.eclipse.jetty.util.thread.ThreadPool;
  * work off of a designated port. The port will be enabled for 
  * "http" or "https" depending upon its successful configuration.
  */
-public class JettyHTTPServerEngine
-    implements ServerEngine {
+public class JettyHTTPServerEngine implements ServerEngine {
+    public static final String DO_NOT_CHECK_URL_PROP = "org.apache.cxf.transports.http_jetty.DontCheckUrl";
     
     private static final Logger LOG = LogUtils.getL7dLogger(JettyHTTPServerEngine.class);
-    private static final String DO_NOT_CHECK_URL_PROP = "org.apache.cxf.transports.http_jetty.DontCheckUrl";
+    
    
     /**
      * This is the network port for which this engine is allocated.
