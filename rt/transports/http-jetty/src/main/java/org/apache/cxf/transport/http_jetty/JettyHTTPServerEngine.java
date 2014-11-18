@@ -30,8 +30,10 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
@@ -62,11 +64,9 @@ import org.eclipse.jetty.util.thread.ThreadPool;
  * work off of a designated port. The port will be enabled for 
  * "http" or "https" depending upon its successful configuration.
  */
-public class JettyHTTPServerEngine
-    implements ServerEngine {
-    
-    private static final Logger LOG =
-        LogUtils.getL7dLogger(JettyHTTPServerEngine.class);
+public class JettyHTTPServerEngine implements ServerEngine {
+    public static final String DO_NOT_CHECK_URL_PROP = "org.apache.cxf.transports.http_jetty.DontCheckUrl";
+    private static final Logger LOG = LogUtils.getL7dLogger(JettyHTTPServerEngine.class);
    
     /**
      * This is the network port for which this engine is allocated.
@@ -210,10 +210,15 @@ public class JettyHTTPServerEngine
         return !Boolean.valueOf(s);
     }
     
-    private boolean shouldCheckUrl() {
-        String s = SystemPropertyAction
-            .getPropertyOrNull("org.apache.cxf.transports.http_jetty.DontCheckUrl");
-        return !Boolean.valueOf(s);
+    private boolean shouldCheckUrl(Bus bus) {
+        Object prop = null;
+        if (bus != null) {
+            prop = bus.getProperty(DO_NOT_CHECK_URL_PROP);
+        }
+        if (prop == null) {
+            prop = SystemPropertyAction.getPropertyOrNull(DO_NOT_CHECK_URL_PROP);
+        }
+        return !PropertyUtils.isTrue(prop);
     }
     
     /**
@@ -282,22 +287,22 @@ public class JettyHTTPServerEngine
     }
     
     protected void checkRegistedContext(URL url) {
-        if (shouldCheckUrl()) {
-            String path = url.getPath();
-            for (String registedPath : registedPaths) {
-                if (path.equals(registedPath)) {
-                    throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
-                }
-                // There are some context path conflicts which could cause the JettyHTTPServerEngine 
-                // doesn't route the message to the right JettyHTTPHandler
-                if (path.equals(HttpUriMapper.getContextName(registedPath))) {
-                    throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
-                }
-                if (registedPath.equals(HttpUriMapper.getContextName(path))) {
-                    throw new Fault(new Message("ADD_HANDLER_CONTEXT_CONFILICT_MSG", LOG, url, registedPath));
-                }
+        
+        String path = url.getPath();
+        for (String registedPath : registedPaths) {
+            if (path.equals(registedPath)) {
+                throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
+            }
+            // There are some context path conflicts which could cause the JettyHTTPServerEngine 
+            // doesn't route the message to the right JettyHTTPHandler
+            if (path.equals(HttpUriMapper.getContextName(registedPath))) {
+                throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
+            }
+            if (registedPath.equals(HttpUriMapper.getContextName(path))) {
+                throw new Fault(new Message("ADD_HANDLER_CONTEXT_CONFILICT_MSG", LOG, url, registedPath));
             }
         }
+        
     }
     
     
@@ -308,8 +313,9 @@ public class JettyHTTPServerEngine
      * @param handler notified on incoming HTTP requests
      */
     public synchronized void addServant(URL url, JettyHTTPHandler handler) {
-        
-        checkRegistedContext(url);
+        if (shouldCheckUrl(handler.getBus())) {
+            checkRegistedContext(url);
+        }
         
         SecurityHandler securityHandler = null;
         if (server == null) {

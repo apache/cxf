@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.transport.http.HttpUrlUtil;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -65,9 +66,13 @@ public class JettyHTTPHandler extends AbstractHandler {
                 jettyHTTPDestination.doService(servletContext, request, response);
             }
         }
-        
     }
 
-
-
+    public Bus getBus() {
+        if (jettyHTTPDestination != null) {
+            return jettyHTTPDestination.getBus();
+        } else {
+            return null;
+        }
+    }
 }
