@@ -102,6 +102,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             }
         }
     }
+    
     private void setJoseMediaType(WriterInterceptorContext ctx) {
         MediaType joseMediaType = JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE);
         ctx.setMediaType(joseMediaType);

@@ -35,7 +35,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 public class AbstractJwsWriterProvider {
     private static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
     private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
-    
+    private static final String JWS_CONTEXT_PROPERTY = "org.apache.cxf.jws.context";
     private JwsSignatureProvider sigProvider;
     
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
@@ -55,6 +55,12 @@ public class AbstractJwsWriterProvider {
         JwsSignatureProvider theSigProvider = JwsUtils.loadSignatureProvider(propLoc, m); 
         headers.setAlgorithm(theSigProvider.getAlgorithm());
         return theSigProvider;
+    }
+    protected void setRequestContextProperty(Message m, JoseHeaders headers) {    
+        String context = (String)m.getContextualProperty(JWS_CONTEXT_PROPERTY);
+        if (context != null) {
+            headers.setHeader(JWS_CONTEXT_PROPERTY, context);
+        }
     }
     protected void writeJws(JwsCompactProducer p, JwsSignatureProvider theSigProvider, OutputStream os) 
         throws IOException {
