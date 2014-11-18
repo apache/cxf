@@ -73,7 +73,7 @@ import org.junit.Test;
 
 public class JAXBDataBindingTest extends Assert {
 
-	private static final Logger LOG = LogUtils.getLogger(JAXBDataBindingTest.class);
+    private static final Logger LOG = LogUtils.getLogger(JAXBDataBindingTest.class);
     private static final String WSDL_PATH = "/wsdl/jaxb/hello_world.wsdl";
     private Definition def;
     private Service service;
