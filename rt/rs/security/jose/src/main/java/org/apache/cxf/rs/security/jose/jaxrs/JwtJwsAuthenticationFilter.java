@@ -18,58 +18,51 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.annotation.Priority;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.HttpHeaders;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
+import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.security.SecurityContext;
 
 @PreMatching
 @Priority(Priorities.JWS_SERVER_READ_PRIORITY)
-public class JwsContainerRequestFilter extends AbstractJwsReaderProvider implements ContainerRequestFilter {
+public class JwtJwsAuthenticationFilter extends AbstractJwsReaderProvider implements ContainerRequestFilter {
     private static final String JWS_CONTEXT_PROPERTY = "org.apache.cxf.jws.context";
+    private static final String JWT_SCHEME_PROPERTY = "JWT";
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (HttpMethod.GET.equals(context.getMethod())) {
-            return;
+        String authHeader = context.getHeaderString(HttpHeaders.AUTHORIZATION);
+        String[] schemeData = authHeader.split(" ");
+        if (schemeData.length != 2 || !JWT_SCHEME_PROPERTY.equals(schemeData[0])) {
+            throw new SecurityException();
         }
+        
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
-        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
+        JwsJwtCompactConsumer p = new JwsJwtCompactConsumer(schemeData[1]);
         if (!p.verifySignatureWith(theSigVerifier)) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
         }
-        validateRequestContextProperty(p);
-        byte[] bytes = p.getDecodedJwsPayloadBytes();
-        context.setEntityStream(new ByteArrayInputStream(bytes));
-        context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
+        Message m = JAXRSUtils.getCurrentMessage();
+        setRequestContextProperty(m, p);
+        JwtToken token = p.getJwtToken();
+        m.put(SecurityContext.class, new JwtTokenSecurityContext(token));
         
-        String ct = JoseUtils.checkContentType(p.getJoseHeaders().getContentType(), getDefaultMediaType());
-        if (ct != null) {
-            context.getHeaders().putSingle("Content-Type", ct);
-        }
     }
-    protected void validateRequestContextProperty(JwsCompactConsumer c) {
-        Object requestContext = JAXRSUtils.getCurrentMessage().get(JWS_CONTEXT_PROPERTY);
+    protected void setRequestContextProperty(Message m, JwsCompactConsumer c) {
         Object headerContext = c.getJoseHeaders().getHeader(JWS_CONTEXT_PROPERTY);
-        if (requestContext == null && headerContext == null) {
-            return;
+        if (headerContext != null) {
+            m.put(JWS_CONTEXT_PROPERTY, headerContext);
         }
-        if (requestContext == null && headerContext != null
-            || requestContext != null && headerContext == null
-            || !requestContext.equals(headerContext)) {
-            throw new SecurityException();
-        }
-        
-        
     }
 }
