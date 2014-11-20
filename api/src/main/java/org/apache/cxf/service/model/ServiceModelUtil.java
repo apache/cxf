@@ -52,6 +52,9 @@ public final class ServiceModelUtil {
 
     public static BindingOperationInfo getOperation(Exchange exchange, String opName) {
         Endpoint ep = exchange.get(Endpoint.class);
+        if (ep == null) {
+            return null;
+        }
         BindingInfo service = ep.getEndpointInfo().getBinding();
 
         for (BindingOperationInfo b : service.getOperations()) {
