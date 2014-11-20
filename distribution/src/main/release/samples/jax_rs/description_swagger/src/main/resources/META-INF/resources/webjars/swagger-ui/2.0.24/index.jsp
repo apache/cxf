@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Swagger UI</title>
+  <title>Swagger UI + JAX-RS</title>
   <link href='css/reset.css' media='screen' rel='stylesheet' type='text/css'/>
   <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
   <link href='css/reset.css' media='print' rel='stylesheet' type='text/css'/>
@@ -24,7 +24,7 @@
   <script type="text/javascript">
     $(function () {
       window.swaggerUi = new SwaggerUi({
-      url: "http://localhost:9000/api-docs",
+      url: "/api-docs",
       dom_id: "swagger-ui-container",
       supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
       onComplete: function(swaggerApi, swaggerUi){
@@ -40,14 +40,6 @@
       sorter : "alpha"
     });
 
-    $('#input_apiKey').change(function() {
-      var key = $('#input_apiKey')[0].value;
-      log("key: " + key);
-      if(key && key.trim() != "") {
-        log("added key " + key);
-        window.authorizations.add("key", new ApiKeyAuthorization("api_key", key, "query"));
-      }
-    })
     window.swaggerUi.load();
   });
   </script>
