@@ -42,7 +42,7 @@ import javax.ws.rs.core.Variant;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
-public final class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
+public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     
     private int status = 200;
     private boolean statusSet;
