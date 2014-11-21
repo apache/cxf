@@ -215,7 +215,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     public void setResourceClassesFromBeans(List<Object> beans) {
         for (Object bean : beans) {
             
-            Class<?> realClass = ClassHelper.getRealClass(bean);
+            Class<?> realClass = ClassHelper.getRealClass(getBus(), bean);
             
             ClassResourceInfo cri = getCreatedFromModel(realClass);
             if (cri != null) {

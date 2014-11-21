@@ -220,7 +220,7 @@ public final class ServerProviderFactory extends ProviderFactory {
             prepareProviders((Object[])providers, application);
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
-            Class<?> providerCls = ClassHelper.getRealClass(provider.getProvider());
+            Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
             
             if (filterContractSupported(provider, providerCls, ContainerRequestFilter.class)) {
                 addContainerRequestFilter(postMatchRequestFilters, 
