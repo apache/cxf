@@ -19,6 +19,9 @@
 
 package org.apache.cxf.common.util;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+
 /**
  * 
  */
@@ -49,10 +52,8 @@ public class ClassHelper {
         return o;
     }
     
-    
-    
     public static Class<?> getRealClass(Object o) {
-        return HELPER.getRealClassInternal(o);
+        return getRealClass(null, o);
     }
     
     public static Class<?> getRealClassFromClass(Class<?> cls) {
@@ -63,5 +64,14 @@ public class ClassHelper {
         return HELPER.getRealObjectInternal(o);
     }
 
+    public static Class<?> getRealClass(Bus bus, Object o) {
+        bus = bus == null ? BusFactory.getThreadDefaultBus() : bus;
+        if (bus != null && bus.getProperty(ClassUnwrapper.class.getName()) != null) {
+            ClassUnwrapper unwrapper = (ClassUnwrapper)bus.getProperty(ClassUnwrapper.class.getName());
+            return unwrapper.getRealClass(o);
+        } else {
+            return HELPER.getRealClassInternal(o);
+        }
+    }
     
 }

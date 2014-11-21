@@ -156,7 +156,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                     getServiceFactory().getProperties().putAll(getProperties());
                 }
                 if (serviceBean != null && getServiceClass() == null) {
-                    setServiceClass(ClassHelper.getRealClass(serviceBean));
+                    setServiceClass(ClassHelper.getRealClass(bus, serviceBean));
                 }
                 if (invoker != null) {
                     getServiceFactory().setInvoker(invoker);
@@ -173,7 +173,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                                                   ? getServiceFactory().getServiceClass() 
                                                   : getServiceClass()
                                               : getServiceClass() == null
-                                                  ? ClassHelper.getRealClass(getServiceBean()) 
+                                                  ? ClassHelper.getRealClass(getBus(), getServiceBean()) 
                                                   : getServiceClass());
 
                 server = new ServerImpl(getBus(),
@@ -285,7 +285,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
 
     public Class<?> getServiceBeanClass() {
         if (serviceBean != null) {
-            return ClassHelper.getRealClass(serviceBean);
+            return ClassHelper.getRealClass(getBus(), serviceBean);
         } else {
             return getServiceFactory().getServiceClass();
         }

@@ -216,7 +216,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
      * @return the class of the implementor object
      */
     public Class<?> getImplementorClass() {
-        return implementorClass != null ? implementorClass : ClassHelper.getRealClass(implementor);
+        return implementorClass != null ? implementorClass : ClassHelper.getRealClass(bus, implementor);
     }
 
     public List<Source> getMetadata() {

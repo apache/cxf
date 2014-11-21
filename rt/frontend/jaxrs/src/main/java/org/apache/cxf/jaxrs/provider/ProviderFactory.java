@@ -272,7 +272,7 @@ public abstract class ProviderFactory {
                                      Class<?> providerClass,
                                      boolean injectContext) {
         
-        Class<?> mapperClass = ClassHelper.getRealClass(em.getProvider());
+        Class<?> mapperClass = ClassHelper.getRealClass(bus, em.getProvider());
         Type[] types = null;
         if (m != null && MessageUtils.isTrue(m.getContextualProperty(IGNORE_TYPE_VARIABLES))) {
             types = new Type[]{mapperClass};
@@ -495,7 +495,7 @@ public abstract class ProviderFactory {
         List<ProviderInfo<WriterInterceptor>> writeInts = 
             new LinkedList<ProviderInfo<WriterInterceptor>>();
         for (ProviderInfo<? extends Object> provider : theProviders) {
-            Class<?> providerCls = ClassHelper.getRealClass(provider.getProvider());
+            Class<?> providerCls = ClassHelper.getRealClass(bus, provider.getProvider());
             
             if (MessageBodyReader.class.isAssignableFrom(providerCls)) {
                 addProviderToList(messageReaders, provider);

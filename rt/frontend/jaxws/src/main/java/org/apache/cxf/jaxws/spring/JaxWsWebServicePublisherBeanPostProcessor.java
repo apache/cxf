@@ -130,7 +130,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     }
     
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        Class<?> clazz = ClassHelper.getRealClass(bean);
+        Class<?> clazz = ClassHelper.getRealClass(getServletBus(), bean);
 
         if (clazz.isAnnotationPresent(WebService.class)) {
             WebService ws = clazz.getAnnotation(WebService.class);

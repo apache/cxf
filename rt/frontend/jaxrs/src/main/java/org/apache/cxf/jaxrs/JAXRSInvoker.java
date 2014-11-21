@@ -235,7 +235,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 result = checkResultObject(result, subResourcePath);
 
                 subCri = cri.getSubResource(methodToInvoke.getReturnType(),
-                    ClassHelper.getRealClass(result), result);
+                    ClassHelper.getRealClass(exchange.getBus(), result), result);
                 if (subCri == null) {
                     org.apache.cxf.common.i18n.Message errorM =
                         new org.apache.cxf.common.i18n.Message("NO_SUBRESOURCE_FOUND",
