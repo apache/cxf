@@ -22,6 +22,7 @@ import javax.ws.rs.container.ResourceContext;
 
 import org.apache.cxf.jaxrs.ext.ResourceContextProvider;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
@@ -40,13 +41,15 @@ public class ResourceContextImpl implements ResourceContext {
     
     @Override
     public <T> T getResource(Class<T> cls) {
-        T resource = null;
+        ResourceProvider rp = null;
+        
         Object propValue = m.getContextualProperty(CONTEXT_PROVIDER_PROP);
         if (propValue instanceof ResourceContextProvider) {
-            resource = ((ResourceContextProvider)propValue).getResource(cls);
+            rp = ((ResourceContextProvider)propValue).getResourceProvider(cls);
         } else { 
-            resource = cls.cast(new PerRequestResourceProvider(cls).getInstance(m));
+            rp = new PerRequestResourceProvider(cls);
         }
+        T resource = cls.cast(rp.getInstance(m));
         return doInitResource(cls, resource);
     }
     

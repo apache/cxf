@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext;
 
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+
 public interface ResourceContextProvider {
-    <T> T getResource(Class<T> cls);
+    ResourceProvider getResourceProvider(Class<?> cls);
 }
