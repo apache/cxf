@@ -586,7 +586,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                     client = new ClientImpl(bus, endpoint);
                 }
             } catch (Exception ex) {
-                throw new TrustException(LOG, "WS_MEX_ERROR", ex);
+                throw new TrustException("WS_MEX_ERROR", ex, LOG);
             }
         }
     }
@@ -1436,7 +1436,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                     try {
                         secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);
                     } catch (WSSecurityException e) {
-                        throw new TrustException("DERIVED_KEY_ERROR", LOG, e);
+                        throw new TrustException("DERIVED_KEY_ERROR", e, LOG);
                     }
                 } else {
                     // Service entropy missing
@@ -1487,7 +1487,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                         WSSecurityEngineResult.TAG_SECRET
                     );
             } catch (IOException e) {
-                throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
+                throw new TrustException("ENCRYPTED_KEY_ERROR", e, LOG);
             }
         }
     }

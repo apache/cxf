@@ -61,7 +61,7 @@ public class TrustException extends UncheckedException {
     public TrustException(String msg, Logger log) {
         super(new Message(msg, log));
     }
-    public TrustException(String msg, Logger log, Throwable t) {
+    public TrustException(String msg, Throwable t, Logger log) {
         super(new Message(msg, log), t);
     }
 
