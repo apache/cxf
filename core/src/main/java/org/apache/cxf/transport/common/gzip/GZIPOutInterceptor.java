@@ -40,6 +40,7 @@ import org.apache.cxf.interceptor.MessageSenderInterceptor;
 import org.apache.cxf.io.AbstractThresholdOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
@@ -131,7 +132,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) throws Fault {
-        UseGzip use = gzipPermitted(message);
+        UseGzip use = gzipPermitted(message, force);
         if (use != UseGzip.NO) {
             // remember the original output stream, we will write compressed
             // data to this later
@@ -166,9 +167,9 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * @throws Fault if the Accept-Encoding header does not allow any encoding
      *                 that we can support (identity, gzip or x-gzip).
      */
-    private UseGzip gzipPermitted(Message message) throws Fault {
+    public static UseGzip gzipPermitted(Message message, boolean force) throws Fault {
         UseGzip permitted = UseGzip.NO;
-        if (isRequestor(message)) {
+        if (MessageUtils.isRequestor(message)) {
             LOG.fine("Requestor role, so gzip enabled");
             Object o = message.getContextualProperty(USE_GZIP_KEY);
             if (o instanceof UseGzip) {
