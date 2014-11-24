@@ -83,12 +83,10 @@ public class JwsCompactProducer {
         return signWith(JwsUtils.getHmacSignatureProvider(key, headers.getAlgorithm()));
     }
     
-    public String signWith(JwsSignatureProvider signer) { 
-        JwsSignature worker = signer.createJwsSignature(getJoseHeaders());
-        
+    public String signWith(JwsSignatureProvider signer) {
         byte[] bytes = StringUtils.toBytesUTF8(getUnsignedEncodedJws());
-        worker.update(bytes, 0, bytes.length);
-        return setSignatureBytes(worker.sign());
+        byte[] sig = signer.sign(getJoseHeaders(), bytes);
+        return setSignatureBytes(sig);
     }
     
     public String setSignatureText(String signatureText) {

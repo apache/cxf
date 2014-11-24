@@ -19,11 +19,7 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 
-
-public interface JweEncryptionProvider extends JweKeyProperties {
-    String encrypt(byte[] jweContent, JweHeaders jweHeaders);
-    /**
-     * Prepare JWE state (optional operation)
-     */
-    JweEncryptionState createJweEncryptionState(JweHeaders jweHeaders);
+public interface JweFactory {
+    JweEncryptionProvider getJweEncryptionProvider();
+    JweDecryptionProvider getJweDecryptionProvider();
 }

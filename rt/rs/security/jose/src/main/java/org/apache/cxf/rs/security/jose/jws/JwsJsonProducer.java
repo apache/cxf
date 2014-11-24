@@ -106,12 +106,12 @@ public class JwsJsonProducer {
         if (unionHeaders.getAlgorithm() == null) {
             throw new SecurityException("Algorithm header is not set");
         }
-        JwsSignature worker = signer.createJwsSignature(unionHeaders);
         String sequenceToBeSigned = protectedHeader.getEncodedHeaderEntries() 
             + "." + getUnsignedEncodedPayload();
         byte[] bytesToBeSigned = StringUtils.toBytesUTF8(sequenceToBeSigned);
-        worker.update(bytesToBeSigned, 0, bytesToBeSigned.length);
-        byte[] signatureBytes = worker.sign();
+        
+        byte[] signatureBytes = signer.sign(unionHeaders, bytesToBeSigned);
+        
         String encodedSignatureBytes = Base64UrlUtility.encode(signatureBytes);
         JwsJsonSignatureEntry signature = 
             new JwsJsonSignatureEntry(encodedPayload, 
