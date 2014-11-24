@@ -409,13 +409,15 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.SIGN && !foundPrimarySignature) {
                 foundPrimarySignature = true;
-                String sigId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                if (sigId == null || !isIdEncrypted(sigId, results)) {
+                Element sigElement = 
+                    (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                if (sigElement == null || !isElementEncrypted(sigElement, results)) {
                     return false;
                 }
             } else if (actInt.intValue() == WSConstants.SC) {
-                String sigId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                if (sigId == null || !isIdEncrypted(sigId, results)) {
+                Element sigElement = 
+                    (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                if (sigElement == null || !isElementEncrypted(sigElement, results)) {
                     return false;
                 }
             }
@@ -424,9 +426,9 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
     }
     
     /**
-     * Return true if the given id was encrypted
+     * Return true if the given Element was encrypted
      */
-    private boolean isIdEncrypted(String sigId, List<WSSecurityEngineResult> results) {
+    private boolean isElementEncrypted(Element element, List<WSSecurityEngineResult> results) {
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.ENCR) {
@@ -435,12 +437,8 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
                 if (el != null) {
                     for (WSDataRef r : el) {
                         Element protectedElement = r.getProtectedElement();
-                        if (protectedElement != null) {
-                            String id = protectedElement.getAttributeNS(null, "Id");
-                            String wsuId = protectedElement.getAttributeNS(WSConstants.WSU_NS, "Id");
-                            if (sigId.equals(id) || sigId.equals(wsuId)) {
-                                return true;
-                            }
+                        if (element.equals(protectedElement)) {
+                            return true;
                         }
                     }
                 }
