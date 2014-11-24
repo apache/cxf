@@ -69,7 +69,7 @@ public class JwsJsonConsumerTest extends Assert {
         assertEquals(KID_OF_THE_SECOND_SIGNER, secondKid);
         JsonWebKey ecKey = jwks.getKey(secondKid);
         assertNotNull(ecKey);
-        //assertTrue(sigEntries.get(1).verifySignatureWith(ecKey));
+        assertTrue(sigEntries.get(1).verifySignatureWith(ecKey));
     }
     public JsonWebKeys readKeySet(String fileName) throws Exception {
         InputStream is = JwsJsonConsumerTest.class.getResourceAsStream(fileName);
