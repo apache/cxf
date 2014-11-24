@@ -40,7 +40,10 @@ import javax.wsdl.Definition;
 import javax.wsdl.Types;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -525,6 +528,11 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                             bus.getExtension(WSDLManager.class).getDefinition((Element)s.getAny());
                     } else if ("http://www.w3.org/2001/XMLSchema".equals(s.getDialect())) {
                         Element schemaElement = (Element)s.getAny();
+                        if (schemaElement ==  null) {
+                            String schemaLocation = s.getLocation();
+                            LOG.info("XSD schema location: " + schemaLocation);
+                            schemaElement = downloadSchema(schemaLocation);
+                        }
                         QName schemaName = 
                             new QName(schemaElement.getNamespaceURI(), schemaElement.getLocalName());
                         WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
@@ -590,6 +598,18 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             }
         }
     }
+    
+    private Element downloadSchema(String schemaLocation) throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        
+        DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+        Document document = documentBuilder.parse(schemaLocation);
+        return document.getDocumentElement();
+    }
+    
     protected String findMEXLocation(EndpointReferenceType ref, boolean useEPRWSAAddrAsMEXLocation) {
         if (ref.getMetadata() != null && ref.getMetadata().getAny() != null) {
             for (Object any : ref.getMetadata().getAny()) {
