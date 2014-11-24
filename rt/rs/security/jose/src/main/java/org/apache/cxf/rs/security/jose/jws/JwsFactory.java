@@ -16,14 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwe;
+package org.apache.cxf.rs.security.jose.jws;
 
 
-
-public interface JweEncryptionProvider extends JweKeyProperties {
-    String encrypt(byte[] jweContent, JweHeaders jweHeaders);
-    /**
-     * Prepare JWE state (optional operation)
-     */
-    JweEncryptionState createJweEncryptionState(JweHeaders jweHeaders);
+public interface JwsFactory {
+    JwsSignatureProvider getJwsSignatureProvider();
+    JwsSignatureVerifier getJwsSignatureVerifier();
 }

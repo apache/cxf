@@ -23,5 +23,9 @@ import org.apache.cxf.rs.security.jose.JoseHeaders;
 
 public interface JwsSignatureProvider {
     String getAlgorithm();
+    byte[] sign(JoseHeaders headers, byte[] content);
+    /**
+     * Create a signature handler capable of updating the signature input (optional operation)
+     */
     JwsSignature createJwsSignature(JoseHeaders headers);
 }

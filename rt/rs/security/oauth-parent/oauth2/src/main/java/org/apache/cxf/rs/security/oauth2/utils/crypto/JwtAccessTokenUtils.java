@@ -126,6 +126,12 @@ public final class JwtAccessTokenUtils {
         public JwsSignature createJwsSignature(JoseHeaders headers) {
             return new NoneJwsSignature();
         }
+
+        @Override
+        public byte[] sign(JoseHeaders headers, byte[] content) {
+            // TODO Auto-generated method stub
+            return null;
+        }
         
     }
     private static class NoneJwsSignature implements JwsSignature {

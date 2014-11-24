@@ -46,6 +46,12 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         return algorithm;    
     }
     @Override
+    public byte[] sign(JoseHeaders headers, byte[] content) {
+        JwsSignature sig = createJwsSignature(headers);
+        sig.update(content, 0, content.length);
+        return sig.sign();
+    }
+    @Override
     public JwsSignature createJwsSignature(JoseHeaders headers) {
         return doCreateJwsSignature(prepareHeaders(headers));
     }

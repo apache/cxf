@@ -27,6 +27,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
+import org.apache.cxf.rs.security.jose.jwe.JweFactory;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 
@@ -53,6 +54,10 @@ public class AbstractJweDecryptingFilter {
             return decryption;    
         } 
         Message m = JAXRSUtils.getCurrentMessage();
+        Object factory = m.getContextualProperty(JweFactory.class.getName());
+        if (factory != null) {
+            return ((JweFactory)factory).getJweDecryptionProvider();
+        }
         String propLoc = 
             (String)MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
         if (propLoc == null) {

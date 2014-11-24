@@ -29,6 +29,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
+import org.apache.cxf.rs.security.jose.jws.JwsFactory;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
@@ -47,6 +48,10 @@ public class AbstractJwsWriterProvider {
             return sigProvider;    
         } 
         Message m = JAXRSUtils.getCurrentMessage();
+        Object factory = m.getContextualProperty(JwsFactory.class.getName());
+        if (factory != null) {
+            return ((JwsFactory)factory).getJwsSignatureProvider();
+        }
         String propLoc = 
             (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_OUT_PROPS, RSSEC_SIGNATURE_PROPS);
         if (propLoc == null) {

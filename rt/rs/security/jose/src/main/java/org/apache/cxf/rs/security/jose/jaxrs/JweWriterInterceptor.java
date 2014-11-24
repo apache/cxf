@@ -42,6 +42,7 @@ import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionState;
+import org.apache.cxf.rs.security.jose.jwe.JweFactory;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweOutputStream;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
@@ -119,6 +120,10 @@ public class JweWriterInterceptor implements WriterInterceptor {
             return encryptionProvider;    
         } 
         Message m = JAXRSUtils.getCurrentMessage();
+        Object factory = m.getContextualProperty(JweFactory.class.getName());
+        if (factory != null) {
+            return ((JweFactory)factory).getJweEncryptionProvider();
+        }
         String propLoc = 
             (String)MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_OUT_PROPS, RSSEC_ENCRYPTION_PROPS);
         if (propLoc == null) {
