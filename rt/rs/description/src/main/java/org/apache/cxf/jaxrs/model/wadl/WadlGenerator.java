@@ -153,6 +153,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean supportCollections = true;
     private boolean supportJaxbXmlType = true;
     private boolean supportJaxbSubstitutions = true;
+    private boolean ignoreOverloadedMethods;
     private boolean checkAbsolutePathSlash;
     
     private List<String> externalSchemasCache;
@@ -167,6 +168,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private String nsPrefix = DEFAULT_NS_PREFIX;
     private MediaType defaultWadlResponseMediaType = MediaType.APPLICATION_XML_TYPE;
     private MediaType defaultRepMediaType = MediaType.WILDCARD_TYPE;
+    private String stylesheetReference;
     private Bus bus;
     private DocumentationProvider docProvider;
     private ResourceIdGenerator idGenerator;     
@@ -235,6 +237,9 @@ public class WadlGenerator implements ContainerRequestFilter {
                                        Message m,
                                        UriInfo ui) {
         StringBuilder sbMain = new StringBuilder();
+        if (!isJson && stylesheetReference != null) {
+            sbMain.append("<?xml-stylesheet type=\"text/xsl\" href=\"" + stylesheetReference + "\"?>");
+        }
         sbMain.append("<application");
         if (!isJson) {
             sbMain.append(" xmlns=\"").append(getNamespace()).append("\" xmlns:xs=\"")
@@ -345,7 +350,10 @@ public class WadlGenerator implements ContainerRequestFilter {
         boolean resourceTagOpened = false;
         for (int i = 0; i < sortedOps.size(); i++) {
             OperationResourceInfo ori = sortedOps.get(i);
-
+            if (i > 0 && ignoreOverloadedMethods 
+                && ori.getMethodToInvoke().getName().equals(sortedOps.get(i - 1).getMethodToInvoke().getName())) {
+                continue;
+            }
             if (ori.getHttpMethod() == null) {
                 Class<?> cls = getMethod(ori).getReturnType();
                 ClassResourceInfo subcri = cri.findResource(cls, cls);
@@ -1033,6 +1041,12 @@ public class WadlGenerator implements ContainerRequestFilter {
                 int result = ut1.getValue().compareTo(ut2.getValue());
                 if (result == 0 && !(sub1 && sub2)) {
                     result = op1.getHttpMethod().compareTo(op2.getHttpMethod());
+                }
+                if (result == 0 && ignoreOverloadedMethods
+                    && op1.getMethodToInvoke().getName().equals(op2.getMethodToInvoke().getName())) {
+                    Integer paramLen1 = op1.getMethodToInvoke().getParameterTypes().length;
+                    Integer paramLen2 = op2.getMethodToInvoke().getParameterTypes().length;
+                    result = paramLen1.compareTo(paramLen2) * -1; 
                 }
                 return result;
             }
@@ -1979,7 +1993,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     /**
      * Set the default WADL response media type.
      * For example, a browser may display WADL better if Content-Type 
-     * is set application/xml which is a default response content type. 
+     * is set to application/xml which is a default response content type. 
      * Users may set it to application/vnd.sun.wadl+xml or other type.
      * @param mt WADL response media type 
      */
@@ -2015,6 +2029,10 @@ public class WadlGenerator implements ContainerRequestFilter {
     
     public void setDocumentationProvider(DocumentationProvider p) {
         docProvider = p;
+    }
+
+    public void setStylesheetReference(String stylesheetReference) {
+        this.stylesheetReference = stylesheetReference;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
