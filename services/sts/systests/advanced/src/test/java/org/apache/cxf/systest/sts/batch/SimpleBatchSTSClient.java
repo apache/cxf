@@ -930,7 +930,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                     try {
                         secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);
                     } catch (WSSecurityException e) {
-                        throw new TrustException("DERIVED_KEY_ERROR", LOG, e);
+                        throw new TrustException("DERIVED_KEY_ERROR", e, LOG);
                     }
                 } else {
                     // Service entropy missing
@@ -981,7 +981,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                         WSSecurityEngineResult.TAG_SECRET
                     );
             } catch (IOException e) {
-                throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
+                throw new TrustException("ENCRYPTED_KEY_ERROR", e, LOG);
             }
         }
     }
