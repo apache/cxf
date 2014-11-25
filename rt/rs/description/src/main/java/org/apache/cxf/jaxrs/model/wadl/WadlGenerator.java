@@ -2035,6 +2035,10 @@ public class WadlGenerator implements ContainerRequestFilter {
         this.stylesheetReference = stylesheetReference;
     }
 
+    public void setIgnoreOverloadedMethods(boolean ignore) {
+        this.ignoreOverloadedMethods = ignore;
+    }
+
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
         private static final String SCHEMA_LOCATION = "schemaLocation";
         private Map<String, String> locsMap;
