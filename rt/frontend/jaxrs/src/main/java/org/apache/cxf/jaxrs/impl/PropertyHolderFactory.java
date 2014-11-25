@@ -49,7 +49,7 @@ public final class PropertyHolderFactory {
         
         public MessagePropertyHolder(Message m) {
             this.m = m;
-            this.props = CastUtils.cast((Map<?, ?>)m.get(PROPERTY_KEY));
+            this.props = CastUtils.cast((Map<?, ?>)m.getExchange().get(PROPERTY_KEY));
         }
         public Object getProperty(String name) {
             return props == null ? null : props.get(name);
@@ -65,7 +65,7 @@ public final class PropertyHolderFactory {
         public void setProperty(String name, Object value) {
             if (props == null) {
                 props = new HashMap<String, Object>();
-                m.put(PROPERTY_KEY, props);
+                m.getExchange().put(PROPERTY_KEY, props);
             }    
             if (value == null) {
                 removeProperty(name);

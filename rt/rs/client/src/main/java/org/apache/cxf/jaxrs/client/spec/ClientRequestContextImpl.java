@@ -148,7 +148,14 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     @Override
     public URI getUri() {
         String requestURI = (String)m.get(Message.REQUEST_URI);
-        return requestURI  == null ? null : URI.create(requestURI);
+        if (requestURI  == null) {
+            return null;
+        }
+        if (requestURI.startsWith("/")) {
+            String endpointAddress = (String)m.get(Message.ENDPOINT_ADDRESS);
+            requestURI = requestURI.length() == 1 ? endpointAddress : endpointAddress + requestURI;     
+        }
+        return URI.create(requestURI);
     }
 
     @Override
