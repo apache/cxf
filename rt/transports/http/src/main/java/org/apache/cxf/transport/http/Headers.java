@@ -435,12 +435,18 @@ public class Headers {
             
             if (addHeaders || HTTP_HEADERS_SINGLE_VALUE_ONLY.contains(header)) {
                 for (int i = 0; i < headerList.size(); i++) {
-                    response.addHeader(header, headerObjectToString(headerList.get(i)));
+                    Object headerObject = headerList.get(i);
+                    if (headerObject != null) {
+                        response.addHeader(header, headerObjectToString(headerObject));
+                    }
                 }
             } else {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < headerList.size(); i++) {
-                    sb.append(headerObjectToString(headerList.get(i)));
+                    Object headerObject = headerList.get(i);
+                    if (headerObject != null) {
+                        sb.append(headerObjectToString(headerObject));
+                    }
                     
                     if (i + 1 < headerList.size()) {
                         sb.append(',');
