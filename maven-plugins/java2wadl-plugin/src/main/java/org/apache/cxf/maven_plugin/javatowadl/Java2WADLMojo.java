@@ -160,6 +160,11 @@ public class Java2WADLMojo extends AbstractMojo {
     private boolean checkAbsolutePathSlash;
     
     /**
+     * @parameter default-value="false"
+     */
+    private boolean ignoreOverloadedMethods;
+    
+    /**
      * @parameter
      */
     private String applicationTitle;
@@ -178,6 +183,11 @@ public class Java2WADLMojo extends AbstractMojo {
      * @parameter default-value="wadl"
      */
     private String outputFileExtension;
+    
+    /**
+     * @parameter
+     */
+    private String stylesheetReference;
     
     private ClassLoader resourceClassLoader;
     
@@ -210,13 +220,14 @@ public class Java2WADLMojo extends AbstractMojo {
         wg.setAddResourceAndMethodIds(addResourceAndMethodIds);
         wg.setLinkAnyMediaTypeToXmlSchema(linkAnyMediaTypeToXmlSchema);
         wg.setCheckAbsolutePathSlash(checkAbsolutePathSlash);
-         
+        wg.setIgnoreOverloadedMethods(ignoreOverloadedMethods);
         if (applicationTitle != null) {
             wg.setApplicationTitle(applicationTitle);
         } 
         if (namespacePrefix != null) {
             wg.setNamespacePrefix(namespacePrefix);
         }
+        wg.setStylesheetReference(stylesheetReference);
     }
     
     private void generateWadl(List<Class<?>> resourceClasses, String wadl) throws MojoExecutionException {
