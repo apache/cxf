@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.rs.security.jose.jws.JwsFactory;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
@@ -42,10 +41,6 @@ public class AbstractJwsReaderProvider {
         } 
         
         Message m = JAXRSUtils.getCurrentMessage();
-        Object factory = m.getContextualProperty(JwsFactory.class.getName());
-        if (factory != null) {
-            return ((JwsFactory)factory).getJwsSignatureVerifier();
-        }
         String propLoc = 
             (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
         if (propLoc == null) {
