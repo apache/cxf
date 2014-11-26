@@ -25,15 +25,18 @@ import java.util.Map;
 
 import javax.annotation.Priority;
 import javax.cache.Cache;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-@ClientCache
 @Priority(Priorities.USER - 1)
 public class CacheControlClientRequestFilter implements ClientRequestFilter {
+    public static final String NO_CACHE_PROPERTY = "no_client_cache";
+    public static final String CACHED_ENTITY_PROPERTY = "client_cached_entity";
+    public static final String CLIENT_ACCEPTS = "client_accepts";
     private Cache<Key, Entry> cache;
 
     public CacheControlClientRequestFilter(final Cache<Key, Entry> cache) {
@@ -46,8 +49,8 @@ public class CacheControlClientRequestFilter implements ClientRequestFilter {
 
     @Override
     public void filter(final ClientRequestContext request) throws IOException {
-        if (!"GET".equals(request.getMethod())) {
-            request.setProperty("no_client_cache", "true");
+        if (!HttpMethod.GET.equals(request.getMethod())) {
+            request.setProperty(NO_CACHE_PROPERTY, "true");
             return;
         }
         final URI uri = request.getUri();
@@ -58,7 +61,8 @@ public class CacheControlClientRequestFilter implements ClientRequestFilter {
             if (entry.isOutDated()) {
                 cache.remove(key, entry);
             } else {
-                Response.ResponseBuilder ok = Response.ok(new String(entry.getData()));
+                Object cachedEntity = entry.getData();
+                Response.ResponseBuilder ok = Response.ok(cachedEntity);
                 if (entry.getHeaders() != null) {
                     for (Map.Entry<String, List<String>> h : entry.getHeaders().entrySet()) {
                         for (final Object instance : h.getValue()) {
@@ -66,9 +70,11 @@ public class CacheControlClientRequestFilter implements ClientRequestFilter {
                         }
                     }
                 }
+                request.setProperty(CACHED_ENTITY_PROPERTY, cachedEntity);
                 request.abortWith(ok.build());
             }
         }
+        request.setProperty(CLIENT_ACCEPTS, accepts);
     }
 
     public CacheControlClientRequestFilter setCache(final Cache<Key, Entry> c) {

@@ -18,15 +18,30 @@
  */
 package org.apache.cxf.jaxrs.client.cache;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.Serializable;
 
-import javax.ws.rs.NameBinding;
-
-@NameBinding
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface ClientCache {
+public class BytesEntity implements Serializable {
+    
+    private static final long serialVersionUID = -6010007172900653981L;
+    private byte[] entity; 
+    private boolean fromStream;
+    public BytesEntity() {
+        
+    }
+    public BytesEntity(byte[] entity, boolean fromStream) {
+        this.entity = entity;
+        this.setFromStream(fromStream);
+    }
+    public byte[] getEntity() {
+        return entity;
+    }
+    public void setEntity(byte[] entity) {
+        this.entity = entity;
+    }
+    public boolean isFromStream() {
+        return fromStream;
+    }
+    public void setFromStream(boolean fromStream) {
+        this.fromStream = fromStream;
+    }
 }

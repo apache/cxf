@@ -18,7 +18,10 @@
  */
 package org.apache.cxf.jaxrs.client.cache;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -36,16 +39,17 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.transport.http.Headers;
 
-@ClientCache
 @Priority(Priorities.USER - 1)
 public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
     private Cache<Key, Entry> cache;
 
     @Context
     private UriInfo uriInfo;
-
+    private boolean cacheResponseInputStream;
+    
     public CacheControlClientReaderInterceptor(final Cache<Key, Entry> cache) {
         setCache(cache);
     }
@@ -61,21 +65,50 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
 
     @Override
     public Object aroundReadFrom(final ReaderInterceptorContext context) throws IOException, WebApplicationException {
-        if (Boolean.parseBoolean((String)context.getProperty("no_client_cache"))) {
+        Object cachedEntity = context.getProperty(CacheControlClientRequestFilter.CACHED_ENTITY_PROPERTY);
+        if (cachedEntity != null) {
+            if (cachedEntity instanceof BytesEntity) {
+                // InputStream or byte[]
+                BytesEntity bytesEntity = (BytesEntity)cachedEntity;
+                byte[] bytes = bytesEntity.getEntity();
+                cachedEntity = bytesEntity.isFromStream() ? new ByteArrayInputStream(bytes) : bytes;
+                if (cacheResponseInputStream) {
+                    InputStream is = bytesEntity.isFromStream() ? (InputStream)cachedEntity 
+                        : new ByteArrayInputStream((byte[])cachedEntity); 
+                    context.setInputStream(is);
+                    return context.proceed();
+                }
+            }
+            return cachedEntity;
+        }
+        
+        if (Boolean.parseBoolean((String)context.getProperty(CacheControlClientRequestFilter.NO_CACHE_PROPERTY))) {
+            // non GET HTTP method or other restriction applies
             return context.proceed();
         }
         final MultivaluedMap<String, String> headers = context.getHeaders(); 
         final String cacheControlHeader = headers.getFirst(HttpHeaders.CACHE_CONTROL);
-        String expiresHeader = headers.getFirst(HttpHeaders.EXPIRES);
+        final CacheControl cacheControl = CacheControl.valueOf(cacheControlHeader.toString());
         
-        long expiry = -1;
-        if (cacheControlHeader != null) {
-            final CacheControl value = CacheControl.valueOf(cacheControlHeader.toString());
-            if (value.isNoCache()) {
-                return context.proceed();
-            }
-            expiry = value.getMaxAge();
-        } else if (expiresHeader != null) {
+        byte[] cachedBytes = null;
+        if (cacheControl != null && !cacheControl.isNoCache() && !cacheControl.isNoStore() 
+            && cacheResponseInputStream) {
+            // if Cache-Control is set and the stream needs to be cached then do it
+            cachedBytes = IOUtils.readBytesFromStream((InputStream)context.getInputStream());
+            context.setInputStream(new ByteArrayInputStream(cachedBytes));
+        }
+        // Read the stream and get the actual entity
+        Object responseEntity = context.proceed();
+        
+        if (cacheControl == null || cacheControl.isNoCache() || cacheControl.isNoStore()) {
+            // TODO: apparently no-cache also means the local cache has to be revalidated
+            return responseEntity;
+        }
+        // if a max-age property is set then it overrides Expires
+        long expiry = cacheControl.getMaxAge();
+        if (expiry == -1) {
+            //TODO: Review if Expires can be supported as an alternative to Cache-Control
+            String expiresHeader = headers.getFirst(HttpHeaders.EXPIRES);
             if (expiresHeader.startsWith("'") && expiresHeader.endsWith("'")) {
                 expiresHeader = expiresHeader.substring(1, expiresHeader.length() - 1);
             }
@@ -83,22 +116,33 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
                 expiry = (Headers.getHttpDateFormat().parse(expiresHeader).getTime() 
                     - System.currentTimeMillis()) / 1000;
             } catch (final ParseException e) {
-                // try next
+                // TODO: Revisit the possibility of supporting multiple formats 
             }
-            
-        } else { // no cache
-            return context.proceed();
+        }
+        Serializable ser = null;
+        if (cachedBytes != null) {
+            // store the cached bytes - they will be parsed again when a client cache will return them
+            ser = new BytesEntity(cachedBytes, responseEntity instanceof InputStream);
+        } else if (responseEntity instanceof Serializable) {
+            // store the entity directly
+            ser = (Serializable)responseEntity;
+        } else if (responseEntity instanceof InputStream) {
+            // read the stream, cache it, the cached bytes will be returned immediately
+            // when a client cache will return them
+            byte[] bytes = IOUtils.readBytesFromStream((InputStream)responseEntity);
+            ser = new BytesEntity(bytes, true);
+            responseEntity = new ByteArrayInputStream(bytes);
+        } else if (responseEntity instanceof byte[]) {
+            // the cached bytes will be returned immediately when a client cache will return them
+            ser = new BytesEntity((byte[])responseEntity, false);
         }
 
-        final Object proceed = context.proceed();
-        
-        final Entry entry = new Entry(((String)proceed).getBytes(), context.getHeaders(), 
-                                      computeCacheHeaders(context.getHeaders()), expiry);
+        final Entry entry = new Entry(ser, context.getHeaders(), computeCacheHeaders(context.getHeaders()), expiry);
         final URI uri = uriInfo.getRequestUri();
-        final String accepts = headers.getFirst(HttpHeaders.ACCEPT);
+        final String accepts = (String)context.getProperty(CacheControlClientRequestFilter.CLIENT_ACCEPTS);
         cache.put(new Key(uri, accepts), entry);
 
-        return proceed;
+        return responseEntity;
     }
 
     private Map<String, String> computeCacheHeaders(final MultivaluedMap<String, String> httpHeaders) {
@@ -106,13 +150,30 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
 
         final String etagHeader = httpHeaders.getFirst(HttpHeaders.ETAG);
         if (etagHeader != null) {
-            cacheHeaders.put("If-None-Match", etagHeader);
+            cacheHeaders.put(HttpHeaders.IF_NONE_MATCH, etagHeader);
         }
         final String lastModifiedHeader = httpHeaders.getFirst(HttpHeaders.LAST_MODIFIED);
         if (lastModifiedHeader != null) {
-            cacheHeaders.put("If-Modified-Since", lastModifiedHeader);
+            cacheHeaders.put(HttpHeaders.IF_MODIFIED_SINCE, lastModifiedHeader);
         }
 
         return cacheHeaders;
+    }
+
+    public boolean isCacheInputStream() {
+        return cacheResponseInputStream;
+    }
+    /**
+     * Enforce the caching of the response stream. 
+     * This is not recommended if the client code expects Serializable data,
+     * example, String or custom JAXB beans marked as Serializable, 
+     * which can be stored in the cache directly.
+     * Use this property only if returning a cached entity does require a 
+     * repeated stream parsing.
+     * 
+     * @param cacheInputStream
+     */
+    public void setCacheResponseInputStream(boolean cacheInputStream) {
+        this.cacheResponseInputStream = cacheInputStream;
     }
 }

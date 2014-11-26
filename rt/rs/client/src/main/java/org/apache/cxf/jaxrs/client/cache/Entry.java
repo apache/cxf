@@ -27,14 +27,14 @@ import javax.ws.rs.core.MultivaluedMap;
 public class Entry implements Serializable {
     private static final long serialVersionUID = -3551501551331222546L;
     private Map<String, String> cacheHeaders = Collections.emptyMap();
-    private byte[] data;
+    private Serializable data;
     private MultivaluedMap<String, String> headers;
     private long expiresValue;
     private long initialTimestamp = now();
 
-    public Entry(final byte[] bytes, final MultivaluedMap<String, String> headers,
+    public Entry(final Serializable data, final MultivaluedMap<String, String> headers,
                  final Map<String, String> cacheHeaders, final long expiresHeaderValue) {
-        this.data = bytes;
+        this.data = data;
         this.headers = headers;
         this.cacheHeaders = cacheHeaders;
         this.expiresValue = expiresHeaderValue;
@@ -56,11 +56,11 @@ public class Entry implements Serializable {
         this.cacheHeaders = cacheHeaders;
     }
 
-    public byte[] getData() {
+    public Serializable getData() {
         return data;
     }
 
-    public void setData(final byte[] data) {
+    public void setData(final Serializable data) {
         this.data = data;
     }
 
