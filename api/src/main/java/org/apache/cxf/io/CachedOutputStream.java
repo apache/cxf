@@ -680,7 +680,12 @@ public class CachedOutputStream extends OutputStream {
             if (!transfered) {
                 // Data is in memory, or we failed to rename the file, try copying
                 // the stream instead.
-                IOUtils.transferTo(getInputStream(), destinationFile);
+                FileOutputStream fout = new FileOutputStream(destinationFile);
+                try {
+                    IOUtils.copyAndCloseInput(this, fout);
+                } finally {
+                    fout.close();
+                }
             }
         }
     }
