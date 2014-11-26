@@ -29,6 +29,7 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
@@ -125,6 +126,9 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             }
             um.setSchema(schema);
             um.setAttachmentUnmarshaller(getAttachmentUnmarshaller());
+            for (XmlAdapter<?, ?> adapter : databinding.getConfiguredXmlAdapters()) {
+                um.setAdapter(adapter);
+            }
             return um;
         } catch (JAXBException ex) {
             if (ex instanceof javax.xml.bind.UnmarshalException) {
