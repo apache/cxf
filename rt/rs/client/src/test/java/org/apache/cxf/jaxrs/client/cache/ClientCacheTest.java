@@ -40,6 +40,7 @@ import org.apache.cxf.transport.local.LocalConduit;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ClientCacheTest extends Assert {
@@ -62,6 +63,7 @@ public class ClientCacheTest extends Assert {
     }
 
     @Test
+    @Ignore
     public void testCache() {
         final WebTarget base = ClientBuilder.newBuilder().register(CacheControlFeature.class).build().target(ADDRESS);
         final Invocation.Builder cached = setAsLocal(base.request()).header(HttpHeaders.CACHE_CONTROL, "public");
