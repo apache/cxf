@@ -26,31 +26,34 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.PreDestroy;
-import javax.annotation.Priority;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.cache.configuration.Factory;
 import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.ExpiryPolicy;
+import javax.cache.integration.CacheLoader;
+import javax.cache.integration.CacheWriter;
 import javax.cache.spi.CachingProvider;
-import javax.ws.rs.Priorities;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
 
 
-@Priority(Priorities.HEADER_DECORATOR)
 public class CacheControlFeature implements Feature {
     private CachingProvider provider;
     private CacheManager manager;
     private Cache<Key, Entry> cache;
-
+    private boolean cacheResponseInputStream;
+    
     @Override
     public boolean configure(final FeatureContext context) {
         // TODO: read context properties to exclude some patterns?
         final Cache<Key, Entry> entryCache = createCache(context.getConfiguration().getProperties());
         context.register(new CacheControlClientRequestFilter(entryCache));
-        context.register(new CacheControlClientReaderInterceptor(entryCache));
+        CacheControlClientReaderInterceptor reader = new CacheControlClientReaderInterceptor(entryCache);
+        reader.setCacheResponseInputStream(cacheResponseInputStream);
+        context.register(reader);
         return true;
     }
 
@@ -71,9 +74,9 @@ public class CacheControlFeature implements Feature {
         final Properties props = new Properties();
         props.putAll(properties);
 
-        final String prefix = ClientCache.class.getName() + ".";
+        final String prefix = this.getClass().getName() + ".";
         final String uri = props.getProperty(prefix + "config-uri");
-        final String name = props.getProperty(prefix + "name", ClientCache.class.getName());
+        final String name = props.getProperty(prefix + "name", this.getClass().getName());
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
@@ -95,15 +98,21 @@ public class CacheControlFeature implements Feature {
 
             final String loader = props.getProperty(prefix + "loaderFactory");
             if (loader != null) {
-                configuration.setCacheLoaderFactory(newInstance(contextClassLoader, loader, Factory.class));
+                @SuppressWarnings("unchecked")
+                Factory<? extends CacheLoader<Key, Entry>> f = newInstance(contextClassLoader, loader, Factory.class);
+                configuration.setCacheLoaderFactory(f);
             }
             final String writer = props.getProperty(prefix + "writerFactory");
             if (writer != null) {
-                configuration.setCacheWriterFactory(newInstance(contextClassLoader, writer, Factory.class));
+                @SuppressWarnings("unchecked")
+                Factory<? extends CacheWriter<Key, Entry>> f = newInstance(contextClassLoader, writer, Factory.class);
+                configuration.setCacheWriterFactory(f);
             }
             final String expiry = props.getProperty(prefix + "expiryFactory");
             if (expiry != null) {
-                configuration.setExpiryPolicyFactory(newInstance(contextClassLoader, expiry, Factory.class));
+                @SuppressWarnings("unchecked")
+                Factory<? extends ExpiryPolicy> f = newInstance(contextClassLoader, expiry, Factory.class);
+                configuration.setExpiryPolicyFactory(f);
             }
 
             cache = manager.createCache(name, configuration);
@@ -113,11 +122,16 @@ public class CacheControlFeature implements Feature {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static <T> T newInstance(final ClassLoader contextClassLoader, final String clazz, final Class<T> cast) {
         try {
             return (T) contextClassLoader.loadClass(clazz).newInstance();
         } catch (final Exception e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    public void setCacheResponseInputStream(boolean cacheStream) {
+        this.cacheResponseInputStream = cacheStream;
     }
 }
