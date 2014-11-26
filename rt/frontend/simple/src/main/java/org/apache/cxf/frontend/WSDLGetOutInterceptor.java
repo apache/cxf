@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -52,7 +53,10 @@ public class WSDLGetOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         message.put(Message.CONTENT_TYPE, "text/xml");
         try {
-            StaxUtils.writeNode(doc, writer, true);
+            StaxUtils.writeDocument(doc, writer, true,
+                                    !MessageUtils.getContextualBoolean(message, 
+                                                                       StaxOutInterceptor.FORCE_START_DOCUMENT, 
+                                                                       false));
         } catch (XMLStreamException e) {
             throw new Fault(e);
         }
