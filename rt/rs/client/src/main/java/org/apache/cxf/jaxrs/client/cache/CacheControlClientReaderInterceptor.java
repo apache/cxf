@@ -86,13 +86,13 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
             // non GET HTTP method or other restriction applies
             return context.proceed();
         }
-        final MultivaluedMap<String, String> headers = context.getHeaders(); 
-        final String cacheControlHeader = headers.getFirst(HttpHeaders.CACHE_CONTROL);
+        final MultivaluedMap<String, String> responseHeaders = context.getHeaders(); 
+        final String cacheControlHeader = responseHeaders.getFirst(HttpHeaders.CACHE_CONTROL);
         final CacheControl cacheControl = CacheControl.valueOf(cacheControlHeader.toString());
         
         byte[] cachedBytes = null;
-        if (cacheControl != null && !cacheControl.isNoCache() && !cacheControl.isNoStore() 
-            && cacheResponseInputStream) {
+        final boolean validCacheControl = isCacheControlValid(context, cacheControl);
+        if (validCacheControl && cacheResponseInputStream) {
             // if Cache-Control is set and the stream needs to be cached then do it
             cachedBytes = IOUtils.readBytesFromStream((InputStream)context.getInputStream());
             context.setInputStream(new ByteArrayInputStream(cachedBytes));
@@ -100,15 +100,14 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
         // Read the stream and get the actual entity
         Object responseEntity = context.proceed();
         
-        if (cacheControl == null || cacheControl.isNoCache() || cacheControl.isNoStore()) {
-            // TODO: apparently no-cache also means the local cache has to be revalidated
+        if (!validCacheControl) {
             return responseEntity;
         }
         // if a max-age property is set then it overrides Expires
         long expiry = cacheControl.getMaxAge();
         if (expiry == -1) {
             //TODO: Review if Expires can be supported as an alternative to Cache-Control
-            String expiresHeader = headers.getFirst(HttpHeaders.EXPIRES);
+            String expiresHeader = responseHeaders.getFirst(HttpHeaders.EXPIRES);
             if (expiresHeader.startsWith("'") && expiresHeader.endsWith("'")) {
                 expiresHeader = expiresHeader.substring(1, expiresHeader.length() - 1);
             }
@@ -136,23 +135,24 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
             // the cached bytes will be returned immediately when a client cache will return them
             ser = new BytesEntity((byte[])responseEntity, false);
         }
-
-        final Entry entry = new Entry(ser, context.getHeaders(), computeCacheHeaders(context.getHeaders()), expiry);
-        final URI uri = uriInfo.getRequestUri();
-        final String accepts = (String)context.getProperty(CacheControlClientRequestFilter.CLIENT_ACCEPTS);
-        cache.put(new Key(uri, accepts), entry);
-
+        if (ser != null) { 
+            final Entry entry = 
+                new Entry(ser, responseHeaders, computeCacheHeaders(responseHeaders), expiry);
+            final URI uri = uriInfo.getRequestUri();
+            final String accepts = (String)context.getProperty(CacheControlClientRequestFilter.CLIENT_ACCEPTS);
+            cache.put(new Key(uri, accepts), entry);
+        }
         return responseEntity;
     }
 
-    private Map<String, String> computeCacheHeaders(final MultivaluedMap<String, String> httpHeaders) {
+    private Map<String, String> computeCacheHeaders(final MultivaluedMap<String, String> responseHeaders) {
         final Map<String, String> cacheHeaders = new HashMap<String, String>(2);
 
-        final String etagHeader = httpHeaders.getFirst(HttpHeaders.ETAG);
+        final String etagHeader = responseHeaders.getFirst(HttpHeaders.ETAG);
         if (etagHeader != null) {
             cacheHeaders.put(HttpHeaders.IF_NONE_MATCH, etagHeader);
         }
-        final String lastModifiedHeader = httpHeaders.getFirst(HttpHeaders.LAST_MODIFIED);
+        final String lastModifiedHeader = responseHeaders.getFirst(HttpHeaders.LAST_MODIFIED);
         if (lastModifiedHeader != null) {
             cacheHeaders.put(HttpHeaders.IF_MODIFIED_SINCE, lastModifiedHeader);
         }
@@ -175,5 +175,21 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
      */
     public void setCacheResponseInputStream(boolean cacheInputStream) {
         this.cacheResponseInputStream = cacheInputStream;
+    }
+    
+    protected boolean isCacheControlValid(final ReaderInterceptorContext context,
+                                          final CacheControl responseControl) {
+        
+        boolean valid =
+            responseControl != null && !responseControl.isNoCache() && !responseControl.isNoStore();
+        if (valid) {
+            String clientHeader = 
+                (String)context.getProperty(CacheControlClientRequestFilter.CLIENT_CACHE_CONTROL);
+            CacheControl clientControl = clientHeader == null ? null : CacheControl.valueOf(clientHeader);
+            if (clientControl != null && clientControl.isPrivate() != responseControl.isPrivate()) {
+                valid = false;
+            }
+        }
+        return valid;
     }
 }

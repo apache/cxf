@@ -34,9 +34,10 @@ import javax.ws.rs.core.Response;
 
 @Priority(Priorities.USER - 1)
 public class CacheControlClientRequestFilter implements ClientRequestFilter {
-    public static final String NO_CACHE_PROPERTY = "no_client_cache";
-    public static final String CACHED_ENTITY_PROPERTY = "client_cached_entity";
-    public static final String CLIENT_ACCEPTS = "client_accepts";
+    static final String NO_CACHE_PROPERTY = "no_client_cache";
+    static final String CACHED_ENTITY_PROPERTY = "client_cached_entity";
+    static final String CLIENT_ACCEPTS = "client_accepts";
+    static final String CLIENT_CACHE_CONTROL = "client_cache_control";
     private Cache<Key, Entry> cache;
 
     public CacheControlClientRequestFilter(final Cache<Key, Entry> cache) {
@@ -50,6 +51,8 @@ public class CacheControlClientRequestFilter implements ClientRequestFilter {
     @Override
     public void filter(final ClientRequestContext request) throws IOException {
         if (!HttpMethod.GET.equals(request.getMethod())) {
+            //TODO: Review the possibility of supporting POST responses, example,
+            //      POST create request may get a created entity representation returned
             request.setProperty(NO_CACHE_PROPERTY, "true");
             return;
         }
@@ -58,6 +61,8 @@ public class CacheControlClientRequestFilter implements ClientRequestFilter {
         final Key key = new Key(uri, accepts);
         Entry entry = cache.get(key);
         if (entry != null) {
+            //TODO: do the extra validation against the conditional headers
+            //      which may be contained in the current request
             if (entry.isOutDated()) {
                 cache.remove(key, entry);
             } else {
@@ -74,7 +79,9 @@ public class CacheControlClientRequestFilter implements ClientRequestFilter {
                 request.abortWith(ok.build());
             }
         }
+        // Should the map of all request headers shared ?
         request.setProperty(CLIENT_ACCEPTS, accepts);
+        request.setProperty(CLIENT_CACHE_CONTROL, request.getHeaderString(HttpHeaders.CACHE_CONTROL));
     }
 
     public CacheControlClientRequestFilter setCache(final Cache<Key, Entry> c) {
