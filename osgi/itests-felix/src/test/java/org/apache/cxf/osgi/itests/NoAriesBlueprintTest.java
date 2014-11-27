@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.osgi.itests;
 
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -28,8 +28,9 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.when;
+
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -48,21 +49,25 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
 
     @Configuration
     public Option[] config() {
+        String localRepo = System.getProperty("localRepository");
+        if (localRepo == null) {
+            localRepo = "";
+        }
+
         return new Option[]{
                 systemProperty("java.awt.headless").value("true"),
-                systemProperty("org.ops4j.pax.url.mvn.localRepository")
-                    .value(System.getProperty("localRepository")),
-                mavenBundle().groupId("org.apache.ws.xmlschema").artifactId("xmlschema-core").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-core").versionAsInProject(),
-                mavenBundle().groupId("org.apache.servicemix.bundles")
-                    .artifactId("org.apache.servicemix.bundles.wsdl4j").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-wsdl").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-databinding-jaxb").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-bindings-xml").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-bindings-soap").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-frontend-simple").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-transports-http").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-frontend-jaxws").versionAsInProject(),
+                when(!"".equals(localRepo))
+                    .useOptions(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepo)),
+                mvnBundle("org.apache.ws.xmlschema", "xmlschema-core"),
+                mvnBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.wsdl4j"),
+                mvnBundle("org.apache.cxf", "cxf-core"),
+                mvnBundle("org.apache.cxf", "cxf-rt-wsdl"),
+                mvnBundle("org.apache.cxf", "cxf-rt-databinding-jaxb"),
+                mvnBundle("org.apache.cxf", "cxf-rt-bindings-xml"),
+                mvnBundle("org.apache.cxf", "cxf-rt-bindings-soap"),
+                mvnBundle("org.apache.cxf", "cxf-rt-frontend-simple"),
+                mvnBundle("org.apache.cxf", "cxf-rt-transports-http"),
+                mvnBundle("org.apache.cxf", "cxf-rt-frontend-jaxws"),
                 junitBundles()
         };
     }

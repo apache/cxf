@@ -23,6 +23,8 @@ package org.apache.cxf.osgi.itests;
 import javax.inject.Inject;
 
 import org.junit.Assert;
+import org.ops4j.pax.exam.CoreOptions;
+import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -49,4 +51,7 @@ public class OSGiTestSupport {
         return null;
     }
 
+    public MavenArtifactProvisionOption mvnBundle(String groupId, String artifactId) {
+        return CoreOptions.mavenBundle().groupId(groupId).artifactId(artifactId).versionAsInProject();
+    }
 }
