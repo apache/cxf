@@ -24,6 +24,7 @@ import java.util.Set;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -51,10 +52,7 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
         validateIssuer(claims.getIssuer());
         validateSubject(client, claims.getSubject());
         validateAudience(client, claims.getAudience());
-        validateExpiryTime(claims.getExpiryTime());
-        validateNotBeforeTime(claims.getNotBefore());
-        validateIssuedAtTime(claims.getIssuedAt());
-        validateTokenId(claims.getTokenId());
+        JwtUtils.validateJwtTimeClaims(claims);    
     }
 
     protected void validateIssuer(String issuer) {
@@ -68,26 +66,6 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     }
     protected void validateAudience(Client client, String audience) {
         //TODO
-    }
-    protected void validateExpiryTime(Long timestamp) {
-        if (timestamp != null) {
-            //TODO
-        }
-    }
-    protected void validateNotBeforeTime(Long timestamp) {
-        if (timestamp != null) {
-            //TODO    
-        }
-    }
-    protected void validateIssuedAtTime(Long timestamp) {
-        if (timestamp != null) {
-            //TODO
-        }
-    }
-    protected void validateTokenId(String tokenId) {
-        if (tokenId != null) {
-            //TODO
-        }
     }
     public void setSupportedIssuers(Set<String> supportedIssuers) {
         this.supportedIssuers = supportedIssuers;
