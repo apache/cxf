@@ -175,6 +175,14 @@ public class WSDLValidationTest extends ToolTestBase {
     }
 
     @Test
+    public void testWSIBPR2209() throws Exception {
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/hello_world_unbound_porttype_elements.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdErr().indexOf("WSI-BP-1.0 R2209") > -1);
+    }
+
+    @Test
     public void testBPR2717() throws Exception {
         try {
             String[] args = new String[] {"-verbose",

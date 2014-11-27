@@ -235,6 +235,17 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
         return true;
     }
 
+    private boolean checkR2209(final Operation operation,
+                               final BindingOperation bop) {
+        if ((bop.getBindingInput() == null && operation.getInput() != null) 
+            || (bop.getBindingOutput() == null && operation.getOutput() != null)) {
+            addErrorMessage(getErrorPrefix("WSI-BP-1.0 R2209") 
+                            + "Unbound PortType elements in Operation '" + operation.getName() + "'");
+            return false;
+        }
+        return true;
+    }
+
     public boolean checkBinding() {
         for (PortType portType : wsdlHelper.getPortTypes(def)) {
             Iterator<?> ite = portType.getOperations().iterator();
@@ -258,6 +269,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                 if ("DOCUMENT".equalsIgnoreCase(style) || StringUtils.isEmpty(style)) {
                     boolean passed = checkR2201Input(operation, bop)
                         && checkR2201Output(operation, bop)
+                        && checkR2209(operation, bop)
                         && checkR2716(bop);
                     if (!passed) {
                         return false;
