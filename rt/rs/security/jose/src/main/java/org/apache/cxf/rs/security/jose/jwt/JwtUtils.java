@@ -41,4 +41,15 @@ public final class JwtUtils {
         }
         return reader.fromJsonClaims(json);
     }
+    public static void validateJwtTimeClaims(JwtClaims claims) {
+        Long currentTimeInSecs = System.currentTimeMillis() / 1000;
+        Long expiryTimeInSecs = claims.getExpiryTime();
+        if (expiryTimeInSecs != null && currentTimeInSecs > expiryTimeInSecs) {
+            throw new SecurityException("The token expired");
+        }
+        Long issuedAtInSecs = claims.getIssuedAt();
+        if (issuedAtInSecs != null && issuedAtInSecs > currentTimeInSecs) {
+            throw new SecurityException("Invalid issuedAt");
+        }
+    }
 }

@@ -37,7 +37,9 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignature;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
+import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
@@ -65,19 +67,12 @@ public final class JwtAccessTokenUtils {
     private static ServerAccessToken toAccessToken(JwtToken jwt, 
                                                    Client client,
                                                    String tokenId) {
-        Long issuedAt = jwt.getClaims().getIssuedAt();
-        Long notBefore = jwt.getClaims().getNotBefore();
-        if (issuedAt == null) {
-            issuedAt = System.currentTimeMillis();
-            notBefore = null;
-        }
-        Long expiresIn = null;
-        if (notBefore == null) {
-            expiresIn = 3600L;
-        } else {
-            expiresIn = notBefore - issuedAt;
-        }
-       
+        JwtClaims claims = jwt.getClaims();
+        validateJwtSubjectAndAudience(claims, client);
+        Long issuedAt = claims.getIssuedAt();
+        Long notBefore = claims.getNotBefore();
+        Long expiresIn = notBefore - issuedAt;
+        
         return new BearerAccessToken(client, tokenId, issuedAt, expiresIn);
     }
     public static JwtToken decryptFromfromAccessToken(String tokenId, SecretKey key) {
@@ -114,6 +109,24 @@ public final class JwtAccessTokenUtils {
         } else {
             throw new SecurityException();
         }
+    }
+    public static void validateJwtClaims(JwtClaims claims, Client c) {
+        validateJwtSubjectAndAudience(claims, c);
+        JwtUtils.validateJwtTimeClaims(claims);
+    }
+    
+    private static void validateJwtSubjectAndAudience(JwtClaims claims, Client c) {
+        if (claims.getSubject() == null || !claims.getSubject().equals(c.getClientId())) {
+            throw new SecurityException("Invalid subject");
+        }
+        // validate audience
+        String aud = claims.getAudience();
+        if (aud == null 
+            || !c.getRegisteredAudiences().isEmpty() && !c.getRegisteredAudiences().contains(aud)) {
+            throw new SecurityException("Invalid audience");
+        }
+        // TODO: the issuer is indirectly validated by validating the signature
+        // but an extra check can be done
     }
     private static class NoneSignatureProvider implements JwsSignatureProvider {
 
