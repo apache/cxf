@@ -26,18 +26,25 @@ import javax.jws.WebService;
     targetNamespace = "http://org.apache.cxf/service/PersonServiceAnnotated")
 public class PersonServiceAnnotatedImpl implements PersonServiceAnnotated {
     @Override
-    public void saveNoValidation(Person data) {
+    public Person saveNoValidation(Person data) {
+        return data;
     }
 
     @Override
-    public void saveInheritEndpoint(Person data) {
+    public Person saveInheritEndpoint(Person data) {
+        return data;
     }
 
     @Override
-    public void saveValidateIn(Person data) {
+    public Person saveValidateIn(Person data) {
+        if ("InvalidResponse".equals(data.getFirstName())) {
+            return new Person();
+        }
+        return data;
     }
 
     @Override
-    public void saveValidateOut(Person data) {
+    public Person saveValidateOut(Person data) {
+        return data;
     }
 }

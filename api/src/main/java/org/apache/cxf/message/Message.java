@@ -105,7 +105,16 @@ public interface Message extends StringMap {
      */
     String MTOM_ENABLED = "mtom-enabled";
     String MTOM_THRESHOLD = "mtom-threshold";
+    
+    /**
+     * Runtime schema validation property
+     */
     String SCHEMA_VALIDATION_ENABLED = "schema-validation-enabled";
+    
+    /**
+     * The default values for schema validation will be set in the service model using this property
+     */
+    String SCHEMA_VALIDATION_TYPE = "schema-validation-type";
 
     /**
      * Boolean property specifying if the Java stack trace is returned as a  

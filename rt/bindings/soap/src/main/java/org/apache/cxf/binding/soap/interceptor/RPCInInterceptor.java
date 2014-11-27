@@ -226,6 +226,6 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
         message.put(Message.WSDL_DESCRIPTION, wsdlDescription);
         
         // configure endpoint and operation level schema validation
-        setOperationSchemaValidation(operation.getOperationInfo(), message);        
+        setOperationSchemaValidation(message);
     }    
 }

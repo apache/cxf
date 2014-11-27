@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxws.schemavalidation;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 
 import org.apache.cxf.annotations.SchemaValidation;
@@ -30,17 +31,21 @@ import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 @SchemaValidation(type = SchemaValidationType.BOTH)
 public interface PersonServiceAnnotated {
     @WebMethod(operationName = "saveInheritEndpoint")
-    void saveInheritEndpoint(@WebParam(name = "Person") Person data);
+    @WebResult(name = "Person")
+    Person saveInheritEndpoint(@WebParam(name = "Person") Person data);
 
     @SchemaValidation(type = SchemaValidationType.NONE)
     @WebMethod(operationName = "saveNoValidation")
-    void saveNoValidation(@WebParam(name = "Person") Person data);
+    @WebResult(name = "Person")
+    Person saveNoValidation(@WebParam(name = "Person") Person data);
 
     @SchemaValidation(type = SchemaValidationType.IN)
     @WebMethod(operationName = "saveValidateIn")
-    void saveValidateIn(@WebParam(name = "Person") Person data);
+    @WebResult(name = "Person")
+    Person saveValidateIn(@WebParam(name = "Person") Person data);
 
     @SchemaValidation(type = SchemaValidationType.OUT)
     @WebMethod(operationName = "saveValidateOut")
-    void saveValidateOut(@WebParam(name = "Person") Person data);
+    @WebResult(name = "Person")
+    Person saveValidateOut(@WebParam(name = "Person") Person data);
 }
