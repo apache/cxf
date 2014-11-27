@@ -58,11 +58,13 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     public AuthorizationCodeGrantService() {
         super(OAuthConstants.CODE_RESPONSE_TYPE, OAuthConstants.AUTHORIZATION_CODE_GRANT);
     }
-    protected Response startAuthorization(MultivaluedMap<String, String> params, UserSubject userSubject) {
+    protected Response startAuthorization(MultivaluedMap<String, String> params, 
+                                          UserSubject userSubject,
+                                          Client client) {
         if (codeRequestFilter != null) {
-            params = codeRequestFilter.process(params, userSubject);
+            params = codeRequestFilter.process(params, userSubject, client);
         }
-        return super.startAuthorization(params, userSubject);
+        return super.startAuthorization(params, userSubject, client);
     }
     protected Response createGrant(MultivaluedMap<String, String> params,
                                    Client client,
