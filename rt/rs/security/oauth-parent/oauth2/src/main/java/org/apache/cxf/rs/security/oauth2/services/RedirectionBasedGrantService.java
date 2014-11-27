@@ -111,11 +111,13 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         SecurityContext sc = getAndValidateSecurityContext(params);
         // Create a UserSubject representing the end user 
         UserSubject userSubject = createUserSubject(sc);
-        return startAuthorization(params, userSubject);
+        Client client = getClient(params);
+        return startAuthorization(params, userSubject, client);
     }
         
-    protected Response startAuthorization(MultivaluedMap<String, String> params, UserSubject userSubject) {    
-        Client client = getClient(params);
+    protected Response startAuthorization(MultivaluedMap<String, String> params, 
+                                          UserSubject userSubject,
+                                          Client client) {    
         
         // Validate the provided request URI, if any, against the ones Client provided
         // during the registration

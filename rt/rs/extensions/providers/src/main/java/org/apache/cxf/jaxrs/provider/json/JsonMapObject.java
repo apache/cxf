@@ -77,7 +77,14 @@ public class JsonMapObject {
             return null;
         }
     }
-    
+    public String getStringProperty(String name) {
+        Object value = getProperty(name);
+        if (value != null) {
+            return value.toString();
+        } else {
+            return null;
+        }
+    }
     public int hashCode() { 
         return values.hashCode();
     }
