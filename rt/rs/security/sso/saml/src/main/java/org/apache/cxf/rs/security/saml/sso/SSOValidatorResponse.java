@@ -20,13 +20,17 @@ package org.apache.cxf.rs.security.saml.sso;
 
 import java.util.Date;
 
+import org.w3c.dom.Element;
+
 /**
  * Some information that encapsulates a successful validation by the SAMLSSOResponseValidator
  */
 public class SSOValidatorResponse {
     private Date sessionNotOnOrAfter;
+    private Date created;
     private String responseId;
     private String assertion;
+    private Element assertionElement;
 
     public String getAssertion() {
         return assertion;
@@ -50,5 +54,21 @@ public class SSOValidatorResponse {
     
     public void setResponseId(String responseId) {
         this.responseId = responseId;
+    }
+
+    public Element getAssertionElement() {
+        return assertionElement;
+    }
+
+    public void setAssertionElement(Element assertionElement) {
+        this.assertionElement = assertionElement;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 }

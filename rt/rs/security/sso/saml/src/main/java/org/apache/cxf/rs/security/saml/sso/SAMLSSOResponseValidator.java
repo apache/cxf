@@ -135,9 +135,16 @@ public class SAMLSSOResponseValidator {
         SSOValidatorResponse validatorResponse = new SSOValidatorResponse();
         validatorResponse.setResponseId(samlResponse.getID());
         validatorResponse.setSessionNotOnOrAfter(sessionNotOnOrAfter);
+        if (samlResponse.getIssueInstant() != null) {
+            validatorResponse.setCreated(samlResponse.getIssueInstant().toDate());
+        }
+        
         // the assumption for now is that SAMLResponse will contain only a single assertion
         Element assertionElement = samlResponse.getAssertions().get(0).getDOM();
-        validatorResponse.setAssertion(DOM2Writer.nodeToString(assertionElement.cloneNode(true)));
+        Element clonedAssertionElement = (Element)assertionElement.cloneNode(true);
+        validatorResponse.setAssertionElement(clonedAssertionElement);
+        validatorResponse.setAssertion(DOM2Writer.nodeToString(clonedAssertionElement));
+        
         return validatorResponse;
     }
     
