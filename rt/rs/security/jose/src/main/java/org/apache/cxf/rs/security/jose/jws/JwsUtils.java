@@ -28,8 +28,10 @@ import java.util.Properties;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
@@ -39,12 +41,17 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public final class JwsUtils {
     private static final String JSON_WEB_SIGNATURE_ALGO_PROP = "rs.security.jws.content.signature.algorithm";
+    private static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
+    private static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
+    private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
     private JwsUtils() {
         
     }
     public static String sign(RSAPrivateKey key, String algo, String content) {
         return sign(key, algo, content, null);
     }
+    
+    
     public static String sign(RSAPrivateKey key, String algo, String content, String ct) {
         return sign(getRSAKeySignatureProvider(key, algo), content, ct);
     }
@@ -71,6 +78,8 @@ public final class JwsUtils {
         if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
             theSigProvider = getRSAKeySignatureProvider(JwkUtils.toRSAPrivateKey(jwk),
                                                         rsaSignatureAlgo);
+            
+            
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) { 
             byte[] key = JoseUtils.decode((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
             theSigProvider = getHmacSignatureProvider(key, rsaSignatureAlgo);
@@ -122,10 +131,37 @@ public final class JwsUtils {
         }
         return map;
     }
+    public static JwsSignatureProvider loadSignatureProvider(boolean required) {
+        Message m = JAXRSUtils.getCurrentMessage();
+        if (m != null) {
+            String propLoc = 
+                (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_OUT_PROPS, RSSEC_SIGNATURE_PROPS);
+            if (propLoc != null) {
+                return loadSignatureProvider(propLoc, m);
+            }
+        }
+        if (required) {
+            throw new SecurityException();
+        }
+        return null;
+    }
     public static JwsSignatureProvider loadSignatureProvider(String propLoc, Message m) {
         return loadSignatureProvider(propLoc, m, false);
     }
-    
+    public static JwsSignatureVerifier loadSignatureVerifier(boolean required) {
+        Message m = JAXRSUtils.getCurrentMessage();
+        if (m != null) {
+            String propLoc = 
+                (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
+            if (propLoc != null) {
+                return loadSignatureVerifier(propLoc, m);
+            }
+        }
+        if (required) {
+            throw new SecurityException();
+        }
+        return null;
+    }
     public static List<JwsSignatureProvider> loadSignatureProviders(String propLoc, Message m) {
         Properties props = loadProperties(m, propLoc);
         JwsSignatureProvider theSigProvider = loadSignatureProvider(propLoc, m, true);

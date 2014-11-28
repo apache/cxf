@@ -24,12 +24,15 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
+import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
+import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.AuthorizationCodeRequestFilter;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
     private static final String REQUEST_PARAM = "request";
@@ -41,17 +44,22 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
                                                   Client client) {
         String requestToken = params.getFirst(REQUEST_PARAM);
         if (requestToken != null) {
-            // there may be Client specific keys so we can have a map of
-            // client id to JWS and JWE handlers
-            if (jweDecryptor != null) {
-                requestToken = jweDecryptor.decrypt(requestToken).getContentText();
+            JweDecryptionProvider theJweDecryptor = getInitializedDecryptionProvider();
+            if (theJweDecryptor != null) {
+                requestToken = theJweDecryptor.decrypt(requestToken).getContentText();
             }
+            JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
             JwsJwtCompactConsumer consumer = new JwsJwtCompactConsumer(requestToken);
-            if (!consumer.verifySignatureWith(jwsVerifier)) {
+            if (!consumer.verifySignatureWith(theSigVerifier)) {
                 throw new SecurityException("Invalid Signature");
             }
             JwtClaims claims = consumer.getJwtClaims();
-            // TODO: validate claim issuer and audience
+            //TODO: 'iss' may be different to a client id
+            if (!client.getClientId().equals(claims.getIssuer())
+                || claims.getClaim(OAuthConstants.CLIENT_ID) != null 
+                && claims.getStringProperty(OAuthConstants.CLIENT_ID).equals(client.getClientId())) {
+                throw new SecurityException();
+            }
             MultivaluedMap<String, String> newParams = new MetadataMap<String, String>();
             Map<String, Object> claimsMap = claims.asMap();
             for (Map.Entry<String, Object> entry : claimsMap.entrySet()) {
@@ -68,5 +76,18 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
 
     public void setJweVerifier(JwsSignatureVerifier theJwsVerifier) {
         this.jwsVerifier = theJwsVerifier;
+    }
+    
+    protected JweDecryptionProvider getInitializedDecryptionProvider() {
+        if (jweDecryptor != null) {
+            return jweDecryptor;    
+        } 
+        return JweUtils.loadDecryptionProvider(false);
+    }
+    protected JwsSignatureVerifier getInitializedSigVerifier() {
+        if (jwsVerifier != null) {
+            return jwsVerifier;    
+        } 
+        return JwsUtils.loadSignatureVerifier(true);
     }
 }

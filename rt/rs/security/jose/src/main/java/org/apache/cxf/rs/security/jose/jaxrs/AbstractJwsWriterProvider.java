@@ -24,17 +24,13 @@ import java.io.OutputStream;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public class AbstractJwsWriterProvider {
-    private static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
-    private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
     private static final String JWS_CONTEXT_PROPERTY = "org.apache.cxf.jws.context";
     private JwsSignatureProvider sigProvider;
     
@@ -46,13 +42,7 @@ public class AbstractJwsWriterProvider {
         if (sigProvider != null) {
             return sigProvider;    
         } 
-        Message m = JAXRSUtils.getCurrentMessage();
-        String propLoc = 
-            (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_OUT_PROPS, RSSEC_SIGNATURE_PROPS);
-        if (propLoc == null) {
-            throw new SecurityException();
-        }
-        JwsSignatureProvider theSigProvider = JwsUtils.loadSignatureProvider(propLoc, m); 
+        JwsSignatureProvider theSigProvider = JwsUtils.loadSignatureProvider(true); 
         headers.setAlgorithm(theSigProvider.getAlgorithm());
         return theSigProvider;
     }

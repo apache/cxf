@@ -41,15 +41,24 @@ public final class JwtUtils {
         }
         return reader.fromJsonClaims(json);
     }
-    public static void validateJwtTimeClaims(JwtClaims claims) {
+    
+    public static void validateJwtTimeClaims(JwtClaims claims, int issuedAtRange, boolean claimsRequired) {
         Long currentTimeInSecs = System.currentTimeMillis() / 1000;
         Long expiryTimeInSecs = claims.getExpiryTime();
-        if (expiryTimeInSecs != null && currentTimeInSecs > expiryTimeInSecs) {
+        if (expiryTimeInSecs == null && claimsRequired 
+            || expiryTimeInSecs != null && currentTimeInSecs > expiryTimeInSecs) {
             throw new SecurityException("The token expired");
         }
         Long issuedAtInSecs = claims.getIssuedAt();
-        if (issuedAtInSecs != null && issuedAtInSecs > currentTimeInSecs) {
+        if (issuedAtInSecs == null && claimsRequired 
+            || issuedAtInSecs != null && (issuedAtInSecs > currentTimeInSecs || issuedAtRange > 0
+            && issuedAtInSecs < currentTimeInSecs - issuedAtRange)) {
             throw new SecurityException("Invalid issuedAt");
         }
     }
+    
+    public static void validateJwtTimeClaims(JwtClaims claims) {
+        validateJwtTimeClaims(claims, 0, false);
+    }
+    
 }
