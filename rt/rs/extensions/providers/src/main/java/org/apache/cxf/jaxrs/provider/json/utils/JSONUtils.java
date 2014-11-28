@@ -135,17 +135,21 @@ public final class JSONUtils {
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
         ConcurrentHashMap<String, String> namespaceMap) throws Exception {
-        return createStreamReader(is, readXsiType, namespaceMap, null, null);
+        return createStreamReader(is, readXsiType, namespaceMap, null, null, null);
     }
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
         ConcurrentHashMap<String, String> namespaceMap,
+        String namespaceSeparator,
         List<String> primitiveArrayKeys,
         DocumentDepthProperties depthProps) throws Exception {
         if (readXsiType) {
             namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
         Configuration conf = new Configuration(namespaceMap);
+        if (namespaceSeparator != null) {
+            conf.setJsonNamespaceSeparator(namespaceSeparator);
+        }
         if (primitiveArrayKeys != null) { 
             conf.setPrimitiveArrayKeys(
                 new HashSet<String>(primitiveArrayKeys));

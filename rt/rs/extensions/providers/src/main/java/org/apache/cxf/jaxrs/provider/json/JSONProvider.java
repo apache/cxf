@@ -102,6 +102,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     private List<String> primitiveArrayKeys;
     private boolean unwrapped;
     private String wrapperName;
+    private String namespaceSeparator;
     private Map<String, String> wrapperMap;
     private boolean dropRootElement;
     private boolean dropElementsInXmlStream = true;
@@ -281,7 +282,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } else {
             reader = JSONUtils.createStreamReader(is, 
                                                   readXsiType, 
-                                                  namespaceMap, 
+                                                  namespaceMap,
+                                                  namespaceSeparator,
                                                   primitiveArrayKeys,
                                                   getDepthProperties());
         }
@@ -526,6 +528,9 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                                           writeXsiType && !ignoreNamespaces,
                                           attributesToElements,
                                           typeConverter);
+        if (namespaceSeparator != null) {
+            config.setJsonNamespaceSeparator(namespaceSeparator);
+        }
         if (!dropElementsInXmlStreamProp && super.outDropElements != null) {
             config.setIgnoredElements(outDropElements);
         }
@@ -649,5 +654,9 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
 
     public void setEscapeForwardSlashesAlways(boolean escape) {
         this.escapeForwardSlashesAlways = escape;
+    }
+
+    public void setNamespaceSeparator(String namespaceSeparator) {
+        this.namespaceSeparator = namespaceSeparator;
     }
 }
