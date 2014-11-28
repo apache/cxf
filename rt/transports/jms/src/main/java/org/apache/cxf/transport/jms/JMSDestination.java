@@ -209,7 +209,8 @@ public class JMSDestination extends AbstractMultiplexDestination
             }
             getLogger().log(Level.FINE, "server received request: ", message);
              // Build CXF message from JMS message
-            Message inMessage = new MessageImpl();            
+            Message inMessage = new MessageImpl();
+            
             JMSUtils.populateIncomingContext(message, inMessage, 
                                              JMSConstants.JMS_SERVER_REQUEST_HEADERS, jmsConfig);
             

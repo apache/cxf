@@ -24,11 +24,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.jms.Message;
+
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.security.SecurityContext;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class JMSUtilsTest extends Assert {
-    
     @Test
     public void testGetEncoding() throws IOException {                
         assertEquals("Get the wrong encoding", JMSUtils.getEncoding("text/xml; charset=utf-8"), "UTF-8");
@@ -41,6 +44,23 @@ public class JMSUtilsTest extends Assert {
             assertTrue("we should get the UnsupportedEncodingException here",
                        ex instanceof UnsupportedEncodingException);
         }
+    }
+    
+    @Test
+    public void testCreateUserSecurityContext() throws Exception {
+        Message service = new MessageStub();
+        JMSConfiguration config = new JMSConfiguration();
+        config.setCreateSecurityContext(true);
+        
+        org.apache.cxf.message.Message inMessage = new MessageImpl();
+        
+        JMSUtils.populateIncomingContext(service, inMessage, "text", config);
+        assertNotNull(inMessage.get(SecurityContext.class));
+        
+        inMessage = new MessageImpl();
+        config.setCreateSecurityContext(false);
+        JMSUtils.populateIncomingContext(service, inMessage, "text", config);
+        assertNull(inMessage.get(SecurityContext.class));
     }
     
     @Test

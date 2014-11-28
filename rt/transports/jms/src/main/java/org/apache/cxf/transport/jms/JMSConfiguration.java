@@ -57,6 +57,7 @@ public class JMSConfiguration implements InitializingBean {
     private TaskExecutor taskExecutor;
     private boolean useJms11 = DEFAULT_USEJMS11;
     private boolean reconnectOnException = true;
+    private boolean createSecurityContext = true;
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
@@ -116,6 +117,14 @@ public class JMSConfiguration implements InitializingBean {
         }
     }
 
+    public boolean isCreateSecurityContext() {
+        return createSecurityContext;
+    }
+    
+    public void setCreateSecurityContext(boolean b) {
+        this.createSecurityContext = b;
+    }
+    
     public String getCacheLevelName() {
         return cacheLevelName;
     }
