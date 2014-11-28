@@ -107,7 +107,7 @@
         <cxf.jaxb.xjc.version>2.2.10-b140310.1920</cxf.jaxb.xjc.version>
         <cxf.joda.time.version>2.2</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
-        <cxf.jettison.version>1.3.8-SNAPSHOT</cxf.jettison.version>
+        <cxf.jettison.version>1.3.6</cxf.jettison.version>
         <cxf.jetty8.version>8.1.15.v20140411</cxf.jetty8.version>
         <cxf.jetty9.version>9.2.3.v20140905</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
