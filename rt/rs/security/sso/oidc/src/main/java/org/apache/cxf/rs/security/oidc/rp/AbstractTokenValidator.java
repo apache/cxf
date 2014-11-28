@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
+import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -30,6 +31,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 public abstract class AbstractTokenValidator {
     private JweDecryptionProvider jweDecryptor;
@@ -44,14 +46,12 @@ public abstract class AbstractTokenValidator {
         if (wrappedJwtToken == null) {
             throw new SecurityException("ID Token is missing");
         }
-        // Decrypt the token if needed
-        if (jweDecryptor != null) {
+        JweDecryptionProvider theJweDecryptor = getInitializedDecryptionProvider(jweOnly);
+        if (theJweDecryptor != null) {
             if (jweOnly) {
                 return new JweJwtCompactConsumer(wrappedJwtToken).decryptWith(jweDecryptor);    
             }
             wrappedJwtToken = jweDecryptor.decrypt(wrappedJwtToken).getContentText();
-        } else if (jweOnly) {
-            throw new SecurityException("Token can not be decrypted");
         }
 
         // validate token signature
@@ -74,27 +74,16 @@ public abstract class AbstractTokenValidator {
         if (issuerId == null && validateClaimsAlways || issuerId != null && !issuerId.equals(issuer)) {
             throw new SecurityException("Invalid provider");
         }
-        Long currentTimeInSecs = System.currentTimeMillis() / 1000;
-        Long expiryTimeInSecs = claims.getExpiryTime();
-        if (expiryTimeInSecs == null && validateClaimsAlways 
-            || expiryTimeInSecs != null && currentTimeInSecs > expiryTimeInSecs) {
-            throw new SecurityException("The token expired");
-        }
-        Long issuedAtInSecs = claims.getIssuedAt();
-        if (issuedAtInSecs == null && validateClaimsAlways 
-            || issuedAtInSecs != null && (issuedAtInSecs > currentTimeInSecs || issuedAtRange > 0
-            && issuedAtInSecs < currentTimeInSecs - issuedAtRange)) {
-            throw new SecurityException("Invalid issuedAt");
-        }
-        
+        JwtUtils.validateJwtTimeClaims(claims, issuedAtRange, validateClaimsAlways);
     }
     
     protected JwtToken getTokenValidateSignature(String wrappedJwtToken, String idTokenKid) {
         // read id_token into JwtToken
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(wrappedJwtToken);
         JwtToken jwt = jwtConsumer.getJwtToken(); 
-        if (jwsVerifier != null) {
-            return validateToken(jwtConsumer, jwt, jwsVerifier);
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
+        if (theSigVerifier != null) {
+            return validateToken(jwtConsumer, jwt, theSigVerifier);
         }
         if (jwkSetClient == null) {
             throw new SecurityException("Provider Jwk Set Client is not available");
@@ -140,5 +129,16 @@ public abstract class AbstractTokenValidator {
         this.issuedAtRange = issuedAtRange;
     }
 
-    
+    protected JweDecryptionProvider getInitializedDecryptionProvider(boolean jweOnly) {
+        if (jweDecryptor != null) {
+            return jweDecryptor;    
+        } 
+        return JweUtils.loadDecryptionProvider(jweOnly);
+    }
+    protected JwsSignatureVerifier getInitializedSigVerifier() {
+        if (jwsVerifier != null) {
+            return jwsVerifier;    
+        } 
+        return JwsUtils.loadSignatureVerifier(false);
+    }
 }

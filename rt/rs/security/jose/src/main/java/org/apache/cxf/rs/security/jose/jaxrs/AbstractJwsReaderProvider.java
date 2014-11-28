@@ -18,16 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public class AbstractJwsReaderProvider {
-    private static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
-    private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
-    
     private JwsSignatureVerifier sigVerifier;
     private String defaultMediaType;
     
@@ -39,14 +33,7 @@ public class AbstractJwsReaderProvider {
         if (sigVerifier != null) {
             return sigVerifier;    
         } 
-        
-        Message m = JAXRSUtils.getCurrentMessage();
-        String propLoc = 
-            (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
-        if (propLoc == null) {
-            throw new SecurityException();
-        }
-        return JwsUtils.loadSignatureVerifier(propLoc, m);
+        return JwsUtils.loadSignatureVerifier(true);
     }
 
     public String getDefaultMediaType() {

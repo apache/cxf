@@ -34,8 +34,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
@@ -48,8 +46,6 @@ import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 
 @Priority(Priorities.JWE_WRITE_PRIORITY)
 public class JweWriterInterceptor implements WriterInterceptor {
-    private static final String RSSEC_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
-    private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
     private JweEncryptionProvider encryptionProvider;
     private boolean contentTypeRequired = true;
     private boolean useJweOutputStream;
@@ -118,13 +114,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
         if (encryptionProvider != null) {
             return encryptionProvider;    
         } 
-        Message m = JAXRSUtils.getCurrentMessage();
-        String propLoc = 
-            (String)MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_OUT_PROPS, RSSEC_ENCRYPTION_PROPS);
-        if (propLoc == null) {
-            throw new SecurityException();
-        }
-        return JweUtils.loadEncryptionProvider(propLoc, m);
+        return JweUtils.loadEncryptionProvider(true);
     }
     
     public void setUseJweOutputStream(boolean useJweOutputStream) {

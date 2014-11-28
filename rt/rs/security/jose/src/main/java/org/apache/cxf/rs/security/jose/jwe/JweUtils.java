@@ -25,8 +25,10 @@ import java.util.Properties;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
@@ -39,6 +41,10 @@ public final class JweUtils {
     private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_KEY_ALGO_PROP = "rs.security.jwe.key.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
+    private static final String RSSEC_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
+    private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
+    private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
+    
     private JweUtils() {
         
     }
@@ -130,6 +136,7 @@ public final class JweUtils {
     public static KeyDecryptionAlgorithm getKeyDecryptionAlgorithm(JsonWebKey jwk) {
         return getKeyDecryptionAlgorithm(jwk, null);
     }
+    
     public static KeyDecryptionAlgorithm getKeyDecryptionAlgorithm(JsonWebKey jwk, String defaultAlgorithm) {
         String keyEncryptionAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         KeyDecryptionAlgorithm keyDecryptionProvider = null;
@@ -208,6 +215,20 @@ public final class JweUtils {
         return new DirectKeyJweDecryption(JwkUtils.toSecretKey(key), 
                                           getContentDecryptionAlgorithm(key.getAlgorithm()));
     }
+    public static JweEncryptionProvider loadEncryptionProvider(boolean required) {
+        Message m = JAXRSUtils.getCurrentMessage();
+        if (m != null) {
+            String propLoc = 
+                (String)MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_OUT_PROPS, RSSEC_ENCRYPTION_PROPS);
+            if (propLoc != null) {
+                return loadEncryptionProvider(propLoc, m);
+            }
+        }
+        if (required) {
+            throw new SecurityException();
+        }
+        return null;
+    }
     public static JweEncryptionProvider loadEncryptionProvider(String propLoc, Message m) {
         KeyEncryptionAlgorithm keyEncryptionProvider = null;
         String keyEncryptionAlgo = null;
@@ -239,6 +260,20 @@ public final class JweUtils {
                                     ctEncryptionProvider, 
                                     contentEncryptionAlgo,
                                     props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP));
+    }
+    public static JweDecryptionProvider loadDecryptionProvider(boolean required) {
+        Message m = JAXRSUtils.getCurrentMessage();
+        if (m != null) {
+            String propLoc = 
+                (String)MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
+            if (propLoc != null) {
+                return loadDecryptionProvider(propLoc, m);
+            }
+        }
+        if (required) {
+            throw new SecurityException();
+        }
+        return null;
     }
     public static JweDecryptionProvider loadDecryptionProvider(String propLoc, Message m) {
         KeyDecryptionAlgorithm keyDecryptionProvider = null;

@@ -22,17 +22,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 
 public class AbstractJweDecryptingFilter {
-    private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
-    private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
@@ -52,13 +47,7 @@ public class AbstractJweDecryptingFilter {
         if (decryption != null) {
             return decryption;    
         } 
-        Message m = JAXRSUtils.getCurrentMessage();
-        String propLoc = 
-            (String)MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
-        if (propLoc == null) {
-            throw new SecurityException();
-        }
-        return JweUtils.loadDecryptionProvider(propLoc, m);
+        return JweUtils.loadDecryptionProvider(true);
     }
     public String getDefaultMediaType() {
         return defaultMediaType;
