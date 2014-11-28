@@ -135,11 +135,12 @@ public final class JSONUtils {
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
         ConcurrentHashMap<String, String> namespaceMap) throws Exception {
-        return createStreamReader(is, readXsiType, namespaceMap, null, null, "UTF-8");
+        return createStreamReader(is, readXsiType, namespaceMap, null, null, null, "UTF-8");
     }
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
         ConcurrentHashMap<String, String> namespaceMap,
+        String namespaceSeparator,
         List<String> primitiveArrayKeys,
         DocumentDepthProperties depthProps,
         String enc) throws Exception {
@@ -147,6 +148,9 @@ public final class JSONUtils {
             namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
         Configuration conf = new Configuration(namespaceMap);
+        if (namespaceSeparator != null) {
+            conf.setJsonNamespaceSeparator(namespaceSeparator);
+        }
         if (primitiveArrayKeys != null) { 
             conf.setPrimitiveArrayKeys(
                 new HashSet<String>(primitiveArrayKeys));
