@@ -38,6 +38,7 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
     private static final String REQUEST_PARAM = "request";
     private JweDecryptionProvider jweDecryptor;
     private JwsSignatureVerifier jwsVerifier;
+    private String issuer;
     @Override
     public MultivaluedMap<String, String> process(MultivaluedMap<String, String> params, 
                                                   UserSubject endUser,
@@ -54,8 +55,8 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
                 throw new SecurityException("Invalid Signature");
             }
             JwtClaims claims = consumer.getJwtClaims();
-            //TODO: 'iss' may be different to a client id
-            if (!client.getClientId().equals(claims.getIssuer())
+            String iss = issuer != null ? issuer : client.getClientId();  
+            if (!iss.equals(claims.getIssuer())
                 || claims.getClaim(OAuthConstants.CLIENT_ID) != null 
                 && claims.getStringProperty(OAuthConstants.CLIENT_ID).equals(client.getClientId())) {
                 throw new SecurityException();
@@ -89,5 +90,8 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
             return jwsVerifier;    
         } 
         return JwsUtils.loadSignatureVerifier(true);
+    }
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 }
