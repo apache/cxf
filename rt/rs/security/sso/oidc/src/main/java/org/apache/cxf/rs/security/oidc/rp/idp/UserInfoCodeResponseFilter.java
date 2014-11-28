@@ -25,12 +25,11 @@ import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
-import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
-import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
-import org.apache.cxf.rs.security.oidc.common.UserIdToken;
-import org.apache.cxf.rs.security.oidc.rp.OidcUtils;
+import org.apache.cxf.rs.security.oidc.common.UserToken;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class UserInfoCodeResponseFilter implements AccessTokenResponseFilter {
     private JwsSignatureProvider sigProvider;
@@ -38,10 +37,11 @@ public class UserInfoCodeResponseFilter implements AccessTokenResponseFilter {
     private UserInfoProvider userInfoProvider;
     private String issuer;
     @Override
-    public void process(Client client, ClientAccessToken ct, UserSubject endUser) {
-        UserIdToken token = userInfoProvider.getUserIdToken(endUser);
+    public void process(ClientAccessToken ct, ServerAccessToken st) {
+        UserToken token = 
+            userInfoProvider.getUserToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
         token.setIssuer(issuer);
-        token.setAudience(client.getClientId());
+        token.setAudience(st.getClient().getClientId());
         
         JwsJwtCompactProducer producer = new JwsJwtCompactProducer(token);
         JoseHeaders headers = new JoseHeaders();
@@ -76,9 +76,6 @@ public class UserInfoCodeResponseFilter implements AccessTokenResponseFilter {
 
     public void setIssuer(String issuer) {
         this.issuer = issuer;
-    }
-    public UserInfoProvider getUserInfoProvider() {
-        return userInfoProvider;
     }
     public void setUserInfoProvider(UserInfoProvider userInfoProvider) {
         this.userInfoProvider = userInfoProvider;

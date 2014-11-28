@@ -20,39 +20,38 @@ package org.apache.cxf.rs.security.oidc.rp;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.oidc.common.UserIdToken;
-import org.apache.cxf.rs.security.oidc.common.UserProfile;
+import org.apache.cxf.rs.security.oidc.common.UserInfo;
+import org.apache.cxf.rs.security.oidc.common.UserToken;
 
-public class UserProfileValidator extends AbstractTokenValidator {
+public class UserInfoValidator extends AbstractTokenValidator {
     private boolean encryptedOnly;
     
-    public UserProfile getProfile(WebClient profileClient, UserIdToken idToken) {
+    public UserInfo getUserInfo(WebClient profileClient, UserToken idToken) {
         return getProfile(profileClient, idToken, false);
     }
-    public UserProfile getProfile(WebClient profileClient, UserIdToken idToken, boolean asJwt) {
+    public UserInfo getProfile(WebClient profileClient, UserToken idToken, boolean asJwt) {
         if (asJwt) {
             String jwt = profileClient.get(String.class);
-            return getProfileFromJwt(jwt, idToken);
+            return getUserInfoFromJwt(jwt, idToken);
         } else {
-            UserProfile profile = profileClient.get(UserProfile.class);
-            validateUserProfile(profile, idToken);
+            UserInfo profile = profileClient.get(UserInfo.class);
+            validateUserInfo(profile, idToken);
             return profile;
         }
-        
     }
-    public UserProfile getProfileFromJwt(String profileJwtToken, UserIdToken idToken) {
-        JwtToken jwt = getProfileJwtToken(profileJwtToken, idToken);
-        return getProfileFromJwt(jwt, idToken);
+    public UserInfo getUserInfoFromJwt(String profileJwtToken, UserToken idToken) {
+        JwtToken jwt = getUserInfoJwt(profileJwtToken, idToken);
+        return getUserInfoFromJwt(jwt, idToken);
     }
-    public UserProfile getProfileFromJwt(JwtToken jwt, UserIdToken idToken) {
-        UserProfile profile = new UserProfile(jwt.getClaims().asMap());
-        validateUserProfile(profile, idToken);
+    public UserInfo getUserInfoFromJwt(JwtToken jwt, UserToken idToken) {
+        UserInfo profile = new UserInfo(jwt.getClaims().asMap());
+        validateUserInfo(profile, idToken);
         return profile;
     }
-    public JwtToken getProfileJwtToken(String profileJwtToken, UserIdToken idToken) {
+    public JwtToken getUserInfoJwt(String profileJwtToken, UserToken idToken) {
         return getJwtToken(profileJwtToken, idToken.getAudience(), (String)idToken.getProperty("kid"), encryptedOnly);
     }
-    public void validateUserProfile(UserProfile profile, UserIdToken idToken) {
+    public void validateUserInfo(UserInfo profile, UserToken idToken) {
         validateJwtClaims(profile, idToken.getAudience(), false);
         // validate subject
         if (!idToken.getSubject().equals(profile.getSubject())) {
