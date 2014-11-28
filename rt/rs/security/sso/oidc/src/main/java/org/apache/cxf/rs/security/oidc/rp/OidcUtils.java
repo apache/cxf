@@ -27,6 +27,7 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 
 public final class OidcUtils {
+    public static final String ID_TOKEN = "id_token";
     private OidcUtils() {
         
     }
