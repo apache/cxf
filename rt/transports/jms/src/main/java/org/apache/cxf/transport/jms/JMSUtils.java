@@ -216,7 +216,6 @@ public final class JMSUtils {
             }
             inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
 
-            // weird construct I know, but the default for this property must be 
             if (jmsConfig.isCreateSecurityContext()) {
                 SecurityContext securityContext = buildSecurityContext(message, jmsConfig);
                 inMessage.put(SecurityContext.class, securityContext);
