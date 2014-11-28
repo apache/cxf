@@ -23,7 +23,7 @@ import java.util.Map;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 
-public class UserProfile extends JwtClaims {
+public class UserInfo extends JwtClaims {
     public static final String NAME_CLAIM = "name";
     public static final String PROFILE_CLAIM = "profile";
     public static final String EMAIL_CLAIM = "email";
@@ -31,10 +31,10 @@ public class UserProfile extends JwtClaims {
     public static final String BIRTHDATE_CLAIM = "birthdate";
     public static final String PHONE_CLAIM = "phone_number";
     public static final String ADDRESS_CLAIM = "address";
-    public UserProfile() {
+    public UserInfo() {
     }
     
-    public UserProfile(Map<String, Object> claims) {
+    public UserInfo(Map<String, Object> claims) {
         super(claims);
     }
     

@@ -16,20 +16,77 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oidc.rp;
+package org.apache.cxf.rs.security.oidc.utils;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
 public final class OidcUtils {
     public static final String ID_TOKEN = "id_token";
+    public static final String OIDC_SCOPE = "oidc";
+    public static final String PROFILE_SCOPE = "profile";
+    public static final String EMAIL_SCOPE = "email";
+    public static final String ADDRESS_SCOPE = "address";
+    public static final String PHONE_SCOPE = "phone";
+    public static final List<String> PROFILE_CLAIMS = Arrays.asList(UserInfo.NAME_CLAIM, 
+                                                                    UserInfo.PROFILE_CLAIM);
+    public static final List<String> EMAIL_CLAIMS = Arrays.asList(UserInfo.EMAIL_CLAIM, 
+                                                                  UserInfo.EMAIL_VERIFIED_CLAIM);
+    public static final List<String> ADDRESS_CLAIMS = Arrays.asList(UserInfo.ADDRESS_CLAIM);
+    public static final List<String> PHONE_CLAIMS = Arrays.asList(UserInfo.PHONE_CLAIM);
+    private static final Map<String, List<String>> SCOPES_MAP;
+    static {
+        SCOPES_MAP = new HashMap<String, List<String>>();
+        SCOPES_MAP.put(PHONE_SCOPE, PHONE_CLAIMS);
+        SCOPES_MAP.put(EMAIL_SCOPE, EMAIL_CLAIMS);
+        SCOPES_MAP.put(ADDRESS_SCOPE, ADDRESS_CLAIMS);
+        SCOPES_MAP.put(PROFILE_SCOPE, PROFILE_CLAIMS);
+    }
+    
     private OidcUtils() {
         
+    }
+    public static String getOidcScope() {
+        return OIDC_SCOPE;
+    }
+    public static String getProfileScope() {
+        return getScope(OIDC_SCOPE, PROFILE_SCOPE);
+    }
+    public static String getEmailScope() {
+        return getScope(OIDC_SCOPE, EMAIL_SCOPE);
+    }
+    public static String getAddressScope() {
+        return getScope(OIDC_SCOPE, ADDRESS_SCOPE);
+    }
+    public static String getPhoneScope() {
+        return getScope(OIDC_SCOPE, PHONE_SCOPE);
+    }
+    public static String getAllScopes() {
+        return getScope(OIDC_SCOPE, PROFILE_SCOPE, EMAIL_SCOPE, ADDRESS_SCOPE, PHONE_SCOPE);
+    }
+    public static List<String> getScopeProperties(String scope) {
+        return SCOPES_MAP.get(scope);
+    }
+    
+    private static String getScope(String... scopes) {
+        StringBuilder sb = new StringBuilder();
+        for (String scope : scopes) {
+            if (sb.length() > 0) {
+                sb.append(" ");
+            }
+            sb.append(scope);
+        }
+        return sb.toString();
     }
     public static void validateAccessTokenHash(ClientAccessToken at, JwtToken jwt) {
         validateAccessTokenHash(at, jwt, true);

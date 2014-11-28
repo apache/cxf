@@ -80,7 +80,7 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
             token = preAuthorizedToken;
         }
         ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(token, isWriteOptionalParameters());
-        processClientAccessToken(client, clientToken, token.getSubject());
+        processClientAccessToken(clientToken, token);
    
         // return the token by appending it as a fragment parameter to the redirect URI
         
@@ -112,9 +112,9 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
         
         return Response.seeOther(URI.create(sb.toString())).build();
     }
-    protected void processClientAccessToken(Client client, ClientAccessToken clientToken, UserSubject endUser) {
+    protected void processClientAccessToken(ClientAccessToken clientToken, ServerAccessToken serverToken) {
         for (AccessTokenResponseFilter filter : responseHandlers) {
-            filter.process(client, clientToken, endUser); 
+            filter.process(clientToken, serverToken); 
         }
     }
     protected Response createErrorResponse(MultivaluedMap<String, String> params,

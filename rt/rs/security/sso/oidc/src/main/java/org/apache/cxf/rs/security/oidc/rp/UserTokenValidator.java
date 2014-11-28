@@ -20,21 +20,22 @@ package org.apache.cxf.rs.security.oidc.rp;
 
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
-import org.apache.cxf.rs.security.oidc.common.UserIdToken;
+import org.apache.cxf.rs.security.oidc.common.UserToken;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
-public class IdTokenValidator extends AbstractTokenValidator {
+public class UserTokenValidator extends AbstractTokenValidator {
     private boolean requireAtHash = true;
     
-    public UserIdToken getIdTokenFromJwt(ClientAccessToken at, String clientId) {
+    public UserToken getIdTokenFromJwt(ClientAccessToken at, String clientId) {
         JwtToken jwt = getIdJwtToken(at, clientId);
         return getIdTokenFromJwt(jwt, clientId);
     }
-    public UserIdToken getIdTokenFromJwt(JwtToken jwt, String clientId) {
+    public UserToken getIdTokenFromJwt(JwtToken jwt, String clientId) {
         //TODO: do the extra validation if needed
-        return new UserIdToken(jwt.getClaims().asMap());
+        return new UserToken(jwt.getClaims().asMap());
     }
     public JwtToken getIdJwtToken(ClientAccessToken at, String clientId) {
-        String idJwtToken = at.getParameters().get("id_token");
+        String idJwtToken = at.getParameters().get(OidcUtils.ID_TOKEN);
         JwtToken jwt = getJwtToken(idJwtToken, clientId, null, false);
         validateJwtClaims(jwt.getClaims(), clientId, true);
         OidcUtils.validateAccessTokenHash(at, jwt, requireAtHash);
