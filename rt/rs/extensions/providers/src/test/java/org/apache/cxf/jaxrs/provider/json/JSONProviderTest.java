@@ -431,11 +431,21 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testReadFromQualifiedTag() throws Exception {
+        doTestReadFromQualifiedTag(".");
+    }
+    @Test
+    public void testReadFromQualifiedTagCustomNsSep() throws Exception {
+        doTestReadFromQualifiedTag("__");
+    }
+    private void doTestReadFromQualifiedTag(String nsSep) throws Exception {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
-        byte[] bytes = "{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}"
+        if (!".".equals(nsSep)) {
+            p.setNamespaceSeparator(nsSep);
+        }
+        byte[] bytes = ("{\"ns1" + nsSep + "thetag\":{\"group\":\"b\",\"name\":\"a\"}}")
             .getBytes();
         Object tagsObject = p.readFrom(TagVO2.class, null, null, 
                                        null, null, new ByteArrayInputStream(bytes));
@@ -638,10 +648,20 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteToSingleQualifiedTag() throws Exception {
+        doTestWriteToSingleQualifiedTag(".");
+    }
+    @Test
+    public void testWriteToSingleQualifiedTagCustomNsSep() throws Exception {
+        doTestWriteToSingleQualifiedTag("__");
+    }
+    private void doTestWriteToSingleQualifiedTag(String nsSep) throws Exception {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
+        if (!".".equals(nsSep)) {
+            p.setNamespaceSeparator(nsSep);
+        }
         TagVO2 tag = createTag2("a", "b");
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -650,7 +670,7 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        assertEquals("{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
+        assertEquals("{\"ns1" + nsSep + "thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
     }
     
     @Test
