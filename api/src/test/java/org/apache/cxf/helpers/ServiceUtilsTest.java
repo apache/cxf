@@ -46,95 +46,128 @@ public class ServiceUtilsTest extends Assert {
     }
     
     @Test
-    public void testIsSchemaValidationEnabled() {
-        setupSchemaValidationValue(SchemaValidationType.NONE);
-        assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.NONE, msg));
-        setupSchemaValidationValue(SchemaValidationType.NONE);
-        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.BOTH, msg));
-        setupSchemaValidationValue(SchemaValidationType.NONE);
-        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
-        setupSchemaValidationValue(SchemaValidationType.NONE);
-        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, msg));
-        
-        setupSchemaValidationValue(SchemaValidationType.IN);
-        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.NONE, msg));
-        setupSchemaValidationValue(SchemaValidationType.IN);
-        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.BOTH, msg));
-        setupSchemaValidationValue(SchemaValidationType.IN);
+    public void testRequestResponseTypes() {
+        // lets do server side first
+        setupSchemaValidationValue(SchemaValidationType.REQUEST, false);
         assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
-        setupSchemaValidationValue(SchemaValidationType.IN);
+        
+        setupSchemaValidationValue(SchemaValidationType.REQUEST, false);
         assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, msg));
         
-        setupSchemaValidationValue(SchemaValidationType.OUT);
-        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.NONE, msg));
-        setupSchemaValidationValue(SchemaValidationType.OUT);
-        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.BOTH, msg));
-        setupSchemaValidationValue(SchemaValidationType.OUT);
-        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
-        setupSchemaValidationValue(SchemaValidationType.OUT);
+        setupSchemaValidationValue(SchemaValidationType.RESPONSE, false);
         assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, msg));
         
-        setupSchemaValidationValue(SchemaValidationType.BOTH);
-        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.NONE, msg));
-        setupSchemaValidationValue(SchemaValidationType.BOTH);
-        assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.BOTH, msg));
-        setupSchemaValidationValue(SchemaValidationType.BOTH);
+        setupSchemaValidationValue(SchemaValidationType.RESPONSE, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
+        
+        // now client side
+        setupSchemaValidationValue(SchemaValidationType.REQUEST, true);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
+        
+        setupSchemaValidationValue(SchemaValidationType.REQUEST, true);
+        assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, msg));
+        
+        setupSchemaValidationValue(SchemaValidationType.RESPONSE, true);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, msg));
+        
+        setupSchemaValidationValue(SchemaValidationType.RESPONSE, true);
         assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
-        setupSchemaValidationValue(SchemaValidationType.BOTH);
+    }
+    
+    @Test
+    public void testIsSchemaValidationEnabled() {
+        setupSchemaValidationValue(SchemaValidationType.NONE, false);
+        assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.NONE, msg));
+        setupSchemaValidationValue(SchemaValidationType.NONE, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.BOTH, msg));
+        setupSchemaValidationValue(SchemaValidationType.NONE, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
+        setupSchemaValidationValue(SchemaValidationType.NONE, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, msg));
+        
+        setupSchemaValidationValue(SchemaValidationType.IN, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.NONE, msg));
+        setupSchemaValidationValue(SchemaValidationType.IN, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.BOTH, msg));
+        setupSchemaValidationValue(SchemaValidationType.IN, false);
+        assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
+        setupSchemaValidationValue(SchemaValidationType.IN, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, msg));
+        
+        setupSchemaValidationValue(SchemaValidationType.OUT, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.NONE, msg));
+        setupSchemaValidationValue(SchemaValidationType.OUT, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.BOTH, msg));
+        setupSchemaValidationValue(SchemaValidationType.OUT, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
+        setupSchemaValidationValue(SchemaValidationType.OUT, false);
+        assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, msg));
+        
+        setupSchemaValidationValue(SchemaValidationType.BOTH, false);
+        assertFalse(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.NONE, msg));
+        setupSchemaValidationValue(SchemaValidationType.BOTH, false);
+        assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.BOTH, msg));
+        setupSchemaValidationValue(SchemaValidationType.BOTH, false);
+        assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, msg));
+        setupSchemaValidationValue(SchemaValidationType.BOTH, false);
         assertTrue(ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, msg));
     }
     
     @Test
     public void testGetSchemaValidationTypeBoolean() {
-        setupSchemaValidationValue(null);
+        setupSchemaValidationValue(null, false);
         assertEquals(SchemaValidationType.NONE, ServiceUtils.getSchemaValidationType(msg));
         
-        setupSchemaValidationValue("");
+        setupSchemaValidationValue("", false);
         assertEquals(SchemaValidationType.NONE, ServiceUtils.getSchemaValidationType(msg));
         
-        setupSchemaValidationValue(Boolean.FALSE);
+        setupSchemaValidationValue(Boolean.FALSE, false);
         assertEquals(SchemaValidationType.NONE, ServiceUtils.getSchemaValidationType(msg));
         
-        setupSchemaValidationValue("false");
+        setupSchemaValidationValue("false", false);
         assertEquals(SchemaValidationType.NONE, ServiceUtils.getSchemaValidationType(msg));
         
-        setupSchemaValidationValue("FALSE");
+        setupSchemaValidationValue("FALSE", false);
         assertEquals(SchemaValidationType.NONE, ServiceUtils.getSchemaValidationType(msg));
         
-        setupSchemaValidationValue("fAlse");
+        setupSchemaValidationValue("fAlse", false);
         assertEquals(SchemaValidationType.NONE, ServiceUtils.getSchemaValidationType(msg));
         
-        setupSchemaValidationValue(Boolean.TRUE);
+        setupSchemaValidationValue(Boolean.TRUE, false);
         assertEquals(SchemaValidationType.BOTH, ServiceUtils.getSchemaValidationType(msg));
         
-        setupSchemaValidationValue("true");
+        setupSchemaValidationValue("true", false);
         assertEquals(SchemaValidationType.BOTH, ServiceUtils.getSchemaValidationType(msg));
         
-        setupSchemaValidationValue("TRUE");
+        setupSchemaValidationValue("TRUE", false);
         assertEquals(SchemaValidationType.BOTH, ServiceUtils.getSchemaValidationType(msg));
         
-        setupSchemaValidationValue("tRue");
+        setupSchemaValidationValue("tRue", false);
         assertEquals(SchemaValidationType.BOTH, ServiceUtils.getSchemaValidationType(msg));
     }
     
     @Test
     public void testGetSchemaValidationType() {
         for (SchemaValidationType type : SchemaValidationType.values()) {
-            setupSchemaValidationValue(type.name());
+            setupSchemaValidationValue(type.name(), false);
             assertEquals(type, ServiceUtils.getSchemaValidationType(msg));
             
-            setupSchemaValidationValue(type.name().toLowerCase());
+            setupSchemaValidationValue(type.name().toLowerCase(), false);
             assertEquals(type, ServiceUtils.getSchemaValidationType(msg));
             
-            setupSchemaValidationValue(StringUtils.capitalize(type.name()));
+            setupSchemaValidationValue(StringUtils.capitalize(type.name()), false);
             assertEquals(type, ServiceUtils.getSchemaValidationType(msg));
         }
     }
     
-    private void setupSchemaValidationValue(Object value) {
+    private void setupSchemaValidationValue(Object value, boolean isRequestor) {
         control.reset();
         msg.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
         EasyMock.expectLastCall().andReturn(value);
+        
+        msg.get(Message.REQUESTOR_ROLE);
+        EasyMock.expectLastCall().andReturn(isRequestor);
+        
         control.replay();
     }
 }

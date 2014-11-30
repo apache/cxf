@@ -20,8 +20,6 @@
 package org.apache.cxf.systest.jaxws.schemavalidation;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,7 +33,6 @@ import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.feature.validation.DefaultSchemaValidationTypeProvider;
 import org.apache.cxf.feature.validation.SchemaValidationFeature;
 import org.apache.cxf.frontend.ClientProxy;
@@ -52,40 +49,52 @@ import org.junit.Test;
 
 public class JavaFirstSchemaValidationTest extends Assert {
     static final String PORT = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
+    static final String PORT2 = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
     static final String PORT_UNUSED = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
 
     private static List<Server> serverList = new ArrayList<Server>();
     private static PersonServiceAnnotated annotatedClient;
-    private static PersonServiceAnnotated annotatedValidatingClient;
     private static PersonService client;
     private static PersonServiceRPC rpcClient;
     
-    private static PersonService disconnectedClient;
+    private static PersonServiceWithRequestResponseAnns annotatedNonValidatingClient;
+    private static PersonServiceWithRequestResponseAnns disconnectedClient;
+    private static PersonServiceWithRequestResponseAnns noValidationServerClient;
 
     @BeforeClass
     public static void startServers() throws Exception {
+        createServer(PORT, PersonService.class, new PersonServiceImpl(), null, createSchemaValidationFeature());
+        
+        createServer(PORT2, PersonServiceWithRequestResponseAnns.class, 
+                new PersonServiceWithRequestResponseAnnsImpl(), SchemaValidationType.NONE);
+        
+        createServer(PORT, PersonServiceAnnotated.class, new PersonServiceAnnotatedImpl(), null);
+        
+        createServer(PORT, PersonServiceRPC.class, new PersonServiceRPCImpl(), null, 
+                createSchemaValidationFeature());
+        
+        createServer(PORT, PersonServiceWithRequestResponseAnns.class, 
+                new PersonServiceWithRequestResponseAnnsImpl(), null);
+
+        annotatedClient = createClient(PORT, PersonServiceAnnotated.class, SchemaValidationType.NONE);
+        annotatedNonValidatingClient = createClient(PORT, PersonServiceWithRequestResponseAnns.class, 
+                SchemaValidationType.NONE);
+        client = createClient(PORT, PersonService.class, SchemaValidationType.NONE);
+        disconnectedClient = createClient(PORT_UNUSED, PersonServiceWithRequestResponseAnns.class, null);
+        rpcClient = createClient(PORT, PersonServiceRPC.class, SchemaValidationType.NONE);
+        noValidationServerClient = createClient(PORT2, PersonServiceWithRequestResponseAnns.class, null);
+    }
+
+    private static SchemaValidationFeature createSchemaValidationFeature() {
         Map<String, SchemaValidationType> operationMap = new HashMap<String, SchemaValidationType>();
         operationMap.put("saveInheritEndpoint", SchemaValidationType.BOTH);
         operationMap.put("saveNoValidation", SchemaValidationType.NONE);
         operationMap.put("saveValidateIn", SchemaValidationType.IN);
         operationMap.put("saveValidateOut", SchemaValidationType.OUT);
         DefaultSchemaValidationTypeProvider provider = new DefaultSchemaValidationTypeProvider(operationMap);
-
-        SchemaValidationFeature feature = new SchemaValidationFeature(provider);
-
-        createServer(PersonService.class, new PersonServiceImpl(), feature);
-
-        createServer(PersonServiceAnnotated.class, new PersonServiceAnnotatedImpl());
-
-        createServer(PersonServiceRPC.class, new PersonServiceRPCImpl(), feature, new LoggingFeature());
-
-        annotatedClient = createClient(PORT, PersonServiceAnnotated.class, SchemaValidationType.NONE);
-        annotatedValidatingClient = createClient(PORT, PersonServiceAnnotated.class, null);
-        client = createClient(PORT, PersonService.class, SchemaValidationType.NONE);
-        disconnectedClient = createClient(PORT_UNUSED, PersonService.class, SchemaValidationType.OUT);
-        rpcClient = createClient(PORT, PersonServiceRPC.class, SchemaValidationType.NONE);
+        return new SchemaValidationFeature(provider);
     }
-
+    
     @AfterClass
     public static void cleanup() throws Exception {
         for (Server server : serverList) {
@@ -126,9 +135,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             annotatedClient.saveInheritEndpoint(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Unmarshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
         }
 
         try {
@@ -136,9 +143,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             annotatedClient.saveInheritEndpoint(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Unmarshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
         }
 
         person.setLastName(""); // empty string is valid
@@ -153,9 +158,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             annotatedClient.saveValidateIn(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Unmarshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
         }
 
         try {
@@ -163,9 +166,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             annotatedClient.saveValidateIn(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Unmarshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
         }
 
         person.setLastName(""); // empty string is valid
@@ -186,78 +187,42 @@ public class JavaFirstSchemaValidationTest extends Assert {
     }
 
     @Test
-    public void testSaveValidationOutAnnotatedWithClientValidationDisabled() {
+    public void testRequestValidationWithClientValidationDisabled() {
         Person person = new Person();
 
         try {
-            annotatedClient.saveValidateOut(person);
+            annotatedNonValidatingClient.saveValidateIn(person);
         } catch (SOAPFaultException sfe) {
-            // verify its server side and a schema validation
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Marshalling Error"));
-            
-            // it's still a server side fault, because server side validation coming in failed
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            // has to be server side exception, as all validation is disabled on client
+            assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
         
         person.setFirstName(""); // empty string is valid
         try {
-            annotatedClient.saveValidateOut(person);
+            annotatedNonValidatingClient.saveValidateIn(person);
         } catch (SOAPFaultException sfe) {
-            // verify its server side and a schema validation
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Marshalling Error"));
-            
-            // it's still a server side fault, because server side validation coming in failed
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            // has to be server side exception, as all validation is disabled on client
+            assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
 
         person.setLastName(""); // empty string is valid
-        annotatedClient.saveValidateIn(person);
-    }
-    
-    // this will still all be server side, as the OUT validation is turned into an IN validation for
-    // the client, but by then the server has already thrown the exception for the OUT
-    @Test
-    public void testSaveValidationOutAnnotatedWithClientValidationEnabled() {
-        Person person = new Person();
-
-        try {
-            annotatedValidatingClient.saveValidateIn(person);
-        } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Marshalling Error"));
-            assertFalse(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
-        }
-        
-        person.setFirstName(""); // empty string is valid
-        try {
-            annotatedValidatingClient.saveValidateIn(person);
-        } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Marshalling Error"));
-            assertFalse(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
-        }
-
-        person.setLastName(""); // empty string is valid
-        annotatedValidatingClient.saveValidateIn(person);
+        annotatedNonValidatingClient.saveValidateIn(person);
     }
     
     @Test
-    public void testSaveValidationInAnnotatedWithClientValidationEnabled() {
+    public void testResponseValidationWithClientValidationDisabled() {
         Person person = new Person();
 
         try {
             person.setFirstName("InvalidResponse");
             person.setLastName("WhoCares");
-            annotatedValidatingClient.saveValidateOut(person);
+            annotatedNonValidatingClient.saveValidateOut(person);
         } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Marshalling Error"));
-            assertFalse(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            // has to be server side exception, as all validation is disabled on client
+            assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
     }
-
+    
     @Test
     public void testEndpointSchemaValidationProvider() {
         Person person = new Person();
@@ -266,9 +231,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             client.saveInheritEndpoint(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Unmarshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
         }
        
         try {
@@ -276,9 +239,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             client.saveInheritEndpoint(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Unmarshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
         }
 
         person.setLastName(""); // empty string is valid
@@ -293,9 +254,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             client.saveValidateIn(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Unmarshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
         }
 
         try {
@@ -303,9 +262,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             client.saveValidateIn(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Unmarshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
         }
 
         person.setLastName(""); // empty string is valid
@@ -325,17 +282,14 @@ public class JavaFirstSchemaValidationTest extends Assert {
     }
 
     @Test
-    public void testSaveValidationOutProviderClientOnly() {
+    public void testRequestClientValidation() {
         Person person = new Person();
 
         try {
             disconnectedClient.saveValidateOut(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            // verify its client side outgoing
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Marshalling Error"));
-            assertFalse(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
         
         person.setFirstName(""); // empty string is valid
@@ -343,10 +297,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             disconnectedClient.saveValidateOut(person);
             fail("Expected exception");
         } catch (SOAPFaultException sfe) {
-            // verify its client side outgoing
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Marshalling Error"));
-            assertFalse(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
 
         person.setLastName(""); // empty string is valid
@@ -359,7 +310,30 @@ public class JavaFirstSchemaValidationTest extends Assert {
             assertTrue(e.getMessage().contains("Could not send Message"));
         }
     }
+    
+    @Test
+    public void testResponseClientValidation() {
+        Person person = new Person();
 
+        try {
+            noValidationServerClient.saveValidateIn(person);
+            fail("Expected exception");
+        } catch (SOAPFaultException e) {
+            assertTrue(e.getMessage().contains("Unmarshalling Error"));
+        }
+        
+        person.setFirstName(""); // empty string is valid
+        try {
+            noValidationServerClient.saveValidateIn(person);
+            fail("Expected exception");
+        } catch (SOAPFaultException sfe) {
+            assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
+        }
+
+        person.setLastName(""); // empty string is valid
+        
+        noValidationServerClient.saveValidateIn(person);        
+    }
     
     @Test
     public void testSaveValidationOutProvider() {
@@ -369,32 +343,31 @@ public class JavaFirstSchemaValidationTest extends Assert {
             client.saveValidateOut(person);
         } catch (SOAPFaultException sfe) {
             // verify its server side outgoing
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Marshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
         
         person.setFirstName(""); // empty string is valid
         try {
             client.saveValidateOut(person);
         } catch (SOAPFaultException sfe) {
-            // verify its server side outgoing
-            String stackTrace = getStackTrace(sfe);
-            assertTrue(stackTrace.contains("Marshalling Error"));
-            assertTrue(stackTrace.contains("org.apache.cxf.binding.soap.SoapFault"));
+            assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
 
         person.setLastName(""); // empty string is valid
         client.saveValidateOut(person);
     }
 
-    private static <T> T createClient(String port, Class<T> serviceClass, SchemaValidationType type) {
+    private static <T> T createClient(String port, Class<T> serviceClass, SchemaValidationType type, 
+            Feature ... features) {
         JaxWsProxyFactoryBean clientFactory = new JaxWsProxyFactoryBean();
         clientFactory.setServiceClass(serviceClass);
         
         
         clientFactory.setAddress(getAddress(port, serviceClass));
         
+        if (features != null) {
+            clientFactory.getFeatures().addAll(Arrays.asList(features));
+        }
         
         @SuppressWarnings("unchecked")
         T newClient = (T)clientFactory.create();
@@ -415,24 +388,26 @@ public class JavaFirstSchemaValidationTest extends Assert {
         return newClient;
     }
 
-    public static Server createServer(Class<?> serviceInterface, Object serviceImpl, Feature ... features)
+    public static Server createServer(String port, Class<?> serviceInterface, Object serviceImpl, 
+            SchemaValidationType type, Feature ... features)
         throws IOException {
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(serviceImpl.getClass());
+        
         if (features != null) {
             svrFactory.getFeatures().addAll(Arrays.asList(features));
         }
-        svrFactory.setAddress(getAddress(PORT, serviceInterface));
+        
+        if (type != null) {
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put(Message.SCHEMA_VALIDATION_ENABLED, type);
+            svrFactory.setProperties(properties);
+        }
+        
+        svrFactory.setAddress(getAddress(port, serviceInterface));
         svrFactory.setServiceBean(serviceImpl);
         Server server = svrFactory.create();
         serverList.add(server);
         return server;
-    }
-    
-    private String getStackTrace(Exception e) {
-        StringWriter sWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(sWriter, true);
-        e.printStackTrace(writer);
-        return sWriter.toString();
     }
 }

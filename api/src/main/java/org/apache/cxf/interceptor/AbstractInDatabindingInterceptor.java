@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.validation.Schema;
 
 import org.w3c.dom.Node;
-
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.databinding.DataReader;
@@ -38,6 +37,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -67,8 +67,9 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         super(i, phase);
     }
     
+    @Deprecated
     protected boolean isRequestor(Message message) {
-        return Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE));
+        return MessageUtils.isRequestor(message);
     }
  
     protected boolean supportsDataReader(Message message, Class<?> input) {

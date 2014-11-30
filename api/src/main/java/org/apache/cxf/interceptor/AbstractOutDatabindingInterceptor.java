@@ -59,9 +59,11 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         super(id, phase);
     }
     
+    @Deprecated
     protected boolean isRequestor(Message message) {
-        return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
+        return MessageUtils.isRequestor(message);
     }
+    
     protected boolean shouldBuffer(Message message) {
         Object en = message.getContextualProperty(OUT_BUFFERING);
         boolean allowBuffer = true;

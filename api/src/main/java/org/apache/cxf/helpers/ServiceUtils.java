@@ -49,6 +49,21 @@ public final class ServiceUtils {
      */
     public static boolean isSchemaValidationEnabled(SchemaValidationType type, Message message) {
         SchemaValidationType validationType = getSchemaValidationType(message);
+
+        boolean isRequestor = MessageUtils.isRequestor(message);
+        if (SchemaValidationType.REQUEST.equals(validationType)) {
+            if (isRequestor) {
+                validationType = SchemaValidationType.OUT;
+            } else {
+                validationType = SchemaValidationType.IN;
+            }
+        } else if (SchemaValidationType.RESPONSE.equals(validationType)) {
+            if (isRequestor) {
+                validationType = SchemaValidationType.IN;
+            } else {
+                validationType = SchemaValidationType.OUT;
+            }
+        }
         
         return validationType.equals(type) 
             || ((SchemaValidationType.IN.equals(type) || SchemaValidationType.OUT.equals(type))
@@ -71,7 +86,7 @@ public final class ServiceUtils {
         if (validationType == null) {
             validationType = SchemaValidationType.NONE;
         }
-        
+     
         return validationType;
     }
     
@@ -86,7 +101,6 @@ public final class ServiceUtils {
     }
     
     private static SchemaValidationType getSchemaValidationTypeFromModel(Message message) {
-        boolean isRequestor = MessageUtils.isRequestor(message);
         Exchange exchange = message.getExchange();
         
         if (exchange != null) {
@@ -99,10 +113,10 @@ public final class ServiceUtils {
                 EndpointInfo ep = endpoint.getEndpointInfo();
                 
                 if (validationType == null && opInfo != null) {
-                    validationType = getSchemaValidationTypeFromModel(message, opInfo, isRequestor);
+                    validationType = getSchemaValidationTypeFromModel(message, opInfo);
                     
                     if (validationType == null && ep != null) {
-                        validationType = getSchemaValidationTypeFromModel(message, ep, isRequestor);
+                        validationType = getSchemaValidationTypeFromModel(message, ep);
                     }
                 }
                 
@@ -115,21 +129,10 @@ public final class ServiceUtils {
     }
     
     private static SchemaValidationType getSchemaValidationTypeFromModel(
-            Message message, AbstractPropertiesHolder properties, boolean isRequestor) {
+            Message message, AbstractPropertiesHolder properties) {
         Object obj = properties.getProperty(Message.SCHEMA_VALIDATION_TYPE);
         if (obj != null) {
-            SchemaValidationType validationType = getSchemaValidationType(obj);
-            
-            // Reverse the direction of any IN / OUT for requestor (client)
-            if (isRequestor) {
-                if (SchemaValidationType.IN.equals(validationType)) {
-                    return SchemaValidationType.OUT;
-                } else if (SchemaValidationType.OUT.equals(validationType)) {
-                    return SchemaValidationType.IN;
-                }
-            }
-
-            return validationType;
+            return getSchemaValidationType(obj);
         } else {
             return null;
         }

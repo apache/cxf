@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface SchemaValidation {
     public enum SchemaValidationType {
-        IN, OUT, BOTH, NONE
+        IN, REQUEST, OUT, RESPONSE, BOTH, NONE
     }
     
     @Deprecated
