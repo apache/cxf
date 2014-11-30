@@ -27,7 +27,14 @@ import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.service.model.AbstractPropertiesHolder;
+import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.OperationInfo;
 
 public final class ServiceUtils {
     
@@ -42,24 +49,96 @@ public final class ServiceUtils {
      * @param type
      */
     public static boolean isSchemaValidationEnabled(SchemaValidationType type, Message message) {
-        SchemaValidationType messageType = getSchemaValidationType(message);
+        SchemaValidationType validationType = getSchemaValidationType(message);
+
+        boolean isRequestor = MessageUtils.isRequestor(message);
+        if (SchemaValidationType.REQUEST.equals(validationType)) {
+            if (isRequestor) {
+                validationType = SchemaValidationType.OUT;
+            } else {
+                validationType = SchemaValidationType.IN;
+            }
+        } else if (SchemaValidationType.RESPONSE.equals(validationType)) {
+            if (isRequestor) {
+                validationType = SchemaValidationType.IN;
+            } else {
+                validationType = SchemaValidationType.OUT;
+            }
+        }
         
-        return messageType.equals(type) 
+        return validationType.equals(type) 
             || ((SchemaValidationType.IN.equals(type) || SchemaValidationType.OUT.equals(type))
-                && SchemaValidationType.BOTH.equals(messageType));
+                && SchemaValidationType.BOTH.equals(validationType));
     }
-    
     /**
-     * Determines the appropriate SchemaValidationType to return based on either
-     * a Boolean (for backwards compatibility) or the selected Schema Validation Type.
-     * 
-     * Package private as the isSchemaValidationEnabled method should be used instead.  Only
-     * visible for easier testing
+     * A convenience method to check for schema validation config in the message context, and then in the service model.
+     * Does not modify the Message context (other than what is done in the getContextualProperty itself)
      * 
      * @param message
+     * @param type
      */
-    static SchemaValidationType getSchemaValidationType(Message message) {
+    public static SchemaValidationType getSchemaValidationType(Message message) {
+        SchemaValidationType validationType = getOverrideSchemaValidationType(message);
+        if (validationType == null) {
+            validationType = getSchemaValidationTypeFromModel(message);
+        } 
+        
+        if (validationType == null) {
+            validationType = SchemaValidationType.NONE;
+        }
+     
+        return validationType;
+    }
+    
+    private static SchemaValidationType getOverrideSchemaValidationType(Message message) {
         Object obj = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+        if (obj != null) {
+            // this method will transform the legacy enabled as well
+            return getSchemaValidationType(obj);
+        } else {
+            return null;
+        }
+    }
+    
+    private static SchemaValidationType getSchemaValidationTypeFromModel(Message message) {
+        Exchange exchange = message.getExchange();
+        
+        if (exchange != null) {
+            BindingOperationInfo boi = exchange.getBindingOperationInfo();
+            Endpoint endpoint = exchange.getEndpoint();
+            
+            if (boi != null && endpoint != null) {
+                SchemaValidationType validationType = null;
+                OperationInfo opInfo = boi.getOperationInfo();
+                EndpointInfo ep = endpoint.getEndpointInfo();
+                
+                if (validationType == null && opInfo != null) {
+                    validationType = getSchemaValidationTypeFromModel(message, opInfo);
+                    
+                    if (validationType == null && ep != null) {
+                        validationType = getSchemaValidationTypeFromModel(message, ep);
+                    }
+                }
+                
+                return validationType;
+            }
+        }
+        
+        // else
+        return null;
+    }
+    
+    private static SchemaValidationType getSchemaValidationTypeFromModel(
+            Message message, AbstractPropertiesHolder properties) {
+        Object obj = properties.getProperty(Message.SCHEMA_VALIDATION_TYPE);
+        if (obj != null) {
+            return getSchemaValidationType(obj);
+        } else {
+            return null;
+        }
+    }
+    
+    public static SchemaValidationType getSchemaValidationType(Object obj) {
         if (obj instanceof SchemaValidationType) {
             return (SchemaValidationType)obj;
         } else if (obj != null) { 

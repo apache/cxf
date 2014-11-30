@@ -51,7 +51,7 @@ public class SchemaValidationFeature extends AbstractFeature {
         for (BindingOperationInfo bop : endpoint.getEndpointInfo().getBinding().getOperations()) {
             SchemaValidationType type = provider.getSchemaValidationType(bop.getOperationInfo());
             if (type != null) {
-                bop.getOperationInfo().setProperty(Message.SCHEMA_VALIDATION_ENABLED, type);
+                bop.getOperationInfo().setProperty(Message.SCHEMA_VALIDATION_TYPE, type);
             }
         }
     }

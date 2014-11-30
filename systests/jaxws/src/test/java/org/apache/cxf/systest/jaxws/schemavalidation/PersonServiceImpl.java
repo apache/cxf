@@ -26,18 +26,22 @@ import javax.jws.WebService;
     targetNamespace = "http://org.apache.cxf/service/PersonService")
 public class PersonServiceImpl implements PersonService {
     @Override
-    public void saveNoValidation(Person data) {
+    public Person saveNoValidation(Person data) {
+        return data;
     }
 
     @Override
-    public void saveInheritEndpoint(Person data) {
+    public Person saveInheritEndpoint(Person data) {
+        return data;
     }
 
     @Override
-    public void saveValidateIn(Person data) {
+    public Person saveValidateIn(Person data) {
+        return data;
     }
 
     @Override
-    public void saveValidateOut(Person data) {
+    public Person saveValidateOut(Person data) {
+        return data;
     }
 }
