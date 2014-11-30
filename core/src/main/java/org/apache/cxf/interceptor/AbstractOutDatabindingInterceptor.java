@@ -43,7 +43,6 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.staxutils.CachingXmlEventWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
@@ -60,9 +59,6 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         super(id, phase);
     }
     
-    protected boolean isRequestor(Message message) {
-        return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
-    }
     protected boolean shouldBuffer(Message message) {
         Object en = message.getContextualProperty(OUT_BUFFERING);
         boolean allowBuffer = true;
@@ -85,7 +81,7 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         CachingXmlEventWriter cache = null;
         
         // configure endpoint and operation level schema validation
-        setOperationSchemaValidation(operation.getOperationInfo(), message);
+        setOperationSchemaValidation(message);
         
         // need to cache the events in case validation fails or buffering is enabled
         if (shouldBuffer(message)) {
@@ -159,22 +155,9 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         }
     }
     
-    /**
-     * Where an operation level validation type has been set, copy it to the message, so it can be interrogated
-     * by all downstream interceptors
-     * 
-     * @param bop
-     * @param message
-     * @param reader
-     */
-    private void setOperationSchemaValidation(OperationInfo opInfo, Message message) {
-        if (opInfo != null) {
-            SchemaValidationType validationType = 
-                (SchemaValidationType) opInfo.getProperty(Message.SCHEMA_VALIDATION_ENABLED);
-            if (validationType != null) {
-                message.put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
-            }
-        }
+    protected void setOperationSchemaValidation(Message message) {
+        SchemaValidationType validationType = ServiceUtils.getSchemaValidationType(message);
+        message.put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
     }
     
     protected boolean shouldValidate(Message m) {

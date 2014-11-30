@@ -52,6 +52,7 @@ import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.ws.commons.schema.constants.Constants;
 
+
 public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String NO_VALIDATE_PARTS = AbstractInDatabindingInterceptor.class.getName() 
                                                     + ".novalidate-parts";
@@ -66,10 +67,6 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         super(i, phase);
     }
     
-    protected boolean isRequestor(Message message) {
-        return Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE));
-    }
- 
     protected boolean supportsDataReader(Message message, Class<?> input) {
         Service service = ServiceModelUtil.getService(message.getExchange());
         Class<?> cls[] = service.getDataBinding().getSupportedReaderFormats();
@@ -124,24 +121,9 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         }
     }
     
-    /**
-     * Where an operation level validation type has been set, copy it to the message, so it can be interrogated
-     * by all downstream interceptors.  It is expected that sub classes will call setDataReaderValidation subsequent
-     * to this to ensure the DataReader schema reference is updated as appropriate.
-     * 
-     * @param bop
-     * @param message
-     * @param reader
-     * @see #setDataReaderValidation(Service, Message, DataReader)
-     */
-    protected void setOperationSchemaValidation(OperationInfo opInfo, Message message) {
-        if (opInfo != null) {
-            SchemaValidationType validationType = 
-                (SchemaValidationType) opInfo.getProperty(Message.SCHEMA_VALIDATION_ENABLED);
-            if (validationType != null) {
-                message.put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
-            }
-        }
+    protected void setOperationSchemaValidation(Message message) {
+        SchemaValidationType validationType = ServiceUtils.getSchemaValidationType(message);
+        message.put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
     }
     
     protected DepthXMLStreamReader getXMLStreamReader(Message message) {
@@ -246,7 +228,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         }
 
         // configure endpoint and operation level schema validation
-        setOperationSchemaValidation(operation.getOperationInfo(), message);
+        setOperationSchemaValidation(message);
         
         QName serviceQName = si.getName();
         message.put(Message.WSDL_SERVICE, serviceQName);

@@ -21,10 +21,10 @@ package org.apache.cxf.systest.jaxws.schemavalidation;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "org.apache.cxf.systest.jaxws.schemavalidation.PersonServiceAnnotated", 
-    serviceName = "PersonServiceAnnotated", 
-    targetNamespace = "http://org.apache.cxf/service/PersonServiceAnnotated")
-public class PersonServiceAnnotatedImpl implements PersonServiceAnnotated {
+@WebService(endpointInterface = "org.apache.cxf.systest.jaxws.schemavalidation.PersonServiceWithRequestResponseAnns", 
+    serviceName = "PersonServiceWithRequestResponseAnns", 
+    targetNamespace = "http://org.apache.cxf/service/PersonServiceWithRequestResponseAnns")
+public class PersonServiceWithRequestResponseAnnsImpl implements PersonServiceWithRequestResponseAnns {
     @Override
     public Person saveNoValidation(Person data) {
         return data;

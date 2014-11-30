@@ -288,9 +288,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
      */
     private void addSchemaValidationSupport(Endpoint endpoint, SchemaValidation annotation) {
         if (annotation != null) {
-            // if someone has gone to the effort of specifying enabled=false, then we need to
-            // handle that, otherwise we use the new SchemaValidationType type only
-            endpoint.put(Message.SCHEMA_VALIDATION_ENABLED, annotation.type());
+            endpoint.getEndpointInfo().setProperty(Message.SCHEMA_VALIDATION_TYPE, annotation.type());
         }
     }
 
@@ -349,11 +347,8 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
     }
 
     private void addSchemaValidationSupport(OperationInfo inf, SchemaValidation annotation) {
-        // Notice no support for deprecated enabled property here!
-        // TODO - should we check for the use of this property and at least log the fact we are
-        // ignoring it
         if (annotation != null) {
-            inf.setProperty(Message.SCHEMA_VALIDATION_ENABLED, annotation.type());
+            inf.setProperty(Message.SCHEMA_VALIDATION_TYPE, annotation.type());
         }
     }
     
