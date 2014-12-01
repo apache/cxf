@@ -19,7 +19,6 @@
 
 package org.apache.cxf.transport.http.osgi;
 
-import java.util.Dictionary;
 import java.util.Properties;
 
 import javax.servlet.Servlet;
@@ -36,17 +35,22 @@ import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.service.http.HttpService;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 public class HTTPTransportActivator 
     implements BundleActivator {
-    private static final String CXF_CONFIG_SCOPE = "org.apache.cxf.osgi";
-    private static final String DISABLE_DEFAULT_HTTP_TRANSPORT = CXF_CONFIG_SCOPE + ".http.transport.disable";
+    private static final String CXF_CONFIG_PID = "org.apache.cxf.osgi";
+    private static final String DISABLE_DEFAULT_HTTP_TRANSPORT = CXF_CONFIG_PID + ".http.transport.disable";
+    private ServiceTracker httpServiceTracker;
     
-    public void start(BundleContext context) throws Exception {
+    public void start(final BundleContext context) throws Exception {
         
         ConfigAdminHttpConduitConfigurer conduitConfigurer = new ConfigAdminHttpConduitConfigurer();
         
@@ -63,13 +67,39 @@ public class HTTPTransportActivator
         
         DestinationRegistry destinationRegistry = new DestinationRegistryImpl();
         HTTPTransportFactory transportFactory = new HTTPTransportFactory(destinationRegistry);
-        Servlet servlet = new CXFNonSpringServlet(destinationRegistry , false);
-        ServletConfigurer servletConfig = new ServletConfigurer(context, servlet);
+        final Servlet servlet = new CXFNonSpringServlet(destinationRegistry , false);
+        httpServiceTracker = new ServiceTracker(context, HttpService.class.getName(), new ServiceTrackerCustomizer() {
+            
+            private ServiceRegistration servletPublisherReg;
+            private ServletExporter servletExporter;
+
+            @Override
+            public void removedService(ServiceReference reference, Object service) {
+                servletPublisherReg.unregister();
+                try {
+                    servletExporter.updated(null);
+                } catch (ConfigurationException e) {
+                    // Ignore
+                }
+            }
+            
+            @Override
+            public void modifiedService(ServiceReference reference, Object service) {
+            }
+            
+            @Override
+            public Object addingService(ServiceReference reference) {
+                HttpService httpService = (HttpService)context.getService(reference);
+                servletExporter = new ServletExporter(servlet, httpService);
+                servletPublisherReg = registerService(context, ManagedService.class, servletExporter, CXF_CONFIG_PID);
+                return null;
+            }
+        });
+        httpServiceTracker.open();
 
         context.registerService(DestinationRegistry.class.getName(), destinationRegistry, null);
         context.registerService(HTTPTransportFactory.class.getName(), transportFactory, null);
-        registerService(context, ManagedService.class, servletConfig, CXF_CONFIG_SCOPE);
-
+        
         BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
             
             @Override
@@ -81,77 +111,13 @@ public class HTTPTransportActivator
                                             "http://cxf.apache.org/transports/http/configuration");  
     }
 
-    private void registerService(BundleContext context, Class<?> serviceInterface,
+    private ServiceRegistration registerService(BundleContext context, Class<?> serviceInterface,
                                         Object serviceObject, String servicePid) {
         Properties servProps = new Properties();
         servProps.put(Constants.SERVICE_PID,  servicePid);  
-        context.registerService(serviceInterface.getName(), serviceObject, servProps);
+        return context.registerService(serviceInterface.getName(), serviceObject, servProps);
     }
 
     public void stop(BundleContext context) throws Exception {
-    }
-
-    
-    class ServletConfigurer implements ManagedService {
-        private ServiceRegistration reg;
-        private BundleContext context;
-        private Servlet servlet;
-        private ServiceRegistration serviceRegistration;
-        
-        public ServletConfigurer(BundleContext context, Servlet servlet) {
-            this.servlet = servlet;
-            this.context = context;
-        }
-
-        @SuppressWarnings("rawtypes")
-        @Override
-        public void updated(Dictionary properties) throws ConfigurationException {
-            if (reg != null) {
-                reg.unregister();
-            }
-            if (properties == null) {
-                properties = new Properties();
-            }
-            Properties sprops = new Properties();
-            sprops.put("alias",
-                       getProp(properties, "org.apache.cxf.servlet.context", "/cxf"));
-            sprops.put("servlet-name", 
-                       getProp(properties, "org.apache.cxf.servlet.name", "cxf-osgi-transport-servlet"));
-            sprops.put("hide-service-list-page", 
-                       getProp(properties, "org.apache.cxf.servlet.hide-service-list-page", "false"));
-            sprops.put("disable-address-updates", 
-                       getProp(properties, "org.apache.cxf.servlet.disable-address-updates", "true"));
-            sprops.put("base-address", 
-                       getProp(properties, "org.apache.cxf.servlet.base-address", ""));
-            sprops.put("service-list-path", 
-                       getProp(properties, "org.apache.cxf.servlet.service-list-path", ""));
-            sprops.put("static-resources-list", 
-                       getProp(properties, "org.apache.cxf.servlet.static-resources-list", ""));
-            sprops.put("redirects-list", 
-                       getProp(properties, "org.apache.cxf.servlet.redirects-list", ""));
-            sprops.put("redirect-servlet-name", 
-                       getProp(properties, "org.apache.cxf.servlet.redirect-servlet-name", ""));
-            sprops.put("redirect-servlet-path", 
-                       getProp(properties, "org.apache.cxf.servlet.redirect-servlet-path", ""));
-            sprops.put("service-list-all-contexts", 
-                       getProp(properties, "org.apache.cxf.servlet.service-list-all-contexts", ""));
-            sprops.put("service-list-page-authenticate", 
-                       getProp(properties, "org.apache.cxf.servlet.service-list-page-authenticate", "false"));
-            sprops.put("service-list-page-authenticate-realm", 
-                       getProp(properties, "org.apache.cxf.servlet.service-list-page-authenticate-realm", "karaf"));
-            sprops.put("use-x-forwarded-headers", 
-                       getProp(properties, "org.apache.cxf.servlet.use-x-forwarded-headers", "false"));
-            if (serviceRegistration != null) {
-                serviceRegistration.unregister();
-            }
-            serviceRegistration = context.registerService(Servlet.class.getName(), servlet, sprops);
-        }
-
-        @SuppressWarnings("rawtypes")
-        private Object getProp(Dictionary properties, String key, Object defaultValue) {
-            Object value = properties.get(key);
-            return value == null ? defaultValue : value;
-        }
-        
     }
 }

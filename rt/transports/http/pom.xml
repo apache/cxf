@@ -35,8 +35,14 @@
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            org.osgi.service.http
         </cxf.osgi.import>
+        <cxf.osgi.export>
+            org.osgi.service.http,
+            org.apache.cxf.transports.http.*,
+            org.apache.cxf.transport.http.*,
+        </cxf.osgi.export>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
             org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/transports/http/configuration"
@@ -149,6 +155,41 @@
                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-javadoc:${cxf.xjc-utils.version}</extension>
                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
                     </extensions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>versions</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>cleanVersions</goal>
+                        </goals>
+                        <configuration>
+                            <versions>
+                                <cxf.osgi.version.clean>${project.version}</cxf.osgi.version.clean>
+                            </versions>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
+                        <Import-Package>
+                            ${cxf.osgi.import},
+                            *
+                        </Import-Package>
+                        <Export-Package>
+                            ${cxf.osgi.export}
+                        </Export-Package>
+                        <Export-Service>
+                            ${cxf.export.service}
+                        </Export-Service>
+                        <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
+                    </instructions>
                 </configuration>
             </plugin>
         </plugins>
