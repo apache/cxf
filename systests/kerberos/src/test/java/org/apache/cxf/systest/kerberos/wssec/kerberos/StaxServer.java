@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.kerberos;
+package org.apache.cxf.systest.kerberos.wssec.kerberos;
 
 import java.net.URL;
 

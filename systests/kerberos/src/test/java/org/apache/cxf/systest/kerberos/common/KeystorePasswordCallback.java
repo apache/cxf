@@ -17,23 +17,34 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.kerberos;
+package org.apache.cxf.systest.kerberos.common;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 
 /**
+ * A CallbackHandler implementation for keystores.
  */
-
-public class KerberosPasswordCallback implements CallbackHandler {
+public class KeystorePasswordCallback implements CallbackHandler {
     
-    public KerberosPasswordCallback() {
+    private Map<String, String> passwords = 
+        new HashMap<String, String>();
+    
+    public KeystorePasswordCallback() {
+        passwords.put("Alice", "abcd!1234");
+        passwords.put("alice", "password");
+        passwords.put("Bob", "abcd!1234");
+        passwords.put("bob", "password");
+        passwords.put("abcd", "dcba");
+        passwords.put("6e0e88f36ebb8744d470f62f604d03ea4ebe5094", "password");
+        passwords.put("wss40rev", "security");
     }
 
     /**
@@ -42,20 +53,17 @@ public class KerberosPasswordCallback implements CallbackHandler {
      */
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-                if ("alice".equals(pc.getIdentifier())) {
-                    pc.setPassword("password");
-                } else if ("bob".equals(pc.getIdentifier())) {
-                    pc.setPassword("password");
+            WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+            if (pc.getUsage() == WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD) {
+                pc.setPassword("this-is-a-secret");
+            } else {
+                String pass = passwords.get(pc.getIdentifier());
+                if (pass != null) {
+                    pc.setPassword(pass);
+                    return;
                 } else {
-                    pc.setPassword("abcd!1234");
+                    pc.setPassword("password");
                 }
-            } else if (callbacks[i] instanceof KerberosContextAndServiceNameCallback) {
-                KerberosContextAndServiceNameCallback pc = 
-                    (KerberosContextAndServiceNameCallback)callbacks[i];
-                pc.setContextName("bob");
-                pc.setServiceName("bob@service.ws.apache.org");
             }
         }
     }

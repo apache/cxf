@@ -675,14 +675,16 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
             for (int i = 0; i < callbacks.length; i++) {
-                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-                
-                String id = pc.getIdentifier();
-                SecurityToken tok = store.getToken(id);
-                if (tok != null && !tok.isExpired()) {
-                    pc.setKey(tok.getSecret());
-                    pc.setCustomToken(tok.getToken());
-                    return;
+                if (callbacks[i] instanceof WSPasswordCallback) {
+                    WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+                    
+                    String id = pc.getIdentifier();
+                    SecurityToken tok = store.getToken(id);
+                    if (tok != null && !tok.isExpired()) {
+                        pc.setKey(tok.getSecret());
+                        pc.setCustomToken(tok.getToken());
+                        return;
+                    }
                 }
             }
             if (internal != null) {
