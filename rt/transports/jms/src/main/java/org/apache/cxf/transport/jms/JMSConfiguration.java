@@ -52,6 +52,7 @@ public class JMSConfiguration {
     private int priority = Message.DEFAULT_PRIORITY;
     private long timeToLive = Message.DEFAULT_TIME_TO_LIVE;
     private boolean sessionTransacted;
+    private boolean createSecurityContext = true;
 
     private int maxSuspendedContinuations = DEFAULT_VALUE;
     private int reconnectPercentOfMax = 70;
@@ -303,6 +304,14 @@ public class JMSConfiguration {
         this.sessionTransacted = sessionTransacted;
     }
 
+    public boolean isCreateSecurityContext() {
+        return createSecurityContext;
+    }
+    
+    public void setCreateSecurityContext(boolean b) {
+        this.createSecurityContext = b;
+    }
+    
     /**
      * For compatibility with old spring based code
      * @param transactionManager
