@@ -40,8 +40,10 @@
         </cxf.osgi.import>
         <cxf.osgi.export>
             org.osgi.service.http,
-            org.apache.cxf.transports.http.*,
+            org.apache.cxf.transports.http*,
             org.apache.cxf.transport.http.*,
+            org.apache.cxf.transport.https.*,
+            org.apache.cxf.transport.servlet.*,
         </cxf.osgi.export>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
