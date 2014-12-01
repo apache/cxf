@@ -119,6 +119,8 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
+        ((BindingProvider)port).getRequestContext().put("thread.local.request.context", "true");
+        
         updateAddressPort(port, test.getPort());
         
         TokenTestUtils.updateSTSPort((BindingProvider)port, test.getStsPort());
@@ -137,6 +139,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         
         DoubleItPortType port2 = 
             service.getPort(portQName, DoubleItPortType.class);
+        ((BindingProvider)port2).getRequestContext().put("thread.local.request.context", "true");
         updateAddressPort(port2, test.getPort());
         
         TokenTestUtils.updateSTSPort((BindingProvider)port2, test.getStsPort());
