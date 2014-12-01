@@ -680,25 +680,27 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
             for (int i = 0; i < callbacks.length; i++) {
-                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-                
-                String id = pc.getIdentifier();
-                
-                if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(pc.getType())
-                    || WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(pc.getType())) {
-                    for (String tokenId : store.getTokenIdentifiers()) {
-                        SecurityToken token = store.getToken(tokenId);
-                        if (token != null && id.equals(token.getSHA1())) {
-                            pc.setKey(token.getSecret());
+                if (callbacks[i] instanceof WSPasswordCallback) {
+                    WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+                    
+                    String id = pc.getIdentifier();
+                    
+                    if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(pc.getType())
+                        || WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(pc.getType())) {
+                        for (String tokenId : store.getTokenIdentifiers()) {
+                            SecurityToken token = store.getToken(tokenId);
+                            if (token != null && id.equals(token.getSHA1())) {
+                                pc.setKey(token.getSecret());
+                                return;
+                            }
+                        }
+                    } else { 
+                        SecurityToken tok = store.getToken(id);
+                        if (tok != null) {
+                            pc.setKey(tok.getSecret());
+                            pc.setCustomToken(tok.getToken());
                             return;
                         }
-                    }
-                } else { 
-                    SecurityToken tok = store.getToken(id);
-                    if (tok != null) {
-                        pc.setKey(tok.getSecret());
-                        pc.setCustomToken(tok.getToken());
-                        return;
                     }
                 }
             }
