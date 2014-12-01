@@ -92,8 +92,16 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
             return;
         }
         try {
-            if (f.getCause().getClass().equals(SOAPFaultException.class)) {
-                SOAPFaultException sf = (SOAPFaultException) (f.getCause());
+            Throwable thr = f.getCause();
+            SOAPFaultException sf = null;
+            while (thr != null) {
+                if (thr instanceof SOAPFaultException) {
+                    sf = (SOAPFaultException) thr;
+                    break;
+                }
+                thr = thr.getCause();
+            }
+            if (sf != null) {
                 if (f instanceof SoapFault) {
                     for (Iterator<QName> it = CastUtils.cast(sf.getFault().getFaultSubcodes()); it.hasNext();) {
                         ((SoapFault) f).addSubCode(it.next());    
