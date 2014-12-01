@@ -76,7 +76,7 @@
         	<groupId>org.apache.activemq</groupId>
         	<artifactId>activemq-karaf</artifactId>
         	<type>xml</type>
-                <version>${cxf.activemq.version}</version>
+            <version>${cxf.activemq.version}</version>
         	<classifier>features</classifier>
         </dependency>
         

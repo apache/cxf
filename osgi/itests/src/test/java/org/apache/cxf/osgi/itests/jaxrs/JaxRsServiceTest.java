@@ -93,9 +93,10 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
     @Configuration
     public Option[] config() {
         return new Option[] {
-            cxfBaseConfigWithTestUtils(),
+            cxfBaseConfig(),
+            testUtils(),
+            features(cxfUrl, "cxf-core", "cxf-jaxrs"),
             logLevel(LogLevel.INFO),
-            features(cxfUrl, "cxf-http"),
             provision(serviceBundle())
         };
     }

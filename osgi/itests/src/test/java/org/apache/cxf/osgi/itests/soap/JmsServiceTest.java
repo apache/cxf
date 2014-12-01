@@ -33,6 +33,7 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -77,10 +78,12 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
         MavenUrlReference activeMQFeature = maven().groupId("org.apache.activemq")
             .artifactId("activemq-karaf").type("xml").classifier("features").versionAsInProject();
         return new Option[] {
-            cxfBaseConfigWithTestUtils(),
-            logLevel(LogLevel.WARN),
+            cxfBaseConfig(),
+            testUtils(),
+            features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-transports-jms"),
+            KarafDistributionOption.keepRuntimeFolder(),
+            logLevel(LogLevel.INFO),
             features(activeMQFeature, "activemq-broker-noweb"),
-            features(cxfUrl, "cxf-transports-jms"),
             provision(serviceBundle())
         };
     }

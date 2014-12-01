@@ -58,23 +58,21 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
-
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.when;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 
 /**
  * 
  */
 public class CXFOSGiTestSupport {
-    static final Long COMMAND_TIMEOUT = 10000L;
-    static final Long DEFAULT_TIMEOUT = 20000L;
-    static final Long SERVICE_TIMEOUT = 30000L;
+    private static final String MAVEN_DEPENDENCIES_PROPERTIES = "/META-INF/maven/dependencies.properties";
+    private static final Long COMMAND_TIMEOUT = 10000L;
+    private static final Long SERVICE_TIMEOUT = 30000L;
 
     @Inject
     protected BundleContext bundleContext;
@@ -98,14 +96,7 @@ public class CXFOSGiTestSupport {
     }
 
     private static String getKarafVersion() {
-        InputStream ins = CXFOSGiTestSupport.class.getResourceAsStream("/META-INF/maven/dependencies.properties");
-        Properties p = new Properties();
-        try {
-            p.load(ins);
-        } catch (Throwable t) {
-            //
-        }
-        String karafVersion = p.getProperty("org.apache.karaf/apache-karaf/version");
+        String karafVersion = getVersionFromPom("org.apache.karaf/apache-karaf/version");
         if (karafVersion == null) {
             karafVersion = System.getProperty("cxf.karaf.version");
         }
@@ -117,13 +108,24 @@ public class CXFOSGiTestSupport {
             karafVersion = "2.3.6";
         }
         return karafVersion;
+    }
+
+    private static String getVersionFromPom(String key) {
+        try {
+            InputStream ins = CXFOSGiTestSupport.class.getResourceAsStream(MAVEN_DEPENDENCIES_PROPERTIES);
+            Properties p = new Properties();
+            p.load(ins);
+            return p.getProperty(key);
+        } catch (Throwable t) {
+            throw new IllegalStateException(MAVEN_DEPENDENCIES_PROPERTIES + " can not be found", t);
+        }
     }    
     /**
      * Create an {@link org.ops4j.pax.exam.Option} for using a .
      * 
      * @return
      */
-    protected Option cxfBaseConfig(boolean testUtils) {
+    protected Option cxfBaseConfig() {
         karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf").version(getKarafVersion())
             .type("tar.gz");
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
@@ -137,24 +139,16 @@ public class CXFOSGiTestSupport {
                              .useDeployFolder(false)
                              .unpackDirectory(new File("target/paxexam/")),
                          //DO NOT COMMIT WITH THIS LINE ENABLED!!!    
-                         //org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder(),
-                         features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-jaxrs"),                         
+                         //KarafDistributionOption.keepRuntimeFolder(),                         
                          systemProperty("java.awt.headless").value("true"),
-                         when(testUtils).useOptions(mavenBundle()
-                                                    .groupId("org.apache.cxf")
-                                                    .artifactId("cxf-testutils")
-                                                    .versionAsInProject()),
                          when(localRepo != null)
                              .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                                   "org.ops4j.pax.url.mvn.localRepository",
                                                                   localRepo)),
                          when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true")));
     }
-    protected Option cxfBaseConfig() {
-        return cxfBaseConfig(false);
-    }
-    protected Option cxfBaseConfigWithTestUtils() {
-        return cxfBaseConfig(true);
+    protected Option testUtils() {
+        return mavenBundle().groupId("org.apache.cxf").artifactId("cxf-testutils").versionAsInProject();
     }
     
     /**
