@@ -124,12 +124,12 @@ public class JsonWebKey extends JsonMapObject {
         return (String)getProperty(X509_URL);
     }
 
-    public void setX509Chain(String x509Chain) {
+    public void setX509Chain(List<String> x509Chain) {
         setProperty(X509_CHAIN, x509Chain);
     }
 
-    public String getX509Chain() {
-        return (String)getProperty(X509_CHAIN);
+    public List<String> getX509Chain() {
+        return CastUtils.cast((List<?>)getProperty(X509_CHAIN));
     }
     
     public void setX509Thumbprint(String x509Thumbprint) {

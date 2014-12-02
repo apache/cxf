@@ -105,7 +105,7 @@ public final class JwsUtils {
         String rsaSignatureAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         JwsSignatureVerifier theVerifier = null;
         if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-            theVerifier = getRSAKeySignatureVerifier(JwkUtils.toRSAPublicKey(jwk), rsaSignatureAlgo);
+            theVerifier = getRSAKeySignatureVerifier(JwkUtils.toRSAPublicKey(jwk, true), rsaSignatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) { 
             byte[] key = JoseUtils.decode((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
             theVerifier = getHmacSignatureVerifier(key, rsaSignatureAlgo);
@@ -195,7 +195,7 @@ public final class JwsUtils {
         }
         List<JwsSignatureVerifier> theVerifiers = null; 
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
-            List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, JsonWebKey.KEY_OPER_SIGN);
+            List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, JsonWebKey.KEY_OPER_VERIFY);
             if (jwks != null) {
                 theVerifiers = new ArrayList<JwsSignatureVerifier>(jwks.size());
                 for (JsonWebKey jwk : jwks) {

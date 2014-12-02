@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URI;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -40,6 +41,7 @@ import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
@@ -256,7 +258,7 @@ public final class JwkUtils {
     public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper, JwkReaderWriter reader) {
         PrivateKeyPasswordProvider cb = loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
-        String kid = getKeyId(props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
+        String kid = getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
         if (kid != null) {
             return jwkSet.getKey(kid);
         } else if (keyOper != null) {
@@ -275,11 +277,11 @@ public final class JwkUtils {
                                                    JwkReaderWriter reader) {
         PrivateKeyPasswordProvider cb = loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
-        String kid = getKeyId(props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
+        String kid = getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
         if (kid != null) {
             return Collections.singletonList(jwkSet.getKey(kid));
         }
-        String kids = getKeyId(props, KeyManagementUtils.RSSEC_KEY_STORE_ALIASES, keyOper);
+        String kids = getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIASES, keyOper);
         if (kids != null) {
             String[] values = kids.split(",");
             List<JsonWebKey> keys = new ArrayList<JsonWebKey>(values.length);
@@ -297,9 +299,22 @@ public final class JwkUtils {
         return null;
     }
     public static RSAPublicKey toRSAPublicKey(JsonWebKey jwk) {
+        return toRSAPublicKey(jwk, false);
+    }
+    public static RSAPublicKey toRSAPublicKey(JsonWebKey jwk, boolean checkX509) {
         String encodedModulus = (String)jwk.getProperty(JsonWebKey.RSA_MODULUS);
         String encodedPublicExponent = (String)jwk.getProperty(JsonWebKey.RSA_PUBLIC_EXP);
-        return CryptoUtils.getRSAPublicKey(encodedModulus, encodedPublicExponent);
+        if (encodedModulus != null) {
+            return CryptoUtils.getRSAPublicKey(encodedModulus, encodedPublicExponent);
+        } else if (checkX509) {
+            List<X509Certificate> chain = toX509CertificateChain(jwk);
+            return (RSAPublicKey)chain.get(0).getPublicKey();
+        }
+        return null;
+    }
+    public static List<X509Certificate> toX509CertificateChain(JsonWebKey jwk) {
+        List<String> base64EncodedChain = jwk.getX509Chain();
+        return KeyManagementUtils.toX509CertificateChain(base64EncodedChain);
     }
     public static JsonWebKey fromRSAPublicKey(RSAPublicKey pk, String algo) {
         JsonWebKey jwk = prepareRSAJwk(pk.getModulus(), algo);
@@ -307,6 +322,14 @@ public final class JwkUtils {
         jwk.setProperty(JsonWebKey.RSA_PUBLIC_EXP, encodedPublicExponent);
         return jwk;
     }
+    public static JsonWebKey fromX509CertificateChain(List<X509Certificate> chain, String algo) {
+        JsonWebKey jwk = new JsonWebKey();
+        jwk.setAlgorithm(algo);
+        List<String> encodedChain = KeyManagementUtils.encodeX509CertificateChain(chain);
+        jwk.setX509Chain(encodedChain);
+        return jwk;
+    }
+    
     public static RSAPrivateKey toRSAPrivateKey(JsonWebKey jwk) {
         String encodedModulus = (String)jwk.getProperty(JsonWebKey.RSA_MODULUS);
         String encodedPrivateExponent = (String)jwk.getProperty(JsonWebKey.RSA_PRIVATE_EXP);
@@ -363,19 +386,24 @@ public final class JwkUtils {
         return jwk;
     }
     
-    private static String getKeyId(Properties props, String propertyName, String keyOper) {
-        String kid = props.getProperty(propertyName);
-        if (kid == null && keyOper != null) {
-            String keyIdProp = null;
-            if (keyOper.equals(JsonWebKey.KEY_OPER_ENCRYPT)) {
-                keyIdProp = propertyName + ".jwe";
-            } else if (keyOper.equals(JsonWebKey.KEY_OPER_SIGN)
-                       || keyOper.equals(JsonWebKey.KEY_OPER_VERIFY)) {
-                keyIdProp = propertyName + ".jws";
+    private static String getKeyId(Message m, Properties props, String preferredPropertyName, String keyOper) {
+        String kid = null;
+        String altPropertyName = null;
+        if (keyOper != null) {
+            if (keyOper.equals(JsonWebKey.KEY_OPER_ENCRYPT) || keyOper.equals(JsonWebKey.KEY_OPER_DECRYPT)) {
+                altPropertyName = preferredPropertyName + ".jwe";
+            } else if (keyOper.equals(JsonWebKey.KEY_OPER_SIGN) || keyOper.equals(JsonWebKey.KEY_OPER_VERIFY)) {
+                altPropertyName = preferredPropertyName + ".jws";
             }
-            if (keyIdProp != null) {
-                kid = props.getProperty(keyIdProp);
-            }
+            String direction = m.getExchange().getOutMessage() == m ? ".out" : ".in";
+            kid = (String)MessageUtils.getContextualProperty(m, altPropertyName, altPropertyName + direction);
+        }
+        
+        if (kid == null) {
+            kid = props.getProperty(preferredPropertyName);
+        }
+        if (kid == null && altPropertyName != null) {
+            kid = props.getProperty(altPropertyName);
         }
         return kid;
     }
@@ -384,7 +412,7 @@ public final class JwkUtils {
             (PrivateKeyPasswordProvider)m.getContextualProperty(KeyManagementUtils.RSSEC_KEY_PSWD_PROVIDER);
         if (cb == null && keyOper != null) {
             String propName = keyOper.equals(JsonWebKey.KEY_OPER_SIGN) ? KeyManagementUtils.RSSEC_SIG_KEY_PSWD_PROVIDER
-                : keyOper.equals(JsonWebKey.KEY_OPER_ENCRYPT) 
+                : keyOper.equals(JsonWebKey.KEY_OPER_DECRYPT) 
                 ? KeyManagementUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER : null;
             if (propName != null) {
                 cb = (PrivateKeyPasswordProvider)m.getContextualProperty(propName);

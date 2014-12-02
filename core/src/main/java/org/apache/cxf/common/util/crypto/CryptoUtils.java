@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.util.crypto;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.Key;
@@ -31,6 +32,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -53,6 +55,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
 
@@ -625,6 +628,21 @@ public final class CryptoUtils {
         try {
             return keyStore.getCertificate(alias);
         } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }
+    }
+    public static String encodeCertificate(Certificate cert) {
+        try {
+            return Base64Utility.encode(cert.getEncoded());
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }
+    }
+    public static Certificate decodeCertificate(String encodedCert) {
+        try {
+            byte[] decoded = Base64Utility.decode(encodedCert);
+            return CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(decoded));
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }

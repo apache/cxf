@@ -24,6 +24,9 @@ import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.cxf.Bus;
@@ -141,6 +144,34 @@ public final class KeyManagementUtils {
             return CryptoUtils.loadKeyStore(is, keyStorePswd.toCharArray(), keyStoreType);
         } catch (Exception ex) {
             throw new SecurityException(ex);
+        }
+    }
+
+    public static List<String> encodeX509CertificateChain(List<X509Certificate> chain) {
+        List<String> encodedChain = new ArrayList<String>(chain.size());
+        for (X509Certificate cert : chain) {
+            try {
+                encodedChain.add(CryptoUtils.encodeCertificate(cert));
+            } catch (Exception ex) {
+                throw new SecurityException(ex);
+            }    
+        }
+        return encodedChain;
+    }
+    public static List<X509Certificate> toX509CertificateChain(List<String> base64EncodedChain) {
+        if (base64EncodedChain != null) {
+            List<X509Certificate> certs = new ArrayList<X509Certificate>(base64EncodedChain.size());
+            for (String encodedCert : base64EncodedChain) {
+                try {
+                    certs.add((X509Certificate)CryptoUtils.decodeCertificate(encodedCert));
+                } catch (Exception ex) {
+                    throw new SecurityException(ex);
+                }
+            }
+            //TODO: validate the chain
+            return certs;
+        } else {
+            return null;
         }
     }
 }
