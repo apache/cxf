@@ -1238,7 +1238,10 @@ public final class JAXRSUtils {
                 } else {
                     name = part.substring(0, index);
                     value =  index < part.length() ? part.substring(index + 1) : "";
-                    if (decode || (decodePlus && value.contains("+"))) {
+                    if (decodePlus && value.contains("+")) {
+                        value = value.replace('+', ' ');
+                    }
+                    if (decode) {
                         value = (";".equals(sep))
                             ? HttpUtils.pathDecode(value) : HttpUtils.urlDecode(value); 
                     }
