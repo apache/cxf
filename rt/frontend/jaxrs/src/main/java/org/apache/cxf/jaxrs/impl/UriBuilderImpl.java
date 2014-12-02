@@ -593,7 +593,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             }
             String rawQuery = uri.getRawQuery();
             if (rawQuery != null) {
-                query = JAXRSUtils.getStructuredParams(rawQuery, "&", false, false);
+                query = JAXRSUtils.getStructuredParams(rawQuery, "&", false, true);
             }
             userInfo = uri.getUserInfo();
             schemeSpecificPart = null;

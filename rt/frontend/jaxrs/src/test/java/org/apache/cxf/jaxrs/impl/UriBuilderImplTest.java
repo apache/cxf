@@ -329,7 +329,7 @@ public class UriBuilderImplTest extends Assert {
         URI uri = new URI("http://bar/foo+%20%2B?q=a+b%20%2B");
         URI newUri = new UriBuilderImpl(uri).buildFromEncoded();   
         assertEquals("URI is not built correctly", 
-                     "http://bar/foo+%20%2B?q=a%2Bb%20%2B", newUri.toString());
+                     "http://bar/foo+%20%2B?q=a+b%20%2B", newUri.toString());
     }
     
     @Test
