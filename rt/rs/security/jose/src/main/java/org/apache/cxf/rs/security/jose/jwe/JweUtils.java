@@ -112,7 +112,7 @@ public final class JweUtils {
         String keyEncryptionAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         KeyEncryptionAlgorithm keyEncryptionProvider = null;
         if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-            keyEncryptionProvider = getRSAKeyEncryptionAlgorithm(JwkUtils.toRSAPublicKey(jwk), 
+            keyEncryptionProvider = getRSAKeyEncryptionAlgorithm(JwkUtils.toRSAPublicKey(jwk, true), 
                                                                  keyEncryptionAlgo);
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
             keyEncryptionProvider = getSecretKeyEncryptionAlgorithm(JwkUtils.toSecretKey(jwk), 
@@ -287,7 +287,7 @@ public final class JweUtils {
         SecretKey ctDecryptionKey = null;
         String keyEncryptionAlgo = getKeyEncryptionAlgo(props, null);
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
-            JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
+            JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_DECRYPT);
             keyEncryptionAlgo = getKeyEncryptionAlgo(props, jwk.getAlgorithm());
             if ("direct".equals(keyEncryptionAlgo)) {
                 contentEncryptionAlgo = getContentEncryptionAlgo(props, contentEncryptionAlgo);

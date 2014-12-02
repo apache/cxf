@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jwk;
 
 import java.io.InputStream;
 import java.security.Security;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +74,7 @@ public class JsonWebKeyTest extends Assert {
     public void testPublicSetAsList() throws Exception {
         JsonWebKeys jwks = readKeySet("jwkPublicSet.txt");
         List<JsonWebKey> keys = jwks.getKeys();
-        assertEquals(2, keys.size());
+        assertEquals(3, keys.size());
         
         JsonWebKey ecKey = keys.get(0);
         assertEquals(6, ecKey.asMap().size());
@@ -81,13 +82,18 @@ public class JsonWebKeyTest extends Assert {
         JsonWebKey rsaKey = keys.get(1);
         assertEquals(5, rsaKey.asMap().size());
         validatePublicRsaKey(rsaKey);
+        JsonWebKey rsaKeyCert = keys.get(2);
+        assertEquals(3, rsaKeyCert.asMap().size());
+        assertEquals(3, rsaKeyCert.getX509Chain().size());
+        List<X509Certificate> certs = JwkUtils.toX509CertificateChain(rsaKeyCert);
+        assertEquals(3, certs.size());
     }
     
     @Test
     public void testPublicSetAsMap() throws Exception {
         JsonWebKeys jwks = readKeySet("jwkPublicSet.txt");
         Map<String, JsonWebKey> keysMap = jwks.getKeyIdMap();
-        assertEquals(2, keysMap.size());
+        assertEquals(3, keysMap.size());
         
         JsonWebKey rsaKey = keysMap.get(RSA_KID_VALUE);
         assertEquals(5, rsaKey.asMap().size());

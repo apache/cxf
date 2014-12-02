@@ -78,12 +78,12 @@ public class JoseHeaders extends JsonMapObject {
         return (String)getHeader(JoseConstants.HEADER_X509_URL);
     }
     
-    public void setX509Chain(String x509Chain) {
-        setHeader(JoseConstants.HEADER_X509_CHAIN, x509Chain);
+    public void setX509Chain(List<String> x509Chain) {
+        setProperty(JoseConstants.HEADER_X509_CHAIN, x509Chain);
     }
 
-    public String getX509Chain() {
-        return (String)getHeader(JoseConstants.HEADER_X509_CHAIN);
+    public List<String> getX509Chain() {
+        return CastUtils.cast((List<?>)getProperty(JoseConstants.HEADER_X509_CHAIN));
     }
     
     public void setX509Thumbprint(String x509Thumbprint) {
