@@ -1,4 +1,4 @@
-Apache CXF 2.7.13 Release Notes
+Apache CXF 2.7.14 Release Notes
 
 1. Overview
 
@@ -28,7 +28,7 @@ In particular, Apache CXF no longer supports Java5.   Users must upgrade to
 Java 6 in order to upgrade to Apache CXF 2.7.x.
 
 
-2.7.13 fixes over 50 JIRA issues reported by users and the community.
+2.7.14 fixes over 35 JIRA issues reported by users and the community.
 
 
 
@@ -72,75 +72,56 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Bug
-    * [CXF-5744] - @XmlTransient behavior change in WSDL fault content
-    * [CXF-5795] - Reading the entity from a Response with 202 - Accepted causes NullPointerException
-    * [CXF-5846] - ClassCastException in  org.apache.cxf.jaxrs.provider.BinaryDataProvider & SourceProvider
-    * [CXF-5878] - Disabling policy engine causes NPE
-    * [CXF-5881] - wadl2java failed on nexus wadl
-    * [CXF-5884] - org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider is incompatible with JAX-RS 2.0
-    * [CXF-5888] - Unwrapped operation detection not looking for attributes of extended types
-    * [CXF-5898] - Feature wss4j should be updated after saaj-impl version change
-    * [CXF-5904] - wadl2java -inheritResourceParams don't generate parent parameter
-    * [CXF-5906] - Claim Manager only parses first claim value
-    * [CXF-5910] - Filters registered by DynamicFeatures match on overloaded resource methods.
-    * [CXF-5913] - logStacktrace Property Not Implemented in MapEventLogger
-    * [CXF-5916] - WADL contains wrong parameter name for parameter beans
-    * [CXF-5917] - SAMLP Response Validator does not decrypt if EncryptedKey is the assertion element child
-    * [CXF-5935] - [wadl2java] Multipart method doesn't generate @Multipart params
-    * [CXF-5943] - Throw error in exceptionmapper
-    * [CXF-5949] - LogBrowser not working
-    * [CXF-5952] - wadl2java: process representation params
-    * [CXF-5953] - wadl2java: generate full class name for representation parameter
-    * [CXF-5961] - wadl2java: 'required = false' don't generated for @Multipart argument
-    * [CXF-5968] - Setting use.async.http.conduit property causes IllegalArgumentException
-    * [CXF-5988] - Provide support for a pluggable parameter conversion mechanism for JAX-RS client side proxies
-    * [CXF-5989] - Query Params not showing up in WADL when declared using @BeanParam
-    * [CXF-5992] - Cannot set org.apache.cxf.stax.maxAttributeCount
-    * [CXF-5995] - ClientProxyImpl problem with handling @BeanParams with null headers/cookies.
-    * [CXF-6000] - Wrong default algorithm is used for TrustManagerFactory instantiation
-    * [CXF-6007] - WebClient does not resend request in Digest authentication for HTTP methods GET, HEAD, DELETE, OPTIONS (with no body).
-    * [CXF-6015] - Path parameters containing semicolon are truncated due to missing encoding
-    * [CXF-6020] - UrilInfo.getAbsolutePath() missing path separator between servlet url and relative url
 
+** Bug
+    * [CXF-6030] - javax.xml.ws.soap.SOAPFaultException: Fault string, and possibly fault code, not set for cxf.
+    * [CXF-6034] - Wrong schemaLocation if jax-ws-catalog is used
+    * [CXF-6038] - Repeatedly invoking setHandlerChain() can cause a build up of handler interceptors on the chain
+    * [CXF-6041] - Corba Binding is throwing a ObjectNotActive Corba exception being thrown back to application code on endpoint/bus shutdown
+    * [CXF-6045] - Setting an entity from ClientRequestFilter has no effect if no entity is already set
+    * [CXF-6055] - WebClient adds Content-Type to GET requests
+    * [CXF-6057] - WADL to Java code generator does not support the documented "encoding" flag
+    * [CXF-6058] - NPE in cxf-rt-transports-http org.apache.cxf.transport.http.Headers line 280
+    * [CXF-6059] - wsdl:fault wsdl2java fails with IllegalArgumentException
+    * [CXF-6061] - The publish attribute on jaxws:endpoint doesn't support placeholder in spring configuration
+    * [CXF-6067] - ProviderFactory fails to analyze generic types correctly with some class hierachies
+    * [CXF-6072] - jaxrs securityContext.getUserPrincipal is broken if login is done during the request
+    * [CXF-6073] - cxf-wsn installation in Karaf fails
+    * [CXF-6076] - MediaType parameter not parsed correctly 
+    * [CXF-6078] - AnnotationUtils.getAnnotatedMethod for abstract classes not inherit from interface
+    * [CXF-6080] - Headers.logProtocolHeaders raise NPE on null header value
+    * [CXF-6089] - XmlAccessorOrder.ALPHABETICAL, Exception.getMessage() duplicate WSDL elements generated
+    * [CXF-6090] - java.lang.NullPointerException when running wsdl2java
+    * [CXF-6091] - Server is not properly stopped with MultipleEndpointObserver
+    * [CXF-6092] - When there is bad connection/timeout, ClientImpl throws NullPointerException
+    * [CXF-6094] - wsdl2java - Default key managers cannot be initialized
+    * [CXF-6103] - Nillable field, in a json payload, was sent as "@nil":"true" instead of an empty string
+    * [CXF-6104] - Support case insensitive mime types
+    * [CXF-6106] - ClientResponseFilterInterceptor wraps client response exchange message into ClientRequestContextImpl - as a result code can't access client request context
+    * [CXF-6109] - Incorrect TrustException constructor in AbstractSTSClient 
+    * [CXF-6115] - Transferable.transferTo can cause infinite loop or stack overflow
+    * [CXF-6118] - Schema Validation refinements
+    * [CXF-6122] - JAX-RS proxy client with @QueryParam is not encoding the parameter value
 
 ** Improvement
-    * [CXF-5652] - WebClient with SSL: javax.net.ssl.SSLHandshakeException handshake_failure
-    * [CXF-5879] - Distinguishing client or service in FactoryBeanListener
-    * [CXF-5885] - Validate "ActAs" tokens in the STS
-    * [CXF-5891] - ReadHeadersInterceptor performances improvement
-    * [CXF-5892] - Ensure EncryptedKey references BST before it
-    * [CXF-5908] - Making Claims clonable
-    * [CXF-5918] - ResoureUtils#createJaxbContext hides JaxB validation errors
-    * [CXF-5922] - Secure CXF WSDL with standard HTTP Authentication
-    * [CXF-5925] - JEXL Support for STS Claim Mappings
-    * [CXF-5927] - Claim Mapping Utils
-    * [CXF-5929] - WADL to Java code generator should support mappings to parameterized types
-    * [CXF-5934] - Make WadlGenerator more easily extensible
-    * [CXF-5947] - use blueprint-cm v1.1.0 so that the changes in org.apache.cxf.osgi.cfg could be reloaded
-    * [CXF-5948] - wadl2java -inheritResourceParams: put parent param first
-    * [CXF-5956] - wadl2java: support 'repeating' attribute for response param
-    * [CXF-5959] - support to specify instance.id of ManagedBus
-    * [CXF-5975] - SecurityToken::isExpired: add clock skew option
-    * [CXF-6006] - StreamingOutput in JAXRS client proxies
-    * [CXF-6019] - WSDLGetUtils: original exception isn't logged by exceptions in WSDL parser
+    * [CXF-4242] - Add exception name to faultstring/detail/stackTrace
+    * [CXF-6051] - Support sp13:Nonce + sp13:Created in the UsernameTokenInterceptor
+    * [CXF-6054] - Add a property to allow using unsigned saml tokens as principals
+    * [CXF-6086] - Disable SSLv3 by default for clients (+ servers based on Jetty)
+    * [CXF-6087] - Add a way to exclude (multiple) SSL/TLS protocols in the HTTPJ namespace
+    * [CXF-6107] - Supporting (Un)marshaller aware XML Readers and Writers in jaxb data binding
+    * [CXF-6110] - AbstractSTSClient MEX: download XML schema from Location
+    * [CXF-6120] - Optionally disable the creation of the JMS Security Context for incoming messages
+
 
 ** Task
-    * [CXF-4913] - Add 'validate' option to WADL to Java generator
-    * [CXF-5993] - Update to Jettison 1.3.6
+    * [CXF-6121] - Update to Jettison 1.3.7
 
 ** Test
-    * [CXF-5882] - UDPTransportTest.testLargeRequest always failed on some machine
+    * [CXF-6070] - NPE while calling a webservice using a clientproxy
 
+** Wish
+    * [CXF-6068] - Make org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor compatible with WebSphere 7
 
-
-8. Known issues
-
-If you are using AES encryption with GCM for symmetric encryption in
-XML/WS-Security, there is a problem if you are using BouncyCastle < 1.49 or
-1.50. To circumvent this either of the following steps can be taken:
-
-a) Upgrade to BouncyCastle 1.49 (or 1.51 when it gets released) OR
-b) Set the system property "org.apache.xml.security.cipher.gcm.useIvParameterSpec" to "true".
 
 
