@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.spnego;
+package org.apache.cxf.systest.kerberos.wssec.spnego;
 
 import java.net.URL;
 
