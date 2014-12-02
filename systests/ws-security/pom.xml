@@ -200,12 +200,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.directory.server</groupId>
-            <artifactId>apacheds-kerberos-shared</artifactId>
-            <version>1.5.7</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.cxf.services.xkms</groupId>
             <artifactId>cxf-services-xkms-client</artifactId>
             <version>${project.version}</version>
