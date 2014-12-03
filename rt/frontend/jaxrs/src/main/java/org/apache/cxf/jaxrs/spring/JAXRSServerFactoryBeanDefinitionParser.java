@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -231,28 +230,20 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                 } catch (ClassNotFoundException ex) {
                     throw new BeanCreationException("Failed to create bean from classfile", ex);
                 }
-            } else if (serviceAnnotationClass != null) {
-                List<Object> services = new LinkedList<Object>();
-                List<Object> providers = new LinkedList<Object>();
-                for (Object obj : ctx.getBeansWithAnnotation(serviceAnnotationClass).values()) {
-                    Class<?> cls = obj.getClass();
-                    if (cls.getAnnotation(Path.class) != null) {
-                        services.add(obj);
-                    } else if (cls.getAnnotation(Provider.class) != null) {
-                        providers.add(obj);
-                    } 
-                }
-                this.setServiceBeans(services);
-                this.setProviders(providers);
-            } else if (!serviceBeansAvailable && !providerBeansAvailable && !resourceProvidersAvailable) {
-                AbstractSpringComponentScanServer scanServer = new AbstractSpringComponentScanServer() { };
-                scanServer.setApplicationContext(context);
-                scanServer.setJaxrsResources(this);
+            } else if (serviceAnnotationClass != null
+                || !serviceBeansAvailable && !providerBeansAvailable && !resourceProvidersAvailable) {
+                discoverContextResources(serviceAnnotationClass);
             }
             if (bus == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
         }        
+        private void discoverContextResources(Class<? extends Annotation> serviceAnnotationClass) {
+            AbstractSpringComponentScanServer scanServer = 
+                new AbstractSpringComponentScanServer(serviceAnnotationClass) { };
+            scanServer.setApplicationContext(context);
+            scanServer.setJaxrsResources(this);
+        }
         @SuppressWarnings("unchecked")
         private Class<? extends Annotation> loadServiceAnnotationClass() {
             if (serviceAnnotation != null) {
