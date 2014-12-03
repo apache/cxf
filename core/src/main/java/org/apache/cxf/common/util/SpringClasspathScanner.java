@@ -165,6 +165,9 @@ class SpringClasspathScanner extends ClasspathScanner {
             //in OSGi should use spring-dm OsgiBundleResourcePatternResolver
             // which can handle bundle url
             Bundle bundle = null;
+            if (loader == null) {
+                loader = Thread.currentThread().getContextClassLoader();
+            }
             if (loader instanceof BundleDelegatingClassLoader) {
                 bundle = ((BundleDelegatingClassLoader)loader).getBundle();
             } else {
