@@ -56,7 +56,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(Server2.class);
     
     final TestParam test;
     
@@ -70,7 +70,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(Server2.class, true)
         );
         assertTrue(
                    "Server failed to launch",
