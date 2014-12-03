@@ -90,12 +90,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.directory.server</groupId>
-            <artifactId>apacheds-kerberos-shared</artifactId>
-            <version>1.5.7</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
             <version>${project.version}</version>
