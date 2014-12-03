@@ -54,6 +54,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
     private boolean callPreDestroy = true;
     private String postConstructMethodName;
     private String preDestroyMethodName;
+    private Object singletonInstance; 
     
     public SpringResourceFactory() {
         
@@ -78,21 +79,32 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
         isSingleton = ac.isSingleton(beanId);
         if (!isSingleton) {
             isPrototype = ac.isPrototype(beanId);
+        } else {
+            try {
+                singletonInstance = ac.getBean(beanId);
+            } catch (BeansException ex) {
+                // ignore for now, can be to do with no default constructor available
+            }
         }
+        
     }
     
     /**
      * {@inheritDoc}
      */
     public Object getInstance(Message m) {
-        ProviderInfo<?> application = m == null ? null
-            : (ProviderInfo<?>)m.getExchange().getEndpoint().get(Application.class.getName());
-        Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null 
-            : Collections.singletonMap(Application.class, application.getProvider()));
-        Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton(), mapValues);
-        Object instance = values.length > 0 ? ac.getBean(beanId, values) : ac.getBean(beanId);
-        initInstance(m, instance);
-        return instance;
+        if (singletonInstance != null) {
+            return singletonInstance;
+        } else {
+            ProviderInfo<?> application = m == null ? null
+                : (ProviderInfo<?>)m.getExchange().getEndpoint().get(Application.class.getName());
+            Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null 
+                : Collections.singletonMap(Application.class, application.getProvider()));
+            Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton(), mapValues);
+            Object instance = values.length > 0 ? ac.getBean(beanId, values) : ac.getBean(beanId);
+            initInstance(m, instance);
+            return instance;
+        }
     }
 
     protected void initInstance(Message m, Object instance) {
