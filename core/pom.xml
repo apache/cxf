@@ -44,7 +44,13 @@
             org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
             org.apache.log4j*;resolution:=optional,
             net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
-            org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.springframework.osgi.io;resolution:=optional;version="${cxf.osgi.spring.osgi.version}",
+            org.springframework.osgi.util;resolution:=optional;version="${cxf.osgi.spring.osgi.version}",
+            org.springframework.aop*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.springframework.beans*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.springframework.context*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.springframework.core*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.springframework.util*;resolution:=optional;version="${cxf.osgi.spring.version}",
             org.objectweb.asm*;resolution:=optional;version="${cxf.osgi.asm.version}",
             javax.activation;version="${cxf.osgi.javax.activation.version}",
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
@@ -202,6 +208,18 @@
                     <artifactId>msv-testharness</artifactId>
                 </exclusion>
             </exclusions>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-io</artifactId>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-core</artifactId>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>

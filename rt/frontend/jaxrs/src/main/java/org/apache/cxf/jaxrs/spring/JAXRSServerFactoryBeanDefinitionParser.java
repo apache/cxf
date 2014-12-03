@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.spring;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.bus.osgi.CXFActivator;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.StringUtils;
@@ -192,8 +194,14 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             
             try {
                 if (basePackages != null) {
-                    final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
-                        ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
+                    //if run CXF in OSGi, we should pass in the classloader associated with
+                    //the bundle which has JAXRS resources under a certain basePackages
+                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                    final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
+                        CXFActivator.isInOSGi()
+                            ? ClasspathScanner.findClasses(
+                                  basePackages, Arrays.asList(Provider.class, Path.class), loader)
+                            : ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
                                               
                     this.setProviders(createBeans(classes.get(Provider.class)));
                     this.setServiceBeans(createBeans(classes.get(Path.class)));

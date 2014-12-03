@@ -28,7 +28,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.bus.osgi.CXFActivator;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -36,6 +39,8 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.ClassUtils;
 
 class SpringClasspathScanner extends ClasspathScanner {
@@ -156,8 +161,20 @@ class SpringClasspathScanner extends ClasspathScanner {
     }
     
     private ResourcePatternResolver getResolver(ClassLoader loader) {
-        return loader != null 
-            ? new PathMatchingResourcePatternResolver(loader) : new PathMatchingResourcePatternResolver();
+        if (CXFActivator.isInOSGi()) {
+            //in OSGi should use spring-dm OsgiBundleResourcePatternResolver
+            // which can handle bundle url
+            Bundle bundle = null;
+            if (loader instanceof BundleDelegatingClassLoader) {
+                bundle = ((BundleDelegatingClassLoader)loader).getBundle();
+            } else {
+                bundle = FrameworkUtil.getBundle(SpringClasspathScanner.class);
+            }
+            return new OsgiBundleResourcePatternResolver(bundle);
+        } else {
+            return loader != null 
+                ? new PathMatchingResourcePatternResolver(loader) : new PathMatchingResourcePatternResolver();
+        }
     }
        
     private boolean shouldSkip(final String classname) {

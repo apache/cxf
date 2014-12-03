@@ -56,6 +56,7 @@
         <cxf.osgi.symbolic.name>${project.groupId}.${project.artifactId}</cxf.osgi.symbolic.name>
         <cxf.osgi.dynamic.import />
         <cxf.osgi.spring.version>[3.1,5)</cxf.osgi.spring.version>
+        <cxf.osgi.spring.osgi.version>[1.2.0,2)</cxf.osgi.spring.osgi.version>
         <cxf.osgi.commons.lang.version>[2.4,3)</cxf.osgi.commons.lang.version>
         <cxf.osgi.slf4j.version>[1.5,2)</cxf.osgi.slf4j.version>
         <cxf.osgi.javax.annotation.version>[0.0,2)</cxf.osgi.javax.annotation.version>
@@ -1294,6 +1295,16 @@
                         <artifactId>commons-logging</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.osgi</groupId>
+                <artifactId>spring-osgi-io</artifactId>
+                <version>${cxf.spring.osgi.version}</version>
+            </dependency>
+            <dependency>
+                 <groupId>org.springframework.osgi</groupId>
+                 <artifactId>spring-osgi-core</artifactId>
+                 <version>${cxf.spring.osgi.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
