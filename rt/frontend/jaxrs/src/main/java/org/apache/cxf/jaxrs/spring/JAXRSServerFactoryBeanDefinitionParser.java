@@ -157,6 +157,10 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
         private List<String> basePackages;
         private String serviceAnnotation;
         private ApplicationContext context;
+        private boolean serviceBeansAvailable;
+        private boolean providerBeansAvailable;
+        private boolean resourceProvidersAvailable;
+        
         public SpringJAXRSServerFactoryBean() {
             super();
         }
@@ -171,7 +175,20 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                 server.destroy();
             }
         }
-        
+        @Override
+        public void setServiceBeans(List<Object> beans) {
+            super.setServiceBeans(beans);
+            this.serviceBeansAvailable = true;
+        }
+        @Override
+        public void setProviders(List<? extends Object> beans) {
+            super.setProviders(beans);
+            this.providerBeansAvailable = true;
+        }
+        public void setResourceProviders(List<ResourceProvider> rps) {
+            super.setResourceProviders(rps);
+            this.resourceProvidersAvailable = true;
+        }
         public void setBasePackages(List<String> basePackages) {
             this.basePackages = basePackages;
         }
@@ -196,7 +213,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                     factories.add(factory);
                 }
                 tempFactories.clear();
-                super.setResourceProviders(factories);
+                setResourceProviders(factories);
             }
             Class<? extends Annotation> serviceAnnotationClass = loadServiceAnnotationClass();
             if (basePackages != null) {
@@ -226,6 +243,10 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                 }
                 this.setServiceBeans(services);
                 this.setProviders(providers);
+            } else if (!serviceBeansAvailable && !providerBeansAvailable && !resourceProvidersAvailable) {
+                AbstractSpringComponentScanServer scanServer = new AbstractSpringComponentScanServer() { };
+                scanServer.setApplicationContext(context);
+                scanServer.setJaxrsResources(this);
             }
             if (bus == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));

@@ -48,6 +48,10 @@
         <jaxrs:extensionMappings>
             <entry key="json" value="application/json"/>
         </jaxrs:extensionMappings>
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.jaxrs.resources.BookStore"/>
+            <bean class="org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly"/>
+        </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="dataBinding" class="org.apache.cxf.jaxrs.provider.DataBindingProvider"/>
     <bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">

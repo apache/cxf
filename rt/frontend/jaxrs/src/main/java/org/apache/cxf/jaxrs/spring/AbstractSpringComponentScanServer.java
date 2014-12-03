@@ -37,23 +37,31 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
 
     private List<ResourceProvider> resourceProviders = new LinkedList<ResourceProvider>();
     private List<Object> jaxrsProviders = new LinkedList<Object>();
-
-    
-    protected void setRootResources(JAXRSServerFactoryBean factory) {
+    private Class<? extends Annotation> serviceAnnotation;
+    protected AbstractSpringComponentScanServer() {
+        
+    }
+    protected AbstractSpringComponentScanServer(Class<? extends Annotation> serviceAnnotation) {
+        this.serviceAnnotation = serviceAnnotation;
+    }
+    protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
         boolean checkJaxrsRoots = checkJaxrsRoots();
         boolean checkJaxrsProviders = checkJaxrsProviders(); 
         
         for (String beanName : applicationContext.getBeanDefinitionNames()) {
-            if (checkJaxrsRoots && isAnnotationAvailable(beanName, Path.class)) {
+            if (checkJaxrsRoots && isAnnotationAvailable(beanName, Path.class)
+                && (serviceAnnotation == null || isAnnotationAvailable(beanName, serviceAnnotation))) {
                 SpringResourceFactory resourceFactory = new SpringResourceFactory(beanName);
                 resourceFactory.setApplicationContext(applicationContext);
                 resourceProviders.add(resourceFactory);
-            } else if (checkJaxrsProviders && isAnnotationAvailable(beanName, Provider.class)) {
+            } else if (checkJaxrsProviders && isAnnotationAvailable(beanName, Provider.class)
+                && (serviceAnnotation == null || isAnnotationAvailable(beanName, serviceAnnotation))) {
                 jaxrsProviders.add(applicationContext.getBean(beanName));
             }
         }
 
         factory.setResourceProviders(getResourceProviders());
+        factory.setProviders(getJaxrsProviders());
     }
     
     protected <A extends Annotation> boolean isAnnotationAvailable(String beanName, Class<A> annClass) {
