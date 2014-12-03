@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
@@ -78,6 +80,8 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             bean.addPropertyValue(name, q);
         } else if ("basePackages".equals(name)) {            
             bean.addPropertyValue("basePackages", ClasspathScanner.parsePackages(val));
+        } else if ("serviceAnnotation".equals(name)) {
+            bean.addPropertyValue("serviceAnnotation", val);
         } else {
             mapToProperty(bean, name, val);
         }
@@ -151,6 +155,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
         
         private List<SpringResourceFactory> tempFactories;
         private List<String> basePackages;
+        private String serviceAnnotation;
         private ApplicationContext context;
         public SpringJAXRSServerFactoryBean() {
             super();
@@ -171,6 +176,10 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             this.basePackages = basePackages;
         }
         
+        public void setServiceAnnotation(String serviceAnnotation) {
+            this.serviceAnnotation = serviceAnnotation;
+        }
+        
         public void setTempResourceProviders(List<SpringResourceFactory> providers) {
             tempFactories = providers;
         }
@@ -189,30 +198,59 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                 tempFactories.clear();
                 super.setResourceProviders(factories);
             }
-            
+            Class<? extends Annotation> serviceAnnotationClass = loadServiceAnnotationClass();
             try {
                 if (basePackages != null) {
                     @SuppressWarnings("unchecked")
                     final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
                         ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
                                               
-                    this.setProviders(createBeans(classes.get(Provider.class)));
-                    this.setServiceBeans(createBeans(classes.get(Path.class)));
+                    this.setServiceBeans(createBeansFromDiscoveredClasses(classes.get(Path.class),
+                                                                          serviceAnnotationClass));
+                    this.setProviders(createBeansFromDiscoveredClasses(classes.get(Provider.class),
+                                                                       serviceAnnotationClass));
+                } catch (IOException ex) {
+                    throw new BeanDefinitionStoreException("I/O failure during classpath scanning", ex);
+                } catch (ClassNotFoundException ex) {
+                    throw new BeanCreationException("Failed to create bean from classfile", ex);
                 }
-            } catch (IOException ex) {
-                throw new BeanDefinitionStoreException("I/O failure during classpath scanning", ex);
-            } catch (ClassNotFoundException ex) {
-                throw new BeanCreationException("Failed to create bean from classfile", ex);
+            } else if (serviceAnnotationClass != null) {
+                List<Object> services = new LinkedList<Object>();
+                List<Object> providers = new LinkedList<Object>();
+                for (Object obj : ctx.getBeansWithAnnotation(serviceAnnotationClass).values()) {
+                    Class<?> cls = obj.getClass();
+                    if (cls.getAnnotation(Path.class) != null) {
+                        services.add(obj);
+                    } else if (cls.getAnnotation(Provider.class) != null) {
+                        providers.add(obj);
+                    } 
+                }
+                this.setServiceBeans(services);
+                this.setProviders(providers);
             }
-            
             if (bus == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
         }        
-        private List<Object> createBeans(Collection<Class<?>> classes) {
+        @SuppressWarnings("unchecked")
+        private Class<? extends Annotation> loadServiceAnnotationClass() {
+            if (serviceAnnotation != null) {
+                try {
+                    return (Class<? extends Annotation>)ClassLoaderUtils.loadClass(serviceAnnotation, this.getClass());
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            } 
+            return null;
+        }
+        private List<Object> createBeansFromDiscoveredClasses(Collection<Class<?>> classes, 
+                                                              Class<? extends Annotation> serviceClassAnnotation) {
             AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
             final List< Object > providers = new ArrayList< Object >();
             for (final Class< ? > clazz: classes) {
+                if (serviceClassAnnotation != null && clazz.getAnnotation(serviceClassAnnotation) == null) {
+                    continue;
+                }
                 Object bean = null;
                 try {
                     bean = beanFactory.createBean(clazz, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
