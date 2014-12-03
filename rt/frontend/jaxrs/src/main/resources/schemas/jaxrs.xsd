@@ -69,6 +69,7 @@
           <xsd:attribute name="docLocation" type="xsd:string"/>
           <xsd:attribute name="publishedEndpointUrl" type="xsd:string"/>
           <xsd:attribute name="basePackages" type="xsd:string"/>
+          <xsd:attribute name="serviceAnnotation" type="xsd:string"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
