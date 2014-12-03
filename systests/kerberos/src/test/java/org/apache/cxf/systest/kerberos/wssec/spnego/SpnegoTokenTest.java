@@ -45,6 +45,7 @@ import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.apache.directory.server.core.kerberos.KeyDerivationInterceptor;
 import org.apache.wss4j.dom.WSSConfig;
 import org.example.contract.doubleit.DoubleItPortType;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
@@ -126,7 +127,6 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         outputStream.close();
         
         System.setProperty("java.security.krb5.conf", f2.getPath());
-        System.setProperty("sun.security.krb5.debug", "false");
     }
     
     @BeforeClass
@@ -145,7 +145,7 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
                 basedir += "/..";
             }
 
-            System.setProperty("sun.security.krb5.debug", "true");
+            // System.setProperty("sun.security.krb5.debug", "true");
             System.setProperty("java.security.auth.login.config", 
                                basedir + "/kerberos/src/test/resources/kerberos.jaas");
             
@@ -261,7 +261,7 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
             SecurityTestUtil.enableStreaming(kerberosPort);
         }
         
-        kerberosPort.doubleIt(25);
+        Assert.assertEquals(50, kerberosPort.doubleIt(25));
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
