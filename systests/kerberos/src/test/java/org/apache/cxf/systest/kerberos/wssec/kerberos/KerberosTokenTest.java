@@ -25,12 +25,15 @@ import java.io.FileOutputStream;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.kerberos.common.SecurityTestUtil;
+import org.apache.cxf.systest.kerberos.wssec.sts.STSServer;
+import org.apache.cxf.systest.kerberos.wssec.sts.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.directory.server.annotations.CreateKdcServer;
@@ -97,6 +100,10 @@ public class KerberosTokenTest extends AbstractLdapTestUnit {
     static final String STAX_PORT = TestUtil.getPortNumber(StaxServer.class);
     static final String PORT2 = TestUtil.getPortNumber(Server.class, 2);
     static final String STAX_PORT2 = TestUtil.getPortNumber(StaxServer.class, 2);
+    
+    static final String PORT3 = TestUtil.getPortNumber(Server.class, 3);
+    static final String STSPORT = TestUtil.getPortNumber(STSServer.class);
+    static final String STAX_STSPORT = TestUtil.getPortNumber(StaxSTSServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -166,8 +173,22 @@ public class KerberosTokenTest extends AbstractLdapTestUnit {
             // set this to false to fork
             AbstractBusClientServerTestBase.launchServer(StaxServer.class, true)
         );
+        
+        org.junit.Assert.assertTrue(
+            "Server failed to launch",
+            // run the server in the same process
+            // set this to false to fork
+            AbstractBusClientServerTestBase.launchServer(STSServer.class, true)
+        );
+        
+        org.junit.Assert.assertTrue(
+            "Server failed to launch",
+            // run the server in the same process
+            // set this to false to fork
+            AbstractBusClientServerTestBase.launchServer(StaxSTSServer.class, true)
+        );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -389,6 +410,24 @@ public class KerberosTokenTest extends AbstractLdapTestUnit {
         // runKerberosTest(portName, true, STAX_PORT);
     }
     
+    // In this test, a CXF client requests a SAML2 HOK Assertion from the STS, which has a 
+    // policy of requiring a KerberosToken over the TransportBinding. The CXF client 
+    // retrieves a service ticket from the KDC and inserts it into the security header of 
+    // the request. The STS validates the ticket using the KerberosTokenValidator.
+    @org.junit.Test
+    public void testWSTrustKerberosToken() throws Exception {
+
+        if (!runTests || !unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
+        String portName = "DoubleItTransportSAML2Port";
+        runKerberosSTSTest(portName, false, PORT3, STSPORT);
+        runKerberosSTSTest(portName, true, PORT3, STSPORT);
+        runKerberosSTSTest(portName, false, PORT3, STAX_STSPORT);
+        runKerberosSTSTest(portName, true, PORT3, STAX_STSPORT);
+    }
+    
     private void runKerberosTest(String portName, boolean streaming, String portNumber) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -405,6 +444,36 @@ public class KerberosTokenTest extends AbstractLdapTestUnit {
                 service.getPort(portQName, DoubleItPortType.class);
         
         TestUtil.updateAddressPort(kerberosPort, portNumber);
+        
+        if (streaming) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
+        
+        kerberosPort.doubleIt(25);
+        
+        ((java.io.Closeable)kerberosPort).close();
+        bus.shutdown(true);
+    }
+    
+    private void runKerberosSTSTest(String portName, boolean streaming, String portNumber,
+                                    String stsPortNumber) throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = KerberosTokenTest.class.getResource("sts-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, portName);
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        
+        TestUtil.updateAddressPort(kerberosPort, portNumber);
+        
+        SecurityTestUtil.updateSTSPort((BindingProvider)kerberosPort, stsPortNumber);
         
         if (streaming) {
             SecurityTestUtil.enableStreaming(kerberosPort);

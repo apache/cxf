@@ -26,6 +26,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 
 /**
@@ -86,6 +87,27 @@ public final class SecurityTestUtil {
         ((BindingProvider)port).getResponseContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
         );
+    }
+    
+    public static void updateSTSPort(BindingProvider p, String port) {
+        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        if (stsClient != null) {
+            String location = stsClient.getWsdlLocation();
+            if (location != null && location.contains("8080")) {
+                stsClient.setWsdlLocation(location.replace("8080", port));
+            } else if (location != null && location.contains("8443")) {
+                stsClient.setWsdlLocation(location.replace("8443", port));
+            }
+        }
+        stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT + ".sct");
+        if (stsClient != null) {
+            String location = stsClient.getWsdlLocation();
+            if (location.contains("8080")) {
+                stsClient.setWsdlLocation(location.replace("8080", port));
+            } else if (location.contains("8443")) {
+                stsClient.setWsdlLocation(location.replace("8443", port));
+            }
+        }
     }
     
 }

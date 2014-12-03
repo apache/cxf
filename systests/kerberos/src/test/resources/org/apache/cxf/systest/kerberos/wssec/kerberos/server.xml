@@ -54,6 +54,7 @@
     <bean id="kerberosValidator" class="org.apache.wss4j.dom.validate.KerberosTokenValidator">
         <property name="contextName" value="bob"/>
         <property name="serviceName" value="bob@service.ws.apache.org"/>
+        <property name="callbackHandler" ref="kerberosCallbackHandler"/>
     </bean>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverTransport" address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosTransportPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl" depends-on="tls-settings">
         <jaxws:properties>
@@ -177,4 +178,27 @@
             <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml2" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" endpointName="s:DoubleItTransportSAML2Port" serviceName="s:DoubleItService" depends-on="STSClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server.3}/doubleit/services/doubleittransportsaml2" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
+    <httpj:engine-factory id="STSClientAuthHttpsSettings" bus="cxf">
+        <httpj:engine port="${testutil.ports.Server.3}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="skpass">
+                    <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
+                </sec:keyManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_EXPORT_.*</sec:include>
+                    <sec:include>.*_EXPORT1024_.*</sec:include>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="false" required="false"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
 </beans>
