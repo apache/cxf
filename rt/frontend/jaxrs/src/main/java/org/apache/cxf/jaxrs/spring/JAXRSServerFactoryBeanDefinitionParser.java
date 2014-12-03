@@ -199,8 +199,8 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                 super.setResourceProviders(factories);
             }
             Class<? extends Annotation> serviceAnnotationClass = loadServiceAnnotationClass();
-            try {
-                if (basePackages != null) {
+            if (basePackages != null) {
+                try {
                     @SuppressWarnings("unchecked")
                     final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
                         ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
