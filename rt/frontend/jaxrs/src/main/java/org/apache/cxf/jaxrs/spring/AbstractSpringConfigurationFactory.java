@@ -44,8 +44,8 @@ public abstract class AbstractSpringConfigurationFactory
         factory.setTransportId(getTransportId());
         factory.setBus(applicationContext.getBean(SpringBus.class));
         
-        setRootResources(factory);
-        factory.setProviders(getJaxrsProviders());
+        setJaxrsResources(factory);
+        
         factory.setInInterceptors(getInInterceptors());
         factory.setOutInterceptors(getOutInterceptors());
         factory.setOutFaultInterceptors(getOutFaultInterceptors());
@@ -59,7 +59,7 @@ public abstract class AbstractSpringConfigurationFactory
         applicationContext = ac;
     }
     
-    protected abstract void setRootResources(JAXRSServerFactoryBean factory);
+    protected abstract void setJaxrsResources(JAXRSServerFactoryBean factory);
     
     protected List<Object> getJaxrsProviders() {
         return Collections.emptyList();
