@@ -49,6 +49,7 @@ import org.apache.directory.server.core.kerberos.KeyDerivationInterceptor;
 import org.apache.wss4j.dom.WSSConfig;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
@@ -113,27 +114,33 @@ public class KerberosTokenTest extends AbstractLdapTestUnit {
         SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
     
     private static boolean runTests;
+    private static boolean portUpdated;
     
-    public KerberosTokenTest() throws Exception {
-        String basedir = System.getProperty("basedir");
-        if (basedir == null) {
-            basedir = new File(".").getCanonicalPath();
+    @Before
+    public void updatePort() throws Exception {
+        if (!portUpdated) {
+            String basedir = System.getProperty("basedir");
+            if (basedir == null) {
+                basedir = new File(".").getCanonicalPath();
+            }
+            
+            // Read in krb5.conf and substitute in the correct port
+            File f = new File(basedir + "/src/test/resources/krb5.conf");
+            
+            FileInputStream inputStream = new FileInputStream(f);
+            String content = IOUtils.toString(inputStream, "UTF-8");
+            inputStream.close();
+            content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
+            
+            File f2 = new File(basedir + "/target/test-classes/krb5.conf");
+            FileOutputStream outputStream = new FileOutputStream(f2);
+            IOUtils.write(content, outputStream, "UTF-8");
+            outputStream.close();
+            
+            System.setProperty("java.security.krb5.conf", f2.getPath());
+            
+            portUpdated = true;
         }
-        
-        // Read in krb5.conf and substitute in the correct port
-        File f = new File(basedir + "/src/test/resources/krb5.conf");
-        
-        FileInputStream inputStream = new FileInputStream(f);
-        String content = IOUtils.toString(inputStream, "UTF-8");
-        inputStream.close();
-        content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
-        
-        File f2 = new File(basedir + "/target/test-classes/krb5.conf");
-        FileOutputStream outputStream = new FileOutputStream(f2);
-        IOUtils.write(content, outputStream, "UTF-8");
-        outputStream.close();
-        
-        System.setProperty("java.security.krb5.conf", f2.getPath());
     }
     
     @BeforeClass
