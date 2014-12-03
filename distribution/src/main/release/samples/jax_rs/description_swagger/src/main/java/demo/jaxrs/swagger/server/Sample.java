@@ -21,15 +21,20 @@ package demo.jaxrs.swagger.server;
 
 import java.util.Arrays;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiImplicitParam;
+import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
@@ -44,7 +49,7 @@ public class Sample {
         response = Item.class, 
         responseContainer = "List"
     )
-    public Response getResponse(
+    public Response getItems(
         @ApiParam(value = "Page to fetch", required = true) @QueryParam("page") @DefaultValue("1") int page) {
         return Response.ok(
             Arrays.asList(
@@ -52,5 +57,38 @@ public class Sample {
                 new Item("Item 2", "Value 2")
             )
         ).build();
+    }
+    
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/{name}")
+    @GET
+    @ApiOperation(
+        value = "Get operation with type and headers", 
+        notes = "Get operation with type and headers",
+        response = Item.class
+    )
+    public Item getItem(
+        @ApiParam(value = "language", required = true) @HeaderParam("Accept-Language") final String language,
+        @ApiParam(value = "name", required = true) @PathParam("name") String name) {
+        return new Item("name", "Value in " + language);
+    }
+    
+    @Path("/{name}")
+    @DELETE
+    @ApiOperation(
+        value = "Delete operation with implicit header", 
+        notes = "Delete operation with implicit header"
+    )
+    @ApiImplicitParams(
+       @ApiImplicitParam(
+           name = "Accept-Language", 
+           value = "language", 
+           required = true, 
+           dataType = "String", 
+           paramType = "header"
+       )
+    )
+    public Response delete(@ApiParam(value = "name", required = true) @PathParam("name") String name) {
+        return Response.ok().build();
     }
 }
