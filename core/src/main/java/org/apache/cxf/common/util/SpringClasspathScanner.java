@@ -30,8 +30,6 @@ import java.util.Map;
 
 import org.apache.cxf.bus.osgi.CXFActivator;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -39,17 +37,27 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
-import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.ClassUtils;
 
 class SpringClasspathScanner extends ClasspathScanner {
+    
+    static final SpringOsgiUtil SPRING_OSGI_UTIL;
+    
+    static {
+        SpringOsgiUtil springOsgiUtil = null;
+        try {
+            springOsgiUtil = new SpringOsgiUtil();
+        } catch (Throwable ex) {
+            springOsgiUtil = null;
+        }
+        SPRING_OSGI_UTIL = springOsgiUtil;
+    }
+    
     SpringClasspathScanner() throws Exception {
         Class.forName("org.springframework.core.io.support.PathMatchingResourcePatternResolver");
         Class.forName("org.springframework.core.type.classreading.CachingMetadataReaderFactory");
     }
     
-
     protected Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClassesInternal(
         Collection< String > basePackages, 
         List<Class< ? extends Annotation > > annotations,
@@ -161,19 +169,8 @@ class SpringClasspathScanner extends ClasspathScanner {
     }
     
     private ResourcePatternResolver getResolver(ClassLoader loader) {
-        if (CXFActivator.isInOSGi()) {
-            //in OSGi should use spring-dm OsgiBundleResourcePatternResolver
-            // which can handle bundle url
-            Bundle bundle = null;
-            if (loader == null) {
-                loader = Thread.currentThread().getContextClassLoader();
-            }
-            if (loader instanceof BundleDelegatingClassLoader) {
-                bundle = ((BundleDelegatingClassLoader)loader).getBundle();
-            } else {
-                bundle = FrameworkUtil.getBundle(SpringClasspathScanner.class);
-            }
-            return new OsgiBundleResourcePatternResolver(bundle);
+        if (CXFActivator.isInOSGi() && SPRING_OSGI_UTIL != null) {
+            return SPRING_OSGI_UTIL.getResolver(loader);
         } else {
             return loader != null 
                 ? new PathMatchingResourcePatternResolver(loader) : new PathMatchingResourcePatternResolver();
