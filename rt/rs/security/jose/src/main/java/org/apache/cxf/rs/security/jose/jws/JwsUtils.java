@@ -31,7 +31,6 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
@@ -133,39 +132,22 @@ public final class JwsUtils {
         return map;
     }
     public static JwsSignatureProvider loadSignatureProvider(boolean required) {
-        Message m = JAXRSUtils.getCurrentMessage();
-        if (m != null) {
-            String propLoc = 
-                (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_OUT_PROPS, RSSEC_SIGNATURE_PROPS);
-            if (propLoc != null) {
-                return loadSignatureProvider(propLoc, m);
-            }
-        }
-        if (required) {
-            throw new SecurityException();
-        }
-        return null;
+        return loadSignatureProvider(JAXRSUtils.getCurrentMessage(), required);
     }
-    public static JwsSignatureProvider loadSignatureProvider(String propLoc, Message m) {
-        return loadSignatureProvider(propLoc, m, false);
+    public static JwsSignatureProvider loadSignatureProvider(Message m, boolean required) {
+        Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
+                                                                  RSSEC_SIGNATURE_OUT_PROPS, RSSEC_SIGNATURE_PROPS);
+        if (props == null) {
+            return null;
+        }
+        return loadSignatureProvider(m, props, false);
     }
     public static JwsSignatureVerifier loadSignatureVerifier(boolean required) {
-        Message m = JAXRSUtils.getCurrentMessage();
-        if (m != null) {
-            String propLoc = 
-                (String)MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
-            if (propLoc != null) {
-                return loadSignatureVerifier(propLoc, m);
-            }
-        }
-        if (required) {
-            throw new SecurityException();
-        }
-        return null;
+        return loadSignatureVerifier(JAXRSUtils.getCurrentMessage(), required);
     }
     public static List<JwsSignatureProvider> loadSignatureProviders(String propLoc, Message m) {
         Properties props = loadProperties(m, propLoc);
-        JwsSignatureProvider theSigProvider = loadSignatureProvider(propLoc, m, true);
+        JwsSignatureProvider theSigProvider = loadSignatureProvider(m, props, true);
         if (theSigProvider != null) {
             return Collections.singletonList(theSigProvider);
         }
@@ -184,13 +166,18 @@ public final class JwsUtils {
         }
         return theSigProviders;
     }
-    public static JwsSignatureVerifier loadSignatureVerifier(String propLoc, Message m) {
-        return loadSignatureVerifier(propLoc, m, false);
+    public static JwsSignatureVerifier loadSignatureVerifier(Message m, boolean required) {
+        Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
+                                                                  RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
+        if (props == null) {
+            return null;
+        }
+        return loadSignatureVerifier(m, props, false);
     }
     
     public static List<JwsSignatureVerifier> loadSignatureVerifiers(String propLoc, Message m) {
         Properties props = loadProperties(m, propLoc);
-        JwsSignatureVerifier theVerifier = loadSignatureVerifier(propLoc, m, true);
+        JwsSignatureVerifier theVerifier = loadSignatureVerifier(m, props, true);
         if (theVerifier != null) {
             return Collections.singletonList(theVerifier);
         }
@@ -213,8 +200,8 @@ public final class JwsUtils {
         //TODO: validate JWS specific constraints
         return JoseUtils.validateCriticalHeaders(headers);
     }
-    private static JwsSignatureProvider loadSignatureProvider(String propLoc, Message m, boolean ignoreNullProvider) {
-        Properties props = loadProperties(m, propLoc);
+    private static JwsSignatureProvider loadSignatureProvider(Message m, Properties props, 
+                                                              boolean ignoreNullProvider) {
         JwsSignatureProvider theSigProvider = null; 
         String rsaSignatureAlgo = null;
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
@@ -234,8 +221,8 @@ public final class JwsUtils {
         }
         return theSigProvider;
     }
-    private static JwsSignatureVerifier loadSignatureVerifier(String propLoc, Message m, boolean ignoreNullVerifier) {
-        Properties props = loadProperties(m, propLoc);
+    private static JwsSignatureVerifier loadSignatureVerifier(Message m, Properties props, 
+                                                              boolean ignoreNullVerifier) {
         JwsSignatureVerifier theVerifier = null;
         String rsaSignatureAlgo = null;
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
