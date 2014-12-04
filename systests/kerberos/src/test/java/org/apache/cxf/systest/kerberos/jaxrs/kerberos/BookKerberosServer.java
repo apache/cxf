@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security;
+package org.apache.cxf.systest.kerberos.jaxrs.kerberos;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -25,7 +25,6 @@ import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.security.KerberosAuthenticationFilter;
-import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
     
@@ -38,10 +37,10 @@ public class BookKerberosServer extends AbstractBusTestServerBase {
         sf.setResourceClasses(BookStore.class);
         //default lifecycle is per-request, change it to singleton
         sf.setResourceProvider(BookStore.class,
-                               new SingletonResourceProvider(new BookStore()));
+                               new SingletonResourceProvider(new BookStoreImpl()));
         KerberosAuthenticationFilter filter = new KerberosAuthenticationFilter();
-        filter.setLoginContextName("KerberosServer");
-        filter.setCallbackHandler(getCallbackHandler("HTTP/localhost", "http"));
+        filter.setLoginContextName("bob");
+        filter.setCallbackHandler(getCallbackHandler("bob", "bob"));
         //filter.setLoginContextName("KerberosServerKeyTab");
         //filter.setServicePrincipalName("HTTP/ktab");
         sf.setProvider(filter);
