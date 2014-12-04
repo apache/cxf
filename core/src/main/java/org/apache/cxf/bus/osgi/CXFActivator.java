@@ -46,11 +46,6 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class CXFActivator implements BundleActivator {
     
-    /*
-     * a flag to tell if run the CXF in OSGi cont
-     */
-    private static boolean inOSGi;
-    
     private List<Extension> extensions;
     private ManagedWorkQueueList workQueues = new ManagedWorkQueueList();
     private ServiceTracker configAdminTracker;
@@ -61,7 +56,6 @@ public class CXFActivator implements BundleActivator {
 
     /** {@inheritDoc}*/
     public void start(BundleContext context) throws Exception {
-        inOSGi = true;
         cxfBundleListener = new CXFExtensionBundleListener(context.getBundle().getBundleId());
         context.addBundleListener(cxfBundleListener);
         cxfBundleListener.registerExistingBundles(context);
@@ -131,10 +125,6 @@ public class CXFActivator implements BundleActivator {
         workQueueServiceRegistration.unregister();
         configAdminTracker.close();
         ExtensionRegistry.removeExtensions(extensions);
-    }
-    
-    public static boolean isInOSGi() {
-        return inOSGi;
     }
 
 }

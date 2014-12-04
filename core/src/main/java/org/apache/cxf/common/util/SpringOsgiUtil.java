@@ -24,16 +24,12 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
-public class SpringOsgiUtil {
+final class SpringOsgiUtil {
 
-    SpringOsgiUtil() throws Exception {
-        Class.forName("org.springframework.osgi.io.OsgiBundleResourcePatternResolver");
-        Class.forName("org.springframework.osgi.util.BundleDelegatingClassLoader");
+    private SpringOsgiUtil() {
     }
     
-    public ResourcePatternResolver getResolver(ClassLoader loader) {
-        //in OSGi should use spring-dm OsgiBundleResourcePatternResolver
-        // which can handle bundle url
+    public static ResourcePatternResolver getResolver(ClassLoader loader) {
         Bundle bundle = null;
         if (loader == null) {
             loader = Thread.currentThread().getContextClassLoader();

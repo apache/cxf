@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.bus.osgi.CXFActivator;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -41,21 +40,22 @@ import org.springframework.util.ClassUtils;
 
 class SpringClasspathScanner extends ClasspathScanner {
     
-    static final SpringOsgiUtil SPRING_OSGI_UTIL;
-    
+    private static final Boolean IN_OSGI;
     static {
-        SpringOsgiUtil springOsgiUtil = null;
-        try {
-            springOsgiUtil = new SpringOsgiUtil();
-        } catch (Throwable ex) {
-            springOsgiUtil = null;
-        }
-        SPRING_OSGI_UTIL = springOsgiUtil;
+        IN_OSGI = isSpringInOsgi();
     }
-    
     SpringClasspathScanner() throws Exception {
         Class.forName("org.springframework.core.io.support.PathMatchingResourcePatternResolver");
         Class.forName("org.springframework.core.type.classreading.CachingMetadataReaderFactory");
+    }
+    private static boolean isSpringInOsgi() {
+        try {
+            Class.forName("org.springframework.osgi.io.OsgiBundleResourcePatternResolver");
+            Class.forName("org.springframework.osgi.util.BundleDelegatingClassLoader");
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }    
     }
     
     protected Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClassesInternal(
@@ -169,8 +169,8 @@ class SpringClasspathScanner extends ClasspathScanner {
     }
     
     private ResourcePatternResolver getResolver(ClassLoader loader) {
-        if (CXFActivator.isInOSGi() && SPRING_OSGI_UTIL != null) {
-            return SPRING_OSGI_UTIL.getResolver(loader);
+        if (IN_OSGI) {
+            return SpringOsgiUtil.getResolver(loader);
         } else {
             return loader != null 
                 ? new PathMatchingResourcePatternResolver(loader) : new PathMatchingResourcePatternResolver();
