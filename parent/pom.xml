@@ -113,9 +113,9 @@
         <cxf.jaxb21.core.version>2.1.14</cxf.jaxb21.core.version>
         <cxf.jaxb21.xjc.version>2.1.14</cxf.jaxb21.xjc.version>
         <cxf.jaxb22.version>2.2.11</cxf.jaxb22.version>
-        <cxf.jaxb22.impl.version>2.2.10-b140310.1920</cxf.jaxb22.impl.version>
-        <cxf.jaxb22.core.version>2.2.10-b140310.1920</cxf.jaxb22.core.version>
-        <cxf.jaxb22.xjc.version>2.2.10-b140310.1920</cxf.jaxb22.xjc.version>
+        <cxf.jaxb22.impl.version>${cxf.jaxb22.version}</cxf.jaxb22.impl.version>
+        <cxf.jaxb22.core.version>${cxf.jaxb22.version}</cxf.jaxb22.core.version>
+        <cxf.jaxb22.xjc.version>${cxf.jaxb22.version}</cxf.jaxb22.xjc.version>
         <!-- by default, we use jaxb 2.1, but java5 profile will override to 2.2 -->
         <cxf.jaxb.version>${cxf.jaxb21.version}</cxf.jaxb.version>
         <cxf.jaxb.impl.version>${cxf.jaxb21.impl.version}</cxf.jaxb.impl.version>
@@ -186,7 +186,7 @@
         <cxf.servicemix.specs.version>2.4.0</cxf.servicemix.specs.version>
         <cxf.servicemix.specs.version.jaxrs>2.4.0</cxf.servicemix.specs.version.jaxrs>
         <cxf.javax.mail.version>1.4.4</cxf.javax.mail.version>
-        <cxf.jaxb.bundle.version>2.2.1.1_2</cxf.jaxb.bundle.version>
+        <cxf.jaxb.bundle.version>2.2.11_1</cxf.jaxb.bundle.version>
         <cxf.saaj-impl.bundle.version>1.3.23_2</cxf.saaj-impl.bundle.version>
         <cxf.stax-ex.version>1.7.6</cxf.stax-ex.version>
         <cxf.wsdl4j.bundle.version>1.6.3_1</cxf.wsdl4j.bundle.version>
