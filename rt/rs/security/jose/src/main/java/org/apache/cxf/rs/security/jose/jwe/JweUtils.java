@@ -26,9 +26,7 @@ import java.util.Properties;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
@@ -216,33 +214,24 @@ public final class JweUtils {
                                           getContentDecryptionAlgorithm(key.getAlgorithm()));
     }
     public static JweEncryptionProvider loadEncryptionProvider(boolean required) {
-        Message m = JAXRSUtils.getCurrentMessage();
-        if (m != null) {
-            String propLoc = 
-                (String)MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_OUT_PROPS, RSSEC_ENCRYPTION_PROPS);
-            if (propLoc != null) {
-                return loadEncryptionProvider(propLoc, m);
-            }
-        }
-        if (required) {
-            throw new SecurityException();
-        }
-        return null;
+        return loadEncryptionProvider(JAXRSUtils.getCurrentMessage(), required);
     }
-    public static JweEncryptionProvider loadEncryptionProvider(String propLoc, Message m) {
-        KeyEncryptionAlgorithm keyEncryptionProvider = null;
-        Properties props = null;
-        try {
-            props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
-        } catch (Exception ex) {
-            throw new SecurityException(ex);
+    public static JweEncryptionProvider loadEncryptionProvider(Message m, boolean required) {
+        
+        Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
+                                                                  RSSEC_ENCRYPTION_OUT_PROPS, RSSEC_ENCRYPTION_PROPS);
+        if (props == null) {
+            return null;
         }
-        String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null);
+        
+        KeyEncryptionAlgorithm keyEncryptionProvider = null;
+        String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null, null);
         String contentEncryptionAlgo = getContentEncryptionAlgo(m, props, null);
         ContentEncryptionAlgorithm ctEncryptionProvider = null;
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_ENCRYPT);
-            keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, jwk.getAlgorithm());
+            keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, jwk.getAlgorithm(), 
+                                                     getDefaultKeyAlgo(jwk));
             if ("direct".equals(keyEncryptionAlgo)) {
                 contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
                 ctEncryptionProvider = getContentEncryptionAlgorithm(jwk, contentEncryptionAlgo);
@@ -260,33 +249,22 @@ public final class JweUtils {
                                     props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP));
     }
     public static JweDecryptionProvider loadDecryptionProvider(boolean required) {
-        Message m = JAXRSUtils.getCurrentMessage();
-        if (m != null) {
-            String propLoc = 
-                (String)MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
-            if (propLoc != null) {
-                return loadDecryptionProvider(propLoc, m);
-            }
-        }
-        if (required) {
-            throw new SecurityException();
-        }
-        return null;
+        return loadDecryptionProvider(JAXRSUtils.getCurrentMessage(), required);
     }
-    public static JweDecryptionProvider loadDecryptionProvider(String propLoc, Message m) {
-        KeyDecryptionAlgorithm keyDecryptionProvider = null;
-        Properties props = null;
-        try {
-            props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
-        } catch (Exception ex) {
-            throw new SecurityException(ex);
+    public static JweDecryptionProvider loadDecryptionProvider(Message m, boolean required) {
+        Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
+                                                                  RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
+        if (props == null) {
+            return null;
         }    
+        KeyDecryptionAlgorithm keyDecryptionProvider = null;
         String contentEncryptionAlgo = getContentEncryptionAlgo(m, props, null);
         SecretKey ctDecryptionKey = null;
-        String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null);
+        String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null, null);
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_DECRYPT);
-            keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, jwk.getAlgorithm());
+            keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, jwk.getAlgorithm(),
+                                                     getDefaultKeyAlgo(jwk));
             if ("direct".equals(keyEncryptionAlgo)) {
                 contentEncryptionAlgo = getContentEncryptionAlgo(m, props, contentEncryptionAlgo);
                 ctDecryptionKey = getContentDecryptionSecretKey(jwk, contentEncryptionAlgo);
@@ -422,12 +400,23 @@ public final class JweUtils {
             return getDirectKeyJweDecryption(ctDecryptionKey, contentDecryptionAlgo);
         }
     }
-    private static String getKeyEncryptionAlgo(Message m, Properties props, String algo) {
+    private static String getKeyEncryptionAlgo(Message m, Properties props, 
+                                               String algo, String defaultAlgo) {
         if (algo == null) {
+            if (defaultAlgo == null) {
+                defaultAlgo = JoseConstants.RSA_OAEP_ALGO;
+            }
             return KeyManagementUtils.getKeyAlgorithm(m, props, 
-                JSON_WEB_ENCRYPTION_KEY_ALGO_PROP, JoseConstants.RSA_OAEP_ALGO);
+                JSON_WEB_ENCRYPTION_KEY_ALGO_PROP, defaultAlgo);
         }
         return algo;
+    }
+    private static String getDefaultKeyAlgo(JsonWebKey jwk) {
+        if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
+            return JoseConstants.A128GCMKW_ALGO;
+        } else {
+            return JoseConstants.RSA_OAEP_ALGO;
+        }
     }
     private static String getContentEncryptionAlgo(Message m, Properties props, String algo) {
         if (algo == null) {

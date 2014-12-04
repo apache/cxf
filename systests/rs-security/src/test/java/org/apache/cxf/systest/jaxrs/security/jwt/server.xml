@@ -111,9 +111,8 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
-            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/public.jwk.properties"/>
-            <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/public.jwk.properties"/>
             <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+            <entry key="rs.security.keystore.file" value="org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt"/>
             <entry key="rs.security.keystore.alias.jwe.out" value="BobCert"/>
             <entry key="rs.security.keystore.alias.jws.in" value="BobCert"/>
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>

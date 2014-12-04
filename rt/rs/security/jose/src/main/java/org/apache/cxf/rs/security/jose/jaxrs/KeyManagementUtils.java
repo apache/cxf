@@ -217,4 +217,39 @@ public final class KeyManagementUtils {
         }
         return algo;
     }
+
+    public static Properties loadStoreProperties(Message m, boolean required, 
+                                                 String storeProp1, String storeProp2) {
+        if (m == null) {
+            if (required) {
+                throw new SecurityException();
+            }
+            return null;
+        }
+        Properties props = null;
+        String propLoc = 
+            (String)MessageUtils.getContextualProperty(m, storeProp1, storeProp2);
+        if (propLoc != null) {
+            try {
+                props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
+            } catch (Exception ex) {
+                throw new SecurityException(ex);
+            }
+        } else {
+            String keyFile = (String)m.getContextualProperty(RSSEC_KEY_STORE_FILE);
+            if (keyFile != null) {
+                props = new Properties();
+                props.setProperty(KeyManagementUtils.RSSEC_KEY_STORE_FILE, keyFile);
+                String type = (String)m.getContextualProperty(RSSEC_KEY_STORE_TYPE);
+                if (type == null) {
+                    type = "jwk";
+                }
+                props.setProperty(RSSEC_KEY_STORE_TYPE, type);
+            }
+        }
+        if (props == null && required) { 
+            throw new SecurityException();
+        }
+        return props; 
+    }
 }
