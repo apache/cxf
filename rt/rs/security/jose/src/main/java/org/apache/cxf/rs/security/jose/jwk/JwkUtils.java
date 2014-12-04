@@ -41,7 +41,6 @@ import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
@@ -256,9 +255,10 @@ public final class JwkUtils {
     }
 
     public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper, JwkReaderWriter reader) {
-        PrivateKeyPasswordProvider cb = loadPasswordProvider(m, props, keyOper);
+        PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
-        String kid = getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
+        String kid = 
+            KeyManagementUtils.getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
         if (kid != null) {
             return jwkSet.getKey(kid);
         } else if (keyOper != null) {
@@ -275,13 +275,13 @@ public final class JwkUtils {
 
     public static List<JsonWebKey> loadJsonWebKeys(Message m, Properties props, String keyOper, 
                                                    JwkReaderWriter reader) {
-        PrivateKeyPasswordProvider cb = loadPasswordProvider(m, props, keyOper);
+        PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
-        String kid = getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
+        String kid = KeyManagementUtils.getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
         if (kid != null) {
             return Collections.singletonList(jwkSet.getKey(kid));
         }
-        String kids = getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIASES, keyOper);
+        String kids = KeyManagementUtils.getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIASES, keyOper);
         if (kids != null) {
             String[] values = kids.split(",");
             List<JsonWebKey> keys = new ArrayList<JsonWebKey>(values.length);
@@ -386,40 +386,7 @@ public final class JwkUtils {
         return jwk;
     }
     
-    private static String getKeyId(Message m, Properties props, String preferredPropertyName, String keyOper) {
-        String kid = null;
-        String altPropertyName = null;
-        if (keyOper != null) {
-            if (keyOper.equals(JsonWebKey.KEY_OPER_ENCRYPT) || keyOper.equals(JsonWebKey.KEY_OPER_DECRYPT)) {
-                altPropertyName = preferredPropertyName + ".jwe";
-            } else if (keyOper.equals(JsonWebKey.KEY_OPER_SIGN) || keyOper.equals(JsonWebKey.KEY_OPER_VERIFY)) {
-                altPropertyName = preferredPropertyName + ".jws";
-            }
-            String direction = m.getExchange().getOutMessage() == m ? ".out" : ".in";
-            kid = (String)MessageUtils.getContextualProperty(m, altPropertyName, altPropertyName + direction);
-        }
-        
-        if (kid == null) {
-            kid = props.getProperty(preferredPropertyName);
-        }
-        if (kid == null && altPropertyName != null) {
-            kid = props.getProperty(altPropertyName);
-        }
-        return kid;
-    }
-    private static PrivateKeyPasswordProvider loadPasswordProvider(Message m, Properties props, String keyOper) {
-        PrivateKeyPasswordProvider cb = 
-            (PrivateKeyPasswordProvider)m.getContextualProperty(KeyManagementUtils.RSSEC_KEY_PSWD_PROVIDER);
-        if (cb == null && keyOper != null) {
-            String propName = keyOper.equals(JsonWebKey.KEY_OPER_SIGN) ? KeyManagementUtils.RSSEC_SIG_KEY_PSWD_PROVIDER
-                : keyOper.equals(JsonWebKey.KEY_OPER_DECRYPT) 
-                ? KeyManagementUtils.RSSEC_DECRYPT_KEY_PSWD_PROVIDER : null;
-            if (propName != null) {
-                cb = (PrivateKeyPasswordProvider)m.getContextualProperty(propName);
-            }
-        }
-        return cb;
-    }
+    
     private static JweEncryptionProvider createDefaultEncryption(char[] password) {
         KeyEncryptionAlgorithm keyEncryption = 
             new PbesHmacAesWrapKeyEncryptionAlgorithm(password, Algorithm.PBES2_HS256_A128KW.getJwtName());
