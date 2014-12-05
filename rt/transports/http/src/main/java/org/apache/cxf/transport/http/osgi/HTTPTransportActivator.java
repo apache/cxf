@@ -21,8 +21,6 @@ package org.apache.cxf.transport.http.osgi;
 
 import java.util.Properties;
 
-import javax.servlet.Servlet;
-
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -31,23 +29,16 @@ import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http.blueprint.HttpBPHandler;
-import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-public class HTTPTransportActivator 
-    implements BundleActivator {
-    private static final String CXF_CONFIG_PID = "org.apache.cxf.osgi";
-    private static final String DISABLE_DEFAULT_HTTP_TRANSPORT = CXF_CONFIG_PID + ".http.transport.disable";
+public class HTTPTransportActivator implements BundleActivator {
+    private static final String DISABLE_DEFAULT_HTTP_TRANSPORT = "org.apache.cxf.osgi.http.transport.disable";
     private ServiceTracker httpServiceTracker;
     
     public void start(final BundleContext context) throws Exception {
@@ -67,34 +58,9 @@ public class HTTPTransportActivator
         
         DestinationRegistry destinationRegistry = new DestinationRegistryImpl();
         HTTPTransportFactory transportFactory = new HTTPTransportFactory(destinationRegistry);
-        final Servlet servlet = new CXFNonSpringServlet(destinationRegistry , false);
-        httpServiceTracker = new ServiceTracker(context, HttpService.class.getName(), new ServiceTrackerCustomizer() {
-            
-            private ServiceRegistration servletPublisherReg;
-            private ServletExporter servletExporter;
-
-            @Override
-            public void removedService(ServiceReference reference, Object service) {
-                servletPublisherReg.unregister();
-                try {
-                    servletExporter.updated(null);
-                } catch (ConfigurationException e) {
-                    // Ignore
-                }
-            }
-            
-            @Override
-            public void modifiedService(ServiceReference reference, Object service) {
-            }
-            
-            @Override
-            public Object addingService(ServiceReference reference) {
-                HttpService httpService = (HttpService)context.getService(reference);
-                servletExporter = new ServletExporter(servlet, httpService);
-                servletPublisherReg = registerService(context, ManagedService.class, servletExporter, CXF_CONFIG_PID);
-                return null;
-            }
-        });
+        
+        HttpServiceTrackerCust customizer = new HttpServiceTrackerCust(destinationRegistry, context);
+        httpServiceTracker = new ServiceTracker(context, HttpService.class.getName(), customizer);
         httpServiceTracker.open();
 
         context.registerService(DestinationRegistry.class.getName(), destinationRegistry, null);

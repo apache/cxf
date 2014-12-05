@@ -128,7 +128,7 @@
     </feature>
     <feature name="cxf-http" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-core</feature>
-        <feature version="[2,5)">http</feature>
+        <bundle start-level="40">mvn:${cxf.servlet-api.group}/${cxf.servlet-api.artifact}/${cxf.servlet-api.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http/${project.version}</bundle>
     </feature>
     <feature name="cxf-http-jetty" version="${project.version}" resolver="(obr)">
