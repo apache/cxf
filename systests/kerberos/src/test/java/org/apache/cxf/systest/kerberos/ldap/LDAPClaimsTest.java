@@ -167,68 +167,6 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         }
     }
 
-<<<<<<< HEAD:services/sts/sts-core/src/test/java/org/apache/cxf/sts/ldap/LDAPClaimsTest.java
-=======
-    @org.junit.Test
-    public void testMultiUserBaseDNs() throws Exception {
-        LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandlerMultipleUserBaseDNs");
-
-        String user = props.getProperty("claimUser");
-        Assert.notNull(user, "Property 'claimUser' not configured");
-        String otherUser = props.getProperty("otherClaimUser");
-        Assert.notNull(otherUser, "Property 'otherClaimUser' not configured");
-
-        ClaimCollection requestedClaims = createRequestClaimCollection();
-
-        List<URI> expectedClaims = new ArrayList<URI>();
-        expectedClaims.add(ClaimTypes.FIRSTNAME);
-        expectedClaims.add(ClaimTypes.LASTNAME);
-        expectedClaims.add(ClaimTypes.EMAILADDRESS);
-       
-        // First user
-        ClaimsParameters params = new ClaimsParameters();
-        params.setPrincipal(new CustomTokenPrincipal(user));
-        ProcessedClaimCollection retrievedClaims = 
-            claimsHandler.retrieveClaimValues(requestedClaims, params);
-
-        Assert.isTrue(
-                      retrievedClaims.size() == expectedClaims.size(), 
-                      "Retrieved number of claims [" + retrievedClaims.size() 
-                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
-        );
-
-        for (ProcessedClaim c : retrievedClaims) {
-            if (expectedClaims.contains(c.getClaimType())) {
-                expectedClaims.remove(c.getClaimType());
-            } else {
-                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
-            }
-        }
-        
-        // Second user
-        params.setPrincipal(new CustomTokenPrincipal(otherUser));
-        retrievedClaims = claimsHandler.retrieveClaimValues(requestedClaims, params);
-
-        expectedClaims.add(ClaimTypes.FIRSTNAME);
-        expectedClaims.add(ClaimTypes.LASTNAME);
-        expectedClaims.add(ClaimTypes.EMAILADDRESS);
-        
-        Assert.isTrue(
-                      retrievedClaims.size() == expectedClaims.size(), 
-                      "Retrieved number of claims [" + retrievedClaims.size() 
-                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
-        );
-
-        for (ProcessedClaim c : retrievedClaims) {
-            if (expectedClaims.contains(c.getClaimType())) {
-                expectedClaims.remove(c.getClaimType());
-            } else {
-                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
-            }
-        }
-    }
->>>>>>> 7bf10fc... Moving LDAP tests to new integration module + re-enabling:systests/kerberos/src/test/java/org/apache/cxf/systest/kerberos/ldap/LDAPClaimsTest.java
-
     @org.junit.Test(expected = STSException.class)
     public void testRetrieveClaimsWithUnsupportedMandatoryClaimType() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
