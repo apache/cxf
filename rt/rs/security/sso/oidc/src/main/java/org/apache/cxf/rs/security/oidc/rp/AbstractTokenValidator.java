@@ -41,7 +41,9 @@ public abstract class AbstractTokenValidator {
     private WebClient jwkSetClient;
     private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>(); 
     
-    protected JwtToken getJwtToken(String wrappedJwtToken, String clientId, String idTokenKid, 
+    protected JwtToken getJwtToken(String wrappedJwtToken, 
+                                   String clientId,
+                                   String idTokenKid, 
                                    boolean jweOnly) {
         if (wrappedJwtToken == null) {
             throw new SecurityException("ID Token is missing");
@@ -89,13 +91,14 @@ public abstract class AbstractTokenValidator {
             throw new SecurityException("Provider Jwk Set Client is not available");
         }
         String keyId = idTokenKid != null ? idTokenKid : jwtConsumer.getJwtToken().getHeaders().getKeyId();
-        if (keyId == null) {
-            throw new SecurityException("Provider JWK key id is null");
-        }
-        JsonWebKey key = keyMap.get(keyId);
+        JsonWebKey key = keyId != null ? keyMap.get(keyId) : null;
         if (key == null) {
             JsonWebKeys keys = jwkSetClient.get(JsonWebKeys.class);
-            key = keys.getKey(keyId);
+            if (keyId != null) {
+                key = keys.getKey(keyId);
+            } else if (keys.getKeys().size() == 1) {
+                key = keys.getKeys().get(0);
+            }
             keyMap.putAll(keys.getKeyIdMap());
         }
         if (key == null) {

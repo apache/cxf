@@ -20,11 +20,13 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.net.URI;
 
+import javax.crypto.SecretKey;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
@@ -42,6 +44,9 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
     private static final long serialVersionUID = -3738825769770411453L;
     private JwsSignatureProvider sigProvider;
     private JweEncryptionProvider encryptionProvider;
+    private String clientSecret;
+    private boolean encryptWithClientSecret;
+    private boolean signWithClientSecret;
     // can be a client id
     private String issuer;
     public JwtRequestCodeGrant() {
@@ -64,13 +69,16 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
         this.sigProvider = signatureProvider;
     }
     
-    protected JwsSignatureProvider getInitializedSigProvider(JoseHeaders headers) {
+    protected JwsSignatureProvider getInitializedSigProvider() {
         if (sigProvider != null) {
             return sigProvider;    
         } 
-        JwsSignatureProvider theSigProvider = JwsUtils.loadSignatureProvider(true); 
-        headers.setAlgorithm(theSigProvider.getAlgorithm());
-        return theSigProvider;
+        if (signWithClientSecret) {
+            byte[] hmac = CryptoUtils.decodeSequence(clientSecret);
+            return JwsUtils.getHmacSignatureProvider(hmac, JoseConstants.HMAC_SHA_256_ALGO);
+        } else {
+            return JwsUtils.loadSignatureProvider(true);
+        }
     }
     public MultivaluedMap<String, String> toMap() {
         String request = getRequest();
@@ -87,8 +95,7 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
             claims.setClaim(key, map.getFirst(key));
         }
         JwsJwtCompactProducer producer = new JwsJwtCompactProducer(claims);
-        JoseHeaders headers = new JoseHeaders();
-        JwsSignatureProvider theSigProvider = getInitializedSigProvider(headers);
+        JwsSignatureProvider theSigProvider = getInitializedSigProvider();
         String request = producer.signWith(theSigProvider);
         
         JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
@@ -101,11 +108,31 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
         if (encryptionProvider != null) {
             return encryptionProvider;    
         } 
-        return JweUtils.loadEncryptionProvider(false);
+        if (encryptWithClientSecret) {
+            SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
+            return JweUtils.getDirectKeyJweEncryption(key, JoseConstants.A128GCM_ALGO);
+        } else {
+            return JweUtils.loadEncryptionProvider(false);
+        }
     }
 
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
-    
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+    public void setEncryptWithClientSecret(boolean encryptWithClientSecret) {
+        if (signWithClientSecret) {
+            throw new SecurityException();
+        }
+        this.encryptWithClientSecret = encryptWithClientSecret;
+    }
+    public void setSignWithClientSecret(boolean signWithClientSecret) {
+        if (encryptWithClientSecret) {
+            throw new SecurityException();
+        }
+        this.signWithClientSecret = signWithClientSecret;
+    }
 }

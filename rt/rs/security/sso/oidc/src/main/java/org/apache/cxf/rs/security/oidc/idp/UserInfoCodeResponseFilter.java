@@ -16,24 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oidc.rp.idp;
+package org.apache.cxf.rs.security.oidc.idp;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
-import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
 import org.apache.cxf.rs.security.oidc.common.UserToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
-public class UserInfoCodeResponseFilter implements AccessTokenResponseFilter {
-    private JwsSignatureProvider sigProvider;
-    private JweEncryptionProvider encryptionProvider;
+public class UserInfoCodeResponseFilter extends AbstractJwsJweProducer implements AccessTokenResponseFilter {
     private UserInfoProvider userInfoProvider;
     private String issuer;
     @Override
@@ -44,40 +39,22 @@ public class UserInfoCodeResponseFilter implements AccessTokenResponseFilter {
         token.setAudience(st.getClient().getClientId());
         
         JwsJwtCompactProducer producer = new JwsJwtCompactProducer(token);
-        JoseHeaders headers = new JoseHeaders();
-        JwsSignatureProvider theSigProvider = getInitializedSigProvider(headers);
+        JwsSignatureProvider theSigProvider = getInitializedSigProvider(st.getClient(), true);
         String idToken = producer.signWith(theSigProvider);
         
-        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
+        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider(st.getClient(), false);
         if (theEncryptionProvider != null) {
             idToken = theEncryptionProvider.encrypt(StringUtils.toBytesUTF8(idToken), null);
         }
         ct.getParameters().put(OidcUtils.ID_TOKEN, idToken);
         
     }
-    public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
-        this.sigProvider = signatureProvider;
-    }
     
-    protected JwsSignatureProvider getInitializedSigProvider(JoseHeaders headers) {
-        if (sigProvider != null) {
-            return sigProvider;    
-        } 
-        JwsSignatureProvider theSigProvider = JwsUtils.loadSignatureProvider(true); 
-        headers.setAlgorithm(theSigProvider.getAlgorithm());
-        return theSigProvider;
-    }
-    protected JweEncryptionProvider getInitializedEncryptionProvider() {
-        if (encryptionProvider != null) {
-            return encryptionProvider;    
-        } 
-        return JweUtils.loadEncryptionProvider(false);
-    }
-
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
     public void setUserInfoProvider(UserInfoProvider userInfoProvider) {
         this.userInfoProvider = userInfoProvider;
     }
+    
 }
