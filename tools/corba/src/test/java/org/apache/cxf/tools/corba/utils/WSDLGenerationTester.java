@@ -30,8 +30,10 @@ import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.cxf.wsdl11.CatalogWSDLLocator;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
@@ -161,7 +163,10 @@ public class WSDLGenerationTester {
         WSDLReader reader = factory.newWSDLReader();
         reader.setFeature("javax.wsdl.importDocuments", false);
         reader.setExtensionRegistry(wm.getExtensionRegistry());
-        Definition wsdlDefn = reader.readWSDL(defnFile.toString());
+        final String url = defnFile.toString();
+        CatalogWSDLLocator locator = new CatalogWSDLLocator(url, (Bus)null);
+
+        Definition wsdlDefn = reader.readWSDL(locator);
         
         WSDLWriter wsdlWriter = factory.newWSDLWriter();
         wsdlWriter.writeWSDL(wsdlDefn, writer);
