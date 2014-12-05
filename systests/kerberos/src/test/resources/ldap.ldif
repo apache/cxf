@@ -1,0 +1,73 @@
+dn: dc=example,dc=com
+dc: example
+objectClass: top
+objectClass: domain
+
+dn: ou=users,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: ou=other-users,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: other-users
+
+dn: ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=employee,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: employee
+member: cn=alice,ou=users,dc=example,dc=com
+member: cn=bob,ou=other-users,dc=example,dc=com
+description: This is an employee
+
+dn: cn=boss,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: boss
+member: cn=alice,ou=users,dc=example,dc=com
+description: The boss
+
+# Web server identity/service principal.
+dn: cn=bob,ou=other-users,dc=example,dc=com
+objectclass: top
+objectclass: person
+objectclass: inetOrgPerson
+objectclass: organizationalPerson
+cn: bob
+sn: green
+uid: bob
+mail: bob@users.apache.org
+givenname: bob2
+userpassword: security
+
+# User / client principal.
+dn: cn=alice,ou=users,dc=example,dc=com
+objectclass: top
+objectclass: person
+objectclass: inetOrgPerson
+objectclass: organizationalPerson
+cn: alice
+sn: smith
+uid: alice
+mail: alice@users.apache.org
+givenname: alice2
+userpassword: security
+
+dn: uid=admin,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: system administrator
+sn: administrator
+displayName: Directory Superuser
+uid: admin
+userPassword:: e1NTSEF9c2UyV0ZiWHowL2RjSkVuTWgvOWNOZnIzUXU4YUg1R1gvM2E1OFE9P
+ Q==
+
