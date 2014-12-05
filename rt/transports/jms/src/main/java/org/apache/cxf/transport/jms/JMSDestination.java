@@ -248,7 +248,8 @@ public class JMSDestination extends AbstractMultiplexDestination
             }
             //need to propagate any exceptions back to Spring container 
             //so transactions can occur
-            if (inMessage.getContent(Exception.class) != null && session != null) {
+            if (inMessage.getContent(Exception.class) != null && session != null
+                    && jmsConfig.isPropogateExceptions()) {
                 PlatformTransactionManager m = jmsConfig.getTransactionManager();
                 if (m != null) {
                     TransactionStatus status = m.getTransaction(null);

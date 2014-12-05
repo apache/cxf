@@ -46,21 +46,28 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
     static EmbeddedJMSBrokerLauncher broker;
 
     public static class Server extends AbstractBusTestServerBase {
-    
         protected void run()  {
             // create the application context
             ClassPathXmlApplicationContext context = 
                 new ClassPathXmlApplicationContext("org/apache/cxf/systest/jms/tx/jms_server_config.xml");
             context.start();
             
+            ConnectionFactory connectionFactory
+                = context.getBean("jmsConnectionFactory", ConnectionFactory.class);
+            
+            publishEndpoint(connectionFactory, "greeter.queue.noaop", true);
+            publishEndpoint(connectionFactory, "greeter.queue.noaop2", false);
+        }
+
+        private void publishEndpoint(ConnectionFactory connectionFactory, String queueName, 
+                boolean propogateExceptions) {
             EndpointImpl endpoint = new EndpointImpl(new GreeterImplWithTransaction());
             endpoint.setAddress("jms://");
             JMSConfiguration jmsConfig = new JMSConfiguration();
     
-            ConnectionFactory connectionFactory
-                = context.getBean("jmsConnectionFactory", ConnectionFactory.class);
+            jmsConfig.setPropogateExceptions(propogateExceptions);
             jmsConfig.setConnectionFactory(connectionFactory);
-            jmsConfig.setTargetDestination("greeter.queue.noaop");
+            jmsConfig.setTargetDestination(queueName);
             jmsConfig.setSessionTransacted(true);
             jmsConfig.setPubSubDomain(false);
             jmsConfig.setUseJms11(true);
@@ -111,8 +118,40 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         Greeter greeter = service.getPort(portName, Greeter.class);
         doService(greeter, true);
     }
+    
     @Test
     public void testNonAopTransaction() throws Exception {
+        Greeter greeter = getServiceClient("greeter.queue.noaop");
+        doService(greeter, false);
+    }
+    
+    @Test
+    public void testNonAopTransactionNoPropogation() throws Exception {
+        Greeter greeter = getServiceClient("greeter.queue.noaop2");
+        
+        String response1 = new String("Hello ");
+        
+        String greeting = greeter.greetMe("Good guy");
+        assertNotNull("No response received from service", greeting);
+        String exResponse = response1 + "Good guy";
+        assertEquals("Get unexpected result", exResponse, greeting);
+
+        try {
+            greeter.greetMe("Bad guy");
+            fail("Should have thrown Exception");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Got a bad guy call for greetMe"));
+        }
+        
+        try {
+            greeter.pingMe();
+            fail("Should have thrown FaultException");
+        } catch (PingMeFault ex) {
+            assertNotNull(ex.getFaultInfo());
+        }
+    }
+    
+    private Greeter getServiceClient(String queueName) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress("jms://");
@@ -121,7 +160,7 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         ConnectionFactory connectionFactory
             = new PooledConnectionFactory(broker.getBrokerURL());
         jmsConfig.setConnectionFactory(connectionFactory);
-        jmsConfig.setTargetDestination("greeter.queue.noaop");
+        jmsConfig.setTargetDestination(queueName);
         jmsConfig.setPubSubDomain(false);
         jmsConfig.setUseJms11(true);
 
@@ -129,11 +168,10 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         jmsConfigFeature.setJmsConfig(jmsConfig);
         factory.getFeatures().add(jmsConfigFeature);
 
-        Greeter greeter = (Greeter)factory.create();
-        doService(greeter, false);
-    }    
+        return (Greeter)factory.create();
+    }
+    
     public void doService(Greeter greeter, boolean doEx) throws Exception {
-
         String response1 = new String("Hello ");
         
         try {
@@ -141,12 +179,12 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
             String greeting = greeter.greetMe("Good guy");
             assertNotNull("No response received from service", greeting);
             String exResponse = response1 + "Good guy";
-            assertEquals("Get unexcpeted result", exResponse, greeting);
+            assertEquals("Get unexpected result", exResponse, greeting);
 
             greeting = greeter.greetMe("Bad guy");
             assertNotNull("No response received from service", greeting);
             exResponse = response1 + "[Bad guy]";
-            assertEquals("Get unexcpeted result", exResponse, greeting);
+            assertEquals("Get unexpected result", exResponse, greeting);
             
             if (doEx) {
                 try {
@@ -160,5 +198,4 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
             throw (Exception)ex.getCause();
         }
     }
-
 }
