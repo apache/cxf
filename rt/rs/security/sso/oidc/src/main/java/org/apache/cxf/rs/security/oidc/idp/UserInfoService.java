@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oidc.rp.idp;
+package org.apache.cxf.rs.security.oidc.idp;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -26,22 +26,16 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactProducer;
-import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthContextUtils;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
 @Path("/userinfo")
-public class UserInfoService {
-    // TODO: review if it makes sense to do JWE and JWS at the out filter level instead
-    private JwsSignatureProvider sigProvider;
-    private JweEncryptionProvider encryptionProvider;
+public class UserInfoService extends AbstractJwsJweProducer {
     private UserInfoProvider userInfoProvider;
     private String issuer;
     
@@ -61,9 +55,8 @@ public class UserInfoService {
         Object responseEntity = userInfo;
         
         JwsJwtCompactProducer producer = new JwsJwtCompactProducer(userInfo);
-        JoseHeaders headers = new JoseHeaders();
-        JwsSignatureProvider theSigProvider = getInitializedSigProvider(headers);
-        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
+        JwsSignatureProvider theSigProvider = getInitializedSigProvider(null, false);
+        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider(null, false);
         if (theSigProvider != null) {
             String userInfoString = producer.signWith(theSigProvider);
             if (theEncryptionProvider != null) {
@@ -77,30 +70,9 @@ public class UserInfoService {
         return Response.ok(responseEntity).build();
         
     }
-    public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
-        this.sigProvider = signatureProvider;
-    }
     
-    protected JwsSignatureProvider getInitializedSigProvider(JoseHeaders headers) {
-        if (sigProvider != null) {
-            return sigProvider;    
-        } 
-        JwsSignatureProvider theSigProvider = JwsUtils.loadSignatureProvider(false); 
-        headers.setAlgorithm(theSigProvider.getAlgorithm());
-        return theSigProvider;
-    }
-    protected JweEncryptionProvider getInitializedEncryptionProvider() {
-        if (encryptionProvider != null) {
-            return encryptionProvider;    
-        } 
-        return JweUtils.loadEncryptionProvider(false);
-    }
-
     public void setIssuer(String issuer) {
         this.issuer = issuer;
-    }
-    public UserInfoProvider getUserInfoProvider() {
-        return userInfoProvider;
     }
     public void setUserInfoProvider(UserInfoProvider userInfoProvider) {
         this.userInfoProvider = userInfoProvider;

@@ -207,11 +207,11 @@ public final class JwsUtils {
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_SIGN);
             if (jwk != null) {
-                rsaSignatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm());
+                rsaSignatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm(), getDefaultKeyAlgo(jwk));
                 theSigProvider = JwsUtils.getSignatureProvider(jwk, rsaSignatureAlgo);
             }
         } else {
-            rsaSignatureAlgo = getSignatureAlgo(m, props, null);
+            rsaSignatureAlgo = getSignatureAlgo(m, props, null, null);
             RSAPrivateKey pk = (RSAPrivateKey)KeyManagementUtils.loadPrivateKey(m, props, 
                 JsonWebKey.KEY_OPER_SIGN);
             theSigProvider = getRSAKeySignatureProvider(pk, rsaSignatureAlgo);
@@ -228,12 +228,12 @@ public final class JwsUtils {
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_VERIFY);
             if (jwk != null) {
-                rsaSignatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm());
+                rsaSignatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm(), getDefaultKeyAlgo(jwk));
                 theVerifier = JwsUtils.getSignatureVerifier(jwk, rsaSignatureAlgo);
             }
             
         } else {
-            rsaSignatureAlgo = getSignatureAlgo(m, props, null);
+            rsaSignatureAlgo = getSignatureAlgo(m, props, null, null);
             theVerifier = getRSAKeySignatureVerifier(
                               (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props), rsaSignatureAlgo);
         }
@@ -249,12 +249,23 @@ public final class JwsUtils {
             throw new SecurityException(ex);
         }
     }
-    private static String getSignatureAlgo(Message m, Properties props, String algo) {
+    private static String getSignatureAlgo(Message m, Properties props, String algo, String defaultAlgo) {
         if (algo == null) {
-            return KeyManagementUtils.getKeyAlgorithm(m, props, 
-                                               JSON_WEB_SIGNATURE_ALGO_PROP, JoseConstants.RS_SHA_256_ALGO);
+            if (defaultAlgo == null) {
+                defaultAlgo = JoseConstants.RS_SHA_256_ALGO;
+            }
+            return KeyManagementUtils.getKeyAlgorithm(m, props, JSON_WEB_SIGNATURE_ALGO_PROP, defaultAlgo);
         }
         return algo;
+    }
+    private static String getDefaultKeyAlgo(JsonWebKey jwk) {
+        if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
+            return JoseConstants.HMAC_SHA_256_ALGO;
+        } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
+            return JoseConstants.ES_SHA_256_ALGO;
+        } else {
+            return JoseConstants.RS_SHA_256_ALGO;
+        }
     }
     private static JwsCompactConsumer verify(JwsSignatureVerifier v, String content) {
         JwsCompactConsumer jws = new JwsCompactConsumer(content);
