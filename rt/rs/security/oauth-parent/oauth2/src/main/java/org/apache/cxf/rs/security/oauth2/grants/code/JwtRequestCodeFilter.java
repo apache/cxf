@@ -20,13 +20,16 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
@@ -47,6 +50,7 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
     private boolean verifyWithClientSecret;
     private boolean decryptWithClientSecret;
     private String issuer;
+    private JsonMapObjectReaderWriter jsonHandler = new JsonMapObjectReaderWriter();
     @Override
     public MultivaluedMap<String, String> process(MultivaluedMap<String, String> params, 
                                                   UserSubject endUser,
@@ -72,7 +76,16 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
             MultivaluedMap<String, String> newParams = new MetadataMap<String, String>();
             Map<String, Object> claimsMap = claims.asMap();
             for (Map.Entry<String, Object> entry : claimsMap.entrySet()) {
-                newParams.putSingle(entry.getKey(), entry.getValue().toString());
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (value instanceof Map) {
+                    Map<String, Object> map = CastUtils.cast((Map<?, ?>)value);
+                    value = jsonHandler.toJson(map);
+                } else if (value instanceof List) {
+                    List<Object> list = CastUtils.cast((List<?>)value);
+                    value = jsonHandler.toJson(list);
+                } 
+                newParams.putSingle(key, value.toString());
             }
             return newParams;
         } else {
