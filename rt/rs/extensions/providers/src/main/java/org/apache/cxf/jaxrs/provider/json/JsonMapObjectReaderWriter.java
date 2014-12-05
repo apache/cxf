@@ -129,8 +129,11 @@ public class JsonMapObjectReaderWriter {
         return nextMap.map;
     }
     public List<Object> fromJsonAsList(String json) {
+        return fromJsonAsList(null, json);
+    }
+    public List<Object> fromJsonAsList(String name, String json) {
         String theJson = json.trim();
-        return internalFromJsonAsList(theJson.substring(1, theJson.length() - 1));
+        return internalFromJsonAsList(name, theJson.substring(1, theJson.length() - 1));
     }
     protected void readJsonObjectAsSettable(Settable values, String json) {
         for (int i = 0; i < json.length(); i++) {
@@ -157,18 +160,18 @@ public class JsonMapObjectReaderWriter {
             } else if (json.charAt(sepIndex + j) == '[') {
                 int closingIndex = getClosingIndex(json, '[', ']', sepIndex + j);
                 String newJson = json.substring(sepIndex + j + 1, closingIndex);
-                values.put(name, internalFromJsonAsList(newJson));
+                values.put(name, internalFromJsonAsList(name, newJson));
                 i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, sepIndex + j);
-                Object value = readPrimitiveValue(json, sepIndex + j, commaIndex);
+                Object value = readPrimitiveValue(name, json, sepIndex + j, commaIndex);
                 values.put(name, value);
                 i = commaIndex + 1;
             }
             
         }
     }
-    protected List<Object> internalFromJsonAsList(String json) {
+    protected List<Object> internalFromJsonAsList(String name, String json) {
         List<Object> values = new LinkedList<Object>();
         for (int i = 0; i < json.length(); i++) {
             if (isWhiteSpace(json.charAt(i))) {
@@ -182,7 +185,7 @@ public class JsonMapObjectReaderWriter {
                 i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, i);
-                Object value = readPrimitiveValue(json, i, commaIndex);
+                Object value = readPrimitiveValue(name, json, i, commaIndex);
                 values.add(value);
                 i = commaIndex;
             }
@@ -190,7 +193,7 @@ public class JsonMapObjectReaderWriter {
         
         return values;
     }
-    protected Object readPrimitiveValue(String json, int from, int to) {
+    protected Object readPrimitiveValue(String name, String json, int from, int to) {
         Object value = json.substring(from, to);
         String valueStr = value.toString().trim(); 
         if (valueStr.startsWith("\"")) {
