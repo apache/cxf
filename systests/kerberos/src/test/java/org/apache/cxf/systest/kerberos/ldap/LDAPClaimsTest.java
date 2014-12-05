@@ -17,22 +17,19 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.ldap;
+package org.apache.cxf.systest.kerberos.ldap;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.SearchControls;
-
+import org.apache.commons.io.IOUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -42,23 +39,58 @@ import org.apache.cxf.sts.claims.LdapClaimsHandler;
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.directory.server.annotations.CreateLdapServer;
+import org.apache.directory.server.annotations.CreateTransport;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
+import org.apache.directory.server.core.annotations.CreateDS;
+import org.apache.directory.server.core.annotations.CreateIndex;
+import org.apache.directory.server.core.annotations.CreatePartition;
+import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
+import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.ldap.core.AttributesMapper;
-import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.filter.AndFilter;
-import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.util.Assert;
 
-public class LDAPClaimsTest {
+@RunWith(FrameworkRunner.class)
 
-    private static ClassPathXmlApplicationContext appContext;
+//Define the DirectoryService
+@CreateDS(name = "LDAPClaimsTest-class",
+  enableAccessControl = false,
+  allowAnonAccess = false,
+  enableChangeLog = true,
+  partitions = {
+        @CreatePartition(
+            name = "example",
+            suffix = "dc=example,dc=com",
+            indexes = {
+                @CreateIndex(attribute = "objectClass"),
+                @CreateIndex(attribute = "dc"),
+                @CreateIndex(attribute = "ou")
+            }
+        ) }
+)
+
+@CreateLdapServer(
+  transports = {
+        @CreateTransport(protocol = "LDAP")
+        }
+)
+
+//Inject an file containing entries
+@ApplyLdifFiles("ldap.ldif")
+
+public class LDAPClaimsTest extends AbstractLdapTestUnit {
+
     private static Properties props;
-
+    private static boolean portUpdated;
+    
+    private ClassPathXmlApplicationContext appContext;
+    
     @BeforeClass
-    public static void setUpLdap() throws Exception {
-        appContext = new ClassPathXmlApplicationContext("ldap.xml");
+    public static void startServers() throws Exception {
         props = new Properties();
 
         InputStream is = null;
@@ -74,9 +106,34 @@ public class LDAPClaimsTest {
         }
     }
 
+    @Before
+    public void updatePort() throws Exception {
+        if (!portUpdated) {
+            String basedir = System.getProperty("basedir");
+            if (basedir == null) {
+                basedir = new File(".").getCanonicalPath();
+            }
+            
+            // Read in ldap.xml and substitute in the correct port
+            File f = new File(basedir + "/src/test/resources/ldap.xml");
+            
+            FileInputStream inputStream = new FileInputStream(f);
+            String content = IOUtils.toString(inputStream, "UTF-8");
+            inputStream.close();
+            content = content.replaceAll("portno", "" + super.getLdapServer().getPort());
+            
+            File f2 = new File(basedir + "/target/test-classes/ldapport.xml");
+            FileOutputStream outputStream = new FileOutputStream(f2);
+            IOUtils.write(content, outputStream, "UTF-8");
+            outputStream.close();
+            
+            portUpdated = true;
+        }
+        
+        appContext = new ClassPathXmlApplicationContext("ldapport.xml");
+    }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testRetrieveClaims() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
 
@@ -108,11 +165,9 @@ public class LDAPClaimsTest {
                 Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
             }
         }
-
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testMultiUserBaseDNs() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandlerMultipleUserBaseDNs");
 
@@ -172,7 +227,6 @@ public class LDAPClaimsTest {
     }
 
     @org.junit.Test(expected = STSException.class)
-    @org.junit.Ignore
     public void testRetrieveClaimsWithUnsupportedMandatoryClaimType() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
 
@@ -188,11 +242,27 @@ public class LDAPClaimsTest {
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
-        claimsHandler.retrieveClaimValues(requestedClaims, params);
+        ProcessedClaimCollection processedClaim = 
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
+        
+        for (Claim requestedClaim : requestedClaims) {
+            URI claimType = requestedClaim.getClaimType();
+            boolean found = false;
+            if (!requestedClaim.isOptional()) {
+                for (ProcessedClaim c : processedClaim) {
+                    if (c.getClaimType().equals(claimType)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new STSException("Mandatory claim '" + claim.getClaimType() + "' not found");
+                }
+            }
+        }
     }
-
+    
     @org.junit.Test
-    @org.junit.Ignore
     public void testRetrieveClaimsWithUnsupportedOptionalClaimType() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
 
@@ -231,24 +301,7 @@ public class LDAPClaimsTest {
             }
         }
     }
-
-    private ClaimCollection createRequestClaimCollection() {
-        ClaimCollection claims = new ClaimCollection();
-        Claim claim = new Claim();
-        claim.setClaimType(ClaimTypes.FIRSTNAME);
-        claim.setOptional(true);
-        claims.add(claim);
-        claim = new Claim();
-        claim.setClaimType(ClaimTypes.LASTNAME);
-        claim.setOptional(true);
-        claims.add(claim);
-        claim = new Claim();
-        claim.setClaimType(ClaimTypes.EMAILADDRESS);
-        claim.setOptional(true);
-        claims.add(claim);
-        return claims;
-    }
-
+    
     @org.junit.Test    
     public void testSupportedClaims() throws Exception {
 
@@ -273,65 +326,21 @@ public class LDAPClaimsTest {
         }
     }
 
-
-    @org.junit.Test
-    @org.junit.Ignore    
-    public void testLdapTemplate() throws Exception {
-
-        try {
-            LdapTemplate ldap = (LdapTemplate)appContext.getBean("ldapTemplate");
-
-            String user = props.getProperty("claimUser");
-            Assert.notNull(user, "Property 'claimUser' not configured");
-
-            String dn = null;
-
-            AndFilter filter = new AndFilter();
-            filter.and(new EqualsFilter("objectclass", "person")).and(new EqualsFilter("cn", user));
-
-            //find DN of user
-            AttributesMapper mapper = 
-                new AttributesMapper() {
-                    public Object mapFromAttributes(Attributes attrs) throws NamingException {
-                        return attrs.get("distinguishedName").get();
-                    }
-                };
-            @SuppressWarnings("rawtypes")
-            List users = 
-                ldap.search(
-                            "OU=users,DC=emea,DC=mycompany,DC=com", 
-                            filter.toString(), 
-                            SearchControls.SUBTREE_SCOPE,
-                            mapper
-                );
-
-            Assert.isTrue(users.size() == 1, "Only one user expected");
-            dn = (String)users.get(0);
-
-            // get attributes
-            AttributesMapper mapper2 = 
-                new AttributesMapper() {
-                    public Object mapFromAttributes(Attributes attrs) throws NamingException {
-                        Map<String, String> map = new HashMap<String, String>();
-                        NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
-                        while (attrEnum.hasMore()) {
-                            Attribute att = attrEnum.next();
-                            System.out.println(att.toString());
-                        }
-    
-                        map.put("cn", (String)attrs.get("cn").get());
-                        map.put("mail", (String)attrs.get("mail").get());
-                        map.put("sn", (String)attrs.get("sn").get());
-                        map.put("givenName", (String)attrs.get("givenName").get());
-                        return map;
-                    }
-                };
-            ldap.lookup(dn, new String[] {"cn", "mail", "sn", "givenName", "c"}, mapper2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
+    private ClaimCollection createRequestClaimCollection() {
+        ClaimCollection claims = new ClaimCollection();
+        Claim claim = new Claim();
+        claim.setClaimType(ClaimTypes.FIRSTNAME);
+        claim.setOptional(true);
+        claims.add(claim);
+        claim = new Claim();
+        claim.setClaimType(ClaimTypes.LASTNAME);
+        claim.setOptional(true);
+        claims.add(claim);
+        claim = new Claim();
+        claim.setClaimType(ClaimTypes.EMAILADDRESS);
+        claim.setOptional(true);
+        claims.add(claim);
+        return claims;
     }
-
+    
 }
