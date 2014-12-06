@@ -305,9 +305,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
         contextClasses = new LinkedHashSet<Class<?>>();
         
-        if(this.getUnmarshallerProperties()==null||this.getUnmarshallerProperties().isEmpty()){
-        	Map<String, Object> unmarshallerProps = new HashMap<String, Object>();
-        	this.setUnmarshallerProperties(unmarshallerProps);
+        if (this.getUnmarshallerProperties() == null || this.getUnmarshallerProperties().isEmpty()) {
+            Map<String, Object> unmarshallerProps = new HashMap<String, Object>();
+            this.setUnmarshallerProperties(unmarshallerProps);
         }
         
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
