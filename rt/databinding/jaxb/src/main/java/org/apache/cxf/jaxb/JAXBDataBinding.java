@@ -307,11 +307,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             return;
         }
 
-
         contextClasses = new LinkedHashSet<Class<?>>();
         
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
-            
             JAXBContextInitializer initializer
                 = new JAXBContextInitializer(serviceInfo, contextClasses, typeRefs, this.getUnmarshallerProperties());
             initializer.walk();
