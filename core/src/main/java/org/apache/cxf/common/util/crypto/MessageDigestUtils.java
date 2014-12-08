@@ -43,7 +43,7 @@ public final class MessageDigestUtils {
     public static String generate(byte[] input, String algo) {    
         try {
             byte[] messageDigest = createDigest(input, algo);
-            StringBuffer hexString = new StringBuffer();
+            StringBuilder hexString = new StringBuilder();
             for (int i = 0; i < messageDigest.length; i++) {
                 hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
             }
@@ -66,9 +66,7 @@ public final class MessageDigestUtils {
     
     public static byte[] createDigest(byte[] input, String algo) throws NoSuchAlgorithmException { 
         MessageDigest md = MessageDigest.getInstance(algo);
-        md.reset();
-        md.update(input);
-        return md.digest();
+        return md.digest(input);
     }
     
 }
