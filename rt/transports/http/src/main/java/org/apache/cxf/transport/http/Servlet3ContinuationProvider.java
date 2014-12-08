@@ -27,6 +27,7 @@ import javax.servlet.AsyncListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationCallback;
 import org.apache.cxf.continuations.ContinuationProvider;
@@ -72,6 +73,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
     }
     
     public class Servlet3Continuation implements Continuation, AsyncListener {
+        private static final String BLOCK_RESTART = "org.apache.cxf.continuation.block.restart";
         AsyncContext context;
         volatile boolean isNew = true;
         volatile boolean isResumed;
@@ -79,16 +81,20 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         volatile boolean isComplete;
         volatile Object obj;
         private ContinuationCallback callback;
+        private boolean blockRestart;
         public Servlet3Continuation() {
             req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
                              inMessage.getExchange().getInMessage());
             callback = inMessage.getExchange().get(ContinuationCallback.class);
+            blockRestart = PropertyUtils.isTrue(inMessage.getContextualProperty(BLOCK_RESTART));
             context = req.startAsync(req, resp);
             context.addListener(this);
         }
 
         void startAsyncAgain() {
-            
+            if (blockRestart) {
+                return;
+            }
             AsyncContext old = context;
             try {
                 context = req.startAsync();
