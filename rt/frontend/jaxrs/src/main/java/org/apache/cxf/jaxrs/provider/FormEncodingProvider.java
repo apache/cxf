@@ -52,8 +52,8 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 @Produces({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Consumes({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Provider
-public class FormEncodingProvider<T> implements 
-    MessageBodyReader<T>, MessageBodyWriter<T> {
+public class FormEncodingProvider<T> extends AbstractConfigurableProvider 
+    implements MessageBodyReader<T>, MessageBodyWriter<T> {
         
     private FormValidator validator;
     @Context private MessageContext mc;
