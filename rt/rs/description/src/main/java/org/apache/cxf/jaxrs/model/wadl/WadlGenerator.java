@@ -2068,10 +2068,9 @@ public class WadlGenerator implements ContainerRequestFilter {
             if (useJaxbContextForQnames) {
                 jaxbQname = getJaxbQName(null, serviceClass, new HashMap<Class<?>, QName>(0));
             }
-            String pName = jaxbQname == null ? PackageUtils.getPackageName(serviceClass) : jaxbQname
-                .getNamespaceURI();
+            String pName = jaxbQname == null ? PackageUtils.getPackageName(serviceClass) : null;
             String localName = jaxbQname == null ? serviceClass.getSimpleName() : jaxbQname.getLocalPart();
-            String nsName = jaxbQname == null ? pName + "." : "{" + pName + "}";
+            String nsName = jaxbQname == null ? pName + "." : "";
             return nsName + localName;
         }
 
