@@ -55,6 +55,7 @@ public class MapEventLogger implements MapEventListener {
         fieldOrder.add(KEYS.CANCEL_PRINCIPAL.name());
         fieldOrder.add(KEYS.RENEW_PRINCIPAL.name());
         fieldOrder.add(KEYS.TOKENTYPE.name());
+        fieldOrder.add(KEYS.KEYTYPE.name());
         fieldOrder.add(KEYS.APPLIESTO.name());
         fieldOrder.add(KEYS.CLAIMS_PRIMARY.name());
         fieldOrder.add(KEYS.CLAIMS_SECONDARY.name());

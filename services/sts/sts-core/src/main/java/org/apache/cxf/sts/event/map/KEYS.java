@@ -38,5 +38,6 @@ public enum KEYS {
     REMOTE_HOST,
     REMOTE_PORT,
     URL,
-    STACKTRACE
+    STACKTRACE,
+    KEYTYPE
 }

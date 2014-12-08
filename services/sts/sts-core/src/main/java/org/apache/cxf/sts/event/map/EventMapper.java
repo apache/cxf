@@ -105,8 +105,9 @@ public class EventMapper implements STSEventListener {
             if (params.getTokenRequirements().getActAs() != null) {
                 map.put(KEYS.ACTAS_PRINCIPAL.name(), params.getTokenRequirements().getActAs().getPrincipal().getName());
             }
-        } else {
-            map.put(KEYS.TOKENTYPE.name(), "N.A.");
+        }
+        if(params.getKeyRequirements() != null) {
+            map.put(KEYS.KEYTYPE.name(), params.getKeyRequirements().getKeyType());
         }
         if (params.getPrincipal() != null) {
             map.put(KEYS.WS_SEC_PRINCIPAL.name(), params.getPrincipal().getName());
@@ -143,6 +144,9 @@ public class EventMapper implements STSEventListener {
             map.put(KEYS.VALIDATE_PRINCIPAL.name(), params.getTokenRequirements().getValidateTarget().getPrincipal()
                     .getName());
         }
+        if(params.getKeyRequirements() != null) {
+            map.put(KEYS.KEYTYPE.name(), params.getKeyRequirements().getKeyType());
+        }
         if (params.getPrincipal() != null) {
             map.put(KEYS.WS_SEC_PRINCIPAL.name(), params.getPrincipal().getName());
         }
@@ -161,6 +165,9 @@ public class EventMapper implements STSEventListener {
         if (params.getTokenRequirements().getActAs() != null) {
             map.put(KEYS.CANCEL_PRINCIPAL.name(), params.getTokenRequirements().getCancelTarget().getPrincipal()
                     .getName());
+        }
+        if(params.getKeyRequirements() != null) {
+            map.put(KEYS.KEYTYPE.name(), params.getKeyRequirements().getKeyType());
         }
         if (params.getPrincipal() != null) {
             map.put(KEYS.WS_SEC_PRINCIPAL.name(), params.getPrincipal().getName());
@@ -182,6 +189,9 @@ public class EventMapper implements STSEventListener {
         }
         if (params.getPrincipal() != null) {
             map.put(KEYS.WS_SEC_PRINCIPAL.name(), params.getPrincipal().getName());
+        }
+        if(params.getKeyRequirements() != null) {
+            map.put(KEYS.KEYTYPE.name(), params.getKeyRequirements().getKeyType());
         }
         map.put(KEYS.REALM.name(), params.getRealm());
         map.put(KEYS.APPLIESTO.name(), params.getAppliesToAddress());
