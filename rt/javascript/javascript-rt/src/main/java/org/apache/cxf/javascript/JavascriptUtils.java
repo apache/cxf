@@ -338,6 +338,13 @@ public class JavascriptUtils {
     public void generateCodeToSerializeElement(ParticleInfo elementInfo,
                                                String referencePrefix,
                                                SchemaCollection schemaCollection) {
+        if (elementInfo.isGroup()) {
+            for (ParticleInfo childElement : elementInfo.getChildren()) {
+                generateCodeToSerializeElement(childElement, referencePrefix, schemaCollection);
+            }
+            return;
+        }
+
         XmlSchemaType type = elementInfo.getType();
         boolean nillable = elementInfo.isNillable();
         boolean optional = elementInfo.isOptional();
@@ -563,9 +570,10 @@ public class JavascriptUtils {
                                                 contextName, object);
         }
         if (!(object instanceof XmlSchemaElement)
-            && !(object instanceof XmlSchemaAny)) {
+            && !(object instanceof XmlSchemaAny)
+            && !(object instanceof XmlSchemaChoice)) {
             unsupportedConstruct("GROUP_CHILD",
-                                                object.getClass().getSimpleName(), contextName,
+                    object.getClass().getSimpleName(), contextName,
                                                 object);
         }
 
