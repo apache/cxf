@@ -32,7 +32,17 @@ import org.junit.Test;
  * 
  */
 public class WSDLToJavaScriptTest extends ProcessorTestBase {
-    
+
+    public int countChar(String text, char symbol) {
+        int count = 0;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == symbol) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     // just run with a minimum of fuss.
     @Test
     public void testGeneration() throws Exception {
@@ -52,6 +62,9 @@ public class WSDLToJavaScriptTest extends ProcessorTestBase {
         FileInputStream fis = new FileInputStream(resultFile);
         String javascript = IOUtils.readStringFromStream(fis);
         assertTrue(javascript.contains("xmlns:murble='http://apache.org/hello_world_soap_http'"));
+        assertEquals("Number of '{' does not match number of '}' in generated JavaScript.",
+                countChar(javascript, '{'),
+                countChar(javascript, '}'));
     }
    
     @Test
@@ -72,6 +85,9 @@ public class WSDLToJavaScriptTest extends ProcessorTestBase {
         FileInputStream fis = new FileInputStream(resultFile);
         String javascript = IOUtils.readStringFromStream(fis);
         assertTrue(javascript.contains("xmlns:murble='http://apache.org/hello_world_soap_http'"));
+        assertEquals("Number of '{' does not match number of '}' in generated JavaScript.",
+                countChar(javascript, '{'),
+                countChar(javascript, '}'));
     }
    
 }

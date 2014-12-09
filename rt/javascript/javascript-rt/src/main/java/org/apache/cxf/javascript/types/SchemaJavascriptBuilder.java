@@ -156,6 +156,7 @@ public class SchemaJavascriptBuilder {
                     domDeserializerFunction(element.getQName(), complexType);
                 }
             } catch (UnsupportedConstruct usc) {
+                LOG.warning(usc.getMessage());
                 continue; // it could be empty, but the style checker
                 // would complain.
             }
@@ -189,7 +190,7 @@ public class SchemaJavascriptBuilder {
         for (XmlSchemaObject thing : items) {
             ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, xmlSchema, xmlSchemaCollection,
                                                               prefixAccumulator, type.getQName());
-            constructOneItem(type, elementPrefix, typeObjectName, itemInfo);
+            constructItem(type, elementPrefix, typeObjectName, itemInfo);
         }
 
         for (XmlSchemaAnnotated thing : attrs) {
@@ -200,6 +201,18 @@ public class SchemaJavascriptBuilder {
 
         code.append("}\n\n");
         code.append(accessors.toString());
+    }
+
+    private void constructItem(XmlSchemaComplexType type, final String elementPrefix,
+                               String typeObjectName, ParticleInfo itemInfo) {
+        if (!itemInfo.isGroup()) {
+            constructOneItem(type, elementPrefix, typeObjectName, itemInfo);
+            return;
+        }
+
+        for (ParticleInfo childInfo : itemInfo.getChildren()) {
+            constructItem(type, elementPrefix, typeObjectName, childInfo);
+        }
     }
 
     private void constructOneItem(XmlSchemaComplexType type, final String elementPrefix,
@@ -396,7 +409,7 @@ public class SchemaJavascriptBuilder {
                 }
                 deserializeAny(type, itemInfo, nextItem);
             } else {
-                deserializeElement(type, contentElement);
+                deserializeElement(type, itemInfo);
             }
         }
         utils.appendLine("return newobject;");
@@ -528,9 +541,14 @@ public class SchemaJavascriptBuilder {
         utils.appendLine("newobject.setAny(anyHolder);");
     }
 
-    private void deserializeElement(XmlSchemaComplexType type, XmlSchemaObject thing) {
-        ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, xmlSchema, xmlSchemaCollection,
-                                                          prefixAccumulator, type.getQName());
+    private void deserializeElement(XmlSchemaComplexType type, ParticleInfo itemInfo) {
+        if (itemInfo.isGroup()) {
+            for (ParticleInfo childElement : itemInfo.getChildren()) {
+                deserializeElement(type, childElement);
+            }
+            return;
+        }
+
         XmlSchemaType itemType = itemInfo.getType();
         boolean simple = itemType instanceof XmlSchemaSimpleType
                          || JavascriptUtils.notVeryComplexType(itemType);
