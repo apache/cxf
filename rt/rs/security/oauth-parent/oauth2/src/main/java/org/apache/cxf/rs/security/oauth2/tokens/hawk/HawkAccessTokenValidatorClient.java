@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -33,6 +34,14 @@ public class HawkAccessTokenValidatorClient extends AbstractHawkAccessTokenValid
                                                              String authSchemeData) {
         return validator.validateAccessToken(mc, OAuthConstants.HAWK_AUTHORIZATION_SCHEME, 
                                              authSchemeData);
+    }
+
+    public void setValidator(AccessTokenValidator validator) {
+        List<String> schemes = validator.getSupportedAuthorizationSchemes();
+        if (!schemes.contains("*") && !schemes.contains(OAuthConstants.HAWK_AUTHORIZATION_SCHEME)) { 
+            throw new IllegalArgumentException();
+        }
+        this.validator = validator;
     }
     
 }
