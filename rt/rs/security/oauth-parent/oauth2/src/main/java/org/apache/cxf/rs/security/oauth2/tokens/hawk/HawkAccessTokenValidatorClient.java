@@ -24,13 +24,33 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class HawkAccessTokenValidatorClient extends AbstractHawkAccessTokenValidator {
     private AccessTokenValidator validator;
         
+    public AccessTokenValidation validateAccessToken(MessageContext mc,
+                                                     String authScheme, 
+                                                     String authSchemeData, 
+                                                     MultivaluedMap<String, String> extraProps) 
+        throws OAuthServiceException {
+        if (isRemoteSignatureValidation()) {
+            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            if (extraProps != null) {
+                map.putAll(extraProps);
+            }
+            map.putSingle(HTTP_VERB, mc.getRequest().getMethod());
+            map.putSingle(HTTP_URI, mc.getUriInfo().getRequestUri().toString());
+            return validator.validateAccessToken(mc, authScheme, authSchemeData, map);
+        } else {
+            return super.validateAccessToken(mc, authScheme, authSchemeData, extraProps);
+        }
+        
+    }
     protected AccessTokenValidation getAccessTokenValidation(MessageContext mc,
                                                              String authScheme, 
                                                              String authSchemeData, 
