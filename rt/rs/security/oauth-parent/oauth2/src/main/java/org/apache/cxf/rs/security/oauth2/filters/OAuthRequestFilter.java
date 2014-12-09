@@ -110,6 +110,15 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             throw new WebApplicationException(403);
         }
       
+        if (accessTokenV.getClientIpAddress() != null) {
+            String remoteAddress = getMessageContext().getHttpServletRequest().getRemoteAddr();
+            if (remoteAddress == null || accessTokenV.getClientIpAddress().matches(remoteAddress)) {
+                String message = "Client IP Address is invalid";
+                LOG.warning(message);
+                throw new WebApplicationException(403);
+            }
+        }
+        
         // Create the security context and make it available on the message
         SecurityContext sc = createSecurityContext(req, accessTokenV);
         m.put(SecurityContext.class, sc);

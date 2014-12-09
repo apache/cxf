@@ -33,6 +33,7 @@ public class Client implements Serializable {
     
     private String clientId;
     private String clientSecret;
+    private String clientIpAddress;
     
     private String applicationName;
     private String applicationDescription;
@@ -294,5 +295,13 @@ public class Client implements Serializable {
      */
     public void setApplicationCertificates(List<String> applicationCertificates) {
         this.applicationCertificates = applicationCertificates;
+    }
+
+    public String getClientIpAddress() {
+        return clientIpAddress;
+    }
+
+    public void setClientIpAddress(String clientIpAddress) {
+        this.clientIpAddress = clientIpAddress;
     }
 }
