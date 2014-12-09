@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -32,8 +34,10 @@ public class HawkAccessTokenValidator extends AbstractHawkAccessTokenValidator {
     private boolean remoteSignatureValidation;
         
     protected AccessTokenValidation getAccessTokenValidation(MessageContext mc,
-                                                             Map<String, String> schemeParams,
-                                                             String authSchemeData) {
+                                                             String authScheme, 
+                                                             String authSchemeData, 
+                                                             MultivaluedMap<String, String> extraProps,
+                                                             Map<String, String> schemeParams) {
         String macKey = schemeParams.get(OAuthConstants.HAWK_TOKEN_ID);
         ServerAccessToken accessToken = dataProvider.getAccessToken(macKey);
         if (!(accessToken instanceof HawkAccessToken)) {

@@ -21,10 +21,11 @@ package org.apache.cxf.rs.security.oauth2.filters;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -40,12 +41,17 @@ public class AccessTokenValidatorClient implements AccessTokenValidator {
 
     public AccessTokenValidation validateAccessToken(MessageContext mc,
                                                      String authScheme, 
-                                                     String authSchemeData) 
+                                                     String authSchemeData,
+                                                     MultivaluedMap<String, String> extraProps) 
         throws OAuthServiceException {
         WebClient client = WebClient.fromClient(tokenValidatorClient, true);
-        Form form = new Form().param(OAuthConstants.AUTHORIZATION_SCHEME_TYPE, authScheme)
-                              .param(OAuthConstants.AUTHORIZATION_SCHEME_DATA, authSchemeData);
-        return client.post(form, AccessTokenValidation.class);
+        MultivaluedMap<String, String> props = new MetadataMap<String, String>();
+        props.putSingle(OAuthConstants.AUTHORIZATION_SCHEME_TYPE, authScheme);
+        props.putSingle(OAuthConstants.AUTHORIZATION_SCHEME_DATA, authSchemeData);
+        if (extraProps != null) {
+            props.putAll(extraProps);
+        }
+        return client.post(props, AccessTokenValidation.class);
     }
 
     public void setTokenValidatorClient(WebClient tokenValidatorClient) {

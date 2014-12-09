@@ -21,6 +21,8 @@ package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 
@@ -28,6 +30,7 @@ public interface AccessTokenValidator {
     List<String> getSupportedAuthorizationSchemes();
     AccessTokenValidation validateAccessToken(MessageContext mc,
                                               String authScheme, 
-                                              String authSchemeData)
+                                              String authSchemeData,
+                                              MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException;
 }

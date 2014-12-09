@@ -21,6 +21,8 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
@@ -30,10 +32,11 @@ public class HawkAccessTokenValidatorClient extends AbstractHawkAccessTokenValid
     private AccessTokenValidator validator;
         
     protected AccessTokenValidation getAccessTokenValidation(MessageContext mc,
-                                                             Map<String, String> schemeParams,
-                                                             String authSchemeData) {
-        return validator.validateAccessToken(mc, OAuthConstants.HAWK_AUTHORIZATION_SCHEME, 
-                                             authSchemeData);
+                                                             String authScheme, 
+                                                             String authSchemeData, 
+                                                             MultivaluedMap<String, String> extraProps,
+                                                             Map<String, String> schemeParams) {
+        return validator.validateAccessToken(mc, authScheme, authSchemeData, extraProps);
     }
 
     public void setValidator(AccessTokenValidator validator) {

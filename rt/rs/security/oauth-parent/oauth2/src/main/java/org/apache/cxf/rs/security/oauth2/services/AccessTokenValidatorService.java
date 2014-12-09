@@ -41,6 +41,6 @@ public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
         }
         String authScheme = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_TYPE);
         String authSchemeData  = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_DATA);
-        return super.getAccessTokenValidation(authScheme, authSchemeData);
+        return super.getAccessTokenValidation(authScheme, authSchemeData, params);
     }
 }
