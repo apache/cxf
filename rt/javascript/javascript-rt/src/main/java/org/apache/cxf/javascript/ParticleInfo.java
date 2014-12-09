@@ -19,6 +19,8 @@
 
 package org.apache.cxf.javascript;
 
+import java.util.List;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -29,6 +31,8 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaChoice;
+import org.apache.ws.commons.schema.XmlSchemaChoiceMember;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaType;
@@ -47,6 +51,10 @@ public final class ParticleInfo implements ItemInfo {
     // in the RPC case, we can have a type and no element.
     private XmlSchemaType type;
     private boolean empty;
+
+    private boolean isGroup;
+    private List<ParticleInfo> children;
+
     // These are exactly the same values as we find in the XmlSchemaElement.
     // there is no rationalization. But the accessors take care of business.
     private long minOccurs;
@@ -149,6 +157,32 @@ public final class ParticleInfo implements ItemInfo {
                 elementInfo.global = true;
             }
             elementInfo.nillable = ((XmlSchemaElement)realParticle).isNillable();
+        } else if (sequenceParticle instanceof XmlSchemaChoice) {
+            XmlSchemaChoice choice = (XmlSchemaChoice)sequenceParticle;
+
+            if (sequenceParticle.getMaxOccurs() > 1) {
+                Message message = new Message("GROUP_ELEMENT_MULTI_OCCURS", LOG, sequenceParticle
+                        .getClass().getSimpleName());
+                throw new UnsupportedConstruct(message.toString());
+            }
+
+            elementInfo.children = new LinkedList<>();
+
+            List<XmlSchemaChoiceMember> items = choice.getItems();
+            for (XmlSchemaChoiceMember item : items) {
+                XmlSchemaObject schemaObject = (XmlSchemaObject)item;
+                ParticleInfo childParticle = ParticleInfo.forLocalItem(schemaObject, currentSchema, schemaCollection,
+                        prefixAccumulator, contextName);
+
+                if (childParticle.isAny()) {
+                    Message message = new Message("GROUP_ELEMENT_ANY", LOG, sequenceParticle.getClass()
+                            .getSimpleName());
+                    throw new UnsupportedConstruct(message.toString());
+                }
+
+                childParticle.minOccurs = 0;
+                elementInfo.children.add(childParticle);
+            }
         }
 
         elementInfo.minOccurs = sequenceParticle.getMinOccurs();
@@ -199,13 +233,17 @@ public final class ParticleInfo implements ItemInfo {
 
             elementInfo.defaultValue = schemaDefaultValue;
             factorySetupType(element, schemaCollection, elementInfo);
+
+            elementInfo.isGroup = false;
+        } else if (particle instanceof XmlSchemaChoice) {
+            elementInfo.isGroup = true;
         } else { // any
             elementInfo.any = true;
             elementInfo.xmlName = null; // unknown until runtime.
             // TODO: multiple 'any'
             elementInfo.javascriptName = "any";
             elementInfo.type = null; // runtime for any.
-
+            elementInfo.isGroup = false;
         }
     }
 
@@ -323,6 +361,14 @@ public final class ParticleInfo implements ItemInfo {
 
     public void setType(XmlSchemaType type) {
         this.type = type;
+    }
+
+    public boolean isGroup() {
+        return isGroup;
+    }
+
+    public List<ParticleInfo> getChildren() {
+        return children;
     }
 
     public boolean isEmpty() {
