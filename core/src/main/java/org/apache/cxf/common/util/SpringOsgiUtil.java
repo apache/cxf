@@ -39,6 +39,6 @@ final class SpringOsgiUtil {
         } else {
             bundle = FrameworkUtil.getBundle(SpringClasspathScanner.class);
         }
-        return new OsgiBundleResourcePatternResolver(bundle);
+        return bundle != null ? new OsgiBundleResourcePatternResolver(bundle) : null;
     }
 }

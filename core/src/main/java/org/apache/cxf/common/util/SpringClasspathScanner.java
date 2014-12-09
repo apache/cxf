@@ -169,12 +169,15 @@ class SpringClasspathScanner extends ClasspathScanner {
     }
     
     private ResourcePatternResolver getResolver(ClassLoader loader) {
+        ResourcePatternResolver resolver = null;
         if (IN_OSGI) {
-            return SpringOsgiUtil.getResolver(loader);
-        } else {
-            return loader != null 
+            resolver = SpringOsgiUtil.getResolver(loader);
+        } 
+        if (resolver == null) {
+            resolver = loader != null 
                 ? new PathMatchingResourcePatternResolver(loader) : new PathMatchingResourcePatternResolver();
         }
+        return resolver;
     }
        
     private boolean shouldSkip(final String classname) {
