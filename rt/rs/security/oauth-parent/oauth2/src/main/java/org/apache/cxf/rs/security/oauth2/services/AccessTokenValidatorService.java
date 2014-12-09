@@ -20,11 +20,11 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
@@ -35,12 +35,12 @@ public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
     @POST
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public AccessTokenValidation getTokenValidationInfo(
-        @FormParam(OAuthConstants.AUTHORIZATION_SCHEME_TYPE) String authScheme, 
-        @Encoded @FormParam(OAuthConstants.AUTHORIZATION_SCHEME_DATA) String authSchemeData) {
+    public AccessTokenValidation getTokenValidationInfo(@Encoded MultivaluedMap<String, String> params) {
         if (getMessageContext().getSecurityContext().getUserPrincipal() == null) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
+        String authScheme = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_TYPE);
+        String authSchemeData  = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_DATA);
         return super.getAccessTokenValidation(authScheme, authSchemeData);
     }
 }
