@@ -63,7 +63,8 @@ public class HawkAccessTokenValidatorTest extends Assert {
         AccessTokenValidation tokenValidation = validator
             .validateAccessToken(messageContext, 
                                  OAuthConstants.HAWK_AUTHORIZATION_SCHEME, 
-                                 authData.split(" ")[1]);
+                                 authData.split(" ")[1],
+                                 null);
         assertNotNull(tokenValidation);
         EasyMock.verify(dataProvider, messageContext, httpRequest);
     }

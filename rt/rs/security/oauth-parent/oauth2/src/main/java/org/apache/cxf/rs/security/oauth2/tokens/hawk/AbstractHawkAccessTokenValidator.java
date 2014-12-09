@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.crypto.HmacUtils;
@@ -42,11 +44,12 @@ public abstract class AbstractHawkAccessTokenValidator implements AccessTokenVal
     }
 
     public AccessTokenValidation validateAccessToken(MessageContext mc,
-                                                     String authScheme, 
-                                                     String authSchemeData) throws OAuthServiceException {
+        String authScheme, String authSchemeData, MultivaluedMap<String, String> extraProps) 
+        throws OAuthServiceException {
          
         Map<String, String> schemeParams = getSchemeParameters(authSchemeData);
-        AccessTokenValidation atv = getAccessTokenValidation(mc, schemeParams, authSchemeData);
+        AccessTokenValidation atv = 
+            getAccessTokenValidation(mc, authScheme, authSchemeData, extraProps, schemeParams);
         
         String macKey = atv.getExtraProps().get(OAuthConstants.HAWK_TOKEN_KEY);
         String macAlgo = atv.getExtraProps().get(OAuthConstants.HAWK_TOKEN_ALGORITHM);
@@ -74,8 +77,10 @@ public abstract class AbstractHawkAccessTokenValidator implements AccessTokenVal
     }
     
     protected abstract AccessTokenValidation getAccessTokenValidation(MessageContext mc,
-                                                             Map<String, String> schemeParams,
-                                                             String authSchemeData);
+                                                                      String authScheme, 
+                                                                      String authSchemeData, 
+                                                                      MultivaluedMap<String, String> extraProps,
+                                                                      Map<String, String> schemeParams);
     
     private static Map<String, String> getSchemeParameters(String authData) {
         String[] attributePairs = authData.split(",");
