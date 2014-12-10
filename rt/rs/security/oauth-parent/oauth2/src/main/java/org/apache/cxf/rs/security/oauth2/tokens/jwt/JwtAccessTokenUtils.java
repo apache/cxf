@@ -25,7 +25,6 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwe.DirectKeyJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
@@ -33,10 +32,10 @@ import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
-import org.apache.cxf.rs.security.jose.jws.JwsSignature;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
+import org.apache.cxf.rs.security.jose.jws.NoneJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
@@ -60,7 +59,7 @@ public final class JwtAccessTokenUtils {
                                                   Client client,
                                                   JweEncryptionProvider jweEncryption) {
         String jwtString = new JwsJwtCompactProducer(jwt)
-                               .signWith(new NoneSignatureProvider());
+                               .signWith(new NoneJwsSignatureProvider());
         String tokenId = jweEncryption.encrypt(getBytes(jwtString), null);
         return toAccessToken(jwt, client, tokenId);
     }
@@ -128,38 +127,7 @@ public final class JwtAccessTokenUtils {
         // TODO: the issuer is indirectly validated by validating the signature
         // but an extra check can be done
     }
-    private static class NoneSignatureProvider implements JwsSignatureProvider {
-
-        @Override
-        public String getAlgorithm() {
-            return "none";
-        }
-
-        @Override
-        public JwsSignature createJwsSignature(JoseHeaders headers) {
-            return new NoneJwsSignature();
-        }
-
-        @Override
-        public byte[] sign(JoseHeaders headers, byte[] content) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-        
-    }
-    private static class NoneJwsSignature implements JwsSignature {
-
-        @Override
-        public void update(byte[] src, int off, int len) {
-            // complete
-        }
-
-        @Override
-        public byte[] sign() {
-            return new byte[]{};
-        }
-        
-    }
+    
     private static byte[] getBytes(String str) {
         return StringUtils.toBytesUTF8(str);
     }

@@ -76,6 +76,8 @@ public final class JoseConstants {
     public static final String A192GCM_ALGO = "A192GCM";
     public static final String A256GCM_ALGO = "A256GCM";
     
+    public static final String JOSE_CONTEXT_PROPERTY = "org.apache.cxf.jose.context";
+    
     private JoseConstants() {
         
     }
