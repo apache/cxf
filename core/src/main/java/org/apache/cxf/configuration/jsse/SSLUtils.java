@@ -68,14 +68,15 @@ public final class SSLUtils {
     private static final boolean DEFAULT_REQUIRE_CLIENT_AUTHENTICATION = false;
     private static final boolean DEFAULT_WANT_CLIENT_AUTHENTICATION = true;
     
-    /**
-     * By default, only include export-compatible ciphersuites.
-     */
     private static final List<String> DEFAULT_CIPHERSUITE_FILTERS_INCLUDE =
         Arrays.asList(new String[] {".*"});
+    /**
+     * By default, exclude NULL, anon, EXPORT, DES ciphersuites
+     */
     private static final List<String> DEFAULT_CIPHERSUITE_FILTERS_EXCLUDE =
         Arrays.asList(new String[] {".*_NULL_.*",
                                     ".*_anon_.*",
+                                    ".*_EXPORT_.*",
                                     ".*_DES_.*"});
     
     private static volatile KeyManager[] defaultManagers;
