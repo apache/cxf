@@ -109,32 +109,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>client.get</id>
-            <build>
-                <defaultGoal>test</defaultGoal>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>java</goal>
-                                </goals>
-                                <configuration>
-                                    <mainClass>demo.hw.client.Get</mainClass>
-                                    <arguments>
-                                        <argument>${basedir}/wsdl/hello_world_soap12.wsdl</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
     <dependencies>
         <dependency>
