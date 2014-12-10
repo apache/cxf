@@ -30,15 +30,6 @@
                 <sec:trustManagers>
                     <sec:keyStore file="src/main/config/serviceKeystore.jks" password="sspass" type="JKS"/>
                 </sec:trustManagers>
-                <sec:cipherSuitesFilter>
-                    <!-- these filters ensure that a ciphersuite with
-          export-suitable or null encryption is used,
-          but exclude anonymous Diffie-Hellman key change as
-          this is vulnerable to man-in-the-middle attacks -->
-                    <sec:include>.*_EXPORT_.*</sec:include>
-                    <sec:include>.*_EXPORT1024_.*</sec:include>
-                    <sec:include>.*_WITH_AES_.*</sec:include>
-                </sec:cipherSuitesFilter>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
