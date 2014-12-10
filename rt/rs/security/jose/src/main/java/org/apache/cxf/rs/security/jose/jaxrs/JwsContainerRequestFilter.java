@@ -36,7 +36,6 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 @PreMatching
 @Priority(Priorities.JWS_SERVER_READ_PRIORITY)
 public class JwsContainerRequestFilter extends AbstractJwsReaderProvider implements ContainerRequestFilter {
-    private static final String JWS_CONTEXT_PROPERTY = "org.apache.cxf.jws.context";
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
         if (HttpMethod.GET.equals(context.getMethod())) {
@@ -48,7 +47,7 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
         }
-        validateRequestContextProperty(p);
+        JoseUtils.validateRequestContextProperty(p.getJoseHeaders());
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
@@ -58,18 +57,5 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             context.getHeaders().putSingle("Content-Type", ct);
         }
     }
-    protected void validateRequestContextProperty(JwsCompactConsumer c) {
-        Object requestContext = JAXRSUtils.getCurrentMessage().get(JWS_CONTEXT_PROPERTY);
-        Object headerContext = c.getJoseHeaders().getHeader(JWS_CONTEXT_PROPERTY);
-        if (requestContext == null && headerContext == null) {
-            return;
-        }
-        if (requestContext == null && headerContext != null
-            || requestContext != null && headerContext == null
-            || !requestContext.equals(headerContext)) {
-            throw new SecurityException();
-        }
-        
-        
-    }
+    
 }
