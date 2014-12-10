@@ -19,20 +19,18 @@
 -->
 
 <!-- 
-  ** This file configures the Bethal Server.
-  ** It is an https server that conditionally responds
-  ** with 401s.
-  -->
+  ** This file configures the Poltim Server.
+  ** It is an https server that redirects to Mortimer.
+ -->
+
 
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:cxf="http://cxf.apache.org/core"
   xmlns:sec="http://cxf.apache.org/configuration/security"
   xmlns:http="http://cxf.apache.org/transports/http/configuration"
   xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
   xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
   xsi:schemaLocation="
-    http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
   		   http://cxf.apache.org/configuration/security
   		      http://cxf.apache.org/schemas/configuration/security.xsd
            http://cxf.apache.org/transports/http/configuration
@@ -41,22 +39,23 @@
               http://cxf.apache.org/schemas/configuration/http-jetty.xsd
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
+
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
-  <http:destination 
-    name="{http://apache.org/hello_world}Bethal.http-destination">
+  <http:destination name="{http://apache.org/hello_world}Poltim.http-destination">
+    <http:server RedirectURL="http://localhost:${testutil.ports.BusServer.0}/Mortimer"/>
   </http:destination>
   
   <httpj:engine-factory bus="cxf">
-	 <httpj:engine port="${testutil.ports.BusServer.2}">
+	 <httpj:engine port="${testutil.ports.BusServer.5}">
 	     <httpj:tlsServerParameters>
-	      <sec:keyManagers keyPassword="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v">
-	           <sec:keyStore type="JKS" password="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v" 
-	                file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+	      <sec:keyManagers keyPassword="password">
+	           <sec:keyStore type="JKS" password="password" 
+	                resource="keys/Poltim.jks"/>
 	      </sec:keyManagers>
 	      <sec:trustManagers>
-	          <sec:keyStore type="JKS" password="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v"
-	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	          <sec:keyStore type="JKS" password="password"
+	               resource="keys/Truststore.jks"/>
 	      </sec:trustManagers>
 	      <sec:cipherSuitesFilter>
 	        <!-- these filters ensure that a ciphersuite with
@@ -73,12 +72,6 @@
 	      <sec:clientAuthentication want="true" required="true"/>
 	    </httpj:tlsServerParameters>
 	  </httpj:engine>
-   </httpj:engine-factory>
+   </httpj:engine-factory>  
   
-   <cxf:bus>
-        <cxf:inInterceptors>
-                <bean class="org.apache.cxf.systest.http.PushBack401"/>
-        </cxf:inInterceptors>
-   </cxf:bus>
-
 </beans>

@@ -119,13 +119,14 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     static {
         try {
             //System.setProperty("javax.net.debug", "all");
-            String keystore = 
-                new File(Server.class.getResource("resources/Morpit.jks").toURI()).getAbsolutePath();
+            URL key = Server.class.getResource("../../../../../keys/Morpit.jks");
+            String keystore = new File(key.toURI()).getAbsolutePath();
             //System.out.println("Keystore: " + keystore);
             KeyManager[] kmgrs = getKeyManagers(getKeyStore("JKS", keystore, "password"), "password");
             
-            String truststore = 
-                new File(Server.class.getResource("resources/Truststore.jks").toURI()).getAbsolutePath();
+            key = Server.class.getResource("../../../../../keys/Truststore.jks");
+            
+            String truststore = new File(key.toURI()).getAbsolutePath();
             //System.out.println("Truststore: " + truststore);
             TrustManager[] tmgrs = getTrustManagers(getKeyStore("JKS", truststore, "password"));
             
@@ -205,7 +206,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         }
         Bus bus = BusFactory.getThreadDefaultBus(false);
         URL serverC =
-            Server.class.getResource("resources/" + name + ".cxf");
+            Server.class.getResource(name + ".cxf");
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
         boolean server = launchServer(Server.class, null,
@@ -297,7 +298,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
     
     private Greeter getMortimerGreeter() throws MalformedURLException {
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -355,7 +356,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         startServer("Mortimer");
         startServer("Rethwel");
 
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -401,12 +402,12 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         startServer("Mortimer");
         startServer("Rethwel");
 
-        URL config = getClass().getResource("resources/Http2HttpRedirect.cxf");
+        URL config = getClass().getResource("Http2HttpRedirect.cxf");
     
         // We go through the back door, setting the default bus.
         new DefaultBusFactory().createBus(config);
         
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -436,12 +437,12 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         startServer("Hurlon");
 
         URL config = getClass().getResource(
-                    "resources/Http2HttpLoopRedirectFail.cxf");
+                    "Http2HttpLoopRedirectFail.cxf");
         
         // We go through the back door, setting the default bus.
         new DefaultBusFactory().createBus(config);
         
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -473,11 +474,11 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         startServer("Bethal");
 
         URL config = getClass().getResource(
-                    "resources/BethalClientConfig.cxf");
+                    "BethalClientConfig.cxf");
         
         // We go through the back door, setting the default bus.
         new DefaultBusFactory().createBus(config);
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -496,7 +497,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         
         BusFactory.setDefaultBus(null);
         // The client bean configuration file
-        URL beans = getClass().getResource("resources/BethalClientBeans.xml");
+        URL beans = getClass().getResource("BethalClientBeans.xml");
         // We go through the back door, setting the default bus.
         Bus bus = new DefaultBusFactory().createBus(beans);
         
@@ -556,7 +557,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     public void testHttpsBasicConnection() throws Exception {
         startServer("Bethal");
 
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -599,7 +600,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         startServer("Mortimer");
         startServer("Poltim");
 
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -688,7 +689,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     public void testHttpsTrust() throws Exception {
         startServer("Bethal");
 
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -749,7 +750,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         startServer("Gordy");
         startServer("Bethal");
 
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -895,7 +896,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         startServer("Gordy");
         startServer("Bethal");
 
-        URL wsdl = getClass().getResource("resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);

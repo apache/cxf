@@ -31,7 +31,7 @@ public class SessionServer extends AbstractBusTestServerBase {
     
     @Override
     protected void run() {
-        String configurationFile = "resources/SessionServer.xml";
+        String configurationFile = "SessionServer.xml";
         URL configure =
             SessionServer.class.getResource(configurationFile);
         bus = new SpringBusFactory().createBus(configure, true);

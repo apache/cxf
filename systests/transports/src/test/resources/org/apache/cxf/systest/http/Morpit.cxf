@@ -19,8 +19,8 @@
 -->
 
 <!-- 
-  ** This file configures the Gordy Server.
-  ** It is an https server that redirects to Bethal.
+  ** This file configures the Morpit Server. It is just an
+  ** Https server with a name that will kick in the HostnameVerifier.
  -->
 
 
@@ -41,21 +41,19 @@
               http://www.springframework.org/schema/beans/spring-beans.xsd">
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
-  <http:destination 
-         name="{http://apache.org/hello_world}Gordy.http-destination">
-    <http:server RedirectURL="https://localhost:${testutil.ports.BusServer.2}/Bethal"/>
+  <http:destination name="{http://apache.org/hello_world}GreeterImplPort.http-destination">
   </http:destination>
   
   <httpj:engine-factory bus="cxf">
-	 <httpj:engine port="${testutil.ports.BusServer.1}">
+	 <httpj:engine port="${testutil.ports.BusServer.8}">
 	     <httpj:tlsServerParameters>
 	      <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 
-	                file="src/test/java/org/apache/cxf/systest/http/resources/Gordy.jks"/>
+	                resource="keys/Morpit.jks"/>
 	      </sec:keyManagers>
 	      <sec:trustManagers>
 	          <sec:keyStore type="JKS" password="password"
-	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	               resource="keys/Truststore.jks"/>
 	      </sec:trustManagers>
 	      <sec:cipherSuitesFilter>
 	        <!-- these filters ensure that a ciphersuite with
@@ -72,6 +70,6 @@
 	      <sec:clientAuthentication want="true" required="true"/>
 	    </httpj:tlsServerParameters>
 	  </httpj:engine>
-   </httpj:engine-factory>
-   
+   </httpj:engine-factory>  
+  
 </beans>

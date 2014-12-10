@@ -139,38 +139,46 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     
     @Test
     public final void testJaxwsServer() throws Exception {
-        testSuccessfulCall("resources/jaxws-server.xml", 
+        testSuccessfulCall("jaxws-server.xml", 
                            "https://localhost:" + BusServer.getPort(2) + "/SoapContext/HttpsPort");        
     }
     @Test
     public final void testJaxwsServerChangeHttpsToHttp() throws Exception {
-        testSuccessfulCall("resources/jaxws-server.xml", 
+        testSuccessfulCall("jaxws-server.xml", 
                             "http://localhost:" + BusServer.getPort(3) + "/SoapContext/HttpPort");    
     }    
     @Test
     public final void testJaxwsEndpoint() throws Exception {
-        testSuccessfulCall("resources/jaxws-publish.xml",
+        testSuccessfulCall("jaxws-publish.xml",
                            "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
     }
     @Test
+<<<<<<< HEAD
+=======
+    public final void testJaxwsEndpointCallback() throws Exception {
+        testSuccessfulCall("jaxws-publish-callback.xml",
+                           "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
+    }
+    @Test
+>>>>>>> d4a35c4... Initial refactor of transports systests
     public final void testJaxwsTLSRefsEndpoint() throws Exception {
-        testSuccessfulCall("resources/jaxws-tlsrefs-publish.xml",
+        testSuccessfulCall("jaxws-tlsrefs-publish.xml",
                            "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testPKCS12Endpoint() throws Exception {
-        testSuccessfulCall("resources/pkcs12.xml",
+        testSuccessfulCall("pkcs12.xml",
                            "https://localhost:" + BusServer.getPort(6) + "/SoapContext/HttpsPort");
     }
     
     @Test
     public final void testResourceKeySpecEndpoint() throws Exception {
-        testSuccessfulCall("resources/resource-key-spec.xml",
+        testSuccessfulCall("resource-key-spec.xml",
                            "https://localhost:" + BusServer.getPort(4) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testResourceKeySpecEndpointURL() throws Exception {
-        testSuccessfulCall("resources/resource-key-spec-url.xml",
+        testSuccessfulCall("resource-key-spec-url.xml",
                            "https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort",
                            new URL("https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort?wsdl"),
                            true);
@@ -181,7 +189,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();
             KeyStoreType kst = new KeyStoreType();
-            kst.setFile("src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks");
+            kst.setFile("src/test/resources/keys/Bethal.jks");
             kst.setPassword("password");
             kst.setType("JKS");
         
@@ -197,7 +205,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         public static TrustManager[] getTrustManagers() {
             TrustManagersType tmt = new TrustManagersType();
             KeyStoreType kst = new KeyStoreType();
-            kst.setFile("src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks");
+            kst.setFile("src/test/resources/keys/Truststore.jks");
             kst.setPassword("password");
             kst.setType("JKS");
         
@@ -214,7 +222,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();
             KeyStoreType kst = new KeyStoreType();
-            kst.setFile("src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks");
+            kst.setFile("src/test/resources/keys/Morpit.jks");
             kst.setPassword("password");
             kst.setType("JKS");
         
@@ -230,7 +238,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         public static TrustManager[] getTrustManagers() {
             TrustManagersType tmt = new TrustManagersType();
             KeyStoreType kst = new KeyStoreType();
-            kst.setFile("src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks");
+            kst.setFile("src/test/resources/keys/Truststore.jks");
             kst.setPassword("password");
             kst.setType("JKS");
         

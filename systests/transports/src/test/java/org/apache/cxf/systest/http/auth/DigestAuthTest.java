@@ -56,7 +56,7 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
     
     @Test    
     public void testDigestAuth() throws Exception {
-        URL wsdl = getClass().getResource("../resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("../greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
@@ -85,7 +85,7 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
     
     @Test    
     public void testNoAuth() throws Exception {
-        URL wsdl = getClass().getResource("../resources/greeting.wsdl");
+        URL wsdl = getClass().getResource("../greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
