@@ -50,22 +50,22 @@ public class EventMapper implements STSEventListener {
     public EventMapper(MapEventListener mapEventListener) {
         this.mapEventListener = mapEventListener;
     }
-    
+
     @Override
     public void handleSTSEvent(AbstractSTSEvent event) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(KEYS.TIME.name(), new Date(event.getTimestamp()));
         map.put(KEYS.OPERATION.name(), event.getOperation());
         map.put(KEYS.DURATION.name(), String.valueOf(event.getDuration()) + "ms");
-        
+
         if (event instanceof AbstractSTSFailureEvent) {
             map.put(KEYS.STATUS.name(), "FAILURE");
-            Exception ex = ((AbstractSTSFailureEvent) event).getException();
+            Exception ex = ((AbstractSTSFailureEvent)event).getException();
             map.put(KEYS.EXCEPTION.name(), ex);
         } else {
             map.put(KEYS.STATUS.name(), "SUCCESS");
         }
-        
+
         if (event instanceof TokenProviderParametersSupport) {
             handleEvent((TokenProviderParametersSupport)event, map);
         } else if (event instanceof TokenValidatorParametersSupport) {
@@ -73,23 +73,23 @@ public class EventMapper implements STSEventListener {
         } else if (event instanceof TokenCancellerParametersSupport) {
             handleEvent((TokenCancellerParametersSupport)event, map);
         } else if (event instanceof TokenRenewerParametersSupport) {
-            handleEvent((TokenRenewerParametersSupport)event, map);            
+            handleEvent((TokenRenewerParametersSupport)event, map);
         } else {
             LOG.warning("Unknown STS event: " + event.getClass());
         }
         MapEvent mapEvent = new MapEvent("org/apache/cxf/sts", map);
         mapEventListener.onEvent(mapEvent);
     }
-    
+
     protected void handleEvent(TokenProviderParametersSupport event, Map<String, Object> map) {
         TokenProviderParameters params = event.getTokenParameters();
         try {
-            HttpServletRequest req = (HttpServletRequest) params.getWebServiceContext().getMessageContext()
-                    .get(AbstractHTTPDestination.HTTP_REQUEST);
+            HttpServletRequest req = (HttpServletRequest)params.getWebServiceContext().getMessageContext()
+                .get(AbstractHTTPDestination.HTTP_REQUEST);
             map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
             map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
-            map.put(KEYS.URL.name(),
-                    (String) params.getWebServiceContext().getMessageContext().get("org.apache.cxf.request.url"));
+            map.put(KEYS.URL.name(), (String)params.getWebServiceContext().getMessageContext()
+                .get("org.apache.cxf.request.url"));
         } catch (Exception ex) {
             map.put(KEYS.REMOTE_HOST.name(), "N.A.");
             map.put(KEYS.REMOTE_PORT.name(), "N.A.");
@@ -100,13 +100,13 @@ public class EventMapper implements STSEventListener {
             map.put(KEYS.TOKENTYPE.name(), params.getTokenRequirements().getTokenType());
             if (params.getTokenRequirements().getOnBehalfOf() != null) {
                 map.put(KEYS.ONBEHALFOF_PRINCIPAL.name(), params.getTokenRequirements().getOnBehalfOf().getPrincipal()
-                        .getName());
+                    .getName());
             }
             if (params.getTokenRequirements().getActAs() != null) {
                 map.put(KEYS.ACTAS_PRINCIPAL.name(), params.getTokenRequirements().getActAs().getPrincipal().getName());
             }
         }
-        if(params.getKeyRequirements() != null) {
+        if (params.getKeyRequirements() != null) {
             map.put(KEYS.KEYTYPE.name(), params.getKeyRequirements().getKeyType());
         }
         if (params.getPrincipal() != null) {
@@ -130,21 +130,21 @@ public class EventMapper implements STSEventListener {
             map.put(KEYS.CLAIMS_SECONDARY.name(), claims.toString());
         }
     }
-    
+
     protected void handleEvent(TokenValidatorParametersSupport event, Map<String, Object> map) {
         TokenValidatorParameters params = event.getTokenParameters();
-        HttpServletRequest req = (HttpServletRequest) params.getWebServiceContext().getMessageContext()
-                .get(AbstractHTTPDestination.HTTP_REQUEST);
+        HttpServletRequest req = (HttpServletRequest)params.getWebServiceContext().getMessageContext()
+            .get(AbstractHTTPDestination.HTTP_REQUEST);
         map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
         map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
-        map.put(KEYS.URL.name(),
-                (String) params.getWebServiceContext().getMessageContext().get("org.apache.cxf.request.url"));
+        map.put(KEYS.URL.name(), (String)params.getWebServiceContext().getMessageContext()
+            .get("org.apache.cxf.request.url"));
         map.put(KEYS.TOKENTYPE.name(), params.getTokenRequirements().getTokenType());
         if (params.getTokenRequirements().getActAs() != null) {
             map.put(KEYS.VALIDATE_PRINCIPAL.name(), params.getTokenRequirements().getValidateTarget().getPrincipal()
-                    .getName());
+                .getName());
         }
-        if(params.getKeyRequirements() != null) {
+        if (params.getKeyRequirements() != null) {
             map.put(KEYS.KEYTYPE.name(), params.getKeyRequirements().getKeyType());
         }
         if (params.getPrincipal() != null) {
@@ -152,45 +152,45 @@ public class EventMapper implements STSEventListener {
         }
         map.put(KEYS.REALM.name(), params.getRealm());
     }
-    
+
     protected void handleEvent(TokenCancellerParametersSupport event, Map<String, Object> map) {
         TokenCancellerParameters params = event.getTokenParameters();
-        HttpServletRequest req = (HttpServletRequest) params.getWebServiceContext().getMessageContext()
-                .get(AbstractHTTPDestination.HTTP_REQUEST);
+        HttpServletRequest req = (HttpServletRequest)params.getWebServiceContext().getMessageContext()
+            .get(AbstractHTTPDestination.HTTP_REQUEST);
         map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
         map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
-        map.put(KEYS.URL.name(),
-                (String) params.getWebServiceContext().getMessageContext().get("org.apache.cxf.request.url"));
+        map.put(KEYS.URL.name(), (String)params.getWebServiceContext().getMessageContext()
+            .get("org.apache.cxf.request.url"));
         map.put(KEYS.TOKENTYPE.name(), params.getTokenRequirements().getTokenType());
         if (params.getTokenRequirements().getActAs() != null) {
             map.put(KEYS.CANCEL_PRINCIPAL.name(), params.getTokenRequirements().getCancelTarget().getPrincipal()
-                    .getName());
+                .getName());
         }
-        if(params.getKeyRequirements() != null) {
+        if (params.getKeyRequirements() != null) {
             map.put(KEYS.KEYTYPE.name(), params.getKeyRequirements().getKeyType());
         }
         if (params.getPrincipal() != null) {
             map.put(KEYS.WS_SEC_PRINCIPAL.name(), params.getPrincipal().getName());
         }
     }
-    
+
     protected void handleEvent(TokenRenewerParametersSupport event, Map<String, Object> map) {
         TokenRenewerParameters params = event.getTokenParameters();
-        HttpServletRequest req = (HttpServletRequest) params.getWebServiceContext().getMessageContext()
-                .get(AbstractHTTPDestination.HTTP_REQUEST);
+        HttpServletRequest req = (HttpServletRequest)params.getWebServiceContext().getMessageContext()
+            .get(AbstractHTTPDestination.HTTP_REQUEST);
         map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
         map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
-        map.put(KEYS.URL.name(),
-                (String) params.getWebServiceContext().getMessageContext().get("org.apache.cxf.request.url"));
+        map.put(KEYS.URL.name(), (String)params.getWebServiceContext().getMessageContext()
+            .get("org.apache.cxf.request.url"));
         map.put(KEYS.TOKENTYPE.name(), params.getTokenRequirements().getTokenType());
         if (params.getTokenRequirements().getRenewTarget() != null) {
             map.put(KEYS.RENEW_PRINCIPAL.name(), params.getTokenRequirements().getRenewTarget().getPrincipal()
-                    .getName());
+                .getName());
         }
         if (params.getPrincipal() != null) {
             map.put(KEYS.WS_SEC_PRINCIPAL.name(), params.getPrincipal().getName());
         }
-        if(params.getKeyRequirements() != null) {
+        if (params.getKeyRequirements() != null) {
             map.put(KEYS.KEYTYPE.name(), params.getKeyRequirements().getKeyType());
         }
         map.put(KEYS.REALM.name(), params.getRealm());
