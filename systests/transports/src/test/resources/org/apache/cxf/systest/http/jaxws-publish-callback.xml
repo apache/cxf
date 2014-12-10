@@ -29,27 +29,21 @@ under the License.
     <!-- server application merely instantiates a Bus, and does not -->
     <!-- publish any services programmatically -->
     <!-- -->
-    <!-- This test ensures we can use PKCS12 keystores and PEM truststores -->
-    <!-- -->
     <!-- -->
     <!-- Spring-load an HTTPS servant -->
     <!-- -->
-    <jaxws:server xmlns:e="http://apache.org/hello_world/services" xmlns:s="http://apache.org/hello_world/services" id="JaxwsHttpsEndpoint" address="https://localhost:${testutil.ports.BusServer.6}/SoapContext/HttpsPort" serviceName="s:SOAPService" endpointName="e:HttpsPort" depends-on="port-9006-tls-config">
-        <jaxws:serviceBean>
-            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
-        </jaxws:serviceBean>
-    </jaxws:server>
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" xmlns:s="http://apache.org/hello_world/services" id="JaxwsHttpsEndpoint" implementor="org.apache.cxf.systest.http.GreeterImpl" address="https://localhost:${testutil.ports.BusServer.1}/SoapContext/HttpsPort" serviceName="s:SOAPService" endpointName="e:HttpsPort" depends-on="port-9001-tls-config"/>
     <!-- -->
-    <!-- TLS Port configuration parameters for port 9006 -->
+    <!-- TLS Port configuration parameters for port 9001 -->
     <!-- -->
-    <httpj:engine-factory id="port-9006-tls-config">
-        <httpj:engine port="${testutil.ports.BusServer.6}">
+    <httpj:engine-factory id="port-9001-tls-config">
+        <httpj:engine port="${testutil.ports.BusServer.1}">
             <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="pkcs12" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.p12"/>
+                <sec:keyManagers keyPasswordCallbackHandler="org.apache.cxf.systest.http.KeyPasswordCallbackHandler">
+                    <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:certStore file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.pem"/>
+                    <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Truststore.jks"/>
                 </sec:trustManagers>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -59,11 +53,11 @@ under the License.
     <!-- -->
     <http:conduit name="{http://apache.org/hello_world/services}HttpsPort.http-conduit">
         <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="pkcs12" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.p12"/>
+            <sec:keyManagers keyPasswordCallbackHandler="org.apache.cxf.systest.http.KeyPasswordCallbackHandler">
+                <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Morpit.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:certStore file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.pem"/>
+                <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

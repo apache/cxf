@@ -78,7 +78,7 @@ public class Server extends AbstractBusTestServerBase {
                     getBus(), 
                     implementor,
                     nullBindingID,
-                    this.getClass().getResource("resources/greeting.wsdl").toString());
+                    this.getClass().getResource("greeting.wsdl").toString());
         // How the hell do I know what the name of the 
         // http-destination is from using this call?
         ep.setEndpointName(new QName("http://apache.org/hello_world", name));

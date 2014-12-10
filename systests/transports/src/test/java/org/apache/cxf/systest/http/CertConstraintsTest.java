@@ -121,7 +121,7 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
     
     @Test
     public final void testCertConstraints() throws Exception {
-        setTheConfiguration("resources/jaxws-server-constraints.xml");
+        setTheConfiguration("jaxws-server-constraints.xml");
         startServers();
         
         //

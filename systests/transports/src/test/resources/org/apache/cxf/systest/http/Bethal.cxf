@@ -19,18 +19,20 @@
 -->
 
 <!-- 
-  ** This file configures the Morpit Server. It is just an
-  ** Https server with a name that will kick in the HostnameVerifier.
- -->
-
+  ** This file configures the Bethal Server.
+  ** It is an https server that conditionally responds
+  ** with 401s.
+  -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:cxf="http://cxf.apache.org/core"
   xmlns:sec="http://cxf.apache.org/configuration/security"
   xmlns:http="http://cxf.apache.org/transports/http/configuration"
   xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
   xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
   xsi:schemaLocation="
+    http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
   		   http://cxf.apache.org/configuration/security
   		      http://cxf.apache.org/schemas/configuration/security.xsd
            http://cxf.apache.org/transports/http/configuration
@@ -41,19 +43,20 @@
               http://www.springframework.org/schema/beans/spring-beans.xsd">
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
-  <http:destination name="{http://apache.org/hello_world}GreeterImplPort.http-destination">
+  <http:destination 
+    name="{http://apache.org/hello_world}Bethal.http-destination">
   </http:destination>
   
   <httpj:engine-factory bus="cxf">
-	 <httpj:engine port="${testutil.ports.BusServer.8}">
+	 <httpj:engine port="${testutil.ports.BusServer.2}">
 	     <httpj:tlsServerParameters>
-	      <sec:keyManagers keyPassword="password">
-	           <sec:keyStore type="JKS" password="password" 
-	                file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
+	      <sec:keyManagers keyPassword="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v">
+	           <sec:keyStore type="JKS" password="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v" 
+	                resource="keys/Bethal.jks"/>
 	      </sec:keyManagers>
 	      <sec:trustManagers>
-	          <sec:keyStore type="JKS" password="password"
-	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	          <sec:keyStore type="JKS" password="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v"
+	               resource="keys/Truststore.jks"/>
 	      </sec:trustManagers>
 	      <sec:cipherSuitesFilter>
 	        <!-- these filters ensure that a ciphersuite with
@@ -70,6 +73,12 @@
 	      <sec:clientAuthentication want="true" required="true"/>
 	    </httpj:tlsServerParameters>
 	  </httpj:engine>
-   </httpj:engine-factory>  
+   </httpj:engine-factory>
   
+   <cxf:bus>
+        <cxf:inInterceptors>
+                <bean class="org.apache.cxf.systest.http.PushBack401"/>
+        </cxf:inInterceptors>
+   </cxf:bus>
+
 </beans>
