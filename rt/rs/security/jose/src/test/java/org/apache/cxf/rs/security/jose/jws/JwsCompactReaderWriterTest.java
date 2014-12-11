@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -36,6 +37,7 @@ import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenWriter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -209,6 +211,29 @@ public class JwsCompactReaderWriterTest extends Assert {
         jws.signWith(new PrivateKeyJwsSignatureProvider(key, Algorithm.SHA256withRSA.getJwtName()));
         
         assertEquals(ENCODED_TOKEN_SIGNED_BY_PRIVATE_KEY, jws.getSignedEncodedJws());
+    }
+    @Test
+    public void testJwsPsSha() throws Exception {
+        Security.addProvider(new BouncyCastleProvider());    
+        try {
+            JoseHeaders outHeaders = new JoseHeaders();
+            outHeaders.setAlgorithm(JoseConstants.PS_SHA_256_ALGO);
+            JwsCompactProducer producer = initSpecJwtTokenWriter(outHeaders);
+            PrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
+            String signed = producer.signWith(
+                new PrivateKeyJwsSignatureProvider(privateKey, JoseConstants.PS_SHA_256_ALGO));
+            
+            JwsJwtCompactConsumer jws = new JwsJwtCompactConsumer(signed);
+            RSAPublicKey key = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
+            assertTrue(jws.verifySignatureWith(new PublicKeyJwsSignatureVerifier(key, 
+                                                                                 JoseConstants.PS_SHA_256_ALGO)));
+            JwtToken token = jws.getJwtToken();
+            JoseHeaders inHeaders = token.getHeaders();
+            assertEquals(JoseConstants.PS_SHA_256_ALGO, inHeaders.getAlgorithm());
+            validateSpecClaim(token.getClaims());
+        } finally {
+            Security.removeProvider(BouncyCastleProvider.class.getName());
+        }
     }
     
     @Test

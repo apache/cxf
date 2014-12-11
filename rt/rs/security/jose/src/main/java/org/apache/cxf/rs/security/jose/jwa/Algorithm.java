@@ -73,6 +73,9 @@ public enum Algorithm {
     public static final String RS_SHA_256_JAVA = "SHA256withRSA";
     public static final String RS_SHA_384_JAVA = "SHA384withRSA";
     public static final String RS_SHA_512_JAVA = "SHA512withRSA";
+    public static final String PS_SHA_256_JAVA = "SHA256withRSAandMGF1";
+    public static final String PS_SHA_384_JAVA = "SHA384withRSAandMGF1";
+    public static final String PS_SHA_512_JAVA = "SHA512withRSAandMGF1";
     public static final String ES_SHA_256_JAVA = "SHA256withECDSA";
     public static final String ES_SHA_384_JAVA = "SHA384withECDSA";
     public static final String ES_SHA_512_JAVA = "SHA512withECDSA";
@@ -90,6 +93,10 @@ public enum Algorithm {
     public static final Set<String> RSA_SHA_SIGN_SET = new HashSet<String>(Arrays.asList(JoseConstants.RS_SHA_256_ALGO,
                                                                         JoseConstants.RS_SHA_384_ALGO,
                                                                         JoseConstants.RS_SHA_512_ALGO));
+    public static final Set<String> RSA_SHA_PS_SIGN_SET = 
+        new HashSet<String>(Arrays.asList(JoseConstants.PS_SHA_256_ALGO,
+                                          JoseConstants.PS_SHA_384_ALGO,
+                                          JoseConstants.PS_SHA_512_ALGO));
     public static final Set<String> EC_SHA_SIGN_SET = new HashSet<String>(Arrays.asList(JoseConstants.ES_SHA_256_ALGO,
                                                                          JoseConstants.ES_SHA_384_ALGO,
                                                                          JoseConstants.ES_SHA_512_ALGO));
@@ -124,6 +131,9 @@ public enum Algorithm {
         JAVA_TO_JWT_NAMES.put(RS_SHA_256_JAVA, JoseConstants.RS_SHA_256_ALGO);
         JAVA_TO_JWT_NAMES.put(RS_SHA_384_JAVA, JoseConstants.RS_SHA_384_ALGO);
         JAVA_TO_JWT_NAMES.put(RS_SHA_512_JAVA, JoseConstants.RS_SHA_512_ALGO);
+        JAVA_TO_JWT_NAMES.put(PS_SHA_256_JAVA, JoseConstants.PS_SHA_256_ALGO);
+        JAVA_TO_JWT_NAMES.put(PS_SHA_384_JAVA, JoseConstants.PS_SHA_384_ALGO);
+        JAVA_TO_JWT_NAMES.put(PS_SHA_512_JAVA, JoseConstants.PS_SHA_512_ALGO);
         JAVA_TO_JWT_NAMES.put(ES_SHA_256_JAVA, JoseConstants.ES_SHA_256_ALGO);
         JAVA_TO_JWT_NAMES.put(ES_SHA_384_JAVA, JoseConstants.ES_SHA_384_ALGO);
         JAVA_TO_JWT_NAMES.put(ES_SHA_512_JAVA, JoseConstants.ES_SHA_512_ALGO);
@@ -146,6 +156,9 @@ public enum Algorithm {
         JWT_TO_JAVA_NAMES.put(JoseConstants.RS_SHA_256_ALGO, RS_SHA_256_JAVA);
         JWT_TO_JAVA_NAMES.put(JoseConstants.RS_SHA_384_ALGO, RS_SHA_384_JAVA);
         JWT_TO_JAVA_NAMES.put(JoseConstants.RS_SHA_512_ALGO, RS_SHA_512_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.PS_SHA_256_ALGO, PS_SHA_256_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.PS_SHA_384_ALGO, PS_SHA_384_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.PS_SHA_512_ALGO, PS_SHA_512_JAVA);
         JWT_TO_JAVA_NAMES.put(JoseConstants.ES_SHA_256_ALGO, ES_SHA_256_JAVA);
         JWT_TO_JAVA_NAMES.put(JoseConstants.ES_SHA_384_ALGO, ES_SHA_384_JAVA);
         JWT_TO_JAVA_NAMES.put(JoseConstants.ES_SHA_512_ALGO, ES_SHA_512_JAVA);
@@ -221,7 +234,7 @@ public enum Algorithm {
         return javaName;
     }
     public static boolean isRsa(String algo) {
-        return isRsa(algo) || isRsaShaSign(algo);
+        return isRsaKeyWrap(algo) || isRsaSign(algo);
     }
     public static boolean isRsaKeyWrap(String algo) {
         return RSA_CEK_SET.contains(algo);
@@ -250,9 +263,15 @@ public enum Algorithm {
             || isAesGcm(algo)
             || isAesGcmKeyWrap(algo)
             || isAesKeyWrap(algo); 
-    } 
+    }
+    public static boolean isRsaSign(String algo) {
+        return isRsaShaSign(algo) || isRsaShaPsSign(algo); 
+    }
     public static boolean isRsaShaSign(String algo) {
         return RSA_SHA_SIGN_SET.contains(algo); 
+    }
+    public static boolean isRsaShaPsSign(String algo) {
+        return RSA_SHA_PS_SIGN_SET.contains(algo); 
     }
     public static boolean isEcDsaSign(String algo) {
         return EC_SHA_SIGN_SET.contains(algo); 
