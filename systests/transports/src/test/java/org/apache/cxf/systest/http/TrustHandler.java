@@ -20,11 +20,9 @@
 package org.apache.cxf.systest.http;
 
 import org.apache.cxf.message.Message;
-import org.apache.cxf.transport.http.HttpURLConnectionInfo;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.URLConnectionInfo;
 import org.apache.cxf.transport.http.UntrustedURLConnectionIOException;
-import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 
 public class TrustHandler
     extends MessageTrustDecider {
@@ -42,10 +40,10 @@ public class TrustHandler
         System.out.println("Trust decision for conduit: "
                 + conduitName + " and " 
                 + connectionInfo.getURI());
-        if (connectionInfo instanceof HttpURLConnectionInfo) {
+        /*if (connectionInfo instanceof HttpURLConnectionInfo) {
             HttpURLConnectionInfo c = (HttpURLConnectionInfo) connectionInfo;
             System.out.println("Http method: " 
-                    + c.getHttpRequestMethod() + " on " + c.getURI());
+                   + c.getHttpRequestMethod() + " on " + c.getURI());
         }
         if (connectionInfo instanceof HttpsURLConnectionInfo) {
             HttpsURLConnectionInfo c = (HttpsURLConnectionInfo) connectionInfo;
@@ -54,6 +52,7 @@ public class TrustHandler
             System.out.println("Local Principal: " + c.getLocalPrincipal());
             System.out.println("Peer Principal: " + c.getPeerPrincipal());
         }
+        */
         //throw new UntrustedURLConnectionIOException("No Way Jose"); 
     }
 }

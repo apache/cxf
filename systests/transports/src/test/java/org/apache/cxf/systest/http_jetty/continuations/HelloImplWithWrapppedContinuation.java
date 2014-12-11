@@ -68,7 +68,7 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
                     String surname = continuation.getObject().toString();
                     sb.append(' ').append(surname);
                 }
-                System.out.println("Saying hi to " + sb.toString());
+                // System.out.println("Saying hi to " + sb.toString());
                 return "Hi " + sb.toString();
             }
         }

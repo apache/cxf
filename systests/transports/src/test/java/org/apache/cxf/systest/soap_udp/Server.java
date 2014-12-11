@@ -51,8 +51,6 @@ public class Server extends AbstractBusTestServerBase {
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally {
-            System.out.println("done!");
         }
     }
     
