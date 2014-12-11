@@ -41,7 +41,7 @@
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
   <http:destination name="{http://apache.org/hello_world}Abost.http-destination">
-    <http:server RedirectURL="http://localhost:${testutil.ports.BusServer.6}/Hurlon"/>
+    <http:server RedirectURL="http://localhost:${testutil.ports.BusServer.3}/Hurlon"/>
   </http:destination>
 
 </beans>

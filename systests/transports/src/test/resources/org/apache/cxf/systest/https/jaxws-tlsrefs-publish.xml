@@ -36,29 +36,25 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9001 -->
     <!-- -->
+    <bean id="serverKeyManagers" class="org.apache.cxf.systest.https.HTTPSClientTest$ServerManagersFactory" factory-method="getKeyManagers"/>
+    <bean id="serverTrustManagers" class="org.apache.cxf.systest.https.HTTPSClientTest$ServerManagersFactory" factory-method="getTrustManagers"/>
     <httpj:engine-factory id="port-9001-tls-config">
         <httpj:engine port="${testutil.ports.BusServer.1}">
             <httpj:tlsServerParameters>
-                <sec:keyManagers keyPasswordCallbackHandler="org.apache.cxf.systest.http.KeyPasswordCallbackHandler">
-                    <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Bethal.jks"/>
-                </sec:keyManagers>
-                <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Truststore.jks"/>
-                </sec:trustManagers>
+                <sec:keyManagers ref="serverKeyManagers"/>
+                <sec:trustManagers ref="serverTrustManagers"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
     <!-- -->
     <!-- HTTP/S configuration for clients -->
     <!-- -->
+    <bean id="clientKeyManagers" class="org.apache.cxf.systest.https.HTTPSClientTest$ClientManagersFactory" factory-method="getKeyManagers"/>
+    <bean id="clientTrustManagers" class="org.apache.cxf.systest.https.HTTPSClientTest$ClientManagersFactory" factory-method="getTrustManagers"/>
     <http:conduit name="{http://apache.org/hello_world/services}HttpsPort.http-conduit">
         <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPasswordCallbackHandler="org.apache.cxf.systest.http.KeyPasswordCallbackHandler">
-                <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Morpit.jks"/>
-            </sec:keyManagers>
-            <sec:trustManagers>
-                <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Truststore.jks"/>
-            </sec:trustManagers>
+            <sec:keyManagers ref="clientKeyManagers"/>
+            <sec:trustManagers ref="clientTrustManagers"/>
         </http:tlsClientParameters>
     </http:conduit>
 </beans>

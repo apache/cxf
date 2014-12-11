@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.http;
+package org.apache.cxf.systest.https;
 
 import java.io.IOException;
 

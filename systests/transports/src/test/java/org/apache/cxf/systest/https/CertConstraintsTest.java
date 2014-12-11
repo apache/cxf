@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.http;
+package org.apache.cxf.systest.https;
 
 import java.net.URL;
 
@@ -28,7 +28,6 @@ import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.http;
+package org.apache.cxf.systest.https;
 
 import java.io.IOException;
 import java.io.OutputStream;
