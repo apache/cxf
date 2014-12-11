@@ -60,7 +60,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
         return algo;
     }
     protected boolean isValidAlgorithmFamily(String algo) {
-        return Algorithm.isRsaShaSign(algo);
+        return Algorithm.isRsaSign(algo);
     }
     @Override
     public String getAlgorithm() {

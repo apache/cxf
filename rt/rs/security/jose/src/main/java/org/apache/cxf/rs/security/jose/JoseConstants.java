@@ -51,6 +51,9 @@ public final class JoseConstants {
     public static final String RS_SHA_256_ALGO = "RS256";
     public static final String RS_SHA_384_ALGO = "RS384";
     public static final String RS_SHA_512_ALGO = "RS512";
+    public static final String PS_SHA_256_ALGO = "PS256";
+    public static final String PS_SHA_384_ALGO = "PS384";
+    public static final String PS_SHA_512_ALGO = "PS512";
     public static final String ES_SHA_256_ALGO = "ES256";
     public static final String ES_SHA_384_ALGO = "ES384";
     public static final String ES_SHA_512_ALGO = "ES512";
