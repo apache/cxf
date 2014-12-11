@@ -153,14 +153,6 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
                            "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
     }
     @Test
-<<<<<<< HEAD
-=======
-    public final void testJaxwsEndpointCallback() throws Exception {
-        testSuccessfulCall("jaxws-publish-callback.xml",
-                           "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
-    }
-    @Test
->>>>>>> d4a35c4... Initial refactor of transports systests
     public final void testJaxwsTLSRefsEndpoint() throws Exception {
         testSuccessfulCall("jaxws-tlsrefs-publish.xml",
                            "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
