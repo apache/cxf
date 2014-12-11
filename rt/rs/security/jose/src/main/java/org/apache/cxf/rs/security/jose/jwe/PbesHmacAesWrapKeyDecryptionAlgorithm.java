@@ -51,7 +51,11 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgor
         int keySize = PbesHmacAesWrapKeyEncryptionAlgorithm.getKeySize(keyAlgoJwt);
         byte[] derivedKey = PbesHmacAesWrapKeyEncryptionAlgorithm
             .createDerivedKey(keyAlgoJwt, keySize, password, saltInput, pbesCount);
-        KeyDecryptionAlgorithm aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey);
+        KeyDecryptionAlgorithm aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey) {
+            protected boolean isValidAlgorithmFamily(String wrapAlgo) {
+                return Algorithm.isPbesHsWrap(wrapAlgo);
+            }    
+        };
         return aesWrap.getDecryptedContentEncryptionKey(consumer);
     }    
     private byte[] getDecodedBytes(JweCompactConsumer consumer, String headerName) {

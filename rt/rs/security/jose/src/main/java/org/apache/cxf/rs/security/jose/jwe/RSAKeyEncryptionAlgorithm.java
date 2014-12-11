@@ -19,21 +19,15 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
-public class RSAOaepKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgorithm {
-    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.RSA_OAEP.getJwtName(),
-                      Algorithm.RSA_OAEP_256.getJwtName()));
-    public RSAOaepKeyEncryptionAlgorithm(RSAPublicKey publicKey, String jweAlgo) {
+public class RSAKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgorithm {
+    public RSAKeyEncryptionAlgorithm(RSAPublicKey publicKey, String jweAlgo) {
         this(publicKey, jweAlgo, true);
     }
-    public RSAOaepKeyEncryptionAlgorithm(RSAPublicKey publicKey, String jweAlgo, boolean wrap) {
-        super(publicKey, jweAlgo, wrap, SUPPORTED_ALGORITHMS);
+    public RSAKeyEncryptionAlgorithm(RSAPublicKey publicKey, String jweAlgo, boolean wrap) {
+        super(publicKey, jweAlgo, wrap, Algorithm.RSA_CEK_SET);
     }
     
 }

@@ -45,9 +45,13 @@ public class AesWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm
     @Override
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
         super.validateKeyEncryptionAlgorithm(keyAlgo);
-        if (!Algorithm.isAesKeyWrap(keyAlgo)) {
+        if (!isValidAlgorithmFamily(keyAlgo)) {
             throw new SecurityException();
         }
+    }
+    
+    protected boolean isValidAlgorithmFamily(String keyAlgo) {
+        return Algorithm.isAesKeyWrap(keyAlgo);
     }
     
 }
