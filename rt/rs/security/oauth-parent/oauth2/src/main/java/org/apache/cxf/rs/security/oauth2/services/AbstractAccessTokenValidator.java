@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
@@ -90,7 +91,8 @@ public abstract class AbstractAccessTokenValidator {
     /**
      * Get the access token
      */
-    protected AccessTokenValidation getAccessTokenValidation(String authScheme, String authSchemeData) {
+    protected AccessTokenValidation getAccessTokenValidation(String authScheme, String authSchemeData,
+                                                             MultivaluedMap<String, String> extraProps) {
         AccessTokenValidation accessTokenV = null;
         if (dataProvider == null && tokenHandlers.isEmpty()) {
             throw ExceptionUtils.toInternalServerErrorException(null, null);
@@ -101,7 +103,8 @@ public abstract class AbstractAccessTokenValidator {
         if (handler != null) {
             try {
                 // Convert the HTTP Authorization scheme data into a token
-                accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData);
+                accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData, 
+                                                           extraProps);
             } catch (OAuthServiceException ex) {
                 AuthorizationUtils.throwAuthorizationFailure(
                     Collections.singleton(authScheme), realm);

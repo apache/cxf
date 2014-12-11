@@ -46,14 +46,12 @@ public class BareServer extends AbstractBusTestServerBase {
     
     public static void main(String[] args) {
         try {
-            System.out.println("!!!!start");
+            // System.out.println("!!!!start");
             BareServer s = new BareServer();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally {
-            System.out.println("done!");
         }
     }
 

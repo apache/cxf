@@ -62,10 +62,11 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
         if (!isValidAlgorithmFamily(algo)) {
             throw new SecurityException();
         }
+        //TODO: validate "A key of size 2048 bits or larger MUST be used" for PS-SHA algorithms 
     }
     
     protected boolean isValidAlgorithmFamily(String algo) {
-        return Algorithm.isRsaShaSign(algo);
+        return Algorithm.isRsaSign(algo);
     }
 
     protected static class PrivateKeyJwsSignature implements JwsSignature {

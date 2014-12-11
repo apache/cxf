@@ -21,11 +21,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
@@ -39,10 +36,7 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
-    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.PBES2_HS256_A128KW.getJwtName(),
-                      Algorithm.PBES2_HS384_A192KW.getJwtName(),
-                      Algorithm.PBES2_HS512_A256KW.getJwtName()));
+    
     private static final Map<String, Integer> PBES_HMAC_MAP;
     private static final Map<String, String> PBES_AES_MAP;
     private static final Map<String, Integer> DERIVED_KEY_SIZE_MAP;
@@ -140,7 +134,7 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
         return saltValue;
     }
     static String validateKeyAlgorithm(String algo) {
-        if (!SUPPORTED_ALGORITHMS.contains(algo)) {
+        if (!Algorithm.isPbesHsWrap(algo)) {
             throw new SecurityException();
         }
         return algo;

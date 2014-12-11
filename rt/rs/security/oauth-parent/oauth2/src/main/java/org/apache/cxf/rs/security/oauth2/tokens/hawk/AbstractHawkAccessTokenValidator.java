@@ -18,11 +18,14 @@
  */
 package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
@@ -36,23 +39,37 @@ import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public abstract class AbstractHawkAccessTokenValidator implements AccessTokenValidator {
+    protected static final String HTTP_VERB = "http.verb";
+    protected static final String HTTP_URI = "http.uri";
     private NonceVerifier nonceVerifier;
+    private boolean remoteSignatureValidation;
     public List<String> getSupportedAuthorizationSchemes() {
         return Collections.singletonList(OAuthConstants.HAWK_AUTHORIZATION_SCHEME);
     }
 
     public AccessTokenValidation validateAccessToken(MessageContext mc,
-                                                     String authScheme, 
-                                                     String authSchemeData) throws OAuthServiceException {
+        String authScheme, String authSchemeData, MultivaluedMap<String, String> extraProps) 
+        throws OAuthServiceException {
          
         Map<String, String> schemeParams = getSchemeParameters(authSchemeData);
-        AccessTokenValidation atv = getAccessTokenValidation(mc, schemeParams, authSchemeData);
+        AccessTokenValidation atv = 
+            getAccessTokenValidation(mc, authScheme, authSchemeData, extraProps, schemeParams);
+        if (isRemoteSignatureValidation()) {
+            return atv;
+        }
         
         String macKey = atv.getExtraProps().get(OAuthConstants.HAWK_TOKEN_KEY);
         String macAlgo = atv.getExtraProps().get(OAuthConstants.HAWK_TOKEN_ALGORITHM);
-            
-        HttpRequestProperties httpProps = new HttpRequestProperties(mc.getUriInfo().getRequestUri(),
-                                                                    mc.getHttpServletRequest().getMethod());
+        
+        
+        HttpRequestProperties httpProps = null;
+        if (extraProps != null && extraProps.containsKey(HTTP_VERB) && extraProps.containsKey(HTTP_URI)) {
+            httpProps = new HttpRequestProperties(URI.create(extraProps.getFirst(HTTP_URI)),
+                                                  extraProps.getFirst(HTTP_VERB));
+        } else {
+            httpProps = new HttpRequestProperties(mc.getUriInfo().getRequestUri(), 
+                                                  mc.getHttpServletRequest().getMethod());
+        }
         HawkAuthorizationScheme macAuthInfo = new HawkAuthorizationScheme(httpProps, schemeParams);
         String normalizedString = macAuthInfo.getNormalizedRequestString();
         try {
@@ -74,10 +91,12 @@ public abstract class AbstractHawkAccessTokenValidator implements AccessTokenVal
     }
     
     protected abstract AccessTokenValidation getAccessTokenValidation(MessageContext mc,
-                                                             Map<String, String> schemeParams,
-                                                             String authSchemeData);
+                                                                      String authScheme, 
+                                                                      String authSchemeData, 
+                                                                      MultivaluedMap<String, String> extraProps,
+                                                                      Map<String, String> schemeParams);
     
-    private static Map<String, String> getSchemeParameters(String authData) {
+    protected static Map<String, String> getSchemeParameters(String authData) {
         String[] attributePairs = authData.split(",");
         Map<String, String> attributeMap = new HashMap<String, String>();
         for (String pair : attributePairs) {
@@ -95,5 +114,13 @@ public abstract class AbstractHawkAccessTokenValidator implements AccessTokenVal
     
     public void setNonceVerifier(NonceVerifier nonceVerifier) {
         this.nonceVerifier = nonceVerifier;
+    }
+
+    public boolean isRemoteSignatureValidation() {
+        return remoteSignatureValidation;
+    }
+
+    public void setRemoteSignatureValidation(boolean remoteSignatureValidation) {
+        this.remoteSignatureValidation = remoteSignatureValidation;
     }
 }

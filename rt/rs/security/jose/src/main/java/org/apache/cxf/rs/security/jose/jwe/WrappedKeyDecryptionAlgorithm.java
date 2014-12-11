@@ -63,10 +63,11 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     }
     protected String getKeyEncryptionAlgorithm(JweCompactConsumer consumer) {
         String keyAlgo = consumer.getJweHeaders().getKeyEncryptionAlgorithm();
+        validateKeyEncryptionAlgorithm(keyAlgo);
         return Algorithm.toJavaName(keyAlgo);
     }
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
-        if (keyAlgo == null || supportedAlgo != null && supportedAlgo.equals(keyAlgo)) {
+        if (keyAlgo == null || supportedAlgo != null && !supportedAlgo.equals(keyAlgo)) {
             throw new SecurityException();
         }
     }

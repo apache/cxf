@@ -31,6 +31,7 @@ import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactReaderWriterTest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -115,6 +116,33 @@ public class JweCompactReaderWriterTest extends Assert {
         assertEquals(specPlainText, decryptedText);
     }
     @Test
+    public void testEncryptDecryptRSA15WrapA128CBCHS256() throws Exception {
+        final String specPlainText = "Live long and prosper.";
+        JweHeaders headers = new JweHeaders();
+        headers.setAlgorithm(Algorithm.RSA_1_5.getJwtName());
+        headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
+        
+        RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED_A1, 
+                                                             RSA_PUBLIC_EXPONENT_ENCODED_A1);
+        
+        KeyEncryptionAlgorithm keyEncryption = new RSAKeyEncryptionAlgorithm(publicKey, 
+                                                       Algorithm.RSA_1_5.getJwtName());
+        
+        JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers,
+                                                           CONTENT_ENCRYPTION_KEY_A3, 
+                                                           INIT_VECTOR_A3,
+                                                           keyEncryption);
+        String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
+        
+        RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1, 
+                                                                RSA_PRIVATE_EXPONENT_ENCODED_A1);
+        KeyDecryptionAlgorithm keyDecryption = new RSAKeyDecryptionAlgorithm(privateKey,
+                                                                                 Algorithm.RSA_1_5.getJwtName());
+        JweDecryptionProvider decryption = new AesCbcHmacJweDecryption(keyDecryption);
+        String decryptedText = decryption.decrypt(jweContent).getContentText();
+        assertEquals(specPlainText, decryptedText);
+    }
+    @Test
     public void testEncryptDecryptAesGcmWrapA128CBCHS256() throws Exception {
         //
         // This test fails with the IBM JDK
@@ -177,7 +205,7 @@ public class JweCompactReaderWriterTest extends Assert {
         } else {
             jwtKeyName = Algorithm.toJwtName(key.getAlgorithm(), key.getEncoded().length * 8);
         }
-        KeyEncryptionAlgorithm keyEncryptionAlgo = new RSAOaepKeyEncryptionAlgorithm(publicKey, 
+        KeyEncryptionAlgorithm keyEncryptionAlgo = new RSAKeyEncryptionAlgorithm(publicKey, 
                                                        Algorithm.RSA_OAEP.getJwtName()); 
         ContentEncryptionAlgorithm contentEncryptionAlgo = 
             new AesGcmContentEncryptionAlgorithm(key == null ? null : key.getEncoded(), INIT_VECTOR_A1, jwtKeyName);
@@ -194,7 +222,7 @@ public class JweCompactReaderWriterTest extends Assert {
                                                                 RSA_PRIVATE_EXPONENT_ENCODED_A1);
         String algo = Cipher.getMaxAllowedKeyLength("AES") > 128 
             ? JoseConstants.A256GCM_ALGO : JoseConstants.A128GCM_ALGO; 
-        JweDecryptionProvider decryptor = new WrappedKeyJweDecryption(new RSAOaepKeyDecryptionAlgorithm(privateKey),
+        JweDecryptionProvider decryptor = new WrappedKeyJweDecryption(new RSAKeyDecryptionAlgorithm(privateKey),
                                               new AesGcmContentDecryptionAlgorithm(algo));
         String decryptedText = decryptor.decrypt(jweContent).getContentText();
         assertEquals(decryptedText, plainContent);

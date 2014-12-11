@@ -69,12 +69,6 @@
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
                 </sec:keyManagers>
-                <sec:cipherSuitesFilter>
-                    <sec:include>.*_EXPORT_.*</sec:include>
-                    <sec:include>.*_EXPORT1024_.*</sec:include>
-                    <sec:include>.*_WITH_DES_.*</sec:include>
-                    <sec:include>.*_WITH_AES_.*</sec:include>
-                </sec:cipherSuitesFilter>
                 <sec:clientAuthentication want="false" required="false"/>
             </httpj:tlsServerParameters>
         </httpj:engine>

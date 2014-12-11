@@ -85,7 +85,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         String authSchemeData = authParts[1];
         
         // Get the access token
-        AccessTokenValidation accessTokenV = getAccessTokenValidation(authScheme, authSchemeData); 
+        AccessTokenValidation accessTokenV = getAccessTokenValidation(authScheme, authSchemeData, null); 
         
         // Find the scopes which match the current request
         

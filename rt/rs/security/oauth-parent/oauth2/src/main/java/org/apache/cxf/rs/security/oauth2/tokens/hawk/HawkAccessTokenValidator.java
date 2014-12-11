@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -29,11 +31,12 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class HawkAccessTokenValidator extends AbstractHawkAccessTokenValidator {
     private OAuthDataProvider dataProvider;
-    private boolean remoteSignatureValidation;
         
     protected AccessTokenValidation getAccessTokenValidation(MessageContext mc,
-                                                             Map<String, String> schemeParams,
-                                                             String authSchemeData) {
+                                                             String authScheme, 
+                                                             String authSchemeData, 
+                                                             MultivaluedMap<String, String> extraProps,
+                                                             Map<String, String> schemeParams) {
         String macKey = schemeParams.get(OAuthConstants.HAWK_TOKEN_ID);
         ServerAccessToken accessToken = dataProvider.getAccessToken(macKey);
         if (!(accessToken instanceof HawkAccessToken)) {
@@ -43,7 +46,7 @@ public class HawkAccessTokenValidator extends AbstractHawkAccessTokenValidator {
         AccessTokenValidation atv = new AccessTokenValidation(macAccessToken);
         
         // OAuth2 Pop token introspection will likely support returning a JWE-encrypted key
-        if (!remoteSignatureValidation || mc.getSecurityContext().isSecure()) {
+        if (!isRemoteSignatureValidation() || mc.getSecurityContext().isSecure()) {
             atv.getExtraProps().put(OAuthConstants.HAWK_TOKEN_KEY, macAccessToken.getMacKey());
             atv.getExtraProps().put(OAuthConstants.HAWK_TOKEN_ALGORITHM, macAccessToken.getMacAlgorithm());
         }
@@ -51,11 +54,8 @@ public class HawkAccessTokenValidator extends AbstractHawkAccessTokenValidator {
         return atv;
     }
     
-        
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
-    public void setRemoteSignatureValidation(boolean remoteSignatureValidation) {
-        this.remoteSignatureValidation = remoteSignatureValidation;
-    }
+    
 }

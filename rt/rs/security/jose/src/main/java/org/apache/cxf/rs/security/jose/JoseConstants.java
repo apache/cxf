@@ -51,6 +51,9 @@ public final class JoseConstants {
     public static final String RS_SHA_256_ALGO = "RS256";
     public static final String RS_SHA_384_ALGO = "RS384";
     public static final String RS_SHA_512_ALGO = "RS512";
+    public static final String PS_SHA_256_ALGO = "PS256";
+    public static final String PS_SHA_384_ALGO = "PS384";
+    public static final String PS_SHA_512_ALGO = "PS512";
     public static final String ES_SHA_256_ALGO = "ES256";
     public static final String ES_SHA_384_ALGO = "ES384";
     public static final String ES_SHA_512_ALGO = "ES512";
@@ -75,6 +78,8 @@ public final class JoseConstants {
     public static final String A128GCM_ALGO = "A128GCM";
     public static final String A192GCM_ALGO = "A192GCM";
     public static final String A256GCM_ALGO = "A256GCM";
+    
+    public static final String JOSE_CONTEXT_PROPERTY = "org.apache.cxf.jose.context";
     
     private JoseConstants() {
         

@@ -31,7 +31,7 @@ public class SessionServer extends AbstractBusTestServerBase {
     
     @Override
     protected void run() {
-        String configurationFile = "resources/SessionServer.xml";
+        String configurationFile = "SessionServer.xml";
         URL configure =
             SessionServer.class.getResource(configurationFile);
         bus = new SpringBusFactory().createBus(configure, true);
@@ -46,14 +46,12 @@ public class SessionServer extends AbstractBusTestServerBase {
     
     public static void main(String[] args) {
         try {
-            System.out.println("!!!!start");
+            // System.out.println("!!!!start");
             SessionServer s = new SessionServer();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally {
-            System.out.println("done!");
         }
     }
 
