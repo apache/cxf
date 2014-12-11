@@ -177,10 +177,8 @@ public class DestinationSequence extends AbstractSequence {
         
         RMEndpoint reliableEndpoint = destination.getReliableEndpoint();
         RMConfiguration cfg = reliableEndpoint.getConfiguration();
-
-        if (null == rmps.getCloseSequence()) {        
-            scheduleAcknowledgement(cfg.getAcknowledgementIntervalTime());
-        }
+        
+        scheduleAcknowledgement(cfg.getAcknowledgementIntervalTime());
        
         long inactivityTimeout = cfg.getInactivityTimeoutTime();
         scheduleSequenceTermination(inactivityTimeout);
