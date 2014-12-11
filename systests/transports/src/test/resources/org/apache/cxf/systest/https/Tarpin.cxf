@@ -19,8 +19,8 @@
 -->
 
 <!-- 
-  ** This file configures the Morpit Server. It is just an
-  ** Https server with a name that will kick in the HostnameVerifier.
+  ** This file configures the Tarpin Server.
+  ** It is an https server that redirects to Gordy.
  -->
 
 
@@ -39,34 +39,24 @@
               http://cxf.apache.org/schemas/configuration/http-jetty.xsd
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
+
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
-  <http:destination name="{http://apache.org/hello_world}GreeterImplPort.http-destination">
+  <http:destination name="{http://apache.org/hello_world}Tarpin.http-destination">
+    <http:server RedirectURL="https://localhost:${testutil.ports.BusServer.3}/Gordy"/>
   </http:destination>
   
   <httpj:engine-factory bus="cxf">
-	 <httpj:engine port="${testutil.ports.BusServer.8}">
+	 <httpj:engine port="${testutil.ports.BusServer.1}">
 	     <httpj:tlsServerParameters>
 	      <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 
-	                resource="keys/Morpit.jks"/>
+	                file="src/test/resources/keys/Tarpin.jks"/>
 	      </sec:keyManagers>
 	      <sec:trustManagers>
 	          <sec:keyStore type="JKS" password="password"
-	               resource="keys/Truststore.jks"/>
+	               file="src/test/resources/keys/Truststore.jks"/>
 	      </sec:trustManagers>
-	      <sec:cipherSuitesFilter>
-	        <!-- these filters ensure that a ciphersuite with
-	          export-suitable or null encryption is used,
-	          but exclude anonymous Diffie-Hellman key change as
-	          this is vulnerable to man-in-the-middle attacks -->
-	        <sec:include>.*_EXPORT_.*</sec:include>
-	        <sec:include>.*_EXPORT1024_.*</sec:include>
-	        <sec:include>.*_WITH_DES_.*</sec:include>
-            <sec:include>.*_WITH_AES_.*</sec:include>
-	        <sec:include>.*_WITH_NULL_.*</sec:include>
-	        <sec:exclude>.*_DH_anon_.*</sec:exclude>
-	      </sec:cipherSuitesFilter>
 	      <sec:clientAuthentication want="true" required="true"/>
 	    </httpj:tlsServerParameters>
 	  </httpj:engine>

@@ -19,8 +19,8 @@
 -->
 
 <!-- 
-  ** This file configures the Gordy Server.
-  ** It is an https server that redirects to Bethal.
+  ** This file configures the Poltim Server.
+  ** It is an https server that redirects to Mortimer.
  -->
 
 
@@ -39,39 +39,27 @@
               http://cxf.apache.org/schemas/configuration/http-jetty.xsd
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
+
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
-  <http:destination 
-         name="{http://apache.org/hello_world}Gordy.http-destination">
-    <http:server RedirectURL="https://localhost:${testutil.ports.BusServer.2}/Bethal"/>
+  <http:destination name="{http://apache.org/hello_world}Poltim.http-destination">
+    <http:server RedirectURL="http://localhost:${testutil.ports.BusServer.0}/Mortimer"/>
   </http:destination>
   
   <httpj:engine-factory bus="cxf">
-	 <httpj:engine port="${testutil.ports.BusServer.1}">
+	 <httpj:engine port="${testutil.ports.BusServer.2}">
 	     <httpj:tlsServerParameters>
 	      <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 
-	                resource="keys/Gordy.jks"/>
+	                resource="keys/Poltim.jks"/>
 	      </sec:keyManagers>
 	      <sec:trustManagers>
 	          <sec:keyStore type="JKS" password="password"
 	               resource="keys/Truststore.jks"/>
 	      </sec:trustManagers>
-	      <sec:cipherSuitesFilter>
-	        <!-- these filters ensure that a ciphersuite with
-	          export-suitable or null encryption is used,
-	          but exclude anonymous Diffie-Hellman key change as
-	          this is vulnerable to man-in-the-middle attacks -->
-	        <sec:include>.*_EXPORT_.*</sec:include>
-	        <sec:include>.*_EXPORT1024_.*</sec:include>
-	        <sec:include>.*_WITH_DES_.*</sec:include>
-            <sec:include>.*_WITH_AES_.*</sec:include>
-	        <sec:include>.*_WITH_NULL_.*</sec:include>
-	        <sec:exclude>.*_DH_anon_.*</sec:exclude>
-	      </sec:cipherSuitesFilter>
 	      <sec:clientAuthentication want="true" required="true"/>
 	    </httpj:tlsServerParameters>
 	  </httpj:engine>
-   </httpj:engine-factory>
-   
+   </httpj:engine-factory>  
+  
 </beans>
