@@ -22,14 +22,14 @@ import java.security.interfaces.RSAPrivateKey;
 
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
-public class RSAOaepKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
-    public RSAOaepKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {    
+public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
+    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {    
         this(privateKey, null);
     }
-    public RSAOaepKeyDecryptionAlgorithm(RSAPrivateKey privateKey, String supportedAlgo) {    
+    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, String supportedAlgo) {    
         this(privateKey, supportedAlgo, true);
     }
-    public RSAOaepKeyDecryptionAlgorithm(RSAPrivateKey privateKey, String supportedAlgo, boolean unwrap) {    
+    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, String supportedAlgo, boolean unwrap) {    
         super(privateKey, supportedAlgo, unwrap);
     }
     protected int getKeyCipherBlockSize() {
@@ -38,7 +38,7 @@ public class RSAOaepKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm
     @Override
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
         super.validateKeyEncryptionAlgorithm(keyAlgo);
-        if (!Algorithm.isRsaOaep(keyAlgo)) {
+        if (!Algorithm.isRsaKeyWrap(keyAlgo)) {
             throw new SecurityException();
         }
     }

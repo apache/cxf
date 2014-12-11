@@ -121,7 +121,7 @@ public final class JweUtils {
         return keyEncryptionProvider;
     }
     public static KeyEncryptionAlgorithm getRSAKeyEncryptionAlgorithm(RSAPublicKey key, String algo) {
-        return new RSAOaepKeyEncryptionAlgorithm(key, algo);
+        return new RSAKeyEncryptionAlgorithm(key, algo);
     }
     public static KeyEncryptionAlgorithm getSecretKeyEncryptionAlgorithm(SecretKey key, String algo) {
         if (Algorithm.isAesKeyWrap(algo)) {
@@ -150,7 +150,7 @@ public final class JweUtils {
         return keyDecryptionProvider;
     }
     public static KeyDecryptionAlgorithm getRSAKeyDecryptionAlgorithm(RSAPrivateKey key, String algo) {
-        return new RSAOaepKeyDecryptionAlgorithm(key, algo);
+        return new RSAKeyDecryptionAlgorithm(key, algo);
     }
     public static KeyDecryptionAlgorithm getSecretKeyDecryptionAlgorithm(SecretKey key, String algo) {
         if (Algorithm.isAesKeyWrap(algo)) {
