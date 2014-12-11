@@ -25,9 +25,9 @@
         </cxf:features>
     </cxf:bus>
     <http:conduit name="https://localhost:.*">
-        <http:tlsClientParameters disableCNCheck="true">
+        <http:tlsClientParameters disableCNCheck="true" secureSocketProtocol="SSLv3">
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
