@@ -24,10 +24,41 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public final class JoseUtils {
+    
     private JoseUtils() {
         
+    }
+    
+    public static void setJoseContextProperty(JoseHeaders headers) {    
+        String context = (String)JAXRSUtils.getCurrentMessage().get(JoseConstants.JOSE_CONTEXT_PROPERTY);
+        if (context != null) {
+            headers.setHeader(JoseConstants.JOSE_CONTEXT_PROPERTY, context);
+        }
+    }
+    public static void setJoseMessageContextProperty(JoseHeaders headers, String value) {    
+        headers.setHeader(JoseConstants.JOSE_CONTEXT_PROPERTY, value);
+        JAXRSUtils.getCurrentMessage().put(JoseConstants.JOSE_CONTEXT_PROPERTY, value);
+    }
+    public static void setMessageContextProperty(JoseHeaders headers) {    
+        String context = (String)headers.getHeader(JoseConstants.JOSE_CONTEXT_PROPERTY);
+        if (context != null) {
+            JAXRSUtils.getCurrentMessage().put(JoseConstants.JOSE_CONTEXT_PROPERTY, context);
+        }
+    }
+    public static void validateRequestContextProperty(JoseHeaders headers) {
+        Object requestContext = JAXRSUtils.getCurrentMessage().get(JoseConstants.JOSE_CONTEXT_PROPERTY);
+        Object headerContext = headers.getHeader(JoseConstants.JOSE_CONTEXT_PROPERTY);
+        if (requestContext == null && headerContext == null) {
+            return;
+        }
+        if (requestContext == null && headerContext != null
+            || requestContext != null && headerContext == null
+            || !requestContext.equals(headerContext)) {
+            throw new SecurityException();
+        }
     }
     
     public static String checkContentType(String contentType, String defaultType) {
