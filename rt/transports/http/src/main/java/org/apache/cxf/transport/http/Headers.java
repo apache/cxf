@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.Message;
@@ -66,6 +67,7 @@ public class Headers {
     public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
     public static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
     public static final String HTTP_HEADERS_LINK = "Link";
+    public static final String EMPTY_REQUEST_PROPERTY = "org.apache.cxf.empty.request";
     private static final TimeZone TIME_ZONE_GMT = TimeZone.getTimeZone("GMT");
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
     
@@ -293,8 +295,12 @@ public class Headers {
      * @throws IOException
      */
     public void setProtocolHeadersInConnection(HttpURLConnection connection) throws IOException {
-        String ct = determineContentType();
+        boolean emptyRequest = PropertyUtils.isTrue(message.get(EMPTY_REQUEST_PROPERTY));
+        // Apparently HttpUrlConnection sets a form Content-Type 
+        // if no Content-Type is set even for empty requests 
+        String ct = emptyRequest ? "*/*" : determineContentType();
         connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, ct);
+         
         transferProtocolHeadersToURLConnection(connection);
         logProtocolHeaders(Level.FINE);
     }

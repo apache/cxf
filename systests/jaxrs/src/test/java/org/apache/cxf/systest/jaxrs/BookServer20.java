@@ -50,6 +50,7 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -60,6 +61,7 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -126,13 +128,22 @@ public class BookServer20 extends AbstractBusTestServerBase {
 
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
+            UriInfo ui = context.getUriInfo();
+            String path = ui.getPath(false);
+            
+            if (context.getMethod().equals("POST") 
+                && "bookstore/bookheaders/simple".equals(path) && !context.hasEntity()) {
+                byte[] bytes = StringUtils.toBytesUTF8("<Book><name>Book</name><id>126</id></Book>");
+                context.getHeaders().putSingle(HttpHeaders.CONTENT_LENGTH, Integer.toString(bytes.length));
+                context.getHeaders().putSingle("Content-Type", "application/xml");
+                context.getHeaders().putSingle("EmptyRequestStreamDetected", "true");
+                context.setEntityStream(new ByteArrayInputStream(bytes));
+            }
             if ("true".equals(context.getProperty("DynamicPrematchingFilter"))) {
                 throw new RuntimeException();
             }
             context.setProperty("FirstPrematchingFilter", "true");
             
-            UriInfo ui = context.getUriInfo();
-            String path = ui.getPath(false);
             if ("wrongpath".equals(path)) {
                 context.setRequestUri(URI.create("/bookstore/bookheaders/simple"));
             } else if ("throwException".equals(path)) {

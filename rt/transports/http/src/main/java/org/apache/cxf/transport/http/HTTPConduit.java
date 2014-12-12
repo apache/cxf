@@ -1290,12 +1290,8 @@ public abstract class HTTPConduit
             // Trust is okay, set up for writing the request.
             
             String method = getMethod();
-            if (KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(method)) {
-                handleNoOutput();
-                return;
-            }
-
-            if (outMessage.get("org.apache.cxf.empty.request") != null) {
+            if (KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(method)
+                || PropertyUtils.isTrue(outMessage.get(Headers.EMPTY_REQUEST_PROPERTY))) {
                 handleNoOutput();
                 return;
             }
