@@ -50,6 +50,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.resource.ResourceManager;
@@ -69,6 +70,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     
     private static final String STATIC_RESOURCES_PARAMETER = "static-resources-list";
     private static final String STATIC_WELCOME_FILE_PARAMETER = "static-welcome-file";
+    private static final String STATIC_CACHE_CONTROL = "static-cache-control";
     private static final String STATIC_RESOURCES_MAP_RESOURCE = "/cxfServletStaticResourcesMap.txt";    
     
     private static final String REDIRECTS_PARAMETER = "redirects-list";
@@ -76,6 +78,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     private static final String REDIRECT_SERVLET_PATH_PARAMETER = "redirect-servlet-path";
     private static final String REDIRECT_ATTRIBUTES_PARAMETER = "redirect-attributes";
     private static final String REDIRECT_QUERY_CHECK_PARAMETER = "redirect-query-check";
+    private static final String REDIRECT_WITH_INCLUDE_PARAMETER = "redirect-with-include";
     
     private static final Map<String, String> DEFAULT_STATIC_CONTENT_TYPES;
     
@@ -322,7 +325,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                     response.setContentType(type);
                 }
             }
-            
+            String cacheControl = getServletConfig().getInitParameter(STATIC_CACHE_CONTROL);
+            if (cacheControl != null) {
+                response.setHeader("Cache-Control", cacheControl.trim());
+            }
             ServletOutputStream os = response.getOutputStream();
             IOUtils.copy(is, os);
             os.flush();
@@ -360,7 +366,11 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             }
             HttpServletRequestFilter servletRequest = 
                 new HttpServletRequestFilter(request, pathInfo, theServletPath, customServletPath);
-            rd.forward(servletRequest, response);
+            if (PropertyUtils.isTrue(getServletConfig().getInitParameter(REDIRECT_WITH_INCLUDE_PARAMETER))) {
+                rd.include(servletRequest, response);
+            } else {
+                rd.forward(servletRequest, response);
+            }
         } catch (Throwable ex) {
             throw new ServletException("RequestDispatcher for path " + pathInfo + " has failed");
         }   

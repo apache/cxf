@@ -43,6 +43,16 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     public void testGetBookHTML() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/bookstore1/books/html/123"; 
+        doTestGetBookHTML(endpointAddress);
+    }
+    @Test
+    public void testGetBookHTMLInclude() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/bookstore5/books/html/123"; 
+        doTestGetBookHTML(endpointAddress);
+    }
+
+    private void doTestGetBookHTML(String endpointAddress) throws Exception {
         WebClient client = WebClient.create(endpointAddress);
         client.accept("text/html");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
