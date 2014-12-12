@@ -17,11 +17,12 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.https;
+package org.apache.cxf.systest.https.conduit;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -35,13 +36,14 @@ import org.junit.BeforeClass;
 import org.littleshoot.proxy.DefaultHttpProxyServer;
 import org.littleshoot.proxy.HttpFilter;
 import org.littleshoot.proxy.HttpRequestFilter;
+import org.littleshoot.proxy.ProxyAuthorizationHandler;
 
 
 /**
  * 
  */
-public class HTTPSProxyConduitTest extends HTTPSConduitTest {
-    static final int PROXY_PORT = Integer.parseInt(allocatePort(HTTPSProxyConduitTest.class));
+public class HTTPSProxyAuthConduitTest extends HTTPSConduitTest {
+    static final int PROXY_PORT = Integer.parseInt(allocatePort(HTTPSProxyAuthConduitTest.class));
     static DefaultHttpProxyServer proxy;
     static CountingFilter requestFilter = new CountingFilter();
     
@@ -59,7 +61,7 @@ public class HTTPSProxyConduitTest extends HTTPSConduitTest {
         }
     }
     
-    public HTTPSProxyConduitTest() {
+    public HTTPSProxyAuthConduitTest() {
     }
 
     
@@ -72,6 +74,11 @@ public class HTTPSProxyConduitTest extends HTTPSConduitTest {
     @BeforeClass
     public static void startProxy() {
         proxy = new DefaultHttpProxyServer(PROXY_PORT, requestFilter, new HashMap<String, HttpFilter>());
+        proxy.addProxyAuthenticationHandler(new ProxyAuthorizationHandler() {
+            public boolean authenticate(String userName, String password) {
+                return "password".equals(password) && "CXF".equals(userName);
+            }
+        });
         proxy.start();
     }
     @Before
@@ -88,6 +95,10 @@ public class HTTPSProxyConduitTest extends HTTPSConduitTest {
         }
         pol.setProxyServer("localhost");
         pol.setProxyServerPort(PROXY_PORT);
+        ProxyAuthorizationPolicy auth = new ProxyAuthorizationPolicy();
+        auth.setUserName("CXF");
+        auth.setPassword("password");
+        cond.setProxyAuthorization(auth);
     }
     
     public void resetProxyCount() {

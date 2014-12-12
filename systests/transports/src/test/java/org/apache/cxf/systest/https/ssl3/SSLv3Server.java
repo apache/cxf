@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.https;
+package org.apache.cxf.systest.https.ssl3;
 
 import java.net.URL;
 
@@ -33,7 +33,7 @@ public class SSLv3Server extends AbstractBusTestServerBase {
     }
 
     protected void run()  {
-        URL busFile = Server.class.getResource("sslv3-server.xml");
+        URL busFile = SSLv3Server.class.getResource("sslv3-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);

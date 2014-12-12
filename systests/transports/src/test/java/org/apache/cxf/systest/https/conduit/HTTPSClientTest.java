@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.https;
+package org.apache.cxf.systest.https.conduit;
 
 import java.net.URL;
 
@@ -32,6 +32,7 @@ import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.KeyStoreType;
 import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
+import org.apache.cxf.systest.https.BusServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;

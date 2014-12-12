@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.https;
+package org.apache.cxf.systest.https.constraints;
 
 import java.net.URL;
 
@@ -25,6 +25,7 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.systest.https.BusServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
