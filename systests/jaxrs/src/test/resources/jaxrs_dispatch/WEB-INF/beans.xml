@@ -42,6 +42,10 @@
         <property name="resourcePath" value="/book.html"/>
         <property name="dispatcherName" value="default"/>
     </bean>
+    <bean id="dispatchProvider5" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+        <property name="resourcePath" value="/book.html"/>
+        <property name="includeResource" value="true"/>
+    </bean>
     <jaxrs:server id="bookservice1" address="/bookstore1">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -72,6 +76,14 @@
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="dispatchProvider4"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice5" address="/bookstore5">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="dispatchProvider5"/>
         </jaxrs:providers>
     </jaxrs:server>
 </beans>
