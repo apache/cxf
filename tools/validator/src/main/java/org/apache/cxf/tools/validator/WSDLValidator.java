@@ -53,9 +53,6 @@ public class WSDLValidator extends AbstractCXFToolContainer {
         super.execute(false);
         ToolContext env = getContext();
         env.setParameters(getParametersMap(getArrayKeys()));
-        if (isVerboseOn()) {
-            env.put(ToolConstants.CFG_VERBOSE, Boolean.TRUE);
-        }
         env.put(ToolConstants.CFG_VALIDATE_WSDL, "all");
         env.put(ToolConstants.CFG_CMD_ARG, getArgument());
 
@@ -70,9 +67,6 @@ public class WSDLValidator extends AbstractCXFToolContainer {
             if (!hasInfoOption()) {
                 ToolContext env = getContext();
                 env.setParameters(getParametersMap(getArrayKeys()));
-                if (isVerboseOn()) {
-                    env.put(ToolConstants.CFG_VERBOSE, Boolean.TRUE);
-                }
                 env.put(ToolConstants.CFG_VALIDATE_WSDL, "all");
                 env.put(ToolConstants.CFG_CMD_ARG, getArgument());
 
