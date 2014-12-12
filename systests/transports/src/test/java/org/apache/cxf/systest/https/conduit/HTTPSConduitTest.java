@@ -37,7 +37,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -714,9 +713,6 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(gordy);
-        
-        BindingProvider provider = (BindingProvider)gordy;
-        provider.getRequestContext().put("use.async.http.conduit", Boolean.FALSE);
         
         HTTPConduit http = 
             (HTTPConduit) client.getConduit();
