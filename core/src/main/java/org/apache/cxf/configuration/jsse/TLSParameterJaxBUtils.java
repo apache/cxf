@@ -302,7 +302,11 @@ public final class TLSParameterJaxBUtils {
             if (ch == null) {
                 return null;
             }
-            PasswordCallback pwCb = new PasswordCallback(kmc.getKeyStore().getFile(), false);
+            String prompt = kmc.getKeyStore().getFile();
+            if (prompt == null) {
+                prompt = kmc.getKeyStore().getResource();
+            }
+            PasswordCallback pwCb = new PasswordCallback(prompt, false);
             PasswordCallback[] callbacks = new PasswordCallback[] {pwCb};
             ch.handle(callbacks);
             keyPass = callbacks[0].getPassword();
