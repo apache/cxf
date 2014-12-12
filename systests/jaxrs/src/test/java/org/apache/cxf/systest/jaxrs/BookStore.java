@@ -720,7 +720,8 @@ public class BookStore {
         @HeaderParam("BOOK") String headerBook,
         @HeaderParam("Simple") String headerSimple,
         @HeaderParam("ServerReaderInterceptor") String serverInterceptorHeader,
-        @HeaderParam("ClientWriterInterceptor") String clientInterceptorHeader) throws Exception {
+        @HeaderParam("ClientWriterInterceptor") String clientInterceptorHeader,
+        @HeaderParam("EmptyRequestStreamDetected") String emptyStreamHeader) throws Exception {
         if (!"application/xml".equals(ct)) {
             throw new RuntimeException();
         }
@@ -730,6 +731,9 @@ public class BookStore {
         }
         if (clientInterceptorHeader != null) {
             builder.header("ClientWriterInterceptor", clientInterceptorHeader);
+        }
+        if (emptyStreamHeader != null) {
+            builder.header("EmptyRequestStreamDetected", emptyStreamHeader);
         }
         return builder.build();
     }
@@ -773,7 +777,7 @@ public class BookStore {
         throws Exception {
         
         return echoBookByHeaderSimple(book, ct, headerBook, headerSimple, serverInterceptorHeader, 
-                                      clientInterceptorHeader);
+                                      clientInterceptorHeader, null);
     }
     
     private ResponseBuilder getBookByHeaderSimpleBuilder(@HeaderParam("BOOK") String headerBook,

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -43,6 +44,40 @@ public final class IOUtils {
 
     }
     
+    public static boolean isEmpty(InputStream is) throws IOException {
+        if (is == null) {
+            return true;
+        }
+        final byte[] bytes = new byte[1];
+        try {
+            if (is.markSupported()) {
+                is.mark(1);
+                try {
+                    return isEof(is.read(bytes));
+                } finally {
+                    is.reset();
+                }
+            }
+            // if available is 0 it does not mean it is empty; it can also throw IOException
+            if (is.available() > 0) {
+                return false;
+            }
+        } catch (IOException ex) {
+            // ignore
+        }
+        // it may be an attachment stream
+        @SuppressWarnings("resource")
+        PushbackInputStream pbStream = 
+            is instanceof PushbackInputStream ? (PushbackInputStream)is : new PushbackInputStream(is);
+        boolean isEmpty = isEof(pbStream.read(bytes));
+        if (!isEmpty) {
+            pbStream.unread(bytes);
+        }
+        return isEmpty;
+    }
+    private static boolean isEof(int result) {
+        return result == -1;
+    }
     /**
      * Use this function instead of new String(byte[], String) to avoid surprises from 
      * non-standard default encodings.

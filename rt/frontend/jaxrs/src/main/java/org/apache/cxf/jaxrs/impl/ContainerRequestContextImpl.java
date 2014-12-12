@@ -18,16 +18,18 @@
  */
 package org.apache.cxf.jaxrs.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
@@ -66,8 +68,11 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public boolean hasEntity() {
-        InputStream is = getEntityStream();
-        return is != null && !HttpMethod.GET.equals(getMethod());
+        try {
+            return !IOUtils.isEmpty(getEntityStream());
+        } catch (IOException ex) {
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
+        }
     }
 
     @Override
