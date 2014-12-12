@@ -73,7 +73,7 @@ public final class AuthorizationUtils {
                                                  Set<String> challenges,
                                                  String realm) {
         List<String> headers = mc.getHttpHeaders().getRequestHeader("Authorization");
-        if (headers.size() == 1) {
+        if (headers != null && headers.size() == 1) {
             String[] parts = headers.get(0).split(" ");
             if (parts.length > 0 
                 && (challenges == null || challenges.isEmpty() || challenges.contains(parts[0]))) {
