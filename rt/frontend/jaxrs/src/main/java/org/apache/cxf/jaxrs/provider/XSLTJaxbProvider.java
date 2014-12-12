@@ -87,7 +87,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     private static final String ABSOLUTE_PATH_PARAMETER = "absolute.path";
     private static final String BASE_PATH_PARAMETER = "base.path";
     private static final String RELATIVE_PATH_PARAMETER = "relative.path";
-    
+    private static final String XSLT_TEMPLATE_PROPERTY = "xslt.template";
     private SAXTransformerFactory factory;
     private Templates inTemplates;
     private Templates outTemplates;
@@ -106,6 +106,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     private String systemId;
     
     private boolean supportJaxbOnly;
+    private boolean refreshTemplates;
     
     public void setSupportJaxbOnly(boolean support) {
         this.supportJaxbOnly = support;
@@ -170,7 +171,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         XSLTTransform ann = getXsltTransformAnn(anns, mt);
         if (ann != null) {
             t = annotationTemplates.get(ann.value());
-            if (t == null) {
+            if (t == null || refreshTemplates) {
                 String path = ann.value();
                 final String cp = "classpath:";
                 if (!path.startsWith(cp)) {
@@ -181,7 +182,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                     createTemplates(ClassLoaderUtils.getResource(ann.value(), cls));
                 }
                 if (t != null) {
-                    annotationTemplates.putIfAbsent(ann.value(), t);
+                    annotationTemplates.put(ann.value(), t);
                 }
             }
         }
@@ -218,7 +219,11 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     
     
     protected Templates getInTemplates(Annotation[] anns, MediaType mt) {
-        Templates t = inTemplates != null ? inTemplates 
+        Templates t = createTemplatesFromContext();
+        if (t != null) {
+            return t;
+        }
+        t = inTemplates != null ? inTemplates 
             : inMediaTemplates != null ? inMediaTemplates.get(mt.getType() + "/" + mt.getSubtype()) : null;
         if (t == null) {    
             t = getAnnotationTemplates(anns);
@@ -227,7 +232,11 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     }
     
     protected Templates getOutTemplates(Annotation[] anns, MediaType mt) {
-        Templates t = outTemplates != null ? outTemplates 
+        Templates t = createTemplatesFromContext();
+        if (t != null) {
+            return t;
+        }
+        t = outTemplates != null ? outTemplates 
             : outMediaTemplates != null ? outMediaTemplates.get(mt.getType() + "/" + mt.getSubtype()) : null;
         if (t == null) {    
             t = getAnnotationTemplates(anns);
@@ -487,6 +496,17 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         return null;
     }
     
+    protected Templates createTemplatesFromContext() { 
+        MessageContext mc = getContext();
+        if (mc != null) {
+            String template = (String)mc.getContextualProperty(XSLT_TEMPLATE_PROPERTY);
+            if (template != null) {
+                return createTemplates(template);
+            }
+        }
+        return null;
+    }
+    
     protected Templates createTemplates(URL urlStream) {
         try {
             if (urlStream == null) {
@@ -511,6 +531,10 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         return null;
     }
     
+    public void setRefreshTemplates(boolean refresh) {
+        this.refreshTemplates = refresh;
+    }
+
     private static class TemplatesImpl implements Templates {
 
         private Templates templates;
