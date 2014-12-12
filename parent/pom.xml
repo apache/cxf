@@ -417,7 +417,7 @@
                             <derby.system.home>${basedir}/target/derby</derby.system.home>
                             <spring.validation.mode>${cxf.spring.validation.mode}</spring.validation.mode>
                             <server.launcher.vmargs>${cxf.server.launcher.vmargs}</server.launcher.vmargs>
-                            <org.apache.cxf.transport.http.async.usePolicy>ALWAYS</org.apache.cxf.transport.http.async.usePolicy>
+                            <org.apache.cxf.transport.http.async.usePolicy>ASYNC_ONLY</org.apache.cxf.transport.http.async.usePolicy>
                             <javax.xml.bind.JAXBContext>${cxf.jaxb.context.class}</javax.xml.bind.JAXBContext>
                             <!--javax.xml.bind.JAXBContext>org.eclipse.persistence.jaxb.JAXBContextFactory</javax.xml.bind.JAXBContext-->
                         </systemPropertyVariables>

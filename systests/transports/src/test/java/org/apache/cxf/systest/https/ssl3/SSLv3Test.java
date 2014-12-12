@@ -27,7 +27,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
-import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -151,9 +150,6 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
         
-        BindingProvider provider = (BindingProvider)port;
-        provider.getRequestContext().put("use.async.http.conduit", Boolean.FALSE);
-        
         updateAddressPort(port, PORT3);
         
         try {
@@ -181,9 +177,6 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         assertNotNull("Service is null", service);   
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
-        BindingProvider provider = (BindingProvider)port;
-        provider.getRequestContext().put("use.async.http.conduit", Boolean.FALSE);
         
         updateAddressPort(port, PORT3);
         
