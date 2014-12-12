@@ -18,13 +18,27 @@
  */
 package org.apache.cxf.jaxrs.swagger;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
+import com.wordnik.swagger.jaxrs.config.BeanConfig;
+import com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider;
+import com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON;
+import com.wordnik.swagger.jaxrs.listing.ResourceListingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 
@@ -39,22 +53,29 @@ public class SwaggerFeature extends AbstractFeature {
     private String license = "Apache 2.0 License";
     private String licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html";
     private boolean scan = true;
-    
+    private boolean runAsFilter;
     
     @Override
     public void initialize(Server server, Bus bus) {
-        List<Object> serviceBeans = new ArrayList<Object>();
-        serviceBeans.add(new com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON());
         calulateDefaultResourcePackage(server);
         calulateDefaultBasePath(server);
-        ((JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName())).
-            setResourceClassesFromBeans(serviceBeans);
+        ApiListingResourceJSON apiListingResource = new ApiListingResourceJSON();
+        if (!runAsFilter) {
+            List<Object> serviceBeans = new ArrayList<Object>();
+            serviceBeans.add(apiListingResource);
+            ((JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName())).
+                setResourceClassesFromBeans(serviceBeans);
+        }
         List<Object> providers = new ArrayList<Object>();
-        providers.add(new com.wordnik.swagger.jaxrs.listing.ResourceListingProvider());
-        providers.add(new com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider());
+        if (runAsFilter) {
+            providers.add(new SwaggerContainerRequestFilter(apiListingResource));
+        }
+        providers.add(new ResourceListingProvider());
+        providers.add(new ApiDeclarationProvider());
         ((ServerProviderFactory)server.getEndpoint().get(
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
-        com.wordnik.swagger.jaxrs.config.BeanConfig beanConfig = new com.wordnik.swagger.jaxrs.config.BeanConfig();
+        
+        BeanConfig beanConfig = new BeanConfig();
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setVersion(getVersion());
         beanConfig.setBasePath(getBasePath());
@@ -138,4 +159,31 @@ public class SwaggerFeature extends AbstractFeature {
         this.scan = scan;
     }
 
+    public boolean isRunAsFilter() {
+        return runAsFilter;
+    }
+    public void setRunAsFilter(boolean runAsFilter) {
+        this.runAsFilter = runAsFilter;
+    }
+
+    @PreMatching
+    private static class SwaggerContainerRequestFilter implements ContainerRequestFilter {
+        private ApiListingResourceJSON apiListingResource;
+        @Context
+        private MessageContext mc;
+        public SwaggerContainerRequestFilter(ApiListingResourceJSON apiListingResource) {
+            this.apiListingResource = apiListingResource;
+        }
+
+        @Override
+        public void filter(ContainerRequestContext requestContext) throws IOException {
+            UriInfo ui = mc.getUriInfo();
+            if (ui.getPath().endsWith("api-docs")) {
+                Response r = 
+                    apiListingResource.apiDeclaration("", null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
+                requestContext.abortWith(r);
+            }
+        }
+        
+    }
 }
