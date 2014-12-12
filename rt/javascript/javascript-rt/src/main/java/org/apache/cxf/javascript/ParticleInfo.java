@@ -31,7 +31,6 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaChoice;
-import org.apache.ws.commons.schema.XmlSchemaChoiceMember;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
@@ -166,11 +165,10 @@ public final class ParticleInfo implements ItemInfo {
                 throw new UnsupportedConstruct(message.toString());
             }
 
-            elementInfo.children = new LinkedList<>();
+            elementInfo.children = new LinkedList<ParticleInfo>();
 
-            List<XmlSchemaChoiceMember> items = choice.getItems();
-            for (XmlSchemaChoiceMember item : items) {
-                XmlSchemaObject schemaObject = (XmlSchemaObject)item;
+            List<XmlSchemaObject> items = choice.getItems();
+            for (XmlSchemaObject schemaObject : items) {
                 ParticleInfo childParticle = ParticleInfo.forLocalItem(schemaObject, currentSchema, schemaCollection,
                         prefixAccumulator, contextName);
 
