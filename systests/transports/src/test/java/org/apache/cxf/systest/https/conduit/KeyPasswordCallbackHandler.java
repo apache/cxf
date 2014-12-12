@@ -16,32 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systest.https.conduit;
 
-package org.apache.cxf.systest.https;
+import java.io.IOException;
 
-import java.net.URL;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+public class KeyPasswordCallbackHandler implements CallbackHandler {
 
-public class SSLv3Server extends AbstractBusTestServerBase {
-
-    public SSLv3Server() {
-
-    }
-
-    protected void run()  {
-        URL busFile = Server.class.getResource("sslv3-server.xml");
-        Bus busLocal = new SpringBusFactory().createBus(busFile);
-        BusFactory.setDefaultBus(busLocal);
-        setBus(busLocal);
-
-        try {
-            new SSLv3Server();
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Override
+    public void handle(Callback[] callbacks) throws IOException,
+        UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
+            PasswordCallback pc = (PasswordCallback)callbacks[i];
+            pc.setPassword("password".toCharArray());
         }
     }
+
 }

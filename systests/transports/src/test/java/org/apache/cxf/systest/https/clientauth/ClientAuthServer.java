@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.https;
+package org.apache.cxf.systest.https.clientauth;
 
 import java.net.URL;
 
@@ -33,7 +33,7 @@ public class ClientAuthServer extends AbstractBusTestServerBase {
     }
 
     protected void run()  {
-        URL busFile = Server.class.getResource("client-auth-server.xml");
+        URL busFile = ClientAuthServer.class.getResource("client-auth-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);

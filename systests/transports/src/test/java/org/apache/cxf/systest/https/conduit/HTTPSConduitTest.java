@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.https;
+package org.apache.cxf.systest.https.conduit;
 
 
 import java.io.File;
@@ -37,6 +37,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -48,6 +49,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.systest.https.BusServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
@@ -99,12 +101,12 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     static {
         try {
             //System.setProperty("javax.net.debug", "all");
-            URL key = Server.class.getResource("../../../../../keys/Morpit.jks");
+            URL key = Server.class.getResource("../../../../../../keys/Morpit.jks");
             String keystore = new File(key.toURI()).getAbsolutePath();
             //System.out.println("Keystore: " + keystore);
             KeyManager[] kmgrs = getKeyManagers(getKeyStore("JKS", keystore, "password"), "password");
             
-            key = Server.class.getResource("../../../../../keys/Truststore.jks");
+            key = Server.class.getResource("../../../../../../keys/Truststore.jks");
             
             String truststore = new File(key.toURI()).getAbsolutePath();
             //System.out.println("Truststore: " + truststore);
@@ -712,6 +714,10 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(gordy);
+        
+        BindingProvider provider = (BindingProvider)gordy;
+        provider.getRequestContext().put("use.async.http.conduit", Boolean.FALSE);
+        
         HTTPConduit http = 
             (HTTPConduit) client.getConduit();
         

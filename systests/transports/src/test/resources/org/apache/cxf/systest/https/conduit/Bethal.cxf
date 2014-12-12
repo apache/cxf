@@ -65,7 +65,7 @@
   
    <cxf:bus>
         <cxf:inInterceptors>
-                <bean class="org.apache.cxf.systest.https.PushBack401"/>
+                <bean class="org.apache.cxf.systest.https.conduit.PushBack401"/>
         </cxf:inInterceptors>
    </cxf:bus>
 
