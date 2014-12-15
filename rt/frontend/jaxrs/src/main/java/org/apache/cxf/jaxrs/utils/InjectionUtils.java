@@ -354,11 +354,15 @@ public final class InjectionUtils {
         
         value = decodeValue(value, decoded, pType);
         
-        Object result = createFromParameterHandler(value, pClass, genericType, paramAnns, message);
+        Object result = null;
+        try {
+            result = createFromParameterHandler(value, pClass, genericType, paramAnns, message);
+        } catch (IllegalArgumentException nfe) {
+            throw createParamConversionException(pType, nfe);
+        }
         if (result != null) {
             return pClass.cast(result);
         }
-        
         if (pClass.isPrimitive()) {
             try {
                 @SuppressWarnings("unchecked")
@@ -368,15 +372,7 @@ public final class InjectionUtils {
                 // the object is a Boolean object
                 return ret;
             } catch (NumberFormatException nfe) {
-                //
-                //  For path, query & matrix parameters this is 404,
-                //  for others 400...
-                //
-                if (pType == ParameterType.PATH || pType == ParameterType.QUERY
-                    || pType == ParameterType.MATRIX) {
-                    throw ExceptionUtils.toNotFoundException(nfe, null);
-                }
-                throw ExceptionUtils.toBadRequestException(nfe, null);
+                throw createParamConversionException(pType, nfe);
             }
         }
         
@@ -431,6 +427,17 @@ public final class InjectionUtils {
         return pClass.cast(result);
     }
 
+    private static RuntimeException createParamConversionException(ParameterType pType, Exception ex) {
+        //
+        //  For path, query & matrix parameters this is 404,
+        //  for others 400...
+        //
+        if (pType == ParameterType.PATH || pType == ParameterType.QUERY
+            || pType == ParameterType.MATRIX) {
+            return ExceptionUtils.toNotFoundException(ex, null);
+        }
+        return ExceptionUtils.toBadRequestException(ex, null);
+    }
     public static <T> T createFromParameterHandler(String value, 
                                                     Class<T> pClass,
                                                     Type genericType,
