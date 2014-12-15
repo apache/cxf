@@ -22,6 +22,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.cxf.common.util.StringUtils;
+
 /**
  * The utility Message Digest generator which can be used for generating
  * random values
@@ -37,18 +39,13 @@ public final class MessageDigestUtils {
     }
         
     public static String generate(byte[] input) {
-        return generate(input, ALGO_MD5);
+        return generate(input, ALGO_SHA_256);
     }   
     
     public static String generate(byte[] input, String algo) {    
         try {
             byte[] messageDigest = createDigest(input, algo);
-            StringBuilder hexString = new StringBuilder();
-            for (int i = 0; i < messageDigest.length; i++) {
-                hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
-            }
-
-            return hexString.toString();
+            return StringUtils.toHexString(messageDigest);
         } catch (NoSuchAlgorithmException e) {
             throw new SecurityException(e);
         }

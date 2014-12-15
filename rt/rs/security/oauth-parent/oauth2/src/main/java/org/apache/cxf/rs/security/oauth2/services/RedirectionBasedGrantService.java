@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
@@ -347,7 +346,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                                                                     subject);
         } else {
             HttpSession session = getMessageContext().getHttpServletRequest().getSession();
-            sessionToken = UUID.randomUUID().toString();
+            sessionToken = OAuthUtils.generateRandomTokenKey();
             session.setAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN, sessionToken);
         }
         secData.setAuthenticityToken(sessionToken);
