@@ -19,8 +19,6 @@
 package org.apache.cxf.systest.sts.template;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,40 +29,26 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
-import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.deployment.STSServer;
-import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test various aspects of the RequestSecurityTokenTemplate. Make sure that if we are expecting
  * a SAML 2.0 token, that's what we get etc. Same goes for the KeyType.
  */
-@RunWith(value = org.junit.runners.Parameterized.class)
 public class TemplateTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
-    static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-    static final String STAX_STSPORT2 = allocatePort(StaxSTSServer.class, 2);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
-    private static final String STAX_PORT = allocatePort(StaxServer.class);
-    
-    final TestParam test;
-    
-    public TemplateTest(TestParam type) {
-        this.test = type;
-    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -78,22 +62,8 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
                    launchServer(STSServer.class, true)
         );
-    }
-    
-    @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
-       
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STSPORT)},
-        });
     }
     
     @org.junit.AfterClass
@@ -117,20 +87,16 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1PublicKeyPort");
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Setup STSClient
         STSClient stsClient = createSTSClient(bus);
-        String wsdlLocation = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
+        String wsdlLocation = "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
         stsClient.setWsdlLocation(wsdlLocation);
         
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.STS_CLIENT, stsClient
         );
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
         
         doubleIt(port, 25);
         
@@ -153,23 +119,19 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1PublicKeyPort");
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Setup STSClient
         STSClient stsClient = createSTSClient(bus);
         stsClient.setKeyType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey");
         stsClient.setTokenType("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0");
-        String wsdlLocation = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
+        String wsdlLocation = "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
         stsClient.setWsdlLocation(wsdlLocation);
         
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.STS_CLIENT, stsClient
         );
 
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
-        
         try {
             doubleIt(port, 25);
             fail("Failure expected on sending a SAML 2.0 token");
@@ -196,13 +158,13 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1PublicKeyPort");
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Setup STSClient
         STSClient stsClient = createSTSClient(bus);
         stsClient.setKeyType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer");
         stsClient.setTokenType("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1");
-        String wsdlLocation = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
+        String wsdlLocation = "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
         stsClient.setWsdlLocation(wsdlLocation);
         
         ((BindingProvider)port).getRequestContext().put(
@@ -210,10 +172,6 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
         );
         ((BindingProvider)port).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME,
                                                         "myclientkey");
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
-        
         try {
             doubleIt(port, 25);
             fail("Failure expected on sending a SAML 1.1 Bearer token");
@@ -240,20 +198,16 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2PublicKeyPort");
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Setup STSClient
         STSClient stsClient = createSTSClient(bus);
-        String wsdlLocation = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
+        String wsdlLocation = "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
         stsClient.setWsdlLocation(wsdlLocation);
         
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.STS_CLIENT, stsClient
         );
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
         
         doubleIt(port, 25);
         
@@ -276,22 +230,18 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2PublicKeyPort");
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Setup STSClient
         STSClient stsClient = createSTSClient(bus);
         stsClient.setKeyType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey");
         stsClient.setTokenType("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1");
-        String wsdlLocation = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
+        String wsdlLocation = "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
         stsClient.setWsdlLocation(wsdlLocation);
         
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.STS_CLIENT, stsClient
         );
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
         
         try {
             doubleIt(port, 25);
@@ -319,22 +269,18 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2PublicKeyPort");
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         // Setup STSClient
         STSClient stsClient = createSTSClient(bus);
         stsClient.setKeyType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer");
         stsClient.setTokenType("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0");
-        String wsdlLocation = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
+        String wsdlLocation = "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
         stsClient.setWsdlLocation(wsdlLocation);
         
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.STS_CLIENT, stsClient
         );
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
         
         try {
             doubleIt(port, 25);
