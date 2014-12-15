@@ -24,12 +24,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.crypto.MessageDigestUtils;
+import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -48,7 +47,7 @@ public final class OAuthUtils {
 
     private OAuthUtils() {
     }
-
+    
     public static UserSubject createSubject(SecurityContext securityContext) {
         List<String> roleNames = Collections.emptyList();
         if (securityContext instanceof LoginSecurityContext) {
@@ -105,23 +104,17 @@ public final class OAuthUtils {
     }
 
     public static String generateRandomTokenKey() throws OAuthServiceException {
-        return generateRandomTokenKey(null);
+        return generateRandomTokenKey(16);
+    }
+    public static String generateRandomTokenKey(int byteSize) {
+        if (byteSize < 16) {
+            throw new OAuthServiceException();
+        }
+        return StringUtils.toHexString(CryptoUtils.generateSecureRandomBytes(byteSize));
     }
     
     public static long getIssuedAt() {
         return System.currentTimeMillis() / 1000;
-    }
-    
-    public static String generateRandomTokenKey(String digestAlgo) throws OAuthServiceException {
-        try {
-            byte[] bytes = UUID.randomUUID().toString().getBytes("UTF-8");
-            if (digestAlgo == null) {
-                digestAlgo = MessageDigestUtils.ALGO_MD5;
-            }
-            return MessageDigestUtils.generate(bytes, digestAlgo);
-        } catch (Exception ex) {
-            throw new OAuthServiceException(OAuthConstants.SERVER_ERROR, ex);
-        }
     }
     
     public static boolean isExpired(Long issuedAt, Long lifetime) {

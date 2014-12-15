@@ -216,4 +216,12 @@ public final class StringUtils {
     public static byte[] toBytes(String str, String enc) throws UnsupportedEncodingException {
         return str.getBytes(enc);
     }
+
+    public static String toHexString(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            hexString.append(Integer.toHexString(0xFF & bytes[i]));
+        }
+        return hexString.toString();
+    }
 }

@@ -107,24 +107,27 @@ public class AbstractTokenService extends AbstractOAuthService {
     }
     
     // Get the Client and check the id and secret
-    protected Client getAndValidateClientFromIdAndSecret(String clientId, String clientSecret) {
+    protected Client getAndValidateClientFromIdAndSecret(String clientId, String providedClientSecret) {
         Client client = getClient(clientId);
         if (!client.getClientId().equals(clientId)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
-        if (isValidPublicClient(client, clientId, clientSecret)) {
+        if (isValidPublicClient(client, clientId, providedClientSecret)) {
             return client;
         }
         if (!client.isConfidential()
-            || clientSecret == null || client.getClientSecret() == null 
-            || !isClientSecretValid(client, clientSecret)) {
+            || !isConfidenatialClientSecretValid(client, providedClientSecret)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         return client;
     }
-    protected boolean isClientSecretValid(Client client, String clientSecret) {
-        return clientSecretVerifier != null ? clientSecretVerifier.validateClientSecret(client, clientSecret)
-            : client.getClientSecret().equals(clientSecret);
+    protected boolean isConfidenatialClientSecretValid(Client client, String providedClientSecret) {
+        if (clientSecretVerifier != null) {
+            return clientSecretVerifier.validateClientSecret(client, providedClientSecret);
+        } else {
+            return client.getClientSecret() != null 
+                && providedClientSecret != null && client.getClientSecret().equals(providedClientSecret);
+        }
     }
     protected boolean isValidPublicClient(Client client, String clientId, String clientSecret) {
         return canSupportPublicClients 
