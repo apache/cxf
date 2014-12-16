@@ -188,16 +188,20 @@ public class UsernameTokenValidator implements TokenValidator {
                 }
             }
             
+            Principal principal = null;
             if (secToken == null) {
                 Credential credential = new Credential();
                 credential.setUsernametoken(ut);
-                validator.validate(credential, requestData);
+                credential = validator.validate(credential, requestData);
+                principal = credential.getPrincipal();
             }
-            
-            Principal principal = 
-                createPrincipal(
-                    ut.getName(), ut.getPassword(), ut.getPasswordType(), ut.getNonce(), ut.getCreated()
-                );
+           
+            if (principal == null) {
+                principal = 
+                    createPrincipal(
+                        ut.getName(), ut.getPassword(), ut.getPasswordType(), ut.getNonce(), ut.getCreated()
+                    );
+            }
             
             // Get the realm of the UsernameToken
             String tokenRealm = null;
