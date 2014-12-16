@@ -44,7 +44,7 @@ import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
  * Default Model Encryption helpers
  */
 public final class ModelEncryptionSupport {
-    private static final String SEP = "|";
+    public static final String SEP = "|";
     private ModelEncryptionSupport() {
     }
     
@@ -431,7 +431,7 @@ public final class ModelEncryptionSupport {
         return state.toString();
     }
     
-    private static String getStringPart(String str) {
+    public static String getStringPart(String str) {
         return " ".equals(str) ? null : str;
     }
     
@@ -458,7 +458,7 @@ public final class ModelEncryptionSupport {
         return props;
     }
     
-    private static String[] getParts(String sequence) {
+    public static String[] getParts(String sequence) {
         return sequence.split("\\" + SEP);
     }
     
@@ -493,7 +493,7 @@ public final class ModelEncryptionSupport {
         }
     }
     
-    private static String tokenizeString(String str) {
+    public static String tokenizeString(String str) {
         return str != null ? str : " ";
     }
 }

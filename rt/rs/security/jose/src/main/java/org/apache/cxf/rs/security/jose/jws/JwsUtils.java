@@ -267,14 +267,14 @@ public final class JwsUtils {
             return JoseConstants.RS_SHA_256_ALGO;
         }
     }
-    private static JwsCompactConsumer verify(JwsSignatureVerifier v, String content) {
+    public static JwsCompactConsumer verify(JwsSignatureVerifier v, String content) {
         JwsCompactConsumer jws = new JwsCompactConsumer(content);
         if (!jws.verifySignatureWith(v)) {
             throw new SecurityException();
         }
         return jws;
     }
-    private static String sign(JwsSignatureProvider jwsSig, String content, String ct) {
+    public static String sign(JwsSignatureProvider jwsSig, String content, String ct) {
         JoseHeaders headers = new JoseHeaders();
         if (ct != null) {
             headers.setContentType(ct);

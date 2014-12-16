@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -33,6 +32,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
@@ -59,9 +59,8 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
         super(OAuthConstants.TOKEN_RESPONSE_TYPE, OAuthConstants.IMPLICIT_GRANT);
     }
     
-    protected Response createGrant(MultivaluedMap<String, String> params,
+    protected Response createGrant(OAuthRedirectionState state,
                                    Client client,
-                                   String redirectUri,
                                    List<String> requestedScope,
                                    List<String> approvedScope,
                                    UserSubject userSubject,
@@ -74,7 +73,7 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
             reg.setSubject(userSubject);
             reg.setRequestedScope(requestedScope);        
             reg.setApprovedScope(approvedScope);
-            reg.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
+            reg.setAudience(state.getAudience());
             token = getDataProvider().createAccessToken(reg);
         } else {
             token = preAuthorizedToken;
@@ -84,13 +83,12 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
    
         // return the token by appending it as a fragment parameter to the redirect URI
         
-        StringBuilder sb = getUriWithFragment(redirectUri);
+        StringBuilder sb = getUriWithFragment(state.getRedirectUri());
         
         sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(clientToken.getTokenKey());
-        String state = params.getFirst(OAuthConstants.STATE);
-        if (state != null) {
+        if (state.getState() != null) {
             sb.append("&");
-            sb.append(OAuthConstants.STATE).append("=").append(state);   
+            sb.append(OAuthConstants.STATE).append("=").append(state.getState());   
         }
         sb.append("&")
             .append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(clientToken.getTokenType());
@@ -117,12 +115,11 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
             filter.process(clientToken, serverToken); 
         }
     }
-    protected Response createErrorResponse(MultivaluedMap<String, String> params,
+    protected Response createErrorResponse(String state,
                                            String redirectUri,
                                            String error) {
         StringBuilder sb = getUriWithFragment(redirectUri);
         sb.append(OAuthConstants.ERROR_KEY).append("=").append(error);
-        String state = params.getFirst(OAuthConstants.STATE);
         if (state != null) {
             sb.append("&");
             sb.append(OAuthConstants.STATE).append("=").append(state);   

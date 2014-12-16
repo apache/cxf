@@ -22,6 +22,7 @@ package org.apache.cxf.rs.security.oauth2.provider;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 /**
@@ -31,21 +32,23 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 public interface SessionAuthenticityTokenProvider {
 
     /**
-     * Creates a new session token and stores it
+     * Create a new session token and stores it
      * 
      * @param mc the {@link MessageContext} of this request
      * @param params redirection-based grant request parameters
      * @param subject authenticated end user
+     * @param secData 
      * @return the created session token
      */
     String createSessionToken(MessageContext mc,
                               MultivaluedMap<String, String> params,
-                              UserSubject subject);
+                              UserSubject subject, 
+                              OAuthRedirectionState secData);
 
     /**
-     * Retrieves the stored session token
+     * Retrieve the stored session token
      * 
-     * @param mc the {@link MessageContext} of this request
+     * @param mc the {@link MessageContext} of this request   
      * @param params grant authorization parameters
      * @param subject authenticated end user
      * @return the stored token
@@ -55,7 +58,7 @@ public interface SessionAuthenticityTokenProvider {
                            UserSubject subject);
 
     /**
-     * Removes the stored session token
+     * Remove the stored session token
      * 
      * @param mc the {@link MessageContext} of this request
      * @param params grant authorization parameters
@@ -64,5 +67,17 @@ public interface SessionAuthenticityTokenProvider {
     String removeSessionToken(MessageContext mc,
                               MultivaluedMap<String, String> params,
                               UserSubject subject);
+
+    /**
+     * Expand the session token
+     * 
+     * @param mc the {@link MessageContext} of this request
+     * @param sessionToken the token
+     * @param subject authenticated end user
+     * @return the expanded token or null
+     */
+    OAuthRedirectionState getSessionState(MessageContext messageContext,
+                                          String sessionToken,
+                                          UserSubject subject);
 
 }

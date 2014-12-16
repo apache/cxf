@@ -25,10 +25,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -46,6 +48,32 @@ import org.apache.cxf.security.SecurityContext;
 public final class OAuthUtils {
 
     private OAuthUtils() {
+    }
+    
+    public static String setDefaultSessionToken(MessageContext mc) {
+        return setDefaultSessionToken(mc, 0);
+    }
+    public static String setDefaultSessionToken(MessageContext mc, int maxInactiveInterval) {
+        return setDefaultSessionToken(mc, generateRandomTokenKey());
+    }
+    public static String setDefaultSessionToken(MessageContext mc, String sessionToken) {
+        return setDefaultSessionToken(mc, sessionToken, 0);
+    }
+    public static String setDefaultSessionToken(MessageContext mc, String sessionToken, int maxInactiveInterval) {
+        HttpSession session = mc.getHttpServletRequest().getSession();
+        if (maxInactiveInterval > 0) {
+            session.setMaxInactiveInterval(maxInactiveInterval);
+        }
+        session.setAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN, sessionToken);
+        return sessionToken;
+    }
+    public static String getDefaultSessionToken(MessageContext mc) {
+        HttpSession session = mc.getHttpServletRequest().getSession();
+        String sessionToken = (String)session.getAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
+        if (sessionToken != null) {
+            session.removeAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);    
+        }
+        return sessionToken;
     }
     
     public static UserSubject createSubject(SecurityContext securityContext) {
@@ -197,4 +225,6 @@ public final class OAuthUtils {
         }
         return clientToken;
     }
+
+    
 }

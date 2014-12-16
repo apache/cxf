@@ -33,15 +33,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "authorizationData", 
                 namespace = "http://org.apache.cxf.rs.security.oauth")
-public class OAuthAuthorizationData implements Serializable {
+public class OAuthAuthorizationData extends OAuthRedirectionState implements Serializable {
     private static final long serialVersionUID = -7755998413495017637L;
     
-    private String clientId;
     private String endUserName;
-    private String redirectUri;
-    private String state;
-    private String proposedScope;
-    
     private String authenticityToken;
     private String replyTo;
     
@@ -53,7 +48,6 @@ public class OAuthAuthorizationData implements Serializable {
     private Map<String, String> extraApplicationProperties = new HashMap<String, String>();
     
     private List<? extends Permission> permissions;
-    private String audience;
     
     public OAuthAuthorizationData() {
     }
@@ -127,54 +121,6 @@ public class OAuthAuthorizationData implements Serializable {
     }
 
     /**
-     * Sets the client id which needs to be retained in a hidden form field
-     * @param clientId the client id
-     */
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    /**
-     * Gets the client id which needs to be retained in a hidden form field
-     * @return the client id
-     */
-    public String getClientId() {
-        return clientId;
-    }
-
-    /**
-     * Sets the redirect uri which needs to be retained in a hidden form field
-     * @param redirectUri the redirect uri
-     */
-    public void setRedirectUri(String redirectUri) {
-        this.redirectUri = redirectUri;
-    }
-
-    /**
-     * Gets the redirect uri which needs to be retained in a hidden form field
-     * @return the redirect uri
-     */
-    public String getRedirectUri() {
-        return redirectUri;
-    }
-
-    /**
-     * Sets the client state token which needs to be retained in a hidden form field
-     * @param state the state
-     */
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    /**
-     * Gets the client state token which needs to be retained in a hidden form field
-     * @return
-     */
-    public String getState() {
-        return state;
-    }
-
-    /**
      * Sets the application web URI
      * @param applicationWebUri the application URI
      */
@@ -204,22 +150,6 @@ public class OAuthAuthorizationData implements Serializable {
      */
     public String getApplicationLogoUri() {
         return applicationLogoUri;
-    }
-
-    /**
-     * Sets the requested scope which needs to be retained in a hidden form field
-     * @param proposedScope the scope
-     */
-    public void setProposedScope(String proposedScope) {
-        this.proposedScope = proposedScope;
-    }
-
-    /**
-     * Gets the requested scope which needs to be retained in a hidden form field
-     * @return the scope
-     */
-    public String getProposedScope() {
-        return proposedScope;
     }
 
     /**
@@ -255,15 +185,6 @@ public class OAuthAuthorizationData implements Serializable {
     public void setEndUserName(String endUserName) {
         this.endUserName = endUserName;
     }
-
-    public String getAudience() {
-        return audience;
-    }
-
-    public void setAudience(String audience) {
-        this.audience = audience;
-    }
-
     public List<String> getApplicationCertificates() {
         return applicationCertificates;
     }
@@ -271,5 +192,4 @@ public class OAuthAuthorizationData implements Serializable {
     public void setApplicationCertificates(List<String> applicationCertificates) {
         this.applicationCertificates = applicationCertificates;
     }
-
 }
