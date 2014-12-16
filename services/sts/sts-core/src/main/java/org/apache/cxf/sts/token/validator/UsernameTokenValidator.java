@@ -33,7 +33,6 @@ import javax.xml.bind.Marshaller;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
@@ -71,6 +70,7 @@ public class UsernameTokenValidator implements TokenValidator {
     private Validator validator = new org.apache.wss4j.dom.validate.UsernameTokenValidator();
     
     private UsernameTokenRealmCodec usernameTokenRealmCodec;
+    private SubjectRoleParser roleParser = new DefaultSubjectRoleParser();
     
     /**
      * Set the WSS4J Validator instance to use to validate the token.
@@ -194,6 +194,12 @@ public class UsernameTokenValidator implements TokenValidator {
                 credential.setUsernametoken(ut);
                 credential = validator.validate(credential, requestData);
                 principal = credential.getPrincipal();
+                if (credential.getSubject() != null && roleParser != null) {
+                    // Parse roles from the validated token
+                    Set<Principal> roles = 
+                        roleParser.parseRolesFromSubject(principal, credential.getSubject());
+                    response.setRoles(roles);
+                }
             }
            
             if (principal == null) {
@@ -262,6 +268,14 @@ public class UsernameTokenValidator implements TokenValidator {
         principal.setCreatedTime(createdTime);
         principal.setPasswordType(passwordType);
         return principal;
+    }
+
+    public SubjectRoleParser getRoleParser() {
+        return roleParser;
+    }
+
+    public void setRoleParser(SubjectRoleParser roleParser) {
+        this.roleParser = roleParser;
     }
     
 }

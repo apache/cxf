@@ -23,8 +23,6 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.cxf.interceptor.security.DefaultSecurityContext;
-import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.rt.security.saml.SAMLUtils;
@@ -33,8 +31,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 /**
  * A default implementation to extract roles from a SAML Assertion
  */
-public class DefaultSAMLRoleParser implements SAMLRoleParser {
-    
+public class DefaultSAMLRoleParser extends DefaultSubjectRoleParser implements SAMLRoleParser {
     /**
      * This configuration tag specifies the default attribute name where the roles are present
      * The default is "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role".
@@ -43,8 +40,6 @@ public class DefaultSAMLRoleParser implements SAMLRoleParser {
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
     
     private boolean useJaasSubject = true;
-    private String roleClassifier;
-    private String roleClassifierType = "prefix";
     private String roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
 
     /**
@@ -58,13 +53,7 @@ public class DefaultSAMLRoleParser implements SAMLRoleParser {
         Principal principal, Subject subject, SamlAssertionWrapper assertion
     ) {
         if (subject != null && useJaasSubject) {
-            if (roleClassifier != null && !"".equals(roleClassifier)) {
-                RolePrefixSecurityContextImpl securityContext =
-                    new RolePrefixSecurityContextImpl(subject, roleClassifier, roleClassifierType);
-                return securityContext.getUserRoles();
-            } else {
-                return new DefaultSecurityContext(principal, subject).getUserRoles();
-            }
+            return super.parseRolesFromSubject(principal, subject);
         }
         
         ClaimCollection claims = SAMLUtils.getClaims(assertion);
@@ -90,36 +79,6 @@ public class DefaultSAMLRoleParser implements SAMLRoleParser {
         this.useJaasSubject = useJaasSubject;
     }
 
-    public String getRoleClassifier() {
-        return roleClassifier;
-    }
-
-    /**
-     * Set the Subject Role Classifier to use. If this value is not specified, then it tries to
-     * get roles from the supplied JAAS Subject (if not null) using the DefaultSecurityContext 
-     * in cxf-rt-core. Otherwise it uses this value in combination with the 
-     * SUBJECT_ROLE_CLASSIFIER_TYPE to get the roles from the Subject.
-     * @param roleClassifier the Subject Role Classifier to use
-     */
-    public void setRoleClassifier(String roleClassifier) {
-        this.roleClassifier = roleClassifier;
-    }
-
-    public String getRoleClassifierType() {
-        return roleClassifierType;
-    }
-
-    /**
-     * Set the Subject Role Classifier Type to use. Currently accepted values are "prefix" or 
-     * "classname". Must be used in conjunction with the SUBJECT_ROLE_CLASSIFIER. The default 
-     * value is "prefix".
-     * @param roleClassifierType the Subject Role Classifier Type to use
-     */
-    public void setRoleClassifierType(String roleClassifierType) {
-        this.roleClassifierType = roleClassifierType;
-    }
-    
-    
     public String getRoleAttributeName() {
         return roleAttributeName;
     }
@@ -132,5 +91,5 @@ public class DefaultSAMLRoleParser implements SAMLRoleParser {
     public void setRoleAttributeName(String roleAttributeName) {
         this.roleAttributeName = roleAttributeName;
     }
-
+    
 }
