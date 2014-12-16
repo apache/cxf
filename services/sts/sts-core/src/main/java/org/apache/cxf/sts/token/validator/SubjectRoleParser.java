@@ -23,22 +23,18 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-
 
 /**
- * This interface defines a way to extract roles from a SAML Assertion
+ * This interface defines a way to extract roles from a JAAS Subject
  */
-public interface SAMLRoleParser extends SubjectRoleParser {
+public interface SubjectRoleParser {
     
     /**
-     * Return the set of User/Principal roles from the Assertion.
-     * @param principal the Principal associated with the Assertion
-     * @param subject the JAAS Subject associated with a successful validation of the Assertion
-     * @param assertion The Assertion object
-     * @return the set of User/Principal roles from the Assertion.
+     * Return the set of User/Principal roles from the Subject.
+     * @param principal the optional Principal 
+     * @param subject the JAAS Subject
+     * @return the set of User/Principal roles from the Subject.
      */
-    Set<Principal> parseRolesFromAssertion(
-        Principal principal, Subject subject, SamlAssertionWrapper assertion
-    );
+    Set<Principal> parseRolesFromSubject(Principal principal, Subject subject);
+    
 }
