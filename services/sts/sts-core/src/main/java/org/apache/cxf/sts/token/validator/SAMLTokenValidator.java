@@ -44,7 +44,6 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -151,9 +150,6 @@ public class SAMLTokenValidator implements TokenValidator {
             Element validateTargetElement = (Element)validateTarget.getToken();
             SamlAssertionWrapper assertion = new SamlAssertionWrapper(validateTargetElement);
             
-            SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipalImpl(assertion);
-            response.setPrincipal(samlPrincipal);
-            
             if (!assertion.isSigned()) {
                 LOG.log(Level.WARNING, "The received assertion is not signed, and therefore not trusted");
                 return response;
@@ -193,6 +189,7 @@ public class SAMLTokenValidator implements TokenValidator {
                 secToken = null;
             }
             
+            Principal principal = null;
             if (secToken == null) {
                 // Validate the assertion against schemas/profiles
                 validateAssertion(assertion);
@@ -203,6 +200,7 @@ public class SAMLTokenValidator implements TokenValidator {
                 trustCredential.setCertificates(samlKeyInfo.getCerts());
     
                 trustCredential = validator.validate(trustCredential, requestData);
+                principal = trustCredential.getPrincipal();
 
                 // Finally check that subject DN of the signing certificate matches a known constraint
                 X509Certificate cert = null;
@@ -215,10 +213,14 @@ public class SAMLTokenValidator implements TokenValidator {
                 }
             }
             
+            if (principal == null) {
+                principal = new SAMLTokenPrincipalImpl(assertion);
+            }
+            
             // Parse roles from the validated token
             if (samlRoleParser != null) {
                 Set<Principal> roles = 
-                    samlRoleParser.parseRolesFromAssertion(samlPrincipal, null, assertion);
+                    samlRoleParser.parseRolesFromAssertion(principal, null, assertion);
                 response.setRoles(roles);
             }
            
@@ -254,6 +256,7 @@ public class SAMLTokenValidator implements TokenValidator {
             Map<String, Object> addProps = new HashMap<String, Object>();
             addProps.put(SamlAssertionWrapper.class.getName(), assertion);
             response.setAdditionalProperties(addProps);
+            response.setPrincipal(principal);
             
             validateTarget.setState(STATE.VALID);
         } catch (WSSecurityException ex) {

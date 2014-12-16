@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.token.validator;
 
+import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.logging.Level;
@@ -154,7 +155,11 @@ public class X509TokenValidator implements TokenValidator {
             }
 
             Credential returnedCredential = validator.validate(credential, requestData);
-            response.setPrincipal(returnedCredential.getCertificates()[0].getSubjectX500Principal());
+            Principal principal = returnedCredential.getPrincipal();
+            if (principal == null) {
+                principal = returnedCredential.getCertificates()[0].getSubjectX500Principal();
+            }
+            response.setPrincipal(principal);
             validateTarget.setState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
