@@ -57,8 +57,8 @@ public class SwaggerFeature extends AbstractFeature {
     
     @Override
     public void initialize(Server server, Bus bus) {
-        calulateDefaultResourcePackage(server);
-        calulateDefaultBasePath(server);
+        calculateDefaultResourcePackage(server);
+        calculateDefaultBasePath(server);
         ApiListingResourceJSON apiListingResource = new ApiListingResourceJSON();
         if (!runAsFilter) {
             List<Object> serviceBeans = new ArrayList<Object>();
@@ -87,7 +87,7 @@ public class SwaggerFeature extends AbstractFeature {
         beanConfig.setScan(isScan());
         initializeProvider(server.getEndpoint(), bus);
     }
-    private void calulateDefaultResourcePackage(Server server) {
+    private void calculateDefaultResourcePackage(Server server) {
         JAXRSServiceFactoryBean serviceFactoryBean = 
             (JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
         AbstractResourceInfo resourceInfo = serviceFactoryBean.getClassResourceInfo().get(0);
@@ -98,7 +98,7 @@ public class SwaggerFeature extends AbstractFeature {
         }
     }
     
-    private void calulateDefaultBasePath(Server server) {
+    private void calculateDefaultBasePath(Server server) {
         if (getBasePath() == null || getBasePath().length() == 0) {
             String address = server.getEndpoint().getEndpointInfo().getAddress();
             setBasePath(address);
