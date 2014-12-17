@@ -73,7 +73,7 @@ import javax.security.auth.x500.X500Principal;
  * HttpClient "contrib" repository.
  *
  */
-
+@Deprecated
 public interface CertificateHostnameVerifier extends javax.net.ssl.HostnameVerifier {
 
 
