@@ -66,6 +66,7 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
                 mvnBundle("org.apache.cxf", "cxf-rt-bindings-xml"),
                 mvnBundle("org.apache.cxf", "cxf-rt-bindings-soap"),
                 mvnBundle("org.apache.cxf", "cxf-rt-frontend-simple"),
+                mvnBundle("org.apache.geronimo.specs", "geronimo-servlet_3.0_spec"),
                 mvnBundle("org.apache.cxf", "cxf-rt-transports-http"),
                 mvnBundle("org.apache.cxf", "cxf-rt-frontend-jaxws"),
                 junitBundles()
