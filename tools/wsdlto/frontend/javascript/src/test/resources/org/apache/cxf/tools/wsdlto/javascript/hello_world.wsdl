@@ -178,6 +178,35 @@ under the License.
                     </sequence>
                 </complexType>
             </element>
+            <element name="testGroup">
+                <complexType>
+                    <sequence>
+                        <group ref="x1:testGroup1"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="testGroupResponse">
+                <complexType>
+                    <sequence>
+                        <choice>
+                            <group ref="x1:testGroup1"/>
+                            <group ref="x1:testGroup2"/>
+                        </choice>
+                    </sequence>
+                </complexType>
+            </element>
+            <group name="testGroup1">
+                <sequence>
+                    <element name="arg0" type="string"/>
+                    <element name="arg1" type="string"/>
+                </sequence>
+            </group>
+            <group name="testGroup2">
+                <sequence>
+                    <element name="arg2" type="string"/>
+                    <element name="arg3" type="string"/>
+                </sequence>
+            </group>
         </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">
@@ -237,6 +266,12 @@ under the License.
     <wsdl:message name="testChoiceResponse">
         <wsdl:part name="out" element="x1:testChoiceResponse"/>
     </wsdl:message>
+    <wsdl:message name="testGroupRequest">
+        <wsdl:part name="in" element="x1:testGroup"/>
+    </wsdl:message>
+    <wsdl:message name="testGroupResponse">
+        <wsdl:part name="out" element="x1:testGroupResponse"/>
+    </wsdl:message>
 
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
@@ -271,6 +306,10 @@ under the License.
         <wsdl:operation name="testChoice">
             <wsdl:input name="testChoiceRequest" message="tns:testChoiceRequest"/>
             <wsdl:output name="testChoiceResponse" message="tns:testChoiceResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="testGroup">
+            <wsdl:input name="testGroupRequest" message="tns:testGroupRequest"/>
+            <wsdl:output name="testGroupResponse" message="tns:testGroupResponse"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:portType name="DocLitBare">
@@ -348,6 +387,15 @@ under the License.
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="testChoice">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testGroup">
             <soap:operation style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
