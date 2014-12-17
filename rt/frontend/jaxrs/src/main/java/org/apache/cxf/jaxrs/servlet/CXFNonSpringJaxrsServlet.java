@@ -38,6 +38,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -62,6 +63,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String IGNORE_APP_PATH_PARAM = "jaxrs.application.address.ignore";
     private static final String SERVICE_CLASSES_PARAM = "jaxrs.serviceClasses";
     private static final String PROVIDERS_PARAM = "jaxrs.providers";
+    private static final String FEATURES_PARAM = "jaxrs.features";
     private static final String OUT_INTERCEPTORS_PARAM = "jaxrs.outInterceptors";
     private static final String OUT_FAULT_INTERCEPTORS_PARAM = "jaxrs.outFaultInterceptors";
     private static final String IN_INTERCEPTORS_PARAM = "jaxrs.inInterceptors";
@@ -128,10 +130,32 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             bean.setResourceProvider(entry.getKey(), entry.getValue());
         }
         setExtensions(bean, servletConfig);
-                
+        List<? extends Feature> features = getFeatures(servletConfig, splitChar);
+        bean.setFeatures(features);        
         bean.create();
     }
 
+    protected List<? extends Feature> getFeatures(ServletConfig servletConfig, String splitChar) 
+        throws ServletException {
+                    
+        String featuresList = servletConfig.getInitParameter(FEATURES_PARAM);
+        if (featuresList == null) {
+            return Collections.< Feature >emptyList();
+        }
+        String[] classNames = StringUtils.split(featuresList, splitChar);
+        List< Feature > features = new ArrayList< Feature >();
+        for (String cName : classNames) {
+            Map<String, List<String>> props = new HashMap<String, List<String>>();
+            String theName = getClassNameAndProperties(cName, props);
+            if (theName.length() != 0) {
+                Class<?> cls = loadClass(theName);
+                if (Feature.class.isAssignableFrom(cls)) {
+                    features.add((Feature)createSingletonInstance(cls, props, servletConfig));
+                }
+            }
+        }
+        return features;
+    }
     protected String getParameterSplitChar(ServletConfig servletConfig) {
         String param = servletConfig.getInitParameter(PARAMETER_SPLIT_CHAR);
         if (!StringUtils.isEmpty(param) && SPACE_PARAMETER_SPLIT_CHAR.equals(param.trim())) {
