@@ -42,6 +42,8 @@ import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.transport.https.httpclient.DefaultHostnameVerifier;
+import org.apache.cxf.transport.https.httpclient.PublicSuffixMatcherLoader;
 
 
 /**
@@ -188,9 +190,9 @@ public class HttpsURLConnectionFactory {
         if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
             verifier = HttpsURLConnection.getDefaultHostnameVerifier();
         } else if (tlsClientParameters.isDisableCNCheck()) {
-            verifier = CertificateHostnameVerifier.ALLOW_ALL;
+            verifier = new AllowAllHostnameVerifier();
         } else {
-            verifier = CertificateHostnameVerifier.DEFAULT;
+            verifier = new DefaultHostnameVerifier(PublicSuffixMatcherLoader.getDefault());
         }
         
         if (connection instanceof HttpsURLConnection) {
