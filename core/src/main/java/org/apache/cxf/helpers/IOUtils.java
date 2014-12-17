@@ -66,7 +66,6 @@ public final class IOUtils {
             // ignore
         }
         // it may be an attachment stream
-        @SuppressWarnings("resource")
         PushbackInputStream pbStream = 
             is instanceof PushbackInputStream ? (PushbackInputStream)is : new PushbackInputStream(is);
         boolean isEmpty = isEof(pbStream.read(bytes));
