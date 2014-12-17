@@ -616,9 +616,10 @@ public abstract class AbstractOperation {
                 try {
                     tokenResponse = tokenValidator.validateToken(validatorParameters);
                     token = tokenResponse.getToken();
-                    // The parsed principal is set if available. It's up to other components to
-                    // deal with the STATE of the validation
+                    // The parsed principal/roles is set if available. It's up to other 
+                    // components to deal with the STATE of the validation
                     token.setPrincipal(tokenResponse.getPrincipal());
+                    token.setRoles(tokenResponse.getRoles());
                 } catch (RuntimeException ex) {
                     LOG.log(Level.WARNING, "Failed to validate the token", ex);
                     token.setState(STATE.INVALID);

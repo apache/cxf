@@ -19,13 +19,13 @@
 package org.apache.cxf.sts.request;
 
 import java.security.Principal;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -45,6 +45,7 @@ public class ReceivedToken {
     private String tokenContext; // WS-Security, OnBehalfOf, ActAs
     private STATE state = STATE.NONE;
     private Principal principal;
+    private Set<Principal> roles;
     
     public enum STATE { VALID, INVALID, CANCELLED, EXPIRED, NONE };
     
@@ -132,6 +133,14 @@ public class ReceivedToken {
 
     public void setPrincipal(Principal principal) {
         this.principal = principal;
+    }
+    
+    public Set<Principal> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Principal> roles) {
+        this.roles = roles;
     }
     
 }
