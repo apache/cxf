@@ -31,6 +31,9 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.jsse.TLSParameterBase;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 
+import org.apache.cxf.transport.https.httpclient.DefaultHostnameVerifier;
+import org.apache.cxf.transport.https.httpclient.PublicSuffixMatcherLoader;
+
 public final class SSLUtils {
     private SSLUtils() {
         //Helper class
@@ -44,9 +47,9 @@ public final class SSLUtils {
         } else if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
             verifier = HttpsURLConnection.getDefaultHostnameVerifier();
         } else if (tlsClientParameters.isDisableCNCheck()) {
-            verifier = CertificateHostnameVerifier.ALLOW_ALL;
+            verifier = new AllowAllHostnameVerifier();
         } else {
-            verifier = CertificateHostnameVerifier.DEFAULT;
+            verifier = new DefaultHostnameVerifier(PublicSuffixMatcherLoader.getDefault());
         }
         return verifier;
     }
