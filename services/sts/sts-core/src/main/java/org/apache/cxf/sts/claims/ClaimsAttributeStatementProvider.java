@@ -45,9 +45,11 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
             params.setEncryptionProperties(providerParameters.getEncryptionProperties());
             params.setKeyRequirements(providerParameters.getKeyRequirements());
             if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
-                params.setPrincipal(providerParameters.getTokenRequirements().getOnBehalfOf().getPrincipal());    
+                params.setPrincipal(providerParameters.getTokenRequirements().getOnBehalfOf().getPrincipal());
+                params.setRoles(providerParameters.getTokenRequirements().getOnBehalfOf().getRoles());
             } else if (providerParameters.getTokenRequirements().getActAs() != null) {
                 params.setPrincipal(providerParameters.getTokenRequirements().getActAs().getPrincipal());    
+                params.setRoles(providerParameters.getTokenRequirements().getActAs().getRoles());
             } else {
                 params.setPrincipal(providerParameters.getPrincipal());
             }
