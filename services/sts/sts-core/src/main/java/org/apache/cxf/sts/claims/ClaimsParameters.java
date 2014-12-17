@@ -22,6 +22,7 @@ package org.apache.cxf.sts.claims;
 
 import java.security.Principal;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.ws.WebServiceContext;
 
@@ -41,6 +42,7 @@ public class ClaimsParameters {
     private STSPropertiesMBean stsProperties;
     private EncryptionProperties encryptionProperties;
     private Principal principal;
+    private Set<Principal> roles;
     private WebServiceContext webServiceContext;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
@@ -111,6 +113,14 @@ public class ClaimsParameters {
     
     public Principal getPrincipal() {
         return principal;
+    }
+    
+    public Set<Principal> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Principal> roles) {
+        this.roles = roles;
     }
     
     public void setAdditionalProperties(Map<String, Object> additionalProperties) {
