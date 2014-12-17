@@ -33,7 +33,6 @@ import javax.ws.rs.core.MediaType;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.transport.https.CertificateHostnameVerifier;
 import org.apache.cxf.transport.https.SSLUtils;
 
 import org.junit.BeforeClass;
@@ -58,7 +57,7 @@ public class JAXRS20HttpsBookTest extends AbstractBusClientServerTestBase {
                                        "password");
         
         builder.trustStore(trustStore);
-        builder.hostnameVerifier(CertificateHostnameVerifier.ALLOW_ALL);
+        builder.hostnameVerifier(new AllowAllHostnameVerifier());
         
         KeyStore keyStore = loadStore("src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks",
             "password");
@@ -79,7 +78,7 @@ public class JAXRS20HttpsBookTest extends AbstractBusClientServerTestBase {
         SSLContext sslContext = createSSLContext();
         builder.sslContext(sslContext);
         
-        builder.hostnameVerifier(CertificateHostnameVerifier.ALLOW_ALL);
+        builder.hostnameVerifier(new AllowAllHostnameVerifier());
         
         
         Client client = builder.build();
