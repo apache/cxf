@@ -19,6 +19,8 @@
 
 package org.apache.cxf.message;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -30,7 +32,7 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.Session;
 
-public class ExchangeImpl extends StringMapImpl implements Exchange {
+public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements Exchange {
     
     private static final long serialVersionUID = -3112077559217623594L;
     private Destination destination;
@@ -69,24 +71,6 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
         this.bindingOp = ex.bindingOp;
     }
 
-    /*
-    public <T> T get(Class<T> key) { 
-        if (key == Bus.class) {
-            return (T)bus;
-        } else if (key == Service.class) {
-            return (T)service;
-        } else if (key == Endpoint.class) {
-            return (T)endpoint;
-        } else if (key == BindingOperationInfo.class) {
-            return (T)bindingOp;
-        } else if (key == Binding.class) {
-            return (T)binding;
-        } else if (key == OperationInfo.class) {
-            return super.get(key);
-        }
-        return super.get(key);
-    }
-    */
     private void resetContextCaches() {
         if (inMessage != null) {
             inMessage.resetContextCache();
@@ -101,9 +85,17 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
             outFaultMessage.resetContextCache();
         }
     }
+    
+    public <T> T get(Class<T> key) {
+        return key.cast(get(key.getName()));
+    }
 
     public <T> void put(Class<T> key, T value) {
-        super.put(key, value);
+        if (value == null) {
+            super.remove(key);
+        } else {
+            super.put(key.getName(), value);
+        }
         if (key == Bus.class) {
             resetContextCaches();
             bus = (Bus)value;
@@ -119,6 +111,7 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
             binding = (Binding)value;
         }
     }
+    
     public Object put(String key, Object value) {
         if (inMessage != null) {
             inMessage.setContextualProperty(key, value);
@@ -131,6 +124,9 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
         }
         if (outFaultMessage != null) {
             outFaultMessage.setContextualProperty(key, value);
+        }
+        if (value == null) {
+            return super.remove(key);
         }
         return super.put(key, value);
     }
