@@ -38,6 +38,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
 import org.apache.cxf.wsdl.WSDLConstants;
+import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAll;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
@@ -49,6 +50,8 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaContent;
 import org.apache.ws.commons.schema.XmlSchemaContentModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaGroup;
+import org.apache.ws.commons.schema.XmlSchemaGroupRef;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
@@ -562,16 +565,37 @@ public class JavascriptUtils {
      * throw. We're not ready for groups yet.
      * @param object
      */
-    public static XmlSchemaParticle getObjectParticle(XmlSchemaObject object, QName contextName) {
+    public static XmlSchemaParticle getObjectParticle(XmlSchemaObject object, QName contextName,
+                                                      XmlSchema currentSchema) {
 
         if (!(object instanceof XmlSchemaParticle)) {
             unsupportedConstruct("NON_PARTICLE_CHILD",
                                                 object.getClass().getSimpleName(),
                                                 contextName, object);
         }
+
+        if (object instanceof XmlSchemaGroupRef) {
+            QName groupName = ((XmlSchemaGroupRef) object).getRefName();
+            XmlSchemaGroup group = currentSchema.getGroupByName(groupName);
+            if (group == null) {
+                unsupportedConstruct("MISSING_GROUP",
+                        groupName.toString(), contextName, null);
+            }
+
+            XmlSchemaParticle groupParticle = group.getParticle();
+
+            if (!(groupParticle instanceof XmlSchemaSequence)) {
+                unsupportedConstruct("GROUP_REF_UNSUPPORTED_TYPE",
+                        groupParticle.getClass().getSimpleName(), contextName, groupParticle);
+            }
+
+            return groupParticle;
+        }
+
         if (!(object instanceof XmlSchemaElement)
             && !(object instanceof XmlSchemaAny)
-            && !(object instanceof XmlSchemaChoice)) {
+            && !(object instanceof XmlSchemaChoice)
+            && !(object instanceof XmlSchemaSequence)) {
             unsupportedConstruct("GROUP_CHILD",
                     object.getClass().getSimpleName(), contextName,
                                                 object);
