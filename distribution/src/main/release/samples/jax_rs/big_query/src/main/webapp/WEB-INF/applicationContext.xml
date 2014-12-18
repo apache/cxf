@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2011 Talend Inc. - www.talend.com
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+      xmlns:jaxrsclient="http://cxf.apache.org/jaxrs-client"
+      xmlns:http="http://cxf.apache.org/transports/http/configuration"
+      xmlns:sec="http://cxf.apache.org/configuration/security"
+      xsi:schemaLocation="
+         http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+         http://cxf.apache.org/jaxrs
+         http://cxf.apache.org/schemas/jaxrs.xsd
+         http://cxf.apache.org/jaxrs-client
+         http://cxf.apache.org/schemas/jaxrs-client.xsd
+         http://cxf.apache.org/transports/http/configuration
+         http://cxf.apache.org/schemas/configuration/http-conf.xsd
+         http://cxf.apache.org/configuration/security
+         http://cxf.apache.org/schemas/configuration/security.xsd">
+
+     
+     <!-- Restaurant Reservations Application -->
+     <!--
+     <http:conduit name="*.http-conduit">
+        <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:keyManagers keyPassword="skpass">
+                   <sec:keyStore type="JKS" password="sspass" 
+	                file="${project.build.directory}/${project.build.finalName}/WEB-INF/servicestore.jks"/>
+	           </sec:keyManagers>
+	        <sec:trustManagers>
+	           <sec:keyStore type="JKS" password="sspass"
+	               file="${project.build.directory}/${project.build.finalName}/WEB-INF/servicestore.jks"/>
+	        </sec:trustManagers>
+        </http:tlsClientParameters>
+     </http:conduit>
+     -->
+
+     <!-- CXF Logging Feature -->
+     <bean id="loggingFeature" class="org.apache.cxf.feature.LoggingFeature"/>
+
+     <!-- WebClient for requesting an OAuth2 Access token --> 
+     
+     <jaxrsclient:client id="atServiceClient" threadSafe="true" 
+        address="https://accounts.google.com/o/oauth2/token"
+        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
+        <jaxrsclient:headers>
+            <entry key="Accept" value="application/json"/>
+        </jaxrsclient:headers>
+        <jaxrsclient:providers>
+           <bean class="org.apache.cxf.jaxrs.provider.FormEncodingProvider">
+               <property name="expectedEncoded" value="true"/>
+           </bean> 
+        </jaxrsclient:providers>
+        <jaxrsclient:features>
+           <ref bean="loggingFeature"/>
+        </jaxrsclient:features>
+     </jaxrsclient:client> 
+     
+     <!-- WebClient for requesting an OIDC UserInfo -->
+     <jaxrsclient:client id="userProfileClient" threadSafe="true" 
+        address="https://www.googleapis.com/plus/v1/people/me/openIdConnect"
+        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
+        <jaxrsclient:headers>
+            <entry key="Accept" value="application/json"/>
+        </jaxrsclient:headers>
+        <jaxrsclient:providers>
+           <bean class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/> 
+        </jaxrsclient:providers>
+        <jaxrsclient:features>
+           <ref bean="loggingFeature"/>
+        </jaxrsclient:features>
+     </jaxrsclient:client>  
+     
+     <!-- WebClient for requesting an OIDC IDP JWK Set -->
+     <jaxrsclient:client id="jwkSetClient" threadSafe="true" 
+        address="https://www.googleapis.com/oauth2/v2/certs"
+        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
+        <jaxrsclient:headers>
+            <entry key="Accept" value="application/json"/>
+        </jaxrsclient:headers>
+        <jaxrsclient:providers>
+           <bean class="org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider"/> 
+        </jaxrsclient:providers>
+        <jaxrsclient:features>
+           <ref bean="loggingFeature"/>
+        </jaxrsclient:features>
+     </jaxrsclient:client>
+     
+     <bean id="idTokenValidator" class="org.apache.cxf.rs.security.oidc.rp.IdTokenValidator">
+         <property name="jwkSetClient" ref="jwkSetClient"/> 
+         <property name="issuerId" value="accounts.google.com"/>
+     </bean>
+
+     <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">
+         <property name="key" value="${client_id}"/> 
+         <property name="secret" value="${client_secret}"/>
+     </bean>
+
+     <bean id="bigQueryService" class="demo.jaxrs.server.BigQueryService">
+         <property name="accessTokenServiceClient" ref="atServiceClient"/>
+         <property name="userInfoServiceClient" ref="userProfileClient"/>
+         <property name="idTokenValidator" ref="idTokenValidator"/>
+         <property name="consumer" ref="consumer"/>
+         <property name="authorizationServiceUri" value="https://accounts.google.com/o/oauth2/auth"/>
+     </bean> 
+     
+     <jaxrs:server id="bigQueryServer" address="/">
+        <jaxrs:serviceBeans>
+           <ref bean="bigQueryService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:features>
+           <ref bean="loggingFeature"/>
+        </jaxrs:features>
+     </jaxrs:server>
+     
+          
+</beans>
+
