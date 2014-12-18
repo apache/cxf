@@ -132,7 +132,7 @@ public class KerberosTokenTest extends AbstractLdapTestUnit {
             inputStream.close();
             content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
             
-            File f2 = new File(basedir + "/target/test-classes/krb5.conf");
+            File f2 = new File(basedir + "/target/test-classes/wssec.kerberos.krb5.conf");
             FileOutputStream outputStream = new FileOutputStream(f2);
             IOUtils.write(content, outputStream, "UTF-8");
             outputStream.close();
