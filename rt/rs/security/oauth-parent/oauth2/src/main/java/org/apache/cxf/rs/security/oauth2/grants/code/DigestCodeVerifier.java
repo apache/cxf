@@ -26,9 +26,7 @@ public class DigestCodeVerifier implements CodeVerifierTransformer {
     public String transformCodeVerifier(String codeVerifier) {
         byte[] digest = MessageDigestUtils.createDigest(codeVerifier, 
                                                         MessageDigestUtils.ALGO_SHA_256);
-        int length = digest.length > 128 / 8 ? 128 / 8 : digest.length;
-        
-        return Base64UrlUtility.encodeChunk(digest, 0, length);
+        return Base64UrlUtility.encode(digest);
     }
 
     
