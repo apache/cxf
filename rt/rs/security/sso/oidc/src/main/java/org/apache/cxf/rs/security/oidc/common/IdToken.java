@@ -22,16 +22,16 @@ import java.util.Map;
 
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 
-public class UserToken extends JwtClaims {
+public class IdToken extends JwtClaims {
     public static final String AUTH_TIME_CLAIM = "auth_time";
     public static final String NONCE_CLAIM = "nonce";
     public static final String ACR_CLAIM = "acr";
     public static final String AZP_CLAIM = "azp";
     
-    public UserToken() {
+    public IdToken() {
     }
     
-    public UserToken(Map<String, Object> claims) {
+    public IdToken(Map<String, Object> claims) {
         super(claims);
     }
     public void setAuthenticationTime(Long time) {

@@ -20,16 +20,16 @@ package org.apache.cxf.rs.security.oidc.rp;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
-import org.apache.cxf.rs.security.oidc.common.UserToken;
 
 public class UserInfoValidator extends AbstractTokenValidator {
     private boolean encryptedOnly;
     
-    public UserInfo getUserInfo(WebClient profileClient, UserToken idToken) {
+    public UserInfo getUserInfo(WebClient profileClient, IdToken idToken) {
         return getProfile(profileClient, idToken, false);
     }
-    public UserInfo getProfile(WebClient profileClient, UserToken idToken, boolean asJwt) {
+    public UserInfo getProfile(WebClient profileClient, IdToken idToken, boolean asJwt) {
         if (asJwt) {
             String jwt = profileClient.get(String.class);
             return getUserInfoFromJwt(jwt, idToken);
@@ -39,19 +39,19 @@ public class UserInfoValidator extends AbstractTokenValidator {
             return profile;
         }
     }
-    public UserInfo getUserInfoFromJwt(String profileJwtToken, UserToken idToken) {
+    public UserInfo getUserInfoFromJwt(String profileJwtToken, IdToken idToken) {
         JwtToken jwt = getUserInfoJwt(profileJwtToken, idToken);
         return getUserInfoFromJwt(jwt, idToken);
     }
-    public UserInfo getUserInfoFromJwt(JwtToken jwt, UserToken idToken) {
+    public UserInfo getUserInfoFromJwt(JwtToken jwt, IdToken idToken) {
         UserInfo profile = new UserInfo(jwt.getClaims().asMap());
         validateUserInfo(profile, idToken);
         return profile;
     }
-    public JwtToken getUserInfoJwt(String profileJwtToken, UserToken idToken) {
+    public JwtToken getUserInfoJwt(String profileJwtToken, IdToken idToken) {
         return getJwtToken(profileJwtToken, idToken.getAudience(), (String)idToken.getProperty("kid"), encryptedOnly);
     }
-    public void validateUserInfo(UserInfo profile, UserToken idToken) {
+    public void validateUserInfo(UserInfo profile, IdToken idToken) {
         validateJwtClaims(profile, idToken.getAudience(), false);
         // validate subject
         if (!idToken.getSubject().equals(profile.getSubject())) {

@@ -25,7 +25,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
-import org.apache.cxf.rs.security.oidc.common.UserToken;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class UserInfoCodeResponseFilter extends AbstractJwsJweProducer implements AccessTokenResponseFilter {
@@ -33,8 +33,8 @@ public class UserInfoCodeResponseFilter extends AbstractJwsJweProducer implement
     private String issuer;
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
-        UserToken token = 
-            userInfoProvider.getUserToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
+        IdToken token = 
+            userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
         token.setIssuer(issuer);
         token.setAudience(st.getClient().getClientId());
         
