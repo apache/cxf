@@ -22,10 +22,10 @@ import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
-import org.apache.cxf.rs.security.oidc.common.UserToken;
 
 public interface UserInfoProvider {
-    UserToken getUserToken(String clientId, UserSubject authenticatedUser, List<OAuthPermission> scopes);
+    IdToken getIdToken(String clientId, UserSubject authenticatedUser, List<OAuthPermission> scopes);
     UserInfo getUserInfo(String clientId, UserSubject authenticatedUser, List<OAuthPermission> scopes);
 }
