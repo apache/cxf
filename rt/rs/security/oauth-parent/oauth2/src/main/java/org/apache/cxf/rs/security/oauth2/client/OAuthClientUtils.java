@@ -384,27 +384,4 @@ public final class OAuthClientUtils {
         }
         
     }
-    
-    /**
-     * Simple consumer representation
-     */
-    public static class Consumer {
-        
-        private String key;
-        private String secret;
-        
-        public Consumer(String key, String secret) {
-            this.key = key;
-            this.secret = secret;
-        }
-        public String getKey() {
-            return key;
-        }
-    
-        public String getSecret() {
-            return secret;
-        }
-        
-        
-    }
 }

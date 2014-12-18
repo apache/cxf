@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.oauth2.auth.saml.Saml2BearerAuthOutInterceptor;
+import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
@@ -71,7 +72,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
                                                       signInfo).assertionToString();
         Saml2BearerGrant grant = new Saml2BearerGrant(assertion);
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
-                                        new OAuthClientUtils.Consumer("alice", "alice"), 
+                                        new Consumer("alice", "alice"), 
                                         grant,
                                         false);
         assertNotNull(at.getTokenKey());
