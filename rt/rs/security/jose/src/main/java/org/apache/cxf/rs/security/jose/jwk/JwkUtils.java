@@ -206,10 +206,13 @@ public final class JwkUtils {
     }
     public static JsonWebKeys loadJwkSet(Message m, Properties props, PrivateKeyPasswordProvider cb, 
                                          JwkReaderWriter reader) {
-        JsonWebKeys jwkSet = (JsonWebKeys)m.getExchange().get(props.get(KeyManagementUtils.RSSEC_KEY_STORE_FILE));
+        String key = (String)props.get(KeyManagementUtils.RSSEC_KEY_STORE_FILE);
+        JsonWebKeys jwkSet = key != null ? (JsonWebKeys)m.getExchange().get(key) : null;
         if (jwkSet == null) {
             jwkSet = loadJwkSet(props, m.getExchange().getBus(), cb, reader);
-            m.getExchange().put((String)props.get(KeyManagementUtils.RSSEC_KEY_STORE_FILE), jwkSet);
+            if (key != null) {
+                m.getExchange().put(key, jwkSet);
+            }
         }
         return jwkSet;
     }
