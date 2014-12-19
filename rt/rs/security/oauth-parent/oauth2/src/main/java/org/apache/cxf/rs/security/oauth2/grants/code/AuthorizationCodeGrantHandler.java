@@ -71,9 +71,9 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         
-        String clientCodeVerifier = grant.getClientCodeVerifier();
-        if (clientCodeVerifier != null) {
-            String clientCodeChallenge = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
+        String clientCodeChallenge = grant.getClientCodeChallenge();
+        if (clientCodeChallenge != null) {
+            String clientCodeVerifier = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
             if (!compareCodeVerifierWithChallenge(clientCodeVerifier, clientCodeChallenge)) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
             }

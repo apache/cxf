@@ -394,7 +394,7 @@ public final class ModelEncryptionSupport {
                                                                               Long.valueOf(parts[3]));
         grant.setRedirectUri(getStringPart(parts[4]));
         grant.setAudience(getStringPart(parts[5]));
-        grant.setClientCodeVerifier(getStringPart(parts[6]));
+        grant.setClientCodeChallenge(getStringPart(parts[6]));
         grant.setApprovedScopes(parseSimpleList(parts[7]));
         grant.setSubject(recreateUserSubject(parts[8]));
         return grant; 
@@ -420,7 +420,7 @@ public final class ModelEncryptionSupport {
         state.append(tokenizeString(grant.getAudience()));
         state.append(SEP);
         // 6: code verifier
-        state.append(tokenizeString(grant.getClientCodeVerifier()));
+        state.append(tokenizeString(grant.getClientCodeChallenge()));
         state.append(SEP);
         // 7: approved scopes
         state.append(grant.getApprovedScopes().toString());

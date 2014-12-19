@@ -35,7 +35,7 @@ public class AuthorizationCodeRegistration {
     private String redirectUri;
     private UserSubject subject;
     private String audience;
-    private String clientCodeVerifier;
+    private String clientCodeChallenge;
     
     /**
      * Sets the {@link Client} reference
@@ -120,10 +120,10 @@ public class AuthorizationCodeRegistration {
     public void setAudience(String audience) {
         this.audience = audience;
     }
-    public String getClientCodeVerifier() {
-        return clientCodeVerifier;
+    public String getClientCodeChallenge() {
+        return clientCodeChallenge;
     }
-    public void setClientCodeVerifier(String clientCodeVerifier) {
-        this.clientCodeVerifier = clientCodeVerifier;
+    public void setClientCodeChallenge(String clientCodeChallenge) {
+        this.clientCodeChallenge = clientCodeChallenge;
     }
 }

@@ -54,7 +54,7 @@ public class OAuthAuthorizationData implements Serializable {
     
     private List<? extends Permission> permissions;
     private String audience;
-    private String codeVerifier;
+    private String codeChallenge;
     
     public OAuthAuthorizationData() {
     }
@@ -273,11 +273,11 @@ public class OAuthAuthorizationData implements Serializable {
         this.applicationCertificates = applicationCertificates;
     }
 
-    public void setClientCodeVerifier(String verifier) {
-        this.codeVerifier = verifier;
+    public void setClientCodeChallenge(String verifier) {
+        this.codeChallenge = verifier;
     }
-    public String getClientCodeVerifier() {
-        return codeVerifier;
+    public String getClientCodeChallenge() {
+        return codeChallenge;
     }
 
 }
