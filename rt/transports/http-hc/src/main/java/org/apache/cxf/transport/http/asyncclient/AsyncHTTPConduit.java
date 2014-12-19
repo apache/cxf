@@ -877,6 +877,29 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                                                          SSLUtils.getSupportedCipherSuites(sslcontext), 
                                                          tlsClientParameters.getCipherSuitesFilter(), LOG, false);
         sslengine.setEnabledCipherSuites(cipherSuites);
+        
+        String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters
+            .getSecureSocketProtocol() : "TLS";
+            
+        String p[] = findProtocols(protocol, sslengine.getSupportedProtocols());
+        if (p != null) {
+            sslengine.setEnabledProtocols(p);
+        }
+    }
+    
+    private String[] findProtocols(String p, String[] options) {
+        List<String> list = new ArrayList<String>();
+        for (String s : options) {
+            if (s.equals(p)) {
+                return new String[] {p};
+            } else if (s.startsWith(p)) {
+                list.add(s);
+            }
+        }
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.toArray(new String[list.size()]);
     }
 
     protected static KeyManager[] getKeyManagersWithCertAlias(TLSClientParameters tlsClientParameters,
