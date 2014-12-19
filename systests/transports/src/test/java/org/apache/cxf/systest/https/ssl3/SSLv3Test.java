@@ -27,6 +27,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
+import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -164,6 +165,37 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testAsyncClientSSL3NotAllowed() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        
+        updateAddressPort(port, PORT3);
+        
+        try {
+            port.greetMe("Kitty");
+            fail("Failure expected on the client not supporting SSLv3 by default");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testClientSSL3Allowed() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
@@ -177,6 +209,32 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         assertNotNull("Service is null", service);   
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT3);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testAsyncClientSSL3Allowed() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
         
         updateAddressPort(port, PORT3);
         
