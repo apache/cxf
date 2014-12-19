@@ -28,6 +28,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
+import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.OOBAuthorizationResponse;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -65,6 +67,19 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             params = codeRequestFilter.process(params, userSubject, client);
         }
         return super.startAuthorization(params, userSubject, client);
+    }
+    protected OAuthAuthorizationData createAuthorizationData(Client client, 
+                                                             MultivaluedMap<String, String> params,
+                                                             UserSubject subject,
+                                                             String redirectUri, 
+                                                             List<OAuthPermission> perms) {
+        
+        OAuthAuthorizationData secData = super.createAuthorizationData(client, params, subject, redirectUri, perms);
+        setCodeQualifier(secData, params);
+        return secData;
+    }
+    private static void setCodeQualifier(OAuthAuthorizationData data, MultivaluedMap<String, String> params) {
+        data.setClientCodeVerifier(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
     }
     protected Response createGrant(MultivaluedMap<String, String> params,
                                    Client client,
