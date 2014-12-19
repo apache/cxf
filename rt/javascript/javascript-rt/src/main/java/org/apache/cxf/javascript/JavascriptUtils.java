@@ -473,7 +473,8 @@ public class JavascriptUtils {
      */
     public void generateCodeToSerializeAny(ParticleInfo itemInfo, String prefix,
                                            SchemaCollection schemaCollection) {
-        boolean optional = XmlSchemaUtils.isParticleOptional(itemInfo.getParticle());
+        boolean optional = XmlSchemaUtils.isParticleOptional(itemInfo.getParticle())
+                || (itemInfo.isArray() && itemInfo.getMinOccurs() == 0);
         boolean array = XmlSchemaUtils.isParticleArray(itemInfo.getParticle());
 
         appendLine("var anyHolder = this._" + itemInfo.getJavascriptName() + ";");
