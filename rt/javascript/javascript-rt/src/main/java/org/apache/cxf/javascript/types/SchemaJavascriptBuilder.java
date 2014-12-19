@@ -533,6 +533,8 @@ public class SchemaJavascriptBuilder {
         // non-matching case
         utils.startIf("anyNeeded > 0");
         utils.appendLine("throw 'not enough ws:any elements';");
+        utils.appendElse(); // else non-match
+        utils.appendLine("break;");
         utils.endBlock(); // non-match+required
         utils.endBlock(); // match/non-match.
         utils.endBlock(); // while
