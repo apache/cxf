@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth.client;
 
 import java.net.URI;
+import java.security.PrivateKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -31,6 +32,7 @@ import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
+import net.oauth.signature.RSA_SHA1;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
@@ -71,20 +73,46 @@ public final class OAuthClientUtils {
                              Consumer consumer,
                              URI callback,
                              Map<String, String> extraParams) throws OAuthServiceException {
+        return getRequestToken(requestTokenService, consumer, callback, extraParams, null);
+    }
+    
+    public static Map<String, Object> prepareOAuthRsaProperties(PrivateKey pk) {
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.RSA_SHA1);
+        props.put(RSA_SHA1.PRIVATE_KEY, pk);
+        return props;
+    }
+    
+    public static Token getRequestToken(WebClient requestTokenService,
+                                        Consumer consumer,
+                                        URI callback,
+                                        Map<String, String> extraParams,
+                                        Map<String, Object> oauthConsumerProps) throws OAuthServiceException {
         Map<String, String> parameters = new HashMap<String, String>();
         if (extraParams != null) {
             parameters.putAll(extraParams);
         }
         parameters.put(OAuth.OAUTH_CALLBACK, callback.toString());
-        parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, "HMAC-SHA1");
+       
+        if (oauthConsumerProps == null || !oauthConsumerProps.containsKey(OAuth.OAUTH_SIGNATURE_METHOD)) {
+            parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.HMAC_SHA1);
+        }
         parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());
         parameters.put(OAuth.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
         parameters.put(OAuth.OAUTH_CONSUMER_KEY, consumer.getKey());
-        
-        OAuthConsumer oAuthConsumer = new OAuthConsumer(null, consumer.getKey(), consumer.getSecret(), 
-                null);
-        OAuthAccessor accessor = new OAuthAccessor(oAuthConsumer);
+       
+        OAuthAccessor accessor = createAccessor(consumer, oauthConsumerProps);
         return getToken(requestTokenService, accessor, parameters);
+    }
+    private static OAuthAccessor createAccessor(Consumer consumer, Map<String, Object> props) {
+        OAuthConsumer oAuthConsumer = new OAuthConsumer(null, consumer.getKey(), consumer.getSecret(), 
+                                                        null);
+        if (props != null) {
+            for (Map.Entry<String, Object> entry : props.entrySet()) {
+                oAuthConsumer.setProperty(entry.getKey(), entry.getValue());
+            }
+        }
+        return new OAuthAccessor(oAuthConsumer);
     }
     
     /**
@@ -98,15 +126,23 @@ public final class OAuthClientUtils {
                                        Consumer consumer,
                                        Token requestToken,
                                        String verifier) throws OAuthServiceException {
+        return getAccessToken(accessTokenService, consumer, requestToken, verifier, null);
+    }
+    
+    public static Token getAccessToken(WebClient accessTokenService,
+                                       Consumer consumer,
+                                       Token requestToken,
+                                       String verifier,
+                                       Map<String, Object> oauthConsumerProps) throws OAuthServiceException {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(OAuth.OAUTH_CONSUMER_KEY, consumer.getKey());
         parameters.put(OAuth.OAUTH_TOKEN, requestToken.getToken());
         parameters.put(OAuth.OAUTH_VERIFIER, verifier);
-        parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, "HMAC-SHA1");
+        if (oauthConsumerProps == null || !oauthConsumerProps.containsKey(OAuth.OAUTH_SIGNATURE_METHOD)) {
+            parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.HMAC_SHA1);
+        }
         
-        OAuthConsumer oAuthConsumer = new OAuthConsumer(null, consumer.getKey(), 
-                consumer.getSecret(), null);
-        OAuthAccessor accessor = new OAuthAccessor(oAuthConsumer);
+        OAuthAccessor accessor = createAccessor(consumer, oauthConsumerProps);
         accessor.requestToken = requestToken.getToken();
         accessor.tokenSecret = requestToken.getSecret();
         return getToken(accessTokenService, accessor, parameters);
@@ -124,18 +160,26 @@ public final class OAuthClientUtils {
                                             Token accessToken, 
                                             String method, 
                                             String requestURI) {
+        return createAuthorizationHeader(consumer, accessToken, method, requestURI, null);
+    }
+    
+    public static String createAuthorizationHeader(Consumer consumer,
+                                                   Token accessToken, 
+                                                   String method, 
+                                                   String requestURI,
+                                                   Map<String, Object> oauthConsumerProps) {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(OAuth.OAUTH_CONSUMER_KEY, consumer.getKey());
         if (accessToken != null) {
             parameters.put(OAuth.OAUTH_TOKEN, accessToken.getToken());
         }
-        parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, "HMAC-SHA1");
+        if (oauthConsumerProps == null || !oauthConsumerProps.containsKey(OAuth.OAUTH_SIGNATURE_METHOD)) {
+            parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.HMAC_SHA1);
+        }
         parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());
         parameters.put(OAuth.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
         
-        OAuthConsumer oAuthConsumer = 
-            new OAuthConsumer(null, consumer.getKey(), consumer.getSecret(), null);
-        OAuthAccessor accessor = new OAuthAccessor(oAuthConsumer);
+        OAuthAccessor accessor = createAccessor(consumer, oauthConsumerProps);
         if (accessToken != null) {
             accessor.accessToken = accessToken.getToken();
             accessor.tokenSecret = accessToken.getSecret();
