@@ -420,7 +420,11 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         utils.appendLine(" httpStatus = -1;");
         utils.appendLine(" httpStatusText = 'Error opening connection to server';");
         utils.appendLine("}");
+        utils.startIf("client.parseErrorDetails");
+        utils.appendLine("client.user_onerror(httpStatus, httpStatusText, client.parseErrorDetails(this));");
+        utils.appendElse();
         utils.appendLine("client.user_onerror(httpStatus, httpStatusText);");
+        utils.endBlock();
         utils.endBlock();
         code.append("}\n\n");
         code.append(currentInterfaceClassName + ".prototype."
