@@ -81,23 +81,23 @@ public class ServletController {
     protected void updateDestination(HttpServletRequest request,
                                      AbstractHTTPDestination d) {
         String base = getBaseURL(request);
-        synchronized (d) {
-            String ad = d.getEndpointInfo().getAddress();
-            if (ad == null 
-                && d.getAddress() != null
-                && d.getAddress().getAddress() != null) {
-                ad = d.getAddress().getAddress().getValue();
-                if (ad == null) {
-                    ad = "/";
-                }
+        String ad = d.getEndpointInfo().getAddress();
+        if (ad == null 
+            && d.getAddress() != null
+            && d.getAddress().getAddress() != null) {
+            ad = d.getAddress().getAddress().getValue();
+            if (ad == null) {
+                ad = "/";
             }
-            // Using HTTP_PREFIX check is safe for ServletController
-            // URI.create(ad).isRelative() can be used - a bit more expensive though
-            if (ad != null && !ad.startsWith(HTTP_PREFIX)) {
-                if (disableAddressUpdates) {
-                    request.setAttribute("org.apache.cxf.transport.endpoint.address", 
-                                         base + ad);
-                } else {
+        }
+        // Using HTTP_PREFIX check is safe for ServletController
+        // URI.create(ad).isRelative() can be used - a bit more expensive though
+        if (ad != null && !ad.startsWith(HTTP_PREFIX)) {
+            if (disableAddressUpdates) {
+                request.setAttribute("org.apache.cxf.transport.endpoint.address", 
+                                     base + ad);
+            } else {
+                synchronized (d) {
                     BaseUrlHelper.setAddress(d, base + ad);
                 }
             }
