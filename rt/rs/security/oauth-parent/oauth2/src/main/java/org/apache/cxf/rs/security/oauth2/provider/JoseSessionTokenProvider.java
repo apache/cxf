@@ -140,7 +140,7 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         OAuthRedirectionState state = new OAuthRedirectionState();
         state.setClientId(parts[0]);
         state.setAudience(parts[1]);
-        state.setClientCodeVerifier(parts[2]);
+        state.setClientCodeChallenge(parts[2]);
         state.setState(parts[3]);
         state.setProposedScope(parts[4]);
         state.setRedirectUri(parts[5]);
@@ -155,7 +155,7 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         state.append(ModelEncryptionSupport.tokenizeString(secData.getAudience()));
         state.append(ModelEncryptionSupport.SEP);
         // 2: client code verifier
-        state.append(ModelEncryptionSupport.tokenizeString(secData.getClientCodeVerifier()));
+        state.append(ModelEncryptionSupport.tokenizeString(secData.getClientCodeChallenge()));
         state.append(ModelEncryptionSupport.SEP);
         // 3: state
         state.append(ModelEncryptionSupport.tokenizeString(secData.getState()));

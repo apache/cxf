@@ -38,7 +38,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private List<String> approvedScopes = Collections.emptyList();
     private UserSubject subject;
     private String audience;
-    private String clientCodeVerifier;
+    private String clientCodeChallenge;
     
     public ServerAuthorizationCodeGrant() {
         
@@ -149,11 +149,11 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
         this.audience = audience;
     }
 
-    public String getClientCodeVerifier() {
-        return clientCodeVerifier;
+    public String getClientCodeChallenge() {
+        return clientCodeChallenge;
     }
 
-    public void setClientCodeVerifier(String clientCodeVerifier) {
-        this.clientCodeVerifier = clientCodeVerifier;
+    public void setClientCodeChallenge(String clientCodeChallenge) {
+        this.clientCodeChallenge = clientCodeChallenge;
     }
 }

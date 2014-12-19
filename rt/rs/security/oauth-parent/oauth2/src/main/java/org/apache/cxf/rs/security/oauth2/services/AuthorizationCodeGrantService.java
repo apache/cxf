@@ -78,7 +78,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         return state;
     }
     private static void setCodeQualifier(OAuthRedirectionState data, MultivaluedMap<String, String> params) {
-        data.setClientCodeVerifier(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
+        data.setClientCodeChallenge(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE));
     }
     protected Response startAuthorization(MultivaluedMap<String, String> params, 
                                           UserSubject userSubject,
@@ -104,7 +104,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         codeReg.setApprovedScope(approvedScope);
         codeReg.setSubject(userSubject);
         codeReg.setAudience(state.getAudience());
-        codeReg.setClientCodeVerifier(state.getClientCodeVerifier());
+        codeReg.setClientCodeChallenge(state.getClientCodeChallenge());
         
         ServerAuthorizationCodeGrant grant = null;
         try {

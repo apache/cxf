@@ -78,7 +78,7 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
             new ServerAuthorizationCodeGrant(reg.getClient(), getCode(reg), getGrantLifetime(), getIssuedAt());
         grant.setApprovedScopes(getApprovedScopes(reg));
         grant.setAudience(reg.getAudience());
-        grant.setClientCodeVerifier(reg.getClientCodeVerifier());
+        grant.setClientCodeChallenge(reg.getClientCodeChallenge());
         grant.setSubject(reg.getSubject());
         grant.setRedirectUri(reg.getRedirectUri());
         return grant;
