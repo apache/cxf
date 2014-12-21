@@ -21,6 +21,8 @@ package org.apache.cxf.jaxrs.swagger;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -168,6 +170,9 @@ public class SwaggerFeature extends AbstractFeature {
 
     @PreMatching
     private static class SwaggerContainerRequestFilter implements ContainerRequestFilter {
+        private static final String APIDOCS_LISTING_PATH = "api-docs";
+        private static final Pattern APIDOCS_RESOURCE_PATH = Pattern.compile(APIDOCS_LISTING_PATH + "(/.+)");
+        
         private ApiListingResourceJSON apiListingResource;
         @Context
         private MessageContext mc;
@@ -178,10 +183,19 @@ public class SwaggerFeature extends AbstractFeature {
         @Override
         public void filter(ContainerRequestContext requestContext) throws IOException {
             UriInfo ui = mc.getUriInfo();
-            if (ui.getPath().endsWith("api-docs")) {
+            if (ui.getPath().endsWith(APIDOCS_LISTING_PATH)) {
                 Response r = 
-                    apiListingResource.apiDeclaration("", null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
+                    apiListingResource.resourceListing(null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
                 requestContext.abortWith(r);
+            } else {
+                final Matcher matcher = APIDOCS_RESOURCE_PATH.matcher(ui.getPath());
+                
+                if (matcher.find()) {
+                    Response r = 
+                        apiListingResource.apiDeclaration(matcher.group(1), 
+                            null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
+                    requestContext.abortWith(r);                
+                }
             }
         }
         
