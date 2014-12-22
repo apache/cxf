@@ -531,7 +531,7 @@ public class RMManagerTest extends Assert {
         control.reset();
         setUpEndpointForRecovery(endpoint, ei, si, bi, ii);  
         RMMessage m = control.createMock(RMMessage.class);
-        Capture<Message> mc = new Capture<Message>();
+        Capture<Message> mc = Capture.newInstance();
         setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, m, mc);        
         control.replay();
         manager.recoverReliableEndpoint(endpoint, conduit);
