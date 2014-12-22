@@ -33,6 +33,7 @@ public class OAuthContext {
     private List<OAuthPermission> tokenPermissions;
     private String tokenGrantType;
     private String clientId;
+    private boolean isClientConfidential;
     private String tokenKey;
     private String tokenAudience;
     private String[] tokenRequestParts;
@@ -126,5 +127,11 @@ public class OAuthContext {
 
     public void setTokenRequestParts(String[] tokenRequestParts) {
         this.tokenRequestParts = tokenRequestParts;
+    }
+    public boolean isClientConfidential() {
+        return isClientConfidential;
+    }
+    public void setClientConfidential(boolean isConfidential) {
+        this.isClientConfidential = isConfidential;
     }
 }

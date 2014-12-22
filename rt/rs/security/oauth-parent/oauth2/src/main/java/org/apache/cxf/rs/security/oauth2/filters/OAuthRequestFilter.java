@@ -130,6 +130,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
                                                      accessTokenV.getTokenGrantType());
         
         oauthContext.setClientId(accessTokenV.getClientId());
+        oauthContext.setClientConfidential(accessTokenV.isClientConfidential());
         oauthContext.setTokenKey(accessTokenV.getTokenKey());
         oauthContext.setTokenAudience(accessTokenV.getAudience());
         oauthContext.setTokenRequestParts(authParts);
