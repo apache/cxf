@@ -39,7 +39,7 @@ public class AccessTokenValidation {
     private String clientId;
     private String clientIpAddress;
     private UserSubject clientSubject;
-    
+    private boolean isClientConfidential;
     private String tokenKey;
     private String tokenType;
     private String tokenGrantType;
@@ -57,6 +57,7 @@ public class AccessTokenValidation {
     public AccessTokenValidation(ServerAccessToken token) {
         this.clientId = token.getClient().getClientId();
         this.clientSubject = token.getClient().getSubject();
+        this.isClientConfidential = token.getClient().isConfidential();
         this.clientIpAddress = token.getClient().getClientIpAddress();
         this.tokenKey = token.getTokenKey();
         this.tokenType = token.getTokenType();
@@ -148,6 +149,14 @@ public class AccessTokenValidation {
 
     public void setExtraProps(Map<String, String> extraProps) {
         this.extraProps = extraProps;
+    }
+
+    public boolean isClientConfidential() {
+        return isClientConfidential;
+    }
+
+    public void setClientConfidential(boolean isConfidential) {
+        this.isClientConfidential = isConfidential;
     }
     
 }
