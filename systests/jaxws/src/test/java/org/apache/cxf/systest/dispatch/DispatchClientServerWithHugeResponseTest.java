@@ -21,9 +21,9 @@ package org.apache.cxf.systest.dispatch;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
@@ -34,7 +34,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 
-
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -44,7 +44,6 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -93,15 +92,13 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
     
     @org.junit.Before
     public void setUp() throws Exception {
-        StaxUtils.setInnerElementCountThreshold(12);
-        StaxUtils.setInnerElementLevelThreshold(12);
         createBus();
         getBus().getOutInterceptors().add(new LoggingOutInterceptor());
         getBus().getInInterceptors().add(new LoggingInInterceptor());
     }
     
-    @AfterClass
-    public static void cleanup() throws Exception {
+    @org.junit.After
+    public void cleanUp() throws Exception {
         StaxUtils.setInnerElementCountThreshold(-1);
         StaxUtils.setInnerElementLevelThreshold(-1);
     }
@@ -125,6 +122,8 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
                                      + "/SOAPDispatchService/SoapDispatchPort");
         
         
+        StaxUtils.setInnerElementCountThreshold(12);
+        StaxUtils.setInnerElementLevelThreshold(12);
 
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
         SOAPMessage soapReqMsg3 = MessageFactory.newInstance().createMessage(null, is3);
@@ -162,6 +161,8 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
                                      + "/SOAPDispatchService/SoapDispatchPort");
         
         
+        StaxUtils.setInnerElementCountThreshold(12);
+        StaxUtils.setInnerElementLevelThreshold(12);
 
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
         SOAPMessage soapReqMsg3 = MessageFactory.newInstance().createMessage(null, is3);
@@ -173,7 +174,24 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
             fail("We should not have encountered a timeout, " 
                 + "should get some exception tell me stackoverflow");
         } catch (Throwable e) {
-            assertTrue(e.getCause().getMessage().startsWith("reach the innerElementLevelThreshold"));
+            if (e.getCause() == null) {
+                throw e;
+            }
+            Throwable t = e.getCause();
+            if (t instanceof SoapFault) {
+                SoapFault sf = (SoapFault)e.getCause();
+                if (sf.getCause() == null) {
+                    throw e;
+                }
+                t = sf.getCause();
+            }
+            if (t.getMessage() == null) {
+                throw e;
+            }
+            
+            String msg = t.getMessage();          
+            assertTrue(msg, msg.startsWith("reach the innerElementLevelThreshold")
+                       || msg.contains("Maximum Element Depth limit"));
         } finally {
             getBus().getInInterceptors().remove(hugeResponseInterceptor);
         }
@@ -190,7 +208,7 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
 
         SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
         assertNotNull(service);
-
+        
         Dispatch<SOAPMessage> disp = service
             .createDispatch(PORT_NAME, SOAPMessage.class, Service.Mode.MESSAGE);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
@@ -199,6 +217,9 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
                                      + "/SOAPDispatchService/SoapDispatchPort");
         
         
+
+        StaxUtils.setInnerElementCountThreshold(12);
+        StaxUtils.setInnerElementLevelThreshold(12);
 
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
         SOAPMessage soapReqMsg3 = MessageFactory.newInstance().createMessage(null, is3);
@@ -210,14 +231,25 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
         } catch (TimeoutException te) {
             fail("We should not have encountered a timeout, " 
                 + "should get some exception tell me stackoverflow");
-        } catch (Throwable e) {
+        } catch (ExecutionException e) {
             if (e.getCause() == null) {
                 throw e;
             }
-            if (e.getCause().getMessage() == null) {
+            Throwable t = e.getCause();
+            if (t instanceof SoapFault) {
+                SoapFault sf = (SoapFault)e.getCause();
+                if (sf.getCause() == null) {
+                    throw e;
+                }
+                t = sf.getCause();
+            }
+            if (t.getMessage() == null) {
                 throw e;
             }
-            assertTrue(e.getCause().getMessage().startsWith("reach the innerElementCountThreshold"));
+            
+            String msg = t.getMessage();
+            assertTrue(msg, msg.startsWith("reach the innerElementCountThreshold")
+                       || msg.contains("Maximum Number of Child Elements"));
         } finally {
             getBus().getInInterceptors().remove(hugeResponseInterceptor);
         }
