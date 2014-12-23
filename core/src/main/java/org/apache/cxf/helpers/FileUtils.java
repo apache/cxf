@@ -38,12 +38,37 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 public final class FileUtils {
     private static final int RETRY_SLEEP_MILLIS = 10;
     private static File defaultTempDir;
-    
+    private static final char[] ILLEGAL_CHARACTERS 
+        = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'};    
     
     private FileUtils() {
         
     }
     
+    public boolean isValidFileName(String name) {
+        for (int i = name.length(); i > 0; i--) {
+            char c = name.charAt(i - 1);
+            for (char c2 : ILLEGAL_CHARACTERS) {
+                if (c == c2) {
+                    return false;
+                }
+            }
+        }
+        File file = new File(getDefaultTempDir(), name);
+        boolean isValid = true;
+        try {
+            if (file.exists()) {
+                return true;
+            }
+            if (file.createNewFile()) {
+                file.delete();
+            }
+        } catch (IOException e) {
+            isValid = false;
+        }
+        return isValid;
+    }
+
     public static synchronized File getDefaultTempDir() {
         if (defaultTempDir != null
             && defaultTempDir.exists()) {
