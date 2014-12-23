@@ -230,10 +230,18 @@ public final class StaxUtils {
     }
     
     public static void setInnerElementLevelThreshold(int i) {
+        if (i == -1) {
+            i = 500;
+        }
         innerElementLevelThreshold = i;
+        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxElementDepth", i);
     }
     public static void setInnerElementCountThreshold(int i) {
+        if (i == -1) {
+            i = 50000;
+        }
         innerElementCountThreshold = i;
+        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxChildrenPerElement", i);
     }
 
     /**
@@ -2100,6 +2108,20 @@ public final class StaxUtils {
                 //ignore
             }
         }
+    }
+    
+    public static boolean isSecureReader(XMLStreamReader reader, Message message) {
+        if (reader instanceof DocumentDepthProperties) {
+            return true;
+        }
+        try {
+            if (reader.getProperty("com.ctc.wstx.maxChildrenPerElement") != null) {
+                return true;
+            }
+        } catch (Exception ex) {
+            //ignore
+        }
+        return false;
     }
     
     public static XMLStreamReader configureReader(XMLStreamReader xreader, Message message) throws XMLStreamException {

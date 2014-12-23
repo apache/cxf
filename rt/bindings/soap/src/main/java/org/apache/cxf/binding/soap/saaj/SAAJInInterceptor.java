@@ -220,10 +220,15 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 soapMessage.getSOAPPart().getEnvelope().addHeader();
             }
             
+            //If we have an xmlReader that already is counting the attributes and such
+            //then we don't want to rely on the system level defaults in StaxUtils.copy
+            //CXF-6173
+            boolean secureReader = StaxUtils.isSecureReader(xmlReader, message);
             StaxUtils.copy(xmlReader, 
                            new SAAJStreamWriter(soapMessage.getSOAPPart(), 
                                                 soapMessage.getSOAPPart().getEnvelope().getBody()),
-                           true, true);
+                           true, 
+                           !secureReader);
             DOMSource bodySource = new DOMSource(soapMessage.getSOAPPart().getEnvelope().getBody());
             xmlReader = StaxUtils.createXMLStreamReader(bodySource);
             xmlReader.nextTag();
