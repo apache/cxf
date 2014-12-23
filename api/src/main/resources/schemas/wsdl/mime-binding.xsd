@@ -11,7 +11,7 @@ Files in any medium without fee or royalty as long as this notice and
 license are distributed with them.  The originals of these files can 
 be located at:
 
-http://schemas.xmlsoap.org/wsdl/mime/2002-01-29.xsd
+http://schemas.xmlsoap.org/wsdl/mime/2004-08-24.xsd
 
 THESE SCHEMA FILES ARE PROVIDED "AS IS," AND THE AUTHORS MAKE NO REPRESENTATIONS 
 OR WARRANTIES, EXPRESS OR IMPLIED, REGARDING THESE FILES, INCLUDING, BUT NOT 
@@ -28,43 +28,50 @@ in these files will at all times remain with the Authors.
 No other rights are granted by implication, estoppel or otherwise.
 
 
-  -->
-<schema targetNamespace="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://www.w3.org/2001/XMLSchema">
+  --> 
+<schema targetNamespace="http://schemas.xmlsoap.org/wsdl/mime/" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/">
 
-	<import namespace="http://schemas.xmlsoap.org/wsdl/"/>
-   	<element name="content" type="mime:contentType"/>
-   	<complexType name="contentType">
+	<import namespace="http://schemas.xmlsoap.org/wsdl/" schemaLocation="http://schemas.xmlsoap.org/wsdl/" />
+
+	<element name="content" type="mime:contentType"/>
+	<complexType name="contentType">
 		<complexContent>
-		<extension base="wsdl:tExtensibilityElement">
-			<sequence/>
-      			<attribute name="type" type="string" use="optional"/>
-	      		<attribute name="part" type="NMTOKEN" use="optional"/>
-		</extension>
+			<extension base="wsdl:tExtensibilityElement">
+				<sequence/>
+				<attribute name="type" type="string" use="optional"/>
+				<attribute name="part" type="NMTOKEN" use="required"/>
+			</extension>
 		</complexContent>
-   	</complexType>
-   	<element name="multipartRelated" type="mime:multipartRelatedType"/>
-   	<complexType name="multipartRelatedType">
+	</complexType>
+	
+  <element name="multipartRelated" type="mime:multipartRelatedType"/>
+	<complexType name="multipartRelatedType">
 		<complexContent>
-		<extension base="wsdl:tExtensibilityElement">
-			<sequence>
-		      		<element name="part" type="mime:tPart" minOccurs="0" maxOccurs="unbounded"/>
-			</sequence>
-		</extension>
+			<extension base="wsdl:tExtensibilityElement">
+				<sequence>
+					<element ref="mime:part" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</extension>
 		</complexContent>
-   	</complexType>
-      	<complexType name="tPart">
+	</complexType>
+  
+	<element name="part" type="mime:tPart"/>
+	<complexType name="tPart">
 		<sequence>
-	      		<any namespace="##targetNamespace" minOccurs="0" maxOccurs="unbounded"/>
+			<any namespace="##any" minOccurs="0" maxOccurs="unbounded"/>
 		</sequence>
-        	<attribute name="name" type="NMTOKEN" use="required"/>
-   	</complexType>
-   	<element name="mimeXml" type="mime:tMimeXml"/>
-   	<complexType name="tMimeXml">
-		<complexContent>
-		<extension base="wsdl:tExtensibilityElement">
-			<sequence/>
-			<attribute name="part" type="NMTOKEN" use="optional"/>
-		</extension>
-		</complexContent>
-   	</complexType>
+		<attribute name="name" type="NMTOKEN" use="optional"/>
+	</complexType>
+
+  <element name="mimeXml" type="mime:tMimeXml" />
+  <complexType name="tMimeXml">
+      <complexContent>
+          <extension base="wsdl:tExtensibilityElement">
+              <sequence />
+              <attribute name="part" type="NMTOKEN" use="optional" />
+          </extension>
+      </complexContent>
+  </complexType>
+
 </schema>
+
