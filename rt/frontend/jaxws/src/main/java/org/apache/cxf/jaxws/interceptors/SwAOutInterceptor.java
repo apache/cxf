@@ -29,9 +29,11 @@ import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -74,6 +76,8 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
     
     private static final Map<String, Method> SWA_REF_METHOD 
         = new ConcurrentHashMap<String, Method>(4, 0.75f, 2);
+    private static final Set<String> SWA_REF_NO_METHOD 
+        = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(4, 0.75f, 2));
     
     AttachmentOutInterceptor attachOut = new AttachmentOutInterceptor();
     
@@ -84,8 +88,9 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
     }
     
     private boolean callSWARefMethod(final JAXBContext ctx) {
-        Method m = SWA_REF_METHOD.get(ctx.getClass().getName());
-        if (m == null && !SWA_REF_METHOD.containsKey(ctx.getClass().getName())) {
+        String cname = ctx.getClass().getName();
+        Method m = SWA_REF_METHOD.get(cname);
+        if (m == null && !SWA_REF_NO_METHOD.contains(cname)) {
             try {
                 m = AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
 
@@ -97,7 +102,11 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                         return hasSwaRefMethod;
                     }
                 });
-                SWA_REF_METHOD.put(ctx.getClass().getName(), m);
+                if (m == null) {
+                    SWA_REF_NO_METHOD.add(cname);
+                } else {
+                    SWA_REF_METHOD.put(cname, m);
+                }
             } catch (Exception e) {
                 //ignore
             }
