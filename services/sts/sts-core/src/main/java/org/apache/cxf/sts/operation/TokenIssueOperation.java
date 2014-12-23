@@ -210,6 +210,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             }
         
         } catch (RuntimeException ex) {
+            LOG.log(Level.SEVERE, "Cannot issue token: " + ex.getMessage(), ex);
             STSIssueFailureEvent event = new STSIssueFailureEvent(providerParameters,
                                                               System.currentTimeMillis() - start, ex);
             publishEvent(event);

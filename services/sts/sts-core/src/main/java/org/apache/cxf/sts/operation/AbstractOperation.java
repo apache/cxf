@@ -522,10 +522,11 @@ public abstract class AbstractOperation {
                 }
             }
             if (!foundService) {
-                LOG.log(Level.WARNING, "The Service cannot match the received AppliesTo address");
-                throw new STSException(
-                    "No service corresponding to " + address + " is known", STSException.REQUEST_FAILED
-                );
+                String msg = "No service corresponding to "
+                             + address
+                             + " is known. Check 'services' property configuration in SecurityTokenServiceProvider";
+                LOG.log(Level.SEVERE, msg);
+                throw new STSException(msg, STSException.REQUEST_FAILED);
             }
         }
         
