@@ -51,7 +51,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private String relRedirectUri;
     private String startUri;
     private String authorizationServiceUri;
-    private Consumer consumer;
+    private OAuthClientUtils.Consumer consumer;
     private ClientCodeStateProvider clientStateProvider;
     private ClientCodeRequestProvider clientRequestProvider;
     private WebClient accessTokenService;
@@ -152,7 +152,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         this.authorizationServiceUri = authorizationServiceUri;
     }
 
-    public void setConsumer(Consumer consumer) {
+    public void setConsumer(OAuthClientUtils.Consumer consumer) {
         this.consumer = consumer;
     }
 
