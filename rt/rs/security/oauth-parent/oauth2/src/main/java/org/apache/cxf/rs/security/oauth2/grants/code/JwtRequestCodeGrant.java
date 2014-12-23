@@ -68,6 +68,9 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
         this.sigProvider = signatureProvider;
     }
+    public void setEncryptionProvider(JweEncryptionProvider encProvider) {
+        this.encryptionProvider = encProvider;
+    }
     
     protected JwsSignatureProvider getInitializedSigProvider() {
         if (sigProvider != null) {
