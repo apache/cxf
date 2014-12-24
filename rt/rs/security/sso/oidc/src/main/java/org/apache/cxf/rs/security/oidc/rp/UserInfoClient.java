@@ -29,9 +29,9 @@ public class UserInfoClient extends IdTokenValidator {
     private boolean encryptedOnly;
     private WebClient profileClient;
     public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken) {
-        return getProfile(at, idToken, false);
+        return getUserInfo(at, idToken, false);
     }
-    public UserInfo getProfile(ClientAccessToken at, IdToken idToken, boolean asJwt) {
+    public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken, boolean asJwt) {
         OAuthClientUtils.setAuthorizationHeader(profileClient, at);
         if (asJwt) {
             String jwt = profileClient.get(String.class);
@@ -64,8 +64,8 @@ public class UserInfoClient extends IdTokenValidator {
     public void setEncryptedOnly(boolean encryptedOnly) {
         this.encryptedOnly = encryptedOnly;
     }
-    public void setProfileClient(WebClient profileClient) {
-        this.profileClient = profileClient;
+    public void setUserInfoServiceClient(WebClient client) {
+        this.profileClient = client;
     }
     
 }
