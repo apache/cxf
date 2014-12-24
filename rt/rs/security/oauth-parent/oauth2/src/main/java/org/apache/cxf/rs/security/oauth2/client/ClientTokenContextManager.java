@@ -18,11 +18,10 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 
-public interface ClientCodeRequestProvider {
-    void setCodeRequest(SecurityContext sc, UriInfo ui, ClientCodeRequest request);
-    ClientCodeRequest getCodeRequest(SecurityContext sc, UriInfo ui);
-    void removeCodeRequest(ClientCodeRequest request);
+public interface ClientTokenContextManager {
+    void setClientTokenContext(MessageContext mc, ClientTokenContext ctx);
+    ClientTokenContext getClientTokenContext(MessageContext mc);
+    void removeClientTokenContext(MessageContext mc, ClientTokenContext ctx);
 }

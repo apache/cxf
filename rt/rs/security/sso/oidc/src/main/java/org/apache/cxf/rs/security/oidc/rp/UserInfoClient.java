@@ -20,16 +20,19 @@ package org.apache.cxf.rs.security.oidc.rp;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
+import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-public class UserInfoValidator extends AbstractTokenValidator {
+public class UserInfoClient extends IdTokenValidator {
     private boolean encryptedOnly;
-    
-    public UserInfo getUserInfo(WebClient profileClient, IdToken idToken) {
-        return getProfile(profileClient, idToken, false);
+    private WebClient profileClient;
+    public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken) {
+        return getProfile(at, idToken, false);
     }
-    public UserInfo getProfile(WebClient profileClient, IdToken idToken, boolean asJwt) {
+    public UserInfo getProfile(ClientAccessToken at, IdToken idToken, boolean asJwt) {
+        OAuthClientUtils.setAuthorizationHeader(profileClient, at);
         if (asJwt) {
             String jwt = profileClient.get(String.class);
             return getUserInfoFromJwt(jwt, idToken);
@@ -60,6 +63,9 @@ public class UserInfoValidator extends AbstractTokenValidator {
     }
     public void setEncryptedOnly(boolean encryptedOnly) {
         this.encryptedOnly = encryptedOnly;
+    }
+    public void setProfileClient(WebClient profileClient) {
+        this.profileClient = profileClient;
     }
     
 }

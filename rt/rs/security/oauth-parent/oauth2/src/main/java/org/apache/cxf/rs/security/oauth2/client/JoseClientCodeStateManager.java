@@ -22,11 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
@@ -38,7 +37,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.NoneJwsSignatureProvider;
 
-public class JoseClientCodeStateProvider implements ClientCodeStateProvider {
+public class JoseClientCodeStateManager implements ClientCodeStateManager {
     
     private JwsSignatureProvider sigProvider;
     private JweEncryptionProvider encryptionProvider;
@@ -46,8 +45,7 @@ public class JoseClientCodeStateProvider implements ClientCodeStateProvider {
     private JwsSignatureVerifier signatureVerifier;
     private JsonMapObjectReaderWriter jsonp = new JsonMapObjectReaderWriter();
     @Override
-    public String toString(SecurityContext sc, UriInfo ui,
-            MultivaluedMap<String, String> state) {
+    public String toString(MessageContext mc, MultivaluedMap<String, String> state) {
         
         Map<String, Object> stateMap = CastUtils.cast((Map<?, ?>)state);
         String json = jsonp.toJson(stateMap);
@@ -64,8 +62,7 @@ public class JoseClientCodeStateProvider implements ClientCodeStateProvider {
     }
 
     @Override
-    public MultivaluedMap<String, String> toState(SecurityContext sc,
-            UriInfo ui, String stateParam) {
+    public MultivaluedMap<String, String> toState(MessageContext mc, String stateParam) {
         
         JweDecryptionProvider jwe = getInitializedDecryptionProvider();
         if (jwe != null) {

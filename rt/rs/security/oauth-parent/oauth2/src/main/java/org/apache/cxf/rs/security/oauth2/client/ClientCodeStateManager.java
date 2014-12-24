@@ -18,39 +18,13 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
-import java.io.Serializable;
-
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 
-public class ClientCodeRequest implements Serializable {
-    private static final long serialVersionUID = -3501237730333195311L;
-    private ClientAccessToken token;
-    private MultivaluedMap<String, String> state;
-    private String userName;
-    
-    public ClientAccessToken getToken() {
-        return token;
-    }
-
-    public void setToken(ClientAccessToken token) {
-        this.token = token;
-    }
-
-    public MultivaluedMap<String, String> getState() {
-        return state;
-    }
-
-    public void setState(MultivaluedMap<String, String> state) {
-        this.state = state;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+public interface ClientCodeStateManager {
+    String toString(MessageContext mc,
+                    MultivaluedMap<String, String> state);
+    MultivaluedMap<String, String> toState(MessageContext mc,
+                                           String stateParam);
 }

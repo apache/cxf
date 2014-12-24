@@ -20,31 +20,30 @@ package org.apache.cxf.rs.security.oauth2.client;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 
-public class MemoryClientCodeRequestProvider implements ClientCodeRequestProvider {
-    private ConcurrentHashMap<String, ClientCodeRequest> map = 
-            new ConcurrentHashMap<String, ClientCodeRequest>();
+public class MemoryClientTokenContextManager implements ClientTokenContextManager {
+    private ConcurrentHashMap<String, ClientTokenContext> map = 
+            new ConcurrentHashMap<String, ClientTokenContext>();
 
     @Override
-    public void setCodeRequest(SecurityContext sc, UriInfo ui, ClientCodeRequest request) {
-        map.put(getKey(sc), request);
+    public void setClientTokenContext(MessageContext mc, ClientTokenContext request) {
+        map.put(getKey(mc), request);
         
     }
 
-    private String getKey(SecurityContext sc) {
-        return sc.getUserPrincipal().getName();
+    private String getKey(MessageContext mc) {
+        return mc.getSecurityContext().getUserPrincipal().getName();
     }
 
     @Override
-    public ClientCodeRequest getCodeRequest(SecurityContext sc, UriInfo ui) {
+    public ClientTokenContext getClientTokenContext(MessageContext mc) {
         // TODO: support an automatic removal based on the token expires property
-        return map.remove(getKey(sc));
+        return map.remove(getKey(mc));
     }
 
     @Override
-    public void removeCodeRequest(ClientCodeRequest request) {
-        map.remove(request.getUserName());
+    public void removeClientTokenContext(MessageContext mc, ClientTokenContext request) {
+        map.remove(getKey(mc));
     }
 }

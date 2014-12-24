@@ -21,26 +21,24 @@ package org.apache.cxf.rs.security.oauth2.client;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
 
-public class MemoryClientCodeStateProvider implements ClientCodeStateProvider {
+import org.apache.cxf.jaxrs.ext.MessageContext;
+
+public class MemoryClientCodeStateManager implements ClientCodeStateManager {
     private ConcurrentHashMap<String, MultivaluedMap<String, String>> map = 
             new ConcurrentHashMap<String, MultivaluedMap<String, String>>();
     
     @Override
-    public String toString(SecurityContext sc, UriInfo ui,
-            MultivaluedMap<String, String> state) {
-        String name = sc.getUserPrincipal().getName();
+    public String toString(MessageContext mc, MultivaluedMap<String, String> state) {
+        String name = mc.getSecurityContext().getUserPrincipal().getName();
         String hashCode = Integer.toString(name.hashCode());
         map.put(hashCode, state);
         return hashCode;
     }
 
     @Override
-    public MultivaluedMap<String, String> toState(SecurityContext sc,
-            UriInfo ui, String stateParam) {
-        String name = sc.getUserPrincipal().getName();
+    public MultivaluedMap<String, String> toState(MessageContext mc, String stateParam) {
+        String name = mc.getSecurityContext().getUserPrincipal().getName();
         String hashCode = Integer.toString(name.hashCode());
         return map.remove(hashCode);
     }

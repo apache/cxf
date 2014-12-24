@@ -36,6 +36,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
+import org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrant;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.hawk.HawkAuthorizationScheme;
@@ -209,6 +210,25 @@ public final class OAuthClientUtils {
         throws OAuthServiceException {
         return getAccessToken(accessTokenService, consumer, grant, extraParams, 
                               null, setAuthorizationHeader);
+    }
+    public static ClientAccessToken refreshAccessToken(WebClient accessTokenService,
+                                                       ClientAccessToken at) {
+        return refreshAccessToken(accessTokenService, null, at, null, true);
+    }
+    public static ClientAccessToken refreshAccessToken(WebClient accessTokenService,
+                                                       Consumer consumer,
+                                                       ClientAccessToken at) {
+        return refreshAccessToken(accessTokenService, consumer, at, null, true);
+    }
+    public static ClientAccessToken refreshAccessToken(WebClient accessTokenService,
+                                                       Consumer consumer,
+                                                       ClientAccessToken at,
+                                                       String scope,
+                                                       boolean setAuthorizationHeader) 
+        throws OAuthServiceException {
+        RefreshTokenGrant grant = new RefreshTokenGrant(at.getRefreshToken(), scope); 
+        return getAccessToken(accessTokenService, consumer, grant, null, 
+                              at.getTokenType(), setAuthorizationHeader);
     }
         
     /**
