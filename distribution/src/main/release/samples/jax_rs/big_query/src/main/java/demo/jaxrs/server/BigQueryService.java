@@ -42,7 +42,7 @@ import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
-import org.apache.cxf.rs.security.oidc.rp.IdTokenValidator;
+import org.apache.cxf.rs.security.oidc.rp.UserInfoClient;
 
 @Path("/service")
 public class BigQueryService {
@@ -54,8 +54,7 @@ public class BigQueryService {
 
     private String authorizationServiceUri;
     private WebClient accessTokenServiceClient;
-    private WebClient userInfoServiceClient;
-    private IdTokenValidator tokenValidator;
+    private UserInfoClient tokenClient;
     private Consumer consumer;
 
     @GET
@@ -104,11 +103,10 @@ public class BigQueryService {
         ClientAccessToken at = getClientAccessToken(consumer, code, postMessage);
 
         // Expect and validate id_token
-        IdToken idToken = tokenValidator.getIdTokenFromJwt(at,
-                consumer.getKey());
+        IdToken idToken = tokenClient.getIdToken(at, consumer.getKey());
 
-        // Get User Profile if needed
-        UserInfo userInfo = getUserInfo(at, idToken);
+        // Get User Profile
+        UserInfo userInfo = tokenClient.getUserInfo(at, idToken);
 
         // Complete the request, use 'at' to access some other user's API,
         // return the response to the user
@@ -137,20 +135,8 @@ public class BigQueryService {
                         OAuthConstants.REDIRECT_URI, redirectUri), false);
     }
 
-    private UserInfo getUserInfo(ClientAccessToken at, IdToken idToken) {
-        if (userInfoServiceClient != null) {
-            OAuthClientUtils.setAuthorizationHeader(userInfoServiceClient, at);
-            return userInfoServiceClient.get(UserInfo.class);
-        }
-        return null;
-    }
-
-    public void setUserInfoServiceClient(WebClient userInfoServiceClient) {
-        this.userInfoServiceClient = userInfoServiceClient;
-    }
-
-    public void setIdTokenValidator(IdTokenValidator tokenValidator) {
-        this.tokenValidator = tokenValidator;
+    public void setUserInfoClient(UserInfoClient tokenClient) {
+        this.tokenClient = tokenClient;
     }
 
     public void setAuthorizationServiceUri(String authorizationServiceUri) {

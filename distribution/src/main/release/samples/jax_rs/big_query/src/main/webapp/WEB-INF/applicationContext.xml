@@ -60,7 +60,7 @@
      </jaxrsclient:client> 
      
      <!-- WebClient for requesting an OIDC UserInfo -->
-     <jaxrsclient:client id="userProfileClient" threadSafe="true" 
+     <jaxrsclient:client id="userInfoServiceClient" threadSafe="true" 
         address="https://www.googleapis.com/plus/v1/people/me/openIdConnect"
         serviceClass="org.apache.cxf.jaxrs.client.WebClient">
         <jaxrsclient:headers>
@@ -89,9 +89,10 @@
         </jaxrsclient:features>
      </jaxrsclient:client>
      
-     <bean id="idTokenValidator" class="org.apache.cxf.rs.security.oidc.rp.IdTokenValidator">
+     <bean id="userInfoClient" class="org.apache.cxf.rs.security.oidc.rp.UserInfoClient">
          <property name="jwkSetClient" ref="jwkSetClient"/> 
          <property name="issuerId" value="accounts.google.com"/>
+         <property name="userInfoServiceClient" ref="userInfoServiceClient"/>
      </bean>
 
      <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">
@@ -101,8 +102,7 @@
 
      <bean id="bigQueryService" class="demo.jaxrs.server.BigQueryService">
          <property name="accessTokenServiceClient" ref="atServiceClient"/>
-         <property name="userInfoServiceClient" ref="userProfileClient"/>
-         <property name="idTokenValidator" ref="idTokenValidator"/>
+         <property name="userInfoClient" ref="userInfoClient"/>
          <property name="consumer" ref="consumer"/>
          <property name="authorizationServiceUri" value="https://accounts.google.com/o/oauth2/auth"/>
      </bean> 

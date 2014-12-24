@@ -76,7 +76,7 @@ public abstract class AbstractTokenValidator {
 
         // validate the provider
         String issuer = claims.getIssuer();
-        if (issuerId == null && validateClaimsAlways || issuerId != null && !issuerId.equals(issuer)) {
+        if (issuer == null && validateClaimsAlways || issuer != null && !issuer.equals(issuerId)) {
             throw new SecurityException("Invalid provider");
         }
         JwtUtils.validateJwtTimeClaims(claims, issuedAtRange, validateClaimsAlways);
