@@ -55,15 +55,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private String relRedirectUri;
     private String startUri;
     private String authorizationServiceUri;
-<<<<<<< HEAD
     private OAuthClientUtils.Consumer consumer;
-    private ClientCodeStateProvider clientStateProvider;
-    private ClientCodeRequestProvider clientRequestProvider;
-=======
-    private Consumer consumer;
     private ClientCodeStateManager clientStateManager;
     private ClientTokenContextManager clientTokenContextManager;
->>>>>>> 27c1bb5... Refactoring the OAuth2 client code filter code, adapting it to OIDC
     private WebClient accessTokenService;
     
     @Override
