@@ -27,6 +27,7 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -34,6 +35,7 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
@@ -46,14 +48,22 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 @PreMatching
 @Priority(Priorities.AUTHENTICATION + 1)
 public class ClientCodeRequestFilter implements ContainerRequestFilter {
-
+    @Context
+    private MessageContext mc;
+    
     private String scopes;
     private String relRedirectUri;
     private String startUri;
     private String authorizationServiceUri;
+<<<<<<< HEAD
     private OAuthClientUtils.Consumer consumer;
     private ClientCodeStateProvider clientStateProvider;
     private ClientCodeRequestProvider clientRequestProvider;
+=======
+    private Consumer consumer;
+    private ClientCodeStateManager clientStateManager;
+    private ClientTokenContextManager clientTokenContextManager;
+>>>>>>> 27c1bb5... Refactoring the OAuth2 client code filter code, adapting it to OIDC
     private WebClient accessTokenService;
     
     @Override
@@ -64,8 +74,8 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         }
         UriInfo ui = rc.getUriInfo();
         if (ui.getPath().endsWith(startUri)) {
-            if (clientRequestProvider != null) {
-                ClientCodeRequest request = clientRequestProvider.getCodeRequest(sc, ui);
+            if (clientTokenContextManager != null) {
+                ClientTokenContext request = clientTokenContextManager.getClientTokenContext(mc);
                 if (request != null) {
                     setClientCodeRequest(request);
                     rc.setRequestUri(URI.create(relRedirectUri));
@@ -91,7 +101,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private URI getAbsoluteRedirectUri(UriInfo ui) {
         return ui.getBaseUriBuilder().path(relRedirectUri).build();
     }
-    private void processCodeResponse(ContainerRequestContext rc, SecurityContext sc, UriInfo ui) {
+    protected void processCodeResponse(ContainerRequestContext rc, SecurityContext sc, UriInfo ui) {
         MultivaluedMap<String, String> params = ui.getQueryParameters();
         String codeParam = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
         AccessTokenGrant grant = new AuthorizationCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
@@ -100,25 +110,28 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
                                                                grant);
         MultivaluedMap<String, String> state = null;
         String stateParam = params.getFirst(OAuthConstants.STATE);
-        if (clientStateProvider != null) {
-            state = clientStateProvider.toState(sc, ui, stateParam);
+        if (clientStateManager != null) {
+            state = clientStateManager.toState(mc, stateParam);
         }
-        ClientCodeRequest request = new ClientCodeRequest();
+        ClientTokenContext request = createTokenContext(at);
         request.setToken(at);
         request.setState(state);
-        request.setUserName(sc.getUserPrincipal().getName());
-        if (clientStateProvider != null) {
-            clientRequestProvider.setCodeRequest(sc, ui, request);
+        if (clientTokenContextManager != null) {
+            clientTokenContextManager.setClientTokenContext(mc, request);
         }
         setClientCodeRequest(request);
     }
     
-    private void setClientCodeRequest(ClientCodeRequest request) {
-        JAXRSUtils.getCurrentMessage().setContent(ClientCodeRequest.class, request);
+    protected ClientTokenContext createTokenContext(ClientAccessToken at) {
+        return new ClientTokenContext();
+    }
+    
+    private void setClientCodeRequest(ClientTokenContext request) {
+        JAXRSUtils.getCurrentMessage().setContent(ClientTokenContext.class, request);
     }
 
     private String createRequestState(ContainerRequestContext rc, SecurityContext sc, UriInfo ui) {
-        if (clientStateProvider == null) {
+        if (clientStateManager == null) {
             return null;
         }
         MultivaluedMap<String, String> state = new MetadataMap<String, String>();
@@ -127,7 +140,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             String body = FormUtils.readBody(rc.getEntityStream(), "UTF-8");
             FormUtils.populateMapFromString(state, JAXRSUtils.getCurrentMessage(), body, "UTF-8", false);
         }
-        return clientStateProvider.toString(sc, ui, state);
+        return clientStateManager.toString(mc, state);
     }
 
     public void setScopeList(List<String> list) {
@@ -152,10 +165,6 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         this.authorizationServiceUri = authorizationServiceUri;
     }
 
-    public void setConsumer(OAuthClientUtils.Consumer consumer) {
-        this.consumer = consumer;
-    }
-
     public void setRelativeRedirectUri(String redirectUri) {
         this.relRedirectUri = redirectUri;
     }
@@ -164,11 +173,19 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         this.accessTokenService = accessTokenService;
     }
 
-    public void setClientStateProvider(ClientCodeStateProvider clientStateProvider) {
-        this.clientStateProvider = clientStateProvider;
+    public void setClientStateManager(ClientCodeStateManager clientStateManager) {
+        this.clientStateManager = clientStateManager;
     }
-    public void setClientRequestProvider(ClientCodeRequestProvider clientRequestProvider) {
-        this.clientRequestProvider = clientRequestProvider;
+    public void setClientTokenContextManager(ClientTokenContextManager clientTokenContextManager) {
+        this.clientTokenContextManager = clientTokenContextManager;
+    }
+
+    public OAuthClientUtils.Consumer getConsumer() {
+        return consumer;
+    }
+
+    public void setConsumer(OAuthClientUtils.Consumer consumer) {
+        this.consumer = consumer;
     }
 
 }

@@ -18,14 +18,31 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
-import org.apache.cxf.jaxrs.ext.ContextProvider;
-import org.apache.cxf.message.Message;
+import java.io.Serializable;
 
-public class ClientCodeRequestContextProvider implements ContextProvider<ClientCodeRequest> {
+import javax.ws.rs.core.MultivaluedMap;
 
-    @Override
-    public ClientCodeRequest createContext(Message m) {
-        return m.getContent(ClientCodeRequest.class);
+import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+
+public class ClientTokenContext implements Serializable {
+    private static final long serialVersionUID = -3501237730333195311L;
+    private ClientAccessToken token;
+    private MultivaluedMap<String, String> state;
+    
+    public ClientAccessToken getToken() {
+        return token;
+    }
+
+    public void setToken(ClientAccessToken token) {
+        this.token = token;
+    }
+
+    public MultivaluedMap<String, String> getState() {
+        return state;
+    }
+
+    public void setState(MultivaluedMap<String, String> state) {
+        this.state = state;
     }
 
 }

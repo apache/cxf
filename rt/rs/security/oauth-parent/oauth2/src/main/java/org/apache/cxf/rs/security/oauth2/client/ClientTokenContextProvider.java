@@ -18,15 +18,14 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
+import org.apache.cxf.jaxrs.ext.ContextProvider;
+import org.apache.cxf.message.Message;
 
-public interface ClientCodeStateProvider {
-    String toString(SecurityContext sc, 
-                    UriInfo ui,
-                    MultivaluedMap<String, String> state);
-    MultivaluedMap<String, String> toState(SecurityContext sc, 
-                                           UriInfo ui,
-                                           String stateParam);
+public class ClientTokenContextProvider implements ContextProvider<ClientTokenContext> {
+
+    @Override
+    public ClientTokenContext createContext(Message m) {
+        return m.getContent(ClientTokenContext.class);
+    }
+
 }
