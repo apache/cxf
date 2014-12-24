@@ -457,7 +457,7 @@ public abstract class ProviderFactory {
     
     protected void setBusProviders() {
         List<Object> extensions = new LinkedList<Object>(); 
-        final String alreadySetProp = "bus.providers.set";
+        final String alreadySetProp = "bus.providers.set." + this.hashCode();
         if (bus.getProperty(alreadySetProp) == null) {
             addBusExtension(extensions,
                             MessageBodyReader.class,
