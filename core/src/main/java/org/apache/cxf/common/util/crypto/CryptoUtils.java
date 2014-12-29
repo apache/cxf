@@ -82,9 +82,7 @@ public final class CryptoUtils {
     
     public static String encryptSecretKey(SecretKey secretKey, PublicKey publicKey,
         KeyProperties props) throws SecurityException {
-        byte[] encryptedBytes = encryptBytes(secretKey.getEncoded(), 
-                                             publicKey,
-                                             props);
+        byte[] encryptedBytes = wrapSecretKey(secretKey, publicKey, props);
         return encodeBytes(encryptedBytes);
     }
     
@@ -603,8 +601,7 @@ public final class CryptoUtils {
                                              KeyProperties props,
                                              PrivateKey privateKey) throws SecurityException {
         byte[] encryptedBytes = decodeSequence(encodedEncryptedSecretKey);
-        byte[] descryptedBytes = decryptBytes(encryptedBytes, privateKey, props);
-        return createSecretKeySpec(descryptedBytes, secretKeyAlgo);
+        return unwrapSecretKey(encryptedBytes, secretKeyAlgo, privateKey, props);
     }
     
     public static SecretKey createSecretKeySpec(String encodedBytes, String algo) {
