@@ -51,7 +51,12 @@ import org.junit.Test;
 
 public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwsJson.PORT;
+    private static final Boolean SKIP_AES_GCM_TESTS = isJava6();
     
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
@@ -94,6 +99,9 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testJweCompactJwsJsonBookBeanHmac() throws Exception {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         String address = "https://localhost:" + PORT + "/jwejwsjsonhmac";
         List<?> extraProviders = Arrays.asList(new JacksonJsonProvider(),
                                                new JweWriterInterceptor(),

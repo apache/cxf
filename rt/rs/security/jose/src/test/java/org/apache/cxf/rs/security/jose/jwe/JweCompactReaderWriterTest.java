@@ -78,14 +78,25 @@ public class JweCompactReaderWriterTest extends Assert {
         + ".KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY" 
         + ".U0m_YmjN04DJvceFICbCVQ";
     
+    private static final Boolean SKIP_AES_GCM_TESTS = isJava6();
+    
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
+    
     @BeforeClass
     public static void registerBouncyCastleIfNeeded() throws Exception {
+        
         try {
-            Cipher.getInstance(Algorithm.AES_GCM_ALGO_JAVA);
+            if (!SKIP_AES_GCM_TESTS) {
+                Cipher.getInstance(Algorithm.AES_GCM_ALGO_JAVA);
+            }
             Cipher.getInstance(Algorithm.AES_CBC_ALGO_JAVA);
         } catch (Throwable t) {
             Security.addProvider(new BouncyCastleProvider());    
         }
+        
     }
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
@@ -145,9 +156,10 @@ public class JweCompactReaderWriterTest extends Assert {
     @Test
     public void testEncryptDecryptAesGcmWrapA128CBCHS256() throws Exception {
         //
-        // This test fails with the IBM JDK
+        // This test fails with the IBM JDK and on Java 6
         //
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))
+            || SKIP_AES_GCM_TESTS) {
             return;
         }
         final String specPlainText = "Live long and prosper.";
@@ -173,6 +185,9 @@ public class JweCompactReaderWriterTest extends Assert {
     
     @Test
     public void testEncryptDecryptSpecExample() throws Exception {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
         String jweContent = encryptContent(specPlainText, true);
         
@@ -181,6 +196,9 @@ public class JweCompactReaderWriterTest extends Assert {
     
     @Test
     public void testDirectKeyEncryptDecrypt() throws Exception {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
         SecretKey key = createSecretKey(true);
         String jweContent = encryptContentDirect(key, specPlainText);
@@ -190,6 +208,9 @@ public class JweCompactReaderWriterTest extends Assert {
     
     @Test
     public void testEncryptDecryptJwsToken() throws Exception {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         String jweContent = encryptContent(JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC, false);
         decrypt(jweContent, JwsCompactReaderWriterTest.ENCODED_TOKEN_SIGNED_BY_MAC, false);
     }

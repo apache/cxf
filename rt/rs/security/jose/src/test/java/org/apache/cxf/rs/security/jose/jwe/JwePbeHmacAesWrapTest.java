@@ -30,6 +30,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JwePbeHmacAesWrapTest extends Assert {
+    private static final Boolean SKIP_AES_GCM_TESTS = isJava6();
+    
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
     @Before
     public void registerBouncyCastleIfNeeded() throws Exception {
         Security.addProvider(new BouncyCastleProvider());    
@@ -58,6 +64,9 @@ public class JwePbeHmacAesWrapTest extends Assert {
     }
     @Test
     public void testEncryptDecryptPbesHmacAesWrapAesGcm() throws Exception {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         final String specPlainText = "Live long and prosper.";
         JweHeaders headers = new JweHeaders();
         headers.setAlgorithm(JoseConstants.PBES2_HS256_A128KW_ALGO);
