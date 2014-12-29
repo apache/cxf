@@ -133,7 +133,9 @@ public class CryptoUtilsTest extends Assert {
     
     @Test
     public void testBearerTokenJSONCertificate() throws Exception {
-        
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         KeyPair keyPair = kpg.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
