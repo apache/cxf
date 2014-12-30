@@ -18,17 +18,28 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.nio.ByteBuffer;
 import java.security.Security;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactReaderWriterTest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -114,6 +125,124 @@ public class JweCompactReaderWriterTest extends Assert {
         JweDecryptionProvider decryption = new AesCbcHmacJweDecryption(keyDecryption);
         String decryptedText = decryption.decrypt(jweContent).getContentText();
         assertEquals(specPlainText, decryptedText);
+    }
+    @Test
+    public void testECDHESDirectKeyEncryption() throws Exception {
+        ECPrivateKey alicePrivateKey = 
+            CryptoUtils.getECPrivateKey(JsonWebKey.EC_CURVE_P256, 
+                                        "0_NxaRPUMQoAJt50Gz8YiTr8gRTwyEaCumd-MToTmIo");
+        ECPublicKey alicePublicKey = 
+            CryptoUtils.getECPublicKey(JsonWebKey.EC_CURVE_P256, 
+                                       "gI0GAILBdu7T53akrFmMyGcsF3n5dO7MmwNBHKW5SV0",
+                                       "SLW_xSffzlPWrHEVI30DHM_4egVwt3NQqeUD7nMFpps");
+        
+        ECPublicKey bobPublicKey = 
+            CryptoUtils.getECPublicKey(JsonWebKey.EC_CURVE_P256, 
+                                       "weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ",
+                                       "e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck");
+        
+        byte[] keyZ = generateKeyZ(alicePrivateKey, bobPublicKey);
+        byte[] apuBytes = StringUtils.toBytesUTF8("Alice");
+        byte[] apvBytes = StringUtils.toBytesUTF8("Bob");
+        
+        byte[] derivedKey = calculateDerivedKey(keyZ, 
+                                                Algorithm.A128GCM.getJwtName(), 
+                                                apuBytes, 
+                                                apvBytes, 
+                                                Algorithm.A128GCM.getKeySizeBits());
+        assertEquals("VqqN6vgjbSBcIijNcacQGg", Base64UrlUtility.encode(derivedKey));
+        
+        JweHeaders headers = new JweHeaders();
+        headers.setAlgorithm(JoseConstants.ECDH_ES_DIRECT_ALGO);
+        headers.setContentEncryptionAlgorithm(Algorithm.A128GCM.getJwtName());
+        headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
+        headers.setHeader("apv", Base64UrlUtility.encode(apvBytes));
+        headers.setJsonWebKey("epv", JwkUtils.fromECPublicKey(alicePublicKey, JsonWebKey.EC_CURVE_P256));
+        
+        ECPrivateKey bobPrivateKey = 
+            CryptoUtils.getECPrivateKey(JsonWebKey.EC_CURVE_P256, 
+                                        "VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw");
+        byte[] derivedKey2 = calculateDerivedKeyFromHeaders(bobPrivateKey,
+                                                            headers,
+                                                            headers.getContentEncryptionAlgorithm(),
+                                                            Algorithm.A128GCM.getKeySizeBits());
+        assertTrue(Arrays.equals(derivedKey2, derivedKey));
+    }
+    private static byte[] calculateDerivedKeyFromHeaders(ECPrivateKey privateKey,
+                                                         JoseHeaders headers,
+                                                         String algoName,
+                                                         int algoKeyLen) {
+        JsonWebKey ephemeralJwk = headers.getJsonWebKey("epv");
+        byte[] keyZ = generateKeyZ(privateKey, JwkUtils.toECPublicKey(ephemeralJwk));
+        String apuHeader = (String)headers.getHeader("apu");
+        byte[] apuBytes = apuHeader == null ? null : JoseUtils.decode(apuHeader);
+        String apvHeader = (String)headers.getHeader("apv");
+        byte[] apvBytes = apvHeader == null ? null : JoseUtils.decode(apvHeader);
+        
+        return calculateDerivedKey(keyZ, 
+                                   algoName, 
+                                   apuBytes, 
+                                   apvBytes, 
+                                   algoKeyLen);
+    }
+                                              
+    private static byte[] calculateDerivedKey(byte[] keyZ, 
+                                       String algoName,
+                                       byte[] apuBytes, 
+                                       byte[] apvBytes,
+                                       int algoKeyBitLen) {
+        final byte[] emptyPartyInfo = new byte[4];
+        
+        if (apuBytes != null && apvBytes != null && Arrays.equals(apuBytes, apvBytes)) {
+            throw new SecurityException();
+        }
+        byte[] algorithmId = concatenateDatalenAndData(StringUtils.toBytesASCII(algoName));
+        byte[] partyUInfo = apuBytes == null ? emptyPartyInfo : concatenateDatalenAndData(apuBytes);
+        byte[] partyVInfo = apvBytes == null ? emptyPartyInfo : concatenateDatalenAndData(apvBytes);
+        byte[] suppPubInfo = datalenToBytes(algoKeyBitLen);
+        
+        byte[] otherInfo = new byte[algorithmId.length 
+                                    + partyUInfo.length
+                                    + partyVInfo.length
+                                    + suppPubInfo.length];
+        System.arraycopy(algorithmId, 0, otherInfo, 0, algorithmId.length);
+        System.arraycopy(partyUInfo, 0, otherInfo, algorithmId.length, partyUInfo.length);
+        System.arraycopy(partyVInfo, 0, otherInfo, algorithmId.length + partyUInfo.length, partyVInfo.length);
+        System.arraycopy(suppPubInfo, 0, otherInfo, algorithmId.length + partyUInfo.length + partyVInfo.length,
+                         suppPubInfo.length);
+        
+        
+        byte[] concatKDF = new byte[36 + otherInfo.length];
+        concatKDF[3] = 1;
+        System.arraycopy(keyZ, 0, concatKDF, 4, keyZ.length);
+        System.arraycopy(otherInfo, 0, concatKDF, 36, otherInfo.length);
+        try {
+            byte[] round1Hash = MessageDigestUtils.createDigest(concatKDF, MessageDigestUtils.ALGO_SHA_256);
+            return Arrays.copyOf(round1Hash, algoKeyBitLen / 8);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    private static byte[] generateKeyZ(ECPrivateKey privateKey, ECPublicKey publicKey) {
+        try {
+            KeyAgreement ka = KeyAgreement.getInstance("ECDH");
+            ka.init(privateKey);
+            ka.doPhase(publicKey, true);
+            return ka.generateSecret();
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    private static byte[] concatenateDatalenAndData(byte[] bytesASCII) {
+        final byte[] datalen = datalenToBytes(bytesASCII.length);
+        byte[] all = new byte[4 + bytesASCII.length];
+        System.arraycopy(datalen, 0, all, 0, 4);
+        System.arraycopy(bytesASCII, 0, all, 4, bytesASCII.length);
+        return all;
+    }
+    private static byte[] datalenToBytes(int len) {
+        ByteBuffer buf = ByteBuffer.allocate(4);
+        return buf.putInt(len).array();
     }
     @Test
     public void testEncryptDecryptRSA15WrapA128CBCHS256() throws Exception {

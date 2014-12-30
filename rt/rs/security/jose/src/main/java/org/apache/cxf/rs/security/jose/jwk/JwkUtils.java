@@ -319,6 +319,24 @@ public final class JwkUtils {
         List<String> base64EncodedChain = jwk.getX509Chain();
         return KeyManagementUtils.toX509CertificateChain(base64EncodedChain);
     }
+    public static JsonWebKey fromECPublicKey(ECPublicKey pk, String curve) {
+        JsonWebKey jwk = new JsonWebKey();
+        jwk.setKeyType(JsonWebKey.KEY_TYPE_ELLIPTIC);
+        jwk.setProperty(JsonWebKey.EC_CURVE, curve);
+        jwk.setProperty(JsonWebKey.EC_X_COORDINATE, 
+                        Base64UrlUtility.encode(pk.getW().getAffineX().toByteArray()));
+        jwk.setProperty(JsonWebKey.EC_Y_COORDINATE, 
+                        Base64UrlUtility.encode(pk.getW().getAffineY().toByteArray()));
+        return jwk;
+    }
+    public static JsonWebKey fromECPrivateKey(ECPrivateKey pk, String curve) {
+        JsonWebKey jwk = new JsonWebKey();
+        jwk.setKeyType(JsonWebKey.KEY_TYPE_ELLIPTIC);
+        jwk.setProperty(JsonWebKey.EC_CURVE, curve);
+        jwk.setProperty(JsonWebKey.EC_PRIVATE_KEY, 
+                        Base64UrlUtility.encode(pk.getS().toByteArray()));
+        return jwk;
+    }
     public static JsonWebKey fromRSAPublicKey(RSAPublicKey pk, String algo) {
         JsonWebKey jwk = prepareRSAJwk(pk.getModulus(), algo);
         String encodedPublicExponent = Base64UrlUtility.encode(pk.getPublicExponent().toByteArray());

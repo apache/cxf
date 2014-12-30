@@ -115,8 +115,8 @@ public final class CryptoUtils {
     public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
                                                byte[] modulusBytes,
                                                byte[] publicExponentBytes) {
-        BigInteger modulus =  new BigInteger(1, modulusBytes);
-        BigInteger publicExponent =  new BigInteger(1, publicExponentBytes);
+        BigInteger modulus = toBigInteger(modulusBytes);
+        BigInteger publicExponent = toBigInteger(publicExponentBytes);
         try {
             return (RSAPublicKey)factory.generatePublic(
                 new RSAPublicKeySpec(modulus, publicExponent));
@@ -137,8 +137,8 @@ public final class CryptoUtils {
     
     public static RSAPrivateKey getRSAPrivateKey(byte[] modulusBytes,
                                                  byte[] privateExponentBytes) {
-        BigInteger modulus =  new BigInteger(1, modulusBytes);
-        BigInteger privateExponent =  new BigInteger(1, privateExponentBytes);
+        BigInteger modulus =  toBigInteger(modulusBytes);
+        BigInteger privateExponent =  toBigInteger(privateExponentBytes);
         try {
             KeyFactory factory = KeyFactory.getInstance("RSA");
             return (RSAPrivateKey)factory.generatePrivate(
@@ -180,14 +180,14 @@ public final class CryptoUtils {
                                                  byte[] primeExpQBytes,
                                                  byte[] crtCoefficientBytes) {
     //CHECKSTYLE:ON
-        BigInteger modulus =  new BigInteger(1, modulusBytes);
-        BigInteger publicExponent =  new BigInteger(1, publicExponentBytes);
-        BigInteger privateExponent =  new BigInteger(1, privateExponentBytes);
-        BigInteger primeP =  new BigInteger(1, primePBytes);
-        BigInteger primeQ =  new BigInteger(1, primeQBytes);
-        BigInteger primeExpP =  new BigInteger(1, primeExpPBytes);
-        BigInteger primeExpQ =  new BigInteger(1, primeExpQBytes);
-        BigInteger crtCoefficient =  new BigInteger(1, crtCoefficientBytes);
+        BigInteger modulus = toBigInteger(modulusBytes);
+        BigInteger publicExponent = toBigInteger(publicExponentBytes);
+        BigInteger privateExponent = toBigInteger(privateExponentBytes);
+        BigInteger primeP = toBigInteger(primePBytes);
+        BigInteger primeQ = toBigInteger(primeQBytes);
+        BigInteger primeExpP = toBigInteger(primeExpPBytes);
+        BigInteger primeExpQ = toBigInteger(primeExpQBytes);
+        BigInteger crtCoefficient = toBigInteger(crtCoefficientBytes);
         try {
             KeyFactory factory = KeyFactory.getInstance("RSA");
             return (RSAPrivateKey)factory.generatePrivate(
@@ -215,7 +215,7 @@ public final class CryptoUtils {
         try {
             ECParameterSpec params = getECParameterSpec(curve, true);
             ECPrivateKeySpec keySpec = new ECPrivateKeySpec(
-                                           new BigInteger(1, privateKey), params);
+                                           toBigInteger(privateKey), params);
             KeyFactory kf = KeyFactory.getInstance("EC");
             return (ECPrivateKey) kf.generatePrivate(keySpec);
 
@@ -225,14 +225,22 @@ public final class CryptoUtils {
     }
     private static ECParameterSpec getECParameterSpec(String curve, boolean isPrivate) 
         throws Exception {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
-        ECGenParameterSpec kpgparams = new ECGenParameterSpec("sec"
-                                                              + curve.toLowerCase().replace("-", "")
-                                                              + "r1");
-        kpg.initialize(kpgparams);
-        KeyPair pair = kpg.generateKeyPair();
+        KeyPair pair = generateECKeyPair(curve);
         return isPrivate ? ((ECPublicKey) pair.getPublic()).getParams()
             : ((ECPrivateKey) pair.getPrivate()).getParams();
+    }
+    
+    public static KeyPair generateECKeyPair(String curve) {
+        try {
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
+            ECGenParameterSpec kpgparams = new ECGenParameterSpec("sec"
+                                                                  + curve.toLowerCase().replace("-", "")
+                                                                  + "r1");
+            kpg.initialize(kpgparams);
+            return kpg.generateKeyPair();
+        } catch (Exception ex) { 
+            throw new SecurityException(ex);
+        }
     }
     
     public static ECPublicKey getECPublicKey(String curve, String encodedXPoint, String encodedYPoint) {
@@ -248,8 +256,8 @@ public final class CryptoUtils {
         try {
             ECParameterSpec params = getECParameterSpec(curve, false);
 
-            ECPoint ecPoint = new ECPoint(new BigInteger(1, xPoint),
-                                          new BigInteger(1, yPoint));
+            ECPoint ecPoint = new ECPoint(toBigInteger(xPoint),
+                                          toBigInteger(yPoint));
             ECPublicKeySpec keySpec = new ECPublicKeySpec(ecPoint, params);
             KeyFactory kf = KeyFactory.getInstance("EC");
             return (ECPublicKey) kf.generatePublic(keySpec);
@@ -258,7 +266,13 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }    
     }
-    
+    private static BigInteger toBigInteger(byte[] bytes) {
+        if (bytes[0] == -128) { 
+            return new BigInteger(bytes); 
+        } else {
+            return new BigInteger(1, bytes);
+        }
+    }
     public static AlgorithmParameterSpec getContentEncryptionCipherSpec(int authTagLength, byte[] iv) {
         if (authTagLength > 0) {
             return CryptoUtils.getGCMParameterSpec(authTagLength, iv);

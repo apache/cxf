@@ -111,11 +111,18 @@ public class JoseHeaders extends JsonMapObject {
     }
     
     public void setJsonWebKey(JsonWebKey key) {
-        setHeader(JoseConstants.HEADER_JSON_WEB_KEY, key);
+        setJsonWebKey(JoseConstants.HEADER_JSON_WEB_KEY, key);
+    }
+    
+    public void setJsonWebKey(String headerName, JsonWebKey key) {
+        setHeader(headerName, key);
     }
     
     public JsonWebKey getJsonWebKey() {
-        Object jsonWebKey = getHeader(JoseConstants.HEADER_JSON_WEB_KEY);
+        return getJsonWebKey(JoseConstants.HEADER_JSON_WEB_KEY);
+    }
+    public JsonWebKey getJsonWebKey(String headerName) {
+        Object jsonWebKey = getHeader(headerName);
         if (jsonWebKey == null || jsonWebKey instanceof JsonWebKey) {
             return (JsonWebKey)jsonWebKey;
         }  
