@@ -71,6 +71,10 @@ public final class JoseConstants {
     
     public static final String ECDH_ES_DIRECT_ALGO = "ECDH-ES";
     
+    public static final String ECDH_ES_A128KW_ALGO = "ECDH-ES+A128KW";
+    public static final String ECDH_ES_A192KW_ALGO = "ECDH-ES+A192KW";
+    public static final String ECDH_ES_A256KW_ALGO = "ECDH-ES+A256KW";
+    
     public static final String PBES2_HS256_A128KW_ALGO = "PBES2-HS256+A128KW";
     public static final String PBES2_HS384_A192KW_ALGO = "PBES2-HS384+A192KW";
     public static final String PBES2_HS512_A256KW_ALGO = "PBES2-HS512+A256KW";

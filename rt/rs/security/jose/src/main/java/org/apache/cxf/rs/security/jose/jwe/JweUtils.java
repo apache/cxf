@@ -18,13 +18,20 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.nio.ByteBuffer;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
+import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.jose.JoseConstants;
@@ -354,10 +361,87 @@ public final class JweUtils {
                                                getContentDecryptionAlgorithm(contentDecryptionAlgo));
         }
     }
-    
     public static boolean validateCriticalHeaders(JoseHeaders headers) {
         //TODO: Validate JWE specific constraints
         return JoseUtils.validateCriticalHeaders(headers);
+    }
+    public static byte[] getECDHKey(JsonWebKey privateKey, 
+                                    JsonWebKey peerPublicKey,
+                                    byte[] partyUInfo,
+                                    byte[] partyVInfo,
+                                    String algoName,
+                                    int algoKeyBitLen) { 
+        return getECDHKey(JwkUtils.toECPrivateKey(privateKey),
+                          JwkUtils.toECPublicKey(peerPublicKey),
+                          partyUInfo, partyVInfo, algoName, algoKeyBitLen);
+    }
+    public static byte[] getECDHKey(ECPrivateKey privateKey, 
+                                    ECPublicKey peerPublicKey,
+                                    byte[] partyUInfo,
+                                    byte[] partyVInfo,
+                                    String algoName,
+                                    int algoKeyBitLen) { 
+        byte[] keyZ = generateKeyZ(privateKey, peerPublicKey);
+        return calculateDerivedKey(keyZ, algoName, partyUInfo, partyVInfo, algoKeyBitLen);
+    }
+    
+    private static byte[] calculateDerivedKey(byte[] keyZ, 
+                                              String algoName,
+                                              byte[] apuBytes, 
+                                              byte[] apvBytes,
+                                              int algoKeyBitLen) {
+        final byte[] emptyPartyInfo = new byte[4];
+       
+        if (apuBytes != null && apvBytes != null && Arrays.equals(apuBytes, apvBytes)) {
+            throw new SecurityException();
+        }
+        byte[] algorithmId = concatenateDatalenAndData(StringUtils.toBytesASCII(algoName));
+        byte[] partyUInfo = apuBytes == null ? emptyPartyInfo : concatenateDatalenAndData(apuBytes);
+        byte[] partyVInfo = apvBytes == null ? emptyPartyInfo : concatenateDatalenAndData(apvBytes);
+        byte[] suppPubInfo = datalenToBytes(algoKeyBitLen);
+       
+        byte[] otherInfo = new byte[algorithmId.length 
+                                   + partyUInfo.length
+                                   + partyVInfo.length
+                                   + suppPubInfo.length];
+        System.arraycopy(algorithmId, 0, otherInfo, 0, algorithmId.length);
+        System.arraycopy(partyUInfo, 0, otherInfo, algorithmId.length, partyUInfo.length);
+        System.arraycopy(partyVInfo, 0, otherInfo, algorithmId.length + partyUInfo.length, partyVInfo.length);
+        System.arraycopy(suppPubInfo, 0, otherInfo, algorithmId.length + partyUInfo.length + partyVInfo.length,
+                         suppPubInfo.length);
+       
+       
+        byte[] concatKDF = new byte[36 + otherInfo.length];
+        concatKDF[3] = 1;
+        System.arraycopy(keyZ, 0, concatKDF, 4, keyZ.length);
+        System.arraycopy(otherInfo, 0, concatKDF, 36, otherInfo.length);
+        try {
+            byte[] round1Hash = MessageDigestUtils.createDigest(concatKDF, MessageDigestUtils.ALGO_SHA_256);
+            return Arrays.copyOf(round1Hash, algoKeyBitLen / 8);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    private static byte[] generateKeyZ(ECPrivateKey privateKey, ECPublicKey publicKey) {
+        try {
+            KeyAgreement ka = KeyAgreement.getInstance("ECDH");
+            ka.init(privateKey);
+            ka.doPhase(publicKey, true);
+            return ka.generateSecret();
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    private static byte[] concatenateDatalenAndData(byte[] bytesASCII) {
+        final byte[] datalen = datalenToBytes(bytesASCII.length);
+        byte[] all = new byte[4 + bytesASCII.length];
+        System.arraycopy(datalen, 0, all, 0, 4);
+        System.arraycopy(bytesASCII, 0, all, 4, bytesASCII.length);
+        return all;
+    }
+    private static byte[] datalenToBytes(int len) {
+        ByteBuffer buf = ByteBuffer.allocate(4);
+        return buf.putInt(len).array();
     }
     private static JweHeaders prepareJweHeaders(String keyEncryptionAlgo,
                                                 String contentEncryptionAlgo,
