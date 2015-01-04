@@ -1212,7 +1212,6 @@ public abstract class HTTPConduit
         
         protected void retransmit(String newURL) throws IOException {
             setupNewConnection(newURL);
-            outMessage.put("transport.retransmit.url", newURL);
             if (cachedStream != null && cachedStream.size() < Integer.MAX_VALUE) {
                 setFixedLengthStreamingMode((int)cachedStream.size());
             }
@@ -1454,6 +1453,7 @@ public abstract class HTTPConduit
                     throw new IOException(e);
                 }
                 cookies.writeToMessageHeaders(outMessage);
+                outMessage.put("transport.retransmit.url", newURL);
                 retransmit(newURL);
                 return true;
             }
