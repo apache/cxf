@@ -56,7 +56,9 @@ public enum Algorithm {
     PBES2_HS256_A128KW(JoseConstants.PBES2_HS256_A128KW_ALGO, "AESWrap", 128),
     PBES2_HS384_A192KW(JoseConstants.PBES2_HS384_A192KW_ALGO, "AESWrap", 192),
     PBES2_HS512_A256KW(JoseConstants.PBES2_HS512_A256KW_ALGO, "AESWrap", 256),
-    
+    ECDH_ES_A128KW(JoseConstants.ECDH_ES_A128KW_ALGO, "AESWrap", 128),
+    ECDH_ES_A192KW(JoseConstants.ECDH_ES_A192KW_ALGO, "AESWrap", 192),
+    ECDH_ES_A256KW(JoseConstants.ECDH_ES_A256KW_ALGO, "AESWrap", 256),
     // Content Encryption
     A128GCM(JoseConstants.A128GCM_ALGO, "AES/GCM/NoPadding", 128),
     A192GCM(JoseConstants.A192GCM_ALGO, "AES/GCM/NoPadding", 192),
@@ -120,6 +122,10 @@ public enum Algorithm {
         new HashSet<String>(Arrays.asList(PBES2_HS256_A128KW.getJwtName(),
                                           PBES2_HS384_A192KW.getJwtName(),
                                           PBES2_HS512_A256KW.getJwtName()));
+    public static final Set<String> ECDH_ES_SET = 
+        new HashSet<String>(Arrays.asList(ECDH_ES_A128KW.getJwtName(),
+                                          ECDH_ES_A192KW.getJwtName(),
+                                          ECDH_ES_A256KW.getJwtName()));
     
     private static final Map<String, String> JAVA_TO_JWT_NAMES;
     private static final Map<String, String> JWT_TO_JAVA_NAMES;
@@ -180,6 +186,9 @@ public enum Algorithm {
         JWT_TO_JAVA_NAMES.put(JoseConstants.PBES2_HS256_A128KW_ALGO, AES_WRAP_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JoseConstants.PBES2_HS384_A192KW_ALGO, AES_WRAP_ALGO_JAVA);
         JWT_TO_JAVA_NAMES.put(JoseConstants.PBES2_HS512_A256KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.ECDH_ES_A128KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.ECDH_ES_A192KW_ALGO, AES_WRAP_ALGO_JAVA);
+        JWT_TO_JAVA_NAMES.put(JoseConstants.ECDH_ES_A256KW_ALGO, AES_WRAP_ALGO_JAVA);
     }
     private final String jwtName;
     private final String javaName;
@@ -247,6 +256,9 @@ public enum Algorithm {
     }
     public static boolean isPbesHsWrap(String algo) {
         return PBES_HS_SET.contains(algo); 
+    }
+    public static boolean isEcdhEsWrap(String algo) {
+        return ECDH_ES_SET.contains(algo); 
     }
     public static boolean isAesGcm(String algo) {
         return AES_GCM_CEK_SET.contains(algo);
