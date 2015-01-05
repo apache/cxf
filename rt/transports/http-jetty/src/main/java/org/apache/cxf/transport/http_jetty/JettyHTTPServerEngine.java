@@ -696,14 +696,26 @@ public class JettyHTTPServerEngine implements ServerEngine {
                      tlsServerParameters.getTrustManagers(),
                      tlsServerParameters.getSecureRandom());
 
-        String[] cs = 
+        // Set the CipherSuites
+        final String[] supportedCipherSuites = 
+            SSLUtils.getServerSupportedCipherSuites(context);
+
+        String[] excludedCipherSuites = 
             SSLUtils.getCiphersuites(
                     tlsServerParameters.getCipherSuites(),
-                    SSLUtils.getServerSupportedCipherSuites(context),
+                    supportedCipherSuites,
                     tlsServerParameters.getCipherSuitesFilter(),
                     LOG, true);
-                
-        scf.setExcludeCipherSuites(cs);
+        scf.setExcludeCipherSuites(excludedCipherSuites);
+        
+        String[] includedCipherSuites = 
+            SSLUtils.getCiphersuites(
+                    tlsServerParameters.getCipherSuites(),
+                    supportedCipherSuites,
+                    tlsServerParameters.getCipherSuitesFilter(),
+                    LOG, false);
+        scf.setIncludeCipherSuites(includedCipherSuites);
+        
         return context;
     }
     protected KeyManager[] getKeyManagersWithCertAlias(KeyManager keyManagers[]) throws Exception {
