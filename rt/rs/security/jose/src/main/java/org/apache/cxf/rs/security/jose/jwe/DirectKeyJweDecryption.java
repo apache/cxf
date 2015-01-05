@@ -30,9 +30,37 @@ public class DirectKeyJweDecryption extends AbstractJweDecryption {
     public DirectKeyJweDecryption(Key contentDecryptionKey, 
                                   JoseHeadersReader reader,
                                   ContentDecryptionAlgorithm cipherProps) {    
-        super(reader, 
+        this(reader, 
               new DirectKeyDecryptionAlgorithm(contentDecryptionKey),
               cipherProps);
     }
-    
+    protected DirectKeyJweDecryption(JoseHeadersReader reader,
+                                     DirectKeyDecryptionAlgorithm direct,
+                                     ContentDecryptionAlgorithm cipherProps) {    
+        super(reader, direct, cipherProps);
+    }
+    protected static class DirectKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
+        private byte[] contentDecryptionKey;
+        public DirectKeyDecryptionAlgorithm(Key contentDecryptionKey) {    
+            this(contentDecryptionKey.getEncoded());
+        }
+        public DirectKeyDecryptionAlgorithm(byte[] contentDecryptionKey) {    
+            this.contentDecryptionKey = contentDecryptionKey;
+        }
+        @Override
+        public byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer) {
+            validateKeyEncryptionKey(consumer);
+            return contentDecryptionKey;
+        }
+        @Override
+        public String getAlgorithm() {
+            return null;
+        }
+        protected void validateKeyEncryptionKey(JweCompactConsumer consumer) {
+            byte[] encryptedCEK = consumer.getEncryptedContentEncryptionKey();
+            if (encryptedCEK != null && encryptedCEK.length > 0) {
+                throw new SecurityException();
+            }
+        }
+    }
 }

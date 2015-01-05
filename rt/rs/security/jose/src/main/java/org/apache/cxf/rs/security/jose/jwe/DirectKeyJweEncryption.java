@@ -25,7 +25,12 @@ public class DirectKeyJweEncryption extends AbstractJweEncryption {
         this(new JweHeaders(ceAlgo.getAlgorithm()), ceAlgo);
     }
     public DirectKeyJweEncryption(JweHeaders headers, ContentEncryptionAlgorithm ceAlgo) {
-        super(headers, ceAlgo, new DirectKeyEncryptionAlgorithm());
+        this(headers, ceAlgo, new DirectKeyEncryptionAlgorithm());
+    }
+    protected DirectKeyJweEncryption(JweHeaders headers, 
+                                     ContentEncryptionAlgorithm ceAlgo,
+                                     DirectKeyEncryptionAlgorithm direct) {
+        super(headers, ceAlgo, direct);
     }
     protected byte[] getProvidedContentEncryptionKey() {
         return validateCek(super.getProvidedContentEncryptionKey());
@@ -37,5 +42,22 @@ public class DirectKeyJweEncryption extends AbstractJweEncryption {
             throw new NullPointerException("CEK must not be null");
         }
         return cek;
+    }
+    protected static class DirectKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
+        public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
+            if (headers.getKeyEncryptionAlgorithm() != null) {
+                throw new SecurityException();
+            }
+            return new byte[0];
+        }
+        protected void checkKeyEncryptionAlgorithm(JweHeaders headers) {
+            if (headers.getKeyEncryptionAlgorithm() != null) {
+                throw new SecurityException();
+            }
+        }
+        @Override
+        public String getAlgorithm() {
+            return null;
+        }
     }
 }
