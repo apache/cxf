@@ -143,7 +143,7 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
     }
      
     @Test
-    public void testThresholdfForSOAPMessageWithHugeResponse() throws Exception {
+    public void testThresholdfForSOAPMessageWithHugeResponse() throws Throwable {
         HugeResponseInterceptor hugeResponseInterceptor = 
             new HugeResponseInterceptor(ResponseInterceptorType.ElementLevelThreshold);
         getBus().getInInterceptors().add(hugeResponseInterceptor);
