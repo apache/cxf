@@ -37,6 +37,7 @@ import org.junit.BeforeClass;
 public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(CipherSuitesServer.class);
     static final String PORT2 = allocatePort(CipherSuitesServer.class, 2);
+    static final String PORT3 = allocatePort(CipherSuitesServer.class, 3);
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -265,6 +266,118 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
         
         updateAddressPort(port, PORT2);
+        
+        try {
+            port.greetMe("Kitty");
+            fail("Failure expected on not being able to negotiate a cipher suite");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // Both client + server include NULL
+    @org.junit.Test
+    public void testNULLIncluded() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-null-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT3);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // Both client + server include NULL
+    @org.junit.Test
+    public void testNULLIncludedAsync() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-null-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        
+        updateAddressPort(port, PORT3);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // Client does not allow NULL
+    @org.junit.Test
+    public void testClientAESServerNULL() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT3);
+        
+        try {
+            port.greetMe("Kitty");
+            fail("Failure expected on not being able to negotiate a cipher suite");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // Client does not allow NULL
+    @org.junit.Test
+    public void testClientAESServerNULLAsync() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        
+        updateAddressPort(port, PORT3);
         
         try {
             port.greetMe("Kitty");
