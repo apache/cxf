@@ -23,20 +23,15 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
-import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactReaderWriterTest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -134,54 +129,28 @@ public class JweCompactReaderWriterTest extends Assert {
         String decryptedText = decryption.decrypt(jweContent).getContentText();
         assertEquals(specPlainText, decryptedText);
     }
+    
     @Test
     public void testECDHESDirectKeyEncryption() throws Exception {
-        ECPrivateKey alicePrivateKey = 
-            CryptoUtils.getECPrivateKey(JsonWebKey.EC_CURVE_P256, 
-                                        "0_NxaRPUMQoAJt50Gz8YiTr8gRTwyEaCumd-MToTmIo");
-        ECPublicKey alicePublicKey = 
-            CryptoUtils.getECPublicKey(JsonWebKey.EC_CURVE_P256, 
-                                       "gI0GAILBdu7T53akrFmMyGcsF3n5dO7MmwNBHKW5SV0",
-                                       "SLW_xSffzlPWrHEVI30DHM_4egVwt3NQqeUD7nMFpps");
-        
-        ECPublicKey bobPublicKey = 
-            CryptoUtils.getECPublicKey(JsonWebKey.EC_CURVE_P256, 
-                                       "weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ",
-                                       "e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck");
-        
-        byte[] apuBytes = StringUtils.toBytesUTF8("Alice");
-        byte[] apvBytes = StringUtils.toBytesUTF8("Bob");
-        
-        byte[] derivedKey = JweUtils.getECDHKey(alicePrivateKey, bobPublicKey, apuBytes, apvBytes, 
-                                                Algorithm.A128GCM.getJwtName(), Algorithm.A128GCM.getKeySizeBits());
-        assertEquals("VqqN6vgjbSBcIijNcacQGg", Base64UrlUtility.encode(derivedKey));
-        
-        JweHeaders headers = new JweHeaders();
-        headers.setAlgorithm(JoseConstants.ECDH_ES_DIRECT_ALGO);
-        headers.setContentEncryptionAlgorithm(Algorithm.A128GCM.getJwtName());
-        headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
-        headers.setHeader("apv", Base64UrlUtility.encode(apvBytes));
-        headers.setJsonWebKey("epv", JwkUtils.fromECPublicKey(alicePublicKey, JsonWebKey.EC_CURVE_P256));
-        
-        byte[] derivedKey2 = calculateDerivedKeyFromHeaders(headers,
-                                                            headers.getContentEncryptionAlgorithm(),
-                                                            Algorithm.A128GCM.getKeySizeBits());
-        assertTrue(Arrays.equals(derivedKey2, derivedKey));
-    }
-    private static byte[] calculateDerivedKeyFromHeaders(JoseHeaders headers,
-                                                         String algoName,
-                                                         int algoKeyLen) {
         ECPrivateKey bobPrivateKey = 
             CryptoUtils.getECPrivateKey(JsonWebKey.EC_CURVE_P256, 
                                         "VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw");
         
-        JsonWebKey publicJwk = headers.getJsonWebKey("epv");
-        String apuHeader = (String)headers.getHeader("apu");
-        byte[] apuBytes = apuHeader == null ? null : JoseUtils.decode(apuHeader);
-        String apvHeader = (String)headers.getHeader("apv");
-        byte[] apvBytes = apvHeader == null ? null : JoseUtils.decode(apvHeader);
-        return JweUtils.getECDHKey(bobPrivateKey, JwkUtils.toECPublicKey(publicJwk), 
-                                   apuBytes, apvBytes, algoName, algoKeyLen);
+        final ECPublicKey bobPublicKey = 
+            CryptoUtils.getECPublicKey(JsonWebKey.EC_CURVE_P256, 
+                                       "weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ",
+                                       "e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck");
+        JweEncryptionProvider jweOut = 
+            new EcdhDirectKeyJweEncryption(bobPublicKey, 
+                                           JsonWebKey.EC_CURVE_P256, 
+                                           "Alice", 
+                                           "Bob", 
+                                           Algorithm.A128GCM.getJwtName());
+    
+        String jweOutput = jweOut.encrypt("Hello".getBytes(), null);
+        JweDecryptionProvider jweIn = 
+            new EcdhDirectKeyJweDecryption(bobPrivateKey, Algorithm.A128GCM.getJwtName());
+        assertEquals("Hello", jweIn.decrypt(jweOutput).getContentText());
     }
     @Test
     public void testEncryptDecryptRSA15WrapA128CBCHS256() throws Exception {
