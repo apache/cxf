@@ -140,7 +140,7 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
             getKeyManagersWithCertAlias();
         }
         context.init(keyManagers, trustManagers, secureRandom);
-
+/*
         String[] cs = 
             SSLUtils.getCiphersuites(
                     cipherSuites,
@@ -149,6 +149,27 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
                     LOG, true);
         
         getCxfSslContextFactory().setExcludeCipherSuites(cs);
+        */
+        
+        // Set the CipherSuites
+        final String[] supportedCipherSuites = 
+            SSLUtils.getServerSupportedCipherSuites(context);
+
+        String[] excludedCipherSuites = 
+            SSLUtils.getCiphersuites(
+                    cipherSuites,
+                    supportedCipherSuites,
+                    cipherSuitesFilter,
+                    LOG, true);
+        getCxfSslContextFactory().setExcludeCipherSuites(excludedCipherSuites);
+        
+        String[] includedCipherSuites = 
+            SSLUtils.getCiphersuites(
+                    cipherSuites,
+                    supportedCipherSuites,
+                    cipherSuitesFilter,
+                    LOG, false);
+        getCxfSslContextFactory().setIncludeCipherSuites(includedCipherSuites);
         
         return context;
     }
@@ -177,6 +198,8 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
     
     interface CxfSslContextFactory {
         void setExcludeCipherSuites(String ... cs);
+        
+        void setIncludeCipherSuites(String ... cs);
 
         String getProtocol();
         
