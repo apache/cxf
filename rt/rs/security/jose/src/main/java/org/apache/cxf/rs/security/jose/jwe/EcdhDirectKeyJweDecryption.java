@@ -32,6 +32,17 @@ public class EcdhDirectKeyJweDecryption extends DirectKeyJweDecryption {
               new EcdhDirectKeyDecryptionAlgorithm(privateKey), 
               new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
     }
+    protected static byte[] getDecryptedContentEncryptionKeyFromHeaders(JweHeaders headers,
+                                                                        ECPrivateKey privateKey) {
+        Algorithm jwtAlgo = Algorithm.valueOf(headers.getContentEncryptionAlgorithm());
+        JsonWebKey publicJwk = headers.getJsonWebKey("epv");
+        String apuHeader = (String)headers.getHeader("apu");
+        byte[] apuBytes = apuHeader == null ? null : JoseUtils.decode(apuHeader);
+        String apvHeader = (String)headers.getHeader("apv");
+        byte[] apvBytes = apvHeader == null ? null : JoseUtils.decode(apvHeader);
+        return JweUtils.getECDHKey(privateKey, JwkUtils.toECPublicKey(publicJwk), 
+                                   apuBytes, apvBytes, jwtAlgo.getJwtName(), jwtAlgo.getKeySizeBits());
+    }
     protected static class EcdhDirectKeyDecryptionAlgorithm extends DirectKeyDecryptionAlgorithm {
         private ECPrivateKey privateKey;
         public EcdhDirectKeyDecryptionAlgorithm(ECPrivateKey privateKey) {    
@@ -42,18 +53,7 @@ public class EcdhDirectKeyJweDecryption extends DirectKeyJweDecryption {
         public byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer) {
             super.validateKeyEncryptionKey(consumer);
             
-            return getDecryptedContentEncryptionKeyFromHeaders(consumer.getJweHeaders());
-        }
-        
-        protected byte[] getDecryptedContentEncryptionKeyFromHeaders(JweHeaders headers) {
-            Algorithm jwtAlgo = Algorithm.valueOf(headers.getContentEncryptionAlgorithm());
-            JsonWebKey publicJwk = headers.getJsonWebKey("epv");
-            String apuHeader = (String)headers.getHeader("apu");
-            byte[] apuBytes = apuHeader == null ? null : JoseUtils.decode(apuHeader);
-            String apvHeader = (String)headers.getHeader("apv");
-            byte[] apvBytes = apvHeader == null ? null : JoseUtils.decode(apvHeader);
-            return JweUtils.getECDHKey(privateKey, JwkUtils.toECPublicKey(publicJwk), 
-                                       apuBytes, apvBytes, jwtAlgo.getJwtName(), jwtAlgo.getKeySizeBits());
+            return getDecryptedContentEncryptionKeyFromHeaders(consumer.getJweHeaders(), privateKey);
         }
     }
 }

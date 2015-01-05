@@ -39,13 +39,10 @@ public class EcdhDirectKeyJweEncryption extends DirectKeyJweEncryption {
         super(new JweHeaders(ctAlgo), 
               new EcdhAesGcmContentEncryptionAlgorithm(peerPublicKey,
                                                        curve,
-                                                       toBytes(apuString),
-                                                       toBytes(apvString),
+                                                       apuString,
+                                                       apvString,
                                                        ctAlgo), 
               new EcdhDirectKeyEncryptionAlgorithm());
-    }
-    private static byte[] toBytes(String str) {
-        return str == null ? null : StringUtils.toBytesUTF8(str);
     }
     protected static class EcdhDirectKeyEncryptionAlgorithm extends DirectKeyEncryptionAlgorithm {
         protected void checkKeyEncryptionAlgorithm(JweHeaders headers) {
@@ -53,31 +50,42 @@ public class EcdhDirectKeyJweEncryption extends DirectKeyJweEncryption {
         }
     }
     protected static class EcdhAesGcmContentEncryptionAlgorithm extends AesGcmContentEncryptionAlgorithm {
+        private EcdhHelper helper;
+        public EcdhAesGcmContentEncryptionAlgorithm(ECPublicKey peerPublicKey,
+                                                    String curve,
+                                                    String apuString,
+                                                    String apvString,
+                                                    String ctAlgo) {
+            super(ctAlgo);
+            helper = new EcdhHelper(peerPublicKey, curve, apuString, apvString, ctAlgo);
+        }
+        public byte[] getContentEncryptionKey(JweHeaders headers) {
+            return helper.getDerivedKey(headers);
+        }
+    }
+    
+    protected static class EcdhHelper {
         private ECPublicKey peerPublicKey;
         private String ecurve;
         private byte[] apuBytes;
         private byte[] apvBytes;
-        public EcdhAesGcmContentEncryptionAlgorithm(ECPublicKey peerPublicKey,
+        private String ctAlgo;
+        public EcdhHelper(ECPublicKey peerPublicKey,
                                                     String curve,
-                                                    byte[] apuBytes,
-                                                    byte[] apvBytes,
+                                                    String apuString,
+                                                    String apvString,
                                                     String ctAlgo) {
-            super(ctAlgo);
+            this.ctAlgo = ctAlgo;
             this.peerPublicKey = peerPublicKey;
             this.ecurve = curve;
-            this.apuBytes = apuBytes;
-            this.apvBytes = apvBytes;
+            this.apuBytes = toBytes(apuString);
+            this.apvBytes = toBytes(apvString);
         }
-        public byte[] getContentEncryptionKey(JweHeaders headers) {
+        public byte[] getDerivedKey(JweHeaders headers) {
             KeyPair pair = CryptoUtils.generateECKeyPair(ecurve);
             ECPublicKey publicKey = (ECPublicKey)pair.getPublic();
             ECPrivateKey privateKey = (ECPrivateKey)pair.getPrivate();
-            return doGetContentEncryptionKey(headers, publicKey, privateKey);
-        }
-        protected byte[] doGetContentEncryptionKey(JweHeaders headers,
-                                                ECPublicKey publicKey,
-                                                ECPrivateKey privateKey) {
-            Algorithm jwtAlgo = Algorithm.valueOf(super.getAlgorithm());
+            Algorithm jwtAlgo = Algorithm.valueOf(ctAlgo);
         
             headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
             headers.setHeader("apv", Base64UrlUtility.encode(apvBytes));
@@ -87,6 +95,10 @@ public class EcdhDirectKeyJweEncryption extends DirectKeyJweEncryption {
                                        jwtAlgo.getJwtName(), jwtAlgo.getKeySizeBits());
             
         }
+        private byte[] toBytes(String str) {
+            return str == null ? null : StringUtils.toBytesUTF8(str);
+        }
+        
     }
     
 }
