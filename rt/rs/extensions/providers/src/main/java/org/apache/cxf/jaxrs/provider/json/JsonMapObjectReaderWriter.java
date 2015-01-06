@@ -201,7 +201,11 @@ public class JsonMapObjectReaderWriter {
         } else if ("true".equals(value) || "false".equals(value)) {
             value = Boolean.valueOf(valueStr);
         } else {
-            value = Long.valueOf(valueStr);
+            try {
+                value = Long.valueOf(valueStr);
+            } catch (NumberFormatException ex) {
+                value = Double.valueOf(valueStr);
+            }
         }
         return value;
     }
