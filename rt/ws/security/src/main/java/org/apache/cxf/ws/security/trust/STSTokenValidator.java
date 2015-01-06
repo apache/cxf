@@ -45,13 +45,18 @@ import org.apache.wss4j.dom.validate.Validator;
 
 /**
  * A WSS4J-based Validator to validate a received WS-Security credential by dispatching
- * it to a STS via WS-Trust. The default binding is "validate", but "issue" using "OnBehalfOf"
- * is also possible by setting the "useIssueBinding" property.
+ * it to a STS via WS-Trust. The default binding is "validate", but "issue" is also possible
+ * by setting the "useIssueBinding" property. In this case, the credentials are sent via
+ * "OnBehalfOf" unless the "useOnBehalfOf" property is set to "false", in which case the
+ * credentials are used depending on the security policy of the STS endpoint (e.g. in a 
+ * UsernameToken if this is what the policy requires). Setting "useOnBehalfOf" to "false" + 
+ * "useIssueBinding" to "true" only works for validating UsernameTokens.
  */
 public class STSTokenValidator implements Validator {
     private STSSamlAssertionValidator samlValidator = new STSSamlAssertionValidator();
     private boolean alwaysValidateToSts;
     private boolean useIssueBinding;
+    private boolean useOnBehalfOf = true;
     private STSClient stsClient;
     private TokenStore tokenStore;
     
@@ -125,11 +130,19 @@ public class STSTokenValidator implements Validator {
                 
                 SecurityToken returnedToken = null;
                 
-                if (useIssueBinding) {
+                if (useIssueBinding && useOnBehalfOf) {
                     ElementCallbackHandler callbackHandler = new ElementCallbackHandler(tokenElement);
                     c.setOnBehalfOf(callbackHandler);
                     returnedToken = c.requestSecurityToken();
                     c.setOnBehalfOf(null);
+                } else if (useIssueBinding && !useOnBehalfOf && credential.getUsernametoken() != null) {
+                    c.getProperties().put(SecurityConstants.USERNAME, 
+                                          credential.getUsernametoken().getName());
+                    c.getProperties().put(SecurityConstants.PASSWORD, 
+                                          credential.getUsernametoken().getPassword());
+                    returnedToken = c.requestSecurityToken();
+                    c.getProperties().remove(SecurityConstants.USERNAME);
+                    c.getProperties().remove(SecurityConstants.PASSWORD);
                 } else {
                     List<SecurityToken> tokens = c.validateSecurityToken(token);
                     returnedToken = tokens.get(0);
@@ -212,6 +225,14 @@ public class STSTokenValidator implements Validator {
 
     public void setUseIssueBinding(boolean useIssueBinding) {
         this.useIssueBinding = useIssueBinding;
+    }
+    
+    public boolean isUseOnBehalfOf() {
+        return useOnBehalfOf;
+    }
+
+    public void setUseOnBehalfOf(boolean useOnBehalfOf) {
+        this.useOnBehalfOf = useOnBehalfOf;
     }
     
     public STSClient getStsClient() {

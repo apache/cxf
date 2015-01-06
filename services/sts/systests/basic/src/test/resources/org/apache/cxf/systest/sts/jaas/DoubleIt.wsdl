@@ -39,6 +39,9 @@
         <wsdl:port name="DoubleItUTPort2" binding="tns:DoubleItUTBinding">
             <soap:address location="https://localhost:8081/doubleit/services/doubleitut2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItUTPort3" binding="tns:DoubleItUTBinding">
+            <soap:address location="https://localhost:8081/doubleit/services/doubleitut3"/>
+        </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItUTPolicy">
         <wsp:ExactlyOne>
