@@ -52,6 +52,7 @@ public class JAASTest extends AbstractBusClientServerTestBase {
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
+    private static final String PORT2 = allocatePort(Server2.class);
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -60,6 +61,12 @@ public class JAASTest extends AbstractBusClientServerTestBase {
                    // run the server in the same process
                    // set this to false to fork
                    launchServer(Server.class, true)
+        );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(Server2.class, true)
         );
         assertTrue(
                    "Server failed to launch",
@@ -301,6 +308,37 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // Here the service config has no TLS settings for the call to the STS...it's configured
+    // separately via the JAAS configuration
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSuccessfulInvocationConfig() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAASTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUTPort");
+        DoubleItPortType utPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT2);
+        
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.USERNAME, "alice");
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.PASSWORD, "clarinet");
+        
+        doubleIt(utPort, 25);
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
     @org.junit.Test
     public void testJAXRSSuccessfulInvocation() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
@@ -335,6 +373,12 @@ public class JAASTest extends AbstractBusClientServerTestBase {
     public void testJAXRSUnsuccessfulAuthorizationPassthroughInvocation() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs3";
         doubleIt("bob", "trombone", address, true);
+    }
+    
+    @org.junit.Test
+    public void testJAXRSSuccessfulInvocationConfig() throws Exception {
+        final String address = "https://localhost:" + PORT2 + "/doubleit/services/doubleit-rs";
+        doubleIt("alice", "clarinet", address, false);
     }
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
