@@ -75,10 +75,22 @@ public class STSLoginModule implements LoginModule {
     /**
      * Whether we require roles or not from the STS. If this is not set then the 
      * WS-Trust validate binding is used. If it is set then the issue binding is 
-     * used, where the Username + Password credentials are passed via "OnBehalfOf".
-     * In addition, claims are added to the request for the standard "role" ClaimType.
+     * used, where the Username + Password credentials are passed via "OnBehalfOf"
+     * (unless the DISABLE_ON_BEHALF_OF property is set to "true", see below). In addition, 
+     * claims are added to the request for the standard "role" ClaimType.
      */
     public static final String REQUIRE_ROLES = "require.roles";
+    
+    /**
+     * Whether to disable passing Username + Password credentials via "OnBehalfOf". If the
+     * REQUIRE_ROLES property (see above) is set to "true", then the Issue Binding is used
+     * and the credentials are passed via OnBehalfOf. If this (DISABLE_ON_BEHALF_OF) property
+     * is set to "true", then the credentials instead are passed through to the 
+     * WS-SecurityPolicy layer and used depending on the security policy of the STS endpoint.
+     * For example, if the STS endpoint requires a WS-Security UsernameToken, then the 
+     * credentials are inserted here.
+     */
+    public static final String DISABLE_ON_BEHALF_OF = "disable.on.behalf.of";
     
     /**
      * The WSDL Location of the STS
@@ -123,6 +135,7 @@ public class STSLoginModule implements LoginModule {
     private Subject subject;
     private CallbackHandler callbackHandler;
     private boolean requireRoles;
+    private boolean disableOnBehalfOf;
     private String wsdlLocation;
     private String serviceName;
     private String endpointName;
@@ -139,6 +152,9 @@ public class STSLoginModule implements LoginModule {
         callbackHandler = cbHandler;
         if (options.containsKey(REQUIRE_ROLES)) {
             requireRoles = Boolean.parseBoolean((String)options.get(REQUIRE_ROLES));
+        }
+        if (options.containsKey(DISABLE_ON_BEHALF_OF)) {
+            disableOnBehalfOf = Boolean.parseBoolean((String)options.get(DISABLE_ON_BEHALF_OF));
         }
         if (options.containsKey(WSDL_LOCATION)) {
             wsdlLocation = (String)options.get(WSDL_LOCATION);
@@ -199,6 +215,7 @@ public class STSLoginModule implements LoginModule {
         
         STSTokenValidator validator = new STSTokenValidator(true);
         validator.setUseIssueBinding(requireRoles);
+        validator.setUseOnBehalfOf(!disableOnBehalfOf);
         
         // Authenticate token
         try {

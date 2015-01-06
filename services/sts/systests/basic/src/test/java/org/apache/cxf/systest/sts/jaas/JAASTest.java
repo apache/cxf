@@ -205,18 +205,136 @@ public class JAASTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSuccessfulPassthroughInvocation() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAASTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUTPort3");
+        DoubleItPortType utPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.USERNAME, "alice");
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.PASSWORD, "clarinet");
+        
+        doubleIt(utPort, 25);
+        
+        // Note that the UsernameToken should be cached for the second invocation
+        doubleIt(utPort, 35);
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testUnsuccessfulAuthenticationPassthroughInvocation() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAASTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUTPort3");
+        DoubleItPortType utPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.USERNAME, "alice");
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.PASSWORD, "clarinet2");
+        
+        try {
+            doubleIt(utPort, 25);
+            fail("Failure expected on an incorrect password");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testUnsuccessfulAuthorizationPassthroughInvocation() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAASTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = JAASTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUTPort3");
+        DoubleItPortType utPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.USERNAME, "bob");
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.PASSWORD, "trombone");
+        
+        try {
+            doubleIt(utPort, 25);
+            fail("Failure expected on an incorrect role");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testJAXRSSuccessfulInvocation() throws Exception {
-        doubleIt("alice", "clarinet", false);
+        final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
+        doubleIt("alice", "clarinet", address, false);
     }
     
     @org.junit.Test
     public void testJAXRSUnsuccessfulAuthentication() throws Exception {
-        doubleIt("alice", "clarinet2", true);
+        final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
+        doubleIt("alice", "clarinet2", address, true);
     }
     
     @org.junit.Test
     public void testJAXRSUnsuccessfulAuthorization() throws Exception {
-        doubleIt("bob", "trombone", true);
+        final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
+        doubleIt("bob", "trombone", address, true);
+    }
+    
+    @org.junit.Test
+    public void testJAXRSSuccessfulPassthroughInvocation() throws Exception {
+        final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs3";
+        doubleIt("alice", "clarinet", address, false);
+    }
+    
+    @org.junit.Test
+    public void testJAXRSUnsuccessfulAuthenticationPassthroughInvocation() throws Exception {
+        final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs3";
+        doubleIt("alice", "clarinet2", address, true);
+    }
+    
+    @org.junit.Test
+    public void testJAXRSUnsuccessfulAuthorizationPassthroughInvocation() throws Exception {
+        final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs3";
+        doubleIt("bob", "trombone", address, true);
     }
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
@@ -224,9 +342,10 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         assertEquals(numToDouble * 2 , resp);
     }
     
-    private static void doubleIt(String username, String password, boolean authFailureExpected) {
+    private static void doubleIt(String username, String password, 
+                                 String address,
+                                 boolean authFailureExpected) {
         final String configLocation = "org/apache/cxf/systest/sts/jaas/cxf-client.xml";
-        final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
         final int numToDouble = 25;  
        
         WebClient client = null;
