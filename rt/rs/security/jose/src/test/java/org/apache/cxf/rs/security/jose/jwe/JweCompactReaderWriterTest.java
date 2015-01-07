@@ -132,6 +132,9 @@ public class JweCompactReaderWriterTest extends Assert {
     
     @Test
     public void testECDHESDirectKeyEncryption() throws Exception {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         ECPrivateKey bobPrivateKey = 
             CryptoUtils.getECPrivateKey(JsonWebKey.EC_CURVE_P256, 
                                         "VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw");
