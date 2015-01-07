@@ -39,8 +39,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.equalTo;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusClientServerTestBase {
     private static final JsonObject DELETE_METHOD_SPEC = Json.createObjectBuilder()
@@ -165,8 +164,9 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             
-            assertThat(IOUtils.readStringFromStream((InputStream)r.getEntity()), 
-                equalTo(Json.createObjectBuilder()
+            JSONAssert.assertEquals(
+                IOUtils.readStringFromStream((InputStream)r.getEntity()), 
+                Json.createObjectBuilder()
                     .add("apiVersion", "1.0.0")
                     .add("swaggerVersion", "1.2")
                     .add("apis", Json.createArrayBuilder()
@@ -181,7 +181,7 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                         .add("contact", "committer@apache.org")
                         .add("license", "Apache 2.0 License")
                         .add("licenseUrl", "http://www.apache.org/licenses/LICENSE-2.0.html")
-                    ).build().toString()));
+                    ).build().toString(), false);
         } finally {
             client.close();
         }
@@ -195,8 +195,9 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
                     
-            assertThat(IOUtils.readStringFromStream((InputStream)r.getEntity()), 
-                equalTo(Json.createObjectBuilder()
+            JSONAssert.assertEquals(
+                IOUtils.readStringFromStream((InputStream)r.getEntity()), 
+                Json.createObjectBuilder()
                     .add("apiVersion", "1.0.0")
                     .add("swaggerVersion", "1.2")
                     .add("basePath", "http://localhost:" + getPort() + "/")
@@ -210,7 +211,7 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                         .add(Json.createObjectBuilder()
                             .add("path", "/bookstore")
                             .add("operations", Json.createArrayBuilder().add(GET_METHOD_SPEC))))
-                    .add("models", BOOK_MODEL_SPEC).build().toString()));
+                    .add("models", BOOK_MODEL_SPEC).build().toString(), false);
         } finally {
             client.close();
         }
