@@ -20,13 +20,17 @@
 package org.apache.cxf.common.util;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.codec.impl.URLDecoder;
+import org.apache.cxf.common.codec.impl.URLEncoder;
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
@@ -34,32 +38,34 @@ import org.apache.cxf.common.logging.LogUtils;
  *
  */
 public final class UrlUtils {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(UrlUtils.class);
-    
+
     private static final String[] RESERVED_CHARS = {"+"};
     private static final String[] ENCODED_CHARS = {"%2b"};
-    
+
     private UrlUtils() {
-        
+
     }
 
     public static String urlEncode(String value) {
-        
+
         return urlEncode(value, "UTF-8");
     }
-    
+
     public static String urlEncode(String value, String enc) {
-        
+
         try {
-            value = URLEncoder.encode(value, enc);
+            value = new URLEncoder().code(ByteBuffer.wrap(value.getBytes(enc))).toString();
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
+        } catch (CharacterCodingException ex) {
+            throw new RuntimeException(ex);
         }
-        
+
         return value;
     }
-    
+
     /**
      * Decodes using URLDecoder - use when queries or form post values are decoded
      * @param value value to decode
@@ -67,17 +73,17 @@ public final class UrlUtils {
      */
     public static String urlDecode(String value, String enc) {
         try {
-            value = URLDecoder.decode(value, enc);
-        } catch (UnsupportedEncodingException e) {
-            LOG.warning("UTF-8 encoding can not be used to decode " + value);          
+            value = Charset.forName(enc).decode(new URLDecoder().code(CharBuffer.wrap(value))).toString();
+        } catch (CharacterCodingException e) {
+            LOG.warning("UTF-8 encoding can not be used to decode " + value);
         }
         return value;
     }
-    
+
     public static String urlDecode(String value) {
         return urlDecode(value, "UTF-8");
     }
-    
+
     /**
      * URL path segments may contain '+' symbols which should not be decoded into ' '
      * This method replaces '+' with %2B and delegates to URLDecoder
@@ -91,11 +97,11 @@ public final class UrlUtils {
                 value = value.replace(RESERVED_CHARS[i], ENCODED_CHARS[i]);
             }
         }
-        
+
         return urlDecode(value);
     }
-    
-    
+
+
     /**
      * Create a map from String to String that represents the contents of the query
      * portion of a URL. For each x=y, x is the key and y is the value.
@@ -117,11 +123,11 @@ public final class UrlUtils {
         }
         return ht;
     }
-    
+
     /**
      * Return everything in the path up to the last slash in a URI.
      * @param baseURI
-     * @return the trailing 
+     * @return the trailing
      */
     public static String getStem(String baseURI) {
         int idx = baseURI.lastIndexOf('/');
@@ -131,6 +137,6 @@ public final class UrlUtils {
         }
         return result;
     }
-    
-    
+
+
 }
