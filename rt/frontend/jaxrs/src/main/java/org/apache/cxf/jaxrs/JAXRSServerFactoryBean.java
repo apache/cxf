@@ -399,7 +399,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         }
     }
     
-    private void updateClassResourceProviders() {
+    protected void updateClassResourceProviders() {
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
             if (cri.getResourceProvider() != null) {
                 continue;
