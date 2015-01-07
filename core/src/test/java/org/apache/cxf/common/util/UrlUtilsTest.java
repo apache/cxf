@@ -24,17 +24,34 @@ import org.junit.Test;
 
 
 public class UrlUtilsTest extends Assert {
-    
+
+    @Test
+    public void testUrlEncode() {
+        assertEquals("%2B+", UrlUtils.urlEncode("+ "));
+        assertEquals("random+word+%C2%A3500+%24", UrlUtils.urlEncode("random word £500 $"));
+    }
+
+    @Test
+    public void testUrlEncodeWithEncoding() {
+        assertEquals("random+word+%A3500+%24", UrlUtils.urlEncode("random word £500 $", "ISO-8859-15"));
+    }
+
     @Test
     public void testUrlDecode() {
         assertEquals("+ ", UrlUtils.urlDecode("%2B+"));
+        assertEquals("random word £500 $", UrlUtils.urlDecode("random+word+%C2%A3500+%24"));
     }
-    
+
+    @Test
+    public void testUrlDecodeWithEncoding() {
+        assertEquals("random word £500 $", UrlUtils.urlDecode("random+word+%A3500+%24", "ISO-8859-15"));
+    }
+
     @Test
     public void testUrlDecodeReserved() {
         assertEquals("!$&'()*,;=", UrlUtils.urlDecode("!$&'()*,;="));
     }
-    
+
     @Test
     public void testPathDecode() {
         assertEquals("+++", UrlUtils.pathDecode("+%2B+"));
