@@ -72,6 +72,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -79,6 +80,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.concurrent.BasicFuture;
 import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -549,6 +551,12 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             if (creds != null) {
                 credsProvider.setCredentials(AuthScope.ANY, creds);
                 ctx.setUserToken(creds.getUserPrincipal());
+            }
+            @SuppressWarnings("unchecked")
+            Registry<AuthSchemeProvider> asp = (Registry<AuthSchemeProvider>)outMessage
+                .getContextualProperty(AuthSchemeProvider.class.getName());
+            if (asp != null) {              
+                ctx.setAuthSchemeRegistry(asp);
             }
 
             c.execute(new CXFHttpAsyncRequestProducer(entity, outbuf),
