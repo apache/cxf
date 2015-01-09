@@ -98,7 +98,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
             return false;
         }
         if (map.containsKey(CODE_QUERY_KEY)) {
-            return endpointInfo.getAddress().contains(UrlUtils.getStem(uri.getSchemeSpecificPart()));
+            return true;
         }
         return false;
     }
