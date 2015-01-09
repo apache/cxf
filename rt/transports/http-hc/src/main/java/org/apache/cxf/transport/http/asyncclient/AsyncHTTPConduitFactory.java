@@ -47,6 +47,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.conn.DefaultSchemePortResolver;
 import org.apache.http.impl.conn.SystemDefaultDnsResolver;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.conn.ManagedNHttpClientConnectionFactory;
 import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
@@ -349,19 +350,26 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
             }
         };
 
-        client = HttpAsyncClients.custom()
+        HttpAsyncClientBuilder httpAsyncClientBuilder = HttpAsyncClients.custom()
             .setConnectionManager(connectionManager)
             .setRedirectStrategy(redirectStrategy)
             .setDefaultCookieStore(new BasicCookieStore() {
                 private static final long serialVersionUID = 1L;
                 public void addCookie(Cookie cookie) {
                 }
-            })
-            .build();
+            });
+        
+        adaptClientBuilder(httpAsyncClientBuilder);
+        
+        client = httpAsyncClientBuilder.build();
         // Start the client thread
         client.start();
     }
 
+    //provide a hook to customize the builder
+    protected void adaptClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {    
+    }
+    
     public CloseableHttpAsyncClient createClient(final AsyncHTTPConduit c) throws IOException {
         if (client == null) {
             setupNIOClient(c.getClient());
