@@ -111,4 +111,34 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         StreamSource response = dispatch.invoke(request);
         assertNotNull(response);
     }
+    
+    @org.junit.Test
+    public void testAddedCommentsInSOAPBody() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SignatureWhitespaceTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = SignatureWhitespaceTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignaturePort2");
+
+        Dispatch<StreamSource> dispatch = 
+            service.createDispatch(portQName, StreamSource.class, Service.Mode.MESSAGE);
+        
+        // Creating a DOMSource Object for the request
+        
+        URL requestFile = 
+            SignatureWhitespaceTest.class.getResource("request-with-comment.xml");
+        
+        StreamSource request = new StreamSource(new File(requestFile.getPath()));
+
+        updateAddressPort(dispatch, PORT);
+        
+        // Make a successful request
+        StreamSource response = dispatch.invoke(request);
+        assertNotNull(response);
+    }
 }
