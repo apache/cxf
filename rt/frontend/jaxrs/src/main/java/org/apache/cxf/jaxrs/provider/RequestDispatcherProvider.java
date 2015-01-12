@@ -213,7 +213,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             }
         } catch (Throwable ex) {
             mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.FALSE);
-            ex.printStackTrace();
+            LOG.warning(ExceptionUtils.getStackTrace(ex));
             throw ExceptionUtils.toInternalServerErrorException(ex, null); 
         }
     }
