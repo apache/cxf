@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
 import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.clustering.FailoverFeature;
-import org.apache.cxf.clustering.LoadDistributorTargetSelector;
+import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
@@ -36,22 +36,22 @@ public class ClusteringBPNamespaceHandler implements NamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
-    
+
     public Metadata parse(Element element, ParserContext context) {
         String s = element.getLocalName();
         if ("failover".equals(s)) {
             return new SimpleBPBeanDefinitionParser(FailoverFeature.class).parse(element, context);
         } else if ("loadDistributor".equals(s)) {
-            return new SimpleBPBeanDefinitionParser(LoadDistributorTargetSelector.class).parse(element, context);
+            return new SimpleBPBeanDefinitionParser(LoadDistributorFeature.class).parse(element, context);
         }
         return null;
     }
-    
+
     @SuppressWarnings("rawtypes")
     public Set<Class> getManagedClasses() {
         return null;
     }
-    
+
     public URL getSchemaLocation(String namespace) {
         return getClass().getClassLoader().getResource("schemas/clustering.xsd");
     }
