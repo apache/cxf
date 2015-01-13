@@ -31,6 +31,13 @@ public class UrlUtilsTest extends Assert {
     }
     
     @Test
+    public void testUrlDecodeSingleCharMultipleEscapes() {
+        String s = "ß";
+        String encoded = UrlUtils.urlEncode(s);
+        assertEquals(s, UrlUtils.urlDecode(encoded));
+    }
+    
+    @Test
     public void testUrlDecodeReserved() {
         assertEquals("!$&'()*,;=", UrlUtils.urlDecode("!$&'()*,;="));
     }
