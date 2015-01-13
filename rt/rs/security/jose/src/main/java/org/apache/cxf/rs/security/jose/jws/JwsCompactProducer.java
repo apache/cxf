@@ -54,24 +54,28 @@ public class JwsCompactProducer {
         return headers;
     }
     public String getUnsignedEncodedJws() {
+        return getUnsignedEncodedJws(false);
+    }
+    private String getUnsignedEncodedJws(boolean detached) {
         checkAlgorithm();
         if (plainRep == null) {
             plainRep = Base64UrlUtility.encode(writer.headersToJson(getJoseHeaders())) 
                 + "." 
-                + Base64UrlUtility.encode(plainJwsPayload);
+                + (detached ? "" : Base64UrlUtility.encode(plainJwsPayload));
         }
         return plainRep;
     }
-    
     public String getSignedEncodedJws() {
+        return getSignedEncodedJws(false);
+    }
+    public String getSignedEncodedJws(boolean detached) {
         checkAlgorithm();
         boolean noSignature = StringUtils.isEmpty(signature);
         if (noSignature && !isPlainText()) {
             throw new IllegalStateException("Signature is not available");
         }
-        return getUnsignedEncodedJws() + "." + (noSignature ? "" : signature);
+        return getUnsignedEncodedJws(detached) + "." + (noSignature ? "" : signature);
     }
-    
     public String signWith(JsonWebKey jwk) {
         return signWith(JwsUtils.getSignatureProvider(jwk, headers.getAlgorithm()));
     }

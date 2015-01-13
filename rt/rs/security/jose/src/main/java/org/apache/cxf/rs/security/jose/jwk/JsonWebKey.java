@@ -55,7 +55,7 @@ public class JsonWebKey extends JsonMapObject {
     public static final String EC_CURVE = "crv";
     public static final String EC_CURVE_P256 = "P-256";
     public static final String EC_CURVE_P384 = "P-384";
-    public static final String EC_CURVE_P512 = "P-512";
+    public static final String EC_CURVE_P521 = "P-521";
     public static final String EC_X_COORDINATE = "x";
     public static final String EC_Y_COORDINATE = "y";
     public static final String EC_PRIVATE_KEY = "d";

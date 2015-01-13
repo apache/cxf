@@ -32,11 +32,14 @@ public class JwsCompactConsumer {
     private String encodedSequence;
     private String encodedSignature;
     private String headersJson;
-    private String jwsPayload;
+    private String decodedJwsPayload;
     public JwsCompactConsumer(String encodedJws) {
         this(encodedJws, null);
     }
     public JwsCompactConsumer(String encodedJws, JoseHeadersReader r) {
+        this(encodedJws, null, r);
+    }
+    public JwsCompactConsumer(String encodedJws, String encodedDetachedPayload, JoseHeadersReader r) {
         if (r != null) {
             this.reader = r;
         }
@@ -53,10 +56,16 @@ public class JwsCompactConsumer {
         } else {
             encodedSignature = parts[2];
         }
+        String encodedJwsPayload = parts[1];
+        if (encodedDetachedPayload != null) {
+            if (StringUtils.isEmpty(encodedJwsPayload)) {
+                throw new SecurityException("Invalid JWS Compact sequence");
+            }
+            encodedJwsPayload = encodedDetachedPayload;
+        }
+        encodedSequence = parts[0] + "." + encodedJwsPayload;
         headersJson = JoseUtils.decodeToString(parts[0]);
-        jwsPayload = JoseUtils.decodeToString(parts[1]);
-        encodedSequence = parts[0] + "." + parts[1];
-        
+        decodedJwsPayload = JoseUtils.decodeToString(encodedJwsPayload);
     }
     public String getUnsignedEncodedSequence() {
         return encodedSequence;
@@ -68,10 +77,10 @@ public class JwsCompactConsumer {
         return headersJson;
     }
     public String getDecodedJwsPayload() {
-        return jwsPayload;
+        return decodedJwsPayload;
     }
     public byte[] getDecodedJwsPayloadBytes() {
-        return StringUtils.toBytesUTF8(jwsPayload);
+        return StringUtils.toBytesUTF8(decodedJwsPayload);
     }
     public byte[] getDecodedSignature() {
         return encodedSignature.isEmpty() ? new byte[]{} : JoseUtils.decode(encodedSignature);
