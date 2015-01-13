@@ -67,27 +67,43 @@ public final class UrlUtils {
     }
 
     private static String urlDecode(String value, String enc, boolean isPath) {
-        final byte[] valueBytes = StringUtils.toBytes(value, enc);
-        ByteBuffer in = ByteBuffer.wrap(valueBytes);
-        ByteBuffer out = ByteBuffer.allocate(in.capacity());
-        while (in.hasRemaining()) {
-            final int b = in.get();
-            if (!isPath && b == PLUS_CHAR) {
-                out.put((byte) ' ');
-            } else if (b == ESCAPE_CHAR) {
-                try {
-                    final int u = digit16((byte) in.get());
-                    final int l = digit16((byte) in.get());
-                    out.put((byte) ((u << 4) + l));
-                } catch (final ArrayIndexOutOfBoundsException e) {
-                    throw new RuntimeException("Invalid URL encoding: ", e);
-                }
-            } else {
-                out.put((byte) b);
+        
+        boolean needDecode = false;
+        int escapesCount = 0;
+        for (int i = 0; i < value.length(); i++) {
+            char ch = value.charAt(i);
+            if (ch == ESCAPE_CHAR) {
+                escapesCount += 1;
+                needDecode = true;
+            } else if (!isPath && ch == PLUS_CHAR) {
+                needDecode = true;
             }
         }
-        out.flip();
-        return Charset.forName(enc).decode(out).toString();
+        if (needDecode) {
+            final byte[] valueBytes = StringUtils.toBytes(value, enc);
+            ByteBuffer in = ByteBuffer.wrap(valueBytes);
+            ByteBuffer out = ByteBuffer.allocate(in.capacity() - 2 * escapesCount);
+            while (in.hasRemaining()) {
+                final int b = in.get();
+                if (!isPath && b == PLUS_CHAR) {
+                    out.put((byte) ' ');
+                } else if (b == ESCAPE_CHAR) {
+                    try {
+                        final int u = digit16((byte) in.get());
+                        final int l = digit16((byte) in.get());
+                        out.put((byte) ((u << 4) + l));
+                    } catch (final ArrayIndexOutOfBoundsException e) {
+                        throw new RuntimeException("Invalid URL encoding: ", e);
+                    }
+                } else {
+                    out.put((byte) b);
+                }
+            }
+            out.flip();
+            return Charset.forName(enc).decode(out).toString();
+        } else {
+            return value;
+        }
     }
 
     private static int digit16(final byte b) {
