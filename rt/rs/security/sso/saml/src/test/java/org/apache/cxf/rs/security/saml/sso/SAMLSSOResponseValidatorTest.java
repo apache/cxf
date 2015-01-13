@@ -19,8 +19,6 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
-<<<<<<< HEAD
-=======
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -29,36 +27,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
->>>>>>> f825cb0... Adding lots of SAML SSO Negative tests
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-<<<<<<< HEAD
-
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.saml.ext.SAMLParms;
+import org.apache.ws.security.saml.ext.bean.AudienceRestrictionBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-=======
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.crypto.Merlin;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.util.Loader;
->>>>>>> f825cb0... Adding lots of SAML SSO Negative tests
+import org.apache.ws.security.util.Loader;
 import org.joda.time.DateTime;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.AuthnStatement;
@@ -262,9 +247,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         response.getAssertions().add(assertion.getSaml2());
         response.setDestination("xyz");
@@ -495,6 +480,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         validator.validateSamlResponse(response, false);
     }
     
+    @SuppressWarnings("deprecation")
     @org.junit.Test
     public void testAssertionBadIssuer() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -517,11 +503,6 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         conditions.setAudienceURI("http://service.apache.org");
         callbackHandler.setConditions(conditions);
         
-<<<<<<< HEAD
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
-=======
         Response response = createResponse(subjectConfirmationData, callbackHandler);
         
         // Validate the Response
@@ -586,10 +567,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         }
         callbackHandler.setConditions(conditions);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
->>>>>>> f825cb0... Adding lots of SAML SSO Negative tests
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         response.getAssertions().add(assertion.getSaml2());
         
@@ -626,9 +606,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             );
 
         // Create an AuthenticationAssertion
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         response.getAssertions().add(assertion.getSaml2());
 

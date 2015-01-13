@@ -31,8 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-<<<<<<< HEAD
-
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
@@ -40,27 +39,13 @@ import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.saml.ext.SAMLParms;
+import org.apache.ws.security.saml.ext.bean.AudienceRestrictionBean;
+import org.apache.ws.security.saml.ext.bean.ConditionsBean;
+import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.Loader;
-=======
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.crypto.Merlin;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.WSSConfig;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
->>>>>>> f825cb0... Adding lots of SAML SSO Negative tests
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.core.Response;
@@ -185,9 +170,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         response.getAssertions().add(assertion.getSaml2());
         
@@ -287,9 +272,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -385,8 +370,6 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         );
     }
     
-<<<<<<< HEAD
-=======
     @org.junit.Test
     public void testModifiedSignedResponse() throws Exception {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -409,9 +392,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -421,7 +404,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
         
         response.getAssertions().add(assertion.getSaml2());
-        signResponse(response, "alice", "password", issuerCrypto, true);
+        signResponse(response, "alice", "password", issuerCrypto);
         
         Element policyElement = OpenSAMLUtil.toDom(response, doc);
         doc.appendChild(policyElement);
@@ -466,9 +449,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -478,7 +461,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
         
         response.getAssertions().add(assertion.getSaml2());
-        signResponse(response, "alice", "password", issuerCrypto, false);
+        signResponse(response, "alice", "password", issuerCrypto);
         
         Element policyElement = OpenSAMLUtil.toDom(response, doc);
         doc.appendChild(policyElement);
@@ -488,7 +471,6 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLProtocolResponseValidator validator = new SAMLProtocolResponseValidator();
-        validator.setKeyInfoMustBeAvailable(false);
         try {
             validator.validateSamlResponse(marshalledResponse, null, new KeystorePasswordCallback());
             fail("Expected failure on no Signature Crypto");
@@ -580,7 +562,6 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     }
     
     
->>>>>>> f825cb0... Adding lots of SAML SSO Negative tests
     /**
      * Sign a SAML Response
      */
@@ -665,9 +646,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
             );
 
         // Create an AuthenticationAssertion
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         response.getAssertions().add(assertion.getSaml2());
 

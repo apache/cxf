@@ -29,7 +29,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-<<<<<<< HEAD
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.message.WSSecEncryptedKey;
@@ -45,23 +44,8 @@ import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
-=======
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.bean.ActionBean;
-import org.apache.wss4j.common.saml.bean.AttributeBean;
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.KeyInfoBean;
-import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
-import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
-import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+
 import org.joda.time.DateTime;
->>>>>>> f825cb0... Adding lots of SAML SSO Negative tests
 
 /**
  * A base implementation of a Callback Handler for a SAML assertion. By default it creates an
