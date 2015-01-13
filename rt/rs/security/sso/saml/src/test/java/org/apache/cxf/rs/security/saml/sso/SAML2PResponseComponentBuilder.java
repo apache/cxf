@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLObjectBuilder;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.Status;
@@ -46,6 +47,8 @@ public final class SAML2PResponseComponentBuilder {
     private static SAMLObjectBuilder<StatusCode> statusCodeBuilder;
     
     private static SAMLObjectBuilder<StatusMessage> statusMessageBuilder;
+    
+    private static SAMLObjectBuilder<AuthnContextClassRef> authnContextClassRefBuilder;
     
     private static XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
     
@@ -122,5 +125,17 @@ public final class SAML2PResponseComponentBuilder {
         return status;
     }
     
+    @SuppressWarnings("unchecked")
+    public static AuthnContextClassRef createAuthnContextClassRef(String newAuthnContextClassRef) {
+        if (authnContextClassRefBuilder == null) {
+            authnContextClassRefBuilder = (SAMLObjectBuilder<AuthnContextClassRef>)
+                builderFactory.getBuilder(AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+        }
+        
+        AuthnContextClassRef authnContextClassRef = authnContextClassRefBuilder.buildObject();
+        authnContextClassRef.setAuthnContextClassRef(newAuthnContextClassRef);
+        
+        return authnContextClassRef;
+    }
     
 }
