@@ -20,14 +20,12 @@
 package org.apache.cxf.common.util;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
-
-import org.apache.cxf.common.logging.LogUtils;
 
 /**
  * Utility class for decoding and encoding URLs
@@ -35,10 +33,9 @@ import org.apache.cxf.common.logging.LogUtils;
  */
 public final class UrlUtils {
     
-    private static final Logger LOG = LogUtils.getL7dLogger(UrlUtils.class);
-    
-    private static final String[] RESERVED_CHARS = {"+"};
-    private static final String[] ENCODED_CHARS = {"%2b"};
+    private static final int RADIX = 16;
+    private static final byte ESCAPE_CHAR = '%';
+    private static final byte PLUS_CHAR = '+';
     
     private UrlUtils() {
         
@@ -66,13 +63,41 @@ public final class UrlUtils {
      * @param enc encoding
      */
     public static String urlDecode(String value, String enc) {
-        try {
-            value = URLDecoder.decode(value, enc);
-        } catch (UnsupportedEncodingException e) {
-            LOG.warning("UTF-8 encoding can not be used to decode " + value);          
-        }
-        return value;
+        return urlDecode(value, enc, false);
     }
+
+    private static String urlDecode(String value, String enc, boolean isPath) {
+        final byte[] valueBytes = StringUtils.toBytes(value, enc);
+        ByteBuffer in = ByteBuffer.wrap(valueBytes);
+        ByteBuffer out = ByteBuffer.allocate(in.capacity());
+        while (in.hasRemaining()) {
+            final int b = in.get();
+            if (!isPath && b == PLUS_CHAR) {
+                out.put((byte) ' ');
+            } else if (b == ESCAPE_CHAR) {
+                try {
+                    final int u = digit16((byte) in.get());
+                    final int l = digit16((byte) in.get());
+                    out.put((byte) ((u << 4) + l));
+                } catch (final ArrayIndexOutOfBoundsException e) {
+                    throw new RuntimeException("Invalid URL encoding: ", e);
+                }
+            } else {
+                out.put((byte) b);
+            }
+        }
+        out.flip();
+        return Charset.forName(enc).decode(out).toString();
+    }
+
+    private static int digit16(final byte b) {
+        final int i = Character.digit((char) b, RADIX);
+        if (i == -1) {
+            throw new RuntimeException("Invalid URL encoding: not a valid digit (radix " + RADIX + "): " + b);
+        }
+        return i;
+    }
+
     
     public static String urlDecode(String value) {
         return urlDecode(value, "UTF-8");
@@ -84,15 +109,7 @@ public final class UrlUtils {
      * @param value value to decode
      */
     public static String pathDecode(String value) {
-        // TODO: we actually need to do a proper URI analysis here according to
-        // http://tools.ietf.org/html/rfc3986
-        for (int i = 0; i < RESERVED_CHARS.length; i++) {
-            if (value.indexOf(RESERVED_CHARS[i]) != -1) {
-                value = value.replace(RESERVED_CHARS[i], ENCODED_CHARS[i]);
-            }
-        }
-        
-        return urlDecode(value);
+        return urlDecode(value, "UTF-8", true);
     }
     
     
