@@ -268,20 +268,26 @@ public class SAMLSSOResponseValidator {
     private boolean matchSaml2AudienceRestriction(
         String appliesTo, List<AudienceRestriction> audienceRestrictions
     ) {
-        boolean found = false;
+        boolean oneMatchFound = false;
         if (audienceRestrictions != null && !audienceRestrictions.isEmpty()) {
             for (AudienceRestriction audienceRestriction : audienceRestrictions) {
                 if (audienceRestriction.getAudiences() != null) {
+                    boolean matchFound = false;
                     for (org.opensaml.saml2.core.Audience audience : audienceRestriction.getAudiences()) {
                         if (appliesTo.equals(audience.getAudienceURI())) {
-                            return true;
+                            matchFound = true;
+                            oneMatchFound = true;
+                            break;
                         }
+                    }
+                    if (!matchFound) {
+                        return false;
                     }
                 }
             }
         }
 
-        return found;
+        return oneMatchFound;
     }
 
     public String getIssuerIDP() {

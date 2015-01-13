@@ -477,7 +477,12 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         validator.setRequestId("12345");
         validator.setSpIdentifier("http://service.apache.org");
         
-        validator.validateSamlResponse(response, false);
+        try {
+            validator.validateSamlResponse(response, false);
+            fail("Expected failure on bad response");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
     
     @SuppressWarnings("deprecation")
