@@ -32,7 +32,6 @@ import javax.security.auth.callback.CallbackHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
@@ -57,6 +56,7 @@ import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
+import org.joda.time.DateTime;
 import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.encryption.EncryptedData;
 import org.opensaml.xml.security.x509.BasicX509Credential;
@@ -82,6 +82,13 @@ public class SAMLProtocolResponseValidator {
     private Validator assertionValidator = new SamlAssertionValidator();
     private Validator signatureValidator = new SignatureTrustValidator();
     private boolean keyInfoMustBeAvailable = true;
+    
+    /**
+     * The time in seconds in the future within which the NotBefore time of an incoming 
+     * Assertion is valid. The default is 60 seconds.
+     */
+    private int futureTTL = 60;
+    
     /**
      * Validate a SAML 2 Protocol Response
      * @param samlResponse
@@ -106,6 +113,15 @@ public class SAMLProtocolResponseValidator {
                 + "does not equal " + SAML2_STATUSCODE_SUCCESS
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        if (samlResponse.getIssueInstant() != null) {
+            DateTime currentTime = new DateTime();
+            currentTime = currentTime.plusSeconds(futureTTL);
+            if (samlResponse.getIssueInstant().isAfter(currentTime)) {
+                LOG.fine("SAML Response IssueInstant not met");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+            }
         }
         
         validateResponseAgainstSchemas(samlResponse);
@@ -157,6 +173,15 @@ public class SAMLProtocolResponseValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
+        if (samlResponse.getIssueInstant() != null) {
+            DateTime currentTime = new DateTime();
+            currentTime = currentTime.plusSeconds(futureTTL);
+            if (samlResponse.getIssueInstant().isAfter(currentTime)) {
+                LOG.fine("SAML Response IssueInstant not met");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+            }
+        }
+        
         validateResponseAgainstSchemas(samlResponse);
         validateResponseSignature(samlResponse, sigCrypto, callbackHandler);
 
@@ -556,4 +581,12 @@ public class SAMLProtocolResponseValidator {
         this.keyInfoMustBeAvailable = keyInfoMustBeAvailable;
     }
 
+    public int getFutureTTL() {
+        return futureTTL;
+    }
+
+    public void setFutureTTL(int futureTTL) {
+        this.futureTTL = futureTTL;
+    }
+    
 }
