@@ -70,10 +70,12 @@ public final class UrlUtils {
         
         boolean needDecode = false;
         int escapesCount = 0;
-        for (int i = 0; i < value.length(); i++) {
-            char ch = value.charAt(i);
+        int i = 0;
+        while (i < value.length()) {
+            char ch = value.charAt(i++);
             if (ch == ESCAPE_CHAR) {
                 escapesCount += 1;
+                i += 2;
                 needDecode = true;
             } else if (!isPath && ch == PLUS_CHAR) {
                 needDecode = true;
