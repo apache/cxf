@@ -119,8 +119,13 @@ public class JwsJsonSignatureEntry {
         return JwsUtils.validateCriticalHeaders(getUnionHeader());
     }
     public String toJson() {
+        return toJson(false);
+    }
+    public String toJson(boolean flattenedMode) {
         StringBuilder sb = new StringBuilder();
-        sb.append("{");
+        if (!flattenedMode) {
+            sb.append("{");
+        }
         if (protectedHeader != null) {
             sb.append("\"protected\":\"" + protectedHeader.getEncodedHeaderEntries() + "\"");
         }
@@ -132,7 +137,9 @@ public class JwsJsonSignatureEntry {
         }
         sb.append(",");
         sb.append("\"signature\":\"" + encodedSignature + "\"");
-        sb.append("}");
+        if (!flattenedMode) {
+            sb.append("}");
+        }
         return sb.toString();
     }
 }
