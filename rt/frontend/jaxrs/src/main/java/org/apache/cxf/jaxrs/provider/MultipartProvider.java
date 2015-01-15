@@ -78,6 +78,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     private static final String ACTIVE_JAXRS_PROVIDER_KEY = "active.jaxrs.provider";
+    private static final String SINGLE_PART_IS_COLLECTION = "single.multipart.is.collection";
     private static final Logger LOG = LogUtils.getL7dLogger(MultipartProvider.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(MultipartProvider.class);
 
@@ -167,7 +168,9 @@ public class MultipartProvider extends AbstractConfigurableProvider
         Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
         Attachment multipart = AttachmentUtils.getMultipart(id, mt, infos);
         if (multipart != null) {
-            if (collectionExpected && !mediaTypeSupported(multipart.getContentType())) {
+            if (collectionExpected 
+                && !mediaTypeSupported(multipart.getContentType())
+                && !MessageUtils.isTrue(mc.getContextualProperty(SINGLE_PART_IS_COLLECTION))) {
                 List<Attachment> allMultiparts = AttachmentUtils.getMatchingAttachments(id, infos);
                 return getAttachmentCollection(t, allMultiparts, anns);
             } else {
