@@ -676,9 +676,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setAuthnInstant(new DateTime().plusDays(1));
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         response.getAssertions().add(assertion.getSaml2());
         
@@ -721,9 +721,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setSessionNotOnOrAfter(new DateTime().minusDays(1));
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         response.getAssertions().add(assertion.getSaml2());
         
@@ -766,9 +766,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setSubjectLocality("xyz.123", null);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
         response.getAssertions().add(assertion.getSaml2());
         
