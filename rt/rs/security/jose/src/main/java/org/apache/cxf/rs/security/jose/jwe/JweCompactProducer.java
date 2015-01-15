@@ -25,8 +25,6 @@ import java.io.OutputStream;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 
 
 public class JweCompactProducer {
@@ -38,22 +36,10 @@ public class JweCompactProducer {
                        byte[] cipherInitVector,
                        byte[] encryptedContentNoTag,
                        byte[] authenticationTag) {    
-        this(headers, null, encryptedContentEncryptionKey, 
+        this(getHeadersJson(headers), encryptedContentEncryptionKey, 
              cipherInitVector, encryptedContentNoTag, authenticationTag);
     }
     
-    public JweCompactProducer(JweHeaders headers,
-                       JoseHeadersWriter writer,
-                       byte[] encryptedContentEncryptionKey,
-                       byte[] cipherInitVector,
-                       byte[] encryptedContentNoTag,
-                       byte[] authenticationTag) {
-        this(getHeadersJson(headers, writer),
-             encryptedContentEncryptionKey,
-             cipherInitVector,
-             encryptedContentNoTag,
-             authenticationTag);
-    }
     public JweCompactProducer(String headersJson,
                               byte[] encryptedContentEncryptionKey,
                               byte[] cipherInitVector,
@@ -71,16 +57,7 @@ public class JweCompactProducer {
                        byte[] cipherInitVector,
                        byte[] encryptedContentWithTag,
                        int authTagLengthBits) {    
-        this(headers, null, encryptedContentEncryptionKey, 
-             cipherInitVector, encryptedContentWithTag, authTagLengthBits);
-    }
-    public JweCompactProducer(JweHeaders headers,
-                       JoseHeadersWriter writer,
-                       byte[] encryptedContentEncryptionKey,
-                       byte[] cipherInitVector,
-                       byte[] encryptedContentWithTag,
-                       int authTagLengthBits) {
-        jweContentBuilder = startJweContent(new StringBuilder(), headers, writer,
+        jweContentBuilder = startJweContent(new StringBuilder(), headers, 
                                    encryptedContentEncryptionKey, cipherInitVector);
         this.encodedEncryptedContent = Base64UrlUtility.encodeChunk(
             encryptedContentWithTag, 
@@ -93,26 +70,22 @@ public class JweCompactProducer {
         
     }
     public static String startJweContent(JweHeaders headers,
-                                                JoseHeadersWriter writer, 
                                                 byte[] encryptedContentEncryptionKey,
                                                 byte[] cipherInitVector) {
         return startJweContent(new StringBuilder(), 
-                               headers, writer, encryptedContentEncryptionKey, cipherInitVector).toString();       
+                               headers, encryptedContentEncryptionKey, cipherInitVector).toString();       
     }
     public static StringBuilder startJweContent(StringBuilder sb,
                                         JweHeaders headers,
-                                        JoseHeadersWriter writer, 
                                         byte[] encryptedContentEncryptionKey,
                                         byte[] cipherInitVector) {
         return startJweContent(sb, 
-                               getHeadersJson(headers, writer), 
+                               getHeadersJson(headers), 
                                encryptedContentEncryptionKey, 
                                cipherInitVector);
     }
-    private static String getHeadersJson(JweHeaders headers,
-                                         JoseHeadersWriter writer) {
-        writer = writer == null ? new JoseHeadersReaderWriter() : writer;
-        return writer.headersToJson(headers);
+    private static String getHeadersJson(JweHeaders headers) {
+        return new JoseHeadersReaderWriter().headersToJson(headers);
         
     }
     public static StringBuilder startJweContent(StringBuilder sb,
@@ -133,11 +106,9 @@ public class JweCompactProducer {
     
     public static void startJweContent(OutputStream os,
                                        JweHeaders headers,
-                                       JoseHeadersWriter writer, 
                                        byte[] encryptedContentEncryptionKey,
                                        byte[] cipherInitVector) throws IOException {
-        writer = writer == null ? new JwtTokenReaderWriter() : writer;
-        byte[] jsonBytes = StringUtils.toBytesUTF8(writer.headersToJson(headers));
+        byte[] jsonBytes = StringUtils.toBytesUTF8(getHeadersJson(headers));
         Base64UrlUtility.encodeAndStream(jsonBytes, 0, jsonBytes.length, os);
         byte[] dotBytes = new byte[]{'.'};
         os.write(dotBytes);

@@ -20,24 +20,15 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.Key;
 
-import org.apache.cxf.rs.security.jose.JoseHeadersReader;
-
 public class DirectKeyJweDecryption extends AbstractJweDecryption {
     public DirectKeyJweDecryption(Key contentDecryptionKey, 
-                                  ContentDecryptionAlgorithm cipherProps) {
-        this(contentDecryptionKey, null, cipherProps);
-    }
-    public DirectKeyJweDecryption(Key contentDecryptionKey, 
-                                  JoseHeadersReader reader,
                                   ContentDecryptionAlgorithm cipherProps) {    
-        this(reader, 
-              new DirectKeyDecryptionAlgorithm(contentDecryptionKey),
-              cipherProps);
+        this(new DirectKeyDecryptionAlgorithm(contentDecryptionKey),
+             cipherProps);
     }
-    protected DirectKeyJweDecryption(JoseHeadersReader reader,
-                                     DirectKeyDecryptionAlgorithm direct,
+    protected DirectKeyJweDecryption(DirectKeyDecryptionAlgorithm direct,
                                      ContentDecryptionAlgorithm cipherProps) {    
-        super(reader, direct, cipherProps);
+        super(direct, cipherProps);
     }
     protected static class DirectKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
         private byte[] contentDecryptionKey;

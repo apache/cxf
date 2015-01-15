@@ -35,8 +35,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionState;
@@ -49,7 +47,6 @@ public class JweWriterInterceptor implements WriterInterceptor {
     private JweEncryptionProvider encryptionProvider;
     private boolean contentTypeRequired = true;
     private boolean useJweOutputStream;
-    private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         if (ctx.getEntity() == null) {
@@ -75,7 +72,6 @@ public class JweWriterInterceptor implements WriterInterceptor {
             try {
                 JweCompactProducer.startJweContent(actualOs,
                                                    encryption.getHeaders(), 
-                                                   writer, 
                                                    encryption.getContentEncryptionKey(), 
                                                    encryption.getIv());
             } catch (IOException ex) {
@@ -119,10 +115,6 @@ public class JweWriterInterceptor implements WriterInterceptor {
     
     public void setUseJweOutputStream(boolean useJweOutputStream) {
         this.useJweOutputStream = useJweOutputStream;
-    }
-
-    public void setWriter(JoseHeadersWriter writer) {
-        this.writer = writer;
     }
 
     public void setEncryptionProvider(JweEncryptionProvider encryptionProvider) {

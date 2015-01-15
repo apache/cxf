@@ -22,24 +22,23 @@ import java.security.interfaces.RSAPublicKey;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactConsumer {
-    private JoseHeadersReader reader = new JoseHeadersReaderWriter();
+    private JoseHeadersReaderWriter reader = new JoseHeadersReaderWriter();
     private String encodedSequence;
     private String encodedSignature;
     private String headersJson;
     private String decodedJwsPayload;
     public JwsCompactConsumer(String encodedJws) {
-        this(encodedJws, null);
+        this(encodedJws, null, null);
     }
-    public JwsCompactConsumer(String encodedJws, JoseHeadersReader r) {
-        this(encodedJws, null, r);
+    public JwsCompactConsumer(String encodedJws, String encodedDetachedPayload) {
+        this(encodedJws, encodedDetachedPayload, null);
     }
-    public JwsCompactConsumer(String encodedJws, String encodedDetachedPayload, JoseHeadersReader r) {
+    protected JwsCompactConsumer(String encodedJws, String encodedDetachedPayload, JoseHeadersReaderWriter r) {
         if (r != null) {
             this.reader = r;
         }
@@ -114,7 +113,7 @@ public class JwsCompactConsumer {
     public boolean validateCriticalHeaders() {
         return JwsUtils.validateCriticalHeaders(getJoseHeaders());
     }
-    protected JoseHeadersReader getReader() {
+    protected JoseHeadersReaderWriter getReader() {
         return reader;
     }
     

@@ -36,7 +36,6 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenWriter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.Assert;
@@ -282,7 +281,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     }
 
     
-    private JwtTokenWriter getWriter() {
+    private JwtTokenReaderWriter getWriter() {
         JwtTokenReaderWriter jsonWriter = new JwtTokenReaderWriter();
         jsonWriter.setFormat(true);
         return jsonWriter;

@@ -24,20 +24,13 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.JoseHeadersReader;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public abstract class AbstractJweDecryption implements JweDecryptionProvider {
     private KeyDecryptionAlgorithm keyDecryptionAlgo;
     private ContentDecryptionAlgorithm contentDecryptionAlgo;
-    private JoseHeadersReader reader = new JoseHeadersReaderWriter();
-    protected AbstractJweDecryption(JoseHeadersReader theReader,
-                                    KeyDecryptionAlgorithm keyDecryptionAlgo,
+    protected AbstractJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
                                     ContentDecryptionAlgorithm contentDecryptionAlgo) {
-        if (theReader != null) {
-            reader = theReader;
-        }
         this.keyDecryptionAlgo = keyDecryptionAlgo;
         this.contentDecryptionAlgo = contentDecryptionAlgo;
     }
@@ -47,7 +40,7 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
     }
     
     public JweDecryptionOutput decrypt(String content) {
-        JweCompactConsumer consumer = new JweCompactConsumer(content, reader);
+        JweCompactConsumer consumer = new JweCompactConsumer(content);
         return doDecrypt(consumer);
     }
     public byte[] decrypt(JweCompactConsumer consumer) {

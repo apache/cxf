@@ -18,17 +18,11 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 
 public class WrappedKeyJweDecryption extends AbstractJweDecryption {
     
     public WrappedKeyJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                   ContentDecryptionAlgorithm contentDecryptionAlgo) {    
-        this(keyDecryptionAlgo, null, contentDecryptionAlgo);
-    }
-    public WrappedKeyJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                   JoseHeadersReader reader,
                                    ContentDecryptionAlgorithm cipherProps) {    
-        super(reader, keyDecryptionAlgo, cipherProps);
+        super(keyDecryptionAlgo, cipherProps);
     }
 }

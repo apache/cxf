@@ -24,22 +24,16 @@ public final class JwtUtils {
         
     }
     public static String claimsToJson(JwtClaims claims) {
-        return claimsToJson(claims);
+        return claimsToJson(claims, null);
     }
-    public static String claimsToJson(JwtClaims claims, JwtTokenWriter writer) {
+    public static String claimsToJson(JwtClaims claims, JwtTokenReaderWriter writer) {
         if (writer == null) {
             writer = new JwtTokenReaderWriter();
         }
         return writer.claimsToJson(claims);
     }
     public static JwtClaims jsonToClaims(String json) {
-        return jsonToClaims(json, null);
-    }
-    public static JwtClaims jsonToClaims(String json, JwtTokenReader reader) {
-        if (reader == null) {
-            reader = new JwtTokenReaderWriter();
-        }
-        return reader.fromJsonClaims(json);
+        return new JwtTokenReaderWriter().fromJsonClaims(json);
     }
     
     public static void validateJwtTimeClaims(JwtClaims claims, int issuedAtRange, boolean claimsRequired) {

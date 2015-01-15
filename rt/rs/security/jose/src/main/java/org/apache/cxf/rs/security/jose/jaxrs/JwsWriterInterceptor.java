@@ -35,7 +35,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsOutputStream;
 import org.apache.cxf.rs.security.jose.jws.JwsSignature;
@@ -45,7 +44,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
     private boolean contentTypeRequired = true;
     private boolean useJwsOutputStream;
-    private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
+    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         if (ctx.getEntity() == null) {
@@ -85,9 +84,6 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     
     public void setUseJwsOutputStream(boolean useJwsOutputStream) {
         this.useJwsOutputStream = useJwsOutputStream;
-    }
-    public void setWriter(JoseHeadersWriter writer) {
-        this.writer = writer;
     }
     private void setContentTypeIfNeeded(JoseHeaders headers, WriterInterceptorContext ctx) {    
         if (contentTypeRequired) {

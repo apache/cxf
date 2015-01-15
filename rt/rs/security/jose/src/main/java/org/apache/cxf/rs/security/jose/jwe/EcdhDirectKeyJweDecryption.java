@@ -28,8 +28,7 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public class EcdhDirectKeyJweDecryption extends DirectKeyJweDecryption {
     public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, String supportedCtAlgo) {
-        super(null, 
-              new EcdhDirectKeyDecryptionAlgorithm(privateKey), 
+        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey), 
               new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
     }
     protected static byte[] getDecryptedContentEncryptionKeyFromHeaders(JweHeaders headers,
