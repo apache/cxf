@@ -24,14 +24,11 @@ import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 
 
 
-public class JoseHeadersReaderWriter extends JsonMapObjectReaderWriter
-    implements JoseHeadersReader, JoseHeadersWriter {
-    @Override
+public class JoseHeadersReaderWriter extends JsonMapObjectReaderWriter {
     public String headersToJson(JoseHeaders headers) {
         return toJson(headers);
     }
     
-    @Override
     public JoseHeaders fromJsonHeaders(String headersJson) {
         JoseHeaders headers = new JoseHeaders();
         fromJson(headers, headersJson);

@@ -24,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 
@@ -36,9 +35,6 @@ public class JweCompactConsumer {
     private byte[] authTag;
     private JweHeaders jweHeaders;
     public JweCompactConsumer(String jweContent) {
-        this(jweContent, new JoseHeadersReaderWriter());
-    }
-    public JweCompactConsumer(String jweContent, JoseHeadersReader reader) {
         if (jweContent.startsWith("\"") && jweContent.endsWith("\"")) {
             jweContent = jweContent.substring(1, jweContent.length() - 1);
         }
@@ -53,6 +49,7 @@ public class JweCompactConsumer {
             
             encryptedContent = Base64UrlUtility.decode(parts[3]);
             authTag = Base64UrlUtility.decode(parts[4]);
+            JoseHeadersReaderWriter reader = new JoseHeadersReaderWriter();
             JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
             if (joseHeaders.getUpdateCount() != null) { 
                 throw new SecurityException("Duplicate headers have been detected");

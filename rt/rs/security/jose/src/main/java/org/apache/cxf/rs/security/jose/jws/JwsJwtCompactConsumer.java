@@ -21,16 +21,12 @@ package org.apache.cxf.rs.security.jose.jws;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenJson;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReader;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 
 public class JwsJwtCompactConsumer extends JwsCompactConsumer {
     private JwtToken token;
     public JwsJwtCompactConsumer(String encodedJws) {
-        this(encodedJws, null);
-    }
-    public JwsJwtCompactConsumer(String encodedJws, JwtTokenReader r) {
-        super(encodedJws, r == null ? new JwtTokenReaderWriter() : r);
+        super(encodedJws, null, new JwtTokenReaderWriter());
     }
     public JwtTokenJson getDecodedJsonToken() {
         return new JwtTokenJson(getDecodedJsonHeaders(), getDecodedJwsPayload());

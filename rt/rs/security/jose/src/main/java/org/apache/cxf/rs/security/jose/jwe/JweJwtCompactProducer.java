@@ -40,7 +40,7 @@ public class JweJwtCompactProducer  {
     }
     public JweJwtCompactProducer(JoseHeaders joseHeaders, JwtClaims claims) {
         headers = new JweHeaders(joseHeaders);
-        claimsJson = JwtUtils.claimsToJson(claims, null);
+        claimsJson = JwtUtils.claimsToJson(claims);
     }
     
     public String encryptWith(JsonWebKey key) {

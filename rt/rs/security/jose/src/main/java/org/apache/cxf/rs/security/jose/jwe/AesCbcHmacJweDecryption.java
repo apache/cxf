@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 import javax.crypto.spec.IvParameterSpec;
 
-import org.apache.cxf.rs.security.jose.JoseHeadersReader;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public class AesCbcHmacJweDecryption extends AbstractJweDecryption {
@@ -31,13 +30,9 @@ public class AesCbcHmacJweDecryption extends AbstractJweDecryption {
     public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo) {
         this(keyDecryptionAlgo, null);
     }
-    public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo, String supportedAlgo) {
-        this(keyDecryptionAlgo, supportedAlgo, null);
-    }
     public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                   String supportedAlgo,
-                                   JoseHeadersReader reader) {
-        super(reader, keyDecryptionAlgo, new AesCbcContentDecryptionAlgorithm(supportedAlgo));
+                                   String supportedAlgo) {
+        super(keyDecryptionAlgo, new AesCbcContentDecryptionAlgorithm(supportedAlgo));
         this.supportedAlgo = supportedAlgo;
     }
     protected JweDecryptionOutput doDecrypt(JweCompactConsumer consumer, byte[] cek) {

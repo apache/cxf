@@ -27,30 +27,18 @@ import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private JweHeaders headers;
-    private JoseHeadersWriter writer;
     private ContentEncryptionAlgorithm contentEncryptionAlgo;
     private KeyEncryptionAlgorithm keyEncryptionAlgo;
-    
+    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
     protected AbstractJweEncryption(JweHeaders headers, 
                                     ContentEncryptionAlgorithm contentEncryptionAlgo,
                                     KeyEncryptionAlgorithm keyEncryptionAlgo) {
-        this(headers, contentEncryptionAlgo, keyEncryptionAlgo, null);
-    }
-    protected AbstractJweEncryption(JweHeaders headers, 
-                                    ContentEncryptionAlgorithm contentEncryptionAlgo, 
-                                    KeyEncryptionAlgorithm keyEncryptionAlgo,
-                                    JoseHeadersWriter writer) {
         this.headers = headers;
-        this.writer = writer;
-        if (this.writer == null) {
-            this.writer = new JoseHeadersReaderWriter();
-        }
         this.keyEncryptionAlgo = keyEncryptionAlgo;
         this.contentEncryptionAlgo = contentEncryptionAlgo;
     }
@@ -105,15 +93,10 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     
     protected JweCompactProducer getJweCompactProducer(JweEncryptionInternal state, byte[] cipher) {
         return new JweCompactProducer(state.theHeaders, 
-                                      getJwtHeadersWriter(),                
                                       state.jweContentEncryptionKey,
                                       state.theIv,
                                       cipher,
                                       DEFAULT_AUTH_TAG_LENGTH);
-    }
-    
-    protected JoseHeadersWriter getJwtHeadersWriter() {
-        return writer;
     }
     protected JweHeaders getJweHeaders() {
         return headers;
@@ -125,6 +108,9 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     @Override
     public String getContentAlgorithm() {
         return getContentEncryptionAlgorithm().getAlgorithm();
+    }
+    protected JoseHeadersReaderWriter getJwtHeadersWriter() {
+        return writer;
     }
     @Override
     public JweEncryptionState createJweEncryptionState(JweHeaders jweHeaders) {

@@ -28,25 +28,22 @@ import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 
 
-public class JwtTokenReaderWriter extends JoseHeadersReaderWriter
-    implements JwtTokenReader, JwtTokenWriter {
+public class JwtTokenReaderWriter extends JoseHeadersReaderWriter {
     private static final Set<String> DATE_PROPERTIES = 
         new HashSet<String>(Arrays.asList(JwtConstants.CLAIM_EXPIRY, 
                                           JwtConstants.CLAIM_ISSUED_AT, 
                                           JwtConstants.CLAIM_NOT_BEFORE));
 
-    @Override
     public String claimsToJson(JwtClaims claims) {
         return toJson(claims);
     }
 
-    @Override
     public JwtTokenJson tokenToJson(JwtToken token) {
         return new JwtTokenJson(toJson(token.getHeaders()),
                                     toJson(token.getClaims()));
     }
     
-    @Override
+    
     public JwtClaims fromJsonClaims(String claimsJson) {
         JwtClaims claims = new JwtClaims();
         fromJson(claims, claimsJson);
@@ -60,7 +57,6 @@ public class JwtTokenReaderWriter extends JoseHeadersReaderWriter
         return new JwtToken(headers, claims);
     }
     
-    @Override
     public JwtToken fromJson(JwtTokenJson pair) {
         return fromJson(pair.getHeadersJson(), pair.getClaimsJson());
     }

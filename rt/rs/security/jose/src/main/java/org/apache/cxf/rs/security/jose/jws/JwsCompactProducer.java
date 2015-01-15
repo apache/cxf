@@ -25,11 +25,10 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseHeadersWriter;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactProducer {
-    private JoseHeadersWriter writer = new JoseHeadersReaderWriter();
+    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
     private JoseHeaders headers;
     private String plainJwsPayload;
     private String signature;
@@ -40,7 +39,7 @@ public class JwsCompactProducer {
     public JwsCompactProducer(JoseHeaders headers, String plainJwsPayload) {
         this(headers, null, plainJwsPayload);
     }
-    public JwsCompactProducer(JoseHeaders headers, JoseHeadersWriter w, String plainJwsPayload) {
+    protected JwsCompactProducer(JoseHeaders headers, JoseHeadersReaderWriter w, String plainJwsPayload) {
         this.headers = headers;
         if (w != null) {
             this.writer = w;

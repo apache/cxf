@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jws;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenWriter;
+import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 
@@ -33,12 +33,9 @@ public class JwsJwtCompactProducer extends JwsCompactProducer {
         this(new JwtToken(null, claims), null);
     }
     public JwsJwtCompactProducer(JoseHeaders headers, JwtClaims claims) {
-        this(headers, claims, null);
+        this(new JwtToken(headers, claims), null);
     }
-    public JwsJwtCompactProducer(JoseHeaders headers, JwtClaims claims, JwtTokenWriter w) {
-        this(new JwtToken(headers, claims), w);
-    }
-    public JwsJwtCompactProducer(JwtToken token, JwtTokenWriter w) {
+    protected JwsJwtCompactProducer(JwtToken token, JwtTokenReaderWriter w) {
         super(token.getHeaders(), w, JwtUtils.claimsToJson(token.getClaims(), w));
     }
     

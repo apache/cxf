@@ -25,7 +25,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReader;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -44,7 +43,6 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
         // and encoded grant type value will help
         ENCODED_JWT_BEARER_GRANT = HttpUtils.urlEncode(Constants.JWT_BEARER_GRANT, "UTF-8");
     }
-    private JwtTokenReader jwtReader;
     public JwtBearerGrantHandler() {
         super(Arrays.asList(Constants.JWT_BEARER_GRANT, ENCODED_JWT_BEARER_GRANT));
     }
@@ -80,12 +78,7 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
     }
 
     protected JwsJwtCompactConsumer getJwsReader(String assertion) {
-        return new JwsJwtCompactConsumer(assertion, jwtReader);
+        return new JwsJwtCompactConsumer(assertion);
     }
-    
-    public void setJwtReader(JwtTokenReader tokenReader) {
-        this.jwtReader = tokenReader;
-    }
-
-    
+        
 }
