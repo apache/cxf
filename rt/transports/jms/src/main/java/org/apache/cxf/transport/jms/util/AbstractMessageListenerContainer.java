@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
-import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.transaction.TransactionManager;
@@ -41,8 +40,6 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
     protected int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
     protected String messageSelector;
     protected boolean running;
-    protected MessageConsumer consumer;
-    protected Session session;
     protected Executor executor;
     protected String durableSubscriptionName;
     protected boolean pubSubNoLocal;
@@ -98,24 +95,5 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
-
-
-    
-    
-
-    /*
-    protected TransactionManager getTransactionManager() {
-        if (this.transactionManager == null) {
-            try {
-                InitialContext ctx = new InitialContext();
-                this.transactionManager = (TransactionManager)ctx
-                    .lookup("javax.transaction.TransactionManager");
-            } catch (NamingException e) {
-                // Ignore
-            }
-        }
-        return this.transactionManager;
-    }
-    */
 
 }
