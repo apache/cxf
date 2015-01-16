@@ -20,6 +20,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
 import java.security.Provider;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -288,6 +289,27 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 config.put("RefId-" + decCrypto.hashCode(), decCrypto);
             }
             ConfigurationConverter.parseCrypto(config, securityProperties);
+        }
+        
+        // Add Audience Restrictions for SAML
+        configureAudienceRestriction(msg, securityProperties);
+    }
+    
+    private void configureAudienceRestriction(SoapMessage msg, WSSSecurityProperties securityProperties) {
+        // Add Audience Restrictions for SAML
+        boolean enableAudienceRestriction = 
+            MessageUtils.getContextualBoolean(msg, 
+                                              SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
+                                              true);
+        if (enableAudienceRestriction) {
+            List<String> audiences = new ArrayList<String>();
+            if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
+                audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
+            }
+            if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
+                audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
+            }
+            securityProperties.setAudienceRestrictions(audiences);
         }
     }
     

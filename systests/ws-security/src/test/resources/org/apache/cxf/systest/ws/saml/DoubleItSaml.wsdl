@@ -383,6 +383,9 @@
         <wsdl:port name="DoubleItSaml2TransportPort2" binding="tns:DoubleItSaml2TransportBinding">
             <soap:address location="https://localhost:9009/DoubleItSaml2Transport2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSaml2TransportPort3" binding="tns:DoubleItSaml2TransportBinding">
+            <soap:address location="https://localhost:9009/DoubleItSaml2Transport3"/>
+        </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItSaml1TransportPolicy">
         <wsp:ExactlyOne>

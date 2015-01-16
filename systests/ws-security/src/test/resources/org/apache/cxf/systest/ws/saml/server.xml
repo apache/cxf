@@ -251,21 +251,20 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <bean id="audienceRestrictionValidator" class="org.apache.cxf.systest.ws.saml.Saml2AudienceRestrictionValidator">
-        <property name="endpointAddresses">
-            <list>
-                <value>https://localhost:${testutil.ports.Server.2}/DoubleItSaml2Transport2</value>
-                <value>https://localhost:${testutil.ports.StaxServer.2}/DoubleItSaml2Transport2</value>
-            </list>
-        </property>
-    </bean>
-            
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TransportToken2" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2Transport2" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-            <entry key="ws-security.saml2.validator" value-ref="audienceRestrictionValidator"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TransportToken3" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2Transport3" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort3" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="ws-security.validate.audience-restriction" value="false"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>
