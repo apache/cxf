@@ -21,16 +21,22 @@ package demo.jaxrs.swagger.server;
 
 import java.util.Arrays;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiImplicitParam;
@@ -71,6 +77,36 @@ public class Sample {
         @ApiParam(value = "language", required = true) @HeaderParam("Accept-Language") final String language,
         @ApiParam(value = "name", required = true) @PathParam("name") String name) {
         return new Item("name", "Value in " + language);
+    }
+    
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @POST
+    @ApiOperation(
+        value = "Post operation with entity in a body", 
+        notes = "Post operation with entity in a body",
+        response = Item.class
+    )
+    public Response createItem(
+        @Context final UriInfo uriInfo,
+        @ApiParam(value = "item", required = true) final Item item) {
+        
+        return Response
+            .created(uriInfo.getBaseUriBuilder().path(item.getName()).build())
+            .entity(item).build();
+    }
+    
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/{name}")
+    @PUT
+    @ApiOperation(
+        value = "Put operation with form parameter", 
+        notes = "Put operation with form parameter",
+        response = Item.class
+    )
+    public Item updateItem(
+        @ApiParam(value = "name", required = true) @PathParam("name") String name,
+        @ApiParam(value = "value", required = true) @FormParam("value") String value) {        
+        return new Item(name, value);
     }
     
     @Path("/{name}")
