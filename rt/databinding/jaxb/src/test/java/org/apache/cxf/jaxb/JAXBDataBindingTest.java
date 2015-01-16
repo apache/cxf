@@ -50,6 +50,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.logging.LogUtils;
@@ -66,6 +67,7 @@ import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -290,6 +292,9 @@ public class JAXBDataBindingTest extends Assert {
     public static class Language {
         private final String code;
         private final String name;
+        public Language() {
+            this(null, null);
+        }
         public Language(String code, String name) {
             this.code = code;
             this.name = name;
