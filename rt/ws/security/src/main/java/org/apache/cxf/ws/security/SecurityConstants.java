@@ -230,6 +230,13 @@ public final class SecurityConstants {
     public static final String KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM = 
         "ws-security.kerberos.is.username.in.servicename.form";
     
+    /**
+     * Enable SAML AudienceRestriction validation. If this is set to "true", then IF the
+     * SAML Token contains Audience Restriction URIs, one of them must match either the
+     * request URL or the Service QName. The default is "true".
+     */
+    public static final String AUDIENCE_RESTRICTION_VALIDATION = "ws-security.validate.audience-restriction";
+    
     //
     // Non-boolean WS-Security Configuration parameters
     //
@@ -608,7 +615,8 @@ public final class SecurityConstants {
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
             DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
             KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE,
-            KERBEROS_REQUEST_CREDENTIAL_DELEGATION, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL
+            KERBEROS_REQUEST_CREDENTIAL_DELEGATION, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL,
+            AUDIENCE_RESTRICTION_VALIDATION
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
