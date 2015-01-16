@@ -216,6 +216,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         reqData.setWssConfig(config);
         
+        // Add Audience Restrictions for SAML
+        configureAudienceRestriction(msg, reqData);
                 
         SOAPMessage doc = getSOAPMessage(msg);
         
@@ -337,6 +339,24 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         } finally {
             reqData.clear();
             reqData = null;
+        }
+    }
+    
+    private void configureAudienceRestriction(SoapMessage msg, RequestData reqData) {
+        // Add Audience Restrictions for SAML
+        boolean enableAudienceRestriction = 
+            MessageUtils.getContextualBoolean(msg, 
+                                              SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
+                                              true);
+        if (enableAudienceRestriction) {
+            List<String> audiences = new ArrayList<String>();
+            if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
+                audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
+            }
+            if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
+                audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
+            }
+            reqData.setAudienceRestrictions(audiences);
         }
     }
 
