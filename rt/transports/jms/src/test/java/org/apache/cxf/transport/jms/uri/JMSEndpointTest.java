@@ -29,10 +29,11 @@ public class JMSEndpointTest extends Assert {
 
     @Test
     public void testBasicQueue() throws Exception {
-        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar");
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?concurrentConsumers=21");
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals("Foo.Bar", endpoint.getDestinationName());
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
+        assertEquals(21, endpoint.getConcurrentConsumers());
     }
 
     @Test

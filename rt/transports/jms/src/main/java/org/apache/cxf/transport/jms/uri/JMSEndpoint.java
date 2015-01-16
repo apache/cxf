@@ -82,6 +82,7 @@ public class JMSEndpoint {
     private String topicReplyToName;
     private boolean useConduitIdSelector = true;
     private String username;
+    private int concurrentConsumers = 1;
 
     /**
      * @param uri
@@ -342,6 +343,19 @@ public class JMSEndpoint {
     public void setUsername(String username) {
         this.username = username;
     }
+    
+    public int getConcurrentConsumers() {
+        return concurrentConsumers;
+    }
+    
+    public void setConcurrentConsumers(int concurrentConsumers) {
+        this.concurrentConsumers = concurrentConsumers;
+    }
+    
+    public void setConcurrentConsumers(String concurrentConsumers) {
+        this.concurrentConsumers = new Integer(concurrentConsumers);
+    }
+    
     public String getPassword() {
         return password;
     }

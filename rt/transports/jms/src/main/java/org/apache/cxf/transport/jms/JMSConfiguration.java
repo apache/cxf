@@ -54,6 +54,7 @@ public class JMSConfiguration {
     private boolean sessionTransacted;
     private boolean createSecurityContext = true;
 
+    private int concurrentConsumers = 1;
     private int maxSuspendedContinuations = DEFAULT_VALUE;
     private int reconnectPercentOfMax = 70;
 
@@ -318,6 +319,14 @@ public class JMSConfiguration {
      */
     @Deprecated
     public void setTransactionManager(Object transactionManager) {
+    }
+
+    public int getConcurrentConsumers() {
+        return concurrentConsumers;
+    }
+
+    public void setConcurrentConsumers(int concurrentConsumers) {
+        this.concurrentConsumers = concurrentConsumers;
     }
 
     public int getMaxSuspendedContinuations() {

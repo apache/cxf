@@ -18,18 +18,16 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import java.util.concurrent.Executor;
 import java.util.logging.Level;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.jms.XASession;
-import javax.transaction.TransactionManager;
 
 /**
  * Listen for messages on a queue or topic asynchronously by registering a
@@ -39,6 +37,8 @@ import javax.transaction.TransactionManager;
  * This has to be handled outside.
  */
 public class MessageListenerContainer extends AbstractMessageListenerContainer {
+    private MessageConsumer consumer;
+    private Session session;
     public MessageListenerContainer(Connection connection, Destination destination,
                                     MessageListener listenerHandler) {
         this.connection = connection;
@@ -82,29 +82,6 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
         ResourceCloser.close(connection);
     }
 
-    static class DispachingListener implements MessageListener {
-        private Executor executor;
-        private MessageListener listenerHandler;
-
-        public DispachingListener(Executor executor, MessageListener listenerHandler) {
-            this.executor = executor;
-            this.listenerHandler = listenerHandler;
-        }
-
-        @Override
-        public void onMessage(final Message message) {
-            executor.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    listenerHandler.onMessage(message);
-                }
-
-            });
-        }
-
-    }
-    
     static class LocalTransactionalMessageListener implements MessageListener {
         private MessageListener listenerHandler;
         private Session session;
@@ -137,43 +114,4 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
         
     }
     
-    static class XATransactionalMessageListener implements MessageListener {
-        private TransactionManager tm;
-        private MessageListener listenerHandler;
-        private XASession session;
-        
-        public XATransactionalMessageListener(TransactionManager tm, Session session, MessageListener listenerHandler) {
-            if (tm == null) {
-                throw new IllegalArgumentException("Must supply a transaction manager");
-            }
-            if (!(session instanceof XASession)) {
-                throw new IllegalArgumentException("Must supply an XASession");
-            }
-            this.tm = tm;
-            this.session = (XASession)session;
-            this.listenerHandler = listenerHandler;
-        }
-
-        @Override
-        public void onMessage(Message message) {
-            try {
-                tm.begin();
-                tm.getTransaction().enlistResource(session.getXAResource());
-                listenerHandler.onMessage(message);
-                tm.commit();
-            } catch (Throwable e) {
-                safeRollback(e);
-            }
-        }
-        
-        private void safeRollback(Throwable t) {
-            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back" , t);
-            try {
-                tm.rollback();
-            } catch (Exception e) {
-                LOG.log(Level.WARNING, "Rollback of JTA transaction failed", e);
-            }
-        }
-        
-    }
 }

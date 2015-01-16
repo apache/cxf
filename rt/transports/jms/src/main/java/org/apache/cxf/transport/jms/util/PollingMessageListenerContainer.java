@@ -30,6 +30,7 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.apache.cxf.common.logging.LogUtils;
 
@@ -38,7 +39,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
     private ExecutorService pollers;
 
-    private int numListenerThreads = 1;
+    private int concurrentConsumers = 1;
 
     public PollingMessageListenerContainer(Connection connection, Destination destination,
                                            MessageListener listenerHandler) {
@@ -47,20 +48,27 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         this.listenerHandler = listenerHandler;
     }
 
-    class Poller implements Runnable {
+    private class Poller implements Runnable {
 
         @Override
         public void run() {
-            ResourceCloser closer = new ResourceCloser();
             while (running) {
+                MessageConsumer consumer = null;
+                Session session = null;
                 try {
                     if (transactionManager != null) {
                         transactionManager.begin();
                     }
-                    Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
-
-                    MessageConsumer consumer = closer.register(session.createConsumer(destination,
-                                                                                      messageSelector));
+                    
+                    session = connection.createSession(transacted, acknowledgeMode);
+                    if (durableSubscriptionName != null && destination instanceof Topic) {
+                        consumer = session.createDurableSubscriber((Topic)destination, 
+                                                                   durableSubscriptionName,
+                                                                   messageSelector,
+                                                                   pubSubNoLocal);
+                    } else {
+                        consumer = session.createConsumer(destination, messageSelector);
+                    }
                     Message message = consumer.receive(1000);
                     try {
                         if (message != null) {
@@ -68,7 +76,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         }
                         if (transactionManager != null) {
                             transactionManager.commit();
-                        } else {
+                        } else if (session.getTransacted()) {
                             session.commit();
                         }
                     } catch (Exception e) {
@@ -77,7 +85,8 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Unexpected exception", e);
                 } finally {
-                    closer.close();
+                    ResourceCloser.close(consumer);
+                    ResourceCloser.close(session);
                 }
             }
 
@@ -91,7 +100,9 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             if (transactionManager != null) {
                 transactionManager.rollback();
             } else {
-                session.rollback();
+                if (session.getTransacted()) {
+                    session.rollback();
+                }
             }
         } catch (Exception e1) {
             LOG.log(Level.WARNING, "Rollback of Local transaction failed", e1);
@@ -104,14 +115,15 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             return;
         }
         running = true;
-        pollers = Executors.newFixedThreadPool(numListenerThreads);
-        for (int c = 0; c < numListenerThreads; c++) {
+        pollers = Executors.newFixedThreadPool(concurrentConsumers);
+        for (int c = 0; c < concurrentConsumers; c++) {
             pollers.execute(new Poller());
         }
     }
 
     @Override
     public void stop() {
+        LOG.fine("Shuttting down " + this.getClass().getSimpleName());
         if (!running) {
             return;
         }
@@ -122,12 +134,16 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         } catch (InterruptedException e) {
             // Ignore
         }
+        pollers.shutdownNow();
         pollers = null;
     }
 
     @Override
     public void shutdown() {
         stop();
-        ResourceCloser.close(connection);
+    }
+
+    public void setConcurrentConsumers(int concurrentConsumers) {
+        this.concurrentConsumers = concurrentConsumers;
     }
 }

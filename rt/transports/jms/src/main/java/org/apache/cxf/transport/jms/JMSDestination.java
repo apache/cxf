@@ -48,10 +48,8 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
-import org.apache.cxf.transport.jms.util.AbstractMessageListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSUtil;
-import org.apache.cxf.transport.jms.util.MessageListenerContainer;
 import org.apache.cxf.transport.jms.util.PollingMessageListenerContainer;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 
@@ -125,15 +123,18 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             connection = JMSFactory.createConnection(jmsConfig);
             connection.setExceptionListener(new ExceptionListener() {
                 public void onException(JMSException exception) {
-                    LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", exception);
-                    restartConnection();
+                    if (!shutdown) {
+                        LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", exception);
+                        restartConnection();
+                    }
                 }
             });
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = jmsConfig.getTargetDestination(session);
-            AbstractMessageListenerContainer container = jmsConfig.getTransactionManager() != null
-                ? new PollingMessageListenerContainer(connection, destination, this)
-                : new MessageListenerContainer(connection, destination, this);
+
+            PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, 
+                                                                                            destination, this);
+            container.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
             container.setTransactionManager(jmsConfig.getTransactionManager());
             container.setMessageSelector(jmsConfig.getMessageSelector());
             container.setTransacted(jmsConfig.isSessionTransacted());
@@ -191,6 +192,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         getLogger().log(Level.FINE, "JMSDestination shutdown()");
         this.deactivate();
     }
+    
+    
 
     /**
      * Convert JMS message received by ListenerThread to CXF message and inform incomingObserver that a
