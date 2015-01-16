@@ -100,7 +100,7 @@ public class BigQueryService {
             boolean postMessage) {
 
         // Get the access token
-        ClientAccessToken at = getClientAccessToken(consumer, code, postMessage);
+        ClientAccessToken at = getClientAccessToken(code, postMessage);
 
         // Expect and validate id_token
         IdToken idToken = tokenClient.getIdToken(at, consumer.getKey());
@@ -126,8 +126,7 @@ public class BigQueryService {
                 .build().toString();
     }
 
-    private ClientAccessToken getClientAccessToken(Consumer consumer,
-            String code, boolean postMessage) {
+    private ClientAccessToken getClientAccessToken(String code, boolean postMessage) {
         AccessTokenGrant grant = new AuthorizationCodeGrant(code);
         String redirectUri = postMessage ? "postmessage" : getRedirectUri();
         return OAuthClientUtils.getAccessToken(accessTokenServiceClient,
@@ -135,8 +134,8 @@ public class BigQueryService {
                         OAuthConstants.REDIRECT_URI, redirectUri), false);
     }
 
-    public void setUserInfoClient(UserInfoClient tokenClient) {
-        this.tokenClient = tokenClient;
+    public void setUserInfoClient(UserInfoClient client) {
+        this.tokenClient = client;
     }
 
     public void setAuthorizationServiceUri(String authorizationServiceUri) {
