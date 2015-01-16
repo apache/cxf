@@ -561,7 +561,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         parameters.setWebServiceContext(webServiceContext);
 
-        parameters.setAppliesToAddress("http://dummy-service.com/dummy");
+        parameters.setAppliesToAddress(
+            "https://localhost:" + STSPORT + "/SecurityTokenService/b-issuer/Transport");
 
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
