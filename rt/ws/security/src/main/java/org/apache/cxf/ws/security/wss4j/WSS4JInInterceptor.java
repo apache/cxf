@@ -345,7 +345,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         boolean enableAudienceRestriction = 
             MessageUtils.getContextualBoolean(msg, 
                                               SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
-                                              true);
+                                              false);
         if (enableAudienceRestriction) {
             List<String> audiences = new ArrayList<String>();
             if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
