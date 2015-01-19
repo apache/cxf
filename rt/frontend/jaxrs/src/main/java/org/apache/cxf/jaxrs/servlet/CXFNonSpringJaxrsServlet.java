@@ -103,8 +103,8 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     public CXFNonSpringJaxrsServlet(Object singletonService) {
         this(Collections.singleton(singletonService));
     }
-    public CXFNonSpringJaxrsServlet(Set<Object> applicationSingletones) {
-        this(new ApplicationImpl(applicationSingletones));
+    public CXFNonSpringJaxrsServlet(Set<Object> applicationSingletons) {
+        this(new ApplicationImpl(applicationSingletons));
     }
     
     @Override
@@ -589,12 +589,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     }
 
     private static class ApplicationImpl extends Application {
-        private Set<Object> applicationSingletones;
-        public ApplicationImpl(Set<Object> applicationSingletones) {
-            this.applicationSingletones = applicationSingletones;
+        private Set<Object> applicationSingletons;
+        public ApplicationImpl(Set<Object> applicationSingletons) {
+            this.applicationSingletons = applicationSingletons;
         }
         public Set<Object> getSingletons() {
-            return applicationSingletones;
+            return applicationSingletons;
         }
     }
 }
