@@ -59,6 +59,19 @@ public class NewCookieHeaderProviderTest extends Assert {
                    && 10 == c.getMaxAge());
     }
     
+    @Test
+    public void testFromComplexStringLowerCase() {
+        NewCookie c = NewCookie.valueOf(
+                      "foo=bar;comment=comment;path=path;max-Age=10;domain=domain;secure;version=1");
+        assertTrue("bar".equals(c.getValue())
+                   && "foo".equals(c.getName())
+                   && 1 == c.getVersion()
+                   && "path".equals(c.getPath())
+                   && "domain".equals(c.getDomain())
+                   && "comment".equals(c.getComment())
+                   && 10 == c.getMaxAge());
+    }
+    
     
     @Test
     public void testFromStringWithSpaces() {

@@ -51,19 +51,23 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         String[] tokens = StringUtils.split(c, ";");
         for (String token : tokens) {
             String theToken = token.trim();
-            if (theToken.startsWith(VERSION)) {
+            String theTokenUC = theToken;
+            if (!StringUtils.isEmpty(theTokenUC) && Character.isLowerCase(theTokenUC.charAt(0))) {
+                theTokenUC = StringUtils.capitalize(theToken);
+            }
+            if (theTokenUC.startsWith(VERSION)) {
                 // should we throw an exception if it's not == 1 ?
-            } else if (theToken.startsWith(MAX_AGE)) {
-                maxAge = Integer.parseInt(theToken.substring(MAX_AGE.length() + 1));
-            } else if (theToken.startsWith(PATH)) {
-                path = theToken.substring(PATH.length() + 1);
-            } else if (theToken.startsWith(DOMAIN)) {
-                domain = theToken.substring(DOMAIN.length() + 1);
-            } else if (theToken.startsWith(COMMENT)) {
-                comment = theToken.substring(COMMENT.length() + 1);
-            } else if (theToken.startsWith(SECURE)) {
+            } else if (theTokenUC.startsWith(MAX_AGE)) {
+                maxAge = Integer.parseInt(theTokenUC.substring(MAX_AGE.length() + 1));
+            } else if (theTokenUC.startsWith(PATH)) {
+                path = theTokenUC.substring(PATH.length() + 1);
+            } else if (theTokenUC.startsWith(DOMAIN)) {
+                domain = theTokenUC.substring(DOMAIN.length() + 1);
+            } else if (theTokenUC.startsWith(COMMENT)) {
+                comment = theTokenUC.substring(COMMENT.length() + 1);
+            } else if (theTokenUC.startsWith(SECURE)) {
                 isSecure = true;
-            } else if (theToken.startsWith(EXPIRES)) {
+            } else if (theTokenUC.startsWith(EXPIRES)) {
                 // ignore
                 continue;
             } else {
