@@ -60,8 +60,6 @@ import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.validation.ValidationException;
-import org.opensaml.xml.validation.ValidatorSuite;
 
 /**
  * Validate a SAML Assertion. It is valid if it was issued and signed by this STS.
@@ -77,6 +75,12 @@ public class SAMLTokenValidator implements TokenValidator {
     private SAMLRealmCodec samlRealmCodec;
     
     private SAMLRoleParser samlRoleParser = new DefaultSAMLRoleParser();
+    
+    /**
+     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * relevant profile. Default is true.
+     */
+    private boolean validateSignatureAgainstProfile = true;
     
     /**
      * Set a list of Strings corresponding to regular expression constraints on the subject DN
@@ -270,31 +274,7 @@ public class SAMLTokenValidator implements TokenValidator {
      * Validate the assertion against schemas/profiles
      */
     protected void validateAssertion(SamlAssertionWrapper assertion) throws WSSecurityException {
-        if (assertion.getSaml1() != null) {
-            ValidatorSuite schemaValidators = 
-                org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
-            ValidatorSuite specValidators = 
-                org.opensaml.Configuration.getValidatorSuite("saml1-spec-validator");
-            try {
-                schemaValidators.validate(assertion.getSaml1());
-                specValidators.validate(assertion.getSaml1());
-            } catch (ValidationException e) {
-                LOG.fine("Saml Validation error: " + e.getMessage());
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-            }
-        } else if (assertion.getSaml2() != null) {
-            ValidatorSuite schemaValidators = 
-                org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
-            ValidatorSuite specValidators = 
-                org.opensaml.Configuration.getValidatorSuite("saml2-core-spec-validator");
-            try {
-                schemaValidators.validate(assertion.getSaml2());
-                specValidators.validate(assertion.getSaml2());
-            } catch (ValidationException e) {
-                LOG.fine("Saml Validation error: " + e.getMessage());
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-            }
-        }
+        assertion.validateAssertion(validateSignatureAgainstProfile);
     }
     
     protected boolean validateConditions(
@@ -302,21 +282,31 @@ public class SAMLTokenValidator implements TokenValidator {
     ) {
         DateTime validFrom = null;
         DateTime validTill = null;
+        DateTime issueInstant = null;
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             validFrom = assertion.getSaml2().getConditions().getNotBefore();
             validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
+            issueInstant = assertion.getSaml2().getIssueInstant();
         } else {
             validFrom = assertion.getSaml1().getConditions().getNotBefore();
             validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
+            issueInstant = assertion.getSaml1().getIssueInstant();
         }
-        if (validFrom.isAfterNow()) {
+        
+        if (validFrom != null && validFrom.isAfterNow()) {
             LOG.log(Level.WARNING, "SAML Token condition not met");
             return false;
-        } else if (validTill.isBeforeNow()) {
+        } else if (validTill != null && validTill.isBeforeNow()) {
             LOG.log(Level.WARNING, "SAML Token condition not met");
             validateTarget.setState(STATE.EXPIRED);
             return false;
         }
+        
+        if (issueInstant != null && issueInstant.isAfterNow()) {
+            LOG.log(Level.WARNING, "SAML Token IssueInstant not met");
+            return false;
+        }
+        
         return true;
     }
     
@@ -350,5 +340,21 @@ public class SAMLTokenValidator implements TokenValidator {
 
     public void setSamlRoleParser(SAMLRoleParser samlRoleParser) {
         this.samlRoleParser = samlRoleParser;
+    }
+    
+    /**
+     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * relevant profile. Default is true.
+     */
+    public boolean isValidateSignatureAgainstProfile() {
+        return validateSignatureAgainstProfile;
+    }
+
+    /**
+     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * relevant profile. Default is true.
+     */
+    public void setValidateSignatureAgainstProfile(boolean validateSignatureAgainstProfile) {
+        this.validateSignatureAgainstProfile = validateSignatureAgainstProfile;
     }
 }
