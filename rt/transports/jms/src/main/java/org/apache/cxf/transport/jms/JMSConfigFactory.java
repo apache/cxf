@@ -85,6 +85,7 @@ public final class JMSConfigFactory {
         jmsConfig.setConduitSelectorPrefix(endpoint.getConduitIdSelectorPrefix());
         jmsConfig.setUserName(endpoint.getUsername());
         jmsConfig.setPassword(endpoint.getPassword());
+        jmsConfig.setConcurrentConsumers(endpoint.getConcurrentConsumers());
 
         TransactionManager tm = getTransactionManager(bus, endpoint);
         jmsConfig.setTransactionManager(tm);

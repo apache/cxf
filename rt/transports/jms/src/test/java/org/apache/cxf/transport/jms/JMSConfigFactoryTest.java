@@ -79,4 +79,12 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
         Assert.assertEquals("java:/comp/TransactionManager", endpoint.getJndiTransactionManagerName());
         // TODO Check JNDI lookup
     }
+    
+    @Test
+    public void testConcurrentConsumers() {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?concurrentConsumers=4");
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpoint(bus, endpoint);
+        Assert.assertEquals(4, jmsConfig.getConcurrentConsumers());
+
+    }
 }
