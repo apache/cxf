@@ -62,7 +62,7 @@ public class NewCookieHeaderProviderTest extends Assert {
     @Test
     public void testFromComplexStringLowerCase() {
         NewCookie c = NewCookie.valueOf(
-                      "foo=bar;comment=comment;path=path;max-Age=10;domain=domain;secure;version=1");
+                      "foo=bar;comment=comment;path=path;max-age=10;domain=domain;secure;version=1");
         assertTrue("bar".equals(c.getValue())
                    && "foo".equals(c.getName())
                    && 1 == c.getVersion()

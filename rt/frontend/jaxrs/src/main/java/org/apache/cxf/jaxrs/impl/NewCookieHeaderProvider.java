@@ -33,7 +33,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     private static final String COMMENT = "Comment";
     private static final String SECURE = "Secure";
     private static final String EXPIRES = "Expires";
-    
+        
     public NewCookie fromString(String c) {
         
         if (c == null) {
@@ -51,31 +51,27 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         String[] tokens = StringUtils.split(c, ";");
         for (String token : tokens) {
             String theToken = token.trim();
-            String theTokenUC = theToken;
-            if (!StringUtils.isEmpty(theTokenUC) && Character.isLowerCase(theTokenUC.charAt(0))) {
-                theTokenUC = StringUtils.capitalize(theToken);
-            }
-            if (theTokenUC.startsWith(VERSION)) {
-                // should we throw an exception if it's not == 1 ?
-            } else if (theTokenUC.startsWith(MAX_AGE)) {
-                maxAge = Integer.parseInt(theTokenUC.substring(MAX_AGE.length() + 1));
-            } else if (theTokenUC.startsWith(PATH)) {
-                path = theTokenUC.substring(PATH.length() + 1);
-            } else if (theTokenUC.startsWith(DOMAIN)) {
-                domain = theTokenUC.substring(DOMAIN.length() + 1);
-            } else if (theTokenUC.startsWith(COMMENT)) {
-                comment = theTokenUC.substring(COMMENT.length() + 1);
-            } else if (theTokenUC.startsWith(SECURE)) {
+            
+            int sepIndex = theToken.indexOf('=');
+            String paramName = sepIndex != -1 ? theToken.substring(0, sepIndex) : theToken;
+            String paramValue = sepIndex == theToken.length() + 1 ? null : theToken.substring(sepIndex + 1);
+            
+            if (paramName.equalsIgnoreCase(MAX_AGE)) {
+                maxAge = Integer.parseInt(paramValue);
+            } else if (paramName.equalsIgnoreCase(PATH)) {
+                path = paramValue;
+            } else if (paramName.equalsIgnoreCase(DOMAIN)) {
+                domain = paramValue;
+            } else if (paramName.equalsIgnoreCase(COMMENT)) {
+                comment = paramValue;
+            } else if (paramName.equalsIgnoreCase(SECURE)) {
                 isSecure = true;
-            } else if (theTokenUC.startsWith(EXPIRES)) {
+            } else if (paramName.equalsIgnoreCase(EXPIRES) || paramName.equalsIgnoreCase(VERSION)) {
                 // ignore
                 continue;
             } else {
-                int i = theToken.indexOf('=');
-                if (i != -1) {
-                    name = theToken.substring(0, i);
-                    value = i == theToken.length()  + 1 ? "" : theToken.substring(i + 1);
-                }
+                name = paramName;
+                value = paramValue;
             }
         }
         
