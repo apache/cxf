@@ -398,7 +398,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         this.start = start;
     }
 
-    private void injectContexts() {
+    protected void injectContexts() {
         Application application = appProvider == null ? null : appProvider.getProvider();
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
             if (cri.isSingleton()) {
@@ -423,14 +423,16 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             if (rp != null) {
                 cri.setResourceProvider(rp);
             } else {
-                //default lifecycle is per-request
-                rp = new PerRequestResourceProvider(cri.getResourceClass());
-                cri.setResourceProvider(rp);  
+                setDefaultResourceProvider(cri);  
             }
         }
         injectContexts();
     }
 
+    protected void setDefaultResourceProvider(ClassResourceInfo cri) {
+        cri.setResourceProvider(new PerRequestResourceProvider(cri.getResourceClass()));
+    }
+    
     /**
      * Set the reference to the document (WADL, etc) describing the endpoint
      * @param documentLocation document location
