@@ -304,8 +304,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (server) {
             for (Iterator<ClassResourceInfo> it = list.iterator(); it.hasNext();) {
                 ClassResourceInfo cri = it.next();
-                if (cri.isCreatedFromModel() && cri.getServiceClass() == cri.getResourceClass() 
-                    && !InjectionUtils.isConcreteClass(cri.getServiceClass())) {
+                if (!isValidClassResourceInfo(cri)) {
                     it.remove();
                 }
             }
@@ -317,6 +316,12 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             LOG.severe(msg.toString());
             throw new ServiceConstructionException(msg);
         }
+    }
+    
+    protected boolean isValidClassResourceInfo(ClassResourceInfo cri) {
+        Class<?> serviceCls = cri.getServiceClass();
+        return !(cri.isCreatedFromModel() && serviceCls == cri.getResourceClass() 
+            && !InjectionUtils.isConcreteClass(serviceCls));
     }
     
     protected void setupFactory(ProviderFactory factory, Endpoint ep) { 
