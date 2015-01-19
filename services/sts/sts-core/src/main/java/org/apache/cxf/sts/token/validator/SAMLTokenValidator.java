@@ -55,13 +55,8 @@ import org.apache.ws.security.validate.SignatureTrustValidator;
 import org.apache.ws.security.validate.Validator;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
-<<<<<<< HEAD
 import org.opensaml.xml.validation.ValidationException;
 import org.opensaml.xml.validation.ValidatorSuite;
-=======
-import org.opensaml.xml.signature.KeyInfo;
-import org.opensaml.xml.signature.Signature;
->>>>>>> c1f9d04... Adding some stuff to the SAMLTokenValidator in the STS
 
 /**
  * Validate a SAML Assertion. It is valid if it was issued and signed by this STS.
@@ -266,8 +261,11 @@ public class SAMLTokenValidator implements TokenValidator {
     /**
      * Validate the assertion against schemas/profiles
      */
-<<<<<<< HEAD
     protected void validateAssertion(AssertionWrapper assertion) throws WSSecurityException {
+        if (validateSignatureAgainstProfile) {
+            assertion.validateSignatureAgainstProfile();
+        }
+        
         if (assertion.getSaml1() != null) {
             ValidatorSuite schemaValidators = 
                 org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
@@ -293,10 +291,6 @@ public class SAMLTokenValidator implements TokenValidator {
                 throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
             }
         }
-=======
-    protected void validateAssertion(SamlAssertionWrapper assertion) throws WSSecurityException {
-        assertion.validateAssertion(validateSignatureAgainstProfile);
->>>>>>> c1f9d04... Adding some stuff to the SAMLTokenValidator in the STS
     }
     
     protected boolean validateConditions(
