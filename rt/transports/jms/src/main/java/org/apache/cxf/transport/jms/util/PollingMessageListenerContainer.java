@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
@@ -56,34 +57,25 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                 MessageConsumer consumer = null;
                 Session session = null;
                 try {
-                    if (transactionManager != null) {
-                        transactionManager.begin();
-                    }
-                    
+                    // Create session early to optimize performance
                     session = connection.createSession(transacted, acknowledgeMode);
-                    if (durableSubscriptionName != null && destination instanceof Topic) {
-                        consumer = session.createDurableSubscriber((Topic)destination, 
-                                                                   durableSubscriptionName,
-                                                                   messageSelector,
-                                                                   pubSubNoLocal);
-                    } else {
-                        consumer = session.createConsumer(destination, messageSelector);
-                    }
-                    Message message = consumer.receive(1000);
-                    try {
-                        if (message != null) {
-                            listenerHandler.onMessage(message);
+                    consumer = createConsumer(session);
+                    while (running) {
+                        Message message = consumer.receive(1000);
+                        try {
+                            if (message != null) {
+                                listenerHandler.onMessage(message);
+                            }
+                            if (session.getTransacted()) {
+                                session.commit();
+                            }
+                        } catch (Exception e) {
+                            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
+                            safeRollBack(session, e);
                         }
-                        if (transactionManager != null) {
-                            transactionManager.commit();
-                        } else if (session.getTransacted()) {
-                            session.commit();
-                        }
-                    } catch (Exception e) {
-                        safeRollBack(session, e);
                     }
                 } catch (Exception e) {
-                    LOG.log(Level.WARNING, "Unexpected exception", e);
+                    LOG.log(Level.WARNING, "Unexpected exception. Restarting session and consumer", e);
                 } finally {
                     ResourceCloser.close(consumer);
                     ResourceCloser.close(session);
@@ -91,21 +83,71 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             }
 
         }
-
-    }
-
-    private void safeRollBack(Session session, Exception e) {
-        LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
-        try {
-            if (transactionManager != null) {
-                transactionManager.rollback();
-            } else {
+        
+        private void safeRollBack(Session session, Exception e) {
+            try {
                 if (session.getTransacted()) {
                     session.rollback();
                 }
+            } catch (Exception e1) {
+                LOG.log(Level.WARNING, "Rollback of Local transaction failed", e1);
             }
-        } catch (Exception e1) {
-            LOG.log(Level.WARNING, "Rollback of Local transaction failed", e1);
+        }
+
+    }
+    
+    private class XAPoller implements Runnable {
+
+        @Override
+        public void run() {
+            while (running) {
+                MessageConsumer consumer = null;
+                Session session = null;
+                try {
+                    transactionManager.begin();
+                    /*
+                     * Create session inside transaction to give it the 
+                     * chance to enlist itself as a resource
+                     */
+                    session = connection.createSession(transacted, acknowledgeMode);
+                    consumer = createConsumer(session);
+                    Message message = consumer.receive(1000);
+                    try {
+                        if (message != null) {
+                            listenerHandler.onMessage(message);
+                        }
+                        transactionManager.commit();
+                    } catch (Exception e) {
+                        LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
+                        safeRollBack(session);
+                    } finally {
+                        ResourceCloser.close(consumer);
+                        ResourceCloser.close(session);
+                    }
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Unexpected exception. Restarting session and consumer", e);
+                }
+
+            }
+
+        }
+        
+        private void safeRollBack(Session session) {
+            try {
+                transactionManager.rollback();
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Rollback of XA transaction failed", e);
+            }
+        }
+
+    }
+    
+    private MessageConsumer createConsumer(Session session) throws JMSException {
+        if (durableSubscriptionName != null && destination instanceof Topic) {
+            return session.createDurableSubscriber((Topic)destination, durableSubscriptionName,
+                                                   messageSelector, pubSubNoLocal);
+        } else {
+            return session.createConsumer(destination, messageSelector);
         }
     }
 
@@ -117,7 +159,8 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         running = true;
         pollers = Executors.newFixedThreadPool(concurrentConsumers);
         for (int c = 0; c < concurrentConsumers; c++) {
-            pollers.execute(new Poller());
+            Runnable poller = (transactionManager != null) ? new XAPoller() : new Poller(); 
+            pollers.execute(poller);
         }
     }
 
