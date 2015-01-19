@@ -173,7 +173,7 @@ public class MessageListenerTest {
             //                   + ", expecting: " + expectedNum);
             Thread.sleep(100);
         } while ((System.currentTimeMillis() - startTime < timeout) && expectedNum != actualNum);
-        Assert.assertEquals(message + " -> number of messages", expectedNum, actualNum);
+        Assert.assertEquals(message + " -> number of messages on queue", expectedNum, actualNum);
     }
 
     private void sendMessage(Connection connection, Destination dest, String content) throws JMSException,
