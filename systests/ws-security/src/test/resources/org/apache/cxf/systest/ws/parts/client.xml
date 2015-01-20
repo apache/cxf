@@ -234,6 +234,21 @@
             </p:policies>
         </jaxws:features>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItEncryptedElementsPort3" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="Alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/parts/multiple-encrypted-elements-policy.xml"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItContentEncryptedElementsPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>

@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -639,16 +638,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         
         if (signedElements != null) {
             // Handle SignedElements
-            try {
-                result.addAll(
-                    this.getElements(
-                        "Element", signedElements.getXPaths(), found, true
-                    )
-                );
-            } catch (XPathExpressionException e) {
-                LOG.log(Level.FINE, e.getMessage(), e);
-                // REVISIT
-            }
+            result.addAll(
+                this.getElements("Element", signedElements.getXPaths(), found, true)
+            );
         }
 
         return result;

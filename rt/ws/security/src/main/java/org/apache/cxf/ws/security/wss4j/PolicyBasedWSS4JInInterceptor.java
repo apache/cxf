@@ -555,15 +555,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 if (elements != null && elements.getXPaths() != null 
                     && !elements.getXPaths().isEmpty()) {
                     List<String> expressions = new ArrayList<String>();
+                    MapNamespaceContext namespaceContext = new MapNamespaceContext();
+                    
                     for (org.apache.wss4j.policy.model.XPath xPath : elements.getXPaths()) {
                         expressions.add(xPath.getXPath());
+                        Map<String, String> namespaceMap = xPath.getPrefixNamespaceMap();
+                        if (namespaceMap != null) {
+                            namespaceContext.addNamespaces(namespaceMap);
+                        }
                     }
 
-                    if (elements.getXPaths().get(0).getPrefixNamespaceMap() != null) {
-                        xpath.setNamespaceContext(
-                            new MapNamespaceContext(elements.getXPaths().get(0).getPrefixNamespaceMap())
-                        );
-                    }
+                    xpath.setNamespaceContext(namespaceContext);
                     try {
                         CryptoCoverageUtil.checkCoverage(soapEnvelope, refs,
                                                          xpath, expressions, type, scope);
