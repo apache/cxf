@@ -152,6 +152,42 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>versions</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>cleanVersions</goal>
+                        </goals>
+                        <configuration>
+                            <versions>
+                                <cxf.osgi.version.clean>${project.version}</cxf.osgi.version.clean>
+                            </versions>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
+                        <Include-Resource>
+                          {maven-resources},
+                          mozilla/public-suffix-list.txt=${basedir}/target/classes/mozilla/public-suffix-list.txt
+                        </Include-Resource>
+                        <Import-Package>
+                            ${cxf.osgi.import},
+                            *
+                        </Import-Package>
+                        <Export-Service>
+                            ${cxf.export.service}
+                        </Export-Service>
+                        <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.googlecode.maven-download-plugin</groupId>
                 <artifactId>download-maven-plugin</artifactId>
                 <version>1.2.0</version>
