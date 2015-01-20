@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" wsu:Id="RequiredPartsPolicy">
+    <wsp:ExactlyOne>
+        <wsp:All>
+            <sp:AsymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy>
+                    <sp:InitiatorToken>
+                        <wsp:Policy>
+                            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                <wsp:Policy>
+                                    <sp:WssX509V3Token10/>
+                                </wsp:Policy>
+                            </sp:X509Token>
+                        </wsp:Policy>
+                    </sp:InitiatorToken>
+                    <sp:RecipientToken>
+                        <wsp:Policy>
+                            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                <wsp:Policy>
+                                    <sp:WssX509V3Token10/>
+                                    <sp:RequireIssuerSerialReference/>
+                                </wsp:Policy>
+                            </sp:X509Token>
+                        </wsp:Policy>
+                    </sp:RecipientToken>
+                    <sp:Layout>
+                        <wsp:Policy>
+                            <sp:Lax/>
+                        </wsp:Policy>
+                    </sp:Layout>
+                    <sp:AlgorithmSuite>
+                        <wsp:Policy>
+                            <sp:Basic128/>
+                        </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                </wsp:Policy>
+            </sp:AsymmetricBinding>
+            <sp:EncryptedElements xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <sp:XPath xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">/soap:Envelope/soap:Header/wsa:To</sp:XPath>
+                <sp:XPath xmlns:example1="http://www.example.org/schema/DoubleIt">//example1:DoubleIt</sp:XPath>
+            </sp:EncryptedElements>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <sp:Body/>
+            </sp:SignedParts>
+            <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl"/>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

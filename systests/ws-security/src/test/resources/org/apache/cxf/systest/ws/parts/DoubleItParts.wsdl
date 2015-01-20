@@ -90,8 +90,16 @@
         <wsdl:port name="DoubleItEncryptedElementsPort2" binding="tns:DoubleItStandardBinding">
             <soap:address location="http://localhost:9010/DoubleItEncryptedElements2" />
         </wsdl:port>
+<<<<<<< HEAD
          <wsdl:port name="DoubleItContentEncryptedElementsPort" binding="tns:DoubleItStandardBinding">
             <soap:address location="http://localhost:9010/DoubleItContentEncryptedElements" />
+=======
+        <wsdl:port name="DoubleItEncryptedElementsPort3" binding="tns:DoubleItStandardBinding">
+            <soap:address location="http://localhost:9010/DoubleItEncryptedElements3"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItContentEncryptedElementsPort" binding="tns:DoubleItStandardBinding">
+            <soap:address location="http://localhost:9010/DoubleItContentEncryptedElements"/>
+>>>>>>> 5c8f473... [CXF-6209][CXF-6210] - Bug in processing Signed/Encrypted Elements policies with multiple XPaths
         </wsdl:port>
         <wsdl:port name="DoubleItContentEncryptedElementsPort2" binding="tns:DoubleItStandardBinding">
             <soap:address location="http://localhost:9010/DoubleItContentEncryptedElements2" />
