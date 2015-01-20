@@ -304,12 +304,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testMultipleEncryptedElements() throws Exception {
         
-        if (test.isStreaming() || STAX_PORT.equals(test.getPort())) {
-            return;
-        }
-
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -321,22 +317,14 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort3");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
+        updateAddressPort(port, PORT);
         
         port.doubleIt(25);
         
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
+        updateAddressPort(port, PORT);
         
         try {
             port.doubleIt(25);

@@ -481,29 +481,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     xpaths = p.getXPathExpressions();
                 }
                 
-<<<<<<< HEAD
                 if (xpaths != null) {
                     if (namespaces != null) {
                         xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
                     }
-=======
-                RequiredElements elements = (RequiredElements)ai.getAssertion();
-                
-                if (elements != null && elements.getXPaths() != null 
-                    && !elements.getXPaths().isEmpty()) {
-                    List<String> expressions = new ArrayList<String>();
-                    MapNamespaceContext namespaceContext = new MapNamespaceContext();
-                    
-                    for (org.apache.wss4j.policy.model.XPath xPath : elements.getXPaths()) {
-                        expressions.add(xPath.getXPath());
-                        Map<String, String> namespaceMap = xPath.getPrefixNamespaceMap();
-                        if (namespaceMap != null) {
-                            namespaceContext.addNamespaces(namespaceMap);
-                        }
-                    }
-
-                    xpath.setNamespaceContext(namespaceContext);
->>>>>>> 5c8f473... [CXF-6209][CXF-6210] - Bug in processing Signed/Encrypted Elements policies with multiple XPaths
                     try {
                         CryptoCoverageUtil.checkCoverage(soapEnvelope, refs,
                                 xpath, xpaths, type, scope);

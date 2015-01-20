@@ -1245,27 +1245,11 @@ public abstract class AbstractBindingBuilder {
         result.addAll(this.getParts(sign, includeBody, parts, found));
         
         // Handle sign/enc elements
-<<<<<<< HEAD
-        try {
-            result.addAll(this.getElements("Element", xpaths, namespaces, found, sign));
-        } catch (XPathExpressionException e) {
-            LOG.log(Level.FINE, e.getMessage(), e);
-            // REVISIT
-        }
+        result.addAll(this.getElements("Element", xpaths, namespaces, found, sign));
         
         // Handle content encrypted elements
-        try {
-            result.addAll(this.getElements("Content", contentXpaths, cnamespaces, found, sign));
-        } catch (XPathExpressionException e) {
-            LOG.log(Level.FINE, e.getMessage(), e);
-            // REVISIT
-=======
-        result.addAll(this.getElements("Element", xpaths, found, sign));
-        
         if (!sign) {
-            // Handle content encrypted elements
-            result.addAll(this.getElements("Content", contentXpaths, found, sign));
->>>>>>> 5c8f473... [CXF-6209][CXF-6210] - Bug in processing Signed/Encrypted Elements policies with multiple XPaths
+            result.addAll(this.getElements("Content", contentXpaths, cnamespaces, found, sign));
         }
         
         return result;
@@ -1389,37 +1373,10 @@ public abstract class AbstractBindingBuilder {
                 if (namespaces != null) {
                     xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
                 }
-               
-<<<<<<< HEAD
-                NodeList list = (NodeList)xpath.evaluate(expression, saaj.getSOAPPart().getEnvelope(),
-                                               XPathConstants.NODESET);
-                for (int x = 0; x < list.getLength(); x++) {
-                    Element el = (Element)list.item(x);
-                    
-                    if (!found.contains(el)) {
-                        String id = null;
-                        if (forceId) {
-                            id = this.addWsuIdToElement(el);
-                        } else {
-                            //not forcing an ID on this.  Use one if there is one 
-                            //there already, but don't force one
-                            Attr idAttr = el.getAttributeNodeNS(null, "Id");
-                            if (idAttr == null) {
-                                //then try the wsu:Id value
-                                idAttr = el.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
-                            }
-                            if (idAttr != null) {
-                                id = idAttr.getValue();
-                            }
-                        }
-                        WSEncryptionPart part = 
-                            new WSEncryptionPart(id, encryptionModifier);
-                        part.setElement(el);
-                        part.setXpath(expression);
-=======
+
                 NodeList list = null;
                 try {
-                    list = (NodeList)xpath.evaluate(xPath.getXPath(), saaj.getSOAPPart().getEnvelope(),
+                    list = (NodeList)xpath.evaluate(expression, saaj.getSOAPPart().getEnvelope(),
                                                              XPathConstants.NODESET);
                 } catch (XPathExpressionException e) {
                     LOG.log(Level.WARNING, "Failure in evaluating an XPath expression", e);
@@ -1428,14 +1385,13 @@ public abstract class AbstractBindingBuilder {
                 if (list != null) {
                     for (int x = 0; x < list.getLength(); x++) {
                         Element el = (Element)list.item(x);
->>>>>>> 5c8f473... [CXF-6209][CXF-6210] - Bug in processing Signed/Encrypted Elements policies with multiple XPaths
                         
                         if (!found.contains(el)) {
                             String id = setIdOnElement(el, forceId);
                             WSEncryptionPart part = 
                                 new WSEncryptionPart(id, encryptionModifier);
                             part.setElement(el);
-                            part.setXpath(xPath.getXPath());
+                            part.setXpath(expression);
                             
                             result.add(part);
                         }
@@ -1447,10 +1403,6 @@ public abstract class AbstractBindingBuilder {
         return result;
     }
     
-<<<<<<< HEAD
-    protected WSSecEncryptedKey getEncryptedKeyBuilder(TokenWrapper wrapper, 
-                                                       Token token) throws WSSecurityException {
-=======
     private String setIdOnElement(Element element, boolean forceId) {
         if (forceId) {
             return this.addWsuIdToElement(element);
@@ -1470,9 +1422,8 @@ public abstract class AbstractBindingBuilder {
         return null;
     }
     
-    protected WSSecEncryptedKey getEncryptedKeyBuilder(AbstractTokenWrapper wrapper, 
-                                                       AbstractToken token) throws WSSecurityException {
->>>>>>> 5c8f473... [CXF-6209][CXF-6210] - Bug in processing Signed/Encrypted Elements policies with multiple XPaths
+    protected WSSecEncryptedKey getEncryptedKeyBuilder(TokenWrapper wrapper, 
+                                                       Token token) throws WSSecurityException {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey(wssConfig);
         Crypto crypto = getEncryptionCrypto(wrapper);
         message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
