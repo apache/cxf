@@ -100,4 +100,9 @@ public class BookStoreWithInterface2 extends BookStoreStorage implements BookInt
         return books.get(123L);
     }
 
+    public Book echoBook(Book b) {
+        
+        return b;
+    }
+
 }

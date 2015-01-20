@@ -39,6 +39,8 @@
 package org.apache.cxf.systest.jaxrs;
 
 import org.apache.cxf.annotations.SchemaValidation;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 
 
 
@@ -65,6 +67,15 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
     public Book getThatBook(Long id) throws BookNotFoundFault {
         checkPostConstruct();
         return doGetBook(id);
+    }
+    
+    public Book echoBook(Book b) {
+        String ct = (String)JAXRSUtils.getCurrentMessage().get(Message.CONTENT_TYPE);
+        if ("application/xml;a=b".equals(ct)) {
+            return b;
+        } else {
+            throw new RuntimeException();
+        }
     }
     
     private Book doGetBook(Long id) throws BookNotFoundFault {

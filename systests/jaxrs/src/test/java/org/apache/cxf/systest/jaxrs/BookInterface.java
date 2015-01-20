@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -42,4 +43,7 @@ public interface BookInterface {
     @Produces("application/xml")
     Book getThatBook() throws BookNotFoundFault;
     
+    @POST
+    @Path("/thosebooks")
+    Book echoBook(Book b);
 }

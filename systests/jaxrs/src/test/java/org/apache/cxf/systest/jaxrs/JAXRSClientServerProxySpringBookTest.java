@@ -24,7 +24,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.List;
+
+import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -114,7 +117,33 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     
     @Test
     public void testGetThatBookInterfacePrototype() throws Exception {
-        getBook("http://localhost:" + PORT + "/test/5/bookstorestorage/thosebooks/123");
+        
+        URL url = new URL("http://localhost:" + PORT + "/test/5/bookstorestorage/thosebooks/123");
+        URLConnection connect = url.openConnection();
+        connect.addRequestProperty("Content-Type", "*/*");
+        connect.addRequestProperty("Accept", "application/xml");
+        connect.addRequestProperty("SpringProxy", "true");
+        InputStream in = connect.getInputStream();           
+
+        InputStream expected = getClass()
+            .getResourceAsStream("resources/expected_get_book123.txt");
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in)));
+        String ct = connect.getHeaderField("Content-Type");
+        assertEquals("application/xml;a=b", ct);
+    }
+    
+    @Test
+    public void testEchoBook() throws Exception {
+        
+        URL url = new URL("http://localhost:" + PORT + "/test/5/bookstorestorage/thosebooks");
+        WebClient wc = WebClient.create(url.toString(), 
+                                        Collections.singletonList(new CustomJaxbElementProvider()));
+        Response r = wc.post(new Book("proxy", 333L));
+        Book book = r.readEntity(Book.class);
+        assertEquals(333L, book.getId());
+        String ct = r.getHeaderString("Content-Type");
+        assertEquals("application/xml;a=b", ct);
     }
     
     @Test
