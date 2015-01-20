@@ -18,11 +18,14 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.annotations.SchemaValidation;
@@ -44,5 +47,12 @@ public class CustomJaxbElementProvider extends JAXBElementProvider<Book> {
             return super.isWriteable(type, genericType, anns, mt);
         }
         
+    }
+    @Override
+    public void writeTo(Book obj, Class<?> cls, Type genericType, Annotation[] anns,  
+                        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
+        throws IOException {
+        headers.putSingle("Content-Type", MediaType.valueOf(m.toString() + ";a=b"));
+        super.writeTo(obj, cls, genericType, anns, m, headers, os);
     }
 }

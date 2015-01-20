@@ -53,4 +53,8 @@ public class SecureBookStoreNoAnnotations implements BookInterface {
     public Book getThatBook() throws BookNotFoundFault {
         return books.get(123L);
     }
+
+    public Book echoBook(Book b) {
+        return b;
+    }
 }

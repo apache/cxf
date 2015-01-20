@@ -306,7 +306,14 @@ public class Headers {
     }
 
     public String determineContentType() {
-        String ct  = (String)message.get(Message.CONTENT_TYPE);
+        String ct = null;
+        List<Object> ctList = CastUtils.cast(headers.get(Message.CONTENT_TYPE));
+        if (ctList != null && ctList.size() == 1) {
+            ct = ctList.get(0).toString();
+        } else {
+            ct  = (String)message.get(Message.CONTENT_TYPE);
+        }
+        
         String enc = (String)message.get(Message.ENCODING);
 
         if (null != ct) {
