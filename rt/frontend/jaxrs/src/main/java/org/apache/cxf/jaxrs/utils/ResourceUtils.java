@@ -753,16 +753,7 @@ public final class ResourceUtils {
         for (Class<?> cls : app.getClasses()) {
             if (isValidApplicationClass(cls, singletons)) {
                 if (isValidProvider(cls)) {
-                    try {
-                        Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
-                        if (c.getParameterTypes().length == 0) {
-                            providers.add(c.newInstance());
-                        } else {
-                            providers.add(c);
-                        }
-                    } catch (Throwable ex) {
-                        throw new RuntimeException("Provider " + cls.getName() + " can not be created", ex); 
-                    }
+                    providers.add(createProviderInstance(cls));
                 } else {
                     resourceClasses.add(cls);
                     map.put(cls, new PerRequestResourceProvider(cls));
@@ -805,6 +796,18 @@ public final class ResourceUtils {
         bean.setApplication(app);
         
         return bean;
+    }
+    public static Object createProviderInstance(Class<?> cls) {
+        try {
+            Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
+            if (c.getParameterTypes().length == 0) {
+                return c.newInstance();
+            } else {
+                return c;
+            }
+        } catch (Throwable ex) {
+            throw new RuntimeException("Provider " + cls.getName() + " can not be created", ex); 
+        }
     }
     
     private static boolean isValidProvider(Class<?> c) {

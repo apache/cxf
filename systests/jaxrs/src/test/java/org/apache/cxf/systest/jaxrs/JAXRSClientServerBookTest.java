@@ -770,7 +770,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testBookWithMultipleExceptions2() throws Exception {
         List<Object> providers = new LinkedList<Object>();
         providers.add(new NotReturnedExceptionMapper());
-        providers.add(new NotFoundExceptionMapper());
+        providers.add(NotFoundExceptionMapper.class);
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, 
                                                     BookStore.class,
                                                     providers);
