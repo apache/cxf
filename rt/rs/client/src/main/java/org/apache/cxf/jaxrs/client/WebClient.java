@@ -55,6 +55,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -241,6 +242,15 @@ public class WebClient extends AbstractClient {
         bean.setPassword(password);
         bean.setProviders(providers);
         return bean.createWebClient();
+    }
+    
+    /**
+     * Creates WebClient, baseURI will be set to Client currentURI
+     * @param client existing client
+     */
+    public static WebClient fromClientObject(Object object) {
+        Client client = client(object);
+        return client == null ? null : fromClient(client, false);
     }
     
     /**
@@ -1229,11 +1239,18 @@ public class WebClient extends AbstractClient {
     }
     
     private static AbstractClient toAbstractClient(Object client) {
+        
         if (client instanceof AbstractClient) {
             return (AbstractClient)client;
-        } else {
+        } else if (client instanceof InvocationHandlerAware) {
             return (AbstractClient)((InvocationHandlerAware)client).getInvocationHandler();
+        } else {
+            Object realObject = ClassHelper.getRealObject(client);
+            if (realObject instanceof AbstractClient) {
+                return (AbstractClient)realObject;
+            }
         }
+        return null;
     }
     
     static JAXRSClientFactoryBean getBean(String baseAddress, String configLocation) {
@@ -1249,14 +1266,12 @@ public class WebClient extends AbstractClient {
     }
     
     static ClientState getClientState(Client client) {
-        ClientState clientState = null;
-        if (client instanceof WebClient) { 
-            clientState = ((AbstractClient)client).getState();
-        } else if (client instanceof InvocationHandlerAware) {
-            Object handler = ((InvocationHandlerAware)client).getInvocationHandler();
-            clientState = ((AbstractClient)handler).getState();
+        AbstractClient newClient = toAbstractClient(client);
+        if (newClient == null) { 
+            return null;
+        } else  {
+            return newClient.getState();
         }
-        return clientState;
     }
     
     static URI convertStringToURI(String baseAddress) {

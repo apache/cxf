@@ -19,6 +19,8 @@
 
 package org.apache.cxf.common.util;
 
+import java.lang.reflect.Proxy;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 
@@ -52,14 +54,14 @@ public class ClassHelper {
     }
     
     protected Class<?> getRealClassInternal(Object o) {
-        return o.getClass();
+        return getRealObjectInternal(o).getClass();
     }
     
     protected Class<?> getRealClassFromClassInternal(Class<?> cls) {
         return cls;
     }
     protected Object getRealObjectInternal(Object o) {
-        return o;
+        return o instanceof Proxy ? Proxy.getInvocationHandler(o) : o;
     }
     
     public static Class<?> getRealClass(Object o) {
