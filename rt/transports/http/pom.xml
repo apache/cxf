@@ -180,6 +180,10 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
+                        <Include-Resource>
+                          {maven-resources},
+                          mozilla/public-suffix-list.txt=${basedir}/target/classes/mozilla/public-suffix-list.txt
+                        </Include-Resource>
                         <Import-Package>
                             ${cxf.osgi.import},
                             *
