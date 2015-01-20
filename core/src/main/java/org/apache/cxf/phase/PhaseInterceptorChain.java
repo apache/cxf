@@ -318,58 +318,9 @@ public class PhaseInterceptorChain implements InterceptorChain {
                     pause();
                     throw ex;
                 } catch (RuntimeException ex) {
-                    
                     if (!faultOccurred) {
-     
                         faultOccurred = true;
-                                            
-                        StringBuilder description = new StringBuilder();
-                        if (message.getExchange() != null) {
-                            Exchange exchange = message.getExchange();
-                            Service service = exchange.get(Service.class);
-                            if (service != null) {
-                                description.append('\'');
-                                description.append(service.getName());
-                                OperationInfo opInfo = exchange.get(OperationInfo.class);
-                                if (opInfo != null) {
-                                    description.append("#").append(opInfo.getName());
-                                }
-                                description.append("\' ");
-                            }
-                        }
-                        
-                        message.setContent(Exception.class, ex);
-                        unwind(message);
-                        Exception ex2 = message.getContent(Exception.class);
-                        if (ex2 == null) {
-                            ex2 = ex;
-                        }
-                        
-                        FaultListener flogger = (FaultListener)
-                                message.getContextualProperty(FaultListener.class.getName());
-                        boolean useDefaultLogging = true;
-                        if (flogger != null) {
-                            useDefaultLogging = flogger.faultOccurred(ex2, description.toString(), message);
-                        }
-                        if (useDefaultLogging) {
-                            doDefaultLogging(message, ex2, description);
-                        }
-                        
-                        boolean isOneWay = false;
-                        if (message.getExchange() != null) {
-                            if (message.getContent(Exception.class) != null) {
-                                message.getExchange().put(Exception.class, ex2);
-                            }
-                            isOneWay = message.getExchange().isOneWay() 
-                                && !MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
-                        }
-                        
-                        if (faultObserver != null && !isOneWay) {
-                            // CXF-5629. when exchange is one way and robust, it becomes req-resp in order to
-                            // send the fault
-                            message.getExchange().setOneWay(false);
-                            faultObserver.onMessage(message);
-                        }
+                        wrapExceptionAsFault(message, ex);
                     }
                     state = State.ABORTED;
                 } 
@@ -383,7 +334,57 @@ public class PhaseInterceptorChain implements InterceptorChain {
         }
     }
 
-    private void doDefaultLogging(Message message, Exception ex, StringBuilder description) {
+    private void wrapExceptionAsFault(Message message, RuntimeException ex) {
+        String description = getServiceInfo(message);
+        
+        message.setContent(Exception.class, ex);
+        unwind(message);
+        Exception ex2 = message.getContent(Exception.class);
+        if (ex2 == null) {
+            ex2 = ex;
+        }
+        
+        FaultListener flogger = (FaultListener)
+                message.getContextualProperty(FaultListener.class.getName());
+        boolean useDefaultLogging = true;
+        if (flogger != null) {
+            useDefaultLogging = flogger.faultOccurred(ex2, description, message);
+        }
+        if (useDefaultLogging) {
+            doDefaultLogging(message, ex2, description);
+        }
+        
+        if (message.getExchange() != null && message.getContent(Exception.class) != null) {
+            message.getExchange().put(Exception.class, ex2);
+        }
+
+        if (faultObserver != null && !isOneWay(message)) {
+            // CXF-5629. when exchange is one way and robust, it becomes req-resp in order to
+            // send the fault
+            message.getExchange().setOneWay(false);
+            faultObserver.onMessage(message);
+        }
+    }
+
+    private String getServiceInfo(Message message) {
+        StringBuilder description = new StringBuilder();
+        if (message.getExchange() != null) {
+            Exchange exchange = message.getExchange();
+            Service service = exchange.get(Service.class);
+            if (service != null) {
+                description.append('\'');
+                description.append(service.getName());
+                OperationInfo opInfo = exchange.get(OperationInfo.class);
+                if (opInfo != null) {
+                    description.append("#").append(opInfo.getName());
+                }
+                description.append("\' ");
+            }
+        }
+        return description.toString();
+    }
+
+    private void doDefaultLogging(Message message, Exception ex, String description) {
         FaultMode mode = message.get(FaultMode.class);
         if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
             if (isFineLogging) {
@@ -414,6 +415,14 @@ public class PhaseInterceptorChain implements InterceptorChain {
                              + "has thrown exception, unwinding now", ex);
             }
         }
+    }
+    
+    private boolean isOneWay(Message message) {
+        return (message.getExchange() != null) ? message.getExchange().isOneWay() && !isRobustOneWay(message) : false;
+    }
+
+    private boolean isRobustOneWay(Message message) {
+        return MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
     }
 
     /**
