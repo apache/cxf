@@ -111,6 +111,9 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
             faultMessage.setInterceptorChain(chain);
             try {
                 chain.doIntercept(faultMessage);
+            } catch (RuntimeException exc) {
+                LOG.log(Level.SEVERE, "Error occurred during error handling, give up!", exc);
+                throw exc;
             } catch (Exception exc) {
                 LOG.log(Level.SEVERE, "Error occurred during error handling, give up!", exc);
                 throw new RuntimeException(exc);
