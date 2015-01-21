@@ -104,6 +104,9 @@ public class JwsCompactConsumer {
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
     }
+    public boolean verifySignatureWith(JsonWebKey key, String algo) {
+        return verifySignatureWith(JwsUtils.getSignatureVerifier(key, algo));
+    }
     public boolean verifySignatureWith(RSAPublicKey key, String algo) {
         return verifySignatureWith(JwsUtils.getRSAKeySignatureVerifier(key, algo));
     }

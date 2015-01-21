@@ -171,6 +171,9 @@ public class JwsJsonConsumer {
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
     }
+    public boolean verifySignatureWith(JsonWebKey key, String algo) {
+        return verifySignatureWith(JwsUtils.getSignatureVerifier(key, algo));
+    }
     public JwsJsonProducer toProducer() {
         JwsJsonProducer p = new JwsJsonProducer(getDecodedJwsPayload());
         p.getSignatureEntries().addAll(signatureEntries);
