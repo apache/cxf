@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor.security;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
@@ -151,7 +152,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
 
         } catch (LoginException ex) {
             String errorMessage = "Authentication failed: " + ex.getMessage();
-            LOG.fine(errorMessage);
+            LOG.log(Level.FINE, errorMessage, ex);
             if (reportFault) {
                 AuthenticationException aex = new AuthenticationException(errorMessage);
                 aex.initCause(ex);
