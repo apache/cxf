@@ -64,6 +64,9 @@ public class JwsCompactProducer {
         }
         return plainRep;
     }
+    public String getEncodedSignature() {
+        return signature;
+    }
     public String getSignedEncodedJws() {
         return getSignedEncodedJws(false);
     }

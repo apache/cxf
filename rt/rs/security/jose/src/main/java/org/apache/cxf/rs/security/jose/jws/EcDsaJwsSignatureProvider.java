@@ -42,42 +42,68 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
     }
     @Override
     protected JwsSignature doCreateJwsSignature(Signature s) {
-        return new EcDsaPrivateKeyJwsSignature(s);
+        return new EcDsaPrivateKeyJwsSignature(s, 
+            EcDsaJwsSignatureVerifier.SIGNATURE_LENGTH_MAP.get(super.getAlgorithm()));
     }
     
     protected static class EcDsaPrivateKeyJwsSignature extends PrivateKeyJwsSignature {
-        public EcDsaPrivateKeyJwsSignature(Signature s) {
+        private int outLen;
+        public EcDsaPrivateKeyJwsSignature(Signature s, int outLen) {
             super(s);
+            this.outLen = outLen;
         }
         @Override
         public byte[] sign() {
-            byte[] der = super.sign();
-            return jcaOutputToJoseOutput(der);
+            byte[] jcaDer = super.sign();
+            return jcaOutputToJoseOutput(outLen, jcaDer);
         }
     }
     
-    private static byte[] jcaOutputToJoseOutput(byte jcaDer[]) {
+    private static byte[] jcaOutputToJoseOutput(int jwsSignatureLen, byte jcaDer[]) {
         // DER uses a pattern of type-length-value triplets
         // http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One#Example_encoded_in_DER
         
         // The algorithm implementation guarantees the correct DER format so no extra validation
         
         // ECDSA signature production: 
-        // 48 (SEQUENCE) + total length + R & S triples, where every triple is 2 
-        // (INTEGER TYPE + length + the actual integer)
+        // 48 (SEQUENCE) + Total Length (1 or 2 bytes, the 1st byte is -127 if 2 bytes) 
+        // + R & S triples, where both triples are represented as 
+        // 2(INTEGER TYPE) + length + the actual sequence of a given length;
+        // The sequence might have the extra leading zeroes which need to be skipped
+        int requiredPartLen = jwsSignatureLen / 2;
         
-        int rPartLen = jcaDer[3];
-        int rOffset = rPartLen % 8;
-        int rValueStart = 4 + rOffset;
-        int sPartStart = 4 + rPartLen;
+        int rsDataBlockStart = jcaDer[1] == -127 ? 4 : 3;
+        int rPartLen = jcaDer[rsDataBlockStart];
+        int rDataBlockStart = rsDataBlockStart + 1;
+        int rPartLenDiff = rPartLen - requiredPartLen; 
+        int rValueStart = rDataBlockStart + getDataBlockOffset(jcaDer, rDataBlockStart, rPartLenDiff);
+        
+        int sPartStart = rDataBlockStart + rPartLen;
         int sPartLen = jcaDer[sPartStart + 1];
-        int sOffset = sPartLen % 8;
-        int sValueStart = sPartStart + 2 + sOffset;
-        
-        int partLen = rPartLen - rOffset;
-        byte[] result = new byte[partLen * 2]; 
-        System.arraycopy(jcaDer, rValueStart, result, 0, partLen);
-        System.arraycopy(jcaDer, sValueStart, result, partLen, partLen);
+        int sPartLenDiff = sPartLen - requiredPartLen; 
+        int sDataBlockStart = sPartStart + 2;
+        int sValueStart = sDataBlockStart + getDataBlockOffset(jcaDer, sDataBlockStart, sPartLenDiff);
+                
+        byte[] result = new byte[jwsSignatureLen]; 
+        System.arraycopy(jcaDer, rValueStart, result, 
+            rPartLenDiff < 0 ? rPartLenDiff * -1 : 0, 
+            rPartLenDiff < 0 ? requiredPartLen + rPartLenDiff : requiredPartLen);
+        System.arraycopy(jcaDer, sValueStart, result, 
+            sPartLenDiff < 0 ? requiredPartLen + sPartLenDiff * -1 : requiredPartLen, 
+            sPartLenDiff < 0 ? requiredPartLen + sPartLenDiff : requiredPartLen);
         return result;
     }
+    private static int getDataBlockOffset(byte[] jcaDer, int blockStart, int partLenDiff) {
+        // ECDSA productions have 64, 96 or 132 output lengths. The R and S parts would be 32, 48 or 66 bytes each.
+        // If it is 32 or 48 bytes then we may have occasional extra zeroes in the JCA DER output
+        int i = 0;
+        if (partLenDiff > 0) {
+            while (i < partLenDiff && jcaDer[blockStart + i] == 0) {
+                i++;
+            }
+        }
+        return i;
+    }
+    
+    
 }

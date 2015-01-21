@@ -27,7 +27,7 @@ import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
 public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
-    private static final Map<String, Integer> SIGNATURE_LENGTH_MAP;
+    static final Map<String, Integer> SIGNATURE_LENGTH_MAP;
     static {
         SIGNATURE_LENGTH_MAP = new HashMap<String, Integer>();
         SIGNATURE_LENGTH_MAP.put(Algorithm.SHA256withECDSA.getJwtName(), 64);
@@ -54,21 +54,25 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     }
     private static byte[] signatureToDer(byte joseSig[]) {
         int partLen = joseSig.length / 2;
-        // 0 needs to be appended if the first byte is negative
         int rOffset = joseSig[0] < 0 ? 1 : 0;
         int sOffset = joseSig[partLen] < 0 ? 1 : 0;
-        
-        byte[] der = new byte[6 + joseSig.length + rOffset + sOffset];
+        int rPartLen = partLen + rOffset;
+        int sPartLen = partLen + sOffset;
+        int totalLenBytesCount = joseSig.length > 127 ? 2 : 1;
+        int rPartStart = 1 + totalLenBytesCount + 2;
+        byte[] der = new byte[rPartStart + 2 + rPartLen + sPartLen];
         der[0] = 48;
-        der[1] = (byte)(der.length - 2);
-        der[2] = 2;
-        der[3] = (byte)(partLen + rOffset);
-        int sPartStart = 4 + der[3];
+        if (totalLenBytesCount == 2) {
+            der[1] = -127;
+        }
+        der[totalLenBytesCount] = (byte)(der.length - (1 + totalLenBytesCount));
+        der[totalLenBytesCount + 1] = 2;
+        der[totalLenBytesCount + 2] = (byte)rPartLen;
+        int sPartStart = rPartStart + rPartLen;
         der[sPartStart] = 2;
-        der[sPartStart + 1] = (byte)(partLen + sOffset);
-        System.arraycopy(joseSig, 0, der, 4 + rOffset, partLen);
+        der[sPartStart + 1] = (byte)sPartLen;
+        System.arraycopy(joseSig, 0, der, rPartStart + rOffset, partLen);
         System.arraycopy(joseSig, partLen, der, sPartStart + 2 + sOffset, partLen);
         return der;
     }
-    
 }
