@@ -841,16 +841,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         }
         
         // Write out renewal semantics
-        if (sendRenewing) {
-            writer.writeStartElement("wst", "Renewing", namespace);
-            if (!allowRenewing) {
-                writer.writeAttribute(null, "Allow", "false");
-            }
-            if (allowRenewing && allowRenewingAfterExpiry) {
-                writer.writeAttribute(null, "OK", "true");
-            }
-            writer.writeEndElement();
-        }
+        writeRenewalSemantics(writer);
         
         writer.writeEndElement();
 
@@ -1053,16 +1044,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         writer.writeEndElement();
         
         // Write out renewal semantics
-        if (sendRenewing) {
-            writer.writeStartElement("wst", "Renewing", namespace);
-            if (!allowRenewing) {
-                writer.writeAttribute(null, "Allow", "false");
-            }
-            if (allowRenewing && allowRenewingAfterExpiry) {
-                writer.writeAttribute(null, "OK", "true");
-            }
-            writer.writeEndElement();
-        }
+        writeRenewalSemantics(writer);
         
         writer.writeEndElement();
 
@@ -1126,19 +1108,82 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         writer.writeCharacters(tokentype);
         writer.writeEndElement();
         
-        addClaims(writer);
+        if (tokentype.endsWith("/RSTR/Status")) {
+            addClaims(writer);
 
-        writer.writeStartElement("wst", "ValidateTarget", namespace);
+            writer.writeStartElement("wst", "ValidateTarget", namespace);
 
-        Element el = tok.getToken();
-        StaxUtils.copy(el, writer);
+            Element el = tok.getToken();
+            StaxUtils.copy(el, writer);
 
-        writer.writeEndElement();
-        writer.writeEndElement();
+            writer.writeEndElement();
+            writer.writeEndElement();
 
-        Object o[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
-        
-        return new STSResponse((DOMSource)o[0], null);
+            Object o[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+            
+            return new STSResponse((DOMSource)o[0], null);
+        } else {
+            if (enableLifetime) {
+                addLifetime(writer);
+            }
+            
+            // Default to Bearer KeyType
+            String keyTypeTemplate = keyType;
+            if (keyTypeTemplate == null) {
+                keyTypeTemplate = namespace + "/Bearer";
+            }
+            keyTypeTemplate = writeKeyType(writer, keyTypeTemplate);
+
+            byte[] requestorEntropy = null;
+            X509Certificate cert = null;
+            Crypto crypto = null;
+
+            if (keySize <= 0) {
+                keySize = 256;
+            }
+            if (keyTypeTemplate != null && keyTypeTemplate.endsWith("SymmetricKey")) {
+                requestorEntropy = writeElementsForRSTSymmetricKey(writer, false);
+            } else if (keyTypeTemplate != null && keyTypeTemplate.endsWith("PublicKey")) {
+                // Use the given cert, or else get it from a Crypto instance
+                if (useKeyCertificate != null) {
+                    cert = useKeyCertificate;
+                } else {
+                    crypto = createCrypto(false);
+                    cert = getCert(crypto);
+                }
+                writeElementsForRSTPublicKey(writer, cert);
+            }
+
+            writeRenewalSemantics(writer);
+            
+            addClaims(writer);
+
+            writer.writeStartElement("wst", "ValidateTarget", namespace);
+
+            Element el = tok.getToken();
+            StaxUtils.copy(el, writer);
+
+            writer.writeEndElement();
+            writer.writeEndElement();
+
+            Object o[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+            
+            return new STSResponse((DOMSource)o[0], requestorEntropy, cert, crypto);
+        }
+    }
+    
+    private void writeRenewalSemantics(XMLStreamWriter writer) throws XMLStreamException {
+        // Write out renewal semantics
+        if (sendRenewing) {
+            writer.writeStartElement("wst", "Renewing", namespace);
+            if (!allowRenewing) {
+                writer.writeAttribute(null, "Allow", "false");
+            }
+            if (allowRenewing && allowRenewingAfterExpiry) {
+                writer.writeAttribute(null, "OK", "true");
+            }
+            writer.writeEndElement();
+        }    
     }
 
     /**
