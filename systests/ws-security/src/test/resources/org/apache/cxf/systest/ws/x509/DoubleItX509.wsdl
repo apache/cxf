@@ -723,6 +723,9 @@
         <wsdl:port name="DoubleItTransportNegativeEndorsingPort2" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="https://localhost:9002/DoubleItX509TransportNegativeEndorsing2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricPropertiesPort" binding="tns:DoubleItAsymmetricIssuerSerialBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509AsymmetricProperties"/>
+        </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItKeyIdentifierPolicy">
         <wsp:ExactlyOne>

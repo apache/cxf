@@ -367,4 +367,6 @@
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricProperties" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricProperties" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPropertiesPort" implementor="org.apache.cxf.systest.ws.x509.DoubleItPropertiesImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+    </jaxws:endpoint>
 </beans>
