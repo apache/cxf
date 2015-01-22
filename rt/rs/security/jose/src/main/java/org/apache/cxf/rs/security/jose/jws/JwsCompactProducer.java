@@ -32,7 +32,6 @@ public class JwsCompactProducer {
     private JoseHeaders headers;
     private String plainJwsPayload;
     private String signature;
-    private String plainRep;
     public JwsCompactProducer(String plainJwsPayload) {
         this(null, null, plainJwsPayload);
     }
@@ -57,12 +56,9 @@ public class JwsCompactProducer {
     }
     private String getUnsignedEncodedJws(boolean detached) {
         checkAlgorithm();
-        if (plainRep == null) {
-            plainRep = Base64UrlUtility.encode(writer.headersToJson(getJoseHeaders())) 
-                + "." 
-                + (detached ? "" : Base64UrlUtility.encode(plainJwsPayload));
-        }
-        return plainRep;
+        return Base64UrlUtility.encode(writer.headersToJson(getJoseHeaders())) 
+               + "." 
+               + (detached ? "" : Base64UrlUtility.encode(plainJwsPayload));
     }
     public String getEncodedSignature() {
         return signature;

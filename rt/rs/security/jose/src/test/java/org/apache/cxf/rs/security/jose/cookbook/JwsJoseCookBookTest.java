@@ -164,6 +164,61 @@ public class JwsJoseCookBookTest {
     private static final String ECSDA_SIGNATURE_PROTECTED_HEADER =
               "eyJhbGciOiJFUzUxMiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX"
             + "hhbXBsZSJ9";
+    private static final String HMAC_KID_VALUE = "018c0ae5-4d9b-471b-bfd6-eef314bc7037";
+    private static final String HMAC_SIGNATURE_PROTECTED_HEADER_JSON = ("{"
+        + "\"alg\": \"HS256\","
+        + "\"kid\": \"018c0ae5-4d9b-471b-bfd6-eef314bc7037\""
+        + "}").replaceAll(" ", "");
+    private static final String HMAC_SIGNATURE_PROTECTED_HEADER =
+          "eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LTRkOWItNDcxYi1iZmQ2LW"
+        + "VlZjMxNGJjNzAzNyJ9";
+    private static final String HMAC_SIGNATURE_VALUE = "s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p0";
+    private static final String HMAC_JSON_GENERAL_SERIALIZATION = ("{"
+        + "\"payload\": \"SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywg"
+        + "Z29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9h"
+        + "ZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXi"
+        + "gJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9m"
+        + "ZiB0by4\","
+        + "\"signatures\": ["
+        + "{"
+        + "\"protected\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LT"
+        + "RkOWItNDcxYi1iZmQ2LWVlZjMxNGJjNzAzNyJ9\","
+        + "\"signature\": \"s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p"
+        + "0\""
+        + "}"
+        + "]"
+        + "}").replaceAll(" ", "");
+    private static final String HMAC_JSON_FLATTENED_SERIALIZATION = ("{"
+        + "\"payload\": \"SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywg"
+        + "Z29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9h"
+        + "ZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXi"
+        + "gJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9m"
+        + "ZiB0by4\","
+        + "\"protected\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LTRkOW"
+        + "ItNDcxYi1iZmQ2LWVlZjMxNGJjNzAzNyJ9\","
+        + "\"signature\": \"s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p0\""
+        + "}").replaceAll(" ", "");
+    private static final String DETACHED_HMAC_JWS =
+          ("eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LTRkOWItNDcxYi1iZmQ2LW"
+        + "VlZjMxNGJjNzAzNyJ9"
+        + "."
+        + "."
+        + "s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p0").replaceAll(" ", "");
+    private static final String HMAC_DETACHED_JSON_GENERAL_SERIALIZATION = ("{"
+        + "\"signatures\": ["
+        + "{"
+        + "\"protected\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LT"
+        + "RkOWItNDcxYi1iZmQ2LWVlZjMxNGJjNzAzNyJ9\","
+        + "\"signature\": \"s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p"
+        + "0\""
+        + "}"
+        + "]"
+        + "}").replaceAll(" ", "");
+    private static final String HMAC_DETACHED_JSON_FLATTENED_SERIALIZATION = ("{"
+        + "\"protected\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LTRkOW"
+        + "ItNDcxYi1iZmQ2LWVlZjMxNGJjNzAzNyJ9\","
+        + "\"signature\": \"s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p0\""
+        + "}").replaceAll(" ", "");
     
     @Test
     public void testEncodedPayload() throws Exception {
@@ -289,6 +344,79 @@ public class JwsJoseCookBookTest {
         } finally {
             Security.removeProvider(BouncyCastleProvider.class.getName());
         }
+    }
+    @Test
+    public void testHMACSignature() throws Exception {
+        JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD);
+        compactProducer.getJoseHeaders().setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+        compactProducer.getJoseHeaders().setKeyId(HMAC_KID_VALUE);
+        JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
+        assertEquals(reader.toJson(compactProducer.getJoseHeaders().asMap()), HMAC_SIGNATURE_PROTECTED_HEADER_JSON);
+        assertEquals(compactProducer.getUnsignedEncodedJws(),
+                HMAC_SIGNATURE_PROTECTED_HEADER + "." + ENCODED_PAYLOAD);
+        JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
+        List<JsonWebKey> keys = jwks.getKeys();
+        JsonWebKey key = keys.get(0);
+        compactProducer.signWith(key);
+        assertEquals(compactProducer.getSignedEncodedJws(),
+                HMAC_SIGNATURE_PROTECTED_HEADER + "." + ENCODED_PAYLOAD + "." + HMAC_SIGNATURE_VALUE);
+        JwsCompactConsumer compactConsumer = new JwsCompactConsumer(compactProducer.getSignedEncodedJws());
+        assertTrue(compactConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+
+        JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
+        assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
+        assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
+        JoseHeaders joseHeaders = new JoseHeaders();
+        joseHeaders.setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+        joseHeaders.setKeyId(HMAC_KID_VALUE);
+        JwsJsonProtectedHeader protectedHeader = new JwsJsonProtectedHeader(joseHeaders);
+        jsonProducer.signWith(JwsUtils.getSignatureProvider(key, JoseConstants.HMAC_SHA_256_ALGO), protectedHeader);
+        assertEquals(jsonProducer.getJwsJsonSignedDocument(), HMAC_JSON_GENERAL_SERIALIZATION);
+        JwsJsonConsumer jsonConsumer = new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument());
+        assertTrue(jsonConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+
+        jsonProducer = new JwsJsonProducer(PAYLOAD, true);
+        jsonProducer.signWith(JwsUtils.getSignatureProvider(key, JoseConstants.HMAC_SHA_256_ALGO), protectedHeader);
+        assertEquals(jsonProducer.getJwsJsonSignedDocument(), HMAC_JSON_FLATTENED_SERIALIZATION);
+        jsonConsumer = new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument());
+        assertTrue(jsonConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+    }
+    @Test
+    public void testDetachedHMACSignature() throws Exception {
+        JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD);
+        compactProducer.getJoseHeaders().setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+        compactProducer.getJoseHeaders().setKeyId(HMAC_KID_VALUE);
+        JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
+        assertEquals(reader.toJson(compactProducer.getJoseHeaders().asMap()), HMAC_SIGNATURE_PROTECTED_HEADER_JSON);
+        assertEquals(compactProducer.getUnsignedEncodedJws(),
+                HMAC_SIGNATURE_PROTECTED_HEADER + "." + ENCODED_PAYLOAD);
+        JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
+        List<JsonWebKey> keys = jwks.getKeys();
+        JsonWebKey key = keys.get(0);
+        compactProducer.signWith(key);
+        assertEquals(compactProducer.getSignedEncodedJws(true), DETACHED_HMAC_JWS);
+        JwsCompactConsumer compactConsumer =
+                new JwsCompactConsumer(compactProducer.getSignedEncodedJws(true), ENCODED_PAYLOAD);
+        assertTrue(compactConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+
+        JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
+        assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
+        assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
+        JoseHeaders joseHeaders = new JoseHeaders();
+        joseHeaders.setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+        joseHeaders.setKeyId(HMAC_KID_VALUE);
+        JwsJsonProtectedHeader protectedHeader = new JwsJsonProtectedHeader(joseHeaders);
+        jsonProducer.signWith(JwsUtils.getSignatureProvider(key, JoseConstants.HMAC_SHA_256_ALGO), protectedHeader);
+        assertEquals(jsonProducer.getJwsJsonSignedDocument(true), HMAC_DETACHED_JSON_GENERAL_SERIALIZATION);
+        JwsJsonConsumer jsonConsumer =
+                new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument(true), ENCODED_PAYLOAD);
+        assertTrue(jsonConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+
+        jsonProducer = new JwsJsonProducer(PAYLOAD, true);
+        jsonProducer.signWith(JwsUtils.getSignatureProvider(key, JoseConstants.HMAC_SHA_256_ALGO), protectedHeader);
+        assertEquals(jsonProducer.getJwsJsonSignedDocument(true), HMAC_DETACHED_JSON_FLATTENED_SERIALIZATION);
+        jsonConsumer = new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument(true), ENCODED_PAYLOAD);
+        assertTrue(jsonConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
     }
     public JsonWebKeys readKeySet(String fileName) throws Exception {
         InputStream is = JwsJoseCookBookTest.class.getResourceAsStream(fileName);

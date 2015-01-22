@@ -57,7 +57,7 @@ public class JwsCompactConsumer {
         }
         String encodedJwsPayload = parts[1];
         if (encodedDetachedPayload != null) {
-            if (StringUtils.isEmpty(encodedJwsPayload)) {
+            if (!StringUtils.isEmpty(encodedJwsPayload)) {
                 throw new SecurityException("Invalid JWS Compact sequence");
             }
             encodedJwsPayload = encodedDetachedPayload;
