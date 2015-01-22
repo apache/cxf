@@ -217,6 +217,65 @@ public class SelectMethodCandidatesTest extends Assert {
     }
     
     @Test
+    public void testDefaultMethod() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(DefaultMethodResource.class);
+        sf.create();
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        String contentType = "text/xml";
+        String acceptContentTypes = "text/xml";
+        
+        Message m = new MessageImpl();
+        m.put(Message.CONTENT_TYPE, contentType);
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(m);
+        m.setExchange(ex);
+        Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        e.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        e.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        e.get(ServerProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(ServerProviderFactory.getInstance()).times(3);
+        e.get("org.apache.cxf.jaxrs.comparator");
+        EasyMock.expectLastCall().andReturn(null);
+        EasyMock.replay(e);
+        ex.put(Endpoint.class, e);
+        
+        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, m, 
+                                                            "/service/all",
+                                                            "PUT",
+                                                            values, 
+                                                            contentType, 
+                                                            sortMediaTypes(acceptContentTypes));
+        assertNotNull(ori);
+        assertEquals("resourceMethod needs to be selected", "all",
+                     ori.getMethodToInvoke().getName());
+        values.clear();
+        ori = findTargetResourceClass(resources, m, 
+                                                            "/service/all",
+                                                            "GET",
+                                                            values, 
+                                                            contentType, 
+                                                            sortMediaTypes(acceptContentTypes));
+        assertNotNull(ori);
+        assertEquals("resourceMethod needs to be selected", "getAll",
+                     ori.getMethodToInvoke().getName());
+        ori = findTargetResourceClass(resources, m, 
+                                      "/service",
+                                      "GET",
+                                      values, 
+                                      contentType, 
+                                      sortMediaTypes(acceptContentTypes));
+        assertNotNull(ori);
+        assertEquals("resourceMethod needs to be selected", "get",
+            ori.getMethodToInvoke().getName());
+    }
+    
+    @Test
     public void testConsumesResource1() throws Exception {
         doTestConsumesResource(ConsumesResource1.class, "text/xml", "m2");
     }
