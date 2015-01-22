@@ -127,21 +127,32 @@ public class JwsJsonProducer {
         if (unionHeaders.getAlgorithm() == null) {
             throw new SecurityException("Algorithm header is not set");
         }
-        String sequenceToBeSigned = protectedHeader.getEncodedHeaderEntries() 
-            + "." + getUnsignedEncodedPayload();
+        String sequenceToBeSigned;
+        if (protectedHeader != null) {
+            sequenceToBeSigned = protectedHeader.getEncodedHeaderEntries()
+                    + "." + getUnsignedEncodedPayload();
+        } else {
+            sequenceToBeSigned = "." + getUnsignedEncodedPayload();
+        }
         byte[] bytesToBeSigned = StringUtils.toBytesUTF8(sequenceToBeSigned);
         
         byte[] signatureBytes = signer.sign(unionHeaders, bytesToBeSigned);
         
         String encodedSignatureBytes = Base64UrlUtility.encode(signatureBytes);
-        JwsJsonSignatureEntry signature = 
-            new JwsJsonSignatureEntry(encodedPayload, 
-                                      protectedHeader.getEncodedHeaderEntries(),
-                                      encodedSignatureBytes,
-                                      unprotectedHeader); 
+        JwsJsonSignatureEntry signature;
+        if (protectedHeader != null) {
+            signature = new JwsJsonSignatureEntry(encodedPayload,
+                    protectedHeader.getEncodedHeaderEntries(),
+                    encodedSignatureBytes,
+                    unprotectedHeader);
+        } else {
+            signature = new JwsJsonSignatureEntry(encodedPayload,
+                    null,
+                    encodedSignatureBytes,
+                    unprotectedHeader);
+        }
         return updateJwsJsonSignedDocument(signature);
     }
-    
     private String updateJwsJsonSignedDocument(JwsJsonSignatureEntry signature) {
         signatures.add(signature);
         return getJwsJsonSignedDocument();
