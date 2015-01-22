@@ -214,6 +214,13 @@
             <entry key="ws-security.encryption.username" value="alice"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSignatureEncryption" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricSignatureEncryption" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSignatureEncryptionPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509Signature.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricProtectTokens" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricProtect" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricProtectTokensPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
