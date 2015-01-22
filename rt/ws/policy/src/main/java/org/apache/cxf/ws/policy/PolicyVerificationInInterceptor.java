@@ -104,7 +104,7 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
                 message.getExchange().put("ws-policy.validated.alternatives", usedAlternatives);
             }
         } catch (PolicyException ex) {
-            LOG.log(Level.SEVERE, "Inbound policy verification failed: " + ex.getMessage(), e);
+            LOG.log(Level.SEVERE, "Inbound policy verification failed: " + ex.getMessage());
             //To check if there is ws addressing policy violation and throw WSA specific 
             //exception to pass jaxws2.2 tests
             if (ex.getMessage().indexOf("Addressing") > -1) {
