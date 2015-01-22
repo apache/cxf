@@ -91,6 +91,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
+import org.apache.cxf.jaxrs.ext.DefaultMethod;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
@@ -620,7 +621,8 @@ public final class JAXRSUtils {
     
     private static boolean matchHttpMethod(String expectedMethod, String httpMethod) {
         if (expectedMethod.equalsIgnoreCase(httpMethod) 
-            || headMethodPossible(expectedMethod, httpMethod)) {
+            || headMethodPossible(expectedMethod, httpMethod)
+            || expectedMethod.equals(DefaultMethod.class.getSimpleName())) {
             return true;
         }
         return false;
