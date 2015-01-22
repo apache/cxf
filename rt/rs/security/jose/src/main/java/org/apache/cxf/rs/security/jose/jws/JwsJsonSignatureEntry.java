@@ -48,8 +48,10 @@ public class JwsJsonSignatureEntry {
         this.encodedProtectedHeader = encodedProtectedHeader;
         this.encodedSignature = encodedSignature;
         this.unprotectedHeader = unprotectedHeader;
-        this.protectedHeader = new JwsJsonProtectedHeader(
-            new JoseHeadersReaderWriter().fromJsonHeaders(JoseUtils.decodeToString(encodedProtectedHeader)));
+        if (encodedProtectedHeader != null) {
+            this.protectedHeader = new JwsJsonProtectedHeader(
+                    new JoseHeadersReaderWriter().fromJsonHeaders(JoseUtils.decodeToString(encodedProtectedHeader)));
+        }
         prepare();
     }
     private void prepare() {
@@ -94,7 +96,11 @@ public class JwsJsonSignatureEntry {
         return JoseUtils.decode(getEncodedSignature());
     }
     public String getUnsignedEncodedSequence() {
-        return getEncodedProtectedHeader() + "." + getEncodedJwsPayload();
+        if (getEncodedProtectedHeader() != null) {
+            return getEncodedProtectedHeader() + "." + getEncodedJwsPayload();
+        } else {
+            return "." + getEncodedJwsPayload();
+        }
     }
     public String getKeyId() {
         return getUnionHeader().getKeyId();
@@ -133,7 +139,7 @@ public class JwsJsonSignatureEntry {
             if (protectedHeader != null) {
                 sb.append(",");
             }
-            sb.append("\"header\":\"" + unprotectedHeader.toJson());
+            sb.append("\"header\":" + unprotectedHeader.toJson());
         }
         sb.append(",");
         sb.append("\"signature\":\"" + encodedSignature + "\"");

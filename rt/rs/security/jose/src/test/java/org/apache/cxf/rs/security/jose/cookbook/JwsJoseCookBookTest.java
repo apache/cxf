@@ -39,9 +39,9 @@ import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonProtectedHeader;
+import org.apache.cxf.rs.security.jose.jws.JwsJsonUnprotectedHeader;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -219,7 +219,134 @@ public class JwsJoseCookBookTest {
         + "ItNDcxYi1iZmQ2LWVlZjMxNGJjNzAzNyJ9\","
         + "\"signature\": \"s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p0\""
         + "}").replaceAll(" ", "");
-    
+    private static final String PROTECTING_SPECIFIC_HEADER_FIELDS_JSON_GENERAL_SERIALIZATION = ("{"
+        + "\"payload\": \"SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywg"
+        + "Z29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9h"
+        + "ZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXi"
+        + "gJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9m"
+        + "ZiB0by4\","
+        + "\"signatures\": ["
+        + "{"
+        + "\"protected\": \"eyJhbGciOiJIUzI1NiJ9\","
+        + "\"header\": {"
+        + "\"kid\": \"018c0ae5-4d9b-471b-bfd6-eef314bc7037\""
+        + "},"
+        + "\"signature\": \"bWUSVaxorn7bEF1djytBd0kHv70Ly5pvbomzMWSOr2"
+        + "0\""
+        + "}"
+        + "]"
+        + "}").replace(" ", "");
+    private static final String PROTECTING_SPECIFIC_HEADER_FIELDS_JSON_FLATTENED_SERIALIZATION = ("{"
+        + "\"payload\": \"SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywg"
+        + "Z29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9h"
+        + "ZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXi"
+        + "gJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9m"
+        + "ZiB0by4\","
+        + "\"protected\": \"eyJhbGciOiJIUzI1NiJ9\","
+        + "\"header\": {"
+        + "\"kid\": \"018c0ae5-4d9b-471b-bfd6-eef314bc7037\""
+        + "},"
+        + "\"signature\": \"bWUSVaxorn7bEF1djytBd0kHv70Ly5pvbomzMWSOr20\""
+        + "}").replace(" ", "");
+    private static final String PROTECTING_CONTENT_ONLY_JSON_GENERAL_SERIALIZATION = ("{"
+        + "\"payload\": \"SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywg"
+        + "Z29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9h"
+        + "ZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXi"
+        + "gJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9m"
+        + "ZiB0by4\","
+        + "\"signatures\": ["
+        + "{"
+        + "\"header\": {"
+        + "\"alg\": \"HS256\","
+        + "\"kid\": \"018c0ae5-4d9b-471b-bfd6-eef314bc7037\""
+        + "},"
+        + "\"signature\": \"xuLifqLGiblpv9zBpuZczWhNj1gARaLV3UxvxhJxZu"
+        + "k\""
+        + "}"
+        + "]"
+        + "}").replace(" ", "");
+    private static final String PROTECTING_CONTENT_ONLY_JSON_FLATTENED_SERIALIZATION = ("{"
+        + "\"payload\": \"SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywg"
+        + "Z29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9h"
+        + "ZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXi"
+        + "gJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9m"
+        + "ZiB0by4\","
+        + "\"header\": {"
+        + "\"alg\": \"HS256\","
+        + "\"kid\": \"018c0ae5-4d9b-471b-bfd6-eef314bc7037\""
+        + "},"
+        + "\"signature\": \"xuLifqLGiblpv9zBpuZczWhNj1gARaLV3UxvxhJxZuk\""
+        + "}").replace(" ", "");
+    private static final String FIRST_SIGNATURE_ENTRY_MULTIPLE_SIGNATURES = ("{"
+        + "\"protected\": \"eyJhbGciOiJSUzI1NiJ9\","
+        + "\"header\": {"
+        + "\"kid\": \"bilbo.baggins@hobbiton.example\""
+        + "},"
+        + "\"signature\": \"MIsjqtVlOpa71KE-Mss8_Nq2YH4FGhiocsqrgi5NvyG53u"
+        + "oimic1tcMdSg-qptrzZc7CG6Svw2Y13TDIqHzTUrL_lR2ZFcryNFiHkS"
+        + "w129EghGpwkpxaTn_THJTCglNbADko1MZBCdwzJxwqZc-1RlpO2HibUY"
+        + "yXSwO97BSe0_evZKdjvvKSgsIqjytKSeAMbhMBdMma622_BG5t4sdbuC"
+        + "HtFjp9iJmkio47AIwqkZV1aIZsv33uPUqBBCXbYoQJwt7mxPftHmNlGo"
+        + "OSMxR_3thmXTCm4US-xiNOyhbm8afKK64jU6_TPtQHiJeQJxz9G3Tx-0"
+        + "83B745_AfYOnlC9w\""
+        + "}").replace(" ", "");
+    private static final String SECOND_SIGNATURE_ENTRY_MULTIPLE_SIGNATURES = ("{"
+        + "\"header\": {"
+        + "\"alg\": \"ES512\","
+        + "\"kid\": \"bilbo.baggins@hobbiton.example\""
+        + "},"
+        + "\"signature\": \"ARcVLnaJJaUWG8fG-8t5BREVAuTY8n8YHjwDO1muhcdCoF"
+        + "ZFFjfISu0Cdkn9Ybdlmi54ho0x924DUz8sK7ZXkhc7AFM8ObLfTvNCrq"
+        + "cI3Jkl2U5IX3utNhODH6v7xgy1Qahsn0fyb4zSAkje8bAWz4vIfj5pCM"
+        + "Yxxm4fgV3q7ZYhm5eD\""
+        + "}").replace(" ", "");
+    private static final String SECOND_SIGNATURE_UNPROTECTED_HEADER_MULTIPLE_SIGNATURES = ("{"
+        + "\"alg\": \"ES512\","
+        + "\"kid\": \"bilbo.baggins@hobbiton.example\""
+        + "}").replace(" ", "");
+    private static final String THIRD_SIGNATURE_ENTRY_MULTIPLE_SIGNATURES = ("{"
+        + "\"protected\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LTRkOW"
+        + "ItNDcxYi1iZmQ2LWVlZjMxNGJjNzAzNyJ9\","
+        + "\"signature\": \"s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p0\""
+        + "}").replace(" ", "");
+    private static final String MULTIPLE_SIGNATURES_JSON_GENERAL_SERIALIZATION = ("{"
+        + "\"payload\": \"SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywg"
+        + "Z29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9h"
+        + "ZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXi"
+        + "gJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9m"
+        + "ZiB0by4\","
+        + "\"signatures\": ["
+        + "{"
+        + "\"protected\": \"eyJhbGciOiJSUzI1NiJ9\","
+        + "\"header\": {"
+        + "\"kid\": \"bilbo.baggins@hobbiton.example\""
+        + "},"
+        + "\"signature\": \"MIsjqtVlOpa71KE-Mss8_Nq2YH4FGhiocsqrgi5Nvy"
+        + "G53uoimic1tcMdSg-qptrzZc7CG6Svw2Y13TDIqHzTUrL_lR2ZFc"
+        + "ryNFiHkSw129EghGpwkpxaTn_THJTCglNbADko1MZBCdwzJxwqZc"
+        + "-1RlpO2HibUYyXSwO97BSe0_evZKdjvvKSgsIqjytKSeAMbhMBdM"
+        + "ma622_BG5t4sdbuCHtFjp9iJmkio47AIwqkZV1aIZsv33uPUqBBC"
+        + "XbYoQJwt7mxPftHmNlGoOSMxR_3thmXTCm4US-xiNOyhbm8afKK6"
+        + "4jU6_TPtQHiJeQJxz9G3Tx-083B745_AfYOnlC9w\""
+        + "},"
+        + "{"
+        + "\"header\": {"
+        + "\"alg\": \"ES512\","
+        + "\"kid\": \"bilbo.baggins@hobbiton.example\""
+        + "},"
+        + "\"signature\": \"ARcVLnaJJaUWG8fG-8t5BREVAuTY8n8YHjwDO1muhc"
+        + "dCoFZFFjfISu0Cdkn9Ybdlmi54ho0x924DUz8sK7ZXkhc7AFM8Ob"
+        + "LfTvNCrqcI3Jkl2U5IX3utNhODH6v7xgy1Qahsn0fyb4zSAkje8b"
+        + "AWz4vIfj5pCMYxxm4fgV3q7ZYhm5eD\""
+        + "},"
+        + "{"
+        + "\"protected\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IjAxOGMwYWU1LT"
+        + "RkOWItNDcxYi1iZmQ2LWVlZjMxNGJjNzAzNyJ9\","
+        + "\"signature\": \"s0h6KThzkfBBBkLspW1h84VsJZFTsPPqMDA7g1Md7p"
+        + "0\""
+        + "}"
+        + "]"
+        + "}").replace(" ", "");;
     @Test
     public void testEncodedPayload() throws Exception {
         assertEquals(Base64UrlUtility.encode(PAYLOAD), ENCODED_PAYLOAD);
@@ -417,6 +544,131 @@ public class JwsJoseCookBookTest {
         assertEquals(jsonProducer.getJwsJsonSignedDocument(true), HMAC_DETACHED_JSON_FLATTENED_SERIALIZATION);
         jsonConsumer = new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument(true), ENCODED_PAYLOAD);
         assertTrue(jsonConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+    }
+    @Test
+    public void testProtectingSpecificHeaderFieldsSignature() throws Exception {
+        JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
+        assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
+        assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
+        JoseHeaders joseProtectedHeaders = new JoseHeaders();
+        joseProtectedHeaders.setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+        JwsJsonProtectedHeader protectedHeader = new JwsJsonProtectedHeader(joseProtectedHeaders);
+        JoseHeaders joseUnprotectedHeaders = new JoseHeaders();
+        joseUnprotectedHeaders.setKeyId(HMAC_KID_VALUE);
+        JwsJsonUnprotectedHeader unprotectedHeader = new JwsJsonUnprotectedHeader(joseUnprotectedHeaders);
+        JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
+        List<JsonWebKey> keys = jwks.getKeys();
+        JsonWebKey key = keys.get(0);
+        jsonProducer.signWith(JwsUtils.getSignatureProvider(key, JoseConstants.HMAC_SHA_256_ALGO),
+                protectedHeader, unprotectedHeader);
+        assertEquals(jsonProducer.getJwsJsonSignedDocument(),
+                PROTECTING_SPECIFIC_HEADER_FIELDS_JSON_GENERAL_SERIALIZATION);
+        JwsJsonConsumer jsonConsumer =
+                new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument());
+        assertTrue(jsonConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+
+        jsonProducer = new JwsJsonProducer(PAYLOAD, true);
+        jsonProducer.signWith(JwsUtils.getSignatureProvider(key, JoseConstants.HMAC_SHA_256_ALGO),
+                protectedHeader, unprotectedHeader);
+        assertEquals(jsonProducer.getJwsJsonSignedDocument(),
+                PROTECTING_SPECIFIC_HEADER_FIELDS_JSON_FLATTENED_SERIALIZATION);
+        jsonConsumer = new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument());
+        assertTrue(jsonConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+    }
+    @Test
+    public void testProtectingContentOnlySignature() throws Exception {
+        JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
+        assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
+        assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
+        JoseHeaders joseUnprotectedHeaders = new JoseHeaders();
+        joseUnprotectedHeaders.setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+        joseUnprotectedHeaders.setKeyId(HMAC_KID_VALUE);
+        JwsJsonUnprotectedHeader unprotectedHeader = new JwsJsonUnprotectedHeader(joseUnprotectedHeaders);
+        JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
+        List<JsonWebKey> keys = jwks.getKeys();
+        JsonWebKey key = keys.get(0);
+        jsonProducer.signWith(JwsUtils.getSignatureProvider(key, JoseConstants.HMAC_SHA_256_ALGO),
+                null, unprotectedHeader);
+        assertEquals(jsonProducer.getJwsJsonSignedDocument(),
+                PROTECTING_CONTENT_ONLY_JSON_GENERAL_SERIALIZATION);
+        JwsJsonConsumer jsonConsumer =
+                new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument());
+        assertTrue(jsonConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+
+        jsonProducer = new JwsJsonProducer(PAYLOAD, true);
+        jsonProducer.signWith(JwsUtils.getSignatureProvider(key, JoseConstants.HMAC_SHA_256_ALGO),
+                null, unprotectedHeader);
+        assertEquals(jsonProducer.getJwsJsonSignedDocument(),
+                PROTECTING_CONTENT_ONLY_JSON_FLATTENED_SERIALIZATION);
+        jsonConsumer = new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument());
+        assertTrue(jsonConsumer.verifySignatureWith(key, JoseConstants.HMAC_SHA_256_ALGO));
+    }
+    @Test
+    public void testMultipleSignatures() throws Exception {
+        try {
+            Cipher.getInstance(Algorithm.ES_SHA_512_JAVA);
+        } catch (Throwable t) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+        try {
+            JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
+            assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
+            assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
+            JoseHeaders firstSignerProtectedJoseHeaders = new JoseHeaders();
+            firstSignerProtectedJoseHeaders.setAlgorithm(JoseConstants.RS_SHA_256_ALGO);
+            JwsJsonProtectedHeader fristSignerProtectedHeader =
+                    new JwsJsonProtectedHeader(firstSignerProtectedJoseHeaders);
+            JoseHeaders firstSignerUnprotectedJoseHeaders = new JoseHeaders();
+            firstSignerUnprotectedJoseHeaders.setKeyId(RSA_KID_VALUE);
+            JwsJsonUnprotectedHeader firstSignerUnprotectedHeader =
+                    new JwsJsonUnprotectedHeader(firstSignerUnprotectedJoseHeaders);
+            JsonWebKeys jwks = readKeySet("cookbookPrivateSet.txt");
+            List<JsonWebKey> keys = jwks.getKeys();
+            JsonWebKey rsaKey = keys.get(1);
+            jsonProducer.signWith(JwsUtils.getSignatureProvider(rsaKey, JoseConstants.RS_SHA_256_ALGO),
+                    fristSignerProtectedHeader, firstSignerUnprotectedHeader);
+            assertEquals(jsonProducer.getSignatureEntries().get(0).toJson(),
+                    FIRST_SIGNATURE_ENTRY_MULTIPLE_SIGNATURES);
+
+            JoseHeaders secondSignerUnprotectedJoseHeaders = new JoseHeaders();
+            secondSignerUnprotectedJoseHeaders.setAlgorithm(JoseConstants.ES_SHA_512_ALGO);
+            secondSignerUnprotectedJoseHeaders.setKeyId(ECDSA_KID_VALUE);
+            JwsJsonUnprotectedHeader secondSignerUnprotectedHeader =
+                    new JwsJsonUnprotectedHeader(secondSignerUnprotectedJoseHeaders);
+            JsonWebKey ecKey = keys.get(0);
+            jsonProducer.signWith(JwsUtils.getSignatureProvider(ecKey, JoseConstants.ES_SHA_512_ALGO),
+                    null, secondSignerUnprotectedHeader);
+            assertEquals(jsonProducer.getSignatureEntries().get(1).getUnprotectedHeader().toJson(),
+                    SECOND_SIGNATURE_UNPROTECTED_HEADER_MULTIPLE_SIGNATURES);
+            assertEquals(jsonProducer.getSignatureEntries().get(1).toJson().length(),
+                    SECOND_SIGNATURE_ENTRY_MULTIPLE_SIGNATURES.length());
+
+            JoseHeaders thirdSignerProtectedJoseHeaders = new JoseHeaders();
+            thirdSignerProtectedJoseHeaders.setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+            thirdSignerProtectedJoseHeaders.setKeyId(HMAC_KID_VALUE);
+            JwsJsonProtectedHeader thirdSignerProtectedHeader =
+                    new JwsJsonProtectedHeader(thirdSignerProtectedJoseHeaders);
+            JsonWebKeys secretJwks = readKeySet("cookbookSecretSet.txt");
+            List<JsonWebKey> secretKeys = secretJwks.getKeys();
+            JsonWebKey hmacKey = secretKeys.get(0);
+            jsonProducer.signWith(JwsUtils.getSignatureProvider(hmacKey, JoseConstants.HMAC_SHA_256_ALGO),
+                    thirdSignerProtectedHeader);
+            assertEquals(jsonProducer.getSignatureEntries().get(2).toJson(),
+                    THIRD_SIGNATURE_ENTRY_MULTIPLE_SIGNATURES);
+            assertEquals(jsonProducer.getJwsJsonSignedDocument().length(),
+                    MULTIPLE_SIGNATURES_JSON_GENERAL_SERIALIZATION.length());
+            JwsJsonConsumer jsonConsumer =
+                    new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument());
+            JsonWebKeys publicJwks = readKeySet("cookbookPublicSet.txt");
+            List<JsonWebKey> publicKeys = publicJwks.getKeys();
+            JsonWebKey rsaPublicKey = publicKeys.get(1);
+            JsonWebKey ecPublicKey = publicKeys.get(0);
+            assertTrue(jsonConsumer.verifySignatureWith(rsaPublicKey, JoseConstants.RS_SHA_256_ALGO));
+            assertTrue(jsonConsumer.verifySignatureWith(ecPublicKey, JoseConstants.ES_SHA_512_ALGO));
+            assertTrue(jsonConsumer.verifySignatureWith(hmacKey, JoseConstants.HMAC_SHA_256_ALGO));
+        } finally {
+            Security.removeProvider(BouncyCastleProvider.class.getName());
+        }
     }
     public JsonWebKeys readKeySet(String fileName) throws Exception {
         InputStream is = JwsJoseCookBookTest.class.getResourceAsStream(fileName);
