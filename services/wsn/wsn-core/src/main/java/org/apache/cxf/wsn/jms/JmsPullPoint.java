@@ -35,8 +35,10 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsn.AbstractPullPoint;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.Notify;
@@ -120,7 +122,9 @@ public class JmsPullPoint extends AbstractPullPoint {
                 }
                 TextMessage txtMsg = (TextMessage) msg;
                 StringReader reader = new StringReader(txtMsg.getText());
-                Notify notify = (Notify) jaxbContext.createUnmarshaller().unmarshal(reader);
+                XMLStreamReader xreader = StaxUtils.createXMLStreamReader(reader);
+                Notify notify = (Notify) jaxbContext.createUnmarshaller().unmarshal(xreader);
+                reader.close();
                 messages.addAll(notify.getNotificationMessage());
             }
             return messages;

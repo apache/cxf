@@ -47,6 +47,8 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.factory.Factory;
@@ -63,6 +65,7 @@ import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @Produces({"application/atom+xml", "application/atom+xml;type=feed", "application/atom+xml;type=entry" })
 @Consumes({"application/atom+xml", "application/atom+xml;type=feed", "application/atom+xml;type=entry" })
@@ -658,12 +661,21 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
         String entryContent = entry.getContent();
         if (entryContent != null) {
+            XMLStreamReader xreader = StaxUtils.createXMLStreamReader(new StringReader(entryContent));
             try {
                 Unmarshaller um = 
                     jaxbProvider.getJAXBContext(cls, cls).createUnmarshaller();
-                return cls.cast(um.unmarshal(new StringReader(entryContent)));
+                return cls.cast(um.unmarshal(xreader));
             } catch (Exception ex) {
                 reportError("Object of type " + cls.getName() + " can not be deserialized from Entry", ex, 400);
+            } finally {
+                try {
+                    if (xreader != null) {
+                        StaxUtils.close(xreader);
+                    }
+                } catch (XMLStreamException e) {
+                    //ignore
+                }
             }
         }
         return null;
