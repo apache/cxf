@@ -1,3 +1,3 @@
-org.apache.cxf.transport.http.netty.server.NettyHttpTransportFactory::true
+org.apache.cxf.transport.http.netty.server.NettyHttpTransportFactory::true:true
 org.apache.cxf.transport.http.netty.server.NettyHttpDestinationFactory::true:true
-org.apache.cxf.transport.http.netty.server.NettyHttpServerEngineFactory::true
+org.apache.cxf.transport.http.netty.server.NettyHttpServerEngineFactory::true:true

@@ -1,2 +1,2 @@
-org.apache.cxf.transport.http.netty.client.NettyHttpTransportFactory::true
+org.apache.cxf.transport.http.netty.client.NettyHttpTransportFactory::true:true
 org.apache.cxf.transport.http.netty.client.NettyHttpConduitFactory::true:true
