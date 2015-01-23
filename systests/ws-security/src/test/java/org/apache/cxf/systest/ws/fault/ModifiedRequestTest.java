@@ -24,6 +24,8 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
@@ -33,18 +35,16 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.fault.server.ModifiedRequestServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
@@ -78,7 +78,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     public void testModifiedSignedTimestamp() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client.xml");
+        URL busFile = ModifiedRequestTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -106,7 +106,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     public void testModifiedSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client.xml");
+        URL busFile = ModifiedRequestTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -134,7 +134,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     public void testUntrustedSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client-untrusted.xml");
+        URL busFile = ModifiedRequestTest.class.getResource("client/client-untrusted.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -157,7 +157,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     public void testModifiedEncryptedKey() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client.xml");
+        URL busFile = ModifiedRequestTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -185,7 +185,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     public void testModifiedEncryptedSOAPBody() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client.xml");
+        URL busFile = ModifiedRequestTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -220,14 +220,13 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
             Iterator<?> subcodeIterator = fault.getFaultSubcodes();
             assertTrue(subcodeIterator.hasNext());
             Object subcode = subcodeIterator.next();
-            assertEquals(WSSecurityException.FAILED_CHECK, subcode);
+            assertEquals(WSConstants.FAILED_CHECK, subcode);
             assertFalse(subcodeIterator.hasNext());
         }
     }
     
     private static class ModifiedTimestampInterceptor extends AbstractModifyRequestInterceptor {
 
-        @Override
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 // Find the Timestamp + change it.
@@ -238,13 +237,19 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                     WSSecurityUtil.findElement(timestampElement, "Created", WSConstants.WSU_NS);
                 DateFormat zulu = new XmlSchemaDateFormat();
                 
-                XMLGregorianCalendar createdCalendar = 
-                    WSSConfig.datatypeFactory.newXMLGregorianCalendar(createdValue.getTextContent());
-                // Add 5 seconds
-                Duration duration = WSSConfig.datatypeFactory.newDuration(5000L);
-                createdCalendar.add(duration);
-                Date createdDate = createdCalendar.toGregorianCalendar().getTime();
-                createdValue.setTextContent(zulu.format(createdDate));
+                DatatypeFactory datatypeFactory;
+                try {
+                    datatypeFactory = DatatypeFactory.newInstance();
+                    XMLGregorianCalendar createdCalendar = 
+                        datatypeFactory.newXMLGregorianCalendar(createdValue.getTextContent());
+                    // Add 5 seconds
+                    Duration duration = datatypeFactory.newDuration(5000L);
+                    createdCalendar.add(duration);
+                    Date createdDate = createdCalendar.toGregorianCalendar().getTime();
+                    createdValue.setTextContent(zulu.format(createdDate));
+                } catch (DatatypeConfigurationException e) {
+                    // TODO Auto-generated catch block
+                }
             }
         }
         
@@ -255,7 +260,6 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     
     private static class ModifiedSignatureInterceptor extends AbstractModifyRequestInterceptor {
 
-        @Override
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 Element signatureElement = 
@@ -276,7 +280,6 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     
     private static class ModifiedEncryptedKeyInterceptor extends AbstractModifyRequestInterceptor {
 
-        @Override
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 Element encryptedKey = 
@@ -306,7 +309,6 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     
     private static class ModifiedEncryptedSOAPBody extends AbstractModifyRequestInterceptor {
 
-        @Override
         public void modifySecurityHeader(Element securityHeader) {
            //
         }

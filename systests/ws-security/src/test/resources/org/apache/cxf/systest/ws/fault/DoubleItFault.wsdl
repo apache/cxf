@@ -92,9 +92,6 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-<<<<<<< HEAD
-    
-=======
     <wsdl:binding name="DoubleItAsymmetricBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItAsymmetricPolicy"/>
         <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -113,7 +110,6 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
->>>>>>> c748748... Adding some modified request testing for WS-Security
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItSoap11Port" binding="tns:DoubleItSoap11Binding">
             <soap:address location="http://localhost:9009/DoubleItSoap11" />
@@ -172,9 +168,6 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-<<<<<<< HEAD
-    
-=======
     <wsp:Policy wsu:Id="DoubleItAsymmetricPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
@@ -217,7 +210,6 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
->>>>>>> c748748... Adding some modified request testing for WS-Security
     <wsp:Policy wsu:Id="DoubleItBinding_DoubleIt_Input_Policy">
       <wsp:ExactlyOne>
          <wsp:All>

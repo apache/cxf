@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.fault;
+package org.apache.cxf.systest.ws.fault.server;
 
 import java.net.URL;
 
