@@ -24,27 +24,13 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSoap11Port" createdFromAPI="true">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="bob"/>
-        </jaxws:properties>
-    </jaxws:client>
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSoap12Port" createdFromAPI="true">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="bob"/>
-        </jaxws:properties>
-    </jaxws:client>
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.encryption.properties" value="bob-enc.properties"/>
             <entry key="ws-security.encryption.username" value="bob"/>
-            <entry key="ws-security.signature.properties" value="alice-enc.properties"/>
-            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.signature.properties" value="morpit.properties"/>
+            <entry key="ws-security.signature.username" value="morpit"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
