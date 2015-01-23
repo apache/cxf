@@ -35,6 +35,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -45,6 +46,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsn.AbstractSubscription;
 import org.oasis_open.docs.wsn.b_2.InvalidTopicExpressionFaultType;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
@@ -189,8 +191,10 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
     public void onMessage(Message jmsMessage) {
         try {
             TextMessage text = (TextMessage) jmsMessage;
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(text.getText())); 
             Notify notify = (Notify) jaxbContext.createUnmarshaller()
-                    .unmarshal(new StringReader(text.getText()));
+                    .unmarshal(reader);
+            reader.close();
             for (Iterator<NotificationMessageHolderType> ith = notify.getNotificationMessage().iterator();
                 ith.hasNext();) {
                 NotificationMessageHolderType h = ith.next();
