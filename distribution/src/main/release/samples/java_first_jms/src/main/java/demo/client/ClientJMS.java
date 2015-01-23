@@ -30,7 +30,8 @@ import demo.service.HelloWorld;
 public final class ClientJMS {
     private static final String JMS_ENDPOINT_URI = "jms:queue:test.cxf.jmstransport.queue?timeToLive=1000"
                                + "&jndiConnectionFactoryName=ConnectionFactory" + "&jndiInitialContextFactory"
-                               + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory";
+                               + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                               + "&jndiURL=tcp://localhost:61616";
 
     private static final QName SERVICE_QNAME =
         new QName("http://impl.service.demo/", "HelloWorldImplService");
