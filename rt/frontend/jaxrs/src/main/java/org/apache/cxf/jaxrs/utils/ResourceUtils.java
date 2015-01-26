@@ -181,23 +181,20 @@ public final class ResourceUtils {
         return null;
     }
     
-    public static ClassResourceInfo createClassResourceInfo(Map<String, UserResource> resources, 
-                                                            UserResource model, boolean isRoot, boolean enableStatic) {
-        return createClassResourceInfo(resources, model, isRoot, enableStatic, 
-                                       BusFactory.getThreadDefaultBus());
-    }
-    
     public static ClassResourceInfo createClassResourceInfo(
-        Map<String, UserResource> resources, UserResource model, boolean isRoot, boolean enableStatic,
+        Map<String, UserResource> resources, UserResource model,
+        Class<?> defaultClass,
+        boolean isRoot, boolean enableStatic,
         Bus bus) {
-        
-        Class<?> sClass = loadClass(model.getName());
-        return createServiceClassResourceInfo(resources, model, sClass, isRoot, enableStatic, bus);
+        final boolean isDefaultClass = defaultClass != null;
+        Class<?> sClass = !isDefaultClass  ? loadClass(model.getName()) : defaultClass;
+        return createServiceClassResourceInfo(resources, model, sClass, isDefaultClass, 
+                                              isRoot, enableStatic, bus);
     }
     
     public static ClassResourceInfo createServiceClassResourceInfo(
         Map<String, UserResource> resources, UserResource model, 
-        Class<?> sClass, boolean isRoot, boolean enableStatic, Bus bus) {
+        Class<?> sClass, boolean isDefaultClass, boolean isRoot, boolean enableStatic, Bus bus) {
         if (model == null) {
             throw new RuntimeException("Resource class " + sClass.getName() + " has no model info");
         }
@@ -208,30 +205,44 @@ public final class ResourceUtils {
         cri.setURITemplate(t);
         MethodDispatcher md = new MethodDispatcher();
         Map<String, UserOperation> ops = model.getOperationsAsMap();
-        for (Method m : cri.getServiceClass().getMethods()) {
-            UserOperation op = ops.get(m.getName());
-            if (op == null || op.getName() == null) {
-                continue;
-            }
-            OperationResourceInfo ori = 
-                new OperationResourceInfo(m, cri, URITemplate.createTemplate(op.getPath()),
-                                          op.getVerb(), op.getConsumes(), op.getProduces(),
-                                          op.getParameters(),
-                                          op.isOneway());
-            String rClassName = m.getReturnType().getName();
-            if (op.getVerb() == null) {
-                if (resources.containsKey(rClassName)) {
-                    ClassResourceInfo subCri = rClassName.equals(model.getName()) ? cri 
-                        : createServiceClassResourceInfo(resources, resources.get(rClassName),
-                                                         m.getReturnType(), false, enableStatic, bus);
-                    if (subCri != null) {
-                        cri.addSubClassResourceInfo(subCri);
-                        md.bind(ori, m);
-                    }
+        if (!isDefaultClass) {
+            for (Method m : cri.getServiceClass().getMethods()) {
+                UserOperation op = ops.get(m.getName());
+                if (op == null || op.getName() == null) {
+                    continue;
                 }
-            } else {
+                OperationResourceInfo ori = 
+                    new OperationResourceInfo(m, cri, URITemplate.createTemplate(op.getPath()),
+                                              op.getVerb(), op.getConsumes(), op.getProduces(),
+                                              op.getParameters(),
+                                              op.isOneway());
+                String rClassName = m.getReturnType().getName();
+                if (op.getVerb() == null) {
+                    if (resources.containsKey(rClassName)) {
+                        ClassResourceInfo subCri = rClassName.equals(model.getName()) ? cri 
+                            : createServiceClassResourceInfo(resources, resources.get(rClassName),
+                                                             m.getReturnType(), false, false, enableStatic, bus);
+                        if (subCri != null) {
+                            cri.addSubClassResourceInfo(subCri);
+                            md.bind(ori, m);
+                        }
+                    }
+                } else {
+                    md.bind(ori, m);
+                }
+            }
+        } else {
+            Method m = cri.getServiceClass().getMethods()[0];
+            for (Map.Entry<String, UserOperation> entry : ops.entrySet()) {
+                UserOperation op = entry.getValue();
+                OperationResourceInfo ori = 
+                    new OperationResourceInfo(m, cri, URITemplate.createTemplate(op.getPath()),
+                                              op.getVerb(), op.getConsumes(), op.getProduces(),
+                                              op.getParameters(),
+                                              op.isOneway());
                 md.bind(ori, m);
             }
+            
         }
         cri.setMethodDispatcher(md);
         return checkMethodDispatcher(cri) ? cri : null;
