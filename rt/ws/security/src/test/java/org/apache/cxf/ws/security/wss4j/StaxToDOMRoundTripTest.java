@@ -35,6 +35,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.WSConstants;
@@ -88,6 +89,8 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
         
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
@@ -134,6 +137,8 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
+        
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
         
         try {
             echo.echo("test");
@@ -182,6 +187,8 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
         
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
@@ -227,6 +234,8 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
+        
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
         
         try {
             echo.echo("test");
@@ -675,6 +684,8 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
         
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on no Timestamp");
@@ -715,6 +726,8 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.ACTION, "");
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
+        
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
         
         try {
             echo.echo("test");

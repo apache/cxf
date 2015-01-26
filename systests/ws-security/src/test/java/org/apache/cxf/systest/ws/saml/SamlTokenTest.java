@@ -42,6 +42,7 @@ import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
@@ -386,8 +387,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with an unsigned SAML SV Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("An error was discovered processing")
-                       || ex.getMessage().contains("SamlToken not satisfied"));
+            assertTrue(ex.getMessage().contains("SamlToken not satisfied")
+                       || ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
         
         ((java.io.Closeable)saml2Port).close();
@@ -996,8 +997,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Failure expected on a replayed SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "A replay attack has been detected";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
         
         ((java.io.Closeable)saml2Port).close();

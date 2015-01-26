@@ -228,8 +228,13 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             data.setDisableBSPEnforcement(true);
         }
         data.setMsgContext(message);
-        List<WSSecurityEngineResult> results = p.handleToken(tokenElement, data, wsDocInfo);
-        return results.get(0);
+        try {
+            List<WSSecurityEngineResult> results = 
+                p.handleToken(tokenElement, data, wsDocInfo);
+            return results.get(0);
+        } catch (WSSecurityException ex) {
+            throw WSS4JUtils.createSoapFault(message, message.getVersion(), ex);
+        }
     }
 
     protected UsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement, boolean bspCompliant) 

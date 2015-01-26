@@ -35,6 +35,7 @@ import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -369,9 +370,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 utPort.doubleIt(25);
                 fail("Failure expected on a replayed UsernameToken");
             } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-                String error = "A replay attack has been detected";
-                String error2 = "The security token could not be authenticated or authorized";
-                assertTrue(ex.getMessage().contains(error) || ex.getMessage().contains(error2));
+                assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
             }
         }
         
@@ -411,8 +410,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 utPort.doubleIt(25);
                 fail("Failure expected on a replayed UsernameToken");
             } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-                String error = "A replay attack has been detected";
-                assertTrue(ex.getMessage().contains(error));
+                assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
             }
         }
         

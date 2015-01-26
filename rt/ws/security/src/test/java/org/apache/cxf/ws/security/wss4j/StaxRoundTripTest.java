@@ -39,6 +39,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -92,6 +93,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
         
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
@@ -140,6 +143,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         inhandler = new WSS4JStaxInInterceptor(inConfig);
         service.getInInterceptors().add(inhandler);
         
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
@@ -178,6 +183,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on an unknown user");
@@ -216,6 +223,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on an unknown password");
@@ -265,6 +274,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
         
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
@@ -313,6 +324,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         inhandler = new WSS4JStaxInInterceptor(inConfig);
         service.getInInterceptors().add(inhandler);
         
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
@@ -351,6 +364,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on an unknown user");
@@ -389,6 +404,8 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on an unknown password");

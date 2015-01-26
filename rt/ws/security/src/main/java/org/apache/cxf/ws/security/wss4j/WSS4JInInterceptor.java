@@ -331,7 +331,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             msg.put(SECURITY_PROCESSED, Boolean.TRUE);
 
         } catch (WSSecurityException e) {
-            throw createSoapFault(msg, version, e);
+            throw WSS4JUtils.createSoapFault(msg, version, e);
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, version.getSender());
         } catch (SOAPException e) {
@@ -840,42 +840,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         return WSS4JUtils.getReplayCache(message, booleanKey, instanceKey);
     }
 
-    /**
-     * Create a SoapFault from a WSSecurityException, following the SOAP Message Security
-     * 1.1 specification, chapter 12 "Error Handling".
-     * 
-     * When the Soap version is 1.1 then set the Fault/Code/Value from the fault code
-     * specified in the WSSecurityException (if it exists).
-     * 
-     * Otherwise set the Fault/Code/Value to env:Sender and the Fault/Code/Subcode/Value
-     * as the fault code from the WSSecurityException.
-     */
-    private SoapFault 
-    createSoapFault(SoapMessage message, SoapVersion version, WSSecurityException e) {
-        SoapFault fault;
-        
-        String errorMessage = null;
-        boolean returnSecurityError = 
-            MessageUtils.getContextualBoolean(message, SecurityConstants.RETURN_SECURITY_ERROR, false);
-        if (returnSecurityError || MessageUtils.isRequestor(message)) {
-            errorMessage = e.getMessage();
-        } else {
-            errorMessage = e.getSafeExceptionMessage();
-        }
-        
-        javax.xml.namespace.QName faultCode = e.getFaultCode();
-        if (version.getVersion() == 1.1 && faultCode != null) {
-            fault = new SoapFault(errorMessage, e, faultCode);
-        } else {
-            fault = new SoapFault(errorMessage, e, version.getSender());
-            if (version.getVersion() != 1.1 && faultCode != null) {
-                fault.setSubCode(faultCode);
-            }
-        }
-        return fault;
-    }
-    
-    
     static class CXFRequestData extends RequestData {
         public CXFRequestData() {
         }

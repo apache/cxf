@@ -209,8 +209,10 @@ public final class SecurityConstants {
         "ws-security.enable.streaming";
     
     /**
-     * Whether to return the security error message to the client, and not one of the default error
-     * QNames. The default is false.
+     * Whether to return the security error message to the client, and not the default error message.
+     * The "real" security errors should not be returned to the client in a deployment scenario,
+     * as they may leak information about the deployment, or otherwise provide a "oracle" for attacks.
+     * The default is false.
      */
     public static final String RETURN_SECURITY_ERROR = "ws-security.return.security.error";
     

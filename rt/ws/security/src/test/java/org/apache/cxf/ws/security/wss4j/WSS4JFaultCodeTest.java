@@ -32,7 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
@@ -41,9 +40,9 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-
 import org.junit.Test;
 
 
@@ -97,7 +96,9 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
-
+        
+        inmsg.put(SecurityConstants.RETURN_SECURITY_ERROR, Boolean.TRUE);
+        
         try {
             inHandler.handleMessage(inmsg);
             fail("Expected failure on an message with no security header");
@@ -161,6 +162,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
 
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
         inHandler.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
+        inmsg.put(SecurityConstants.RETURN_SECURITY_ERROR, Boolean.TRUE);
 
         try {
             //
@@ -170,7 +172,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             inHandler.handleMessage(inmsg);
             fail("Expected failure on an invalid Timestamp");
         } catch (SoapFault fault) {
-            assertTrue(fault.getReason().contains("The message has expired"));
+            assertTrue(fault.getReason().contains("Invalid timestamp"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "MessageExpired");
             assertTrue(fault.getFaultCode().equals(faultCode));
         }
@@ -229,6 +231,8 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.USERNAME_TOKEN);
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
 
+        inmsg.put(SecurityConstants.RETURN_SECURITY_ERROR, Boolean.TRUE);
+        
         try {
             inHandler.handleMessage(inmsg);
             fail("Expected failure on an action mismatch");

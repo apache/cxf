@@ -26,7 +26,9 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
@@ -40,6 +42,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -227,4 +230,42 @@ public final class WSS4JUtils {
 
     }
 
+    /**
+     * Create a SoapFault from a WSSecurityException, following the SOAP Message Security
+     * 1.1 specification, chapter 12 "Error Handling".
+     * 
+     * When the Soap version is 1.1 then set the Fault/Code/Value from the fault code
+     * specified in the WSSecurityException (if it exists).
+     * 
+     * Otherwise set the Fault/Code/Value to env:Sender and the Fault/Code/Subcode/Value
+     * as the fault code from the WSSecurityException.
+     */
+    public static SoapFault createSoapFault(
+        SoapMessage message, SoapVersion version, WSSecurityException e
+    ) {
+        SoapFault fault;
+        
+        String errorMessage = null;
+        javax.xml.namespace.QName faultCode = null;
+        
+        boolean returnSecurityError = 
+            MessageUtils.getContextualBoolean(message, SecurityConstants.RETURN_SECURITY_ERROR, false);
+        if (returnSecurityError || MessageUtils.isRequestor(message)) {
+            errorMessage = e.getMessage();
+            faultCode = e.getFaultCode();
+        } else {
+            errorMessage = e.getSafeExceptionMessage();
+            faultCode = e.getSafeFaultCode();
+        }
+        
+        if (version.getVersion() == 1.1 && faultCode != null) {
+            fault = new SoapFault(errorMessage, e, faultCode);
+        } else {
+            fault = new SoapFault(errorMessage, e, version.getSender());
+            if (version.getVersion() != 1.1 && faultCode != null) {
+                fault.setSubCode(faultCode);
+            }
+        }
+        return fault;
+    }
 }
