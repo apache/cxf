@@ -513,7 +513,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     
                     client.cancelSecurityToken(tok);
                     NegotiationUtils.getTokenStore(m2).remove(tok.getId());
-                    m2.setContextualProperty(SecurityConstants.TOKEN, null);
+                    m2.put(SecurityConstants.TOKEN, null);
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {

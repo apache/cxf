@@ -238,7 +238,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         private void translateProperties(SoapMessage msg) {
             String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
             if (bspCompliant != null) {
-                msg.setContextualProperty(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
+                msg.put(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
             }
         }
         

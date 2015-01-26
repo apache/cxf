@@ -242,7 +242,7 @@ public class STSLoginModule implements LoginModule {
             
             STSClient stsClient = configureSTSClient(message);
             if (message != null) {
-                message.setContextualProperty(SecurityConstants.STS_CLIENT, stsClient);
+                message.put(SecurityConstants.STS_CLIENT, stsClient);
                 data.setMsgContext(message);
             } else {
                 TokenStore tokenStore = configureTokenStore(message);

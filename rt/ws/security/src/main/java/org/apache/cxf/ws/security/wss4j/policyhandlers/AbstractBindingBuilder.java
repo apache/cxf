@@ -894,7 +894,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         }
         secToken.setToken(assertion.getElement());
         getTokenStore().add(secToken);
-        message.setContextualProperty(SecurityConstants.TOKEN_ID, secToken.getId());
+        message.put(SecurityConstants.TOKEN_ID, secToken.getId());
     }
     
     protected String findIDFromSamlToken(Element samlToken) {
@@ -944,7 +944,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             try {
                 handler = (CallbackHandler)ClassLoaderUtils
                     .loadClass((String)o, this.getClass()).newInstance();
-                message.setContextualProperty(SecurityConstants.CALLBACK_HANDLER, handler);
+                message.put(SecurityConstants.CALLBACK_HANDLER, handler);
             } catch (Exception e) {
                 handler = null;
             }

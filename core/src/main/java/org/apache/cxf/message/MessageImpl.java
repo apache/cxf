@@ -225,7 +225,7 @@ public class MessageImpl extends StringMapImpl implements Message {
         }
     }
 
-    public void setContextualProperty(String key, Object v) {
+    void setContextualProperty(String key, Object v) {
         if (contextCache != null && !containsKey(key)) {
             contextCache.put(key, v);
         }

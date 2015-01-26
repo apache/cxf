@@ -115,8 +115,8 @@ public class PolicyBasedSamlTest extends AbstractPolicySecurityTest {
         // Necessary because the Bearer Assertion does not have an internal signature
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
         assertionValidator.setRequireBearerSignature(false);
-        inmsg.setContextualProperty(SecurityConstants.SAML2_TOKEN_VALIDATOR, assertionValidator);
-        inmsg.setContextualProperty(SecurityConstants.SAML1_TOKEN_VALIDATOR, assertionValidator);
+        inmsg.put(SecurityConstants.SAML2_TOKEN_VALIDATOR, assertionValidator);
+        inmsg.put(SecurityConstants.SAML1_TOKEN_VALIDATOR, assertionValidator);
         inHandler.handleMessage(inmsg);
 
         for (CoverageType type : types) {
