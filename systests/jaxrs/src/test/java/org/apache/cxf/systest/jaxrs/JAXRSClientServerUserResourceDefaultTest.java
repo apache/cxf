@@ -70,26 +70,12 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             op.setVerb("GET");
             op.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
             
-            UserOperation op2 = new UserOperation();
-            op2.setPath("/books/{id}/chapter");
-            op2.setName("getBookChapter");
-            op2.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
-            
             List<UserOperation> ops = new ArrayList<UserOperation>();
             ops.add(op);
-            ops.add(op2);
             
             ur.setOperations(ops);
             
-            UserResource ur2 = new UserResource();
-            ur2.setName(ChapterNoAnnotations.class.getName());
-            UserOperation op3 = new UserOperation();
-            op3.setPath("/");
-            op3.setName("getItself");
-            op3.setVerb("GET");
-            ur2.setOperations(Collections.singletonList(op3));
-            
-            sf.setModelBeans(ur, ur2);
+            sf.setModelBeans(ur);
             
             server = sf.create();
         }
