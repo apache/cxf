@@ -57,6 +57,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     private Executor executor;
     private boolean enableStatic;
     private QName serviceName;
+
+    private Class<?> defaultModelClass;
     
     public JAXRSServiceFactoryBean() {
     }
@@ -171,7 +173,10 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         Map<String, UserResource> map = userResourcesAsMap(resources);
         for (UserResource ur : resources) {
             if (ur.getPath() != null) {
-                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, true, enableStatic,
+                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, 
+                                                                              defaultModelClass, 
+                                                                              true, 
+                                                                              enableStatic,
                                                                               getBus());
                 if (cri != null) {
                     classResourceInfos.add(cri);
@@ -184,7 +189,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         Map<String, UserResource> map = userResourcesAsMap(resources);
         for (Class<?> sClass : sClasses) {
             ClassResourceInfo cri = ResourceUtils.createServiceClassResourceInfo(
-                map, map.get(sClass.getName()), sClass, true, enableStatic, getBus());
+                map, map.get(sClass.getName()), sClass, false, true, enableStatic, getBus());
             if (cri != null) {
                 classResourceInfos.add(cri);
             }
@@ -264,5 +269,13 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
 
     public void setService(Service service) {
         super.setService(service);
+    }
+
+    public Class<?> getDefaultModelClass() {
+        return defaultModelClass;
+    }
+
+    public void setDefaultModelClass(Class<?> defaultModelClass) {
+        this.defaultModelClass = defaultModelClass;
     }
 }

@@ -32,6 +32,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -71,7 +72,8 @@ public class ResourceUtilsTest extends Assert {
         
         Map<String, UserResource> resources = new HashMap<String, UserResource>();
         resources.put(ur.getName(), ur);
-        ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(resources, ur, true, true);
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(resources, ur, null, true, true, BusFactory.getDefaultBus());
         assertNotNull(cri);
         assertEquals("/hashmap", cri.getURITemplate().getValue());
         Method method = 
