@@ -113,24 +113,29 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
     }
     
     public Object put(String key, Object value) {
-        if (inMessage != null) {
-            inMessage.setContextualProperty(key, value);
-        }
-        if (outMessage != null) {
-            outMessage.setContextualProperty(key, value);
-        }
-        if (inFaultMessage != null) {
-            inFaultMessage.setContextualProperty(key, value);
-        }
-        if (outFaultMessage != null) {
-            outFaultMessage.setContextualProperty(key, value);
-        }
+        setMessageContextProperty(inMessage, key, value);
+        setMessageContextProperty(outMessage, key, value);
+        setMessageContextProperty(inFaultMessage, key, value);
+        setMessageContextProperty(outFaultMessage, key, value);
         if (value == null) {
             return super.remove(key);
         }
         return super.put(key, value);
     }
 
+    private void setMessageContextProperty(Message m, String key, Object value) {
+        if (m == null) {
+            return;
+        }
+        if (m instanceof MessageImpl) {
+            ((MessageImpl)m).setContextualProperty(key, value);
+        }  else if (m instanceof AbstractWrappedMessage) {
+            ((AbstractWrappedMessage)m).setContextualProperty(key, value);
+        } else {
+            //cannot set directly.  Just invalidate the cache.
+            m.resetContextCache();
+        }
+    }
     
     public Destination getDestination() {
         return destination;

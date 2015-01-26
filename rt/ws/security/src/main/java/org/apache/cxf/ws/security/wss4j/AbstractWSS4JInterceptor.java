@@ -155,34 +155,34 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     protected void translateProperties(SoapMessage msg) {
         String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
         if (bspCompliant != null) {
-            msg.setContextualProperty(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
+            msg.put(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
         }
         String futureTTL = 
             (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_FUTURE_TTL);
         if (futureTTL != null) {
-            msg.setContextualProperty(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
+            msg.put(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
         }
         String ttl = 
                 (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_TTL);
         if (ttl != null) {
-            msg.setContextualProperty(WSHandlerConstants.TTL_TIMESTAMP, ttl);
+            msg.put(WSHandlerConstants.TTL_TIMESTAMP, ttl);
         }
         
         String utFutureTTL = 
             (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_FUTURE_TTL);
         if (utFutureTTL != null) {
-            msg.setContextualProperty(WSHandlerConstants.TTL_FUTURE_USERNAMETOKEN, utFutureTTL);
+            msg.put(WSHandlerConstants.TTL_FUTURE_USERNAMETOKEN, utFutureTTL);
         }
         String utTTL = 
             (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_TTL);
         if (utTTL != null) {
-            msg.setContextualProperty(WSHandlerConstants.TTL_USERNAMETOKEN, utTTL);
+            msg.put(WSHandlerConstants.TTL_USERNAMETOKEN, utTTL);
         }
         
         String certConstraints = 
             (String)msg.getContextualProperty(SecurityConstants.SUBJECT_CERT_CONSTRAINTS);
         if (certConstraints != null) {
-            msg.setContextualProperty(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
+            msg.put(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
         }
         
         // Now set SAML SenderVouches + Holder Of Key requirements
@@ -190,7 +190,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             MessageUtils.getContextualBoolean(
                 msg, SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true
             );
-        msg.setContextualProperty(
+        msg.put(
             WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, 
             Boolean.toString(validateSAMLSubjectConf)
         );
@@ -198,7 +198,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         PasswordEncryptor passwordEncryptor = 
             (PasswordEncryptor)msg.getContextualProperty(SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE);
         if (passwordEncryptor != null) {
-            msg.setContextualProperty(ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE, passwordEncryptor);
+            msg.put(ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE, passwordEncryptor);
         }
     }
 

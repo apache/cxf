@@ -91,7 +91,7 @@ public class LocatorServiceImpl implements LocatorService {
         // create a wsdlLocation attribute with a location only
         if (serviceQname.getNamespaceURI().endsWith("2")) {
             Message m = PhaseInterceptorChain.getCurrentMessage();
-            m.setContextualProperty("org.apache.cxf.wsa.metadata.wsdlLocationOnly", "true");
+            m.put("org.apache.cxf.wsa.metadata.wsdlLocationOnly", "true");
         }
         
         ClassLoader cl = Thread.currentThread().getContextClassLoader();

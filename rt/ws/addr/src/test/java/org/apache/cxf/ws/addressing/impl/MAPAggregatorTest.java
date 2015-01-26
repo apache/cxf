@@ -496,8 +496,8 @@ public class MAPAggregatorTest extends Assert {
                              REQUESTOR_ROLE,
                              Boolean.TRUE);
         message.getContextualProperty(WSAContextUtils.REPLYTO_PROPERTY);
-        message.setContextualProperty(WSAContextUtils.REPLYTO_PROPERTY, localReplyTo);
-        message.setContextualProperty(WSAContextUtils.DECOUPLED_ENDPOINT_BASE_PROPERTY, decoupledEndpointBase);
+        message.put(WSAContextUtils.REPLYTO_PROPERTY, localReplyTo);
+        message.put(WSAContextUtils.DECOUPLED_ENDPOINT_BASE_PROPERTY, decoupledEndpointBase);
         
         AddressingProperties maps = new AddressingProperties();
         AttributedURIType id = 

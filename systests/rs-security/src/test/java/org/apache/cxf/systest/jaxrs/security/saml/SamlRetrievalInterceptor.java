@@ -66,7 +66,7 @@ public class SamlRetrievalInterceptor extends AbstractPhaseInterceptor<Message> 
             SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
             Document doc = DOMUtils.createDocument();
             Element token = assertion.toDOM(doc);
-            message.setContextualProperty(SAMLConstants.SAML_TOKEN_ELEMENT, token);
+            message.put(SAMLConstants.SAML_TOKEN_ELEMENT, token);
         } catch (WSSecurityException ex) {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));

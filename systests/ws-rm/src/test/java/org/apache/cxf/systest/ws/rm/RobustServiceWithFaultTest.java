@@ -176,7 +176,7 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
         
         @Override
         public void handleMessage(Message message) throws Fault {
-            message.setContextualProperty(Message.ROBUST_ONEWAY, robust);
+            message.put(Message.ROBUST_ONEWAY, robust);
         }
     }
 }

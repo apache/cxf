@@ -162,7 +162,14 @@ public abstract class AbstractWrappedMessage implements Message {
         return message.getContextualProperty(key);
     }  
     public void setContextualProperty(String key, Object v) {
-        message.setContextualProperty(key, v);
+        if (message instanceof MessageImpl) {
+            ((MessageImpl)message).setContextualProperty(key, v);
+        }  else if (message instanceof AbstractWrappedMessage) {
+            ((AbstractWrappedMessage)message).setContextualProperty(key, v);
+        } else {
+            //cannot set directly.  Just invalidate the cache.
+            message.resetContextCache();
+        }        
     }
     
     public Set<String> getContextualPropertyKeys() {

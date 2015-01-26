@@ -248,7 +248,16 @@ public interface Message extends StringMap {
      */
     Object getContextualProperty(String key);   
     
+    /**
+     * Resets the cache of contextual properties that messages may contain.  Subsequent
+     * calls to getContextualProperty will likely recalculate the cache.
+     */
     void resetContextCache();
+    
+    /**
+     * Don't call, will be made non-public in 3.1
+     */
+    @Deprecated
     void setContextualProperty(String key, Object v);
     
     /**
