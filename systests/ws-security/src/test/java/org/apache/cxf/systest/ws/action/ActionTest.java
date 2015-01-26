@@ -31,6 +31,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -113,8 +114,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernameToken element");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "An error was discovered";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
         
         
@@ -150,8 +150,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a replayed UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "A replay attack has been detected";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
         
         ((java.io.Closeable)port).close();
@@ -212,8 +211,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "A replay attack has been detected";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
         
         ((java.io.Closeable)port).close();

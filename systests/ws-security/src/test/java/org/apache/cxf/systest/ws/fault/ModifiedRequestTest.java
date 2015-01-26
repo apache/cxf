@@ -216,11 +216,11 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         } catch (SOAPFaultException ex) {
             SOAPFault fault = ex.getFault();
             assertEquals("soap:Sender", fault.getFaultCode());
-            assertEquals("The signature or decryption was invalid", fault.getFaultString());
+            assertEquals(WSSecurityException.UNIFIED_SECURITY_ERR, fault.getFaultString());
             Iterator<?> subcodeIterator = fault.getFaultSubcodes();
             assertTrue(subcodeIterator.hasNext());
             Object subcode = subcodeIterator.next();
-            assertEquals(WSSecurityException.FAILED_CHECK, subcode);
+            assertEquals(WSSecurityException.SECURITY_ERROR, subcode);
             assertFalse(subcodeIterator.hasNext());
         }
     }

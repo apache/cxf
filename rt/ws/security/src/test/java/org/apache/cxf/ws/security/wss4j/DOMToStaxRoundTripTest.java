@@ -33,6 +33,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -82,6 +83,8 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
         
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
+        
         try {
             echo.echo("test");
             fail("Failure expected on the wrong password type");
@@ -127,6 +130,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
+        service.put(SecurityConstants.RETURN_SECURITY_ERROR, true);
         
         try {
             echo.echo("test");

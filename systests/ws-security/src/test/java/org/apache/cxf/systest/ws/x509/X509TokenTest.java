@@ -40,6 +40,7 @@ import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.example.contract.doubleit.DoubleItPortType2;
 import org.junit.BeforeClass;
@@ -1148,9 +1149,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             x509Port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "A replay attack has been detected";
-            assertTrue(ex.getMessage().contains(error)
-                       || ex.getMessage().contains("The message has expired"));
+            assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
         
         ((java.io.Closeable)x509Port).close();

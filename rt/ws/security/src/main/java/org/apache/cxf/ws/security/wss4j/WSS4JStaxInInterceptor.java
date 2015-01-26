@@ -138,8 +138,11 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             final List<SecurityEventListener> securityEventListeners = 
                 configureSecurityEventListeners(soapMessage, secProps);
             
+            boolean returnSecurityError = 
+                MessageUtils.getContextualBoolean(soapMessage, SecurityConstants.RETURN_SECURITY_ERROR, false);
+            
             final InboundWSSec inboundWSSec = 
-                WSSec.getInboundWSSec(secProps, MessageUtils.isRequestor(soapMessage));
+                WSSec.getInboundWSSec(secProps, MessageUtils.isRequestor(soapMessage), returnSecurityError);
             
             newXmlStreamReader = 
                 inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListeners);

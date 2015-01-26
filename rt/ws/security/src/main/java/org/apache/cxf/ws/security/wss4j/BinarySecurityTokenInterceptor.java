@@ -27,13 +27,11 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -97,7 +95,7 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
 
                     }
                 } catch (WSSecurityException ex) {
-                    throw new Fault(ex);
+                    throw WSS4JUtils.createSoapFault(message, message.getVersion(), ex);
                 }
             }
             child = DOMUtils.getNextElement(child);

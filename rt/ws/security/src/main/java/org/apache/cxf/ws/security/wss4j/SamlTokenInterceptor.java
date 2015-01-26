@@ -40,7 +40,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.security.SecurityContext;
@@ -156,7 +155,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                         }
                     }
                 } catch (WSSecurityException ex) {
-                    throw new Fault(ex);
+                    throw WSS4JUtils.createSoapFault(message, message.getVersion(), ex);
                 }
             }
             child = DOMUtils.getNextElement(child);
