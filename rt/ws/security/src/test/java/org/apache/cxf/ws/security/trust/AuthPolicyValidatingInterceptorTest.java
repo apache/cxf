@@ -47,6 +47,42 @@ public class AuthPolicyValidatingInterceptorTest extends Assert {
         assertTrue(validator.isValidated());
     }
     
+    @Test
+    public void testInvalidUsernamePassword() throws Exception {
+        AuthPolicyValidatingInterceptor in = new AuthPolicyValidatingInterceptor();
+        TestSTSTokenValidator validator = new TestSTSTokenValidator();
+        in.setValidator(validator);
+        
+        AuthorizationPolicy policy = new AuthorizationPolicy();
+        policy.setUserName("bob");
+        policy.setPassword("pswd2");
+        Message message = new MessageImpl();
+        message.put(AuthorizationPolicy.class, policy);
+        
+        in.handleMessage(message);
+        
+        assertFalse(validator.isValidated());
+    }
+    
+    @Test
+    public void testNoUsername() throws Exception {
+        AuthPolicyValidatingInterceptor in = new AuthPolicyValidatingInterceptor();
+        TestSTSTokenValidator validator = new TestSTSTokenValidator();
+        in.setValidator(validator);
+        
+        AuthorizationPolicy policy = new AuthorizationPolicy();
+        policy.setPassword("pswd");
+        Message message = new MessageImpl();
+        message.put(AuthorizationPolicy.class, policy);
+        
+        try {
+            in.handleMessage(message);
+            fail("Failure expected with no username");
+        } catch (SecurityException ex) {
+            // expected
+        }
+    }
+    
     private static class TestSTSTokenValidator extends STSTokenValidator {
         
         private boolean validated; 
