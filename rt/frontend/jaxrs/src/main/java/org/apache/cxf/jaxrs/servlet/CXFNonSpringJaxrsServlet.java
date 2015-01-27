@@ -517,7 +517,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     protected boolean isIgnoreApplicationPath(ServletConfig servletConfig) {
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
-        return ignoreParam != null && MessageUtils.isTrue(ignoreParam);
+        return ignoreParam == null || MessageUtils.isTrue(ignoreParam);
     }    
     
     protected void createServerFromApplication(ServletConfig servletConfig) 
