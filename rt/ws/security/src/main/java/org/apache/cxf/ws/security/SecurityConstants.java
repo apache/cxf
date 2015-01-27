@@ -129,6 +129,14 @@ public final class SecurityConstants {
      */
     public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
     
+    /**
+     * A message property for prepared X509 certificate to be used for encryption. 
+     * If this is not defined, then the certificate will be either loaded from the 
+     * keystore {@link ENCRYPT_PROPERTIES} or extracted from request 
+     * (if {@link ENCRYPT_USERNAME} has value "useReqSigCert").
+     */
+    public static final String ENCRYPT_CERT = "ws-security.encryption.certificate";
+    
     //
     // Boolean WS-Security configuration tags, e.g. the value should be "true" or "false".
     //

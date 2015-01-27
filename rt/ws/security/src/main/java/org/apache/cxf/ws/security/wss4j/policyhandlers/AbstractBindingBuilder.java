@@ -1397,13 +1397,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         encrKey.prepare(saaj.getSOAPPart(), crypto);
         
         if (alsoIncludeToken) {
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias(encrUser);
-            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+            X509Certificate encCert = getEncryptCert(crypto, encrUser);
             BinarySecurity bstToken = new X509Security(saaj.getSOAPPart());
-            ((X509Security) bstToken).setX509Certificate(certs[0]);
+            ((X509Security) bstToken).setX509Certificate(encCert);
             bstToken.addWSUNamespace();
-            bstToken.setID(wssConfig.getIdAllocator().createSecureId("X509-", certs[0]));
+            bstToken.setID(wssConfig.getIdAllocator().createSecureId("X509-", encCert));
             WSSecurityUtil.prependChildElement(
                 secHeader.getSecurityHeader(), bstToken.getElement()
             );
@@ -1413,6 +1411,18 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return encrKey;
     }
 
+    private X509Certificate getEncryptCert(Crypto crypto, String encrUser) throws WSSecurityException {
+        // Check for prepared encryption certificate
+        X509Certificate encrCert = (X509Certificate)message.getContextualProperty(SecurityConstants.ENCRYPT_CERT);
+        if (encrCert != null) {
+            return encrCert;
+        }
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(encrUser);
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        return certs[0];
+    }
+    
     public Crypto getSignatureCrypto(AbstractTokenWrapper wrapper) throws WSSecurityException {
         return getCrypto(wrapper, SecurityConstants.SIGNATURE_CRYPTO,
                          SecurityConstants.SIGNATURE_PROPERTIES);
@@ -1582,6 +1592,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     public String setEncryptionUser(WSSecEncryptedKey encrKeyBuilder, AbstractTokenWrapper token,
                                   boolean sign, Crypto crypto) {
+        // Check for prepared certificate property
+        X509Certificate encrCert = (X509Certificate)message.getContextualProperty(SecurityConstants.ENCRYPT_CERT);
+        if (encrCert != null) {
+            encrKeyBuilder.setUseThisCert(encrCert);
+            return null;
+        }
+        
         String encrUser = (String)message.getContextualProperty(sign 
                                                                 ? SecurityConstants.SIGNATURE_USERNAME
                                                                 : SecurityConstants.ENCRYPT_USERNAME);
