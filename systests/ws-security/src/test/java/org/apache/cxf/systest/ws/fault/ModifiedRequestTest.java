@@ -54,6 +54,7 @@ import org.junit.BeforeClass;
  */
 public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ModifiedRequestServer.class);
+    static final String STAX_PORT = allocatePort(ModifiedRequestServer.class, 2);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -96,7 +97,17 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
             new ModifiedTimestampInterceptor();
         cxfClient.getOutInterceptors().add(modifyInterceptor);
         
-        makeInvocation(port);
+        makeInvocation(port, false);
+        
+        // Streaming invocation
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, STAX_PORT);
+
+        cxfClient = ClientProxy.getClient(port);
+        modifyInterceptor = new ModifiedTimestampInterceptor();
+        cxfClient.getOutInterceptors().add(modifyInterceptor);
+
+        makeInvocation(port, true);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -124,7 +135,17 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
             new ModifiedSignatureInterceptor();
         cxfClient.getOutInterceptors().add(modifyInterceptor);
         
-        makeInvocation(port);
+        makeInvocation(port, false);
+        
+        // Streaming invocation
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, STAX_PORT);
+
+        cxfClient = ClientProxy.getClient(port);
+        modifyInterceptor = new ModifiedSignatureInterceptor();
+        cxfClient.getOutInterceptors().add(modifyInterceptor);
+
+        makeInvocation(port, true);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -147,7 +168,13 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
         
-        makeInvocation(port);
+        makeInvocation(port, false);
+        
+        // Streaming invocation
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, STAX_PORT);
+
+        makeInvocation(port, true);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -175,7 +202,17 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
             new ModifiedEncryptedKeyInterceptor();
         cxfClient.getOutInterceptors().add(modifyInterceptor);
         
-        makeInvocation(port);
+        makeInvocation(port, false);
+        
+        // Streaming invocation
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, STAX_PORT);
+
+        cxfClient = ClientProxy.getClient(port);
+        modifyInterceptor = new ModifiedEncryptedKeyInterceptor();
+        cxfClient.getOutInterceptors().add(modifyInterceptor);
+
+        makeInvocation(port, true);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -203,25 +240,43 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
             new ModifiedEncryptedSOAPBody();
         cxfClient.getOutInterceptors().add(modifyInterceptor);
         
-        makeInvocation(port);
+        makeInvocation(port, false);
+        
+        // Streaming invocation
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, STAX_PORT);
+
+        cxfClient = ClientProxy.getClient(port);
+        modifyInterceptor = new ModifiedEncryptedSOAPBody();
+        cxfClient.getOutInterceptors().add(modifyInterceptor);
+
+        makeInvocation(port, true);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     
-    private void makeInvocation(DoubleItPortType port) throws DoubleItFault {
+    private void makeInvocation(DoubleItPortType port, boolean streaming) throws DoubleItFault {
         try {
             port.doubleIt(25);
             fail("Expected failure on a modified request");
         } catch (SOAPFaultException ex) {
             SOAPFault fault = ex.getFault();
-            assertEquals("soap:Sender", fault.getFaultCode());
-            assertEquals(WSSecurityException.UNIFIED_SECURITY_ERR, fault.getFaultString());
-            Iterator<?> subcodeIterator = fault.getFaultSubcodes();
-            assertTrue(subcodeIterator.hasNext());
-            Object subcode = subcodeIterator.next();
-            assertEquals(WSSecurityException.SECURITY_ERROR, subcode);
-            assertFalse(subcodeIterator.hasNext());
+            if (streaming) {
+                assertTrue("soap:Sender".equals(fault.getFaultCode())
+                           || "soap:Receiver".equals(fault.getFaultCode()));
+                assertTrue(fault.getFaultString().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
+                Iterator<?> subcodeIterator = fault.getFaultSubcodes();
+                assertFalse(subcodeIterator.hasNext());
+            } else {
+                assertEquals("soap:Sender", fault.getFaultCode());
+                assertEquals(fault.getFaultString(), WSSecurityException.UNIFIED_SECURITY_ERR);
+                Iterator<?> subcodeIterator = fault.getFaultSubcodes();
+                assertTrue(subcodeIterator.hasNext());
+                Object subcode = subcodeIterator.next();
+                assertEquals(WSSecurityException.SECURITY_ERROR, subcode);
+                assertFalse(subcodeIterator.hasNext());
+            }
         }
     }
     
