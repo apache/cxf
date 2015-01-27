@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import java.io.InputStream;
+
 
 public class Parameter {
     private ParameterType type;
@@ -88,5 +90,9 @@ public class Parameter {
     
     public void setDefaultValue(String dValue) {
         defaultValue = dValue;
+    }
+    public Class<?> getJavaType() {
+        //TODO: support the conversion from "xs:int" or Java class names (DOMSource, etc)
+        return type == ParameterType.REQUEST_BODY ? InputStream.class : String.class;
     }
 }

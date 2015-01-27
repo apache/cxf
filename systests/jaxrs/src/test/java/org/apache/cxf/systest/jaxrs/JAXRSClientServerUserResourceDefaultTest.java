@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +29,9 @@ import java.util.Map;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.NotAllowedException;
 import javax.ws.rs.Path;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
@@ -38,12 +42,19 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -59,11 +70,13 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
         org.apache.cxf.endpoint.Server server;
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-            sf.setAddress("http://localhost:" + PORT + "/default");
+            sf.setInvoker(new CustomModelInvoker());
+            sf.setProvider(new PreMatchContainerRequestFilter());
+            sf.setAddress("http://localhost:" + PORT + "/");
             sf.getServiceFactory().setDefaultModelClass(DefaultResource.class);
             
             UserResource ur = new UserResource();
-            ur.setPath("/bookstoreNoAnnotations");
+            ur.setPath("/default");
             UserOperation op = new UserOperation();
             op.setPath("/books/{id}");
             op.setName("getBook");
@@ -108,14 +121,21 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
     }
     
     @Test
-    public void testGetBook123() throws Exception {
-        getAndCompare("http://localhost:" + PORT + "/default/bookstoreNoAnnotations/books/123",
-                      "application/xml", 200);
+    public void testGetBookInvokeService() throws Exception {
+        getAndCompare("http://localhost:" + PORT + "/default/books/123",
+                      "application/xml", 200, 123);
+    }
+    
+    @Test
+    public void testGetBookInvokerOnly() throws Exception {
+        getAndCompare("http://localhost:" + PORT + "/default/books/999",
+                      "application/xml", 200, 999);
     }
     
     private void getAndCompare(String address, 
                                String acceptType,
-                               int expectedStatus) throws Exception {
+                               int expectedStatus,
+                               long expectedId) throws Exception {
         GetMethod get = new GetMethod(address);
         get.setRequestHeader("Accept", acceptType);
         HttpClient httpClient = new HttpClient();
@@ -123,7 +143,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             int result = httpClient.executeMethod(get);
             assertEquals(expectedStatus, result);
             Book book = readBook(get.getResponseBodyAsStream());
-            assertEquals(123, book.getId());
+            assertEquals(expectedId, book.getId());
             assertEquals("CXF in Action", book.getName());
         } finally {
             get.releaseConnection();
@@ -155,5 +175,33 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
                 throw new NotAllowedException("GET");
             }
         }
+    }
+    
+    public static class CustomModelInvoker extends JAXRSInvoker {
+
+        @Override
+        public Object invoke(Exchange exchange, Object request, Object resourceObject) {
+            MessageContext mc = new MessageContextImpl(exchange.getInMessage());
+            List<Object> params = CastUtils.cast((List<?>)request);
+            if (params.size() > 0) {
+                Long bookId = Long.valueOf(params.get(0).toString());
+                Book book = new Book("CXF in Action", bookId);
+                Response r = Response.ok(book, 
+                                         mc.getHttpHeaders().getAcceptableMediaTypes().get(0)).build();
+                return new MessageContentsList(r);
+            } else { 
+                return super.invoke(exchange, request, resourceObject);
+            }
+            
+        }
+    }
+    @PreMatching
+    private static class PreMatchContainerRequestFilter implements ContainerRequestFilter {
+        public void filter(ContainerRequestContext context) throws IOException {
+            if (context.getUriInfo().getRequestUri().toString().endsWith("999")) {
+                JAXRSUtils.getCurrentMessage().put("org.apache.cxf.preferModelParameters", true);
+            }
+        }
+        
     }
 }
