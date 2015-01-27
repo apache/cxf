@@ -85,6 +85,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -161,7 +162,8 @@ public final class JAXRSUtils {
     private static final String PATH_SEGMENT_SEP = "/";
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
     private static final String NO_CONTENT_EXCEPTION = "javax.ws.rs.core.NoContentException";
-    private static final String HTTP_CHARSET_PARAM = "charset"; 
+    private static final String HTTP_CHARSET_PARAM = "charset";
+    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0]; 
     
     private JAXRSUtils() {        
     }
@@ -759,25 +761,37 @@ public final class JAXRSUtils {
                                                  Message message)
         throws IOException, WebApplicationException {
         
-        
-        
         Class<?>[] parameterTypes = ori.getInParameterTypes();
-        Parameter[] paramsInfo = ori.getParameters().toArray(new Parameter[ori.getParameters().size()]);  
+        List<Parameter> paramsInfo = ori.getParameters();  
+        boolean preferModelParams = paramsInfo.size() > parameterTypes.length 
+            && PropertyUtils.isTrue(message.getContextualProperty("org.apache.cxf.preferModelParameters"));
+        
+        int parameterTypesLengh = preferModelParams ? paramsInfo.size() : parameterTypes.length;
         
         Type[] genericParameterTypes = ori.getInGenericParameterTypes();
         Annotation[][] anns = ori.getInParameterAnnotations();
-        List<Object> params = new ArrayList<Object>(parameterTypes.length);
+        List<Object> params = new ArrayList<Object>(parameterTypesLengh);
 
-        for (int i = 0; i < parameterTypes.length; i++) {
-            Class<?> param = parameterTypes[i]; 
-            Type genericParam = InjectionUtils.processGenericTypeIfNeeded(
-                ori.getClassResourceInfo().getServiceClass(), param, genericParameterTypes[i]);
-            param = InjectionUtils.updateParamClassToTypeIfNeeded(param, genericParam);
+        for (int i = 0; i < parameterTypesLengh; i++) {
+            Class<?> param = null;
+            Type genericParam = null;
+            Annotation[] paramAnns = null;
+            if (!preferModelParams) {
+                param = parameterTypes[i]; 
+                genericParam = InjectionUtils.processGenericTypeIfNeeded(
+                    ori.getClassResourceInfo().getServiceClass(), param, genericParameterTypes[i]);
+                param = InjectionUtils.updateParamClassToTypeIfNeeded(param, genericParam);
+                paramAnns = anns == null ? EMPTY_ANNOTATIONS : anns[i];
+            } else {
+                param = paramsInfo.get(i).getJavaType();
+                genericParam = param;
+                paramAnns = EMPTY_ANNOTATIONS;
+            }
             
             Object paramValue = processParameter(param, 
                                                  genericParam,
-                                                 anns == null ? new Annotation[0] : anns[i],
-                                                 paramsInfo[i], 
+                                                 paramAnns,
+                                                 paramsInfo.get(i), 
                                                  values, 
                                                  message,
                                                  ori);
