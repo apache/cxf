@@ -215,31 +215,13 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
             fail("Expected failure on a modified request");
         } catch (SOAPFaultException ex) {
             SOAPFault fault = ex.getFault();
-<<<<<<< HEAD
-            assertEquals("soap:Sender", fault.getFaultCode());
+            assertTrue(fault.getFaultCode().endsWith("Sender"));
             assertEquals("The signature or decryption was invalid", fault.getFaultString());
             Iterator<?> subcodeIterator = fault.getFaultSubcodes();
             assertTrue(subcodeIterator.hasNext());
             Object subcode = subcodeIterator.next();
             assertEquals(WSConstants.FAILED_CHECK, subcode);
             assertFalse(subcodeIterator.hasNext());
-=======
-            if (streaming) {
-                assertTrue("soap:Sender".equals(fault.getFaultCode())
-                           || "soap:Receiver".equals(fault.getFaultCode()));
-                assertTrue(fault.getFaultString().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
-                Iterator<?> subcodeIterator = fault.getFaultSubcodes();
-                assertFalse(subcodeIterator.hasNext());
-            } else {
-                assertTrue(fault.getFaultCode().endsWith("Sender"));
-                assertEquals(fault.getFaultString(), WSSecurityException.UNIFIED_SECURITY_ERR);
-                Iterator<?> subcodeIterator = fault.getFaultSubcodes();
-                assertTrue(subcodeIterator.hasNext());
-                Object subcode = subcodeIterator.next();
-                assertEquals(WSSecurityException.SECURITY_ERROR, subcode);
-                assertFalse(subcodeIterator.hasNext());
-            }
->>>>>>> 32e2daf... Fixing failing test
         }
     }
     
