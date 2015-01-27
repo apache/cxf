@@ -269,7 +269,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                 Iterator<?> subcodeIterator = fault.getFaultSubcodes();
                 assertFalse(subcodeIterator.hasNext());
             } else {
-                assertEquals("soap:Sender", fault.getFaultCode());
+                assertTrue(fault.getFaultCode().endsWith("Sender"));
                 assertEquals(fault.getFaultString(), WSSecurityException.UNIFIED_SECURITY_ERR);
                 Iterator<?> subcodeIterator = fault.getFaultSubcodes();
                 assertTrue(subcodeIterator.hasNext());
