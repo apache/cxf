@@ -58,6 +58,7 @@
         <module>ws/mex</module>
         <module>ws/eventing</module>
         <module>rs/client</module>
+        <module>rs/http-sci</module>
         <module>rs/description</module>
         <module>rs/extensions/providers</module>
         <module>rs/extensions/search</module>
