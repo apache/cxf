@@ -327,9 +327,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         assertTrue(result.indexOf("Fault") != -1);
     }
     
-    // TODO
     @Test
-    @org.junit.Ignore
     public void testDecoupledFaultFromSecurity() throws Exception {
         Dispatch<Source> dispatcher = null;
         java.io.InputStream is = null;

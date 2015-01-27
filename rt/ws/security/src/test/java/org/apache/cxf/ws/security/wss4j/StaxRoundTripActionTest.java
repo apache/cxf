@@ -37,6 +37,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -93,8 +94,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
             fail("Failure expected on the wrong action");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
-            String error = "An error was discovered processing";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
     }
     
@@ -146,8 +146,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
             fail("Failure expected on the wrong action");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
-            String error = "An error was discovered processing";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
     }
   
@@ -201,8 +200,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
             fail("Failure expected on the wrong action");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
-            String error = "An error was discovered processing";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
     }
     
@@ -250,8 +248,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
             fail("Failure expected on the wrong action");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
-            String error = "An error was discovered processing";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
     }
     
@@ -397,8 +394,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
             fail("Failure expected on the wrong action");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
-            String error = "An error was discovered processing";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
     }
     
@@ -448,8 +444,7 @@ public class StaxRoundTripActionTest extends AbstractSecurityTest {
             fail("Failure expected on the wrong action");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
-            String error = "An error was discovered processing";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
     }
     

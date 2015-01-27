@@ -36,7 +36,6 @@ import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -170,7 +169,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             // processing in the WS-Stack.
             soapMessage.put(SECURITY_PROCESSED, Boolean.TRUE);
         } catch (WSSecurityException e) {
-            throw createSoapFault(soapMessage.getVersion(), e);
+            throw WSS4JUtils.createSoapFault(soapMessage, soapMessage.getVersion(), e);
         } catch (XMLSecurityException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, soapMessage.getVersion().getSender());
         } catch (WSSPolicyException e) {
@@ -365,31 +364,6 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
         
         return false;
-    }
-    
-    /**
-     * Create a SoapFault from a WSSecurityException, following the SOAP Message Security
-     * 1.1 specification, chapter 12 "Error Handling".
-     * 
-     * When the Soap version is 1.1 then set the Fault/Code/Value from the fault code
-     * specified in the WSSecurityException (if it exists).
-     * 
-     * Otherwise set the Fault/Code/Value to env:Sender and the Fault/Code/Subcode/Value
-     * as the fault code from the WSSecurityException.
-     */
-    private SoapFault 
-    createSoapFault(SoapVersion version, WSSecurityException e) {
-        SoapFault fault;
-        javax.xml.namespace.QName faultCode = e.getFaultCode();
-        if (version.getVersion() == 1.1 && faultCode != null) {
-            fault = new SoapFault(e.getMessage(), e, faultCode);
-        } else {
-            fault = new SoapFault(e.getMessage(), e, version.getSender());
-            if (version.getVersion() != 1.1 && faultCode != null) {
-                fault.setSubCode(faultCode);
-            }
-        }
-        return fault;
     }
     
     private void setTokenValidators(
