@@ -58,6 +58,9 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
+    private static boolean unrestrictedPoliciesInstalled = 
+        SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -76,6 +79,10 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testModifiedSignedTimestamp() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = ModifiedRequestTest.class.getResource("client/client.xml");
@@ -104,6 +111,10 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testModifiedSignature() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = ModifiedRequestTest.class.getResource("client/client.xml");
@@ -132,6 +143,10 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testUntrustedSignature() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = ModifiedRequestTest.class.getResource("client/client-untrusted.xml");
@@ -155,6 +170,10 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testModifiedEncryptedKey() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = ModifiedRequestTest.class.getResource("client/client.xml");
@@ -183,6 +202,10 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testModifiedEncryptedSOAPBody() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = ModifiedRequestTest.class.getResource("client/client.xml");
