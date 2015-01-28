@@ -60,6 +60,7 @@
                               </xsd:attribute>
                               <xsd:attribute name="defaultValue" type="xsd:string"/>
                               <xsd:attribute name="encoded" type="xsd:boolean"/>
+                              <xsd:attribute name="class" type="xsd:string"/>
                            </xsd:complexType>
                          </xsd:element>
                       </xsd:sequence>

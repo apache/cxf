@@ -28,6 +28,7 @@ public class Parameter {
     private String aValue;
     private boolean isEncoded;
     private String defaultValue;
+    private Class<?> javaType;
     
     public Parameter() {
         
@@ -91,8 +92,14 @@ public class Parameter {
     public void setDefaultValue(String dValue) {
         defaultValue = dValue;
     }
+    public void setJavaType(Class<?> jType) {
+        this.javaType = jType;
+    }
     public Class<?> getJavaType() {
-        //TODO: support the conversion from "xs:int" or Java class names (DOMSource, etc)
-        return type == ParameterType.REQUEST_BODY ? InputStream.class : String.class;
+        if (javaType == null) {
+            return type == ParameterType.REQUEST_BODY ? InputStream.class : String.class;
+        } else {
+            return javaType;
+        }
     }
 }
