@@ -47,7 +47,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.abdera.Abdera;
@@ -669,12 +668,8 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
             } catch (Exception ex) {
                 reportError("Object of type " + cls.getName() + " can not be deserialized from Entry", ex, 400);
             } finally {
-                try {
-                    if (xreader != null) {
-                        StaxUtils.close(xreader);
-                    }
-                } catch (XMLStreamException e) {
-                    //ignore
+                if (xreader != null) {
+                    StaxUtils.close(xreader);
                 }
             }
         }
