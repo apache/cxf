@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.jaxrs.servlet;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -36,11 +36,16 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ClasspathScanner;
 
-@HandlesTypes(Application.class)
-public class JaxrsServletContainerInitializer implements ServletContainerInitializer {
+@HandlesTypes({ Application.class, Provider.class, Path.class })
+public class JaxrsServletContainerInitializer implements ServletContainerInitializer {  
     private static final Logger LOG = LogUtils.getL7dLogger(JaxrsServletContainerInitializer.class);
+    private static final String IGNORE_PACKAGE = "org.apache.cxf";
+    
+    private static final String IGNORE_APP_PATH_PARAM = "jaxrs.application.address.ignore";
+    private static final String SERVICE_CLASSES_PARAM = "jaxrs.serviceClasses";
+    private static final String PROVIDERS_PARAM = "jaxrs.providers";
+    private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
     
     @Override
     public void onStartup(final Set< Class< ? > > classes, final ServletContext ctx) throws ServletException {        
@@ -49,19 +54,41 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
         
         final Class< ? > application = findCandidate(classes);
         if (application != null) {
-            servlet.setInitParameter("javax.ws.rs.Application", application.getName());            
+            servlet.setInitParameter(JAXRS_APPLICATION_PARAM, application.getName());
+            servlet.setInitParameter(IGNORE_APP_PATH_PARAM, "false");
         } else {
-            try {
-                final Map< Class< ? extends Annotation >, Collection< Class< ? > > > providersAndResources = 
-                    ClasspathScanner.findClasses(Arrays.asList(ClasspathScanner.WILDCARD), 
-                        Arrays.asList(Provider.class, Path.class));
-                
-                servlet.setInitParameter("jaxrs.providers", getClassNames(providersAndResources.get(Provider.class)));
-                servlet.setInitParameter("jaxrs.serviceClasses", getClassNames(providersAndResources.get(Path.class)));
-            } catch (final ClassNotFoundException | IOException ex) {
-                throw new ServletException("Unabled to perform classpath scan", ex);
+            final Map< Class< ? extends Annotation >, Collection< Class< ? > > > providersAndResources = 
+                groupByAnnotations(classes);
+            
+            servlet.setInitParameter(PROVIDERS_PARAM, getClassNames(providersAndResources.get(Provider.class)));
+            servlet.setInitParameter(SERVICE_CLASSES_PARAM, getClassNames(providersAndResources.get(Path.class)));
+        }
+    }
+    
+    private Map< Class< ? extends Annotation >, Collection< Class< ? > > > groupByAnnotations(
+        final Set< Class< ? > > classes) {
+        
+        final Map< Class< ? extends Annotation >, Collection< Class< ? > > > grouped = 
+            new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
+        
+        grouped.put(Provider.class, new ArrayList< Class< ? > >());
+        grouped.put(Path.class, new ArrayList< Class< ? > >());
+        
+        for (final Class< ? > clazz: classes) {
+            if (!classShouldBeIgnored(clazz)) {
+                for (final Class< ? extends Annotation > annotation: grouped.keySet()) {
+                    if (clazz.isAnnotationPresent(annotation)) {
+                        grouped.get(annotation).add(clazz);
+                    }
+                }
             }
         }
+        
+        return grouped;
+    }
+
+    private static boolean classShouldBeIgnored(final Class<?> clazz) {
+        return clazz.getPackage().getName().startsWith(IGNORE_PACKAGE);
     }
 
     private static String getClassNames(final Collection< Class< ? > > classes) {
@@ -78,7 +105,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
     
     private static Class< ? > findCandidate(final Set< Class< ? > > classes) {
         for (final Class< ? > clazz: classes) {
-            if (!clazz.getPackage().equals(JaxrsServletContainerInitializer.class.getPackage())) {
+            if (Application.class.isAssignableFrom(clazz) && !classShouldBeIgnored(clazz)) {
                 LOG.fine("Found JAX-RS application to initialize: " + clazz.getName());
                 return clazz;
             }
