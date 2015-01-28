@@ -45,6 +45,8 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.DefaultMethod;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -83,8 +85,15 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             op.setVerb("GET");
             op.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
             
+            UserOperation op2 = new UserOperation();
+            op2.setPath("echobook");
+            op2.setName("echo");
+            op2.setVerb("POST");
+            op2.setParameters(Collections.singletonList(new Parameter(ParameterType.REQUEST_BODY, null)));
+            
             List<UserOperation> ops = new ArrayList<UserOperation>();
             ops.add(op);
+            ops.add(op2);
             
             ur.setOperations(ops);
             
@@ -132,6 +141,14 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
                       "application/xml", 200, 999);
     }
     
+    @Test
+    public void testEchoBook() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/default/echobook");
+        Book b = wc.type("application/xml").accept("application/xml").post(new Book("echo", 333L), Book.class);
+        assertEquals("echo", b.getName());
+        assertEquals(333L, b.getId());
+    }
+    
     private void getAndCompare(String address, 
                                String acceptType,
                                int expectedStatus,
@@ -166,6 +183,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
         private HttpHeaders headers;
         private Map<String, Book> books = Collections.singletonMap("123", new Book("CXF in Action", 123L));
         @Path("{a:.*}")
+        @DefaultMethod
         public Response handle() {
             if (HttpMethod.GET.equals(request.getMethod())) {
                 String id = ui.getPathParameters().getFirst("id");
@@ -175,6 +193,9 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
                 throw new NotAllowedException("GET");
             }
         }
+        public Book echo(Book book) {
+            return book;
+        }
     }
     
     public static class CustomModelInvoker extends JAXRSInvoker {
@@ -183,7 +204,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
         public Object invoke(Exchange exchange, Object request, Object resourceObject) {
             MessageContext mc = new MessageContextImpl(exchange.getInMessage());
             List<Object> params = CastUtils.cast((List<?>)request);
-            if (params.size() > 0) {
+            if (params.size() == 1 && "999".equals(params.get(0))) {
                 Long bookId = Long.valueOf(params.get(0).toString());
                 Book book = new Book("CXF in Action", bookId);
                 Response r = Response.ok(book, 
