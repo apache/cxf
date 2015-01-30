@@ -145,9 +145,12 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
             body = boi.getOutput().getExtensor(SoapBody.class);
         } else {
             body = boi.getInput().getExtensor(SoapBody.class);
-        }        
-        if (body != null && !StringUtils.isEmpty(body.getNamespaceURI())) {
-            ns = body.getNamespaceURI();
+        }
+        if (body != null) {
+            final String nsUri = body.getNamespaceURI(); //do it once, as it might internally use reflection...
+            if (!StringUtils.isEmpty(nsUri)) {
+                ns = nsUri;
+            }
         }
 
         nsStack.add(ns);
