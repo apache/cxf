@@ -43,6 +43,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
@@ -72,9 +73,10 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     }
 
     @Override
-    protected void setupConnection(Message message, URI currentURL, HTTPClientPolicy csPolicy)
+    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy)
         throws IOException {
 
+        URI currentURL = address.getURI();
         String s = currentURL.getScheme();
         if (!"ws".equals(s) && !"wss".equals(s)) {
             throw new MalformedURLException("unknown protocol: " + s);

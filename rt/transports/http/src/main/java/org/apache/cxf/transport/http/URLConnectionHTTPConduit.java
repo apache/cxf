@@ -88,8 +88,10 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         }
     }    
     
-    private HttpURLConnection createConnection(Message message, URI uri, HTTPClientPolicy csPolicy) throws IOException {
-        URL url = uri.toURL();
+    private HttpURLConnection createConnection(Message message, Address address, HTTPClientPolicy csPolicy)
+        throws IOException {
+        URL url = address.getURL();
+        URI uri = address.getURI();
         Proxy proxy = proxyFactory.createProxy(csPolicy , uri);
         message.put("http.scheme", uri.getScheme());
         // check tlsClientParameters from message header
@@ -99,8 +101,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         }
         return connectionFactory.createConnection(clientParameters, proxy, url);
     }
-    protected void setupConnection(Message message, URI currentURL, HTTPClientPolicy csPolicy) throws IOException {
-        HttpURLConnection connection = createConnection(message, currentURL, csPolicy);
+    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
+        HttpURLConnection connection = createConnection(message, address, csPolicy);
         connection.setDoOutput(true);       
         
         int ctimeout = determineConnectionTimeout(message, csPolicy);
@@ -127,6 +129,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         // We place the connection on the message to pick it up
         // in the WrappedOutputStream.
         message.put(KEY_HTTP_CONNECTION, connection);
+        message.put(KEY_HTTP_CONNECTION_ADDRESS, address);
     }
 
     
@@ -151,6 +154,11 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         }
     }
     
+    private static URI computeURI(Message message, HttpURLConnection connection) throws URISyntaxException {
+        Address address = (Address)message.get(KEY_HTTP_CONNECTION_ADDRESS);
+        return address != null ? address.getURI() : connection.getURL().toURI();
+    }
+    
     class URLConnectionWrappedOutputStream extends WrappedOutputStream {
         HttpURLConnection connection;
         public URLConnectionWrappedOutputStream(Message message, HttpURLConnection connection,
@@ -158,9 +166,10 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                                                 int chunkThreshold, String conduitName) throws URISyntaxException {
             super(message, needToCacheRequest, isChunking,
                   chunkThreshold, conduitName,
-                  connection.getURL().toURI());
+                  computeURI(message, connection));
             this.connection = connection;
         }
+        
         // This construction makes extending the HTTPConduit more easier 
         protected URLConnectionWrappedOutputStream(URLConnectionWrappedOutputStream wos) {
             super(wos);
@@ -285,18 +294,15 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         }
         protected void setupNewConnection(String newURL) throws IOException {
             HTTPClientPolicy cp = getClient(outMessage);
-            URI nurl;
+            Address address;
             try {
-                nurl = new URI(newURL);
+                URI nurl = new URI(newURL);
+                address = new Address(nurl);
             } catch (URISyntaxException e) {
                 throw new IOException(e);
             }
-            setupConnection(outMessage, nurl, cp);
-            try {
-                url = new URI(newURL);
-            } catch (URISyntaxException e) {
-                throw new IOException(e); 
-            }
+            setupConnection(outMessage, address, cp);
+            this.url = address.getURI();
             connection = (HttpURLConnection)outMessage.get(KEY_HTTP_CONNECTION);
         }
 

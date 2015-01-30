@@ -61,6 +61,7 @@ import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduitFactory.UseAsyncPolicy;
@@ -127,17 +128,21 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         return factory;
     }
     
-    protected void setupConnection(Message message, URI uri, HTTPClientPolicy csPolicy) throws IOException {
+    @Override
+    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
         if (factory.isShutdown()) {
             message.put(USE_ASYNC, Boolean.FALSE);
-            super.setupConnection(message, uri, csPolicy);
+            super.setupConnection(message, address, csPolicy);
             return;
         }
+        boolean addressChanged = false;
         // need to do some clean up work on the URI address
+        URI uri = address.getURI();
         String uriString = uri.toString();
         if (uriString.startsWith("hc://")) {
             try {
                 uri = new URI(uriString.substring(5));
+                addressChanged = true;
             } catch (URISyntaxException ex) {
                 throw new MalformedURLException("unsupport uri: "  + uriString);
             }
@@ -179,12 +184,13 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
         if (!MessageUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
-            super.setupConnection(message, uri, csPolicy);
+            super.setupConnection(message, addressChanged ? new Address(uri) : address, csPolicy);
             return;
         }
         if (StringUtils.isEmpty(uri.getPath())) {
             //hc needs to have the path be "/" 
             uri = uri.resolve("/");
+            addressChanged = true;
         }
 
         message.put(USE_ASYNC, Boolean.TRUE);
@@ -823,7 +829,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             outbuf = new SharedOutputBuffer(bufSize, allocator);
             try {
                 this.url = new URI(newURL);
-                setupConnection(outMessage, this.url, csPolicy);
+                setupConnection(outMessage, new Address(this.url), csPolicy);
                 entity = outMessage.get(CXFHttpRequest.class);
                 basicEntity = (BasicHttpEntity)entity.getEntity();
                 entity.setOutputStream(this);
