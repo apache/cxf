@@ -48,6 +48,7 @@ import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
@@ -91,15 +92,17 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
     }
     
     // Using Netty API directly
-    protected void setupConnection(Message message, URI uri, HTTPClientPolicy csPolicy) throws IOException {
+    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
         
-        
+        URI uri = address.getURI();
+        boolean addressChanged = false;
         
         // need to do some clean up work on the URI address
         String uriString = uri.toString();
         if (uriString.startsWith("netty://")) {
             try {
                 uri = new URI(uriString.substring(8));
+                addressChanged = true;
             } catch (URISyntaxException ex) {
                 throw new MalformedURLException("unsupport uri: "  + uriString);
             }
@@ -141,7 +144,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         }
         if (!MessageUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
-            super.setupConnection(message, uri, csPolicy);
+            super.setupConnection(message, addressChanged ? new Address(uri) : address, csPolicy);
             return;
         }
         message.put(USE_ASYNC, Boolean.TRUE);
@@ -542,7 +545,8 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
             try {
                 this.url = new URI(newURL);
-                setupConnection(outMessage, this.url, csPolicy);
+                Address address = new Address(this.url);
+                setupConnection(outMessage, address, csPolicy);
                 entity = outMessage.get(NettyHttpClientRequest.class);
                 //reset the buffers
                 outBuffer.clear();
