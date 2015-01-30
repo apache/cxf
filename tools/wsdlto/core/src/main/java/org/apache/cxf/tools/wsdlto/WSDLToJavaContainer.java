@@ -553,11 +553,22 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         if (!env.containsKey(ToolConstants.CFG_WSDLLOCATION)) {
             //make sure the "raw" form is used for the wsdlLocation
             //instead of the absolute URI that normalize may return
+            boolean assumeFileURI = false;
             try {
                 URI uri = new URI(wsdl);
+
+                String uriScheme = uri.getScheme();
+                if (uriScheme == null) {
+                    assumeFileURI = true;
+                }
+
                 wsdl = uri.toString();
             } catch (Exception e) {
                 //not a URL, assume file
+                assumeFileURI = true;
+            }
+
+            if (assumeFileURI) {
                 if (wsdl.indexOf(":") != -1 && !wsdl.startsWith("/")) {
                     wsdl = "file:/" + wsdl;
                 } else {
@@ -570,6 +581,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     //ignore... 
                 }
             }
+
             wsdl = wsdl.replace("\\", "/");
 
             env.put(ToolConstants.CFG_WSDLLOCATION, wsdl);
