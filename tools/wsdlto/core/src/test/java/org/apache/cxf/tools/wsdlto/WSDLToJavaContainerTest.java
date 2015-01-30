@@ -66,6 +66,17 @@ public class WSDLToJavaContainerTest extends Assert {
         assertTrue(context.optionSet(ToolConstants.CFG_SUPPRESS_WARNINGS));
     }
 
+    @Test
+    public void testWsdlLocationDefaultSchemeIsFile() throws Exception {
+        WSDLToJavaContainer container = new WSDLToJavaContainer("dummy", null);
+        ToolContext context = new ToolContext();
+        context.put(ToolConstants.CFG_WSDLURL, getLocation("hello_world.wsdl"));
+        container.setContext(context);
+        container.validate(context);
+        String wsdlLocation = (String)context.get(ToolConstants.CFG_WSDLLOCATION);
+        assertTrue("default scheme for wsdlLocation is file", wsdlLocation.startsWith("file:"));
+    }
+
     private String getLocation(String wsdlFile) throws URISyntaxException {
         return this.getClass().getResource(wsdlFile).toURI().getPath();
     }
