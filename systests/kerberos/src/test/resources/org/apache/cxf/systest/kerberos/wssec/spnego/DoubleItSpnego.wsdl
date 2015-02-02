@@ -109,6 +109,24 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItSpnegoSymmetricSecureConversationBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSpnegoSymmetricSecureConversationPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItSpnegoSymmetricPort" binding="tns:DoubleItSpnegoSymmetricProtectionBinding">
             <soap:address location="http://localhost:9001/DoubleItSpnegoSymmetric"/>
@@ -124,6 +142,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItSpnegoTransportEndorsingPort" binding="tns:DoubleItSpnegoTransportEndorsingBinding">
             <soap:address location="https://localhost:9001/DoubleItSpnegoTransportEndorsing"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItSpnegoSymmetricSecureConversationPort" binding="tns:DoubleItSpnegoSymmetricSecureConversationBinding">
+            <soap:address location="http://localhost:9001/DoubleItSpnegoSymmetricSecureConversation"/>
         </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItSpnegoSymmetricProtectionPolicy">
@@ -362,6 +383,96 @@
                         <sp:MustSupportRefEncryptedKey/>
                     </wsp:Policy>
                 </sp:Wss11>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItSpnegoSymmetricSecureConversationPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                    <wsp:Policy>
+                        <sp:ProtectionToken>
+                            <wsp:Policy>
+                               <sp:SecureConversationToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                   <wsp:Policy>
+                                       <sp:RequireDerivedKeys />
+                                       <sp:BootstrapPolicy>
+                                           <wsp:Policy> 
+                                              <sp:SymmetricBinding>
+                                                 <wsp:Policy>
+                                                    <sp:ProtectionToken>
+                                                       <wsp:Policy>
+                                                          <sp:SpnegoContextToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                                             <wsp:Policy>
+                                                                <sp:RequireDerivedKeys/>
+                                                             </wsp:Policy>
+                                                          </sp:SpnegoContextToken>
+                                                       </wsp:Policy>
+                                                    </sp:ProtectionToken>
+                                                    <sp:Layout>
+                                                       <wsp:Policy>
+                                                           <sp:Lax/>
+                                                       </wsp:Policy>
+                                                    </sp:Layout>
+                                                    <sp:IncludeTimestamp/>
+                                                    <sp:EncryptSignature/>
+                                                    <sp:OnlySignEntireHeadersAndBody/>
+                                                    <sp:AlgorithmSuite>
+                                                       <wsp:Policy>
+                                                          <sp:Basic128/>
+                                                       </wsp:Policy>
+                                                    </sp:AlgorithmSuite>
+                                                 </wsp:Policy>
+                                              </sp:SymmetricBinding> 
+                                              <sp:Wss11>
+                                                 <wsp:Policy>
+                                                     <sp:MustSupportRefIssuerSerial/>
+                                                     <sp:MustSupportRefThumbprint/>
+                                                     <sp:MustSupportRefEncryptedKey/>
+                                                 </wsp:Policy>
+                                              </sp:Wss11>
+                                              <sp:Trust13>
+                                                 <wsp:Policy>
+                                                    <sp:MustSupportIssuedTokens />
+                                                    <sp:RequireClientEntropy />
+                                                    <sp:RequireServerEntropy />
+                                                 </wsp:Policy>
+                                              </sp:Trust13> 
+                                          </wsp:Policy>
+                                      </sp:BootstrapPolicy>
+                                   </wsp:Policy>
+                               </sp:SecureConversationToken>
+                            </wsp:Policy>
+                        </sp:ProtectionToken>
+                        <sp:AlgorithmSuite>
+                           <wsp:Policy>
+                              <sp:Basic128 />
+                           </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                           <wsp:Policy>
+                              <sp:Lax />
+                           </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp />
+                        <sp:EncryptSignature />
+                        <sp:OnlySignEntireHeadersAndBody />
+                    </wsp:Policy>
+                </sp:SymmetricBinding>
+                <sp:Wss11>
+                    <wsp:Policy>
+                        <sp:MustSupportRefIssuerSerial/>
+                        <sp:MustSupportRefThumbprint/>
+                        <sp:MustSupportRefEncryptedKey/>
+                    </wsp:Policy>
+                </sp:Wss11>
+                <sp:Trust13>
+                    <wsp:Policy>
+                       <sp:MustSupportIssuedTokens />
+                       <sp:RequireClientEntropy />
+                       <sp:RequireServerEntropy />
+                    </wsp:Policy>
+                </sp:Trust13> 
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
