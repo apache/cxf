@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.cxf.Bus;
 import org.apache.cxf.maven_plugin.common.ClassLoaderSwitcher;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 
 /**
@@ -53,6 +54,10 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
      */
     File testWadlRoot;
     
+    
+    /** @component */
+    BuildContext buildContext;
+    
     private void mergeOptions(List<WadlOption> effectiveOptions) {
         if (wadlOptions == null) {
             return;
@@ -74,6 +79,20 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
         File classesDir = new File(classesDirectory);
         classesDir.mkdirs();
         markerDirectory.mkdirs();
+        
+        // add the generated source into compile source
+        // do this step first to ensure the source folder will be added to the Eclipse classpath
+        if (project != null && sourceRoot != null) {
+            project.addCompileSourceRoot(sourceRoot.getAbsolutePath());
+        }
+        if (project != null && testSourceRoot != null) {
+            project.addTestCompileSourceRoot(testSourceRoot.getAbsolutePath());
+        }
+        
+        // if this is an m2e configuration build then return immediately without doing any work
+        if (project != null && buildContext.isIncremental() && !buildContext.hasDelta(project.getBasedir())) {
+            return;
+        }
 
         List<WadlOption> effectiveWsdlOptions = createWadlOptionsFromScansAndExplicitWadlOptions(classesDir);
 
@@ -109,12 +128,6 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
                 bus.shutdown(true);
             }
             classLoaderSwitcher.restoreClassLoader();
-        }
-        if (project != null && sourceRoot != null && sourceRoot.exists()) {
-            project.addCompileSourceRoot(sourceRoot.getAbsolutePath());
-        }
-        if (project != null && testSourceRoot != null && testSourceRoot.exists()) {
-            project.addTestCompileSourceRoot(testSourceRoot.getAbsolutePath());
         }
 
         System.gc();
