@@ -77,4 +77,10 @@
             <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SpnegoOverSymmetricSecureConversation" address="http://localhost:${testutil.ports.Server}/DoubleItSpnegoSymmetricSecureConversation" serviceName="s:DoubleItService" endpointName="s:DoubleItSpnegoSymmetricSecureConversationPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/spnego/DoubleItSpnego.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.kerberos.jaas.context" value="bob"/>
+            <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
 </beans>

@@ -247,6 +247,20 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         // runKerberosTest(portName, true, STAX_PORT2);
     }
     
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSpnegoOverSymmetricSecureConversation() throws Exception {
+        if (!runTests || !unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
+        String portName = "DoubleItSpnegoSymmetricSecureConversationPort";
+        runKerberosTest(portName, false, PORT);
+        //runKerberosTest(portName, false, STAX_PORT);
+        //runKerberosTest(portName, true, PORT);
+        //runKerberosTest(portName, true, STAX_PORT);
+    }
+    
     private void runKerberosTest(String portName, boolean streaming, String portNumber) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
