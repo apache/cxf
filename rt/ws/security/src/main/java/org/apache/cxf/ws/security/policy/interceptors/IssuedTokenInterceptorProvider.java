@@ -440,7 +440,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 
                     client.setMessage(message);
 
-                    if (maps != null) {
+                    if (maps != null && maps.getNamespaceURI() != null) {
                         client.setAddressingNamespace(maps.getNamespaceURI());
                     }
                     
@@ -473,11 +473,6 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     } else {
                         throw new Fault(ex);
                     }
-                } finally {
-                    client.setTrust((Trust10)null);
-                    client.setTrust((Trust13)null);
-                    client.setTemplate(null);
-                    client.setAddressingNamespace(null);
                 }
             }
         }
@@ -537,11 +532,6 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     throw e;
                 } catch (Exception e) {
                     throw new Fault(e);
-                } finally {
-                    client.setTrust((Trust10)null);
-                    client.setTrust((Trust13)null);
-                    client.setTemplate(null);
-                    client.setAddressingNamespace(null);
                 }
             }
         }
