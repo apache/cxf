@@ -220,6 +220,14 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         assertEquals("book", text);
     }
     @Test
+    public void testJweRsaJwsRsaCertInHeaders() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejwsrsaCertInHeaders";
+        BookStore bs = createJweJwsBookStore(address, null, null);
+        WebClient.getConfig(bs).getRequestContext().put("rs.security.report.public.key", "true");
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    @Test
     public void testJweRsaJwsPlainTextHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwshmac";
         HmacJwsSignatureProvider hmacProvider = 

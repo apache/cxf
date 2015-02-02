@@ -24,8 +24,12 @@ import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -54,8 +58,30 @@ public final class KeyManagementUtils {
     public static final String RSSEC_SIG_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
     public static final String RSSEC_DECRYPT_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
     public static final String RSSEC_DEFAULT_ALGORITHMS = "rs.security.default.algorithms";
+    public static final String RSSEC_REPORT_KEY_PROP = "rs.security.report.public.key";
     
     private KeyManagementUtils() {
+    }
+    public static List<String> loadAndEncodeX509CertificateOrChain(Message m, Properties props) {
+        X509Certificate[] chain = loadX509CertificateOrChain(m, props);
+        return encodeX509CertificateChain(chain);
+    }
+    public static X509Certificate[] loadX509CertificateOrChain(Message m, Properties props) {
+        KeyStore keyStore = KeyManagementUtils.loadPersistKeyStore(m, props);
+        String alias = props.getProperty(RSSEC_KEY_STORE_ALIAS);
+        return loadX509CertificateOrChain(keyStore, alias);
+    }
+    private static X509Certificate[] loadX509CertificateOrChain(KeyStore keyStore, String alias) {
+        try {
+            Certificate[] certs = keyStore.getCertificateChain(alias);
+            if (certs != null) {
+                return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
+            } else {
+                return new X509Certificate[]{(X509Certificate)CryptoUtils.loadCertificate(keyStore, alias)};
+            }
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }    
     }
     
     public static PublicKey loadPublicKey(Message m, Properties props) {
@@ -89,13 +115,14 @@ public final class KeyManagementUtils {
                                             Properties props, 
                                             Bus bus, 
                                             PrivateKeyPasswordProvider provider,
-                                            String keyOper) {
+                                            String keyOper,
+                                            String alias) {
         
         String keyPswd = props.getProperty(RSSEC_KEY_PSWD);
-        String alias = getKeyId(m, props, RSSEC_KEY_STORE_ALIAS, keyOper);
+        String theAlias = alias != null ? alias : getKeyId(m, props, RSSEC_KEY_STORE_ALIAS, keyOper);
         char[] keyPswdChars = provider != null ? provider.getPassword(props) 
             : keyPswd != null ? keyPswd.toCharArray() : null;    
-        return CryptoUtils.loadPrivateKey(keyStore, keyPswdChars, alias);
+        return CryptoUtils.loadPrivateKey(keyStore, keyPswdChars, theAlias);
     }
     
     public static PrivateKey loadPrivateKey(Message m, String keyStoreLocProp, String keyOper) {
@@ -148,9 +175,13 @@ public final class KeyManagementUtils {
         return cb;
     }
     
-    public static PrivateKey loadPrivateKey(Message m, Properties props, String keyOper) {
-        Bus bus = m.getExchange().getBus();
+    public static RSAPrivateKey loadPrivateKey(Message m, Properties props, String keyOper) {
         KeyStore keyStore = loadPersistKeyStore(m, props);
+        return (RSAPrivateKey)loadPrivateKey(keyStore, m, props, keyOper, null);
+    }
+    private static RSAPrivateKey loadPrivateKey(KeyStore keyStore, Message m, Properties props, String keyOper, 
+                                                String alias) {
+        Bus bus = m.getExchange().getBus();
         PrivateKeyPasswordProvider cb = loadPasswordProvider(m, props, keyOper);
         if (cb != null && m.getExchange().getInMessage() != null) {
             SecurityContext sc = m.getExchange().getInMessage().get(SecurityContext.class);
@@ -161,7 +192,7 @@ public final class KeyManagementUtils {
                 }
             }
         }
-        return loadPrivateKey(keyStore, m, props, bus, cb, keyOper);
+        return (RSAPrivateKey)loadPrivateKey(keyStore, m, props, bus, cb, keyOper, alias);
     }
     public static KeyStore loadPersistKeyStore(Message m, Properties props) {
         KeyStore keyStore = (KeyStore)m.getExchange().get(props.get(RSSEC_KEY_STORE_FILE));
@@ -182,7 +213,9 @@ public final class KeyManagementUtils {
             throw new SecurityException(ex);
         }
     }
-
+    public static List<String> encodeX509CertificateChain(X509Certificate[] chain) {
+        return encodeX509CertificateChain(Arrays.asList(chain));
+    }
     public static List<String> encodeX509CertificateChain(List<X509Certificate> chain) {
         List<String> encodedChain = new ArrayList<String>(chain.size());
         for (X509Certificate cert : chain) {
@@ -251,5 +284,23 @@ public final class KeyManagementUtils {
             throw new SecurityException();
         }
         return props; 
+    }
+    public static RSAPrivateKey loadPrivateKey(Message m, Properties props, 
+                                               List<X509Certificate> inCert, String keyOper) {
+        KeyStore keyStore = loadPersistKeyStore(m, props);
+        try {
+            Object[] inCertArray = inCert.toArray();
+            // perhaps inCert properties can be optionally used as aliases
+            for (Enumeration<String> e = keyStore.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
+                X509Certificate[] chain = loadX509CertificateOrChain(keyStore, alias);
+                if (chain != null && Arrays.equals(chain, inCertArray)) {
+                    return loadPrivateKey(keyStore, m, props, keyOper, alias);
+                }
+            }
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+        return null;
     }
 }

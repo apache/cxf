@@ -35,8 +35,8 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsClientResponseFilter extends AbstractJwsReaderProvider implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJoseHeaders());
         if (!p.verifySignatureWith(theSigVerifier)) {
             throw new SecurityException();
         }

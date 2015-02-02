@@ -47,8 +47,8 @@ public class JwtJwsAuthenticationFilter extends AbstractJwsReaderProvider implem
             throw new SecurityException();
         }
         
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         JwsJwtCompactConsumer p = new JwsJwtCompactConsumer(schemeData[1]);
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJoseHeaders());
         if (!p.verifySignatureWith(theSigVerifier)) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;

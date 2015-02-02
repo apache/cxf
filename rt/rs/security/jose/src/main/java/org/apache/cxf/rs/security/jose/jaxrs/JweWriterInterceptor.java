@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.zip.DeflaterOutputStream;
 
 import javax.annotation.Priority;
@@ -54,8 +53,8 @@ public class JweWriterInterceptor implements WriterInterceptor {
             return;
         }
         OutputStream actualOs = ctx.getOutputStream();
-        
-        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
+        JweHeaders jweHeaders = new JweHeaders();
+        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider(jweHeaders);
         
         String ctString = null;
         MediaType contentMediaType = ctx.getMediaType();
@@ -66,9 +65,12 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 ctString = JAXRSUtils.mediaTypeToString(contentMediaType);
             }
         }
+        if (ctString != null) {
+            jweHeaders.setContentType(ctString);
+        }
         
         if (useJweOutputStream) {
-            JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(toJweHeaders(ctString));
+            JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(jweHeaders);
             try {
                 JweCompactProducer.startJweContent(actualOs,
                                                    encryption.getHeaders(), 
@@ -93,7 +95,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
             CachedOutputStream cos = new CachedOutputStream(); 
             ctx.setOutputStream(cos);
             ctx.proceed();
-            String jweContent = theEncryptionProvider.encrypt(cos.getBytes(), toJweHeaders(ctString));
+            String jweContent = theEncryptionProvider.encrypt(cos.getBytes(), jweHeaders);
             setJoseMediaType(ctx);
             IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jweContent)), 
                          actualOs);
@@ -106,11 +108,11 @@ public class JweWriterInterceptor implements WriterInterceptor {
         ctx.setMediaType(joseMediaType);
     }
     
-    protected JweEncryptionProvider getInitializedEncryptionProvider() {
+    protected JweEncryptionProvider getInitializedEncryptionProvider(JweHeaders headers) {
         if (encryptionProvider != null) {
             return encryptionProvider;    
         } 
-        return JweUtils.loadEncryptionProvider(true);
+        return JweUtils.loadEncryptionProvider(headers, true);
     }
     
     public void setUseJweOutputStream(boolean useJweOutputStream) {
@@ -120,7 +122,5 @@ public class JweWriterInterceptor implements WriterInterceptor {
     public void setEncryptionProvider(JweEncryptionProvider encryptionProvider) {
         this.encryptionProvider = encryptionProvider;
     }
-    private static JweHeaders toJweHeaders(String ct) {
-        return new JweHeaders(Collections.<String, Object>singletonMap(JoseConstants.HEADER_CONTENT_TYPE, ct));
-    }
+    
 }
