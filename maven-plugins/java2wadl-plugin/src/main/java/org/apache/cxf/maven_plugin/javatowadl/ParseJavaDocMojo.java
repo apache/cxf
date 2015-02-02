@@ -20,18 +20,20 @@ package org.apache.cxf.maven_plugin.javatowadl;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.javadoc.AbstractJavadocMojo;
+import org.apache.maven.plugin.javadoc.JavadocReport;
 import org.apache.maven.plugin.javadoc.options.DocletArtifact;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.reporting.MavenReportException;
 import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
@@ -41,7 +43,7 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
  * @requiresDependencyResolution compile
  * @threadSafe
  */
-public class ParseJavaDocMojo extends AbstractJavadocMojo {
+public class ParseJavaDocMojo extends AbstractMojo {
 
     /**
      * @parameter expression="${project}"
@@ -118,24 +120,20 @@ public class ParseJavaDocMojo extends AbstractJavadocMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (skip) {
-            getLog().info("Skipping parse javadoc");
-            return;
-        }
-
+        AbstractJavadocMojo mojo = new JavadocReport();
+        Locale locale = Locale.getDefault();
         try {
-            Locale locale = Locale.getDefault();
             Field f = AbstractJavadocMojo.class.getDeclaredField("doclet");
             f.setAccessible(true);
-            f.set(this, "org.apache.cxf.maven_plugin.javatowadl.DumpJavaDoc");
+            f.set(mojo, "org.apache.cxf.maven_plugin.javatowadl.DumpJavaDoc");
 
             f = AbstractJavadocMojo.class.getDeclaredField("stylesheet");
             f.setAccessible(true);
-            f.set(this, "stylesheet");
+            f.set(mojo, "stylesheet");
             
             f = AbstractJavadocMojo.class.getDeclaredField("javadocOptionsDir");
             f.setAccessible(true);
-            f.set(this, javadocOptionsDir);
+            f.set(mojo, javadocOptionsDir);
 
             f = AbstractJavadocMojo.class.getDeclaredField("docletArtifact");
             f.setAccessible(true);
@@ -150,81 +148,68 @@ public class ParseJavaDocMojo extends AbstractJavadocMojo {
                     }
                 }
             }
-            f.set(this, docletArtifact);
+            f.set(mojo, docletArtifact);
 
             f = AbstractJavadocMojo.class.getDeclaredField("factory");
             f.setAccessible(true);
-            f.set(this, this.mavenArtifactFactory);
+            f.set(mojo, this.mavenArtifactFactory);
 
             f = AbstractJavadocMojo.class.getDeclaredField("mavenProjectBuilder");
             f.setAccessible(true);
-            f.set(this, this.mavenProjectBuilder);
+            f.set(mojo, this.mavenProjectBuilder);
 
             f = AbstractJavadocMojo.class.getDeclaredField("resolver");
             f.setAccessible(true);
-            f.set(this, this.artifactResolver);
+            f.set(mojo, this.artifactResolver);
 
             f = AbstractJavadocMojo.class.getDeclaredField("archiverManager");
             f.setAccessible(true);
-            f.set(this, this.archiverManager);
+            f.set(mojo, this.archiverManager);
 
             f = AbstractJavadocMojo.class.getDeclaredField("artifactMetadataSource");
             f.setAccessible(true);
-            f.set(this, this.artifactMetadataSource);
+            f.set(mojo, this.artifactMetadataSource);
 
             f = AbstractJavadocMojo.class.getDeclaredField("toolchainManager");
             f.setAccessible(true);
-            f.set(this, this.toolchainManager);
+            f.set(mojo, this.toolchainManager);
 
             f = AbstractJavadocMojo.class.getDeclaredField("localRepository");
             f.setAccessible(true);
-            f.set(this, this.localRepository);
+            f.set(mojo, this.localRepository);
 
             f = AbstractJavadocMojo.class.getDeclaredField("remoteRepositories");
             f.setAccessible(true);
-            f.set(this, this.remoteRepositories);
+            f.set(mojo, this.remoteRepositories);
 
             f = AbstractJavadocMojo.class.getDeclaredField("applyJavadocSecurityFix");
             f.setAccessible(true);
-            f.set(this, false);
+            f.set(mojo, false);
             
             f = AbstractJavadocMojo.class.getDeclaredField("additionalparam");
             f.setAccessible(true);
-            f.set(this, "-dumpJavaDocFile " + this.dumpFileOutputDirectory.getAbsolutePath() 
+            f.set(mojo, "-dumpJavaDocFile " + this.dumpFileOutputDirectory.getAbsolutePath() 
                       + File.separator + "dumpFile.properties");
 
-            useStandardDocletOptions = false;
-            this.project = mavenProject;
-            generate(locale);
+            f = AbstractJavadocMojo.class.getDeclaredField("useStandardDocletOptions");
+            f.setAccessible(true);
+            f.set(mojo, false);
+            
+            f = AbstractJavadocMojo.class.getDeclaredField("project");
+            f.setAccessible(true);
+            f.set(mojo, mavenProject);
+            
+            if (dumpFileOutputDirectory != null) {
+                f = AbstractJavadocMojo.class.getDeclaredField("outputDirectory");
+                f.setAccessible(true);
+                f.set(mojo, dumpFileOutputDirectory);
+            }
+        
+            Method m = AbstractJavadocMojo.class.getMethod("executeReport", Locale.class);
+            m.setAccessible(true);
+            m.invoke(mojo, locale);
         } catch (Exception e) {
-            failOnError("An error has occurred in parsing javadoc", e);
-        }
-
-    }
-
-    private void generate(Locale locale) throws MavenReportException {
-        try {
-            outputDirectory = getReportOutputDirectory();
-            executeReport(locale);
-        } catch (MavenReportException e) {
-            if (failOnError) {
-                throw e;
-            }
-            getLog().error("Error while creating javadoc report: " + e.getMessage(), e);
-        } catch (RuntimeException e) {
-            if (failOnError) {
-                throw e;
-            }
-            getLog().error("Error while creating javadoc report: " + e.getMessage(), e);
+            throw new MojoExecutionException("Failed to generate javadoc", e);
         }
     }
-
-    private File getReportOutputDirectory() {
-        if (dumpFileOutputDirectory == null) {
-            return outputDirectory;
-        }
-
-        return dumpFileOutputDirectory;
-    }
-
 }

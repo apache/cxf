@@ -39,44 +39,38 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
-/**
- * @goal wsdl2js
- * @phase generate-sources
- * @description CXF WSDL To JavaScript Tool
- * @requiresDependencyResolution test
- * @threadSafe
- */
+@Mojo(name = "wsdl2js", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true,
+      requiresDependencyResolution = ResolutionScope.TEST)
 public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
 
-    /**
-     * @parameter expression="${cxf.testJavascriptRoot}"
-     */
+    @Parameter(property = "cxf.testJavascriptRoot")
     File testSourceRoot;
 
     /**
      * Path where the generated sources should be placed
-     * 
-     * @parameter expression="${cxf.sourceJavascriptRoot}"
-     *            default-value="${project.build.directory}/generated-sources/cxf-js"
-     * @required
      */
+    @Parameter(required = true, defaultValue = "${project.build.directory}/generated-sources/cxf-js",
+               property = "cxf.sourceJavascriptRoot")
     File sourceRoot;
 
     /**
      * Default options to be applied to all of the wsdls.
-     * 
-     * @parameter
      */
+    @Parameter
     Option defaultOptions = new Option();
     
     /**
      * Options that specify WSDLs to process and/or control the processing of wsdls. 
      * If you have enabled wsdl scanning, these elements attach options to particular wsdls.
      * If you have not enabled wsdl scanning, these options call out the wsdls to process. 
-     * @parameter
      */
+    @Parameter
     WsdlOption wsdlOptions[];
 
     @Override

@@ -47,6 +47,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
@@ -60,54 +62,42 @@ import org.codehaus.plexus.util.cli.Commandline;
 public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
     /**
-     * @parameter expression="${cxf.testSourceRoot}"
+     * Source Root
      */
+	@Parameter(property = "cxf.testSourceRoot")
     File testSourceRoot;
 
     /**
      * Path where the generated sources should be placed
-     * 
-     * @parameter expression="${cxf.sourceRoot}"
-     *            default-value="${project.build.directory}/generated-sources/cxf"
-     * @required
      */
+    @Parameter(required = true,
+            property = "cxf.sourceRoot",
+            defaultValue = "${project.build.directory}/generated-sources/cxf")
     File sourceRoot;
 
-    /**
-     * @parameter expression="${project.build.outputDirectory}"
-     * @required
-     */
+    @Parameter(required = true, property = "project.build.outputDirectory")
     String classesDirectory;
 
-    /**
-     * @parameter expression="${project}"
-     * @required
-     */
+    @Parameter(required = true, property = "project")
     MavenProject project;
 
     /**
      * Default options to be used when a wadl has not had it's options explicitly specified.
-     * 
-     * @parameter
      */
+    @Parameter
     Option defaultOptions = new Option();
-
-    
 
     /**
      * Directory in which the "DONE" markers are saved that
-     * 
-     * @parameter expression="${cxf.markerDirectory}"
-     *            default-value="${project.build.directory}/cxf-codegen-plugin-markers"
      */
+    @Parameter(property = "cxf.markerDirectory", defaultValue = "${project.build.directory}/cxf-codegen-plugin-markers")
     File markerDirectory;
 
     /**
      * Use the compile classpath rather than the test classpath for execution useful if the test dependencies
      * clash with those of wadl2java
-     * 
-     * @parameter expression="${cxf.useCompileClasspath}" default-value="false"
      */
+    @Parameter(property = "cxf.useCompileClasspath", defaultValue = "false")
     boolean useCompileClasspath;
     
     
@@ -116,94 +106,69 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      * By default, we scan for *.wadl (see include/exclude params as well) in the wadlRoot
      * directories and run wadl2java on all the wadl's we find.    This disables that scan
      * and requires an explicit wadlOption to be set for each wadl that needs to be processed.
-     * @parameter expression="${cxf.disableDirectoryScan}" default-value="false"
      */
+    @Parameter(property = "cxf.disableDirectoryScan", defaultValue = "false")
     boolean disableDirectoryScan;
 
     /**
      * By default all maven dependencies of type "wadl" are added to the effective wadlOptions. Setting this
      * parameter to true disables this functionality
-     * 
-     * @parameter expression="${cxf.disableDependencyScan}" default-value="false"
      */
+    @Parameter(property = "cxf.disableDependencyScan", defaultValue = "false")
     boolean disableDependencyScan;
 
     /**
      * A list of wadl files to include. Can contain ant-style wildcards and double wildcards. Defaults to
      * *.wadl
-     * 
-     * @parameter
      */
+    @Parameter
     String includes[];
 
     /**
      * A list of wadl files to exclude. Can contain ant-style wildcards and double wildcards.
-     * 
-     * @parameter
      */
+    @Parameter
     String excludes[];
 
     /**
      * Allows running the JavaToWs in a separate process.
      * Valid values are "false", "always", and "once"
      * The value of "true" is equal to "once"
-     *
-     * @parameter default-value="false"
-     * @since 2.4
      */
+    @Parameter(defaultValue = "false")
     String fork;
     
     /**
      * The Maven session.
-     * 
-     * @parameter expression="${session}"
-     * @readonly
-     * @required
      */
+    @Parameter(readonly = true, required = true, property = "session")
     private MavenSession mavenSession;
 
     /**
      * The plugin dependencies, needed for the fork mode.
-     *
-     * @parameter expression="${plugin.artifacts}"
-     * @required
-     * @readonly
      */
+    @Parameter(readonly = true, required = true, property = "plugin.artifacts")
     private List<Artifact> pluginArtifacts;
     
 
     /**
      * Sets the Java executable to use when fork parameter is <code>true</code>.
-     *
-     * @parameter default-value="${java.home}/bin/java"
-     * @since 2.4
      */
+    @Parameter(defaultValue = "${java.home}/bin/java")
     private String javaExecutable;
 
     /**
      * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is set to <code>true</code>.
-     *
-     * @parameter
-     * @since 2.4
      */
+    @Parameter
     private String additionalJvmArgs;
     
-    /**
-     * @component
-     * @readonly
-     * @required
-     */
+    @Component
     private RepositorySystem repositorySystem;
     
     
     private ClassLoader resourceClassLoader;
-    
-    /**
-     * Merge WadlOptions that point to the same file by adding the extraargs to the first option and deleting
-     * the second from the options list
-     * 
-     * @param options
-     */
+
     
     private Artifact resolveRemoteWadlArtifact(Artifact artifact)
         throws MojoExecutionException {

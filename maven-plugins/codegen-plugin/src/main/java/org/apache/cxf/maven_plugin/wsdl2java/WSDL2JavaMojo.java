@@ -47,15 +47,14 @@ import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-/**
- * @goal wsdl2java
- * @phase generate-sources
- * @description CXF WSDL To Java Tool
- * @requiresDependencyResolution test
- * @threadSafe
- */
+@Mojo(name = "wsdl2java", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true,
+      requiresDependencyResolution = ResolutionScope.TEST)
 public class WSDL2JavaMojo extends AbstractCodegenMoho {
 
     final class MavenToolErrorListener extends ToolErrorListener {
@@ -125,40 +124,35 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         }
     }
 
-    /**
-     * @parameter expression="${cxf.testSourceRoot}"
-     */
+    @Parameter(property = "cxf.testSourceRoot")
     File testSourceRoot;
 
     /**
      * Path where the generated sources should be placed
      * 
-     * @parameter expression="${cxf.sourceRoot}"
-     *            default-value="${project.build.directory}/generated-sources/cxf"
-     * @required
      */
+    @Parameter(required = true, defaultValue = "${project.build.directory}/generated-sources/cxf",
+               property = "cxf.sourceRoot")
     File sourceRoot;
 
     /**
      * Options that specify WSDLs to process and/or control the processing of wsdls. 
      * If you have enabled wsdl scanning, these elements attach options to particular wsdls.
      * If you have not enabled wsdl scanning, these options call out the wsdls to process. 
-     * @parameter
      */
+    @Parameter
     WsdlOption wsdlOptions[];
 
     /**
      * Default options to be used when a wsdl has not had it's options explicitly specified.
-     * 
-     * @parameter
      */
+    @Parameter
     Option defaultOptions = new Option();
 
     /**
      * Encoding to use for generated sources
-     * 
-     * @parameter default-value="${project.build.sourceEncoding}"
      */
+    @Parameter(defaultValue = "${project.build.sourceEncoding}")
     String encoding;
 
     /**

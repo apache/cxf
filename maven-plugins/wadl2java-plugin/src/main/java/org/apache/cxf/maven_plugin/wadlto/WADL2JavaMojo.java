@@ -28,34 +28,31 @@ import java.util.Set;
 import org.apache.cxf.Bus;
 import org.apache.cxf.maven_plugin.common.ClassLoaderSwitcher;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 
 /**
- * @goal wadl2java
- * @phase generate-sources
- * @description CXF WADL To Java Tool
- * @requiresDependencyResolution test
- * @threadSafe
+ * CXF WADL To Java Tool
  */
+@Mojo(name = "wadl2java", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true,
+      requiresDependencyResolution = ResolutionScope.TEST)
 public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
-    /**
-     * @parameter
-     */
-    WadlOption wadlOptions[];
+    @Parameter
+	WadlOption wadlOptions[];
 
-    /**
-     * @parameter expression="${cxf.wadlRoot}" default-value="${basedir}/src/main/resources/wadl"
-     */
+    @Parameter(property = "cxf.wadlRoot", defaultValue = "${basedir}/src/main/resources/wad")
     File wadlRoot;
 
-    /**
-     * @parameter expression="${cxf.testWadlRoot}" default-value="${basedir}/src/test/resources/wadl"
-     */
+    @Parameter(property = "cxf.testWadlRoot", defaultValue = "${basedir}/src/test/resources/wadl")
     File testWadlRoot;
     
     
-    /** @component */
+    @Component
     BuildContext buildContext;
     
     private void mergeOptions(List<WadlOption> effectiveOptions) {
