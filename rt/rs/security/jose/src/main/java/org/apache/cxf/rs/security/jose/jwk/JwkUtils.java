@@ -38,10 +38,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.PrivateKeyPasswordProvider;
@@ -437,5 +439,16 @@ public final class JwkUtils {
     }
     private static JweHeaders toJweHeaders(String ct) {
         return new JweHeaders(Collections.<String, Object>singletonMap(JoseConstants.HEADER_CONTENT_TYPE, ct));
+    }
+    public static void setPublicKeyInfo(JsonWebKey jwk, JoseHeaders headers, String algo) {
+        if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
+            List<String> chain = CastUtils.cast((List<?>)jwk.getProperty("x5c"));
+            if (chain != null) {
+                headers.setX509Chain(chain);
+            } else {
+                headers.setJsonWebKey(
+                    JwkUtils.fromRSAPublicKey(JwkUtils.toRSAPublicKey(jwk), algo));
+            }
+        }
     }
 }

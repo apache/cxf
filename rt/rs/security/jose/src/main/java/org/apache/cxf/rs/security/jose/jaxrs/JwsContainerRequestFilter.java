@@ -41,8 +41,8 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
         if (HttpMethod.GET.equals(context.getMethod())) {
             return;
         }
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJoseHeaders());
         if (!p.verifySignatureWith(theSigVerifier)) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;

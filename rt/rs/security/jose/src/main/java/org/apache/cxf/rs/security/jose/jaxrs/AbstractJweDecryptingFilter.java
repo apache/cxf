@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.rs.security.jose.jwe.JweCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
@@ -31,8 +32,9 @@ public class AbstractJweDecryptingFilter {
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
-        JweDecryptionProvider theDecryptor = getInitializedDecryptionProvider();
-        JweDecryptionOutput out = theDecryptor.decrypt(new String(IOUtils.readBytesFromStream(is), "UTF-8"));
+        JweCompactConsumer jwe = new JweCompactConsumer(new String(IOUtils.readBytesFromStream(is), "UTF-8"));
+        JweDecryptionProvider theDecryptor = getInitializedDecryptionProvider(jwe.getJweHeaders());
+        JweDecryptionOutput out = new JweDecryptionOutput(jwe.getJweHeaders(), jwe.getDecryptedContent(theDecryptor));
         validateHeaders(out.getHeaders());
         return out;
     }
@@ -43,11 +45,11 @@ public class AbstractJweDecryptingFilter {
     public void setDecryptionProvider(JweDecryptionProvider decryptor) {
         this.decryption = decryptor;
     }
-    protected JweDecryptionProvider getInitializedDecryptionProvider() {
+    protected JweDecryptionProvider getInitializedDecryptionProvider(JweHeaders headers) {
         if (decryption != null) {
             return decryption;    
         } 
-        return JweUtils.loadDecryptionProvider(true);
+        return JweUtils.loadDecryptionProvider(headers, true);
     }
     public String getDefaultMediaType() {
         return defaultMediaType;

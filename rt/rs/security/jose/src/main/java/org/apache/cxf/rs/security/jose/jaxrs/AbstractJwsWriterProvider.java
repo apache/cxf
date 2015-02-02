@@ -42,9 +42,7 @@ public class AbstractJwsWriterProvider {
         if (sigProvider != null) {
             return sigProvider;    
         } 
-        JwsSignatureProvider theSigProvider = JwsUtils.loadSignatureProvider(true); 
-        headers.setAlgorithm(theSigProvider.getAlgorithm());
-        return theSigProvider;
+        return JwsUtils.loadSignatureProvider(headers, true); 
     }
     protected void setRequestContextProperty(JoseHeaders headers) {    
         JoseUtils.setJoseContextProperty(headers);
