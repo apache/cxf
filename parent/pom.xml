@@ -115,7 +115,7 @@
         <cxf.jetty9.version>9.2.3.v20140905</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
         <cxf.jetty.osgi.version>[8.1,10)</cxf.jetty.osgi.version>
-        <cxf.jibx.version>1.2.5</cxf.jibx.version>
+        <cxf.jibx.version>1.2.6</cxf.jibx.version>
         <cxf.junit.version>4.12</cxf.junit.version>
         <cxf.maven.core.version>3.0.5</cxf.maven.core.version>
         <cxf.msv.version>2013.6.1</cxf.msv.version>
