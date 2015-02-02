@@ -51,10 +51,10 @@ public final class XSLTUtils {
     }
 
     public static InputStream transform(Templates xsltTemplate, InputStream in) {
+        CachedOutputStream out = new CachedOutputStream();
         try {
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(in);
             Source beforeSource = new StaxSource(reader);
-            CachedOutputStream out = new CachedOutputStream();
 
             Transformer trans = xsltTemplate.newTransformer();
             trans.transform(beforeSource, new StreamResult(out));
@@ -64,14 +64,25 @@ public final class XSLTUtils {
             throw new Fault("GET_CACHED_INPUT_STREAM", LOG, e, e.getMessage());
         } catch (TransformerException e) {
             throw new Fault("XML_TRANSFORM", LOG, e, e.getMessage());
+        } finally {
+            try {
+                in.close();
+            } catch (Exception e) {
+                // ignore
+            }
+            try {
+                out.close();
+            } catch (Exception e) {
+                // ignore
+            }
         }
     }
 
     public static Reader transform(Templates xsltTemplate, Reader inReader) {
+        CachedWriter outWriter = new CachedWriter();
         try {
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(inReader);
             Source beforeSource = new StaxSource(reader);
-            CachedWriter outWriter = new CachedWriter();
 
             Transformer trans = xsltTemplate.newTransformer();
             trans.transform(beforeSource, new StreamResult(outWriter));
@@ -81,6 +92,17 @@ public final class XSLTUtils {
             throw new Fault("GET_CACHED_INPUT_STREAM", LOG, e, e.getMessage());
         } catch (TransformerException e) {
             throw new Fault("XML_TRANSFORM", LOG, e, e.getMessage());
+        } finally {
+            try {
+                inReader.close();
+            } catch (Exception e) {
+                // ignore
+            }
+            try {
+                outWriter.close();
+            } catch (Exception e) {
+                // ignore
+            }
         }
     }
 
