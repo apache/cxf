@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -116,6 +117,10 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
     protected void validateToken(Message message, AssertionWrapper assertion) {
         try {
             RequestData data = new RequestData();
+            
+            // Add Audience Restrictions for SAML
+            configureAudienceRestriction(message, data);
+            
             if (assertion.isSigned()) {
                 WSSConfig cfg = WSSConfig.getNewInstance(); 
                 data.setWssConfig(cfg);
@@ -149,7 +154,39 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         }
     }
     
+<<<<<<< HEAD
     protected void checkSubjectConfirmationData(Message message, AssertionWrapper assertion) {
+=======
+    protected void configureAudienceRestriction(Message msg, RequestData reqData) {
+        // Add Audience Restrictions for SAML
+        boolean enableAudienceRestriction = 
+            MessageUtils.getContextualBoolean(msg, 
+                                              SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
+                                              false);
+        if (enableAudienceRestriction) {
+            List<String> audiences = new ArrayList<String>();
+            if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
+                audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
+            }
+            reqData.setAudienceRestrictions(audiences);
+        }
+    }
+    
+    protected SAMLKeyInfo createKeyInfoFromDefaultAlias(Crypto sigCrypto) throws WSSecurityException {
+        try {
+            X509Certificate[] certs = SecurityUtils.getCertificates(sigCrypto, 
+                                                                    sigCrypto.getDefaultX509Identifier());
+            SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(new X509Certificate[]{certs[0]});
+            samlKeyInfo.setPublicKey(certs[0].getPublicKey());
+            return samlKeyInfo;
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, "Error in loading the certificates: " + ex.getMessage(), ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex);
+        }
+    }
+    
+    protected void checkSubjectConfirmationData(Message message, SamlAssertionWrapper assertion) {
+>>>>>>> 0377022... Add the ability to validate SAML Audience Restrictions. Defaults to false unlike for SOAP
         Certificate[] tlsCerts = getTLSCertificates(message);
         if (!checkHolderOfKey(message, assertion, tlsCerts)) {
             throwFault("Holder Of Key claim fails", null);
