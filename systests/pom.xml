@@ -46,6 +46,7 @@
         <module>rs-security</module>
         <module>wsdl_maven</module>
         <module>cdi</module>
+        <module>rs-http-sci</module>
     </modules>
 
     <profiles>
