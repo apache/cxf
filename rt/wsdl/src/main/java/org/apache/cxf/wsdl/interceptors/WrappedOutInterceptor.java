@@ -34,7 +34,6 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
-import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 
 public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
@@ -64,8 +63,7 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
                 messageInfo = bop.getWrappedOperation().getOperationInfo().getOutput();
             }
 
-            MessagePartInfo part = messageInfo.getMessageParts().get(0);
-            QName name = part.getConcreteName();
+            QName name = messageInfo.getFirstMessagePart().getConcreteName();
 
             try {
                 String pfx = null;

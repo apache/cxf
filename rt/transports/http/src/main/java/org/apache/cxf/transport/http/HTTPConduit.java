@@ -326,6 +326,17 @@ public abstract class HTTPConduit
         }
         clientSidePolicyCalced = true;
     }
+    
+    private void updateClientPolicy() {
+        if (!clientSidePolicyCalced) {
+            //do no spend time on building Message and Exchange (which basically
+            //are ConcurrentHashMap instances) if the policy is already available
+            Message m = new MessageImpl();
+            m.setExchange(new ExchangeImpl());
+            m.getExchange().put(EndpointInfo.class, this.endpointInfo);
+            updateClientPolicy(m);
+        }
+    }
 
     /**
      * This method returns the registered Logger for this conduit.
@@ -846,10 +857,7 @@ public abstract class HTTPConduit
      * HTTPConduit.
      */
     public HTTPClientPolicy getClient() {
-        Message m = new MessageImpl();
-        m.setExchange(new ExchangeImpl());
-        m.getExchange().put(EndpointInfo.class, this.endpointInfo);
-        updateClientPolicy(m);
+        updateClientPolicy();
         return clientSidePolicy;
     }
 

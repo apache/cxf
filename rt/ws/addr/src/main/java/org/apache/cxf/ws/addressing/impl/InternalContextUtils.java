@@ -445,7 +445,7 @@ final class InternalContextUtils {
                     if (fi.size() == 0) {
                         continue;
                     }
-                    Class<?> fiTypeClass = fi.getMessagePart(0).getTypeClass();
+                    Class<?> fiTypeClass = fi.getFirstMessagePart().getTypeClass();
                     if (t != null 
                             && fiTypeClass != null
                             && t.getClass().isAssignableFrom(fiTypeClass)) {

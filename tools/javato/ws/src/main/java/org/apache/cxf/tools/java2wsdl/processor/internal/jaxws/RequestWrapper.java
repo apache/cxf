@@ -38,8 +38,9 @@ public class RequestWrapper extends Wrapper {
     @Override
     public void setOperationInfo(final OperationInfo op) {
         super.setOperationInfo(op);
-        setName(op.getInput().getMessageParts().get(0).getElementQName());
-        setClassName((String)op.getInput().getMessageParts().get(0).getProperty("REQUEST.WRAPPER.CLASSNAME"));
+        MessagePartInfo mpi = op.getInput().getFirstMessagePart();
+        setName(mpi.getElementQName());
+        setClassName((String)mpi.getProperty("REQUEST.WRAPPER.CLASSNAME"));
     }
 
     @Override

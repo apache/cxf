@@ -214,8 +214,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             return endedHeader;
         }
         
-        List<MessagePartInfo> parts = wrappedBmi.getMessageInfo().getMessageParts();
-        if (parts.size() > 0) {
+        if (wrappedBmi.getMessageInfo().getMessagePartsNumber() > 0) {
             MessageContentsList objs = MessageContentsList.getContentsList(message);
             if (objs == null) {
                 return endedHeader;

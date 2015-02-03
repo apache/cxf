@@ -93,9 +93,9 @@ public class TypeClassInitializer extends ServiceModelVisitor {
             op = oInfo.getWrappedOperation();
             
             if (part.getMessageInfo() == oInfo.getInput()) {
-                mapping = model.get(op.getInput().getMessagePart(0).getElementQName());
+                mapping = model.get(op.getInput().getFirstMessagePart().getElementQName());
             } else {
-                mapping = model.get(op.getOutput().getMessagePart(0).getElementQName());
+                mapping = model.get(op.getOutput().getFirstMessagePart().getElementQName());
             }
             if (mapping != null) {
                 jType = mapping.getType().getTypeClass();

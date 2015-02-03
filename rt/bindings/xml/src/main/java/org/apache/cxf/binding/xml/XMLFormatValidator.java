@@ -67,8 +67,8 @@ public class XMLFormatValidator extends ServiceValidator {
         for (BindingOperationInfo bo : bos) {
             OperationInfo op = binding.getInterface().getOperation(bo.getName());
             needRootNode = false;
-            if (op.getInput().getMessageParts().size() == 0
-                || op.getInput().getMessageParts().size() > 1) {
+            final int inputPartsNum = op.getInput().getMessagePartsNumber();
+            if (inputPartsNum == 0 || inputPartsNum > 1) {
                 needRootNode = true;
             }
             if (needRootNode) {
@@ -86,8 +86,8 @@ public class XMLFormatValidator extends ServiceValidator {
                 // Input check correct, continue to check output binding
                 if (op.getOutput() != null) {
                     needRootNode = false;
-                    if (op.getOutput().getMessageParts().size() == 0
-                        || op.getOutput().getMessageParts().size() > 1) {
+                    final int outputPartsNum = op.getOutput().getMessagePartsNumber();
+                    if (outputPartsNum == 0 || outputPartsNum > 1) {
                         needRootNode = true;
                     }
                     if (needRootNode) {

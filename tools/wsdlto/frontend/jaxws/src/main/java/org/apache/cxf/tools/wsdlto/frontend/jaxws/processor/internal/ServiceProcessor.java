@@ -740,7 +740,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 && headerMessage.getNamespaceURI().equalsIgnoreCase(bodyMessage.getName().getNamespaceURI())
                 && headerMessage.getLocalPart().equalsIgnoreCase(bodyMessage.getName().getLocalPart())) {
                 isSameMessage = true;
-                if (bodyMessage.getMessageParts().size() == 1) {
+                if (bodyMessage.getMessagePartsNumber() == 1) {
                     allPartsHeader = true;
                 }
 
