@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -126,6 +127,10 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     protected void validateToken(Message message, SamlAssertionWrapper assertion) {
         try {
             RequestData data = new RequestData();
+            
+            // Add Audience Restrictions for SAML
+            configureAudienceRestriction(message, data);
+            
             if (assertion.isSigned()) {
                 WSSConfig cfg = WSSConfig.getNewInstance(); 
                 data.setWssConfig(cfg);
@@ -174,6 +179,21 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
             
         } catch (Exception ex) {
             throwFault("Assertion can not be validated", ex);
+        }
+    }
+    
+    protected void configureAudienceRestriction(Message msg, RequestData reqData) {
+        // Add Audience Restrictions for SAML
+        boolean enableAudienceRestriction = 
+            MessageUtils.getContextualBoolean(msg, 
+                                              SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
+                                              false);
+        if (enableAudienceRestriction) {
+            List<String> audiences = new ArrayList<String>();
+            if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
+                audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
+            }
+            reqData.setAudienceRestrictions(audiences);
         }
     }
     
