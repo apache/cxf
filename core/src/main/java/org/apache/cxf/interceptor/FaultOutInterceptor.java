@@ -79,7 +79,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
             Object bean = getFaultBean(cause, fi, message);
             Service service = message.getExchange().get(Service.class);
 
-            MessagePartInfo part = fi.getMessageParts().iterator().next();
+            MessagePartInfo part = fi.getFirstMessagePart();
             DataBinding db = service.getDataBinding();
 
             try {

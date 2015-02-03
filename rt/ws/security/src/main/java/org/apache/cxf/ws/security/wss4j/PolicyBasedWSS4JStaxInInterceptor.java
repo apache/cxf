@@ -368,18 +368,22 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 if (bindingOperationInfo.getOutput() != null) {
                     MessageInfo messageInfo = bindingOperationInfo.getOutput().getMessageInfo();
                     operationName = messageInfo.getName();
-                    if (!messageInfo.getMessageParts().isEmpty()
-                        && messageInfo.getMessagePart(0).getConcreteName() != null) {
-                        operationName = messageInfo.getMessagePart(0).getConcreteName();
+                    if (messageInfo.getMessagePartsNumber() > 0) {
+                        QName cn = messageInfo.getFirstMessagePart().getConcreteName();
+                        if (cn != null) {
+                            operationName = cn;
+                        }
                     }
                 }
             } else {
                 if (bindingOperationInfo.getInput() != null) {
                     MessageInfo messageInfo = bindingOperationInfo.getInput().getMessageInfo();
                     operationName = messageInfo.getName();
-                    if (!messageInfo.getMessageParts().isEmpty()
-                        && messageInfo.getMessagePart(0).getConcreteName() != null) {
-                        operationName = messageInfo.getMessagePart(0).getConcreteName();
+                    if (messageInfo.getMessagePartsNumber() > 0) {
+                        QName cn = messageInfo.getFirstMessagePart().getConcreteName();
+                        if (cn != null) {
+                            operationName = cn;
+                        }
                     }
                 }
             }

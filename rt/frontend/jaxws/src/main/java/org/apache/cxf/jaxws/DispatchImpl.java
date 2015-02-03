@@ -562,7 +562,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 if ("document".equals(operationStyle)) {
                     // if doc
                     if (bop.getOperationInfo().getInput() != null
-                        && !bop.getOperationInfo().getInput().getMessageParts().isEmpty()) {
+                        && bop.getOperationInfo().getInput().getMessagePartsNumber() > 0) {
                         QName qn = bop.getOperationInfo().getInput().getMessagePartByIndex(0)
                             .getElementQName();
                         QName op = bop.getOperationInfo().getName();

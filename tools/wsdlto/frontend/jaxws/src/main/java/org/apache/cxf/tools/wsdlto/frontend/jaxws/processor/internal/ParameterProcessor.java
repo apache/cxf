@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -199,7 +200,7 @@ public class ParameterProcessor extends AbstractProcessor {
 
     private boolean messagePartsNotUnique(final MessageInfo message) {
         int count = countOutOfBandHeader(message);
-        return message.getMessageParts().size() - count > 1;
+        return message.getMessagePartsNumber() - count > 1;
     }
 
     private void processInput(JavaMethod method, MessageInfo inputMessage) throws ToolException {
@@ -229,15 +230,13 @@ public class ParameterProcessor extends AbstractProcessor {
     }
 
     private void processWrappedInput(JavaMethod method, MessageInfo inputMessage) throws ToolException {
-        List<MessagePartInfo> inputParts = inputMessage.getMessageParts();
-
         if (messagePartsNotUnique(inputMessage)) {
             processInput(method, inputMessage);
             return;
-        } else if (inputParts.isEmpty()) {
+        } else if (inputMessage.getMessagePartsNumber() == 0) {
             return;
         }
-        MessagePartInfo part = inputParts.iterator().next();
+        MessagePartInfo part = inputMessage.getFirstMessagePart();
 
         List<QName> wrappedElements = ProcessorUtil.getWrappedElementQNames(context, part.getElementQName());
         if ((wrappedElements == null || wrappedElements.size() == 0) 
@@ -375,20 +374,19 @@ public class ParameterProcessor extends AbstractProcessor {
                                               MessageInfo inputMessage,
                                               MessageInfo outputMessage) throws ToolException {
 
-        List<MessagePartInfo> outputParts = outputMessage.getMessageParts();
-        List<MessagePartInfo> inputParts = inputMessage.getMessageParts();
-
         if (messagePartsNotUnique(inputMessage) || messagePartsNotUnique(outputMessage)) {
             processOutput(method, inputMessage, outputMessage);
             return;
         }
-        if (outputParts.size() == 0) {
+        if (outputMessage.getMessagePartsNumber() == 0) {
             addVoidReturn(method);
             return;
         }
 
-        MessagePartInfo inputPart = inputParts.size() > 0 ? inputParts.iterator().next() : null;
-        MessagePartInfo outputPart = outputParts.size() > 0 ? outputParts.iterator().next() : null;
+        MessagePartInfo inputPart = inputMessage.getMessagePartsNumber() > 0 ? inputMessage
+            .getFirstMessagePart() : null;
+        MessagePartInfo outputPart = outputMessage.getMessagePartsNumber() > 0 ? outputMessage
+            .getFirstMessagePart() : null;
 
         List<QName> inputWrapElement = null;
         List<QName> outputWrapElement = null;
@@ -671,19 +669,19 @@ public class ParameterProcessor extends AbstractProcessor {
                                               MessageInfo outputMessage,
                                               List<String> parameterList) throws ToolException {
         Map<QName, MessagePartInfo> inputPartsMap = inputMessage.getMessagePartsMap();
+        Collection<MessagePartInfo> inputParts = inputPartsMap.values();
 
-        Map<QName, MessagePartInfo> outputPartsMap = new LinkedHashMap<QName, MessagePartInfo>();
+        final Map<QName, MessagePartInfo> outputPartsMap;
+        final Collection<MessagePartInfo> outputParts;
         
         if (outputMessage != null) {
             outputPartsMap = outputMessage.getMessagePartsMap();
+            outputParts = outputPartsMap.values();
+        } else {
+            outputPartsMap = new LinkedHashMap<QName, MessagePartInfo>();
+            outputParts = new ArrayList<MessagePartInfo>();
         }
 
-        List<MessagePartInfo> inputParts = inputMessage.getMessageParts();
-        List<MessagePartInfo> outputParts = new ArrayList<MessagePartInfo>();
-
-        if (outputMessage != null) {
-            outputParts = outputMessage.getMessageParts();
-        }
 
         List<MessagePartInfo> inputUnlistedParts = new ArrayList<MessagePartInfo>();
         List<MessagePartInfo> outputUnlistedParts = new ArrayList<MessagePartInfo>();
@@ -766,10 +764,12 @@ public class ParameterProcessor extends AbstractProcessor {
         Iterator<String> params = parameterOrder.iterator();
 
         List<MessagePartInfo> inputParts = inputMessage.getMessageParts();
-        List<MessagePartInfo> outputParts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> outputParts;
 
         if (outputMessage != null) {
             outputParts = outputMessage.getMessageParts();
+        } else {
+            outputParts = new ArrayList<MessagePartInfo>();
         }
 
         while (params.hasNext()) {

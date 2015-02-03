@@ -43,9 +43,9 @@ public final class ResponseWrapper extends Wrapper {
     @Override
     public void setOperationInfo(final OperationInfo op) {
         super.setOperationInfo(op);
-        setName(op.getOutput().getMessageParts().get(0).getElementQName());
-        setClassName((String)op.getOutput().getMessageParts().get(0)
-                         .getProperty("RESPONSE.WRAPPER.CLASSNAME"));
+        MessagePartInfo mpi = op.getOutput().getFirstMessagePart();
+        setName(mpi.getElementQName());
+        setClassName((String)mpi.getProperty("RESPONSE.WRAPPER.CLASSNAME"));
     }
 
     @Override

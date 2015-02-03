@@ -75,8 +75,8 @@ public class UniqueBodyValidator extends ServiceValidator {
         for (BindingOperationInfo bo : bos) {
             OperationInfo op = binding.getInterface().getOperation(bo.getName());
             if (op.getInput() != null
-                && op.getInput().getMessageParts().size() == 1) {
-                MessagePartInfo part = op.getInput().getMessageParts().iterator().next();
+                && op.getInput().getMessagePartsNumber() == 1) {
+                MessagePartInfo part = op.getInput().getFirstMessagePart();
                 if (part.getElementQName() == null) {
                     continue;
                 }
@@ -105,7 +105,7 @@ public class UniqueBodyValidator extends ServiceValidator {
             }
             
             for (BindingFaultInfo fault : bo.getFaults()) {
-                if (fault.getFaultInfo().getMessageParts().size() > 1) {
+                if (fault.getFaultInfo().getMessagePartsNumber() > 1) {
                     Message msg = new Message("FAULT_WITH_MULTIPLE_PARTS", LOG, 
                                               fault.getFaultInfo().getName()
                                                   .getLocalPart());

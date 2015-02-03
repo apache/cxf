@@ -221,6 +221,21 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         parts.addAll(outOfBandParts);
         return parts;
     }
+    public int getMessagePartsNumber() {
+        if (outOfBandParts == null) {
+            return messageParts.size();
+        }
+        return messageParts.size() + outOfBandParts.size();
+    }
+    public MessagePartInfo getFirstMessagePart() {
+        if (!messageParts.isEmpty()) {
+            return messageParts.values().iterator().next();
+        } else  if (outOfBandParts != null && !outOfBandParts.isEmpty()) {
+            return outOfBandParts.get(0);
+        } else {
+            return null;
+        }
+    }
     public List<MessagePartInfo> getOutOfBandParts() {
         if (outOfBandParts == null) {
             return Collections.emptyList();

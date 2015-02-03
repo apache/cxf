@@ -485,7 +485,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                 // check to make sure the faults are elements
                 for (FaultInfo fault : opInfo.getFaults()) {
                     QName qn = (QName)fault.getProperty("elementName");
-                    MessagePartInfo part = fault.getMessagePart(0);
+                    MessagePartInfo part = fault.getFirstMessagePart();
                     if (!part.isElement()) {
                         part.setElement(true);
                         part.setElementQName(qn);
@@ -582,7 +582,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                 if (opInfo.hasFaults()) {
                     // check to make sure the faults are elements
                     for (FaultInfo fault : opInfo.getFaults()) {
-                        MessagePartInfo mpi = fault.getMessagePart(0);
+                        MessagePartInfo mpi = fault.getFirstMessagePart();
                         assert mpi != null;
                         assert mpi.getXmlSchema() != null;
                         assert mpi.isElement();
@@ -721,7 +721,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
             if (o.getUnwrappedOperation() != null) {
                 if (o.hasInput()) {
                     MessageInfo input = o.getInput();
-                    MessagePartInfo part = input.getMessageParts().get(0);
+                    MessagePartInfo part = input.getFirstMessagePart();
                     part.setTypeClass(getRequestWrapper(method));
                     part.setProperty("REQUEST.WRAPPER.CLASSNAME", getRequestWrapperClassName(method));
                     part.setIndex(0);
@@ -729,7 +729,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
                 if (o.hasOutput()) {
                     MessageInfo input = o.getOutput();
-                    MessagePartInfo part = input.getMessageParts().get(0);
+                    MessagePartInfo part = input.getFirstMessagePart();
                     part.setTypeClass(getResponseWrapper(method));
                     part.setProperty("RESPONSE.WRAPPER.CLASSNAME", getResponseWrapperClassName(method));
                     part.setIndex(0);
@@ -1029,14 +1029,15 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         for (OperationInfo op : serviceInfo.getInterface().getOperations()) {
             if (op.getUnwrappedOperation() != null) {
                 if (op.hasInput()) {
-                    if (op.getInput().getMessageParts().get(0).getTypeClass() == null) {
+                    MessagePartInfo fmpi = op.getInput().getFirstMessagePart();
+                    if (fmpi.getTypeClass() == null) {
 
-                        QName wrapperBeanName = op.getInput().getMessageParts().get(0).getElementQName();
+                        QName wrapperBeanName = fmpi.getElementQName();
                         XmlSchemaElement e = null;
                         for (SchemaInfo s : serviceInfo.getSchemas()) {
                             e = s.getElementByQName(wrapperBeanName);
                             if (e != null) {
-                                op.getInput().getMessageParts().get(0).setXmlSchema(e);
+                                fmpi.setXmlSchema(e);
                                 break;
                             }
                         }
@@ -1058,9 +1059,10 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
                 }
                 if (op.hasOutput()) {
-                    if (op.getOutput().getMessageParts().get(0).getTypeClass() == null) {
+                    MessagePartInfo fmpi = op.getOutput().getFirstMessagePart();
+                    if (fmpi.getTypeClass() == null) {
 
-                        QName wrapperBeanName = op.getOutput().getMessageParts().get(0).getElementQName();
+                        QName wrapperBeanName = fmpi.getElementQName();
                         XmlSchemaElement e = null;
                         for (SchemaInfo s : serviceInfo.getSchemas()) {
                             e = s.getElementByQName(wrapperBeanName);
@@ -1150,18 +1152,19 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
         MessageInfo message = isOut ? opInfo.getOutput() : opInfo.getInput();
 
-        if (message.getMessageParts().size() == 0) {
+        final List<MessagePartInfo> messageParts = message.getMessageParts();
+        if (messageParts.size() == 0) {
             return;
         }
 
         Method method = (Method)opInfo.getProperty(METHOD);
         int paraNumber = 0;
-        for (MessagePartInfo mpi : message.getMessageParts()) {
+        for (MessagePartInfo mpi : messageParts) {
             SchemaInfo schemaInfo = null;
             XmlSchema schema = null;
 
             QName qname = (QName)mpi.getProperty(ELEMENT_NAME);
-            if (message.getMessageParts().size() == 1 && qname == null) {
+            if (messageParts.size() == 1 && qname == null) {
                 qname = !isOut ? getInParameterName(opInfo, method, -1) 
                         : getOutParameterName(opInfo, method, -1);
                 
@@ -1170,7 +1173,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                         ? new QName(qname.getNamespaceURI(), method.getName() + "Response") : new QName(qname
                             .getNamespaceURI(), method.getName());
                 }
-            } else if (isOut && message.getMessageParts().size() > 1 && qname == null) {
+            } else if (isOut && messageParts.size() > 1 && qname == null) {
                 while (!isOutParam(method, paraNumber)) {
                     paraNumber++;
                 }
@@ -1292,7 +1295,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         XmlSchemaElement el = new XmlSchemaElement(schema, true);
         el.setName(wrapperName.getLocalPart());
 
-        wrappedMessage.getMessageParts().get(0).setXmlSchema(el);
+        wrappedMessage.getFirstMessagePart().setXmlSchema(el);
 
         XmlSchemaComplexType ct = new XmlSchemaComplexType(schema, true);
 
@@ -1575,10 +1578,11 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                     QName q2 = getOutParameterName(op, method, j);
 
                     if (isInParam(method, j)) {
-                        q = op.getInput().getMessagePartByIndex(j).getName();
-                        q2 = (QName)op.getInput().getMessagePartByIndex(j).getProperty(ELEMENT_NAME);
+                        MessagePartInfo mpi = op.getInput().getMessagePartByIndex(j);
+                        q = mpi.getName();
+                        q2 = (QName)mpi.getProperty(ELEMENT_NAME);
                         if (q2 == null) {
-                            q2 = op.getInput().getMessagePartByIndex(j).getElementQName();
+                            q2 = mpi.getElementQName();
                         }
                     }
 

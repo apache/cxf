@@ -68,16 +68,16 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
         }
              
         Class<?> wrapped = null;
-        List<MessagePartInfo> parts = wrappedMsgInfo.getMessageParts();
-        if (parts.size() > 0) {
-            wrapped = parts.get(0).getTypeClass();
+        if (wrappedMsgInfo.getMessagePartsNumber() > 0) {
+            wrapped = wrappedMsgInfo.getFirstMessagePart().getTypeClass();
         }
 
         if (wrapped != null) {
+            MessagePartInfo firstMessagePart = wrappedMsgInfo.getFirstMessagePart();
             MessageContentsList objs = MessageContentsList.getContentsList(message);
-            WrapperHelper helper = parts.get(0).getProperty("WRAPPER_CLASS", WrapperHelper.class);
+            WrapperHelper helper = firstMessagePart.getProperty("WRAPPER_CLASS", WrapperHelper.class);
             if (helper == null) {
-                helper = getWrapperHelper(message, messageInfo, wrappedMsgInfo, wrapped, parts.get(0));
+                helper = getWrapperHelper(message, messageInfo, wrappedMsgInfo, wrapped, firstMessagePart);
             }
             if (helper == null) {
                 return;
@@ -99,7 +99,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
                     }
                 }
                 Object o2 = helper.createWrapperObject(objs);
-                newObjs.put(parts.get(0), o2);
+                newObjs.put(firstMessagePart, o2);
                 
                 for (MessagePartInfo p : messageInfo.getMessageParts()) {
                     if (Boolean.TRUE.equals(p.getProperty(ReflectionServiceFactoryBean.HEADER))) {

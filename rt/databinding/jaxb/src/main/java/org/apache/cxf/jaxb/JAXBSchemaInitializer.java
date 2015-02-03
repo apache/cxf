@@ -382,7 +382,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     }
 
     public void end(FaultInfo fault) {
-        MessagePartInfo part = fault.getMessageParts().get(0);
+        MessagePartInfo part = fault.getFirstMessagePart();
         Class<?> cls = part.getTypeClass();
         Class<?> cl2 = (Class<?>)fault.getProperty(Class.class.getName());
         if (cls != cl2) {

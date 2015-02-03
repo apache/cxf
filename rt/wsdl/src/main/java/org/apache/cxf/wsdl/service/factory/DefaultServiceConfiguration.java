@@ -117,7 +117,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         }
         
         return DefaultServiceConfiguration.createName(method, paramNumber, op.getInput()
-            .getMessageParts().size(), false, prefix);
+            .getMessagePartsNumber(), false, prefix);
     }
 
     public static String createName(final Method method, final int paramNumber, final int currentSize,

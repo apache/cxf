@@ -116,7 +116,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                 if (method == null) {
                     continue;
                 }
-                MessagePartInfo inf = opInfo.getInput().getMessageParts().get(0);
+                MessagePartInfo inf = opInfo.getInput().getFirstMessagePart();
                 if (inf.getTypeClass() == null) {
                     MessageInfo messageInfo = opInfo.getUnwrappedOperation().getInput();
                     createWrapperClass(inf,
@@ -127,7 +127,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                 }
                 MessageInfo messageInfo = opInfo.getUnwrappedOperation().getOutput();
                 if (messageInfo != null) {
-                    inf = opInfo.getOutput().getMessageParts().get(0);
+                    inf = opInfo.getOutput().getFirstMessagePart();
                     if (inf.getTypeClass() == null) {
                         createWrapperClass(inf,
                                            messageInfo,

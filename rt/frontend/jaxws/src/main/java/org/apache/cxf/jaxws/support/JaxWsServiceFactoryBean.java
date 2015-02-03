@@ -349,24 +349,32 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             bop.setUnwrappedOperation(null);
                         }
                         if (o.getInput() != null) {
-                            if (o.getInput().getMessageParts().isEmpty()) {
+                            final List<MessagePartInfo> messageParts;
+                            if (o.getInput().getMessagePartsNumber() == 0) {
                                 MessagePartInfo inf = o.getInput().addMessagePart(o.getName());
                                 inf.setConcreteName(o.getName());
-                                bop.getInput().setMessageParts(o.getInput().getMessageParts());
+                                messageParts = o.getInput().getMessageParts();
+                                bop.getInput().setMessageParts(messageParts);
+                            } else {
+                                messageParts = o.getInput().getMessageParts();
                             }
-                            for (MessagePartInfo inf : o.getInput().getMessageParts()) {
+                            for (MessagePartInfo inf : messageParts) {
                                 inf.setTypeClass(c);
                                 break;
                             }
                         }
                         if (o.getOutput() != null) {
-                            if (o.getOutput().getMessageParts().isEmpty()) {
+                            final List<MessagePartInfo> messageParts;
+                            if (o.getOutput().getMessagePartsNumber() == 0) {
                                 MessagePartInfo inf = o.getOutput().addMessagePart(o.getName());
                                 inf.setConcreteName(new QName(o.getName().getNamespaceURI(),
                                                               o.getName().getLocalPart() + "Response"));
-                                bop.getOutput().setMessageParts(o.getOutput().getMessageParts());
+                                messageParts = o.getOutput().getMessageParts();
+                                bop.getOutput().setMessageParts(messageParts);
+                            } else {
+                                messageParts = o.getOutput().getMessageParts();
                             }
-                            for (MessagePartInfo inf : o.getOutput().getMessageParts()) {
+                            for (MessagePartInfo inf : messageParts) {
                                 inf.setTypeClass(c);
                                 break;
                             }
@@ -435,18 +443,18 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     void initializeWrapping(OperationInfo o, Method selected) {
         Class<?> responseWrapper = getResponseWrapper(selected);
         if (responseWrapper != null) {
-            o.getOutput().getMessageParts().get(0).setTypeClass(responseWrapper);
+            o.getOutput().getFirstMessagePart().setTypeClass(responseWrapper);
         }
         if (getResponseWrapperClassName(selected) != null) {
-            o.getOutput().getMessageParts().get(0).setProperty("RESPONSE.WRAPPER.CLASSNAME",
+            o.getOutput().getFirstMessagePart().setProperty("RESPONSE.WRAPPER.CLASSNAME",
                                                            getResponseWrapperClassName(selected));
         }
         Class<?> requestWrapper = getRequestWrapper(selected);
         if (requestWrapper != null) {
-            o.getInput().getMessageParts().get(0).setTypeClass(requestWrapper);
+            o.getInput().getFirstMessagePart().setTypeClass(requestWrapper);
         }
         if (getRequestWrapperClassName(selected) != null) {
-            o.getInput().getMessageParts().get(0).setProperty("REQUEST.WRAPPER.CLASSNAME",
+            o.getInput().getFirstMessagePart().setProperty("REQUEST.WRAPPER.CLASSNAME",
                                                            getRequestWrapperClassName(selected));
         }
     }

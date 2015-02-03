@@ -135,13 +135,13 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         MessagePartInfo input = null;
         MessagePartInfo output = null;
         if (operation.getInput() != null
-            && operation.getInput().getMessageParts().size() == 1) {
-            input = operation.getInput().getMessageParts().iterator().next();
+            && operation.getInput().getMessagePartsNumber() == 1) {
+            input = operation.getInput().getFirstMessagePart();
         }
 
         if (operation.getOutput() != null
-            && operation.getOutput().getMessageParts().size() == 1) {
-            output = operation.getOutput().getMessageParts().iterator().next();
+            && operation.getOutput().getMessagePartsNumber() == 1) {
+            output = operation.getOutput().getFirstMessagePart();
         }
         if (!c) {
             Map<String, QName> names = new HashMap<String, QName>();

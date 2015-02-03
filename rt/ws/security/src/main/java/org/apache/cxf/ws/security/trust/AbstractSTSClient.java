@@ -714,8 +714,8 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         }        
         //Still didn't find anything useful
         for (BindingOperationInfo boi : bi.getOperations()) {
-            if (boi.getInput().getMessageInfo().getMessageParts().size() > 0) {
-                MessagePartInfo mpi = boi.getInput().getMessageInfo().getMessagePart(0);
+            if (boi.getInput().getMessageInfo().getMessagePartsNumber() > 0) {
+                MessagePartInfo mpi = boi.getInput().getMessageInfo().getFirstMessagePart();
                 if ("RequestSecurityToken".equals(mpi.getConcreteName().getLocalPart())) {
                     return boi;
                 }

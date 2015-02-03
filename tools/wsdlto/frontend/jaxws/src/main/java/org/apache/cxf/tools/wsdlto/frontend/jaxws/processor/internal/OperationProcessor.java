@@ -203,12 +203,12 @@ public class OperationProcessor  extends AbstractProcessor {
 
     private void setWrapper(OperationInfo operation) {
         MessagePartInfo inputPart = null;
-        if (operation.getInput() != null && operation.getInput().getMessageParts() != null) {
-            inputPart = operation.getInput().getMessageParts().iterator().next();
+        if (operation.getInput() != null) {
+            inputPart = operation.getInput().getFirstMessagePart();
         }
         MessagePartInfo outputPart = null;
-        if (operation.getOutput() != null && operation.getOutput().getMessageParts() != null) {
-            outputPart = operation.getOutput().getMessageParts().iterator().next();
+        if (operation.getOutput() != null) {
+            outputPart = operation.getOutput().getFirstMessagePart();
         }
 
         if (inputPart != null) {
