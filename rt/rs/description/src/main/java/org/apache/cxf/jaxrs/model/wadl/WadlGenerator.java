@@ -156,6 +156,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean supportJaxbSubstitutions = true;
     private boolean ignoreOverloadedMethods;
     private boolean checkAbsolutePathSlash;
+    private boolean keepRelativeDocLinks;
     
     private List<String> externalSchemasCache;
     private List<URI> externalSchemaLinks;
@@ -1169,6 +1170,9 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     private void handleExistingDocRefs(List<Element> elements, String attrName, String parentDocLoc,
                                        String parentRef, Message m, UriInfo ui) {
+        if (keepRelativeDocLinks) {
+            return;
+        }
         int index = parentDocLoc.lastIndexOf('/');
         parentDocLoc = index == -1 ? parentDocLoc : parentDocLoc.substring(0, index + 1);
 
@@ -2039,6 +2043,10 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     public void setIgnoreOverloadedMethods(boolean ignore) {
         this.ignoreOverloadedMethods = ignore;
+    }
+
+    public void setKeepRelativeDocLinks(boolean keepRelativeDocLinks) {
+        this.keepRelativeDocLinks = keepRelativeDocLinks;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
