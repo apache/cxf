@@ -242,6 +242,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testJweRsaJwsRsaCertInHeaders() throws Exception {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         String address = "https://localhost:" + PORT + "/jwejwsrsaCertInHeaders";
         BookStore bs = createJweJwsBookStore(address, null, null);
         WebClient.getConfig(bs).getRequestContext().put("rs.security.report.public.key", "true");
