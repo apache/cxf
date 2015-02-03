@@ -45,6 +45,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
     private static final Logger LOG = LogUtils.getL7dLogger(JaxrsServletContainerInitializer.class);
     private static final String IGNORE_PACKAGE = "org.apache.cxf";
     
+    private static final String JAXRS_APPLICATION_SERVLET_NAME = "javax.ws.rs.core.Application";
     private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
     private static final String CXF_JAXRS_APPLICATION_PARAM = "jaxrs.application";
     private static final String CXF_JAXRS_CLASSES_PARAM = "jaxrs.classes";
@@ -93,10 +94,10 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                 || !providersAndResources.get(Provider.class).isEmpty()) {
                 if (app == null) {
                     // Servlet name is a JAX-RS Application class name
-                    servletName = JAXRS_APPLICATION_PARAM;
+                    servletName = JAXRS_APPLICATION_SERVLET_NAME;
                     // Servlet mapping is obtained from a servlet registration 
                     // with a JAX-RS Application class name
-                    servletMapping = getServletMapping(ctx, JAXRS_APPLICATION_PARAM);
+                    servletMapping = getServletMapping(ctx, servletName);
                 }
                 app = new Application() {
                     @Override
