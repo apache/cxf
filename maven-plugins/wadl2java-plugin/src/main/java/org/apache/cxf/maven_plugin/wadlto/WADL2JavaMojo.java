@@ -43,7 +43,7 @@ import org.sonatype.plexus.build.incremental.BuildContext;
       requiresDependencyResolution = ResolutionScope.TEST)
 public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     @Parameter
-	WadlOption wadlOptions[];
+    WadlOption wadlOptions[];
 
     @Parameter(property = "cxf.wadlRoot", defaultValue = "${basedir}/src/main/resources/wad")
     File wadlRoot;

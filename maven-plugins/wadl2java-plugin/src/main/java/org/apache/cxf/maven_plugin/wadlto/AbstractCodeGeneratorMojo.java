@@ -64,7 +64,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     /**
      * Source Root
      */
-	@Parameter(property = "cxf.testSourceRoot")
+    @Parameter(property = "cxf.testSourceRoot")
     File testSourceRoot;
 
     /**
