@@ -534,6 +534,8 @@ public class WadlGeneratorTest extends Assert {
         verifyXmlJsonRepresentations(requestEls.get(0), book2El, "InputBook");
         List<Element> responseEls = getElements(methodEls.get(0), "response", 1);
         checkDocs(responseEls.get(0), "", "Response", "");
+        String status = responseEls.get(0).getAttribute("status");
+        assertTrue("201 200".equals(status) || "200 201".equals(status));
         verifyXmlJsonRepresentations(responseEls.get(0), bookEl, "Requested Book");
         
         // PUT
