@@ -190,6 +190,9 @@
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="jaxbProviderForTypes"/>
+            <bean class="org.apache.cxf.jaxrs.model.wadl.WadlGenerator">
+                <property name="stylesheetReference" value="/WEB-INF/templates/wadlTemplate.xsl"/>
+            </bean>
         </jaxrs:providers>
     </jaxrs:server>
     <jaxrs:server id="bookservice9" address="/thebooks9">

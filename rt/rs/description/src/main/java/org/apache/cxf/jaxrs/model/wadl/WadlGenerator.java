@@ -72,13 +72,17 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.ProcessingInstruction;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -129,6 +133,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     public static final String WADL_NS = "http://wadl.dev.java.net/2009/02";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
+    private static final String XLS_NS = "http://www.w3.org/1999/XSL/Transform";
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
     private static final String CLASSPATH_PREFIX = "classpath:";
@@ -195,12 +200,13 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         UriInfo ui = context.getUriInfo();
         if (!ui.getQueryParameters().containsKey(WADL_QUERY)) {
-            if (!docLocationMap.isEmpty()) {
+            if (stylesheetReference != null || !docLocationMap.isEmpty()) {
                 String path = ui.getPath(false);
                 if (path.startsWith("/") && path.length() > 0) {
                     path = path.substring(1);
                 }
-                if (docLocationMap.containsKey(path)) {
+                if (stylesheetReference != null && path.endsWith(".xsl") 
+                    || docLocationMap.containsKey(path)) {
                     context.abortWith(getExistingResource(m, ui, path));
                 }
             }
@@ -233,6 +239,14 @@ public class WadlGenerator implements ContainerRequestFilter {
         context.abortWith(r);
     }
 
+    private String getStylesheetInstructionData(Message m, UriInfo ui) {
+        String theStylesheetReference = stylesheetReference;
+        if (!keepRelativeDocLinks) {
+            theStylesheetReference = UriBuilder.fromUri(getBaseURI(m, ui))
+                .path(theStylesheetReference).build().toString();
+        }
+        return "type=\"text/xsl\" href=\"" + theStylesheetReference + "\"";
+    }
     public StringBuilder generateWADL(String baseURI, 
                                        List<ClassResourceInfo> cris, 
                                        boolean isJson,
@@ -240,7 +254,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                                        UriInfo ui) {
         StringBuilder sbMain = new StringBuilder();
         if (!isJson && stylesheetReference != null) {
-            sbMain.append("<?xml-stylesheet type=\"text/xsl\" href=\"" + stylesheetReference + "\"?>");
+            sbMain.append("<?xml-stylesheet " + getStylesheetInstructionData(m, ui) + "?>");
         }
         sbMain.append("<application");
         if (!isJson) {
@@ -1090,7 +1104,8 @@ public class WadlGenerator implements ContainerRequestFilter {
                 try {
                     InputStream is = ResourceUtils.getResourceStream(loc, (Bus)ep.get(Bus.class.getName()));
                     if (is != null) {
-                        Element appEl = StaxUtils.read(is).getDocumentElement();
+                        Document wadlDoc = StaxUtils.read(is);
+                        Element appEl = wadlDoc.getDocumentElement();
 
                         List<Element> grammarEls = DOMUtils.getChildrenWithName(appEl, WadlGenerator.WADL_NS,
                                                                                 "grammars");
@@ -1111,8 +1126,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                                                                                      WadlGenerator.WADL_NS,
                                                                                      "resource");
                             handleExistingDocRefs(resourceEls, "type", loc, "", m, ui);
-
-                            return Response.ok().type(mt).entity(new DOMSource(appEl)).build();
+                            return finalizeExistingWadlResponse(wadlDoc, m, ui, mt);
                         }
 
                     }
@@ -1123,48 +1137,76 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         return null;
     }
+    private Response finalizeExistingWadlResponse(Document wadlDoc, Message m, UriInfo ui, MediaType mt) 
+        throws Exception {
+        if (stylesheetReference != null) {
+            ProcessingInstruction pi = wadlDoc.createProcessingInstruction("xml-stylesheet", 
+                                          getStylesheetInstructionData(m, ui));
+            wadlDoc.insertBefore(pi, wadlDoc.getDocumentElement());
+            String wadlDocString = copyDOMToString(wadlDoc);
+            return Response.ok().type(mt).entity(wadlDocString).build();
+        } else {
+            return Response.ok().type(mt).entity(new DOMSource(wadlDoc)).build();
+        }
+    }
+    private static String copyDOMToString(Document wadlDoc) throws Exception {
+        DOMSource domSource = new DOMSource(wadlDoc);
+        // temporary workaround
+        StringWriter stringWriter = new StringWriter();
+        TransformerFactory tFactory = TransformerFactory.newInstance();
+        Transformer transformer = tFactory.newTransformer();
+        transformer.transform(domSource, new StreamResult(stringWriter));
+        return stringWriter.toString();
+    }
 
     // TODO: deal with caching later on
     public Response getExistingResource(Message m, UriInfo ui, String href) {
-        String loc = docLocationMap.get(href);
-        Endpoint ep = m.getExchange().get(Endpoint.class);
-        if (ep != null && loc != null) {
-            try {
+        try {
+            String loc = docLocationMap.get(href);
+            if (loc != null) {
                 int fragmentIndex = loc.lastIndexOf("#");
                 if (fragmentIndex != -1) {
                     loc = loc.substring(0, fragmentIndex);
                 }
-                InputStream is = ResourceUtils.getResourceStream(loc, (Bus)ep.get(Bus.class.getName()));
+                InputStream is = ResourceUtils.getResourceStream(loc, m.getExchange().getBus());
                 if (is != null) {
                     Element docEl = StaxUtils.read(is).getDocumentElement();
-                    if (fragmentIndex != -1) {
-                        List<Element> grammarEls = DOMUtils.getChildrenWithName(docEl, WadlGenerator.WADL_NS,
-                                                                                "grammars");
-                        if (grammarEls.size() == 1) {
-                            handleExistingDocRefs(DOMUtils.getChildrenWithName(grammarEls.get(0),
-                                                                               WadlGenerator.WADL_NS,
-                                                                               "include"), "href", loc, href,
-                                                  m, ui);
-                        }
+                    if (href.endsWith(".xsl")) {
+                        List<Element> xslImports = DOMUtils.getChildrenWithName(docEl, XLS_NS, "import");
+                        handleExistingDocRefs(xslImports, "href", loc, href, m, ui);
+                        List<Element> xslIncludes = DOMUtils.getChildrenWithName(docEl, XLS_NS, "import");
+                        handleExistingDocRefs(xslIncludes, "href", loc, href, m, ui);
                     } else {
-                        handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl,
-                                                                           Constants.URI_2001_SCHEMA_XSD,
-                                                                           "import"), "schemaLocation", loc,
-                                              href, m, ui);
-                        handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl,
-                                                                           Constants.URI_2001_SCHEMA_XSD,
-                                                                           "include"), "schemaLocation", loc,
-                                              href, m, ui);
+                        if (fragmentIndex != -1) {
+                            List<Element> grammarEls = DOMUtils.getChildrenWithName(docEl, WADL_NS, "grammars");
+                            if (grammarEls.size() == 1) {
+                                handleExistingDocRefs(DOMUtils.getChildrenWithName(grammarEls.get(0), WADL_NS,
+                                                                                   "include"), "href", loc, href,
+                                                      m, ui);
+                            }
+                        } else {
+                            handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl,
+                                                                               Constants.URI_2001_SCHEMA_XSD,
+                                                                               "import"), "schemaLocation", loc,
+                                                  href, m, ui);
+                            handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl,
+                                                                               Constants.URI_2001_SCHEMA_XSD,
+                                                                               "include"), "schemaLocation", loc,
+                                                  href, m, ui);
+                        }
                     }
-
+    
                     return Response.ok().type(MediaType.APPLICATION_XML_TYPE).entity(new DOMSource(docEl))
                         .build();
                 }
-            } catch (Exception ex) {
-                throw ExceptionUtils.toBadRequestException(null, null);
+            } else if (stylesheetReference != null && href.endsWith(".xsl")) {
+                InputStream is = ResourceUtils.getResourceStream(href, m.getExchange().getBus());
+                return Response.ok().type(MediaType.APPLICATION_XML_TYPE).entity(is).build();
             }
-
-        }
+            
+        } catch (Exception ex) {
+            throw ExceptionUtils.toBadRequestException(null, null);
+        }    
         return null;
     }
 
