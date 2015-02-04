@@ -42,6 +42,7 @@ import org.apache.cxf.ws.transfer.dialect.fragment.language.FragmentDialectLangu
 import org.apache.cxf.ws.transfer.dialect.fragment.language.FragmentDialectLanguageQName;
 import org.apache.cxf.ws.transfer.dialect.fragment.language.FragmentDialectLanguageXPath10;
 import org.apache.cxf.ws.transfer.shared.TransferTools;
+import org.apache.cxf.ws.transfer.shared.faults.InvalidRepresentation;
 import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
 
 /**
@@ -356,6 +357,9 @@ public class FragmentDialect implements Dialect {
         }
         
         for (Node node : nodeList) {
+            if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
+                throw new InvalidRepresentation();
+            }
             insertBefore(ownerDocument, parent, node, value);
         }
         
@@ -393,6 +397,9 @@ public class FragmentDialect implements Dialect {
         }
         
         for (Node node : nodeList) {
+            if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
+                throw new InvalidRepresentation();
+            }
             insertAfter(ownerDocument, parent, node, value);
         }
         
@@ -469,7 +476,7 @@ public class FragmentDialect implements Dialect {
                     FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
                     && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
                 ) {
-                    throw new InvalidExpression();
+                    throw new InvalidRepresentation();
                 }
                 
                 Node importedNode = ownerDocument.importNode(node, true);
@@ -498,7 +505,7 @@ public class FragmentDialect implements Dialect {
                     FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
                     && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
                 ) {
-                    throw new InvalidExpression();
+                    throw new InvalidRepresentation();
                 }
                 
                 Node importedNode = ownerDocument.importNode(node, true);
@@ -521,7 +528,7 @@ public class FragmentDialect implements Dialect {
      */
     private void addNode(Document ownerDocument, Node parent, Node nextSibling, ValueType value) {
         if (ownerDocument == parent && ownerDocument.getDocumentElement() != null) {
-            throw new InvalidExpression();
+            throw new InvalidRepresentation();
         }
         for (Object o : value.getContent()) {
             if (o instanceof String) {
@@ -541,7 +548,7 @@ public class FragmentDialect implements Dialect {
                         throw new RuntimeException("wsf:AttributeNode@name is not present.");
                     }
                     if (((Element) parent).hasAttribute(attrName)) {
-                        throw new InvalidExpression();
+                        throw new InvalidRepresentation();
                     }
                     ((Element) parent).setAttribute(attrName, attrValue);
                 } else {
