@@ -154,9 +154,6 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         }
     }
     
-<<<<<<< HEAD
-    protected void checkSubjectConfirmationData(Message message, AssertionWrapper assertion) {
-=======
     protected void configureAudienceRestriction(Message msg, RequestData reqData) {
         // Add Audience Restrictions for SAML
         boolean enableAudienceRestriction = 
@@ -172,21 +169,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         }
     }
     
-    protected SAMLKeyInfo createKeyInfoFromDefaultAlias(Crypto sigCrypto) throws WSSecurityException {
-        try {
-            X509Certificate[] certs = SecurityUtils.getCertificates(sigCrypto, 
-                                                                    sigCrypto.getDefaultX509Identifier());
-            SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(new X509Certificate[]{certs[0]});
-            samlKeyInfo.setPublicKey(certs[0].getPublicKey());
-            return samlKeyInfo;
-        } catch (Exception ex) {
-            LOG.log(Level.FINE, "Error in loading the certificates: " + ex.getMessage(), ex);
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex);
-        }
-    }
-    
-    protected void checkSubjectConfirmationData(Message message, SamlAssertionWrapper assertion) {
->>>>>>> 0377022... Add the ability to validate SAML Audience Restrictions. Defaults to false unlike for SOAP
+    protected void checkSubjectConfirmationData(Message message, AssertionWrapper assertion) {
         Certificate[] tlsCerts = getTLSCertificates(message);
         if (!checkHolderOfKey(message, assertion, tlsCerts)) {
             throwFault("Holder Of Key claim fails", null);
