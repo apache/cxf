@@ -72,6 +72,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
@@ -176,6 +177,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private MediaType defaultWadlResponseMediaType = MediaType.APPLICATION_XML_TYPE;
     private MediaType defaultRepMediaType = MediaType.WILDCARD_TYPE;
     private String stylesheetReference;
+    private boolean applyStylesheetLocally;
     private Bus bus;
     private DocumentationProvider docProvider;
     private ResourceIdGenerator idGenerator;     
@@ -230,15 +232,17 @@ public class WadlGenerator implements ContainerRequestFilter {
             return;
         }
 
-        boolean isJson = type == MediaType.APPLICATION_JSON_TYPE;
+        boolean isJson = isJson(type);
 
         StringBuilder sbMain = generateWADL(getBaseURI(m, ui), getResourcesList(m, ui), isJson, m, ui);
 
         m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, !isJson && ignoreMessageWriters);
-        Response r = Response.ok().type(type).entity(createResponseEntity(sbMain.toString(), isJson)).build();
+        Response r = Response.ok().type(type).entity(createResponseEntity(m, ui, sbMain.toString(), isJson)).build();
         context.abortWith(r);
     }
-
+    private boolean isJson(MediaType mt) {
+        return mt == MediaType.APPLICATION_JSON_TYPE;
+    }
     private String getStylesheetInstructionData(Message m, UriInfo ui) {
         String theStylesheetReference = stylesheetReference;
         if (!keepRelativeDocLinks) {
@@ -253,7 +257,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                                        Message m,
                                        UriInfo ui) {
         StringBuilder sbMain = new StringBuilder();
-        if (!isJson && stylesheetReference != null) {
+        if (!isJson && stylesheetReference != null && !applyStylesheetLocally) {
             sbMain.append("<?xml-stylesheet " + getStylesheetInstructionData(m, ui) + "?>");
         }
         sbMain.append("<application");
@@ -314,11 +318,15 @@ public class WadlGenerator implements ContainerRequestFilter {
         return sbMain;
     }
 
-    private Object createResponseEntity(String entity, boolean isJson) {
-        if (!isJson) {
-            return entity;
-        }
+    private Object createResponseEntity(Message m, UriInfo ui, String entity, boolean isJson) {
         try {
+            if (!isJson) {
+                if (stylesheetReference != null && applyStylesheetLocally) {
+                    return transformLocally(m, ui, new StreamSource(new StringReader(entity)));
+                } else {
+                    return entity;
+                }
+            }
             return StaxUtils.read(new StringReader(entity));
         } catch (Exception ex) {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
@@ -1104,6 +1112,9 @@ public class WadlGenerator implements ContainerRequestFilter {
                 try {
                     InputStream is = ResourceUtils.getResourceStream(loc, (Bus)ep.get(Bus.class.getName()));
                     if (is != null) {
+                        if (isJson(mt)) {
+                            return Response.ok(is, mt).build();
+                        }
                         Document wadlDoc = StaxUtils.read(is);
                         Element appEl = wadlDoc.getDocumentElement();
 
@@ -1139,17 +1150,23 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
     private Response finalizeExistingWadlResponse(Document wadlDoc, Message m, UriInfo ui, MediaType mt) 
         throws Exception {
+        Object entity = null;
         if (stylesheetReference != null) {
-            ProcessingInstruction pi = wadlDoc.createProcessingInstruction("xml-stylesheet", 
-                                          getStylesheetInstructionData(m, ui));
-            wadlDoc.insertBefore(pi, wadlDoc.getDocumentElement());
-            String wadlDocString = copyDOMToString(wadlDoc);
-            return Response.ok().type(mt).entity(wadlDocString).build();
+            if (!applyStylesheetLocally) {
+                ProcessingInstruction pi = wadlDoc.createProcessingInstruction("xml-stylesheet", 
+                                              getStylesheetInstructionData(m, ui));
+                wadlDoc.insertBefore(pi, wadlDoc.getDocumentElement());
+                entity = copyDOMToString(wadlDoc);
+            } else {
+                entity = transformLocally(m, ui, new DOMSource(wadlDoc));
+            }
         } else {
-            return Response.ok().type(mt).entity(new DOMSource(wadlDoc)).build();
+            entity = new DOMSource(wadlDoc);
         }
+        return Response.ok(entity, mt).build();
+        
     }
-    private static String copyDOMToString(Document wadlDoc) throws Exception {
+    private String copyDOMToString(Document wadlDoc) throws Exception {
         DOMSource domSource = new DOMSource(wadlDoc);
         // temporary workaround
         StringWriter stringWriter = new StringWriter();
@@ -1158,6 +1175,15 @@ public class WadlGenerator implements ContainerRequestFilter {
         transformer.transform(domSource, new StreamResult(stringWriter));
         return stringWriter.toString();
     }
+    private String transformLocally(Message m, UriInfo ui, Source source) throws Exception {
+        InputStream is = ResourceUtils.getResourceStream(stylesheetReference, m.getExchange().getBus());
+        Transformer t = TransformerFactory.newInstance().newTemplates(new StreamSource(is)).newTransformer();
+        t.setParameter("base.path", (String)m.get("http.base.path"));
+        StringWriter stringWriter = new StringWriter();
+        t.transform(source, new StreamResult(stringWriter));
+        return stringWriter.toString();
+    }
+    
 
     // TODO: deal with caching later on
     public Response getExistingResource(Message m, UriInfo ui, String href) {
@@ -2089,6 +2115,10 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     public void setKeepRelativeDocLinks(boolean keepRelativeDocLinks) {
         this.keepRelativeDocLinks = keepRelativeDocLinks;
+    }
+
+    public void setApplyStylesheetLocally(boolean applyStylesheetLocally) {
+        this.applyStylesheetLocally = applyStylesheetLocally;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
