@@ -30,7 +30,8 @@ import org.atmosphere.websocket.WebSocket;
 import org.atmosphere.websocket.WebSocketProtocolStream;
 
 /**
- * 
+ * @deprecated No longer used as the protocol handling is done by Atmosphere's protocol intercepter
+ * such as org.apache.cxf.transport.websocket.atmosphere.DefaultProtocolInterceptor.
  */
 public class AtmosphereWebSocketStreamHandler extends AtmosphereWebSocketHandler implements 
     WebSocketProtocolStream {

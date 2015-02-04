@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket;
+package org.apache.cxf.transport.websocket.jetty;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,11 +34,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.transport.websocket.WebSocketConstants;
+import org.apache.cxf.transport.websocket.WebSocketUtils;
 
 /**
- * @deprecated This class is only used by jetty, it has been moved to org.apache.cxf.transport.websocket.jetty
+ * 
  */
-public class WebSocketVirtualServletResponse implements HttpServletResponse {
+class WebSocketVirtualServletResponse implements HttpServletResponse {
     private static final Logger LOG = LogUtils.getL7dLogger(WebSocketVirtualServletResponse.class);
     private WebSocketServletHolder webSocketHolder;
     private Map<String, String> responseHeaders;
@@ -333,7 +335,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
             @Override
             public void write(byte[] data, int offset, int length) throws IOException {
                 if (responseHeaders.get(WebSocketUtils.FLUSHED_KEY) == null) {
-                    // buffer the data until it gets flushed
+                    // buffer the data until it gets flushed for the first time
                     buffer.write(data, offset, length);
                 } else {
                     // unbuffered write to the socket

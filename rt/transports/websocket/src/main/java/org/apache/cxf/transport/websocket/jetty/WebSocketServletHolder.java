@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket;
+package org.apache.cxf.transport.websocket.jetty;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -28,9 +28,9 @@ import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 
 /**
- * @deprecated This class is only used by jetty, it has been moved to org.apache.cxf.transport.websocket.jetty
+ * 
  */
-public interface WebSocketServletHolder {
+interface WebSocketServletHolder {
     String getAuthType();
     String getContextPath();
     String getLocalAddr();

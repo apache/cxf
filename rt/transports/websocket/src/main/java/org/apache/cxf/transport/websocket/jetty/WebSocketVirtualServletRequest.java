@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket;
+package org.apache.cxf.transport.websocket.jetty;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,11 +50,13 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.transport.websocket.InvalidPathException;
+import org.apache.cxf.transport.websocket.WebSocketUtils;
 
 /**
- * @deprecated This class is only used by jetty, it has been moved to org.apache.cxf.transport.websocket.jetty
+ * 
  */
-public class WebSocketVirtualServletRequest implements HttpServletRequest {
+class WebSocketVirtualServletRequest implements HttpServletRequest {
     private static final Logger LOG = LogUtils.getL7dLogger(WebSocketVirtualServletRequest.class);
 
     private WebSocketServletHolder webSocketHolder;

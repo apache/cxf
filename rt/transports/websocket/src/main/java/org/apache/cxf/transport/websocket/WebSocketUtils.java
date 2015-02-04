@@ -30,14 +30,13 @@ import java.util.TreeMap;
  * 
  */
 public final class WebSocketUtils {
-    static final String URI_KEY = "$uri";
-    static final String METHOD_KEY = "$method";
-    static final String SC_KEY = "$sc";
-    static final String SM_KEY = "$sm";
-    static final String FLUSHED_KEY = "$flushed";
+    public static final String URI_KEY = "$uri";
+    public static final String METHOD_KEY = "$method";
+    public static final String SC_KEY = "$sc";
+    public static final String FLUSHED_KEY = "$flushed";
+
     private static final byte[] CRLF = "\r\n".getBytes();
     private static final byte[] COLSP = ": ".getBytes();
-    private static final String DEFAULT_SC = "200";
 
     private WebSocketUtils() {
     }
@@ -116,6 +115,15 @@ public final class WebSocketUtils {
         return buffer.toString();
     }
 
+    public static byte[] readBody(InputStream in) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buf = new byte[8192];
+        for (int n = in.read(buf); n > -1; n = in.read(buf)) {
+            baos.write(buf, 0, n);
+        }
+        return baos.toByteArray();
+    }
+
     /**
      * Build response bytes with the status and type information specified in the headers.
      *
@@ -128,14 +136,15 @@ public final class WebSocketUtils {
     public static byte[] buildResponse(Map<String, String> headers, byte[] data, int offset, int length) {
         ByteArrayBuilder sb = new ByteArrayBuilder();
         String v = headers.get(SC_KEY);
-        sb.append(v == null ? DEFAULT_SC : v).append(CRLF);
-        appendHeaders(headers, sb);
-        
-        byte[] longdata = sb.toByteArray();
-        if (data != null && length > 0) {
-            longdata = buildResponse(longdata, data, offset, length);
+        if (v != null) {
+            sb.append(v).append(CRLF);
         }
-        return longdata;
+        sb.append(headers);
+        
+        if (data != null && length > 0) {
+            sb.append(CRLF).append(data, offset, length);
+        }
+        return sb.toByteArray();
     }
 
     /**
@@ -154,9 +163,10 @@ public final class WebSocketUtils {
         if (hlen > 0) {
             System.arraycopy(headers, 0, longdata, 0, hlen);
         }
-        longdata[hlen] = 0x0d;
-        longdata[hlen + 1] = 0x0a;
-        System.arraycopy(data, offset, longdata, hlen + 2, length);
+        if (data != null && length > 0) {
+            System.arraycopy(CRLF, 0, longdata, hlen, CRLF.length);
+            System.arraycopy(data, offset, longdata, hlen + CRLF.length, length);
+        }
         return longdata;
     }
 
@@ -172,8 +182,9 @@ public final class WebSocketUtils {
     public static byte[] buildResponse(byte[] data, int offset, int length) {
         return buildResponse((byte[])null, data, offset, length);
     }
-    
-    static byte[] buildHeaderLine(String name, String value) {
+
+    //FIXME (consolidate the response building code)
+    public static byte[] buildHeaderLine(String name, String value) {
         byte[] hl = new byte[name.length() + COLSP.length + value.length() + CRLF.length];
         System.arraycopy(name.getBytes(), 0, hl, 0, name.length());
         System.arraycopy(COLSP, 0, hl, name.length(), COLSP.length);
@@ -181,7 +192,7 @@ public final class WebSocketUtils {
         System.arraycopy(CRLF, 0, hl, name.length() + COLSP.length + value.length(), CRLF.length);
         return hl;
     }
-        
+
     /**
      * Build request bytes with the specified method, url, headers, and content entity.
      * 
@@ -196,34 +207,20 @@ public final class WebSocketUtils {
     public static byte[] buildRequest(String method, String url, Map<String, String> headers,
                                       byte[] data, int offset, int length) {
         ByteArrayBuilder sb = new ByteArrayBuilder();
-        sb.append(method).append(' ').append(url).append(CRLF);
-        appendHeaders(headers, sb);
-        sb.append(CRLF);
+        sb.append(method).append(' ').append(url).append(CRLF).append(headers);
 
-        byte[] longdata = sb.toByteArray();
         if (data != null && length > 0) {
-            final byte[] hb = longdata;
-            longdata = new byte[hb.length + length];
-            System.arraycopy(hb, 0, longdata, 0, hb.length);
-            System.arraycopy(data, offset, longdata, hb.length, length);
+            sb.append(CRLF).append(data, offset, length);
         }
-        return longdata;
+        return sb.toByteArray();
     }
 
-    private static void appendHeaders(Map<String, String> headers, ByteArrayBuilder sb) {
-        for (Entry<String, String> header : headers.entrySet()) {
-            if (!header.getKey().startsWith("$")) {
-                sb.append(header.getKey()).append(COLSP).append(header.getValue()).append(CRLF);
-            }
-        }
-    }
-    
     private static class ByteArrayBuilder {
         private ByteArrayOutputStream baos;
         public ByteArrayBuilder() {
             baos = new ByteArrayOutputStream();
         }
-        
+
         public ByteArrayBuilder append(byte[] b) {
             try {
                 baos.write(b);
@@ -232,21 +229,35 @@ public final class WebSocketUtils {
             }
             return this;
         }
-        
+
+        public ByteArrayBuilder append(byte[] b, int offset, int length) {
+            baos.write(b, offset, length);
+            return this;
+        }
+
         public ByteArrayBuilder append(String s) {
             try {
-                baos.write(s.getBytes());
+                baos.write(s.getBytes("utf-8"));
             } catch (IOException e) {
                 // ignore
             }
             return this;
         }
-        
-        public ByteArrayBuilder append(char c) {
+
+        public ByteArrayBuilder append(int c) {
             baos.write(c);
             return this;
         }
-        
+
+        public ByteArrayBuilder append(Map<String, String> map) {
+            for (Entry<String, String> m : map.entrySet()) {
+                if (!m.getKey().startsWith("$")) {
+                    append(m.getKey()).append(COLSP).append(m.getValue()).append(CRLF);
+                }
+            }
+            return this;
+        }
+
         public byte[] toByteArray() {
             return baos.toByteArray();
         }

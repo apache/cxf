@@ -41,9 +41,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.transport.websocket.InvalidPathException;
 import org.apache.cxf.transport.websocket.WebSocketConstants;
-import org.apache.cxf.transport.websocket.WebSocketServletHolder;
-import org.apache.cxf.transport.websocket.WebSocketVirtualServletRequest;
-import org.apache.cxf.transport.websocket.WebSocketVirtualServletResponse;
 import org.eclipse.jetty.websocket.WebSocket;
 
 class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessage {

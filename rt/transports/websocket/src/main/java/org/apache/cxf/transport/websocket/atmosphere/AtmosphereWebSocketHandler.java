@@ -50,7 +50,8 @@ import org.atmosphere.websocket.WebSocketProcessor.WebSocketException;
 import org.atmosphere.websocket.WebSocketProtocol;
 
 /**
- * 
+ * @deprecated No longer used as the protocol handling is done by Atmosphere's protocol intercepter
+ * such as org.apache.cxf.transport.websocket.atmosphere.DefaultProtocolInterceptor.
  */
 public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketHandler.class);
