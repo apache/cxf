@@ -101,6 +101,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.Oneway;
+import org.apache.cxf.jaxrs.ext.ResponseStatus;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
@@ -578,9 +579,12 @@ public class WadlGenerator implements ContainerRequestFilter {
         startMethodResponseTag(sb, ori);
         Class<?> returnType = getMethod(ori).getReturnType();
         boolean isVoid = void.class == returnType;
-        if (isVoid) {
+        ResponseStatus responseStatus = getMethod(ori).getAnnotation(ResponseStatus.class);
+        if (responseStatus != null) {
+            setResponseStatus(sb, responseStatus.value());
+        } else if (isVoid) {
             boolean oneway = getMethod(ori).getAnnotation(Oneway.class) != null;
-            sb.append(" status=\"" + (oneway ? 202 : 204) + "\"");
+            setResponseStatus(sb, oneway ? 202 : 204);
         }
         sb.append(">");
         handleDocs(anns, sb, DocTarget.RESPONSE, false, isJson);
@@ -596,6 +600,18 @@ public class WadlGenerator implements ContainerRequestFilter {
             resourceTagOpened = false;
         }
         return resourceTagOpened;
+    }
+
+    private void setResponseStatus(StringBuilder sb, int... statuses) {
+        sb.append(" status=\"");
+        for (int i = 0; i < statuses.length; i++) {
+            if (i > 0) {
+                sb.append(" ");
+            }
+            sb.append(statuses[i]);
+        }
+        sb.append("\"");
+        
     }
 
     protected boolean compareOperations(OperationResourceInfo ori1, OperationResourceInfo ori2) {
