@@ -1174,7 +1174,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                     if (href.endsWith(".xsl")) {
                         List<Element> xslImports = DOMUtils.getChildrenWithName(docEl, XLS_NS, "import");
                         handleExistingDocRefs(xslImports, "href", loc, href, m, ui);
-                        List<Element> xslIncludes = DOMUtils.getChildrenWithName(docEl, XLS_NS, "import");
+                        List<Element> xslIncludes = DOMUtils.getChildrenWithName(docEl, XLS_NS, "include");
                         handleExistingDocRefs(xslIncludes, "href", loc, href, m, ui);
                     } else {
                         if (fragmentIndex != -1) {
