@@ -40,6 +40,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
@@ -136,8 +139,9 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetWadlFromWadlLocation() throws Exception {
         String address = "http://localhost:" + PORT + "/the/generated";    
-        List<Element> resources = 
-            checkWadlResourcesInfo(address, address + "/bookstore", "/schemas/book.xsd", 2);
+        WebClient client = WebClient.create(address + "/bookstore" + "?_wadl&_type=xml");
+        Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        List<Element> resources = checkWadlResourcesInfo(doc, address, "/schemas/book.xsd", 2);
         assertEquals("", resources.get(0).getAttribute("type"));
         String type = resources.get(1).getAttribute("type");
         String resourceTypeAddress = address + "/bookstoreImportResourceType.wadl#bookstoreType";
@@ -148,6 +152,26 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         
         // check resource type resource
         checkWadlResourcesType(address, resourceTypeAddress, "/schemas/book.xsd");
+        
+        String templateRef = null;
+        NodeList nd = doc.getChildNodes();
+        for (int i = 0; i < nd.getLength(); i++) {
+            Node n = nd.item(i);
+            if (n.getNodeType() == Document.PROCESSING_INSTRUCTION_NODE) {
+                String piData = ((ProcessingInstruction)n).getData();
+                int hRefStart = piData.indexOf("href=\"");
+                if (hRefStart > 0) {
+                    int hRefEnd = piData.indexOf("\"", hRefStart + 6);
+                    templateRef = piData.substring(hRefStart + 6, hRefEnd);
+                }
+            }
+        }
+        assertNotNull(templateRef);
+        WebClient client2 = WebClient.create(templateRef);
+        WebClient.getConfig(client2).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        String template = client2.get(String.class);
+        assertNotNull(template);
+        assertTrue(template.indexOf("<xsl:stylesheet") != -1);
     }
     
     @Test
@@ -277,11 +301,16 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                                         String schemaRef, int size) throws Exception {
         WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
         Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        return checkWadlResourcesInfo(doc, baseURI, schemaRef, size);
+    }
+    private List<Element> checkWadlResourcesInfo(Document doc, String baseURI, String schemaRef, int size) 
+        throws Exception {
+                 
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());
         List<Element> grammarEls = DOMUtils.getChildrenWithName(root, 
-                                                                  WadlGenerator.WADL_NS, "grammars");
+                                                                WadlGenerator.WADL_NS, "grammars");
         assertEquals(1, grammarEls.size());
         List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
                                                                 WadlGenerator.WADL_NS, "include");
@@ -298,7 +327,6 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                                          WadlGenerator.WADL_NS, "resource");
         assertEquals(size, resourceEls.size());
         return resourceEls;
-        
     }
     
     @Test
