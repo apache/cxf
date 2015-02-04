@@ -109,6 +109,24 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItSpnegoTransportEndorsingSP11Binding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSpnegoTransportEndorsingSP11Policy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItSpnegoSymmetricSecureConversationBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItSpnegoSymmetricSecureConversationPolicy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -142,6 +160,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItSpnegoTransportEndorsingPort" binding="tns:DoubleItSpnegoTransportEndorsingBinding">
             <soap:address location="https://localhost:9001/DoubleItSpnegoTransportEndorsing"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItSpnegoTransportEndorsingSP11Port" binding="tns:DoubleItSpnegoTransportEndorsingSP11Binding">
+            <soap:address location="https://localhost:9001/DoubleItSpnegoTransportEndorsingSP11"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSpnegoSymmetricSecureConversationPort" binding="tns:DoubleItSpnegoSymmetricSecureConversationBinding">
             <soap:address location="http://localhost:9001/DoubleItSpnegoSymmetricSecureConversation"/>
@@ -302,48 +323,6 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-    <wsp:Policy wsu:Id="DoubleItSpnegoTransportPolicy">
-        <wsp:ExactlyOne>
-            <wsp:All>
-                <sp:TransportBinding>
-                    <wsp:Policy>
-                        <sp:TransportToken>
-                            <wsp:Policy>
-                                <sp:HttpsToken>
-                                    <wsp:Policy/>
-                                </sp:HttpsToken>
-                            </wsp:Policy>
-                        </sp:TransportToken>
-                        <sp:Layout>
-                            <wsp:Policy>
-                                <sp:Lax/>
-                            </wsp:Policy>
-                        </sp:Layout>
-                        <sp:IncludeTimestamp/>
-                        <sp:AlgorithmSuite>
-                            <wsp:Policy>
-                                <sp:Basic128/>
-                            </wsp:Policy>
-                        </sp:AlgorithmSuite>
-                    </wsp:Policy>
-                </sp:TransportBinding>
-                <sp:SupportingTokens>
-                    <wsp:Policy>
-                        <sp:SpnegoContextToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
-                            <wsp:Policy />
-                        </sp:SpnegoContextToken>
-                    </wsp:Policy>
-                </sp:SupportingTokens>
-                <sp:Wss11>
-                    <wsp:Policy>
-                        <sp:MustSupportRefIssuerSerial/>
-                        <sp:MustSupportRefThumbprint/>
-                        <sp:MustSupportRefEncryptedKey/>
-                    </wsp:Policy>
-                </sp:Wss11>
-            </wsp:All>
-        </wsp:ExactlyOne>
-    </wsp:Policy>
     <wsp:Policy wsu:Id="DoubleItSpnegoTransportEndorsingPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
@@ -372,6 +351,48 @@
                 <sp:EndorsingSupportingTokens>
                     <wsp:Policy>
                         <sp:SpnegoContextToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                            <wsp:Policy />
+                        </sp:SpnegoContextToken>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
+                <sp:Wss11>
+                    <wsp:Policy>
+                        <sp:MustSupportRefIssuerSerial/>
+                        <sp:MustSupportRefThumbprint/>
+                        <sp:MustSupportRefEncryptedKey/>
+                    </wsp:Policy>
+                </sp:Wss11>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItSpnegoTransportEndorsingSP11Policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:EndorsingSupportingTokens xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:SpnegoContextToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Once">
                             <wsp:Policy />
                         </sp:SpnegoContextToken>
                     </wsp:Policy>

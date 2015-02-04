@@ -246,6 +246,20 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         // runKerberosTest(portName, true, PORT2);
         // runKerberosTest(portName, true, STAX_PORT2);
     }
+  
+    @org.junit.Test
+    public void testSpnegoOverTransportEndorsingSP11() throws Exception {
+        if (!runTests || !unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
+        String portName = "DoubleItSpnegoTransportEndorsingSP11Port";
+        runKerberosTest(portName, false, PORT2);
+        runKerberosTest(portName, false, STAX_PORT2);
+        // TODO Supporting streaming Spnego outbound
+        // runKerberosTest(portName, true, PORT2);
+        // runKerberosTest(portName, true, STAX_PORT2);
+    }
     
     @org.junit.Test
     @org.junit.Ignore
