@@ -82,7 +82,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
         // If application is null or empty then try to create a new application from available
         // resource and provider classes
         if (app == null
-            || app.getClasses().isEmpty() && app.getSingletons().isEmpty()) {
+            || (app.getClasses().isEmpty() && app.getSingletons().isEmpty())) {
             // The best effort at detecting a CXFNonSpringJaxrsServlet
             // Custom servlets using non-standard mechanisms to create Application will not be detected
             if (isCxfServletAvailable(ctx)) {
@@ -98,7 +98,8 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                     // Servlet mapping is obtained from a servlet registration 
                     // with a JAX-RS Application class name
                     servletMapping = getServletMapping(ctx, servletName);
-                }
+                } 
+                
                 app = new Application() {
                     @Override
                     public Set<Class<?>> getClasses() {
