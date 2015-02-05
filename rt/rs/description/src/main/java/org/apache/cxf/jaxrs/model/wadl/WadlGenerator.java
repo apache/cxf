@@ -584,7 +584,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             setResponseStatus(sb, responseStatus.value());
         } else if (isVoid) {
             boolean oneway = getMethod(ori).getAnnotation(Oneway.class) != null;
-            setResponseStatus(sb, oneway ? 202 : 204);
+            setResponseStatus(sb, oneway ? Response.Status.ACCEPTED : Response.Status.NO_CONTENT);
         }
         sb.append(">");
         handleDocs(anns, sb, DocTarget.RESPONSE, false, isJson);
@@ -602,13 +602,13 @@ public class WadlGenerator implements ContainerRequestFilter {
         return resourceTagOpened;
     }
 
-    private void setResponseStatus(StringBuilder sb, int... statuses) {
+    private void setResponseStatus(StringBuilder sb, Response.Status... statuses) {
         sb.append(" status=\"");
         for (int i = 0; i < statuses.length; i++) {
             if (i > 0) {
                 sb.append(" ");
             }
-            sb.append(statuses[i]);
+            sb.append(statuses[i].getStatusCode());
         }
         sb.append("\"");
         
