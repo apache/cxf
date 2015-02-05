@@ -21,15 +21,18 @@ package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.ServletDestination;
@@ -37,16 +40,20 @@ import org.apache.cxf.transport.websocket.WebSocketDestinationService;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
+import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.atmosphere.util.Utils;
-import org.atmosphere.websocket.WebSocketProtocol;
 
 /**
  * 
  */
 public class AtmosphereWebSocketServletDestination extends ServletDestination implements
     WebSocketDestinationService {
+    private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketServletDestination.class);
+
     private AtmosphereFramework framework;
     private Executor executor;
 
@@ -54,18 +61,13 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
                                                  String path) throws IOException {
         super(bus, registry, ei, path);
         this.framework = new AtmosphereFramework(false, true);
-
         framework.setUseNativeImplementation(false);
+        framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
+        framework.addInitParameter(ApplicationConfig.PROPERTY_SESSION_SUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
-        //TODO provide a way to switch between the non-stream handler and the stream handler
-        framework.addInitParameter(ApplicationConfig.WEBSOCKET_PROTOCOL, 
-                                   AtmosphereWebSocketHandler.class.getName());
+        framework.interceptor(getInterceptor(bus));
+        framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();
-
-        WebSocketProtocol wsp = framework.getWebSocketProtocol();
-        if (wsp instanceof AtmosphereWebSocketHandler) {
-            ((AtmosphereWebSocketHandler)wsp).setDestination(this);
-        }
 
         // the executor for decoupling the service invocation from websocket's onMessage call which is
         // synchronously blocked
@@ -77,7 +79,7 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
                        HttpServletResponse resp) throws IOException {
         if (Utils.webSocketEnabled(req)) {
             try {
-                framework.doCometSupport(AtmosphereRequest.wrap(new HttpServletRequestFilter(req)), 
+                framework.doCometSupport(AtmosphereRequest.wrap(req), 
                                          AtmosphereResponse.wrap(resp));
             } catch (ServletException e) {
                 throw new IOException(e);
@@ -96,20 +98,44 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
     Executor getExecutor() {
         return executor;
     }
-    
-    private static class HttpServletRequestFilter extends HttpServletRequestWrapper {
-        private static final String TRANSPORT_ADDRESS 
-            = "org.apache.cxf.transport.endpoint.address";
-        private String transportAddress; 
-        public HttpServletRequestFilter(HttpServletRequest request) {
-            super(request);
-            transportAddress = (String)request.getAttribute(TRANSPORT_ADDRESS);
-        }
-        
+
+    private class DestinationHandler extends AbstractReflectorAtmosphereHandler {
+
         @Override
-        public Object getAttribute(String name) {
-            return TRANSPORT_ADDRESS.equals(name) ? transportAddress : super.getAttribute(name);
+        public void onRequest(final AtmosphereResource resource) throws IOException {
+            LOG.fine("onRequest");
+            executeHandlerTask(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        invokeInternal(null, 
+                            resource.getRequest().getServletContext(), resource.getRequest(), resource.getResponse());
+                    } catch (Exception e) {
+                        LOG.log(Level.WARNING, "Failed to invoke service", e);
+                    }
+                }
+            });
         }
-        
+    }
+    
+    private void executeHandlerTask(Runnable r) {
+        try {
+            executor.execute(r);
+        } catch (RejectedExecutionException e) {
+            LOG.warning(
+                "Executor queue is full, run the service invocation task in caller thread." 
+                + "  Users can specify a larger executor queue to avoid this.");
+            r.run();
+        }
+    }
+
+    //FIXME a temporary workaround until we decide how to customize atmosphere using cxf's destination configuration
+    private AtmosphereInterceptor getInterceptor(Bus bus) {
+        AtmosphereInterceptor ai = (AtmosphereInterceptor)bus.getProperty("atmosphere.interceptor");
+        if (ai == null) {
+            ai = new DefaultProtocolInterceptor(); 
+        }
+        LOG.info("AtmosphereInterceptor: " + ai);
+        return ai;
     }
 }

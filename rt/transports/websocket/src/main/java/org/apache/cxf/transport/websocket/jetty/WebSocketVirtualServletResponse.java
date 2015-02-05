@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket;
+package org.apache.cxf.transport.websocket.jetty;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,6 +34,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.transport.websocket.WebSocketConstants;
+import org.apache.cxf.transport.websocket.WebSocketUtils;
 
 /**
  * 
@@ -259,7 +261,6 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
             LOG.log(Level.FINE, "sendError({0}, {1})", new Object[]{sc, msg});
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
-        responseHeaders.put(WebSocketUtils.SM_KEY, msg);
         byte[] data = WebSocketUtils.buildResponse(responseHeaders, null, 0, 0);
         webSocketHolder.write(data, 0, data.length);
     }
@@ -308,7 +309,6 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
             LOG.log(Level.FINE, "setStatus({0}, {1})", new Object[]{sc, sm});
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
-        responseHeaders.put(WebSocketUtils.SM_KEY, sm);
     }
 
     private ServletOutputStream createOutputStream() {

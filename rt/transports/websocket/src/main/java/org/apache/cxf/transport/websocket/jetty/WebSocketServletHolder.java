@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket;
+package org.apache.cxf.transport.websocket.jetty;
 
 import java.io.IOException;
 import java.security.Principal;
