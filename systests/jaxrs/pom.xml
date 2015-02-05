@@ -147,29 +147,6 @@
             <artifactId>jetty-util</artifactId>
             <version>${cxf.jetty.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
-            <version>${cxf.jetty9.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-websocket</artifactId>
-            <version>${cxf.jetty8.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-jaas</artifactId>
-            <version>${cxf.jetty9.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -484,10 +461,10 @@
             <artifactId>tika-parsers</artifactId>
             <scope>test</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>org.apache.poi</groupId>
-            		<artifactId>poi-ooxml</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -547,6 +524,51 @@
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-hc</artifactId>
                     <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jetty8</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+              <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-plus</artifactId>
+                <version>${cxf.jetty8.version}</version>
+                <scope>test</scope>
+              </dependency>
+              <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-websocket</artifactId>
+                <version>${cxf.jetty8.version}</version>
+                <scope>test</scope>
+              </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jetty9</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.jetty.websocket</groupId>
+                    <artifactId>websocket-server</artifactId>
+                    <version>${cxf.jetty9.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>javax.servlet</groupId>
+                            <artifactId>javax.servlet-api</artifactId>
+                        </exclusion>
+                    </exclusions>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-jaas</artifactId>
+                    <version>${cxf.jetty9.version}</version>
                 </dependency>
             </dependencies>
         </profile>

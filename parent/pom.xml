@@ -1831,6 +1831,12 @@
             </properties>
         </profile>
         <profile>
+            <id>jetty8</id>
+            <properties>
+                <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
+            </properties>
+        </profile>
+        <profile>
             <!-- Profile for testing with EclipseLink MOXy based JAXB implementation -->
             <id>eclipse.moxy</id>
             <properties>
