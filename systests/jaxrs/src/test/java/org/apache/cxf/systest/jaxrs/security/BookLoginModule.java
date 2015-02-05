@@ -28,12 +28,17 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 public class BookLoginModule implements LoginModule {
+    private static final Class<LoginModule> LOGIN_MODULE_C = getLoginModuleClass();
 
     private LoginModule module;
     private String fileResource;
     
     public BookLoginModule() {
-        module = new org.eclipse.jetty.jaas.spi.PropertyFileLoginModule();
+        try {
+            module = LOGIN_MODULE_C.newInstance();
+        } catch (Throwable ex) {
+            throw new RuntimeException(ex);
+        }
         try {
             fileResource = getClass()
                 .getResource("/org/apache/cxf/systest/jaxrs/security/jetty-realm.properties")
@@ -42,7 +47,28 @@ public class BookLoginModule implements LoginModule {
             throw new RuntimeException(ex);
         }
     }
-    
+
+    @SuppressWarnings("unchecked")
+    private static Class<LoginModule> getLoginModuleClass() {
+        Class<?> clz = null;
+        try {
+            // try the jetty9 version
+            clz = Class.forName("org.eclipse.jetty.jaas.spi.PropertyFileLoginModule", 
+                                           true, BookLoginModule.class.getClassLoader());
+        } catch (Throwable t) {
+            if (clz == null) {
+                try {
+                    // try the jetty8 version
+                    clz = Class.forName("org.eclipse.jetty.plus.jaas.spi.PropertyFileLoginModule", 
+                                                   true, BookLoginModule.class.getClassLoader());
+                } catch (Throwable t2) {
+                    // ignore
+                }
+            }
+        }
+        return (Class<LoginModule>)clz;
+    }
+
     public boolean abort() throws LoginException {
         return module.abort();
     }
