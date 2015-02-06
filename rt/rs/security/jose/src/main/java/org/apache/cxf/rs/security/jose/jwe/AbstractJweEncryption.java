@@ -137,6 +137,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         }
         theHeaders.setContentEncryptionAlgorithm(getContentAlgorithm());
         
+        JweHeaders protectedHeaders = null;
         if (jweHeaders != null) {
             if (jweHeaders.getKeyEncryptionAlgorithm() != null 
                 && (getKeyAlgorithm() == null 
@@ -146,6 +147,14 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
                 throw new SecurityException();
             }
             theHeaders.asMap().putAll(jweHeaders.asMap());
+            if (jweHeaders.getProtectedHeaders() != null 
+                && !jweHeaders.asMap().entrySet().containsAll(theHeaders.asMap().entrySet())) {
+                jweHeaders.getProtectedHeaders().asMap().putAll(theHeaders.asMap());
+            }
+            protectedHeaders = jweHeaders.getProtectedHeaders() != null 
+                ? jweHeaders.getProtectedHeaders() : theHeaders;
+        } else {
+            protectedHeaders = theHeaders;
         }
         
         
@@ -161,7 +170,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         byte[] jweContentEncryptionKey = 
             getEncryptedContentEncryptionKey(theHeaders, theCek);
         
-        JweHeaders protectedHeaders = theHeaders;
+        
         String protectedHeadersJson = writer.headersToJson(protectedHeaders);
         
         byte[] additionalEncryptionParam = getAAD(protectedHeadersJson, aad);
