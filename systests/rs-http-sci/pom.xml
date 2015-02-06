@@ -34,12 +34,13 @@
         <cxf.surefire.fork.vmargs>-XX:MaxPermSize=192m</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-XX:MaxPermSize=192m</cxf.server.launcher.vmargs>
         <cxf.tomcat.version>7.0.52</cxf.tomcat.version>
+        <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-annotations</artifactId>
-            <version>${cxf.jetty.version}</version>            
+            <version>${cxf.jetty.version}</version>
         </dependency>    
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
