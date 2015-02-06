@@ -998,8 +998,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertEquals("void", method.getReturnType().getSimpleName());
         assertEquals("Exception class is not generated ", 1, method.getExceptionTypes().length);
         assertEquals("org.apache.cxf.w2j.hello_world.messages.PingMeFault",
-                     method.getExceptionTypes()[0]
-            .getCanonicalName());
+                     method.getExceptionTypes()[0].getCanonicalName());
     }
 
     @Test

@@ -41,7 +41,7 @@ import org.junit.Test;
 public class EnumTypeTest extends AbstractAegisTest {
     private DefaultTypeMapping tm;
 
-    private enum smallEnum {
+    private enum SmallEnum {
         VALUE1, VALUE2;
 
         @Override
@@ -64,12 +64,12 @@ public class EnumTypeTest extends AbstractAegisTest {
     @Test
     public void testType() throws Exception {
         EnumType type = new EnumType();
-        type.setTypeClass(smallEnum.class);
+        type.setTypeClass(SmallEnum.class);
         type.setSchemaType(new QName("urn:test", "test"));
 
         tm.register(type);
 
-        Element element = writeObjectToElement(type, smallEnum.VALUE1, getContext());
+        Element element = writeObjectToElement(type, SmallEnum.VALUE1, getContext());
 
         assertEquals("VALUE1", element.getTextContent());
         
@@ -77,12 +77,12 @@ public class EnumTypeTest extends AbstractAegisTest {
         ElementReader reader = new ElementReader(xreader);
         Object value = type.readObject(reader, getContext());
 
-        assertEquals(smallEnum.VALUE1, value);
+        assertEquals(SmallEnum.VALUE1, value);
     }
 
     @Test
     public void testAutoCreation() throws Exception {
-        AegisType type = tm.getTypeCreator().createType(smallEnum.class);
+        AegisType type = tm.getTypeCreator().createType(SmallEnum.class);
 
         assertTrue(type instanceof EnumType);
     }
@@ -117,7 +117,7 @@ public class EnumTypeTest extends AbstractAegisTest {
     @Test
     public void testWSDL() throws Exception {
         EnumType type = new EnumType();
-        type.setTypeClass(smallEnum.class);
+        type.setTypeClass(SmallEnum.class);
         type.setSchemaType(new QName("urn:test", "test"));
         XmlSchema schema = newXmlSchema("urn:test");
         type.writeSchema(schema);

@@ -933,8 +933,12 @@ public class JAXBElementProviderTest extends Assert {
     
         //ParameterizedType required for Lists of Objects
         ParameterizedType type = new ParameterizedType() {
-            public Type getRawType() { return List.class; }
-            public Type getOwnerType() { return null; }
+            public Type getRawType() { 
+                return List.class; 
+            }
+            public Type getOwnerType() { 
+                return null; 
+            }
             public Type[] getActualTypeArguments() {
                 return new Type[] {TagVO2Holder.class};
             }

@@ -23,7 +23,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 
-public abstract interface IdlDefn {
+public interface IdlDefn {
     IdlScopeBase definedIn();
 
 

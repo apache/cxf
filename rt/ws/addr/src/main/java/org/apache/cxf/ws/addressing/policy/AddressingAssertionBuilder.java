@@ -80,7 +80,7 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
                                                   mp,
                                                   policy);
                 }
-            } .build(elem, factory); 
+            }.build(elem, factory); 
             return nap;
         } else if (MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME.equals(qn)
             || MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705.equals(qn)) {

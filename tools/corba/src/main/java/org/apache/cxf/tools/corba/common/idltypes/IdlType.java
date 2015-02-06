@@ -19,6 +19,6 @@
 
 package org.apache.cxf.tools.corba.common.idltypes;
 
-public abstract interface IdlType extends IdlDefn {
+public interface IdlType extends IdlDefn {
     // empty for now
 }

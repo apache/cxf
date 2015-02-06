@@ -156,7 +156,9 @@ public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTes
         public String getUris(@Context UriInfo uriInfo) {
             String baseUriOnEntry = uriInfo.getRequestUri().toString();
             try {
-                while (locked) { Thread.sleep(1000); }
+                while (locked) { 
+                    Thread.sleep(1000);
+                }
             } catch (InterruptedException x) {
                 // ignore
             }
@@ -170,11 +172,15 @@ public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTes
         @GET
         @Path("/lock")
         @Produces("text/plain")
-        public String lock() { locked = true; return "locked"; }
+        public String lock() { 
+            locked = true; return "locked"; 
+        }
 
         @GET
         @Path("/unlock")
         @Produces("text/plain")
-        public String unlock() { locked = false; return "unlocked"; }
+        public String unlock() { 
+            locked = false; return "unlocked"; 
+        }
     }
 }

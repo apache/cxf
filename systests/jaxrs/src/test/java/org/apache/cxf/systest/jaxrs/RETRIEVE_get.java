@@ -28,6 +28,7 @@ import javax.ws.rs.HttpMethod;
 @Target({ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @HttpMethod("GET")
+//CHECKSTYLE:OFF
 public @interface RETRIEVE_get {
 
 }
