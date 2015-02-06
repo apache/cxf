@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.ValidationEventHandler;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.databinding.DataReader;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxStreamFilter;
@@ -58,6 +60,39 @@ public class XMLStreamDataReaderTest extends Assert {
 
     @Test
     public void testSetProperty() throws Exception {
+        MyCustomHandler handler = new MyCustomHandler();
+        
+        DataReaderImpl<XMLStreamReader> dr = newDataReader(handler);
+        
+        // Should fail if custom handler doesn't skip formatting error
+        Object val = dr.read(reader);
+        assertTrue(val instanceof GreetMe);
+        assertEquals("TestSOAPInputPMessage", ((GreetMe)val).getRequestType());
+
+        assertTrue(handler.getUsed());
+    }
+    
+    @Test
+    public void testSetPropertyWithCustomExceptionHandling() throws Exception {
+        MyCustomMarshallerHandler handler = new MyCustomMarshallerHandler();
+        
+        DataReaderImpl<XMLStreamReader> dr = newDataReader(handler);
+
+        // Should fail if custom handler doesn't skip formatting error
+        try {
+            dr.read(reader);
+            fail("Expected exception");
+        } catch (Fault f) {
+            assertTrue(f.getMessage().contains("My unmarshalling exception"));
+        }
+        
+        // Check handler used
+        assertTrue(handler.getUsed());
+        assertFalse(handler.isOnMarshalComplete());
+        assertTrue(handler.isOnUnmarshalComplete());
+    }
+    
+    private DataReaderImpl<XMLStreamReader> newDataReader(ValidationEventHandler handler) throws Exception {
         JAXBDataBinding db = getDataBinding(GreetMe.class);
     
         reader = getTestReader("../resources/SetPropertyValidationFailureReq.xml");
@@ -68,18 +103,12 @@ public class XMLStreamDataReaderTest extends Assert {
         
         // Build message to set custom event handler
         org.apache.cxf.message.Message message = new org.apache.cxf.message.MessageImpl();
-        message.put("jaxb-validation-event-handler", new MyCustomHandler());
+        message.put(JAXBDataBinding.READER_VALIDATION_EVENT_HANDLER, handler);
         message.put("unwrap.jaxb.element", true);
     
         dr.setProperty("org.apache.cxf.message.Message", message);        
         
-        // Should fail if custom handler doesn't skip formatting error
-        Object val = dr.read(reader);
-        assertTrue(val instanceof GreetMe);
-        assertEquals("TestSOAPInputPMessage", ((GreetMe)val).getRequestType());
-        
-        // Check handler used
-        assertTrue(((MyCustomHandler)dr.veventHandler).getUsed());
+        return dr;
     }
     
     @Test

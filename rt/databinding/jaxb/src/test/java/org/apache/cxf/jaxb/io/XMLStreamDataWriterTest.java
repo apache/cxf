@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.ValidationEventHandler;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -33,6 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.databinding.DataWriter;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
@@ -47,7 +49,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class XMLStreamDataWriterTest extends Assert {
-
     private ByteArrayOutputStream baos;
     private XMLStreamWriter streamWriter;
     private XMLInputFactory inFactory;
@@ -68,17 +69,9 @@ public class XMLStreamDataWriterTest extends Assert {
     
     @Test
     public void testSetProperty() throws Exception {
-        JAXBDataBinding db = getTestWriterFactory();
-               
-        DataWriterImpl<XMLStreamWriter> dw = (DataWriterImpl<XMLStreamWriter>)db.createWriter(XMLStreamWriter.class);
-        assertNotNull(dw);
+        MyCustomHandler handler = new MyCustomHandler();
         
-        // Build message to set custom event handler
-        org.apache.cxf.message.Message message = new org.apache.cxf.message.MessageImpl();
-        message.put("jaxb-writer-validation-event-handler", new MyCustomHandler());
-    
-        dw.setProperty("org.apache.cxf.message.Message", message);     
-        
+        DataWriterImpl<XMLStreamWriter> dw = newDataWriter(handler);
         // Write Stuff
         TradePriceData val = new TradePriceData();
         val.setTickerSymbol("This is a symbol");
@@ -92,9 +85,53 @@ public class XMLStreamDataWriterTest extends Assert {
         streamWriter.flush();
         
         // Test MyCustomHandler
-        assertTrue(((MyCustomHandler)dw.veventHandler).getUsed());       
+        assertTrue(handler.getUsed());
+    }
+    
+    @Test
+    public void testSetPropertyWithCustomExceptionHandling() throws Exception {
+        MyCustomMarshallerHandler handler = new MyCustomMarshallerHandler();
+        
+        DataWriterImpl<XMLStreamWriter> dw = newDataWriter(handler);
+        // Write Stuff
+        TradePriceData val = new TradePriceData();
+        val.setTickerSymbol("This is a symbol");
+        val.setTickerPrice(1.0f);
+        
+        QName elName = new QName("http://apache.org/hello_world_doc_lit_bare/types", "inout");
+        MessagePartInfo part = new MessagePartInfo(elName, null);
+        part.setElement(true);
+        part.setElementQName(elName);
+        
+        try {
+            dw.write(val, part, streamWriter);
+            streamWriter.flush();
+            fail("Expected exception");
+        } catch (Fault f) {
+            assertTrue(f.getMessage().contains("My marshalling exception"));
+        }
+        
+        // Test MyCustomHandler
+        assertTrue(handler.getUsed());
+        assertTrue(handler.isOnMarshalComplete());
+        assertFalse(handler.isOnUnmarshalComplete());
     }
 
+    private DataWriterImpl<XMLStreamWriter> newDataWriter(ValidationEventHandler handler) throws Exception {
+        JAXBDataBinding db = getTestWriterFactory();
+        
+        DataWriterImpl<XMLStreamWriter> dw = (DataWriterImpl<XMLStreamWriter>)db.createWriter(XMLStreamWriter.class);
+        assertNotNull(dw);
+        
+        // Build message to set custom event handler
+        org.apache.cxf.message.Message message = new org.apache.cxf.message.MessageImpl();
+        message.put(JAXBDataBinding.WRITER_VALIDATION_EVENT_HANDLER, handler);
+    
+        dw.setProperty("org.apache.cxf.message.Message", message);     
+        
+        return dw;
+    }
+    
     @Test
     public void testWriteRPCLit1() throws Exception {
         JAXBDataBinding db = getTestWriterFactory();
