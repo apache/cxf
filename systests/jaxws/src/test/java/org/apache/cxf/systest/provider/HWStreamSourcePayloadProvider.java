@@ -51,7 +51,7 @@ import org.w3c.dom.ls.LSSerializer;
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world_rpc_lit.wsdl"
 @WebServiceProvider(portName = "SoapPortProviderRPCLit7", serviceName = "SOAPServiceProviderRPCLit",
                 targetNamespace = "http://apache.org/hello_world_rpclit",
-wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
+                wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
 @ServiceMode(value = Service.Mode.PAYLOAD)
 public class HWStreamSourcePayloadProvider implements Provider<StreamSource> {
     

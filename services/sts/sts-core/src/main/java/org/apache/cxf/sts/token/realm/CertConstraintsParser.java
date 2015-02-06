@@ -68,8 +68,7 @@ public class CertConstraintsParser {
      *              subject DNConstraints; false, otherwise. The certificate subject DN only
      *              has to match ONE of the subject cert constraints (not all).
      */
-    public boolean
-    matches(
+    public boolean matches(
         final java.security.cert.X509Certificate cert
     ) {
         if (!subjectDNPatterns.isEmpty()) {

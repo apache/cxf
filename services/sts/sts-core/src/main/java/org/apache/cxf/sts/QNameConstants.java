@@ -28,8 +28,8 @@ public final class QNameConstants {
     
     public static final org.apache.cxf.ws.security.sts.provider.model.ObjectFactory WS_TRUST_FACTORY 
         = new org.apache.cxf.ws.security.sts.provider.model.ObjectFactory();
-    public static final org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory 
-    WS_TRUST14_FACTORY = new org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory();
+    public static final org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory WS_TRUST14_FACTORY
+        = new org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory();
     public static final org.apache.cxf.ws.security.sts.provider.model.secext.ObjectFactory WSSE_FACTORY 
         = new org.apache.cxf.ws.security.sts.provider.model.secext.ObjectFactory();
     public static final org.apache.cxf.ws.security.sts.provider.model.utility.ObjectFactory UTIL_FACTORY

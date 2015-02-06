@@ -20,9 +20,9 @@ package org.apache.cxf.systest.schemaimport;
 
 import javax.jws.WebService;
 @WebService(targetNamespace = "http://cxf.apache.org/xsd/test/", name = "service_v1_port",
-wsdlLocation = "classpath:/wsdl_systest/service.wsdl",
-serviceName = "service_v1",
-endpointInterface = "org.apache.cxf.systest.schemaimport.ServiceV1Port")
+            wsdlLocation = "classpath:/wsdl_systest/service.wsdl",
+            serviceName = "service_v1",
+            endpointInterface = "org.apache.cxf.systest.schemaimport.ServiceV1Port")
 public class ServiceImpl implements ServiceV1Port {
 
     @Override

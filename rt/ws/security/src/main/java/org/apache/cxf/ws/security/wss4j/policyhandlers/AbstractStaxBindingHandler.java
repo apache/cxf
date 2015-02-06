@@ -1001,6 +1001,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     
     protected org.apache.xml.security.stax.securityToken.SecurityToken 
     findInboundSecurityToken(SecurityEventConstants.Event event) throws XMLSecurityException {
+        
         @SuppressWarnings("unchecked")
         final List<SecurityEvent> incomingEventList = 
             (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");

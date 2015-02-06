@@ -758,10 +758,8 @@ public abstract class AbstractOperation {
     }
     
     protected static org.apache.xml.security.stax.securityToken.SecurityToken 
-    findInboundSecurityToken(
-        SecurityEventConstants.Event event,
-        MessageContext messageContext
-    ) throws XMLSecurityException {
+    findInboundSecurityToken(SecurityEventConstants.Event event,
+                             MessageContext messageContext) throws XMLSecurityException {
         @SuppressWarnings("unchecked")
         final List<SecurityEvent> incomingEventList = 
             (List<SecurityEvent>) messageContext.get(SecurityEvent.class.getName() + ".in");

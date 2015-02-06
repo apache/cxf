@@ -38,9 +38,9 @@ import org.oasis_open.docs.wsn.bw_2.UnrecognizedPolicyRequestFault;
 import org.oasis_open.docs.wsn.bw_2.UnsupportedPolicyRequestFault;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.PausableSubscriptionManager",
-targetNamespace = "http://cxf.apache.org/wsn/jaxws",
-serviceName = "PausableSubscriptionManagerService",
-portName = "PausableSubscriptionManagerPort"
+            targetNamespace = "http://cxf.apache.org/wsn/jaxws",
+            serviceName = "PausableSubscriptionManagerService",
+            portName = "PausableSubscriptionManagerPort"
 )
 public class JaxwsSubscription extends JmsSubscription {
 

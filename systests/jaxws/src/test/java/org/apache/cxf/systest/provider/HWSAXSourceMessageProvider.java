@@ -42,7 +42,7 @@ import org.xml.sax.InputSource;
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world_rpc_lit.wsdl"
 @WebServiceProvider(portName = "SoapPortProviderRPCLit4", serviceName = "SOAPServiceProviderRPCLit",
                     targetNamespace = "http://apache.org/hello_world_rpclit",
-wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
+                    wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
 @ServiceMode(value = Service.Mode.MESSAGE)
 public class HWSAXSourceMessageProvider implements Provider<SAXSource> {
     

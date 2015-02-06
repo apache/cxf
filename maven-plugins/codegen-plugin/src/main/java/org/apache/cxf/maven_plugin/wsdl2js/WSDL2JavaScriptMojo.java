@@ -250,10 +250,9 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         return options;
     }
 
-    public static List<GenericWsdlOption> 
-    loadWsdlOptionsFromDependencies(MavenProject project,
-                                    Option defaultOptions,
-                                    File outputDir) {
+    public static List<GenericWsdlOption> loadWsdlOptionsFromDependencies(MavenProject project,
+                                                                          Option defaultOptions,
+                                                                          File outputDir) {
         List<GenericWsdlOption> options 
             = new ArrayList<GenericWsdlOption>();
         Set<Artifact> dependencies = CastUtils.cast(project.getDependencyArtifacts());

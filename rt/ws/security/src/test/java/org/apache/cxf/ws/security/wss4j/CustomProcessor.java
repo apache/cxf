@@ -31,8 +31,7 @@ import org.apache.wss4j.dom.validate.Validator;
  */
 public class CustomProcessor implements Processor {
     
-    public final java.util.List<WSSecurityEngineResult> 
-    handleToken(
+    public final java.util.List<WSSecurityEngineResult> handleToken(
         final org.w3c.dom.Element elem, 
         final RequestData data, 
         final WSDocInfo wsDocInfo 

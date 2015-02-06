@@ -112,6 +112,7 @@ public class VersionTransformer {
      */
     public static org.apache.cxf.ws.addressing.v200403.AttributedURI 
     convertTo200403(AttributedURIType internal) {
+        
         org.apache.cxf.ws.addressing.v200403.AttributedURI exposed = Names200403.WSA_OBJECT_FACTORY
             .createAttributedURI();
         String exposedValue = Names.WSA_ANONYMOUS_ADDRESS.equals(internal.getValue())
@@ -264,8 +265,7 @@ public class VersionTransformer {
      * @param exposed the 2004/03 EndpointReferenceType
      * @return an equivalent 2005/08 EndpointReferenceType
      */
-    public static EndpointReferenceType 
-    convert(org.apache.cxf.ws.addressing.v200403.EndpointReferenceType exposed) {
+    public static EndpointReferenceType convert(org.apache.cxf.ws.addressing.v200403.EndpointReferenceType exposed) {
         EndpointReferenceType internal = ContextUtils.WSA_OBJECT_FACTORY.createEndpointReferenceType();
         internal.setAddress(convert(exposed.getAddress()));
         // TODO ref parameters not present in 2004/03

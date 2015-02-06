@@ -58,10 +58,10 @@ import org.springframework.util.Assert;
 
 //Define the DirectoryService
 @CreateDS(name = "LDAPClaimsTest-class",
-  enableAccessControl = false,
-  allowAnonAccess = false,
-  enableChangeLog = true,
-  partitions = {
+          enableAccessControl = false,
+          allowAnonAccess = false,
+          enableChangeLog = true,
+          partitions = {
         @CreatePartition(
             name = "example",
             suffix = "dc=example,dc=com",
@@ -71,13 +71,13 @@ import org.springframework.util.Assert;
                 @CreateIndex(attribute = "ou")
             }
         ) }
-)
+    )
 
 @CreateLdapServer(
-  transports = {
+    transports = {
         @CreateTransport(protocol = "LDAP")
         }
-)
+    )
 
 //Inject an file containing entries
 @ApplyLdifFiles("ldap.ldif")

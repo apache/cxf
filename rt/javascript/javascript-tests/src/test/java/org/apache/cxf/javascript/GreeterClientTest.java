@@ -50,8 +50,7 @@ public class GreeterClientTest extends JavascriptRhinoTest {
     
     
     @Before
-    public 
-    void before() throws Exception {
+    public void before() throws Exception {
         setupRhino("greeter-service-endpoint",  
                    "/org/apache/cxf/javascript/GreeterTests.js",
                    SchemaValidationType.BOTH);

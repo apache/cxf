@@ -50,7 +50,7 @@ import org.apache.cxf.helpers.DOMUtils;
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world.wsdl"
 @WebServiceProvider(portName = "SoapProviderPort", serviceName = "SOAPProviderService",
                     targetNamespace = "http://apache.org/hello_world_soap_http",
- wsdlLocation = "/org/apache/cxf/systest/provider/hello_world_with_restriction.wsdl")
+                    wsdlLocation = "/org/apache/cxf/systest/provider/hello_world_with_restriction.wsdl")
 @ServiceMode(value = Service.Mode.MESSAGE)            
 public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
 

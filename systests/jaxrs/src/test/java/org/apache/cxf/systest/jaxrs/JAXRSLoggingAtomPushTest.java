@@ -204,8 +204,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
     
     
     @Ignore
-    private AbstractFeedBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> 
-    createCustomFeedBuilder() {
+    private AbstractFeedBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> createCustomFeedBuilder() {
 
         AbstractFeedBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> fb = 
             new AbstractFeedBuilder<List<org.apache.cxf.management.web.logging.LogRecord>>() {
@@ -218,8 +217,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
     }  
 
     @Ignore
-    private AbstractEntryBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> 
-    createCustomEntryBuilder() {
+    private AbstractEntryBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> createCustomEntryBuilder() {
         AbstractEntryBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> eb = 
             new AbstractEntryBuilder<List<org.apache.cxf.management.web.logging.LogRecord>>() {
                 @Override

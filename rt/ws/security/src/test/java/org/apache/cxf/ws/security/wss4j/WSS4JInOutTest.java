@@ -502,8 +502,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
      *              null, which will cause the WSS4J runtime to do no
      *              processing on the input)
      */
-    private Map<QName, String>
-    createCustomProcessorMap() {
+    private Map<QName, String> createCustomProcessorMap() {
         final Map<QName, String> ret = new HashMap<QName, String>();
         ret.put(
             new QName(

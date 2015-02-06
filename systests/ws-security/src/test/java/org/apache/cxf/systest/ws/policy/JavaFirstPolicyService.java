@@ -26,7 +26,7 @@ import org.apache.cxf.annotations.Policies;
 import org.apache.cxf.annotations.Policy;
 
 @WebService(name = "JavaFirstPolicyService", 
-targetNamespace = "http://www.example.org/contract/JavaFirstPolicyService")
+            targetNamespace = "http://www.example.org/contract/JavaFirstPolicyService")
 public interface JavaFirstPolicyService {
     @Policies({
         @Policy(uri = "#InternalTransportAndUsernamePolicy", 

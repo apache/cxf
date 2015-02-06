@@ -71,8 +71,7 @@ public class CertConstraints {
          *              ANY.  Note that if the combinator is ALL and the list of patterns
          *              is empty, then any dn will match (by definition of the universal quantifier)
          */
-        final boolean
-        matches(
+        final boolean matches(
             final javax.security.auth.x500.X500Principal dn
         ) {
             boolean atLeastOnePatternMatches = false;
@@ -121,8 +120,7 @@ public class CertConstraints {
     /**
      * Create a CertificateConstraints from a CertificateConstraintsType specification
      */
-    public
-    CertConstraints(
+    public CertConstraints(
         final java.util.List<String> subjectConstraints,
         final Combinator subjectConstraintsCombinator,
         final java.util.List<String> issuerConstraints,
@@ -139,8 +137,7 @@ public class CertConstraints {
      *              subject DNConstraints and the certificate's IssuerDN matches the issuer
      *              DNConstraints; false, otherwise
      */
-    public boolean
-    matches(
+    public boolean matches(
         final java.security.cert.X509Certificate cert
     ) {
         return 

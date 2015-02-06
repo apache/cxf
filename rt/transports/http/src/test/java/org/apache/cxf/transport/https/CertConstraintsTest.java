@@ -37,8 +37,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 public class CertConstraintsTest extends org.junit.Assert {
 
     @org.junit.Test
-    public void
-    testCertConstraints() throws Exception {
+    public void testCertConstraints() throws Exception {
         final X509Certificate bethalCert = 
             loadCertificate("Bethal.jks", "JKS", "password", "bethal");
         final X509Certificate gordyCert = 
@@ -91,8 +90,7 @@ public class CertConstraintsTest extends org.junit.Assert {
     // Private utilities
     //
     
-    private static CertConstraints
-    loadCertConstraints(
+    private static CertConstraints loadCertConstraints(
         final String id
     ) throws Exception {
         CertificateConstraintsType certsConstraintsType = 
@@ -100,8 +98,7 @@ public class CertConstraintsTest extends org.junit.Assert {
         return CertConstraintsJaxBUtils.createCertConstraints(certsConstraintsType);
     }
     
-    private static CertificateConstraintsType
-    loadCertificateConstraintsType(
+    private static CertificateConstraintsType loadCertificateConstraintsType(
         final String id
     ) throws Exception {
         return loadGeneratedType(
@@ -112,8 +109,7 @@ public class CertConstraintsTest extends org.junit.Assert {
         );
     }
     
-    private static X509Certificate
-    loadCertificate(
+    private static X509Certificate loadCertificate(
         final String keystoreFilename,
         final String keystoreType,
         final String keystorePassword,
@@ -138,8 +134,7 @@ public class CertConstraintsTest extends org.junit.Assert {
         throw new RuntimeException("error in test -- keystore " + id + " has no trusted certs");
     }
     
-    private static <T> T
-    loadGeneratedType(
+    private static <T> T loadGeneratedType(
         final Class<T> cls,
         final String elementName,
         final String name,
@@ -162,8 +157,7 @@ public class CertConstraintsTest extends org.junit.Assert {
     }
     
     
-    private static org.w3c.dom.Document
-    loadDocument(
+    private static org.w3c.dom.Document loadDocument(
         final String name
     ) throws Exception {
         final java.io.InputStream inStream = 
@@ -171,8 +165,7 @@ public class CertConstraintsTest extends org.junit.Assert {
         return StaxUtils.read(inStream);
     }
 
-    private static <T> T
-    unmarshal(
+    private static <T> T unmarshal(
         final Class<T> cls,
         final org.w3c.dom.Element elt
     ) throws JAXBException {

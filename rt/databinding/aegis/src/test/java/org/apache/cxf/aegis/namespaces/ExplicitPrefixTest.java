@@ -117,8 +117,7 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
      * @param node
      * @return
      */
-    private Map<String, String>
-    getNodeNamespaceDeclarations(Node node) {
+    private Map<String, String> getNodeNamespaceDeclarations(Node node) {
         Map<String, String> result = new HashMap<String, String>();
         NamedNodeMap attributes = node.getAttributes();
         for (int x = 0; x < attributes.getLength(); x++) {
