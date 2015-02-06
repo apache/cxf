@@ -25,5 +25,5 @@ public interface JweEncryptionProvider extends JweKeyProperties {
     /**
      * Prepare JWE state (optional operation)
      */
-    JweEncryptionState createJweEncryptionState(JweHeaders jweHeaders);
+    JweEncryptionState createJweEncryptionState(JweHeaders jweHeaders, byte[] aad);
 }

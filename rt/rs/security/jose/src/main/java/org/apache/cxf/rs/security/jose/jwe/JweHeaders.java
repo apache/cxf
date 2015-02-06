@@ -31,7 +31,6 @@ import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 
 public class JweHeaders extends JoseHeaders {
-    
     public JweHeaders() {
     }
     

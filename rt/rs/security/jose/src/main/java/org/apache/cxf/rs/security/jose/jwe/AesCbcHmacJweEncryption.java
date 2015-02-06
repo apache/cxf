@@ -100,13 +100,14 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         return authTag;
     }
     private MacState getInitializedMacState(final JweEncryptionInternal state) {
-        String headersJson = getJwtHeadersWriter().headersToJson(state.theHeaders);
-        return getInitializedMacState(state.secretKey, state.theIv, state.theHeaders, headersJson);
+        return getInitializedMacState(state.secretKey, state.theIv, state.aad, 
+                                      state.theHeaders, state.protectedHeadersJson);
     }
     protected static MacState getInitializedMacState(byte[] secretKey,
                                                      byte[] theIv,
-                                                     JweHeaders theHeaders, 
-                                                     String headersJson) {
+                                                     byte[] extraAad,
+                                                     JweHeaders theHeaders,
+                                                     String protectedHeadersJson) {
         String algoJwt = theHeaders.getContentEncryptionAlgorithm();
         int size = getFullCekKeySize(algoJwt) / 2;
         byte[] macKey = new byte[size];
@@ -115,8 +116,7 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         String hmacAlgoJava = AES_HMAC_MAP.get(algoJwt);
         Mac mac = HmacUtils.getInitializedMac(macKey, hmacAlgoJava, null);
         
-        
-        byte[] aad = JweHeaders.toCipherAdditionalAuthData(headersJson);
+        byte[] aad = JweUtils.getAdditionalAuthenticationData(protectedHeadersJson, extraAad);
         ByteBuffer buf = ByteBuffer.allocate(8);
         final byte[] al = buf.putInt(0).putInt(aad.length * 8).array();
         
@@ -125,7 +125,7 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         MacState macState = new MacState();
         macState.mac = mac;
         macState.al = al;
-        macState.headersJson = headersJson;
+        macState.headersJson = protectedHeadersJson;
         return macState;
     }
     
@@ -160,7 +160,7 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
             return new IvParameterSpec(theIv);
         }
         @Override
-        public byte[] getAdditionalAuthenticationData(String headersJson) {
+        public byte[] getAdditionalAuthenticationData(String headersJson, byte[] aad) {
             return null;
         }
     }

@@ -48,7 +48,7 @@ public class JweJwtCompactConsumer  {
                                                                 headers.getContentEncryptionAlgorithm()));
     }
     public JwtToken decryptWith(JweDecryptionProvider jwe) {
-        byte[] bytes = jwe.decrypt(jweConsumer);
+        byte[] bytes = jwe.decrypt(jweConsumer.getJweDecryptionInput());
         JwtClaims claims = new JwtTokenReaderWriter().fromJsonClaims(toString(bytes));
         return new JwtToken(headers, claims);
     }

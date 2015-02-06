@@ -37,19 +37,19 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
         this.supportedAlgo = supportedAlgo;
         this.unwrap = unwrap;
     }
-    public byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer) {
-        KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm(consumer));
-        AlgorithmParameterSpec spec = getAlgorithmParameterSpec(consumer); 
+    public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
+        KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm(jweDecryptionInput));
+        AlgorithmParameterSpec spec = getAlgorithmParameterSpec(jweDecryptionInput); 
         if (spec != null) {
             keyProps.setAlgoSpec(spec);
         }
         if (!unwrap) {
             keyProps.setBlockSize(getKeyCipherBlockSize());
-            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(consumer), 
+            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(jweDecryptionInput), 
                                             getCekDecryptionKey(), keyProps);
         } else {
-            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(consumer), 
-                                               getContentEncryptionAlgorithm(consumer), 
+            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(jweDecryptionInput), 
+                                               getContentEncryptionAlgorithm(jweDecryptionInput), 
                                                getCekDecryptionKey(), 
                                                keyProps).getEncoded();
         }
@@ -61,8 +61,8 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     protected int getKeyCipherBlockSize() {
         return -1;
     }
-    protected String getKeyEncryptionAlgorithm(JweCompactConsumer consumer) {
-        String keyAlgo = consumer.getJweHeaders().getKeyEncryptionAlgorithm();
+    protected String getKeyEncryptionAlgorithm(JweDecryptionInput jweDecryptionInput) {
+        String keyAlgo = jweDecryptionInput.getJweHeaders().getKeyEncryptionAlgorithm();
         validateKeyEncryptionAlgorithm(keyAlgo);
         return Algorithm.toJavaName(keyAlgo);
     }
@@ -71,14 +71,14 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
             throw new SecurityException();
         }
     }
-    protected String getContentEncryptionAlgorithm(JweCompactConsumer consumer) {
-        return Algorithm.toJavaName(consumer.getJweHeaders().getContentEncryptionAlgorithm());
+    protected String getContentEncryptionAlgorithm(JweDecryptionInput jweDecryptionInput) {
+        return Algorithm.toJavaName(jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm());
     }
-    protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweCompactConsumer consumer) {
+    protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweDecryptionInput jweDecryptionInput) {
         return null;
     }
-    protected byte[] getEncryptedContentEncryptionKey(JweCompactConsumer consumer) {
-        return consumer.getEncryptedContentEncryptionKey();
+    protected byte[] getEncryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
+        return jweDecryptionInput.getEncryptedCEK();
     }
     @Override
     public String getAlgorithm() {

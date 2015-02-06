@@ -21,5 +21,5 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 public interface KeyDecryptionAlgorithm {
     String getAlgorithm();
-    byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer);
+    byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput);
 }

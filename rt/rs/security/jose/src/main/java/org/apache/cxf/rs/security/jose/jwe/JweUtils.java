@@ -413,7 +413,18 @@ public final class JweUtils {
         byte[] keyZ = generateKeyZ(privateKey, peerPublicKey);
         return calculateDerivedKey(keyZ, algoName, partyUInfo, partyVInfo, algoKeyBitLen);
     }
-    
+    public static byte[] getAdditionalAuthenticationData(String headersJson, byte[] aad) {
+        byte[] headersAAD = JweHeaders.toCipherAdditionalAuthData(headersJson);
+        if (aad != null) {
+            // JWE JSON can provide the extra aad
+            byte[] newAAD = Arrays.copyOf(headersAAD, headersAAD.length + 1 + aad.length);
+            newAAD[headersAAD.length] = '.';
+            System.arraycopy(aad, 0, newAAD, headersAAD.length + 1, aad.length);
+            return newAAD;
+        } else {
+            return headersAAD;
+        }
+    }
     private static byte[] calculateDerivedKey(byte[] keyZ, 
                                               String algoName,
                                               byte[] apuBytes, 

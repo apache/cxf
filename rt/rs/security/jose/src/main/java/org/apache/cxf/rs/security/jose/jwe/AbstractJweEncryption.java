@@ -78,11 +78,11 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected String getContentEncryptionAlgoJava() {
         return Algorithm.toJavaName(getContentEncryptionAlgoJwt());
     }
-    protected byte[] getAAD(JweHeaders theHeaders) {
-        return getContentEncryptionAlgorithm().getAdditionalAuthenticationData(writer.headersToJson(theHeaders));
+    protected byte[] getAAD(String protectedHeaders, byte[] aad) {
+        return getContentEncryptionAlgorithm().getAdditionalAuthenticationData(protectedHeaders, aad);
     }
     public String encrypt(byte[] content, JweHeaders jweHeaders) {
-        JweEncryptionInternal state = getInternalState(jweHeaders);
+        JweEncryptionInternal state = getInternalState(jweHeaders, null);
         
         byte[] cipher = CryptoUtils.encryptBytes(content, createCekSecretKey(state), state.keyProps);
         
@@ -113,8 +113,8 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         return writer;
     }
     @Override
-    public JweEncryptionState createJweEncryptionState(JweHeaders jweHeaders) {
-        JweEncryptionInternal state = getInternalState(jweHeaders);
+    public JweEncryptionState createJweEncryptionState(JweHeaders jweHeaders, byte[] aad) {
+        JweEncryptionInternal state = getInternalState(jweHeaders, aad);
         Cipher c = CryptoUtils.initCipher(createCekSecretKey(state), state.keyProps, 
                                           Cipher.ENCRYPT_MODE);
         return new JweEncryptionState(c, 
@@ -136,7 +136,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         return theCek;
     }
     
-    private JweEncryptionInternal getInternalState(JweHeaders jweHeaders) {
+    private JweEncryptionInternal getInternalState(JweHeaders jweHeaders, byte[] aad) {
         byte[] theCek = getContentEncryptionKey();
         String contentEncryptionAlgoJavaName = Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
@@ -158,9 +158,12 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
             theHeaders = new JweHeaders(theHeaders.asMap());
             theHeaders.asMap().putAll(jweHeaders.asMap());
         }
-        byte[] additionalEncryptionParam = getAAD(theHeaders);
-        keyProps.setAdditionalData(additionalEncryptionParam);
+        JweHeaders protectedHeaders = theHeaders;
+            
+        String protectedHeadersJson = writer.headersToJson(protectedHeaders);
         
+        byte[] additionalEncryptionParam = getAAD(protectedHeadersJson, aad);
+        keyProps.setAdditionalData(additionalEncryptionParam);
         
         JweEncryptionInternal state = new JweEncryptionInternal();
         state.theHeaders = theHeaders;
@@ -168,6 +171,8 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         state.keyProps = keyProps;
         state.secretKey = theCek; 
         state.theIv = theIv;
+        state.protectedHeadersJson = protectedHeadersJson;
+        state.aad = aad;
         return state;
     }
     private boolean compressionRequired(JweHeaders theHeaders) {
@@ -182,5 +187,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         byte[] theIv;
         KeyProperties keyProps;
         byte[] secretKey;
+        String protectedHeadersJson;
+        byte[] aad;
     }
 }

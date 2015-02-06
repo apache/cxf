@@ -49,10 +49,10 @@ public class EcdhDirectKeyJweDecryption extends DirectKeyJweDecryption {
             this.privateKey = privateKey;
         }
         @Override
-        public byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer) {
-            super.validateKeyEncryptionKey(consumer);
+        public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
+            super.validateKeyEncryptionKey(jweDecryptionInput);
             
-            return getDecryptedContentEncryptionKeyFromHeaders(consumer.getJweHeaders(), privateKey);
+            return getDecryptedContentEncryptionKeyFromHeaders(jweDecryptionInput.getJweHeaders(), privateKey);
         }
     }
 }

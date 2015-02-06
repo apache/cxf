@@ -46,18 +46,18 @@ public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgori
         super(secretKey, supportedAlgo);
     }
     @Override
-    protected byte[] getEncryptedContentEncryptionKey(JweCompactConsumer consumer) {
-        byte[] encryptedCekKey = super.getEncryptedContentEncryptionKey(consumer);
-        byte[] tag = getDecodedBytes(consumer, "tag");
+    protected byte[] getEncryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
+        byte[] encryptedCekKey = super.getEncryptedContentEncryptionKey(jweDecryptionInput);
+        byte[] tag = getDecodedBytes(jweDecryptionInput, "tag");
         return JweCompactConsumer.getCipherWithAuthTag(encryptedCekKey, tag);
     }
-    protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweCompactConsumer consumer) {
-        byte[] iv = getDecodedBytes(consumer, "iv");
+    protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweDecryptionInput jweDecryptionInput) {
+        byte[] iv = getDecodedBytes(jweDecryptionInput, "iv");
         return CryptoUtils.getContentEncryptionCipherSpec(128, iv);
     }
-    private byte[] getDecodedBytes(JweCompactConsumer consumer, String headerName) {
+    private byte[] getDecodedBytes(JweDecryptionInput jweDecryptionInput, String headerName) {
         try {
-            Object ivHeader = consumer.getJweHeaders().getHeader(headerName);
+            Object ivHeader = jweDecryptionInput.getJweHeaders().getHeader(headerName);
             return Base64UrlUtility.decode(ivHeader.toString());
         } catch (Exception ex) {
             throw new SecurityException(ex);

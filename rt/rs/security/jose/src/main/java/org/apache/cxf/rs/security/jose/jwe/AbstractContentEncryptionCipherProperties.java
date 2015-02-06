@@ -33,8 +33,8 @@ public abstract class AbstractContentEncryptionCipherProperties implements Conte
     public AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] theIv) {
         return CryptoUtils.getContentEncryptionCipherSpec(getAuthTagLen(), theIv);
     }
-    public byte[] getAdditionalAuthenticationData(String headersJson) {
-        return JweHeaders.toCipherAdditionalAuthData(headersJson);
+    public byte[] getAdditionalAuthenticationData(String headersJson, byte[] aad) {
+        return JweUtils.getAdditionalAuthenticationData(headersJson, aad);
     }
     protected int getAuthTagLen() {
         return authTagLen;

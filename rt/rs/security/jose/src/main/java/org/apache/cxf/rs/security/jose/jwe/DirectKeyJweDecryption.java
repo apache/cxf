@@ -39,16 +39,16 @@ public class DirectKeyJweDecryption extends AbstractJweDecryption {
             this.contentDecryptionKey = contentDecryptionKey;
         }
         @Override
-        public byte[] getDecryptedContentEncryptionKey(JweCompactConsumer consumer) {
-            validateKeyEncryptionKey(consumer);
+        public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
+            validateKeyEncryptionKey(jweDecryptionInput);
             return contentDecryptionKey;
         }
         @Override
         public String getAlgorithm() {
             return null;
         }
-        protected void validateKeyEncryptionKey(JweCompactConsumer consumer) {
-            byte[] encryptedCEK = consumer.getEncryptedContentEncryptionKey();
+        protected void validateKeyEncryptionKey(JweDecryptionInput jweDecryptionInput) {
+            byte[] encryptedCEK = jweDecryptionInput.getEncryptedCEK();
             if (encryptedCEK != null && encryptedCEK.length > 0) {
                 throw new SecurityException();
             }
