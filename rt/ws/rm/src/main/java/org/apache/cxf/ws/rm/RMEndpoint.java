@@ -373,6 +373,13 @@ public class RMEndpoint {
         si.addEndpoint(ei);
 
         Endpoint endpoint = new WrappedEndpoint(applicationEndpoint, ei, service);
+        if (applicationEndpoint.getEndpointInfo() != null
+             && applicationEndpoint.getEndpointInfo().getProperties() != null) {
+            for (String key : applicationEndpoint.getEndpointInfo().getProperties().keySet()) {
+                endpoint.getEndpointInfo()
+                    .setProperty(key, applicationEndpoint.getEndpointInfo().getProperty(key));
+            }
+        }       
         service.setEndpoint(endpoint);
         endpoints.put(protocol, endpoint);
     }
