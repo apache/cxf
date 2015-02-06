@@ -22,8 +22,8 @@ package org.apache.cxf.systest.ws.policy;
 import javax.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService", 
-serviceName = "JavaFirstAttachmentPolicyService", 
-targetNamespace = "http://www.example.org/contract/JavaFirstAttachmentPolicyService")
+            serviceName = "JavaFirstAttachmentPolicyService", 
+            targetNamespace = "http://www.example.org/contract/JavaFirstAttachmentPolicyService")
 public class JavaFirstAttachmentPolicyServiceImpl implements JavaFirstAttachmentPolicyService {
     public void doOperationLevelPolicy() {
     }

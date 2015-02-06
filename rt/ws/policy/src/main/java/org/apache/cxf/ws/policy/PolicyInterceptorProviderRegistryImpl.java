@@ -110,6 +110,7 @@ public class PolicyInterceptorProviderRegistryImpl
     public List<Interceptor<? extends Message>> 
     getInterceptorsForAlternative(Collection<? extends Assertion> alternative,
                                   boolean out, boolean fault) {
+        
         List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
         for (Assertion a : alternative) {
             if (a.isOptional()) {

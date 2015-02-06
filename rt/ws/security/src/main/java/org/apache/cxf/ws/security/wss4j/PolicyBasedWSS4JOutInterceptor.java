@@ -232,6 +232,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
 
         public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>> 
         getAdditionalInterceptors() {
+            
             return null;
         }
         

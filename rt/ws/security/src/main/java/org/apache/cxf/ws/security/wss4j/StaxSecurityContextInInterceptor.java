@@ -236,8 +236,7 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
      * Otherwise set the Fault/Code/Value to env:Sender and the Fault/Code/Subcode/Value
      * as the fault code from the WSSecurityException.
      */
-    private SoapFault 
-    createSoapFault(SoapVersion version, WSSecurityException e) {
+    private SoapFault createSoapFault(SoapVersion version, WSSecurityException e) {
         SoapFault fault;
         javax.xml.namespace.QName faultCode = e.getFaultCode();
         if (version.getVersion() == 1.1 && faultCode != null) {

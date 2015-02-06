@@ -372,8 +372,7 @@ public class RMManagerTest extends Assert {
      
     @Test
     public void testGetExistingSequence() throws NoSuchMethodException, SequenceFault, RMException {
-        Method m = RMManager.class
-           .getDeclaredMethod("getSource", new Class[] {Message.class});
+        Method m = RMManager.class.getDeclaredMethod("getSource", new Class[] {Message.class});
         manager = control.createMock(RMManager.class, new Method[] {m});
         Message message = control.createMock(Message.class);
         Identifier inSid = control.createMock(Identifier.class);

@@ -25,7 +25,7 @@ import javax.jws.soap.SOAPBinding;
 import org.apache.hello_world_soap_action.WrappedGreeter;
 
 @WebService(endpointInterface = "org.apache.hello_world_soap_action.WrappedGreeter", 
-serviceName = "WrappedSOAPService")
+            serviceName = "WrappedSOAPService")
 @SOAPBinding(style = SOAPBinding.Style.RPC, use = SOAPBinding.Use.ENCODED)
 public class RPCEncodedSoapActionGreeterImpl implements WrappedGreeter {
 

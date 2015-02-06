@@ -238,8 +238,8 @@ public final class XmlSchemaUtils {
         return ext.getAttributes();
     }
 
-    public static List<XmlSchemaAnnotated>
-    getContentAttributes(XmlSchemaComplexType type, SchemaCollection collection) {
+    public static List<XmlSchemaAnnotated> getContentAttributes(XmlSchemaComplexType type, 
+                                                                SchemaCollection collection) {
         List<XmlSchemaAnnotated> results = new ArrayList<XmlSchemaAnnotated>();
         QName baseTypeName = getBaseType(type);
         if (baseTypeName != null) {

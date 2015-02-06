@@ -553,11 +553,10 @@ public class CodeFirstTest extends AbstractJaxWsTest {
                    targetNamespace = "http://cxf.apache.org/service.wsdl/types",
                    partName = "returnResponse")
         @WebMethod(action = "http://cxf.apache.org/doReturn")
-        ReturnResponseType 
-        doReturn(@WebParam(partName = "returnTrx",
-                           name = "return-request", 
-                           targetNamespace = "http://cxf.apache.org/service.wsdl/types")
-                           ReturnRequestType returnTrx);
+        ReturnResponseType doReturn(@WebParam(partName = "returnTrx",
+                                              name = "return-request", 
+                                              targetNamespace = "http://cxf.apache.org/service.wsdl/types")
+                                    ReturnRequestType returnTrx);
     }
     @WebService(targetNamespace = "http://cxf.apache.org/service.wsdl")
     public static class CXF2766Impl implements CXF2766 {

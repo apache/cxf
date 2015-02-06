@@ -225,8 +225,7 @@ public final class TLSParameterJaxBUtils {
     /**
      * load the certificates as X.509 certificates
      */
-    private static Collection<? extends Certificate>
-    loadCertificates(final java.io.InputStream is)
+    private static Collection<? extends Certificate> loadCertificates(final java.io.InputStream is)
         throws IOException, CertificateException {
 
         final CertificateFactory factory = CertificateFactory.getInstance("X.509");

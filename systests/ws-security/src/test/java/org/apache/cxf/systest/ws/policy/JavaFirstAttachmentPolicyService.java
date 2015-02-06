@@ -23,7 +23,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 @WebService(name = "JavaFirstAttachmentPolicyService", 
-targetNamespace = "http://www.example.org/contract/JavaFirstAttachmentPolicyService")
+            targetNamespace = "http://www.example.org/contract/JavaFirstAttachmentPolicyService")
 public interface JavaFirstAttachmentPolicyService {
     @WebMethod(operationName = "doOperationLevelPolicy")
     void doOperationLevelPolicy();

@@ -908,8 +908,8 @@ public final class EndpointReferenceUtils {
             javax.xml.bind.Marshaller jm = getJAXBContextForEPR().createMarshaller();
             jm.setProperty(Marshaller.JAXB_FRAGMENT, true);
             QName qname = new QName("http://www.w3.org/2005/08/addressing", "EndpointReference");
-            JAXBElement<EndpointReferenceType> 
-            jaxEle = new JAXBElement<EndpointReferenceType>(qname, EndpointReferenceType.class, epr);
+            JAXBElement<EndpointReferenceType> jaxEle
+                = new JAXBElement<EndpointReferenceType>(qname, EndpointReferenceType.class, epr);
             
             
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter();

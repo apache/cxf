@@ -52,6 +52,7 @@ public class ServiceImpl implements Service {
 
     public Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> 
     getByNames(Collection<NoDefaultConstructorBeanKey> keys) {
+
         if (keys == null) {
             throw new IllegalArgumentException("keys is null");
         }

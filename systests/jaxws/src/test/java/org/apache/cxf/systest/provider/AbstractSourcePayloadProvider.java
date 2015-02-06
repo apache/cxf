@@ -49,9 +49,10 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 //The following wsdl file is used.
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world_rpc_lit.wsdl"
-@WebServiceProvider(portName = "SoapPortProviderRPCLit3", serviceName = "SOAPServiceProviderRPCLit",
-                      targetNamespace = "http://apache.org/hello_world_rpclit",
- wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
+@WebServiceProvider(portName = "SoapPortProviderRPCLit3",
+                    serviceName = "SOAPServiceProviderRPCLit",
+                    targetNamespace = "http://apache.org/hello_world_rpclit",
+                    wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
 @ServiceMode (value = javax.xml.ws.Service.Mode.PAYLOAD)
 @HandlerChain(file = "./handlers_invocation.xml", name = "TestHandlerChain")
 public abstract class AbstractSourcePayloadProvider implements SourceProvider {

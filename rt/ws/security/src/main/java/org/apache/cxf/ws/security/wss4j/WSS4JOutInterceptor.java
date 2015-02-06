@@ -357,8 +357,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             }
         }
 
-        public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>> 
-        getAdditionalInterceptors() {
+        public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>> getAdditionalInterceptors() {
             return null;
         }
     }

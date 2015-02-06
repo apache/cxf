@@ -27,8 +27,8 @@ import java.util.concurrent.Executor;
  */
 public final class OneShotAsyncExecutor implements Executor {
 
-    private static final OneShotAsyncExecutor INSTANCE = new
-    OneShotAsyncExecutor();
+    private static final OneShotAsyncExecutor INSTANCE 
+        = new OneShotAsyncExecutor();
     
     private OneShotAsyncExecutor() {
     }

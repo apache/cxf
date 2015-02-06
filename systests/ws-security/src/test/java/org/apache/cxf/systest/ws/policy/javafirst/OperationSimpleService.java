@@ -23,7 +23,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 @WebService(name = "OperationSimpleService", 
-targetNamespace = "http://www.example.org/contract/OperationSimpleService")
+            targetNamespace = "http://www.example.org/contract/OperationSimpleService")
 public interface OperationSimpleService {
     @WebMethod(operationName = "doStuff")
     void doStuff();

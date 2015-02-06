@@ -27,13 +27,13 @@ import javax.xml.ws.Holder;
 @WebService
 public interface HolderService {
 
-    String echo(String s1, String s2, @WebParam(mode = Mode.OUT)
-    Holder<String> outS2);
+    String echo(String s1, String s2, 
+                @WebParam(mode = Mode.OUT) Holder<String> outS2);
 
-    String echo2(String s1, @WebParam(mode = Mode.OUT)
-    Holder<String> outS2, String s2);
+    String echo2(String s1, 
+                 @WebParam(mode = Mode.OUT) Holder<String> outS2, String s2);
 
     String echo3(@WebParam(mode = Mode.INOUT, header = true, name = "header")
-    Holder<String> header, String s1);
+                 Holder<String> header, String s1);
 
 }

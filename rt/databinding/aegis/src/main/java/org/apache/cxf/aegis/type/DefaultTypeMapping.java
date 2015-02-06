@@ -340,7 +340,7 @@ public class DefaultTypeMapping implements TypeMapping {
     }
 
     public static DefaultTypeMapping createDefaultTypeMapping(boolean defaultNillable, 
-      boolean enableMtomXmime) {
+                                                              boolean enableMtomXmime) {
         return createDefaultTypeMapping(
                                         defaultNillable,
                                         enableMtomXmime,

@@ -606,8 +606,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         return tempTok.getId();
     }
     
-    private org.apache.xml.security.stax.securityToken.SecurityToken 
-    findEncryptedKeyToken() throws XMLSecurityException {
+    private org.apache.xml.security.stax.securityToken.SecurityToken findEncryptedKeyToken() 
+        throws XMLSecurityException {
         @SuppressWarnings("unchecked")
         final List<SecurityEvent> incomingEventList = 
             (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");

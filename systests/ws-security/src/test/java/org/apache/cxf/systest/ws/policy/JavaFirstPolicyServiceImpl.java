@@ -22,8 +22,8 @@ package org.apache.cxf.systest.ws.policy;
 import javax.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.ws.policy.JavaFirstPolicyService", 
-serviceName = "JavaFirstPolicyService", 
-targetNamespace = "http://www.example.org/contract/JavaFirstPolicyService")
+            serviceName = "JavaFirstPolicyService", 
+            targetNamespace = "http://www.example.org/contract/JavaFirstPolicyService")
 public class JavaFirstPolicyServiceImpl implements JavaFirstPolicyService {
     public void doOperationOne() {
     }

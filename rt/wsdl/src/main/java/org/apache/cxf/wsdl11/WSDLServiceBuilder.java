@@ -321,9 +321,9 @@ public class WSDLServiceBuilder {
             PortType bindingPt = binding.getPortType();
             if (bindingPt == null) {
                 org.apache.cxf.common.i18n.Message msg = new
-                org.apache.cxf.common.i18n.Message("BINDING_MISSING_TYPE",
-                                                   LOG,
-                                                   binding.getQName());
+                    org.apache.cxf.common.i18n.Message("BINDING_MISSING_TYPE",
+                                                       LOG,
+                                                       binding.getQName());
                 throw new WSDLRuntimeException(msg);
             }
 

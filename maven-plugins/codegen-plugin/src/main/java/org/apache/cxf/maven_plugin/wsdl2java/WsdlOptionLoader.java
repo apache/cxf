@@ -41,9 +41,8 @@ public final class WsdlOptionLoader {
     private WsdlOptionLoader() {
     }
     
-    public static List<GenericWsdlOption> 
-    loadWsdlOptionsFromDependencies(MavenProject project, 
-                                    File outputDir) {
+    public static List<GenericWsdlOption> loadWsdlOptionsFromDependencies(MavenProject project, 
+                                                                          File outputDir) {
         List<GenericWsdlOption> options = new ArrayList<GenericWsdlOption>();
         Set<Artifact> dependencies = CastUtils.cast(project.getDependencyArtifacts());
         for (Artifact artifact : dependencies) {
@@ -76,10 +75,10 @@ public final class WsdlOptionLoader {
      * @return list of one WsdlOption object for each wsdl found
      * @throws MojoExecutionException
      */
-    public static List<GenericWsdlOption> 
-    loadWsdlOptionsFromFiles(File wsdlBasedir, String includes[],
-                                 String excludes[],
-                                 File defaultOutputDir)
+    public static List<GenericWsdlOption> loadWsdlOptionsFromFiles(File wsdlBasedir, 
+                                                                   String includes[],
+                                                                   String excludes[],
+                                                                   File defaultOutputDir)
         throws MojoExecutionException {
 
         if (wsdlBasedir == null) {
