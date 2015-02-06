@@ -150,7 +150,7 @@
         <cxf.wss4j.version>2.0.3-SNAPSHOT</cxf.wss4j.version>
         <cxf.xerces.version>2.11.0</cxf.xerces.version>
         <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
-        <cxf.xmlschema.version>2.2.0</cxf.xmlschema.version>
+        <cxf.xmlschema.version>2.2.1</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version>
         <cxf.cdi.api.version>1.1</cxf.cdi.api.version>
