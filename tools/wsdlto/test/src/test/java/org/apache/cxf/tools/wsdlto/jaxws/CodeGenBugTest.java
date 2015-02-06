@@ -46,7 +46,6 @@ import org.apache.cxf.tools.wsdlto.WSDLToJava;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.validator.UniqueBodyValidator;
 import org.apache.cxf.wsdl11.WSDLRuntimeException;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
 import org.junit.Test;
@@ -494,7 +493,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         // 'add' it.
         server.setHandler(reshandler);
         server.start();
-        int port = ((ServerConnector)server.getConnectors()[0]).getLocalPort();
+        int port = server.getConnectors()[0].getLocalPort();
         env.put(ToolConstants.CFG_WSDLURL, "http://localhost:" 
             + port + "/hello_world.wsdl");
         env.put(ToolConstants.CFG_BINDING, "http://localhost:"
