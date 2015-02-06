@@ -36,8 +36,7 @@ public class EcdhDirectKeyJweEncryption extends DirectKeyJweEncryption {
                                       String apuString,
                                       String apvString,
                                       String ctAlgo) {
-        super(new JweHeaders(ctAlgo), 
-              new EcdhAesGcmContentEncryptionAlgorithm(peerPublicKey,
+        super(new EcdhAesGcmContentEncryptionAlgorithm(peerPublicKey,
                                                        curve,
                                                        apuString,
                                                        apvString,

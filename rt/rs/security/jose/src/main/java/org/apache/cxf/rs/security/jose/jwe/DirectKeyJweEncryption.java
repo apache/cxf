@@ -22,18 +22,15 @@ package org.apache.cxf.rs.security.jose.jwe;
 public class DirectKeyJweEncryption extends AbstractJweEncryption {
     
     public DirectKeyJweEncryption(ContentEncryptionAlgorithm ceAlgo) {
-        this(new JweHeaders(ceAlgo.getAlgorithm()), ceAlgo);
+        this(ceAlgo, new DirectKeyEncryptionAlgorithm());
     }
-    public DirectKeyJweEncryption(JweHeaders headers, ContentEncryptionAlgorithm ceAlgo) {
-        this(headers, ceAlgo, new DirectKeyEncryptionAlgorithm());
-    }
-    protected DirectKeyJweEncryption(JweHeaders headers, 
-                                     ContentEncryptionAlgorithm ceAlgo,
+    protected DirectKeyJweEncryption(ContentEncryptionAlgorithm ceAlgo,
                                      DirectKeyEncryptionAlgorithm direct) {
-        super(headers, ceAlgo, direct);
+        super(ceAlgo, direct);
     }
-    protected byte[] getProvidedContentEncryptionKey() {
-        return validateCek(super.getProvidedContentEncryptionKey());
+    @Override
+    protected byte[] getProvidedContentEncryptionKey(JweHeaders headers) {
+        return validateCek(super.getProvidedContentEncryptionKey(headers));
     }
     private static byte[] validateCek(byte[] cek) {
         if (cek == null) {
