@@ -23,6 +23,6 @@ import java.security.spec.AlgorithmParameterSpec;
 
 public interface ContentEncryptionCipherProperties {
     String getAlgorithm();
-    byte[] getAdditionalAuthenticationData(String headersJson);
+    byte[] getAdditionalAuthenticationData(String headersJson, byte[] aad);
     AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] iv);
 }

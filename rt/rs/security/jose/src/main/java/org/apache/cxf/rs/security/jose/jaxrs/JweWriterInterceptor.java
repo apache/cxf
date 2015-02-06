@@ -70,7 +70,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
         }
         
         if (useJweOutputStream) {
-            JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(jweHeaders);
+            JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(jweHeaders, null);
             try {
                 JweCompactProducer.startJweContent(actualOs,
                                                    encryption.getHeaders(), 

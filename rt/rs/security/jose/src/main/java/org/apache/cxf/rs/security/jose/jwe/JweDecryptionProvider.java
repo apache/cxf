@@ -22,5 +22,5 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 public interface JweDecryptionProvider extends JweKeyProperties {
     JweDecryptionOutput decrypt(String jweContent);
-    byte[] decrypt(JweCompactConsumer consumer);
+    byte[] decrypt(JweDecryptionInput jweInput);
 }
