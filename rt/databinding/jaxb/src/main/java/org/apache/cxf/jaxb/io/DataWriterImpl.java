@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.MarshalException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.ValidationEvent;
@@ -46,6 +47,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBase;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
+import org.apache.cxf.jaxb.MarshallerEventHandler;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentMarshaller;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -71,7 +73,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         if (prop.equals(org.apache.cxf.message.Message.class.getName())) {
             org.apache.cxf.message.Message m = (org.apache.cxf.message.Message)value;
             veventHandler = (ValidationEventHandler)m.getContextualProperty(
-                    "jaxb-writer-validation-event-handler");
+                    JAXBDataBinding.WRITER_VALIDATION_EVENT_HANDLER);
+            
             if (veventHandler == null) {
                 veventHandler = (ValidationEventHandler)m.getContextualProperty(
                     "jaxb-validation-event-handler");
@@ -79,7 +82,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             if (veventHandler == null) {
                 veventHandler = databinding.getValidationEventHandler();
             }      
-            setEventHandler = MessageUtils.getContextualBoolean(m, "set-jaxb-validation-event-handler", true);
+            setEventHandler = MessageUtils.getContextualBoolean(m, 
+                    JAXBDataBinding.SET_VALIDATION_EVENT_HANDLER, true);
         }
     }
     
@@ -93,18 +97,19 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         }
         
         public boolean handleEvent(ValidationEvent event) {
-            String msg = event.getMessage();
-            if (msg.startsWith("cvc-type.3.1.2: ")
-                && msg.contains(marshaller.getLastMTOMElementName().getLocalPart())) {
+            // if the original handler has already handled the event, no need for us
+            // to do anything, otherwise if not yet handled, then do this 'hack'
+            if (origHandler != null && origHandler.handleEvent(event)) {
                 return true;
+            } else {
+                String msg = event.getMessage();
+                return msg.startsWith("cvc-type.3.1.2: ")
+                    && msg.contains(marshaller.getLastMTOMElementName().getLocalPart());
             }
-            if (origHandler != null) {
-                return origHandler.handleEvent(event);
-            }
-            return false;
         }
         
     }
+    
     public Marshaller createMarshaller(Object elValue, MessagePartInfo part) {
         Class<?> cls = null;
         if (part != null) {
@@ -222,11 +227,13 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 JAXBEncoderDecoder.marshallException(createMarshaller(obj, part),
                                                      (Exception)obj,
                                                      part, 
-                                                     output);                
+                                                     output);
+                onCompleteMarshalling();
             } else {
                 Annotation[] anns = getJAXBAnnotation(part);
                 if (!honorJaxbAnnotation || anns.length == 0) {
                     JAXBEncoderDecoder.marshall(createMarshaller(obj, part), obj, part, output);
+                    onCompleteMarshalling();
                 } else if (honorJaxbAnnotation && anns.length > 0) {
                     //RpcLit will use the JAXB Bridge to marshall part message when it is 
                     //annotated with @XmlList,@XmlAttachmentRef,@XmlJavaTypeAdapter
@@ -244,6 +251,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         } else if (needToRender(part)) {
             JAXBEncoderDecoder.marshallNullElement(createMarshaller(null, part),
                                                    output, part);
+            
+            onCompleteMarshalling();
         }
     }
 
@@ -292,4 +301,18 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         return false;
     }
     
+    private void onCompleteMarshalling() {
+        if (setEventHandler && veventHandler instanceof MarshallerEventHandler) {
+            try {
+                ((MarshallerEventHandler) veventHandler).onMarshalComplete();
+            } catch (MarshalException e) {
+                if (e.getLinkedException() != null) {
+                    throw new Fault(new Message("MARSHAL_ERROR", LOG, 
+                            e.getLinkedException().getMessage()), e);
+                } else {
+                    throw new Fault(new Message("MARSHAL_ERROR", LOG, e.getMessage()), e);
+                }
+            }
+        }
+    }
 }
