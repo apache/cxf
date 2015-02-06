@@ -31,6 +31,7 @@ import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 
 public class JweHeaders extends JoseHeaders {
+    private JweHeaders protectedHeaders;
     public JweHeaders() {
     }
     
@@ -98,5 +99,13 @@ public class JweHeaders extends JoseHeaders {
         byte[] headerBytes = StringUtils.toBytesUTF8(headersJson);
         String base64UrlHeadersInJson = Base64UrlUtility.encode(headerBytes);
         return StringUtils.toBytesASCII(base64UrlHeadersInJson);
+    }
+
+    public JweHeaders getProtectedHeaders() {
+        return protectedHeaders;
+    }
+
+    public void setProtectedHeaders(JweHeaders protectedHeaders) {
+        this.protectedHeaders = protectedHeaders;
     }
 }
