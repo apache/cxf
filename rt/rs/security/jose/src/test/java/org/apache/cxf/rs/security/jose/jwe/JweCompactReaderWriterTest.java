@@ -98,15 +98,12 @@ public class JweCompactReaderWriterTest extends Assert {
     @Test
     public void testEncryptDecryptAesWrapA128CBCHS256() throws Exception {
         final String specPlainText = "Live long and prosper.";
-        JweHeaders headers = new JweHeaders();
-        headers.setAlgorithm(Algorithm.A128KW.getJwtName());
-        headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
         
         byte[] cekEncryptionKey = Base64UrlUtility.decode(KEY_ENCRYPTION_KEY_A3);
         
         AesWrapKeyEncryptionAlgorithm keyEncryption = 
             new AesWrapKeyEncryptionAlgorithm(cekEncryptionKey, Algorithm.A128KW.getJwtName());
-        JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers,
+        JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(Algorithm.A128CBC_HS256.getJwtName(),
                                                            CONTENT_ENCRYPTION_KEY_A3, 
                                                            INIT_VECTOR_A3,
                                                            keyEncryption);
@@ -144,9 +141,6 @@ public class JweCompactReaderWriterTest extends Assert {
     @Test
     public void testEncryptDecryptRSA15WrapA128CBCHS256() throws Exception {
         final String specPlainText = "Live long and prosper.";
-        JweHeaders headers = new JweHeaders();
-        headers.setAlgorithm(Algorithm.RSA_1_5.getJwtName());
-        headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
         
         RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED_A1, 
                                                              RSA_PUBLIC_EXPONENT_ENCODED_A1);
@@ -154,7 +148,7 @@ public class JweCompactReaderWriterTest extends Assert {
         KeyEncryptionAlgorithm keyEncryption = new RSAKeyEncryptionAlgorithm(publicKey, 
                                                        Algorithm.RSA_1_5.getJwtName());
         
-        JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers,
+        JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(Algorithm.A128CBC_HS256.getJwtName(),
                                                            CONTENT_ENCRYPTION_KEY_A3, 
                                                            INIT_VECTOR_A3,
                                                            keyEncryption);
@@ -177,15 +171,12 @@ public class JweCompactReaderWriterTest extends Assert {
             return;
         }
         final String specPlainText = "Live long and prosper.";
-        JweHeaders headers = new JweHeaders();
-        headers.setAlgorithm(JoseConstants.A128GCMKW_ALGO);
-        headers.setContentEncryptionAlgorithm(Algorithm.A128CBC_HS256.getJwtName());
         
         byte[] cekEncryptionKey = Base64UrlUtility.decode(KEY_ENCRYPTION_KEY_A3);
         
         AesGcmWrapKeyEncryptionAlgorithm keyEncryption = 
             new AesGcmWrapKeyEncryptionAlgorithm(cekEncryptionKey, JoseConstants.A128GCMKW_ALGO);
-        JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(headers,
+        JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(Algorithm.A128CBC_HS256.getJwtName(),
                                                            CONTENT_ENCRYPTION_KEY_A3, 
                                                            INIT_VECTOR_A3,
                                                            keyEncryption);

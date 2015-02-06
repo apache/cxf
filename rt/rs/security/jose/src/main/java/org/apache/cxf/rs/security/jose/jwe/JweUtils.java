@@ -360,10 +360,9 @@ public final class JweUtils {
                                                                     JweHeaders headers) {
         String contentEncryptionAlgo = headers.getContentEncryptionAlgorithm();
         if (Algorithm.isAesCbcHmac(contentEncryptionAlgo)) { 
-            return new AesCbcHmacJweEncryption(headers, keyEncryptionProvider);
+            return new AesCbcHmacJweEncryption(contentEncryptionAlgo, keyEncryptionProvider);
         } else {
-            return new WrappedKeyJweEncryption(headers, 
-                                               keyEncryptionProvider,
+            return new WrappedKeyJweEncryption(keyEncryptionProvider,
                                                getContentEncryptionAlgorithm(contentEncryptionAlgo));
         }
     }
@@ -509,7 +508,7 @@ public final class JweUtils {
         if (keyEncryptionProvider != null) {
             return createJweEncryptionProvider(keyEncryptionProvider, headers);
         } else {
-            return new DirectKeyJweEncryption(headers, ctEncryptionProvider);
+            return new DirectKeyJweEncryption(ctEncryptionProvider);
         }
     }
     private static JweDecryptionProvider createJweDecryptionProvider(KeyDecryptionAlgorithm keyDecryptionProvider,

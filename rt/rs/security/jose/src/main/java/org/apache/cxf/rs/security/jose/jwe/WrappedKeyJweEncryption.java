@@ -22,13 +22,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 public class WrappedKeyJweEncryption extends AbstractJweEncryption {
     public WrappedKeyJweEncryption(KeyEncryptionAlgorithm keyEncryptionAlgorithm,
                                    ContentEncryptionAlgorithm contentEncryptionAlgo) {
-        this(new JweHeaders(keyEncryptionAlgorithm.getAlgorithm(), contentEncryptionAlgo.getAlgorithm()), 
-             keyEncryptionAlgorithm, contentEncryptionAlgo);
-    }
-    public WrappedKeyJweEncryption(JweHeaders headers, 
-                                   KeyEncryptionAlgorithm keyEncryptionAlgorithm,
-                                   ContentEncryptionAlgorithm contentEncryptionAlgo) {
-        super(headers, contentEncryptionAlgo, keyEncryptionAlgorithm);
+        super(contentEncryptionAlgo, keyEncryptionAlgorithm);
     }
     
     

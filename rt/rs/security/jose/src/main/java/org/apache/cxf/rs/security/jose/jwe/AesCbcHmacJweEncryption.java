@@ -45,18 +45,12 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
     }
     public AesCbcHmacJweEncryption(String cekAlgoJwt, 
                                    KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
-        this(new JweHeaders(keyEncryptionAlgorithm.getAlgorithm(), cekAlgoJwt), null, null, 
-             keyEncryptionAlgorithm);
+        this(cekAlgoJwt, null, null, keyEncryptionAlgorithm);
     }
-    public AesCbcHmacJweEncryption(JweHeaders headers, 
-                                   KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
-        this(headers, null, null, keyEncryptionAlgorithm);
-    }
-    public AesCbcHmacJweEncryption(JweHeaders headers, byte[] cek, 
+    public AesCbcHmacJweEncryption(String cekAlgoJwt, byte[] cek, 
                                    byte[] iv, KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
-        super(headers, 
-              new AesCbcContentEncryptionAlgorithm(cek, iv, 
-                                                   validateCekAlgorithm(headers.getContentEncryptionAlgorithm())),
+        super(new AesCbcContentEncryptionAlgorithm(cek, iv, 
+                                                   validateCekAlgorithm(cekAlgoJwt)),
               keyEncryptionAlgorithm);
         
     }
@@ -146,9 +140,9 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
             }
         };
     }
-    
-    protected byte[] getEncryptedContentEncryptionKey(byte[] theCek) {
-        return getKeyEncryptionAlgo().getEncryptedContentEncryptionKey(getJweHeaders(), theCek);
+    @Override
+    protected byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
+        return getKeyEncryptionAlgo().getEncryptedContentEncryptionKey(headers, theCek);
     }
     
     private static class AesCbcContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
