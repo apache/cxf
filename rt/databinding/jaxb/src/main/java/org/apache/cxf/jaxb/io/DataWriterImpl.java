@@ -92,15 +92,17 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         }
         
         public boolean handleEvent(ValidationEvent event) {
-            // if the original handler has already handled the event, no need for us
-            // to do anything, otherwise if not yet handled, then do this 'hack'
-            if (origHandler != null && origHandler.handleEvent(event)) {
+            // CXF-1194 this hack is specific to MTOM, so pretty safe to leave in here before calling the origHandler.
+            String msg = event.getMessage();
+            if (msg.startsWith("cvc-type.3.1.2: ")
+                && msg.contains(marshaller.getLastMTOMElementName().getLocalPart())) {
                 return true;
-            } else {
-                String msg = event.getMessage();
-                return msg.startsWith("cvc-type.3.1.2: ")
-                    && msg.contains(marshaller.getLastMTOMElementName().getLocalPart());
             }
+            
+            if (origHandler != null) {
+                return origHandler.handleEvent(event);
+            }
+            return false;
         }
         
     }

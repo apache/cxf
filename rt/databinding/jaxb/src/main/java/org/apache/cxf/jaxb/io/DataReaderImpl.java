@@ -72,6 +72,7 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             if (origHandler != null && origHandler.handleEvent(event)) {
                 return true;
             } else {
+                // hack for CXF-3453
                 String msg = event.getMessage();
                 return msg != null 
                     && msg.contains(":Id") 
