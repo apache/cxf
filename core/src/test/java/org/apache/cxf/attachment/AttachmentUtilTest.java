@@ -70,7 +70,13 @@ public class AttachmentUtilTest extends Assert {
         assertEquals("a;txt", 
                      AttachmentUtil.getContentDispositionFileName("name=\"a\";filename=\"a;txt\""));
     }
-    
-    
+
+    @Test
+    public void testContendDispositionFileNameKanjiChars() {
+        assertEquals("世界ーファイル.txt",
+                AttachmentUtil.getContentDispositionFileName(
+                        "filename*=UTF-8''%e4%b8%96%e7%95%8c%e3%83%bc%e3%83%95%e3%82%a1%e3%82%a4%e3%83%ab.txt"));
+    }
+
 }
 
