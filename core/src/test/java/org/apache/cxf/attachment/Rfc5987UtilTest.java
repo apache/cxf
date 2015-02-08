@@ -39,7 +39,7 @@ public class Rfc5987UtilTest {
 
     @Parameterized.Parameters
     public static List<Object[]> params() throws Exception {
-        List<Object[]> params = new ArrayList<>();
+        List<Object[]> params = new ArrayList<Object[]>();
         params.add(new Object[] {"foo-ä-€.html", "foo-%c3%a4-%e2%82%ac.html"});
         params.add(new Object[]{"世界ーファイル 2.jpg",
             "%e4%b8%96%e7%95%8c%e3%83%bc%e3%83%95%e3%82%a1%e3%82%a4%e3%83%ab%202.jpg"});
