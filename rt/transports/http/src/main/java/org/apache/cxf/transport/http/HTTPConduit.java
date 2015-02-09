@@ -760,7 +760,7 @@ public abstract class HTTPConduit
             headers.setAuthorization(authString);
         }
         
-        String proxyAuthString = authSupplier.getAuthorization(proxyAuthorizationPolicy, 
+        String proxyAuthString = proxyAuthSupplier.getAuthorization(proxyAuthorizationPolicy, 
                                                                currentURI, message, null);
         if (proxyAuthString != null) {
             headers.setProxyAuthorization(proxyAuthString);
