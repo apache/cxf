@@ -86,9 +86,8 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             try {
                 MessageContentsList newObjs = new MessageContentsList();
                 if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)
-                    && helper instanceof AbstractWrapperHelper) { {
-                        ((AbstractWrapperHelper)helper).setValidate(true);
-                    }
+                    && helper instanceof AbstractWrapperHelper) {
+                    ((AbstractWrapperHelper)helper).setValidate(true);
                 }
                 Object o2 = helper.createWrapperObject(objs);
                 newObjs.put(firstMessagePart, o2);
