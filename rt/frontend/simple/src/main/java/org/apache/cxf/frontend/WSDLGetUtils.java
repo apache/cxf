@@ -392,7 +392,7 @@ public class WSDLGetUtils {
                 : CastUtils.cast(types.getExtensibilityElements(), ExtensibilityElement.class)) {
                 if (el instanceof Schema) {
                     Schema see = (Schema)el;
-                    updateSchemaImports(bus, see, see.getDocumentBaseURI(), doneSchemas, base);
+                    updateSchemaImports(bus, see, see.getDocumentBaseURI(), doneSchemas, base, null);
                 }
             }
         }
@@ -449,7 +449,8 @@ public class WSDLGetUtils {
                                        Schema schema,
                                        String docBase,
                                        Map<String, SchemaReference> doneSchemas,
-                                       String base) {
+                                       String base,
+                                       String parent) {
         OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);
         Collection<List<?>>  imports = CastUtils.cast((Collection<?>)schema.getImports().values());
         for (List<?> lst : imports) {
@@ -481,14 +482,27 @@ public class WSDLGetUtils {
                                 new URL(start);
                             } catch (MalformedURLException e) {
                                 if (doneSchemas.put(decodedStart, imp) == null) {
-                                    updateSchemaImports(bus, imp.getReferencedSchema(), docBase, doneSchemas, base);
+                                    try {
+                                        if ( !( new URI( decodedStart ).isAbsolute() ) && parent != null ) {
+                                            resolvedSchemaLocation = new URI( parent ).resolve( decodedStart ).toString();
+                                            decodedStart = URLDecoder.decode( resolvedSchemaLocation, "utf-8" );
+                                            doneSchemas.put( resolvedSchemaLocation, imp );
+                                        }
+                                    }
+                                    catch ( URISyntaxException ex ) {
+                                        // ignore
+                                    }
+                                    catch ( UnsupportedEncodingException ex ) {
+                                        // ignore
+                                    }
+                                    updateSchemaImports(bus, imp.getReferencedSchema(), docBase, doneSchemas, base, decodedStart);
                                 }
                             }
                         } else {
                             if (doneSchemas.put(decodedStart, imp) == null) {
                                 doneSchemas.put(resolvedSchemaLocation, imp);
                                 doneSchemas.put(imp.getSchemaLocationURI(), imp);
-                                updateSchemaImports(bus, imp.getReferencedSchema(), docBase, doneSchemas, base);
+                                updateSchemaImports(bus, imp.getReferencedSchema(), docBase, doneSchemas, base, decodedStart);
                             }
                         }
                     }
@@ -521,7 +535,7 @@ public class WSDLGetUtils {
                             new URL(start);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
-                                updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base);
+                                updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base, decodedStart);
                             }
                         }
                     }
@@ -529,7 +543,7 @@ public class WSDLGetUtils {
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
                     doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
-                    updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base);
+                    updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base, decodedStart);
                 }
             }
         }
@@ -558,7 +572,19 @@ public class WSDLGetUtils {
                             new URL(start);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
-                                updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base);
+                                try {
+                                    if (!(new URI(decodedStart).isAbsolute()) && parent != null) {
+                                        resolvedSchemaLocation = new URI(parent).resolve(decodedStart).toString();
+                                        decodedStart = URLDecoder.decode(resolvedSchemaLocation, "utf-8");
+                                        doneSchemas.put(resolvedSchemaLocation, included);
+                                    }                   }
+                                catch ( URISyntaxException ex ) {
+                                    // ignore
+                                }
+                                catch ( UnsupportedEncodingException ex ) {
+                                    // ignore
+                                }
+                                updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base, decodedStart);
                             }
                         }
                     }
@@ -566,7 +592,7 @@ public class WSDLGetUtils {
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
                     doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
-                    updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base);
+                    updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base, decodedStart);
                 }
             }
         }
