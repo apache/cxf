@@ -764,7 +764,7 @@ public final class JAXRSUtils {
         Class<?>[] parameterTypes = ori.getInParameterTypes();
         List<Parameter> paramsInfo = ori.getParameters();  
         boolean preferModelParams = paramsInfo.size() > parameterTypes.length 
-            && PropertyUtils.isTrue(message.getContextualProperty("org.apache.cxf.preferModelParameters"));
+            && !PropertyUtils.isTrue(message.getContextualProperty("org.apache.cxf.preferMethodParameters"));
         
         int parameterTypesLengh = preferModelParams ? paramsInfo.size() : parameterTypes.length;
         
