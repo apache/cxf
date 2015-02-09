@@ -19,13 +19,13 @@
 
 package org.apache.cxf.jaxws.interceptors;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
+import org.apache.cxf.databinding.AbstractWrapperHelper;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
 import org.apache.cxf.databinding.WrapperHelper;
@@ -85,17 +85,9 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             
             try {
                 MessageContentsList newObjs = new MessageContentsList();
-                // set the validate option for XMLBeans Wrapper Helper
-                if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)) {
-                    try {
-                        Class<?> xmlBeanWrapperHelperClass = 
-                            Class.forName("org.apache.cxf.xmlbeans.XmlBeansWrapperHelper");
-                        if (xmlBeanWrapperHelperClass.isInstance(helper)) {
-                            Method method = xmlBeanWrapperHelperClass.getMethod("setValidate", boolean.class);
-                            method.invoke(helper, true);
-                        }
-                    } catch (Exception exception) {
-                        // do nothing there
+                if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)
+                    && helper instanceof AbstractWrapperHelper) { {
+                        ((AbstractWrapperHelper)helper).setValidate(true);
                     }
                 }
                 Object o2 = helper.createWrapperObject(objs);
