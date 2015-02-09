@@ -41,7 +41,7 @@
         <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
         <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
         <cxf.codegen.jvmArgs />
-        <cf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
+        <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
         <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
         <cxf.saaj.impl.version>1.3.23</cxf.saaj.impl.version>

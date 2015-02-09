@@ -172,8 +172,9 @@ public final class ParticleInfo implements ItemInfo {
 
             elementInfo.children = new LinkedList<ParticleInfo>();
 
-            List<XmlSchemaObject> items = choice.getItems();
-            for (XmlSchemaObject item : items) {
+            List<?> items = choice.getItems();
+            for (Object i : items) {
+                XmlSchemaObject item = (XmlSchemaObject)i;
                 XmlSchemaObject schemaObject = JavascriptUtils.getObjectParticle(item, contextName,
                         currentSchema);
                 ParticleInfo childParticle = ParticleInfo.forLocalItem(schemaObject, currentSchema, schemaCollection,
