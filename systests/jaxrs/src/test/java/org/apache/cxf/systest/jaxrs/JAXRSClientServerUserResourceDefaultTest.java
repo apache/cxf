@@ -34,11 +34,14 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXSource;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -91,9 +94,18 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             op2.setVerb("POST");
             op2.setParameters(Collections.singletonList(new Parameter(ParameterType.REQUEST_BODY, null)));
             
+            UserOperation op3 = new UserOperation();
+            op3.setPath("echobookdefault");
+            op3.setName("echoDefault");
+            op3.setVerb("POST");
+            Parameter echoDefaultParam = new Parameter(ParameterType.REQUEST_BODY, null);
+            echoDefaultParam.setJavaType(SAXSource.class);
+            op3.setParameters(Collections.singletonList(echoDefaultParam));
+            
             List<UserOperation> ops = new ArrayList<UserOperation>();
             ops.add(op);
             ops.add(op2);
+            ops.add(op3);
             
             ur.setOperations(ops);
             
@@ -147,6 +159,14 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
         Book b = wc.type("application/xml").accept("application/xml").post(new Book("echo", 333L), Book.class);
         assertEquals("echo", b.getName());
         assertEquals(333L, b.getId());
+    }
+    
+    @Test
+    public void testEchoBookDefault() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/default/echobookdefault");
+        Book b = wc.type("application/xml").accept("application/xml").post(new Book("echo", 444L), Book.class);
+        assertEquals("echo", b.getName());
+        assertEquals(444L, b.getId());
     }
     
     private void getAndCompare(String address, 
@@ -204,13 +224,18 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
         public Object invoke(Exchange exchange, Object request, Object resourceObject) {
             MessageContext mc = new MessageContextImpl(exchange.getInMessage());
             List<Object> params = CastUtils.cast((List<?>)request);
-            if (params.size() == 1 && "999".equals(params.get(0))) {
+            String path = mc.getUriInfo().getPath();
+            if ("default/books/999".equals(path)) {
                 Long bookId = Long.valueOf(params.get(0).toString());
                 Book book = new Book("CXF in Action", bookId);
                 Response r = Response.ok(book, 
                                          mc.getHttpHeaders().getAcceptableMediaTypes().get(0)).build();
                 return new MessageContentsList(r);
-            } else { 
+            } else if ("default/echobookdefault".equals(path)) {
+                Source source = (Source)params.get(0);
+                Response r = Response.ok(source, MediaType.APPLICATION_ATOM_XML_TYPE).build();
+                return new MessageContentsList(r);
+            } else {
                 return super.invoke(exchange, request, resourceObject);
             }
             
@@ -219,8 +244,15 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
     @PreMatching
     private static class PreMatchContainerRequestFilter implements ContainerRequestFilter {
         public void filter(ContainerRequestContext context) throws IOException {
-            if (context.getUriInfo().getRequestUri().toString().endsWith("999")) {
-                JAXRSUtils.getCurrentMessage().put("org.apache.cxf.preferModelParameters", true);
+            String path = context.getUriInfo().getPath();
+            if (path.endsWith("123")) {
+                // Setting this property makes sense only if we have a user model,
+                // default service class, a number of method parameters described 
+                // in the model not matching a number of the matched method's parameters,
+                // and this method is actually expected to be invoked (testGetBookInvokeService)
+                // which is rare for a model-only case, typically a custom invoker would manage
+                // the actual processing of the request
+                JAXRSUtils.getCurrentMessage().put("org.apache.cxf.preferMethodParameters", true);
             }
         }
         
