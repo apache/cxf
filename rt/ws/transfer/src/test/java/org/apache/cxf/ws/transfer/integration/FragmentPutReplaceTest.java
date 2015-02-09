@@ -21,6 +21,7 @@ package org.apache.cxf.ws.transfer.integration;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -341,6 +342,114 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         Assert.assertEquals(1, rootEl.getChildNodes().getLength());
         Assert.assertEquals("c", ((Element)rootEl.getChildNodes().item(0)).getLocalName());
         
+        resource.destroy();
+    }
+
+    @Test
+    public  void replaceNonExistingElementTest() {
+        String content = "<a/>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.getContent().add("/a/b");
+        Element replacedElement = TransferTools.createElement("b");
+        ValueType value = new ValueType();
+        value.getContent().add(replacedElement);
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+
+        PutResponse response = client.put(request);
+        Element rootEl = (Element) response.getRepresentation().getAny();
+        Assert.assertEquals(1, rootEl.getChildNodes().getLength());
+        Assert.assertEquals("b", ((Element)rootEl.getChildNodes().item(0)).getLocalName());
+
+        resource.destroy();
+    }
+
+    @Test
+    public  void replaceNonExistingRootTest() {
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(new Representation());
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.getContent().add("/a");
+        Element replacedElement = TransferTools.createElement("a");
+        ValueType value = new ValueType();
+        value.getContent().add(replacedElement);
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+
+        PutResponse response = client.put(request);
+        Element rootEl = (Element) response.getRepresentation().getAny();
+        Assert.assertEquals("a", rootEl.getLocalName());
+
+        resource.destroy();
+    }
+
+    @Test(expected = SOAPFaultException.class)
+    public  void replaceNonExistingElementFailTest() {
+        String content = "<a/>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.getContent().add("//b");
+        Element replacedElement = TransferTools.createElement("b");
+        ValueType value = new ValueType();
+        value.getContent().add(replacedElement);
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+
+        client.put(request);
+
+        resource.destroy();
+    }
+
+    @Test(expected = SOAPFaultException.class)
+    public  void replaceNonExistingElementFail2Test() {
+        String content = "<a/>";
+        ResourceManager resourceManager = new MemoryResourceManager();
+        ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
+        Server resource = createLocalResource(resourceManager);
+        Resource client = createClient(refParams);
+
+        Put request = new Put();
+        request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
+        Fragment fragment = new Fragment();
+        ExpressionType expression = new ExpressionType();
+        expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
+        expression.getContent().add("/a/[local-name() = 'b'");
+        Element replacedElement = TransferTools.createElement("b");
+        ValueType value = new ValueType();
+        value.getContent().add(replacedElement);
+        fragment.setExpression(expression);
+        fragment.setValue(value);
+        request.getAny().add(fragment);
+
+        client.put(request);
+
         resource.destroy();
     }
 }

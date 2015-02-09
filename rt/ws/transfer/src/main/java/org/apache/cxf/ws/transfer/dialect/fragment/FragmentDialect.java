@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import javax.xml.bind.JAXBElement;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,11 +55,29 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
 public class FragmentDialect implements Dialect {
     
     private final Map<String, FragmentDialectLanguage> languages;
+
+    private Pattern badXPathPattern;
+
+    private Pattern goodXPathPattern;
     
     public FragmentDialect() {
         languages = new HashMap<String, FragmentDialectLanguage>();
         languages.put(FragmentDialectConstants.QNAME_LANGUAGE_IRI, new FragmentDialectLanguageQName());
         languages.put(FragmentDialectConstants.XPATH10_LANGUAGE_IRI, new FragmentDialectLanguageXPath10());
+        if (badXPathPattern == null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("//@?");
+            sb.append(FragmentDialectLanguageQName.getQNamePatternString());
+            sb.append("$");
+            badXPathPattern = Pattern.compile(sb.toString());
+        }
+        if (goodXPathPattern == null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("/@?");
+            sb.append(FragmentDialectLanguageQName.getQNamePatternString());
+            sb.append("$");
+            goodXPathPattern = Pattern.compile(sb.toString());
+        }
     }
 
     @Override
@@ -99,6 +119,11 @@ public class FragmentDialect implements Dialect {
                     Object resourceFragment = language.getResourceFragment(representation, expression);
                     String mode = expression.getMode();
                     mode = mode == null ? FragmentDialectConstants.FRAGMENT_MODE_REPLACE : mode;
+                    if (resourceFragment == null && FragmentDialectConstants.FRAGMENT_MODE_REPLACE.equals(mode)
+                            && FragmentDialectConstants.XPATH10_LANGUAGE_IRI.equals(languageIRI)) {
+                        resourceFragment = language.getResourceFragment(representation, getParentXPath(expression));
+                        mode = FragmentDialectConstants.FRAGMENT_MODE_ADD;
+                    }
                     return modifyRepresentation(resourceFragment, mode, value);
                 } else {
                     throw new UnsupportedLanguage();
@@ -215,6 +240,34 @@ public class FragmentDialect implements Dialect {
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createValue(resultValue);
     }
+
+    /**
+     * Returns expression containing XPath, which refers to parent element.
+     * @param expression
+     * @return
+     */
+    private ExpressionType getParentXPath(ExpressionType expression) {
+        String expr;
+        if (expression.getContent().size() == 1) {
+            expr = (String) expression.getContent().get(0);
+        } else {
+            throw new InvalidExpression();
+        }
+        if (badXPathPattern.matcher(expr).find()) {
+            throw new InvalidExpression();
+        }
+        if (goodXPathPattern.matcher(expr).find()) {
+            expression.getContent().clear();
+            expr = expr.replaceFirst(goodXPathPattern.pattern(), "");
+            if (expr.isEmpty()) {
+                expr = "/";
+            }
+            expression.getContent().add(expr);
+            return expression;
+        } else {
+            throw new InvalidExpression();
+        }
+    }
     
     /**
      * Process Put requests.
@@ -245,7 +298,6 @@ public class FragmentDialect implements Dialect {
     
     /**
      * Process Put requests.
-     * @param resourceFragment Result of the XPath evaluation.
      * @param mode Mode defined in the Mode attribute.
      * @param value Value defined in the Value element.
      * @return Representation element, which is returned as response.
@@ -272,7 +324,6 @@ public class FragmentDialect implements Dialect {
 
     /**
      * Process Put requests for Replace mode.
-     * @param resourceFragment Result of the XPath evaluation.
      * @param value Value defined in the Value element.
      * @return Representation element, which is returned as response.
      */
@@ -304,7 +355,6 @@ public class FragmentDialect implements Dialect {
     
     /**
      * Process Put requests for Add mode.
-     * @param resourceFragment Result of the XPath evaluation.
      * @param value Value defined in the Value element.
      * @return Representation element, which is returned as response.
      */
@@ -330,7 +380,6 @@ public class FragmentDialect implements Dialect {
     
     /**
      * Process Put requests for InsertBefore mode.
-     * @param resourceFragment Result of the XPath evaluation.
      * @param value Value defined in the Value element.
      * @return Representation element, which is returned as response.
      */
@@ -370,7 +419,6 @@ public class FragmentDialect implements Dialect {
     
     /**
      * Process Put requests for InsertAfter mode.
-     * @param resourceFragment Result of the XPath evaluation.
      * @param value Value defined in the Value element.
      * @return Representation element, which is returned as response.
      */
@@ -410,7 +458,6 @@ public class FragmentDialect implements Dialect {
     
     /**
      * Process Put requests for Remove mode.
-     * @param resourceFragment Result of the XPath evaluation.
      * @param value Value defined in the Value element.
      * @return Representation element, which is returned as response.
      */
