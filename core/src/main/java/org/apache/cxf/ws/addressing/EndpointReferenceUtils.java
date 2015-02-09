@@ -669,9 +669,13 @@ public final class EndpointReferenceUtils {
             return null;
         }
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
-        if (schema == null && !serviceInfo.hasProperty(Schema.class.getName())) {
-            synchronized (serviceInfo) {
-                return createSchema(serviceInfo, b);
+        if (schema == null && !serviceInfo.hasProperty(Schema.class.getName() + ".CHECKED")) {
+            try {
+                synchronized (serviceInfo) {
+                    return createSchema(serviceInfo, b);
+                }
+            } finally {
+                serviceInfo.setProperty(Schema.class.getName() + ".CHECKED", Boolean.TRUE);
             }
         }
         return schema;
