@@ -39,6 +39,8 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
     protected final Method setMethods[];
     protected final Method getMethods[];    
     protected final Field fields[];   
+    protected boolean validate;
+    
                  
     protected AbstractWrapperHelper(Class<?> wt,
                   Method sets[],
@@ -48,6 +50,19 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
         getMethods = gets;
         fields = f;        
         wrapperType = wt;        
+    }
+    
+    /**
+     * WrapperClassOutInterceptor may call this if the wrapper class needs to be validated.
+     * Implementations may choose to ignore this as the SchemaValidation that occurs later
+     * may catch the errors, but this allows quicker failures if the databinding 
+     * can support it.
+     */
+    public void setValidate(boolean v) {
+        validate = v;
+    }
+    public boolean getValidate() {
+        return validate;
     }
     
     public String getSignature() {
