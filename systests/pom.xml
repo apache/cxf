@@ -42,7 +42,7 @@
         <module>ws-rm</module>
         <module>ws-security</module>
         <module>ws-security-examples</module>
-        <!--<module>kerberos</module>-->
+        <module>kerberos</module>
         <module>rs-security</module>
         <module>wsdl_maven</module>
         <module>cdi</module>
