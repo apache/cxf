@@ -28,19 +28,9 @@ import org.apache.xmlbeans.XmlOptions;
 
 public class XmlBeansWrapperHelper extends AbstractWrapperHelper {
     
-    private boolean validate;
-            
     public XmlBeansWrapperHelper(Class<?> wt, Method[] sets, Method[] gets, Field[] f) {
         super(wt, sets, gets, f);
        
-    }
-    
-    public void setValidate(boolean v) {
-        validate = v;
-    }
-    
-    public boolean getValidate() {
-        return validate;
     }
 
     @Override
