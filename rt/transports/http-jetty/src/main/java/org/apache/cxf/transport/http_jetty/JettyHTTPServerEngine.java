@@ -349,6 +349,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
             //need an error handler that won't leak information about the exception 
             //back to the client.
             ErrorHandler eh = new ErrorHandler() {
+                @SuppressWarnings("deprecation")
                 public void handle(String target, Request baseRequest, 
                                    HttpServletRequest request, HttpServletResponse response) 
                     throws IOException {
