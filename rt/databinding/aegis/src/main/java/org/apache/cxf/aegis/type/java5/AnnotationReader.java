@@ -21,26 +21,22 @@ package org.apache.cxf.aegis.type.java5;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.cxf.aegis.type.AegisType;
-import org.apache.cxf.common.logging.LogUtils;
 
 public class AnnotationReader {
-    private static final Logger LOG = LogUtils.getL7dLogger(AnnotationReader.class);
-    private static final Class<? extends Annotation> WEB_PARAM = load("javax.jws.WebParam");
-    private static final Class<? extends Annotation> WEB_RESULT = load("javax.jws.WebResult");
+    private static final Class<? extends Annotation> WEB_PARAM = javax.jws.WebParam.class;
+    private static final Class<? extends Annotation> WEB_RESULT = javax.jws.WebResult.class;
     private static final Class<? extends Annotation> XML_ATTRIBUTE =
-            load("javax.xml.bind.annotation.XmlAttribute");
+            javax.xml.bind.annotation.XmlAttribute.class;
     private static final Class<? extends Annotation> XML_ELEMENT =
-            load("javax.xml.bind.annotation.XmlElement");
+            javax.xml.bind.annotation.XmlElement.class;
     private static final Class<? extends Annotation> XML_SCHEMA =
-            load("javax.xml.bind.annotation.XmlSchema");
+            javax.xml.bind.annotation.XmlSchema.class;
     private static final Class<? extends Annotation> XML_TYPE =
-            load("javax.xml.bind.annotation.XmlType");
+            javax.xml.bind.annotation.XmlType.class;
     private static final Class<? extends Annotation> XML_TRANSIENT =
-            load("javax.xml.bind.annotation.XmlTransient");
+            javax.xml.bind.annotation.XmlTransient.class;
 
     @SuppressWarnings("unchecked")
     public boolean isIgnored(AnnotatedElement element) {
@@ -376,15 +372,6 @@ public class AnnotationReader {
             }
         }
         return null;
-    }
-
-    private static Class<? extends Annotation> load(String name) {
-        try {
-            return AnnotationReader.class.getClassLoader().loadClass(name).asSubclass(Annotation.class);
-        } catch (Throwable e) {
-            LOG.log(Level.FINE, "Error loading annotation class " + name + ".", e);
-            return null;
-        }
     }
 
     public boolean isFlat(Annotation[] annotations) {
