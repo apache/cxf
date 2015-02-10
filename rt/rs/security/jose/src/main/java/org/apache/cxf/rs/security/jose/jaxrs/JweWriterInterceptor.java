@@ -35,6 +35,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
+import org.apache.cxf.rs.security.jose.jwe.JweEncryptionInput;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionState;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
@@ -70,7 +71,8 @@ public class JweWriterInterceptor implements WriterInterceptor {
         }
         
         if (useJweOutputStream) {
-            JweEncryptionState encryption = theEncryptionProvider.createJweEncryptionState(jweHeaders, null);
+            JweEncryptionState encryption = 
+                theEncryptionProvider.createJweEncryptionState(new JweEncryptionInput(jweHeaders));
             try {
                 JweCompactProducer.startJweContent(actualOs,
                                                    encryption.getHeaders(), 
