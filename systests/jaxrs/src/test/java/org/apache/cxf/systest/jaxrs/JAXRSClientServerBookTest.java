@@ -21,7 +21,9 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -39,6 +41,9 @@ import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientResponseContext;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericEntity;
@@ -102,6 +107,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         Book book = wc.get(Book.class);
         assertEquals(124L, book.getId());
         assertEquals("root", book.getName());
+    }
+    @Test
+    public void testNonExistent() throws Exception {
+        String address = "http://localhost/bookstore";
+        WebClient wc = WebClient.create(address, 
+                                        Collections.singletonList(new TestResponseFilter()));
+        try {
+            wc.get();
+            fail();
+        } catch (ProcessingException ex) {
+            assertTrue(ex.getCause() instanceof ConnectException);
+        }
     }
     @Test
     public void testGetBookQueryGZIP() throws Exception {
@@ -2721,6 +2738,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             } else {
                 return null;
             }
+        }
+        
+    }
+    public static class TestResponseFilter implements ClientResponseFilter {
+
+        @Override
+        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
+            throws IOException {
+            // TODO Auto-generated method stub
+            
         }
         
     }

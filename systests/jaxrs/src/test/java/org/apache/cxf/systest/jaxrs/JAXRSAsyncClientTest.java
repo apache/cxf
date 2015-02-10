@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -32,6 +33,9 @@ import java.util.concurrent.Future;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientResponseContext;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.ResponseProcessingException;
@@ -48,6 +52,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
@@ -68,7 +73,6 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             Thread.sleep(Long.valueOf(property));
         }
     }
-    
     @Test
     public void testRetrieveBookCustomMethodAsyncSync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
@@ -123,6 +127,26 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getCause() instanceof NotFoundException);
         }
         wc.close();
+    }
+    
+    @Test
+    @Ignore
+    public void testNonExistent() throws Exception {
+        String address = "http://localhost/bookstore";
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new TestResponseFilter());
+        WebClient wc =  WebClient.create(address, providers);
+        Future<Book> future = wc.async().get(Book.class);
+        try {
+            future.get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            Throwable cause = ex.getCause();
+            assertTrue(cause instanceof ProcessingException);
+            assertTrue(ex.getCause().getCause() instanceof ConnectException);
+        } finally {
+            wc.close();
+        }
     }
     
     @Test
@@ -230,5 +254,15 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
 
                 
+    }
+    public static class TestResponseFilter implements ClientResponseFilter {
+
+        @Override
+        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
+            throws IOException {
+            // TODO Auto-generated method stub
+            
+        }
+        
     }
 }
