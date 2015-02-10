@@ -447,7 +447,15 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         }
 
         private int length(Object o) {
-            return o instanceof char[] ? ((String)o).length() : (o instanceof byte[] ? ((byte[])o).length : 0);
+            if (o instanceof String) {
+                return ((String)o).length();
+            } else if (o instanceof char[]) {
+                return ((char[])o).length;
+            } else if (o instanceof byte[]) {
+                return ((byte[])o).length;
+            } else {
+                return 0;
+            }
         }
 
         private int getchar(Object o, int p) {
