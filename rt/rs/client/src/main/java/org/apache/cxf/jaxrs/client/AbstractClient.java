@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -83,6 +84,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseChainCache;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -860,15 +862,12 @@ public abstract class AbstractClient implements Client {
     }
     
     protected static MessageObserver setupInFaultObserver(final ClientConfiguration cfg) { 
-        if (!cfg.getInFaultInterceptors().isEmpty()) {
-            return new InFaultChainInitiatorObserver(cfg.getBus()) {
-                protected void initializeInterceptors(Exchange ex, PhaseInterceptorChain chain) {
-                    chain.add(cfg.getInFaultInterceptors());
-                }
-            };
-        } else {
-            return null;
-        }
+        return new InFaultChainInitiatorObserver(cfg.getBus()) {
+            protected void initializeInterceptors(Exchange ex, PhaseInterceptorChain chain) {
+                chain.add(cfg.getInFaultInterceptors());
+                chain.add(new ConnectionFaultInterceptor());
+            }
+        };
     }
     
     protected void setSupportOnewayResponseProperty(Message outMessage) {
@@ -1058,5 +1057,20 @@ public abstract class AbstractClient implements Client {
             return AbstractClient.this.retryInvoke(oi, params, context, exchange);
         }
         
+    }
+    private static class ConnectionFaultInterceptor extends AbstractPhaseInterceptor<Message> {
+        public ConnectionFaultInterceptor() {
+            super(Phase.PRE_STREAM);
+        } 
+
+        public void handleMessage(Message message) throws Fault {
+            Exception ex = message.getContent(Exception.class);
+            if (!message.getExchange().isSynchronous() 
+                && ex instanceof ConnectException) {
+                //TODO: make sure it works with the failover feature
+                JaxrsClientCallback<?> cb = message.getExchange().get(JaxrsClientCallback.class);
+                cb.handleException(message, new ProcessingException(ex));
+            }
+        }
     }
 }
