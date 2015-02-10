@@ -21,9 +21,13 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 
 public interface JweEncryptionProvider extends JweKeyProperties {
+    /**
+     * JWE compact encryption
+     */
     String encrypt(byte[] jweContent, JweHeaders jweHeaders);
     /**
-     * Prepare JWE state (optional operation)
+     * Prepare JWE state for completing either
+     * JWE compact or JSON encryption 
      */
-    JweEncryptionState createJweEncryptionState(JweHeaders jweHeaders, byte[] aad);
+    JweEncryptionState createJweEncryptionState(JweEncryptionInput jweInput);
 }
