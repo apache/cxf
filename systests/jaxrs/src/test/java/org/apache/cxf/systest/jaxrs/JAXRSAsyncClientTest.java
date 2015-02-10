@@ -72,7 +72,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             Thread.sleep(Long.valueOf(property));
         }
     }
-    //@Test
+    @Test
     public void testRetrieveBookCustomMethodAsyncSync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);
@@ -83,7 +83,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
     
-    //@Test
+    @Test
     public void testDeleteWithBody() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/deletebody";
         WebClient wc = WebClient.create(address);
@@ -94,7 +94,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
     
-    //@Test
+    @Test
     public void testRetrieveBookCustomMethodAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);
@@ -105,7 +105,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
     
-    //@Test
+    @Test
     public void testGetBookAsyncResponse404() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
         WebClient wc = createWebClient(address);
@@ -114,7 +114,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
     
-    //@Test
+    @Test
     public void testGetBookAsync404() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
         WebClient wc = createWebClient(address);
@@ -147,7 +147,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
     }
     
-    //@Test
+    @Test
     public void testPostBookProcessingException() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/";
         List<Object> providers = new ArrayList<Object>();
@@ -164,7 +164,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
     
-    //@Test
+    @Test
     public void testGetBookResponseProcessingException() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/123";
         List<Object> providers = new ArrayList<Object>();
@@ -181,7 +181,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
     
-    //@Test
+    @Test
     public void testGetBookAsync404Callback() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
         WebClient wc = createWebClient(address);
