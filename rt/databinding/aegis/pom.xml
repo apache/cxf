@@ -30,6 +30,14 @@
         <version>3.0.4-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+    
+    <properties>
+        <cxf.osgi.import>
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.activation;version="${cxf.osgi.javax.activation.version}",
+            javax.xml.stream*;version="${cxf.osgi.javax.stream.version}"
+        </cxf.osgi.import>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
