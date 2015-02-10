@@ -161,11 +161,13 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
         grouped.put(Provider.class, new ArrayList< Class< ? > >());
         grouped.put(Path.class, new ArrayList< Class< ? > >());
         
-        for (final Class< ? > clazz: classes) {
-            if (!classShouldBeIgnored(clazz)) {
-                for (final Class< ? extends Annotation > annotation: grouped.keySet()) {
-                    if (clazz.isAnnotationPresent(annotation)) {
-                        grouped.get(annotation).add(clazz);
+        if (classes != null) {
+            for (final Class< ? > clazz: classes) {
+                if (!classShouldBeIgnored(clazz)) {
+                    for (final Class< ? extends Annotation > annotation: grouped.keySet()) {
+                        if (clazz.isAnnotationPresent(annotation)) {
+                            grouped.get(annotation).add(clazz);
+                        }
                     }
                 }
             }
@@ -179,10 +181,12 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
     }
 
     private static Class< ? > findCandidate(final Set< Class< ? > > classes) {
-        for (final Class< ? > clazz: classes) {
-            if (Application.class.isAssignableFrom(clazz) && !classShouldBeIgnored(clazz)) {
-                LOG.fine("Found JAX-RS application to initialize: " + clazz.getName());
-                return clazz;
+        if (classes != null) {
+            for (final Class< ? > clazz: classes) {
+                if (Application.class.isAssignableFrom(clazz) && !classShouldBeIgnored(clazz)) {
+                    LOG.fine("Found JAX-RS application to initialize: " + clazz.getName());
+                    return clazz;
+                }
             }
         }
         

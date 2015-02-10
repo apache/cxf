@@ -34,6 +34,7 @@
         <cxf.surefire.fork.vmargs>-XX:MaxPermSize=192m</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-XX:MaxPermSize=192m</cxf.server.launcher.vmargs>
         <cxf.tomcat.version>7.0.52</cxf.tomcat.version>
+        <cxf.jetty.version>9.2.3.v20140905</cxf.jetty.version>
     </properties>
     <dependencies>
         <dependency>
@@ -114,17 +115,7 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>${cxf.tomcat.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-logging-juli</artifactId>
-            <version>${cxf.tomcat.version}</version>
-        </dependency>        
+        </dependency>              
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>async-http-client</artifactId>
