@@ -234,9 +234,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         if (c != null) {
             return c;
         }
-        boolean full = MessageUtils.getContextualBoolean(message,
-                                                         CONDUIT_COMPARE_FULL_URL,
-                                                         false);
+        ContextualBooleanGetter cbg = new ContextualBooleanGetter(message);
         for (Conduit c2 : conduits) {
             if (c2.getTarget() == null 
                 || c2.getTarget().getAddress() == null
@@ -253,14 +251,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
                 actualAddress = messageAddress;
             }
 
-            if (!full) {
-                int idx = conduitAddress.indexOf(':');
-                conduitAddress = idx == -1 ? "" : conduitAddress.substring(0, idx);
-                idx = actualAddress.indexOf(':');
-                actualAddress = idx == -1 ? "" : actualAddress.substring(0, idx);
-            }
-            
-            if (conduitAddress.equalsIgnoreCase(actualAddress)) {
+            if (matchAddresses(conduitAddress, actualAddress, cbg)) {
                 return c2;
             }
         }
@@ -272,5 +263,52 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             }
         }
         return null;
+    }
+    
+    private boolean matchAddresses(String conduitAddress, String actualAddress, ContextualBooleanGetter cbg) {
+        if (conduitAddress.length() == actualAddress.length()) {
+            //let's be optimistic and try full comparison first, regardless of CONDUIT_COMPARE_FULL_URL value,
+            //which can be expensive to fetch; as a matter of fact, anyway, if the addresses fully match,
+            //their hosts also match
+            if (conduitAddress.equalsIgnoreCase(actualAddress)) {
+                return true;
+            } else {
+                return cbg.isFullComparison() ? false : matchAddressSubstrings(conduitAddress, actualAddress);
+            }
+        } else {
+            return cbg.isFullComparison() ? false : matchAddressSubstrings(conduitAddress, actualAddress);
+        }
+    }
+
+    //smart address substring comparison that tries to avoid building and comparing substrings unless strictly required 
+    private boolean matchAddressSubstrings(String conduitAddress, String actualAddress) {
+        int idx = conduitAddress.indexOf(':');
+        if (idx == actualAddress.indexOf(':')) {
+            if (idx <= 0) {
+                return true;
+            }
+            conduitAddress = conduitAddress.substring(0, idx);
+            actualAddress = actualAddress.substring(0, idx);
+            return conduitAddress.equalsIgnoreCase(actualAddress);
+        } else {
+            //no possible match as for sure the substrings before idx will be different 
+            return false;
+        }
+    }
+    
+    private static final class ContextualBooleanGetter {
+        private Boolean value;
+        private final Message message;
+        
+        public ContextualBooleanGetter(Message message) {
+            this.message = message;
+        }
+        
+        public boolean isFullComparison() {
+            if (value == null) {
+                value = MessageUtils.getContextualBoolean(message, CONDUIT_COMPARE_FULL_URL, false);
+            }
+            return value;
+        }
     }
 }
