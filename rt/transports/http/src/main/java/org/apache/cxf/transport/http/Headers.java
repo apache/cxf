@@ -68,6 +68,7 @@ public class Headers {
     public static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
     public static final String HTTP_HEADERS_LINK = "Link";
     public static final String EMPTY_REQUEST_PROPERTY = "org.apache.cxf.empty.request";
+    private static final String USE_ASYNC_PROPERTY = "use.async.http.conduit";
     private static final TimeZone TIME_ZONE_GMT = TimeZone.getTimeZone("GMT");
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
     
@@ -298,10 +299,13 @@ public class Headers {
      */
     public void setProtocolHeadersInConnection(HttpURLConnection connection) throws IOException {
         boolean emptyRequest = PropertyUtils.isTrue(message.get(EMPTY_REQUEST_PROPERTY));
-        // Apparently HttpUrlConnection sets a form Content-Type 
-        // if no Content-Type is set even for empty requests 
-        String ct = emptyRequest ? "*/*" : determineContentType();
-        connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, ct);
+        // HttpUrlConnection sets a form Content-Type and completely loses custom Accept 
+        // if HTTP proxies are used if no Content-Type is set for empty requests 
+        boolean asyncConduitUsed = PropertyUtils.isTrue(message.get(USE_ASYNC_PROPERTY));
+        if (!asyncConduitUsed || !emptyRequest) {
+            String ct = emptyRequest ? "*/*" : determineContentType();
+            connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, ct);
+        }
          
         transferProtocolHeadersToURLConnection(connection);
         logProtocolHeaders(Level.FINE);
