@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -1065,8 +1064,7 @@ public abstract class AbstractClient implements Client {
 
         public void handleMessage(Message message) throws Fault {
             Exception ex = message.getContent(Exception.class);
-            if (!message.getExchange().isSynchronous() 
-                && ex instanceof ConnectException) {
+            if (!message.getExchange().isSynchronous()) {
                 //TODO: make sure it works with the failover feature
                 JaxrsClientCallback<?> cb = message.getExchange().get(JaxrsClientCallback.class);
                 cb.handleException(message, new ProcessingException(ex));
