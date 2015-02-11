@@ -143,7 +143,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
                 && (getKeyAlgorithm() == null 
                     || !getKeyAlgorithm().equals(jweInHeaders.getKeyEncryptionAlgorithm()))
                 || jweInHeaders.getAlgorithm() != null 
-                    && !getContentAlgorithm().equals(jweInHeaders.getAlgorithm())) {
+                    && !getContentAlgorithm().equals(jweInHeaders.getContentEncryptionAlgorithm())) {
                 throw new SecurityException();
             }
             theHeaders.asMap().putAll(jweInHeaders.asMap());
