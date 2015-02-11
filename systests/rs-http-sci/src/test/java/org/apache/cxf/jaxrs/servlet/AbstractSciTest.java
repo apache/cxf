@@ -28,14 +28,33 @@ import javax.ws.rs.core.Response.Status;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.demo.resources.Book;
+
 import org.junit.Test;
 
 
 public abstract class AbstractSciTest extends AbstractBusClientServerTestBase {
+    public static final Boolean JAVA6_ACTIVE = isJava6();
+    
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
+    protected static void startServers(Class<?> serverClass) throws Exception {
+        if (AbstractSciTest.JAVA6_ACTIVE) {
+            return;
+        }
+        AbstractResourceInfo.clearAllMaps();
+        assertTrue("server did not launch correctly", launchServer(serverClass, true));
+        createStaticBus();
+    }
     @Test
     public void testResponseHasBeenReceivedWhenQueringBook() {
+        if (AbstractSciTest.JAVA6_ACTIVE) {
+            return;
+        }
         Response r = createWebClient("/bookstore/books").path("1").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         

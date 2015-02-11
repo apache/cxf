@@ -21,9 +21,9 @@ package org.apache.cxf.jaxrs.servlet.jetty;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.servlet.AbstractSciTest;
 import org.eclipse.jetty.util.resource.Resource;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 
@@ -47,9 +47,7 @@ public class JettyEmptyApplicationTest extends AbstractSciTest {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
-        createStaticBus();
+        startServers(EmbeddedJettyServer.class);
     }
     
     @Override
