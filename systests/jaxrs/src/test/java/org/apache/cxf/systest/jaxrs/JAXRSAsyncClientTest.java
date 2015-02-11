@@ -33,12 +33,15 @@ import java.util.concurrent.Future;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.ResponseProcessingException;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -144,6 +147,24 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getCause().getCause() instanceof ConnectException);
         } finally {
             wc.close();
+        }
+    }
+    @Test
+    public void testNonExistentJaxrs20() throws Exception {
+        String address = "http://localhost/bookstore";
+        Client c = ClientBuilder.newClient();
+        c.register(new TestResponseFilter());
+        WebTarget t1 = c.target(address);
+        Future<Response> future = t1.request().async().get();
+        try {
+            future.get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            Throwable cause = ex.getCause();
+            assertTrue(cause instanceof ProcessingException);
+            assertTrue(ex.getCause().getCause() instanceof ConnectException);
+        } finally {
+            c.close();
         }
     }
     
