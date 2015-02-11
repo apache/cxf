@@ -42,18 +42,18 @@ import org.junit.Test;
 
 public class JweCompactReaderWriterTest extends Assert {
     // A1 example
-    private static final byte[] CONTENT_ENCRYPTION_KEY_A1 = {
+    static final byte[] CONTENT_ENCRYPTION_KEY_A1 = {
         (byte)177, (byte)161, (byte)244, (byte)128, 84, (byte)143, (byte)225,
         115, 63, (byte)180, 3, (byte)255, 107, (byte)154, (byte)212, (byte)246,
         (byte)138, 7, 110, 91, 112, 46, 34, 105, 47, 
         (byte)130, (byte)203, 46, 122, (byte)234, 64, (byte)252};
-    private static final String RSA_MODULUS_ENCODED_A1 = "oahUIoWw0K0usKNuOR6H4wkf4oBUXHTxRvgb48E-BVvxkeDNjbC4he8rUW"
+    static final String RSA_MODULUS_ENCODED_A1 = "oahUIoWw0K0usKNuOR6H4wkf4oBUXHTxRvgb48E-BVvxkeDNjbC4he8rUW"
            + "cJoZmds2h7M70imEVhRU5djINXtqllXI4DFqcI1DgjT9LewND8MW2Krf3S"
            + "psk_ZkoFnilakGygTwpZ3uesH-PFABNIUYpOiN15dsQRkgr0vEhxN92i2a"
            + "sbOenSZeyaxziK72UwxrrKoExv6kc5twXTq4h-QChLOln0_mtUZwfsRaMS"
            + "tPs6mS6XrgxnxbWhojf663tuEQueGC-FCMfra36C9knDFGzKsNa7LZK2dj"
            + "YgyD3JR_MB_4NUJW_TqOQtwHYbxevoJArm-L5StowjzGy-_bq6Gw";
-    private static final String RSA_PUBLIC_EXPONENT_ENCODED_A1 = "AQAB";
+    static final String RSA_PUBLIC_EXPONENT_ENCODED_A1 = "AQAB";
     private static final String RSA_PRIVATE_EXPONENT_ENCODED_A1 = 
         "kLdtIj6GbDks_ApCSTYQtelcNttlKiOyPzMrXHeI-yk1F7-kpDxY4-WY5N"
         + "WV5KntaEeXS1j82E375xxhWMHXyvjYecPT9fpwR_M9gV8n9Hrh2anTpTD9"
