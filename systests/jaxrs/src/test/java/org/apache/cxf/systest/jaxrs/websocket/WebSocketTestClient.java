@@ -31,10 +31,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.websocket.WebSocket;
-import com.ning.http.client.websocket.WebSocketByteListener;
-import com.ning.http.client.websocket.WebSocketTextListener;
-import com.ning.http.client.websocket.WebSocketUpgradeHandler;
+import com.ning.http.client.ws.WebSocket;
+import com.ning.http.client.ws.WebSocketByteListener;
+import com.ning.http.client.ws.WebSocketTextListener;
+import com.ning.http.client.ws.WebSocketUpgradeHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.websocket.WebSocketConstants;
@@ -72,7 +72,7 @@ class WebSocketTestClient {
     }
 
     public void sendTextMessage(String message) {
-        websocket.sendTextMessage(message);
+        websocket.sendMessage(message);
     }
 
     public void sendMessage(byte[] message) {
