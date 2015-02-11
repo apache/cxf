@@ -519,6 +519,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                         tlsClientParameters = new TLSClientParameters();
                     }
                     final SSLContext sslcontext = getSSLContext(tlsClientParameters);
+                    final HostnameVerifier verifier = org.apache.cxf.transport.https.SSLUtils
+                        .getHostnameVerifier(tlsClientParameters);
                     regBuilder
                         .register("https",
                                   new SSLIOSessionStrategy(sslcontext) {
@@ -530,6 +532,10 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                                 protected void verifySession(final HttpHost host,
                                                              final IOSession iosession,
                                                              final SSLSession sslsession) throws SSLException {
+                                    if (!verifier.verify(host.getHostName(), sslsession)) {
+                                        throw new SSLException("Could not verify host " + host.getHostName());
+                                    }
+                                    
                                     iosession.setAttribute("cxf.handshake.done", Boolean.TRUE);
                                     setSSLSession(sslsession);
                                 }
@@ -873,7 +879,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
         ctx.init(keyManagers, tlsClientParameters.getTrustManagers(),
                  tlsClientParameters.getSecureRandom());
-
+        
         sslContext = ctx;
         lastTlsHash = hash;
         sslState = null;

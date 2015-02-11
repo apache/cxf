@@ -21,6 +21,8 @@ package org.apache.cxf.systest.https.hostname;
 
 import java.net.URL;
 
+import javax.xml.ws.BindingProvider;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -78,6 +80,11 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
         
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
@@ -99,6 +106,16 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
         
         updateAddressPort(port, PORT2);
+        
+        try {
+            port.greetMe("Kitty");
+            fail("Failure expected on a non-matching subject alternative name");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
         
         try {
             port.greetMe("Kitty");
@@ -130,6 +147,11 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT3);
         
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -152,6 +174,16 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
         
         updateAddressPort(port, PORT4);
+        
+        try {
+            port.greetMe("Kitty");
+            fail("Failure expected with no matching Subject Alt Name or CN");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
         
         try {
             port.greetMe("Kitty");
