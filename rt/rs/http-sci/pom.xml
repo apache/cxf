@@ -21,8 +21,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-rt-rs-http-sci</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache CXF JAX-RS Service Description</name>
-    <description>Apache CXF JAX-RS Service Description</description>
+    <name>Apache CXF JAX-RS Servlet Container Initializer</name>
+    <description>Apache CXF JAX-RS Servlet Container Initializer</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
