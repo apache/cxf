@@ -21,7 +21,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-features-clustering</artifactId>
     <packaging>jar</packaging>
-    <version>2.7.15-SNAPSHOT</version>
+    <version>2.7.15</version>
     <name>Apache CXF Runtime Clustering</name>
     <description>Failover and loadbalancing support</description>
     <url>http://cxf.apache.org</url>
@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.7.15-SNAPSHOT</version>
+        <version>2.7.15</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
