@@ -77,7 +77,9 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         HandlerChainAnnotation hcAnn = findHandlerChainAnnotation(clz, true);
         List<Handler> chain = null;
         if (hcAnn == null) {
-            LOG.fine("no HandlerChain annotation on " + clz);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("no HandlerChain annotation on " + clz);
+            }
             chain = new ArrayList<Handler>();
         } else {
             hcAnn.validate();
@@ -215,8 +217,6 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                                                "NOT_A_QNAME_PATTER",
                                                namePattern, xml));                    
         }
-        String localPart = namePattern.substring(namePattern.indexOf(':') + 1,
-                                                 namePattern.length());
         String pfx = namePattern.substring(0, namePattern.indexOf(':'));
         String ns = el.lookupNamespaceURI(pfx);
         if (ns == null) {
@@ -225,6 +225,8 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         if (!ns.equals(comp.getNamespaceURI())) {
             return false;
         }
+        String localPart = namePattern.substring(namePattern.indexOf(':') + 1,
+                                                 namePattern.length());
         if (localPart.contains("*")) {
             //wildcard pattern matching
             return Pattern.matches(mapPattern(localPart), comp.getLocalPart());

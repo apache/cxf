@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -43,7 +44,10 @@ public abstract class AbstractObservable implements Observable {
             // the observer switch must take place before activation or after deactivation
             if (observer != null) {
                 incomingObserver = observer;
-                getLogger().fine("registering incoming observer: " + observer);
+                final Logger logger = getLogger();
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("registering incoming observer: " + observer);
+                }
                 if (old == null) {
                     try {
                         activate();
@@ -54,7 +58,10 @@ public abstract class AbstractObservable implements Observable {
                 }
             } else {
                 if (old != null) {
-                    getLogger().fine("unregistering incoming observer: " + old);
+                    final Logger logger = getLogger();
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine("unregistering incoming observer: " + old);
+                    }
                     deactivate();
                 }
                 incomingObserver = observer;
