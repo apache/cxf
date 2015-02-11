@@ -166,10 +166,11 @@ public class WSDLGetUtils {
         throws UnsupportedEncodingException {
         String key = loc;
         try {
-            if (!(new URI(loc).isAbsolute()) && xsd != null) {
+            boolean absoluteLocUri = new URI(loc).isAbsolute();
+            if (!absoluteLocUri && xsd != null) {
                 key = new URI(xsd).resolve(loc).toString();
             }
-            if (!(new URI(loc).isAbsolute()) && xsd == null) {
+            if (!absoluteLocUri && xsd == null) {
                 key = new URI(".").resolve(loc).toString();
             }
         } catch (URISyntaxException e) {
