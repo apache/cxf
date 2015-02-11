@@ -28,7 +28,6 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import org.apache.cxf.ws.transfer.Representation;
-import org.apache.cxf.ws.transfer.validationtransformation.ValidatorResult;
 import org.apache.cxf.ws.transfer.validationtransformation.XSDResourceValidator;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -37,7 +36,7 @@ import org.junit.Test;
 
 /**
  *
- * @author erich
+ * @author Erich Duda
  */
 public class XSDResourceValidatorTest {
     
@@ -69,18 +68,18 @@ public class XSDResourceValidatorTest {
     public void validRepresentationTest() throws SAXException, IOException {
         XSDResourceValidator validator = new XSDResourceValidator(
                 new StreamSource(getClass().getResourceAsStream("/xml/xsdresourcevalidator/schema.xsd")));
-        ValidatorResult result = validator.validate(loadRepresentation(
-                getClass().getResourceAsStream("/xml/xsdresourcevalidator/validRepresentation.xml")));
-        Assert.assertTrue(result.isValidate());
+        boolean result = validator.validate(loadRepresentation(
+                getClass().getResourceAsStream("/xml/xsdresourcevalidator/validRepresentation.xml")), null);
+        Assert.assertTrue(result);
     }
     
     @Test
     public void invalidRepresentationTest() throws SAXException, IOException {
         XSDResourceValidator validator = new XSDResourceValidator(
                 new StreamSource(getClass().getResourceAsStream("/xml/xsdresourcevalidator/schema.xsd")));
-        ValidatorResult result = validator.validate(loadRepresentation(
-                getClass().getResourceAsStream("/xml/xsdresourcevalidator/invalidRepresentation.xml")));
-        Assert.assertFalse(result.isValidate());
+        boolean result = validator.validate(loadRepresentation(
+                getClass().getResourceAsStream("/xml/xsdresourcevalidator/invalidRepresentation.xml")), null);
+        Assert.assertFalse(result);
     }
     
 }

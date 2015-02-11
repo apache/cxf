@@ -19,40 +19,19 @@
 
 package org.apache.cxf.ws.transfer.validationtransformation;
 
+import org.apache.cxf.ws.transfer.Representation;
+
 /**
- * This class represents the result from the ResourceValidator.
- * 
+ * The interface for TypeIdentifier objects.
  * @author Erich Duda
  */
-public class ValidatorResult {
-    
-    private boolean validate;
-    
-    private ResourceTransformer transformer;
-    
-    public ValidatorResult() {
-        
-    }
-    
-    public ValidatorResult(boolean validate, ResourceTransformer transformer) {
-        this.validate = validate;
-        this.transformer = transformer;
-    }
+public interface ResourceTypeIdentifier {
 
-    public boolean isValidate() {
-        return validate;
-    }
+    /**
+     * Returns true if the representation corresponds to type, which object represents.
+     * @param representation
+     * @return
+     */
+    ResourceTypeIdentifierResult identify(Representation representation);
 
-    public void setValidate(boolean validate) {
-        this.validate = validate;
-    }
-
-    public ResourceTransformer getTransformer() {
-        return transformer;
-    }
-
-    public void setTransformer(ResourceTransformer transformer) {
-        this.transformer = transformer;
-    }
-    
 }

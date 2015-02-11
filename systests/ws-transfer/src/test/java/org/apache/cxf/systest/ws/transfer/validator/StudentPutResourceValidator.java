@@ -17,31 +17,25 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.transfer.transformer;
+package org.apache.cxf.systest.ws.transfer.validator;
 
-import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Element;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.shared.faults.PutDenied;
-import org.apache.cxf.ws.transfer.validationtransformation.ResourceTransformer;
-import org.apache.cxf.ws.transfer.validationtransformation.XSLTResourceTransformer;
+import org.apache.cxf.ws.transfer.validationtransformation.ResourceValidator;
 
 /**
  *
- * @author erich
+ * @author Erich Duda
  */
-public class StudentPutResourceTransformer implements ResourceTransformer {
+public class StudentPutResourceValidator implements ResourceValidator {
 
     public static final String UID_NAMESPACE = "http://university.edu/student";
     
     public static final String UID_NAME = "uid";
     
     @Override
-    public void transform(Representation newRepresentation, Representation oldRepresentation) {
-        ResourceTransformer transformer = new XSLTResourceTransformer(new StreamSource(
-                getClass().getResourceAsStream("/xslt/studentPut.xsl")));
-        transformer.transform(newRepresentation, null);
-        
+    public boolean validate(Representation newRepresentation, Representation oldRepresentation) {
         Element newRepresentationEl = (Element) newRepresentation.getAny();
         Element oldRepresentationEl = (Element) oldRepresentation.getAny();
         
@@ -51,6 +45,7 @@ public class StudentPutResourceTransformer implements ResourceTransformer {
         if (!newUid.equals(oldUid)) {
             throw new PutDenied();
         }
+        return true;
     } 
     
 }

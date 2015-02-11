@@ -43,8 +43,15 @@ public class XSLTResourceTransformer implements ResourceTransformer {
     protected Transformer transformer;
     
     protected DocumentBuilder documentBuilder;
-    
+
+    protected ResourceValidator validator;
+
     public XSLTResourceTransformer(Source xsl) {
+        this(xsl, null);
+    }
+
+    public XSLTResourceTransformer(Source xsl, ResourceValidator validator) {
+        this.validator = validator;
         try {
             transformer = TransformerFactory.newInstance().newTransformer(xsl);
         } catch (TransformerConfigurationException ex) {
@@ -60,12 +67,13 @@ public class XSLTResourceTransformer implements ResourceTransformer {
     }
 
     @Override
-    public void transform(Representation newRepresentation, Representation oldRepresentation) {
+    public ResourceValidator transform(Representation newRepresentation, Representation oldRepresentation) {
         try {
             Document result = documentBuilder.newDocument();
             transformer.transform(new DOMSource((Node) newRepresentation.getAny()),
                     new DOMResult((Node) result));
             newRepresentation.setAny(result.getDocumentElement());
+            return validator;
         } catch (TransformerException ex) {
             throw new RuntimeException("Error occured during transformation.", ex);
         }

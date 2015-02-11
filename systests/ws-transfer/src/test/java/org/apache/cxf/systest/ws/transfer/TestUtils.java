@@ -28,8 +28,8 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.systest.ws.transfer.resolver.MyResourceResolver;
-import org.apache.cxf.systest.ws.transfer.transformer.StudentPutResourceTransformer;
-import org.apache.cxf.systest.ws.transfer.transformer.TeacherResourceTransformer;
+import org.apache.cxf.systest.ws.transfer.validator.StudentPutResourceValidator;
+import org.apache.cxf.systest.ws.transfer.validator.TeacherResourceValidator;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
@@ -40,7 +40,7 @@ import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactoryImpl;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 import org.apache.cxf.ws.transfer.shared.handlers.ReferenceParameterAddingHandler;
-import org.apache.cxf.ws.transfer.validationtransformation.XSDResourceValidator;
+import org.apache.cxf.ws.transfer.validationtransformation.XSDResourceTypeIdentifier;
 import org.apache.cxf.ws.transfer.validationtransformation.XSLTResourceTransformer;
 
 /**
@@ -110,9 +110,11 @@ public final class TestUtils {
         ResourceManager teachersResourceManager = new MemoryResourceManager();
         ResourceRemote resource = new ResourceRemote();
         resource.setManager(teachersResourceManager);
-        resource.getValidators().add(new XSDResourceValidator(
-            new StreamSource(TestUtils.class.getResourceAsStream("/schema/teacher.xsd")),
-            new TeacherResourceTransformer()));
+        resource.getResourceTypeIdentifiers().add(new XSDResourceTypeIdentifier(
+                new StreamSource(TestUtils.class.getResourceAsStream("/schema/teacher.xsd")),
+                new XSLTResourceTransformer(
+                        new StreamSource(TestUtils.class.getResourceAsStream("/xslt/teacherDefaultValues.xsl")),
+                        new TeacherResourceValidator())));
         teachersResourceFactoryServer = createTeachersResourceFactoryEndpoint(resource);
         teachersResourceServer = createTeacherResourceEndpoint(resource);
     }
@@ -131,16 +133,17 @@ public final class TestUtils {
         ResourceFactoryImpl resourceFactory = new ResourceFactoryImpl();
         resourceFactory.setResourceResolver(
                 new MyResourceResolver(RESOURCE_STUDENTS_URL, resourceManager, RESOURCE_TEACHERS_URL));
-        resourceFactory.getValidators().add(
-                new XSDResourceValidator(new StreamSource(
-                    TestUtils.class.getResourceAsStream("/schema/studentCreate.xsd")),
-                    new XSLTResourceTransformer(new StreamSource(
-                        TestUtils.class.getResourceAsStream("/xslt/studentCreate.xsl")))));
-        resourceFactory.getValidators().add(
-                new XSDResourceValidator(new StreamSource(
-                    TestUtils.class.getResourceAsStream("/schema/teacherCreateBasic.xsd")),
-                    new XSLTResourceTransformer(new StreamSource(
-                        TestUtils.class.getResourceAsStream("/xslt/teacherCreateBasic.xsl")))));
+        resourceFactory.getResourceTypeIdentifiers().add(
+                new XSDResourceTypeIdentifier(
+                        new StreamSource(TestUtils.class.getResourceAsStream("/schema/studentCreate.xsd")),
+                        new XSLTResourceTransformer(
+                                new StreamSource(TestUtils.class.getResourceAsStream("/xslt/studentCreate.xsl")))));
+        resourceFactory.getResourceTypeIdentifiers().add(
+                new XSDResourceTypeIdentifier(
+                        new StreamSource(TestUtils.class.getResourceAsStream("/schema/teacherCreateBasic.xsd")),
+                        new XSLTResourceTransformer(
+                                new StreamSource(
+                                        TestUtils.class.getResourceAsStream("/xslt/teacherCreateBasic.xsl")))));
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceClass(org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory.class);
         factory.setServiceBean(resourceFactory);
@@ -161,10 +164,12 @@ public final class TestUtils {
     private static Server createStudentsResource(ResourceManager resourceManager) {
         ResourceLocal resourceLocal = new ResourceLocal();
         resourceLocal.setManager(resourceManager);
-        resourceLocal.getValidators().add(
-                new XSDResourceValidator(new StreamSource(
-                    TestUtils.class.getResourceAsStream("/schema/studentPut.xsd")),
-                        new StudentPutResourceTransformer()));
+        resourceLocal.getResourceTypeIdentifiers().add(
+                new XSDResourceTypeIdentifier(
+                        new StreamSource(TestUtils.class.getResourceAsStream("/schema/studentPut.xsd")),
+                        new XSLTResourceTransformer(
+                                new StreamSource(TestUtils.class.getResourceAsStream("/xslt/studentPut.xsl")),
+                                new StudentPutResourceValidator())));
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceClass(Resource.class);
         factory.setServiceBean(resourceLocal);

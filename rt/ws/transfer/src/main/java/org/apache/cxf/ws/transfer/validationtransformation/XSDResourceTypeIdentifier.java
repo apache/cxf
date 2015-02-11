@@ -31,16 +31,18 @@ import org.xml.sax.SAXException;
 import org.apache.cxf.ws.transfer.Representation;
 
 /**
- * Implementation of the ResourceValidator interface for Schema validation.
- * 
+ * Implementation of the ResourceTypeIdentifier interface using by XSDSchema validation.
  * @author Erich Duda
  */
-public class XSDResourceValidator implements ResourceValidator {
-    
+public class XSDResourceTypeIdentifier implements ResourceTypeIdentifier {
+
+    protected ResourceTransformer resourceTransformer;
+
     protected Validator validator;
-    
-    public XSDResourceValidator(Source xsd, ResourceTransformer resourceTransformer) {
+
+    public XSDResourceTypeIdentifier(Source xsd, ResourceTransformer resourceTransformer) {
         try {
+            this.resourceTransformer = resourceTransformer;
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFactory.newSchema(xsd);
             this.validator = schema.newValidator();
@@ -48,21 +50,17 @@ public class XSDResourceValidator implements ResourceValidator {
             throw new IllegalArgumentException("Error occured during creating the Validator.", ex);
         }
     }
-    
-    public XSDResourceValidator(Source xsd) {
-        this(xsd, null);
-    }
-    
+
     @Override
-    public boolean validate(Representation representation, Representation oldRepresentation) {
+    public ResourceTypeIdentifierResult identify(Representation representation) {
         try {
             validator.validate(new DOMSource((Node) representation.getAny()));
         } catch (SAXException ex) {
-            return false;
+            return new ResourceTypeIdentifierResult(false, resourceTransformer);
         } catch (IOException ex) {
             throw new RuntimeException("Error occured during reading the XML representation.", ex);
         }
-        return true;
+        return new ResourceTypeIdentifierResult(true, resourceTransformer);
     }
-    
+
 }

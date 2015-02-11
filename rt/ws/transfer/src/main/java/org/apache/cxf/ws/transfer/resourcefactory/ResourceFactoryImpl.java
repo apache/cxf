@@ -37,7 +37,7 @@ import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceReference;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
-import org.apache.cxf.ws.transfer.validationtransformation.ResourceValidator;
+import org.apache.cxf.ws.transfer.validationtransformation.ResourceTypeIdentifier;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
 
 /**
@@ -47,7 +47,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
 
     protected ResourceResolver resourceResolver;
     
-    protected List<ResourceValidator> validators;
+    protected List<ResourceTypeIdentifier> resourceTypeIdentifiers;
     
     protected Map<String, Dialect> dialects;
     
@@ -57,9 +57,18 @@ public class ResourceFactoryImpl implements ResourceFactory {
     
     @Override
     public CreateResponse create(Create body) {
-        if (body.getDialect() == null || body.getDialect().isEmpty()) {
-            ValidAndTransformHelper.validationAndTransformation(validators, body.getRepresentation(), null);
+        if (body.getDialect() != null && !body.getDialect().isEmpty()) {
+            if (dialects.containsKey(body.getDialect())) {
+                Dialect dialect = dialects.get(body.getDialect());
+                Representation representation = dialect.processCreate(body);
+                body.setRepresentation(representation);
+            } else {
+                throw new UnknownDialect();
+            }
         }
+        ValidAndTransformHelper.validationAndTransformation(
+                resourceTypeIdentifiers, body.getRepresentation(), null);
+
         ResourceReference resourceReference = resourceResolver.resolve(body);
         if (resourceReference.getResourceManager() != null) {
             return createLocally(body, resourceReference);
@@ -76,15 +85,15 @@ public class ResourceFactoryImpl implements ResourceFactory {
         this.resourceResolver = resourceResolver;
     }
 
-    public List<ResourceValidator> getValidators() {
-        if (validators == null) {
-            validators = new ArrayList<ResourceValidator>();
+    public List<ResourceTypeIdentifier> getResourceTypeIdentifiers() {
+        if (resourceTypeIdentifiers == null) {
+            resourceTypeIdentifiers = new ArrayList<>();
         }
-        return validators;
+        return resourceTypeIdentifiers;
     }
 
-    public void setValidators(List<ResourceValidator> validators) {
-        this.validators = validators;
+    public void setResourceTypeIdentifiers(List<ResourceTypeIdentifier> resourceTypeIdentifiers) {
+        this.resourceTypeIdentifiers = resourceTypeIdentifiers;
     }
     
     /**
@@ -112,16 +121,6 @@ public class ResourceFactoryImpl implements ResourceFactory {
     
     private CreateResponse createLocally(Create body, ResourceReference ref) {
         Representation representation = body.getRepresentation();
-        if (body.getDialect() != null && !body.getDialect().isEmpty()) {
-            System.out.println(body.getDialect());
-            System.out.println(dialects.containsKey(body.getDialect()));
-            if (dialects.containsKey(body.getDialect())) {
-                Dialect dialect = dialects.get(body.getDialect());
-                representation = dialect.processCreate(body);
-            } else {
-                throw new UnknownDialect();
-            }
-        }
         ReferenceParametersType referenceParams = ref.getResourceManager().create(representation);
             
         CreateResponse response = new CreateResponse();

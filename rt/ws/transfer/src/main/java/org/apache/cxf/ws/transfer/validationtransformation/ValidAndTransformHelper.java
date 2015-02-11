@@ -36,20 +36,24 @@ public final class ValidAndTransformHelper {
     
     /**
      * Validation and transformation process.
-     * @param validators List of validators.
+     * @param resourceTypeIdentifiers List of resourceTypeIdentifiers.
      * @param newRepresentation Incoming representation.
      * @param oldRepresentation Representation stored in the ResourceManager.
      */
     public static void validationAndTransformation(
-            List<ResourceValidator> validators,
+            List<ResourceTypeIdentifier> resourceTypeIdentifiers,
             Representation newRepresentation,
             Representation oldRepresentation) {
-        if (validators != null && !validators.isEmpty()) {
-            for (ResourceValidator validator : validators) {
-                ValidatorResult valResult = validator.validate(newRepresentation);
-                if (valResult.isValidate()) {
+        if (resourceTypeIdentifiers != null && !resourceTypeIdentifiers.isEmpty()) {
+            for (ResourceTypeIdentifier resourceIdentifier : resourceTypeIdentifiers) {
+                ResourceTypeIdentifierResult valResult = resourceIdentifier.identify(newRepresentation);
+                if (valResult.getResult()) {
                     if (valResult.getTransformer() != null) {
-                        valResult.getTransformer().transform(newRepresentation, oldRepresentation);
+                        ResourceTransformer transformer = valResult.getTransformer();
+                        ResourceValidator validator = transformer.transform(newRepresentation, oldRepresentation);
+                        if (validator != null && !validator.validate(newRepresentation, oldRepresentation)) {
+                            throw new InvalidRepresentation();
+                        }
                     }
                     return;
                 }

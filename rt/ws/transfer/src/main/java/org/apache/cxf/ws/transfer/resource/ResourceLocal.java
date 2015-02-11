@@ -39,12 +39,12 @@ import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialectConstants;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
-import org.apache.cxf.ws.transfer.validationtransformation.ResourceValidator;
+import org.apache.cxf.ws.transfer.validationtransformation.ResourceTypeIdentifier;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
 
 /**
  * Implementation of the Resource interface for resources, which are created locally.
- * @see ResourceResolver
+ * @see org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver
  * 
  * @author Erich Duda
  */
@@ -55,7 +55,7 @@ public class ResourceLocal implements Resource {
     
     protected ResourceManager manager;
     
-    protected List<ResourceValidator> validators;
+    protected List<ResourceTypeIdentifier> resourceTypeIdentifiers;
     
     protected Map<String, Dialect> dialects;
 
@@ -72,15 +72,15 @@ public class ResourceLocal implements Resource {
         this.manager = manager;
     }
 
-    public List<ResourceValidator> getValidators() {
-        if (validators == null) {
-            validators = new ArrayList<ResourceValidator>();
+    public List<ResourceTypeIdentifier> getResourceTypeIdentifiers() {
+        if (resourceTypeIdentifiers == null) {
+            resourceTypeIdentifiers = new ArrayList<>();
         }
-        return validators;
+        return resourceTypeIdentifiers;
     }
 
-    public void setValidators(List<ResourceValidator> validators) {
-        this.validators = validators;
+    public void setResourceTypeIdentifiers(List<ResourceTypeIdentifier> resourceTypeIdentifiers) {
+        this.resourceTypeIdentifiers = resourceTypeIdentifiers;
     }
     
     /**
@@ -172,7 +172,7 @@ public class ResourceLocal implements Resource {
             }
         }
         ValidAndTransformHelper.validationAndTransformation(
-            validators, putRepresentation, storedRepresentation);
+                resourceTypeIdentifiers, putRepresentation, storedRepresentation);
         manager.put(refParams, putRepresentation);
         PutResponse response = new PutResponse();
         response.setRepresentation(putRepresentation);
