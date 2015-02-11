@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -110,14 +109,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testNonExistent() throws Exception {
-        String address = "http://localhost/bookstore";
+        String address = "http://localhostt/bookstore";
         WebClient wc = WebClient.create(address, 
                                         Collections.singletonList(new TestResponseFilter()));
         try {
             wc.get();
             fail();
         } catch (ProcessingException ex) {
-            assertTrue(ex.getCause() instanceof ConnectException);
+            assertTrue(ex.getCause() instanceof IOException);
         }
     }
     @Test

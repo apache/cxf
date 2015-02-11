@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -133,7 +132,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testNonExistent() throws Exception {
-        String address = "http://localhost/bookstore";
+        String address = "http://localhostt/bookstore";
         List<Object> providers = new ArrayList<Object>();
         providers.add(new TestResponseFilter());
         WebClient wc =  WebClient.create(address, providers);
@@ -144,14 +143,14 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         } catch (ExecutionException ex) {
             Throwable cause = ex.getCause();
             assertTrue(cause instanceof ProcessingException);
-            assertTrue(ex.getCause().getCause() instanceof ConnectException);
+            assertTrue(ex.getCause().getCause() instanceof IOException);
         } finally {
             wc.close();
         }
     }
     @Test
     public void testNonExistentJaxrs20() throws Exception {
-        String address = "http://localhost/bookstore";
+        String address = "http://localhostt/bookstore";
         Client c = ClientBuilder.newClient();
         c.register(new TestResponseFilter());
         WebTarget t1 = c.target(address);
@@ -162,7 +161,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         } catch (ExecutionException ex) {
             Throwable cause = ex.getCause();
             assertTrue(cause instanceof ProcessingException);
-            assertTrue(ex.getCause().getCause() instanceof ConnectException);
+            assertTrue(ex.getCause().getCause() instanceof IOException);
         } finally {
             c.close();
         }
