@@ -118,6 +118,14 @@ public class JoseHeaders extends JsonMapObject {
         setHeader(headerName, key);
     }
     
+    public void setJsonWebKeysUrl(String url) {
+        setHeader(JoseConstants.HEADER_JSON_WEB_KEY_SET, url);
+    }
+    
+    public String getJsonWebKeysUrl() {
+        return (String)getHeader(JoseConstants.HEADER_JSON_WEB_KEY_SET);
+    }
+    
     public JsonWebKey getJsonWebKey() {
         return getJsonWebKey(JoseConstants.HEADER_JSON_WEB_KEY);
     }

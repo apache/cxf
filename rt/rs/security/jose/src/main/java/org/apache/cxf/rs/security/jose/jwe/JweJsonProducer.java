@@ -37,17 +37,25 @@ public class JweJsonProducer {
     private JweHeaders unprotectedHeader;
     private byte[] content;
     private byte[] aad;
+    private boolean canBeFlat;
     public JweJsonProducer(JweHeaders protectedHeader, byte[] content) {
+        this(protectedHeader, content, false);    
+    }
+    public JweJsonProducer(JweHeaders protectedHeader, byte[] content, boolean canBeFlat) {
+        this(protectedHeader, content, null, canBeFlat);
+    }
+    public JweJsonProducer(JweHeaders protectedHeader, byte[] content, byte[] aad, boolean canBeFlat) {
         this.protectedHeader = protectedHeader;
-        this.content = content;    
-    }
-    public JweJsonProducer(JweHeaders protectedHeader, byte[] content, byte[] aad) {
-        this(protectedHeader, content);
+        this.content = content;
         this.aad = aad;
+        this.canBeFlat = canBeFlat;
     }
-    public JweJsonProducer(JweHeaders protectedHeader, JweHeaders unprotectedHeader, 
-                           byte[] content, byte[] aad) {
-        this(protectedHeader, content, aad);
+    public JweJsonProducer(JweHeaders protectedHeader, 
+                           JweHeaders unprotectedHeader, 
+                           byte[] content, 
+                           byte[] aad,
+                           boolean canBeFlat) {
+        this(protectedHeader, content, aad, canBeFlat);
         this.unprotectedHeader = unprotectedHeader;
     }
     public String encryptWith(JweEncryptionProvider encryptor) {
@@ -68,8 +76,8 @@ public class JweJsonProducer {
             throw new IllegalArgumentException();
         }
         //TODO: determine the actual cek and iv length based on the algo
-        byte[] cek = CryptoUtils.generateSecureRandomBytes(32);
-        byte[] iv = CryptoUtils.generateSecureRandomBytes(16);
+        byte[] cek = generateCek();
+        byte[] iv = generateIv();
         JweHeaders unionHeaders = new JweHeaders();
         if (protectedHeader != null) {
             unionHeaders.asMap().putAll(protectedHeader.asMap());
@@ -153,7 +161,15 @@ public class JweJsonProducer {
                 throw new SecurityException(ex);
             }
         }
-        jweJsonMap.put("recipients", entries);
+        if (entries.size() == 1 && canBeFlat) {
+            JweHeaders unprotectedEntryHeader = entries.get(0).getUnprotectedHeader();
+            if (unprotectedEntryHeader != null) {
+                jweJsonMap.put("header", unprotectedEntryHeader);
+            }
+            jweJsonMap.put("encrypted_key", entries.get(0).getEncodedEncryptedKey());
+        } else {
+            jweJsonMap.put("recipients", entries);
+        }
         if (aad != null) {
             jweJsonMap.put("aad", Base64UrlUtility.encode(aad));
         }
@@ -161,6 +177,12 @@ public class JweJsonProducer {
         jweJsonMap.put("ciphertext", Base64UrlUtility.encode(cipherText));
         jweJsonMap.put("tag", Base64UrlUtility.encode(authTag));
         return writer.toJson(jweJsonMap);
+    }
+    protected byte[] generateIv() {
+        return CryptoUtils.generateSecureRandomBytes(16);
+    }
+    protected byte[] generateCek() {
+        return CryptoUtils.generateSecureRandomBytes(32);
     }
     private String checkAndGetContentAlgorithm(List<JweEncryptionProvider> encryptors) {
         Set<String> set = new HashSet<String>();
