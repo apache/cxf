@@ -82,6 +82,13 @@ public class JweJsonProducerTest extends Assert {
         + "[\"gender\",{},\"text\",\"M\"]"
         + "]]";
     
+    private static final Boolean SKIP_AES_GCM_TESTS = isJava6();
+    
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
+
     @BeforeClass
     public static void registerBouncyCastleIfNeeded() throws Exception {
         try {
@@ -107,6 +114,9 @@ public class JweJsonProducerTest extends Assert {
     }
     
     private void doTestSingleRecipientFlat(String expectedOutput, boolean canBeFlat) throws Exception {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(SECRET_BYTES, "AES");
         JweHeaders headers = new JweHeaders(JoseConstants.A128KW_ALGO,
@@ -125,6 +135,9 @@ public class JweJsonProducerTest extends Assert {
     }
     @Test
     public void testSingleRecipientAllTypeOfHeadersAndAad() {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(SECRET_BYTES, "AES");
         
