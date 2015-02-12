@@ -307,6 +307,11 @@
                             <artifactId>cxf-buildtools</artifactId>
                             <version>${cxf.build-utils.version}</version>
                         </dependency>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>6.2</version>
+                        </dependency>
                     </dependencies>
                     <configuration>
                         <encoding>UTF-8</encoding>
@@ -334,7 +339,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.2</version>
+                    <version>3.4</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.cxf.build-utils</groupId>
@@ -343,8 +348,13 @@
                         </dependency>
                         <dependency>
                             <groupId>net.sourceforge.pmd</groupId>
-                            <artifactId>pmd</artifactId>
-                            <version>5.0.4</version>
+                            <artifactId>pmd-core</artifactId>
+                            <version>5.2.3</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-java</artifactId>
+                            <version>5.2.3</version>
                         </dependency>
                     </dependencies>
                     <configuration>
