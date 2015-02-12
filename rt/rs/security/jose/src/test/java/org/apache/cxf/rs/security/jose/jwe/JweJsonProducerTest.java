@@ -146,7 +146,7 @@ public class JweJsonProducerTest extends Assert {
                                          final byte[] cek,
                                          boolean canBeFlat) throws Exception {
         if (contentEncryptionAlgo.equals(JoseConstants.A128GCM_ALGO) && SKIP_AES_GCM_TESTS) {
-            return;
+            return null;
         }
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(wrapperKeyBytes, "AES");
         JweHeaders headers = new JweHeaders(JoseConstants.A128KW_ALGO,
