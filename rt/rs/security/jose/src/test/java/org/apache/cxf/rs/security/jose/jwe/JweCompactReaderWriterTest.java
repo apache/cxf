@@ -54,7 +54,7 @@ public class JweCompactReaderWriterTest extends Assert {
            + "tPs6mS6XrgxnxbWhojf663tuEQueGC-FCMfra36C9knDFGzKsNa7LZK2dj"
            + "YgyD3JR_MB_4NUJW_TqOQtwHYbxevoJArm-L5StowjzGy-_bq6Gw";
     static final String RSA_PUBLIC_EXPONENT_ENCODED_A1 = "AQAB";
-    private static final String RSA_PRIVATE_EXPONENT_ENCODED_A1 = 
+    static final String RSA_PRIVATE_EXPONENT_ENCODED_A1 = 
         "kLdtIj6GbDks_ApCSTYQtelcNttlKiOyPzMrXHeI-yk1F7-kpDxY4-WY5N"
         + "WV5KntaEeXS1j82E375xxhWMHXyvjYecPT9fpwR_M9gV8n9Hrh2anTpTD9"
         + "3Dt62ypW3yDsJzBnTnrYu1iwWRgBKrEYY46qAZIrA2xAwnm2X7uGR1hghk"
@@ -62,7 +62,7 @@ public class JweCompactReaderWriterTest extends Assert {
         + "t3UVe4WO3JkJOzlpUf-KTVI2Ptgm-dARxTEtE-id-4OJr0h-K-VFs3VSnd"
         + "VTIznSxfyrj8ILL6MG_Uv8YAu7VILSB3lOW085-4qE3DzgrTjgyQ";
     
-    private static final byte[] INIT_VECTOR_A1 = {(byte)227, (byte)197, 117, (byte)252, 2, (byte)219, 
+    static final byte[] INIT_VECTOR_A1 = {(byte)227, (byte)197, 117, (byte)252, 2, (byte)219, 
         (byte)233, 68, (byte)180, (byte)225, 77, (byte)219};
     
     // A3 example
