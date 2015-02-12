@@ -147,10 +147,6 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
                 throw new SecurityException();
             }
             theHeaders.asMap().putAll(jweInHeaders.asMap());
-            if (jweInHeaders.getProtectedHeaders() != null 
-                && !jweInHeaders.asMap().entrySet().containsAll(theHeaders.asMap().entrySet())) {
-                jweInHeaders.getProtectedHeaders().asMap().putAll(theHeaders.asMap());
-            }
             protectedHeaders = jweInHeaders.getProtectedHeaders() != null 
                 ? jweInHeaders.getProtectedHeaders() : theHeaders;
         } else {
