@@ -66,14 +66,14 @@ public class JweCompactReaderWriterTest extends Assert {
         (byte)233, 68, (byte)180, (byte)225, 77, (byte)219};
     
     // A3 example
-    private static final byte[] CONTENT_ENCRYPTION_KEY_A3 = {
+    static final byte[] CONTENT_ENCRYPTION_KEY_A3 = {
         4, (byte)211, 31, (byte)197, 84, (byte)157, (byte)252, (byte)254, 11, 100, 
         (byte)157, (byte)250, 63, (byte)170, 106, (byte)206, 107, 124, (byte)212, 
         45, 111, 107, 9, (byte)219, (byte)200, (byte)177, 0, (byte)240, (byte)143, 
         (byte)156, 44, (byte)207};
-    private static final byte[] INIT_VECTOR_A3 = {
+    static final byte[] INIT_VECTOR_A3 = {
         3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104, 101};
-    private static final String KEY_ENCRYPTION_KEY_A3 = "GawgguFyGrWKav7AX4VKUg";
+    static final String KEY_ENCRYPTION_KEY_A3 = "GawgguFyGrWKav7AX4VKUg";
     private static final String JWE_OUTPUT_A3 = 
         "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0" 
         + ".6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ" 

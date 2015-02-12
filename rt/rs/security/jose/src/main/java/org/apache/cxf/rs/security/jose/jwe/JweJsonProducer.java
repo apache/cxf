@@ -92,13 +92,6 @@ public class JweJsonProducer {
         
         List<JweJsonEncryptionEntry> entries = new ArrayList<JweJsonEncryptionEntry>(encryptors.size());
         Map<String, Object> jweJsonMap = new LinkedHashMap<String, Object>();
-        if (protectedHeader != null) {
-            jweJsonMap.put("protected", 
-                        Base64UrlUtility.encode(writer.toJson(protectedHeader)));
-        }
-        if (unprotectedHeader != null) {
-            jweJsonMap.put("unprotected", unprotectedHeader);
-        }
         byte[] cipherText = null;
         byte[] authTag = null;
         for (int i = 0; i < encryptors.size(); i++) {
@@ -126,13 +119,14 @@ public class JweJsonProducer {
             JweEncryptionState state = encryptor.createJweEncryptionState(input);
             try {
                 byte[] currentCipherOutput = state.getCipher().doFinal(content);
-                byte[] currentCipherText = null;
-                byte[] currentAuthTag = null;
                 if (state.getAuthTagProducer() != null) {
-                    currentCipherText = currentCipherOutput;
+                    cipherText = currentCipherOutput;
                     state.getAuthTagProducer().update(content, 0, content.length);
-                    currentAuthTag = state.getAuthTagProducer().getTag();
+                    authTag = state.getAuthTagProducer().getTag();
                 } else {
+                    byte[] currentCipherText = null;
+                    byte[] currentAuthTag = null;
+                    
                     final int authTagLengthBits = 128;
                     final int cipherTextLen = currentCipherOutput.length - authTagLengthBits / 8;
                     currentCipherText = Arrays.copyOf(currentCipherOutput, cipherTextLen);
@@ -160,6 +154,13 @@ public class JweJsonProducer {
             } catch (Exception ex) {
                 throw new SecurityException(ex);
             }
+        }
+        if (protectedHeader != null) {
+            jweJsonMap.put("protected", 
+                        Base64UrlUtility.encode(writer.toJson(protectedHeader)));
+        }
+        if (unprotectedHeader != null) {
+            jweJsonMap.put("unprotected", unprotectedHeader);
         }
         if (entries.size() == 1 && canBeFlat) {
             JweHeaders unprotectedEntryHeader = entries.get(0).getUnprotectedHeader();
