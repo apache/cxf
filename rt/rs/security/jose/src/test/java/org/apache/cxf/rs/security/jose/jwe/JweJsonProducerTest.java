@@ -222,6 +222,9 @@ public class JweJsonProducerTest extends Assert {
     }
     @Test
     public void testMultipleRecipients() {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         SecretKey wrapperKey1 = CryptoUtils.createSecretKeySpec(WRAPPER_BYTES1, "AES");
         SecretKey wrapperKey2 = CryptoUtils.createSecretKeySpec(WRAPPER_BYTES2, "AES");
