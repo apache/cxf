@@ -72,16 +72,13 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
     protected static int getFullCekKeySize(String algoJwt) {
         return AES_CEK_SIZE_MAP.get(algoJwt);
     }
-    
-    protected JweCompactProducer getJweCompactProducer(JweEncryptionInternal state, byte[] cipher) {
+    protected byte[] getActualCipher(byte[] cipher) {
+        return cipher;
+    }
+    protected byte[] getAuthenticationTag(JweEncryptionInternal state, byte[] cipher) {
         final MacState macState = getInitializedMacState(state);
         macState.mac.update(cipher);
-        byte[] authTag = signAndGetTag(macState);
-        return new JweCompactProducer(macState.headersJson,
-                                      state.jweContentEncryptionKey,
-                                      state.theIv,
-                                      cipher,
-                                      authTag);
+        return signAndGetTag(macState);
     }
     
     protected static byte[] signAndGetTag(MacState macState) {
@@ -119,7 +116,6 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
         MacState macState = new MacState();
         macState.mac = mac;
         macState.al = al;
-        macState.headersJson = protectedHeadersJson;
         return macState;
     }
     
@@ -162,7 +158,6 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
     protected static class MacState {
         protected Mac mac;
         private byte[] al;
-        private String headersJson;
     }
     
     private static String validateCekAlgorithm(String cekAlgo) {

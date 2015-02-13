@@ -29,5 +29,5 @@ public interface JweEncryptionProvider extends JweKeyProperties {
      * Prepare JWE state for completing either
      * JWE compact or JSON encryption 
      */
-    JweEncryptionState createJweEncryptionState(JweEncryptionInput jweInput);
+    JweEncryptionOutput getEncryptionOutput(JweEncryptionInput jweInput);
 }
