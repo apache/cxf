@@ -92,7 +92,7 @@ public class JweJsonProducerTest extends Assert {
         + "],"
         + "\"iv\":\"AxY8DCtDaGlsbGljb3RoZQ\","
         + "\"ciphertext\":\"KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY\","
-        + "\"tag\":\"vmz4ZlGcZHWBlSMbwtP_Jg\""
+        + "\"tag\":\"U0m_YmjN04DJvceFICbCVQ\""
         + "}";
     private static final Boolean SKIP_AES_GCM_TESTS = isJava6();
     
@@ -153,11 +153,11 @@ public class JweJsonProducerTest extends Assert {
                                             contentEncryptionAlgo);
         JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(wrapperKey, headers);
         JweJsonProducer p = new JweJsonProducer(headers, StringUtils.toBytesUTF8(text), canBeFlat) {
-            protected byte[] generateIv() {
-                return iv;
-            }
-            protected byte[] generateCek() {
-                return cek;
+            protected JweEncryptionInput createEncryptionInput(JweHeaders jsonHeaders) {
+                JweEncryptionInput input = super.createEncryptionInput(jsonHeaders);
+                input.setCek(cek);
+                input.setIv(iv);
+                return input;
             }    
         };
         String jweJson = p.encryptWith(jwe);
@@ -185,12 +185,12 @@ public class JweJsonProducerTest extends Assert {
                                                 StringUtils.toBytesUTF8(text),
                                                 StringUtils.toBytesUTF8(EXTRA_AAD_SOURCE),
                                                 false) {
-            protected byte[] generateIv() {
-                return JweCompactReaderWriterTest.INIT_VECTOR_A1;
+            protected JweEncryptionInput createEncryptionInput(JweHeaders jsonHeaders) {
+                JweEncryptionInput input = super.createEncryptionInput(jsonHeaders);
+                input.setCek(CEK_BYTES);
+                input.setIv(JweCompactReaderWriterTest.INIT_VECTOR_A1);
+                return input;
             }
-            protected byte[] generateCek() {
-                return CEK_BYTES;
-            }    
         };
         JweHeaders recepientUnprotectedHeaders = new JweHeaders();
         recepientUnprotectedHeaders.setKeyEncryptionAlgorithm(JoseConstants.A128KW_ALGO);

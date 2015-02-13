@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 public class JweJsonProducer {
@@ -75,9 +74,6 @@ public class JweJsonProducer {
             && recipientUnprotected.size() != encryptors.size()) {
             throw new IllegalArgumentException();
         }
-        //TODO: determine the actual cek and iv length based on the algo
-        byte[] cek = generateCek();
-        byte[] iv = generateIv();
         JweHeaders unionHeaders = new JweHeaders();
         if (protectedHeader != null) {
             unionHeaders.asMap().putAll(protectedHeader.asMap());
@@ -94,6 +90,7 @@ public class JweJsonProducer {
         Map<String, Object> jweJsonMap = new LinkedHashMap<String, Object>();
         byte[] cipherText = null;
         byte[] authTag = null;
+        byte[] iv = null;
         for (int i = 0; i < encryptors.size(); i++) {
             JweEncryptionProvider encryptor = encryptors.get(i);
             JweHeaders perRecipientUnprotected = 
@@ -111,49 +108,38 @@ public class JweJsonProducer {
             }
             jsonHeaders.setProtectedHeaders(protectedHeader);
             
-            JweEncryptionInput input = new JweEncryptionInput(jsonHeaders,
-                                                              cek,
-                                                              iv,
-                                                              aad);
+            JweEncryptionInput input = createEncryptionInput(jsonHeaders);
                 
-            JweEncryptionState state = encryptor.createJweEncryptionState(input);
-            try {
-                byte[] currentCipherOutput = state.getCipher().doFinal(content);
-                if (state.getAuthTagProducer() != null) {
-                    cipherText = currentCipherOutput;
-                    state.getAuthTagProducer().update(content, 0, content.length);
-                    authTag = state.getAuthTagProducer().getTag();
-                } else {
-                    byte[] currentCipherText = null;
-                    byte[] currentAuthTag = null;
-                    
-                    final int authTagLengthBits = 128;
-                    final int cipherTextLen = currentCipherOutput.length - authTagLengthBits / 8;
-                    currentCipherText = Arrays.copyOf(currentCipherOutput, cipherTextLen);
-                    currentAuthTag = Arrays.copyOfRange(currentCipherOutput, cipherTextLen, 
-                                                        cipherTextLen + authTagLengthBits / 8);
-                    if (cipherText == null) {
-                        cipherText = currentCipherText;
-                    } else if (!Arrays.equals(cipherText, currentCipherText)) {
-                        throw new SecurityException();
-                    }
-                    if (authTag == null) {
-                        authTag = currentAuthTag;
-                    } else if (!Arrays.equals(authTag, currentAuthTag)) {
-                        throw new SecurityException();
-                    }
-                }
-                
-                byte[] encryptedCek = state.getContentEncryptionKey(); 
-                if (encryptedCek == null && encryptor.getKeyAlgorithm() != null) {
-                    // can be null only if it is the direct key encryption
-                    throw new SecurityException();
-                }
-                String encodedCek = encryptedCek == null ? null : Base64UrlUtility.encode(encryptedCek);    
-                entries.add(new JweJsonEncryptionEntry(perRecipientUnprotected, encodedCek));
-            } catch (Exception ex) {
-                throw new SecurityException(ex);
+            JweEncryptionOutput state = encryptor.getEncryptionOutput(input);
+            
+            byte[] currentCipherText = state.getEncryptedContent();
+            byte[] currentAuthTag = state.getAuthTag();
+            byte[] currentIv = state.getIv();
+            if (cipherText == null) {
+                cipherText = currentCipherText;
+            } else if (!Arrays.equals(cipherText, currentCipherText)) {
+                throw new SecurityException();
             }
+            if (authTag == null) {
+                authTag = currentAuthTag;
+            } else if (!Arrays.equals(authTag, currentAuthTag)) {
+                throw new SecurityException();
+            }
+            if (iv == null) {
+                iv = currentIv;
+            } else if (!Arrays.equals(iv, currentIv)) {
+                throw new SecurityException();
+            }
+            
+            
+            byte[] encryptedCek = state.getContentEncryptionKey(); 
+            if (encryptedCek == null && encryptor.getKeyAlgorithm() != null) {
+                // can be null only if it is the direct key encryption
+                throw new SecurityException();
+            }
+            String encodedCek = encryptedCek == null ? null : Base64UrlUtility.encode(encryptedCek);    
+            entries.add(new JweJsonEncryptionEntry(perRecipientUnprotected, encodedCek));
+            
         }
         if (protectedHeader != null) {
             jweJsonMap.put("protected", 
@@ -179,11 +165,8 @@ public class JweJsonProducer {
         jweJsonMap.put("tag", Base64UrlUtility.encode(authTag));
         return writer.toJson(jweJsonMap);
     }
-    protected byte[] generateIv() {
-        return CryptoUtils.generateSecureRandomBytes(16);
-    }
-    protected byte[] generateCek() {
-        return CryptoUtils.generateSecureRandomBytes(32);
+    protected JweEncryptionInput createEncryptionInput(JweHeaders jsonHeaders) {
+        return new JweEncryptionInput(jsonHeaders, content, aad);
     }
     private String checkAndGetContentAlgorithm(List<JweEncryptionProvider> encryptors) {
         Set<String> set = new HashSet<String>();

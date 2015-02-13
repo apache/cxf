@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -78,22 +79,53 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected byte[] getAAD(String protectedHeaders, byte[] aad) {
         return getContentEncryptionAlgorithm().getAdditionalAuthenticationData(protectedHeaders, aad);
     }
+    @Override
     public String encrypt(byte[] content, JweHeaders jweHeaders) {
         JweEncryptionInternal state = getInternalState(jweHeaders, null);
         
-        byte[] cipher = CryptoUtils.encryptBytes(content, createCekSecretKey(state), state.keyProps);
-        
-        
-        JweCompactProducer producer = getJweCompactProducer(state, cipher);
+        byte[] encryptedContent = encryptInternal(state, content);
+        byte[] cipher = getActualCipher(encryptedContent);
+        byte[] authTag = getAuthenticationTag(state, encryptedContent);
+        JweCompactProducer producer = new JweCompactProducer(state.protectedHeadersJson, 
+                                                             state.jweContentEncryptionKey,
+                                                             state.theIv,
+                                                             cipher,
+                                                             authTag);
         return producer.getJweContent();
     }
-    
-    protected JweCompactProducer getJweCompactProducer(JweEncryptionInternal state, byte[] cipher) {
-        return new JweCompactProducer(state.theHeaders, 
-                                      state.jweContentEncryptionKey,
+    @Override
+    public JweEncryptionOutput getEncryptionOutput(JweEncryptionInput jweInput) {
+        JweEncryptionInternal state = getInternalState(jweInput.getJweHeaders(), jweInput);
+        Cipher c = null;
+        AuthenticationTagProducer authTagProducer = null;
+        byte[] cipher = null;
+        byte[] authTag = null;
+        if (jweInput.getContent() == null) {
+            c = CryptoUtils.initCipher(createCekSecretKey(state), state.keyProps, 
+                                              Cipher.ENCRYPT_MODE);
+            authTagProducer = getAuthenticationTagProducer(state);
+        } else {
+            byte[] encryptedContent = encryptInternal(state, jweInput.getContent());
+            cipher = getActualCipher(encryptedContent);
+            authTag = getAuthenticationTag(state, encryptedContent);    
+        }
+        return new JweEncryptionOutput(c, 
+                                      state.theHeaders, 
+                                      state.jweContentEncryptionKey, 
                                       state.theIv,
+                                      authTagProducer,
+                                      state.keyProps,
                                       cipher,
-                                      DEFAULT_AUTH_TAG_LENGTH);
+                                      authTag);
+    }
+    protected byte[] encryptInternal(JweEncryptionInternal state, byte[] content) {
+        return CryptoUtils.encryptBytes(content, createCekSecretKey(state), state.keyProps);
+    }
+    protected byte[] getActualCipher(byte[] cipher) {
+        return Arrays.copyOf(cipher, cipher.length - DEFAULT_AUTH_TAG_LENGTH / 8);
+    }
+    protected byte[] getAuthenticationTag(JweEncryptionInternal state, byte[] cipher) {
+        return Arrays.copyOfRange(cipher, cipher.length - DEFAULT_AUTH_TAG_LENGTH / 8, cipher.length);
     }
     @Override
     public String getKeyAlgorithm() {
@@ -106,18 +138,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected JoseHeadersReaderWriter getJwtHeadersWriter() {
         return writer;
     }
-    @Override
-    public JweEncryptionState createJweEncryptionState(JweEncryptionInput jweInput) {
-        JweEncryptionInternal state = getInternalState(jweInput.getJweHeaders(), jweInput);
-        Cipher c = CryptoUtils.initCipher(createCekSecretKey(state), state.keyProps, 
-                                          Cipher.ENCRYPT_MODE);
-        return new JweEncryptionState(c, 
-                                      state.theHeaders, 
-                                      state.jweContentEncryptionKey, 
-                                      state.theIv,
-                                      getAuthenticationTagProducer(state),
-                                      state.keyProps.isCompressionSupported());
-    }
+    
     protected AuthenticationTagProducer getAuthenticationTagProducer(JweEncryptionInternal state) {
         return null;
     }

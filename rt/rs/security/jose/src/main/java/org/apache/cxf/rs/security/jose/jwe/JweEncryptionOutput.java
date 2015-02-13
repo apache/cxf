@@ -20,26 +20,36 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import javax.crypto.Cipher;
 
-public class JweEncryptionState {
+import org.apache.cxf.common.util.crypto.KeyProperties;
+
+public class JweEncryptionOutput {
     private Cipher cipher;
     private JweHeaders headers;
     private byte[] contentEncryptionKey;
     private byte[] iv;
-    private boolean compressionSupported;
     private AuthenticationTagProducer authTagProducer;
+    private byte[] encryptedContent;
+    private byte[] authTag;
+    private KeyProperties keyProps;
     
-    public JweEncryptionState(Cipher cipher, 
+    //CHECKSTYLE:OFF
+    public JweEncryptionOutput(Cipher cipher, 
                               JweHeaders headers, 
                               byte[] contentEncryptionKey, 
                               byte[] iv, 
                               AuthenticationTagProducer authTagProducer,
-                              boolean compressionSupported) {
+                              KeyProperties keyProps,
+                              byte[] encryptedContent,
+                              byte[] authTag) {
+    //CHECKSTYLE:ON    
         this.cipher = cipher;
         this.headers = headers;
         this.contentEncryptionKey = contentEncryptionKey;
         this.iv = iv;
         this.authTagProducer = authTagProducer;
-        this.compressionSupported = compressionSupported;
+        this.keyProps = keyProps;
+        this.encryptedContent = encryptedContent;
+        this.authTag = authTag;
     }
     public Cipher getCipher() {
         return cipher;
@@ -54,10 +64,15 @@ public class JweEncryptionState {
         return iv;
     }
     public boolean isCompressionSupported() {
-        return compressionSupported;
+        return keyProps.isCompressionSupported();
     }
     public AuthenticationTagProducer getAuthTagProducer() {
         return authTagProducer;
     }
-    
+    public byte[] getEncryptedContent() {
+        return encryptedContent;
+    }
+    public byte[] getAuthTag() {
+        return authTag;
+    }
 }

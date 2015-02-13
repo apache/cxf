@@ -23,24 +23,36 @@ public class JweEncryptionInput {
     private byte[] cek;
     private byte[] iv;
     private byte[] aad;
+    private byte[] content;
+    public JweEncryptionInput() {
+        
+    }
     public JweEncryptionInput(JweHeaders jweHeaders) {
-        this.jweHeaders = jweHeaders;
+        this(jweHeaders, null);
     }
     public JweEncryptionInput(JweHeaders jweHeaders,
-                              byte[] cek,
-                              byte[] iv) {
-        this(jweHeaders, cek, iv, null);
+                              byte[] content) {
+        this(jweHeaders, content, null);
+    }
+    public JweEncryptionInput(JweHeaders jweHeaders,
+                              byte[] content,
+                              byte[] aad) {
+        this(jweHeaders, content, aad, null, null);
         
     }
     public JweEncryptionInput(JweHeaders jweHeaders,
-                              byte[] aad) {
-        this(jweHeaders, null, null, aad);
+                              byte[] content,
+                              byte[] cek,
+                              byte[] iv) {
+        this(jweHeaders, content, null, cek, iv);
     }
     public JweEncryptionInput(JweHeaders jweHeaders,
+                              byte[] content,
+                              byte[] aad,
                               byte[] cek,
-                              byte[] iv,
-                              byte[] aad) {
-        this(jweHeaders);
+                              byte[] iv) {
+        this.jweHeaders = jweHeaders;
+        this.content = content;
         this.cek = cek;
         this.iv = iv;
         this.aad = aad;
@@ -48,13 +60,31 @@ public class JweEncryptionInput {
     public JweHeaders getJweHeaders() {
         return jweHeaders;
     }
+    public void setJweHeaders(JweHeaders jweHeaders) {
+        this.jweHeaders = jweHeaders;
+    }
     public byte[] getCek() {
         return cek;
+    }
+    public void setCek(byte[] cek) {
+        this.cek = cek;
     }
     public byte[] getIv() {
         return iv;
     }
+    public void setIv(byte[] iv) {
+        this.iv = iv;
+    }
     public byte[] getAad() {
         return aad;
+    }
+    public void setAad(byte[] aad) {
+        this.aad = aad;
+    }
+    public byte[] getContent() {
+        return content;
+    }
+    public void setContent(byte[] content) {
+        this.content = content;
     }
 }
