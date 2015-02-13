@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -109,28 +108,22 @@ public class JweJsonProducer {
             jsonHeaders.setProtectedHeaders(protectedHeader);
             
             JweEncryptionInput input = createEncryptionInput(jsonHeaders);
-                
+            if (i > 0) {    
+                input.setContent(null);
+            }
             JweEncryptionOutput state = encryptor.getEncryptionOutput(input);
-            
             byte[] currentCipherText = state.getEncryptedContent();
             byte[] currentAuthTag = state.getAuthTag();
             byte[] currentIv = state.getIv();
             if (cipherText == null) {
                 cipherText = currentCipherText;
-            } else if (!Arrays.equals(cipherText, currentCipherText)) {
-                throw new SecurityException();
             }
             if (authTag == null) {
                 authTag = currentAuthTag;
-            } else if (!Arrays.equals(authTag, currentAuthTag)) {
-                throw new SecurityException();
             }
             if (iv == null) {
                 iv = currentIv;
-            } else if (!Arrays.equals(iv, currentIv)) {
-                throw new SecurityException();
-            }
-            
+            } 
             
             byte[] encryptedCek = state.getContentEncryptionKey(); 
             if (encryptedCek == null && encryptor.getKeyAlgorithm() != null) {
