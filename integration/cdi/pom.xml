@@ -30,11 +30,19 @@
         <version>3.1.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
+    
     <properties>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+            javax.enterprise*;version="[${cxf.cdi.api.version},2)",
+            javax.ws.rs*;version="[1.0,3)",
+            org.apache.cxf*;version="${project.version}",
         </cxf.osgi.import>
+        <cxf.osgi.export>
+            org.apache.cxf.jaxrs*
+        </cxf.osgi.export>
     </properties>
+    
     <dependencies>
         <dependency>
             <groupId>javax.enterprise</groupId>
@@ -67,4 +75,43 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    <build>
+    	<plugins>
+    		<!-- Generate Manifest file required for OSGI bundles -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
+                        <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
+                        <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
+                        <Implementation-Version>${cxf.osgi.version.clean}</Implementation-Version>
+                        <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
+                        <Specification-Version>${cxf.osgi.version.clean}</Specification-Version>
+                        <Bundle-DocURL>http://cxf.apache.org</Bundle-DocURL>
+                        <Fragment-Host>${cxf.fragment.host}</Fragment-Host>
+                        <_failok>true</_failok>
+                        <_nouses>true</_nouses>
+                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
+                        <Export-Package>${cxf.osgi.export}</Export-Package>
+                        <Import-Package>
+                            ${cxf.osgi.import}
+                        </Import-Package>
+                        <DynamicImport-Package>
+                            ${cxf.osgi.dynamic.import}
+                        </DynamicImport-Package>
+                        <Require-Capability>
+                            osgi.extender;filter:="(osgi.extender=pax.cdi)"
+                        </Require-Capability>
+                        <Provide-Capability>
+                            org.ops4j.pax.cdi.extension; extension="cxf-integration-cdi"
+                        </Provide-Capability>        
+                    </instructions>
+                </configuration>
+            </plugin>    		
+    	</plugins>
+    </build>
 </project>

@@ -415,4 +415,9 @@
         <bundle start-level="35">mvn:org.apache.abdera/abdera-parser/${cxf.abdera.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-management-web/${project.version}</bundle>
     </feature>
+
+    <feature name="cxf-jaxrs-cdi" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-jaxrs</feature>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-integration-cdi/${project.version}</bundle>
+    </feature>
 </features>
