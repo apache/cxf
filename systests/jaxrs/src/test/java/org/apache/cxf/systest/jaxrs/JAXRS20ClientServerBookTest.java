@@ -271,6 +271,26 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertNotSame(collectionEntity.getEntity().get(0), book);
         assertEquals(collectionEntity.getEntity().get(0).getName(), book.getName());
     }
+    @Test
+    public void testPostCollectionGenericEntityGenericCallback() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections3"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").type("application/xml");
+        
+        GenericEntity<List<Book>> collectionEntity = createGenericEntity();
+        final Holder<Book> holder = new Holder<Book>();
+        InvocationCallback<Book> callback = 
+            new GenericInvocationCallback<Book>(holder) { };        
+            
+        Future<Book> future = wc.post(collectionEntity, callback);
+        Book book = future.get();
+        assertEquals(200, wc.getResponse().getStatus());
+        assertSame(book, holder.value);
+        assertNotSame(collectionEntity.getEntity().get(0), book);
+        assertEquals(collectionEntity.getEntity().get(0).getName(), book.getName());
+    }
     
     @Test
     public void testPostCollectionGenericEntityAsEntity() throws Exception {
@@ -455,6 +475,25 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         @Override
         public void completed(List<Book> books) {
             holder.value = books;
+            
+        }
+
+        @Override
+        public void failed(Throwable arg0) {
+            // TODO Auto-generated method stub
+            
+        }
+        
+    }
+    private static class GenericInvocationCallback<T> implements InvocationCallback<T> {
+        private Holder<T> holder;
+        public GenericInvocationCallback(Holder<T> holder) {
+            this.holder = holder;
+        }
+        
+        @Override
+        public void completed(T book) {
+            holder.value = book;
             
         }
 
