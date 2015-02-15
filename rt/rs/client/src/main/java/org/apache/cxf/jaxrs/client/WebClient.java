@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
@@ -915,10 +916,15 @@ public class WebClient extends AbstractClient {
     private Type getCallbackType(InvocationCallback<?> callback) {
         Class<?> cls = callback.getClass();
         ParameterizedType pt = findCallbackType(cls);
+        Type actualType = null;
         for (Type tp : pt.getActualTypeArguments()) {
-            return tp;
+            actualType = tp;
+            break;
         }
-        return null;
+        if (actualType instanceof TypeVariable) { 
+            actualType = InjectionUtils.getSuperType(cls, (TypeVariable<?>)actualType);
+        }
+        return actualType;
     }
     
     protected <T> Future<T> doInvokeAsyncCallback(String httpMethod, 
