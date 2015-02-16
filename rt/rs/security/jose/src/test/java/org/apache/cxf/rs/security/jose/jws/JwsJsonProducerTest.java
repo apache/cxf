@@ -76,7 +76,7 @@ public class JwsJsonProducerTest extends Assert {
                
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1,
                           JoseConstants.HMAC_SHA_256_ALGO),
-                          new JwsJsonProtectedHeader(headerEntries));
+                          headerEntries);
         assertEquals(SIGNED_JWS_JSON_DOCUMENT,
                      producer.getJwsJsonSignedDocument());
     }
@@ -88,7 +88,7 @@ public class JwsJsonProducerTest extends Assert {
                
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1,
                           JoseConstants.HMAC_SHA_256_ALGO),
-                          new JwsJsonProtectedHeader(headerEntries));
+                          headerEntries);
         assertEquals(SIGNED_JWS_JSON_FLAT_DOCUMENT,
                      producer.getJwsJsonSignedDocument());
     }
@@ -100,10 +100,10 @@ public class JwsJsonProducerTest extends Assert {
                
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1,
                           JoseConstants.HMAC_SHA_256_ALGO),
-                          new JwsJsonProtectedHeader(headerEntries));
+                          headerEntries);
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_2,
                           JoseConstants.HMAC_SHA_256_ALGO),
-                          new JwsJsonProtectedHeader(headerEntries));
+                          headerEntries);
         assertEquals(DUAL_SIGNED_JWS_JSON_DOCUMENT,
                      producer.getJwsJsonSignedDocument());
     }

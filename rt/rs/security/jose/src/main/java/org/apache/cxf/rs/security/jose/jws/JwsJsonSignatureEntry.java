@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import java.util.Collections;
 
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
@@ -32,14 +33,15 @@ public class JwsJsonSignatureEntry {
     private String encodedJwsPayload;
     private String encodedProtectedHeader;
     private String encodedSignature;
-    private JwsJsonProtectedHeader protectedHeader;
-    private JwsJsonUnprotectedHeader unprotectedHeader;
+    private JoseHeaders protectedHeader;
+    private JoseHeaders unprotectedHeader;
     private JoseHeaders unionHeaders;
+    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
       
     public JwsJsonSignatureEntry(String encodedJwsPayload,
                                  String encodedProtectedHeader,
                                  String encodedSignature,
-                                 JwsJsonUnprotectedHeader unprotectedHeader) {
+                                 JoseHeaders unprotectedHeader) {
         if (encodedProtectedHeader == null && unprotectedHeader == null || encodedSignature == null) {
             throw new SecurityException("Invalid security entry");
         }
@@ -49,8 +51,7 @@ public class JwsJsonSignatureEntry {
         this.encodedSignature = encodedSignature;
         this.unprotectedHeader = unprotectedHeader;
         if (encodedProtectedHeader != null) {
-            this.protectedHeader = new JwsJsonProtectedHeader(
-                    new JoseHeadersReaderWriter().fromJsonHeaders(JoseUtils.decodeToString(encodedProtectedHeader)));
+            this.protectedHeader = writer.fromJsonHeaders(JoseUtils.decodeToString(encodedProtectedHeader));
         }
         prepare();
     }
@@ -58,14 +59,14 @@ public class JwsJsonSignatureEntry {
         unionHeaders = new JoseHeaders();
         
         if (protectedHeader != null) {
-            unionHeaders.asMap().putAll(protectedHeader.getHeaderEntries().asMap());
+            unionHeaders.asMap().putAll(protectedHeader.asMap());
         }
         if (unprotectedHeader != null) {
             if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
-                                     unprotectedHeader.getHeaderEntries().asMap().keySet())) {
+                                     unprotectedHeader.asMap().keySet())) {
                 throw new SecurityException("Protected and unprotected headers have duplicate values");
             }
-            unionHeaders.asMap().putAll(unprotectedHeader.getHeaderEntries().asMap());
+            unionHeaders.asMap().putAll(unprotectedHeader.asMap());
         }
     }
     public String getEncodedJwsPayload() {
@@ -80,10 +81,10 @@ public class JwsJsonSignatureEntry {
     public String getEncodedProtectedHeader() {
         return encodedProtectedHeader;
     }
-    public JwsJsonProtectedHeader getProtectedHeader() {
+    public JoseHeaders getProtectedHeader() {
         return protectedHeader;
     }
-    public JwsJsonUnprotectedHeader getUnprotectedHeader() {
+    public JoseHeaders getUnprotectedHeader() {
         return unprotectedHeader;
     }
     public JoseHeaders getUnionHeader() {
@@ -133,13 +134,13 @@ public class JwsJsonSignatureEntry {
             sb.append("{");
         }
         if (protectedHeader != null) {
-            sb.append("\"protected\":\"" + protectedHeader.getEncodedHeaderEntries() + "\"");
+            sb.append("\"protected\":\"" + Base64UrlUtility.encode(writer.toJson(protectedHeader)) + "\"");
         }
         if (unprotectedHeader != null) {
             if (protectedHeader != null) {
                 sb.append(",");
             }
-            sb.append("\"header\":" + unprotectedHeader.toJson());
+            sb.append("\"header\":" + writer.toJson(unprotectedHeader));
         }
         sb.append(",");
         sb.append("\"signature\":\"" + encodedSignature + "\"");
