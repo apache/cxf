@@ -19,9 +19,9 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 
-public class WrappedKeyJweEncryption extends AbstractJweEncryption {
-    public WrappedKeyJweEncryption(KeyEncryptionAlgorithm keyEncryptionAlgorithm,
-                                   ContentEncryptionAlgorithm contentEncryptionAlgo) {
+public class JweEncryption extends AbstractJweEncryption {
+    public JweEncryption(KeyEncryptionAlgorithm keyEncryptionAlgorithm,
+                         ContentEncryptionAlgorithm contentEncryptionAlgo) {
         super(contentEncryptionAlgo, keyEncryptionAlgorithm);
     }
     
