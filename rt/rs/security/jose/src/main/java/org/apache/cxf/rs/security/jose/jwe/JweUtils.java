@@ -488,10 +488,10 @@ public final class JweUtils {
         JweHeaders headers = new JweHeaders();
         if (keyEncryptionAlgo != null) {
             headers.setAlgorithm(keyEncryptionAlgo);
-            headers.setContentEncryptionAlgorithm(contentEncryptionAlgo);
-            if (compression != null) {
-                headers.setZipAlgorithm(compression);
-            }
+        }
+        headers.setContentEncryptionAlgorithm(contentEncryptionAlgo);
+        if (compression != null) {
+            headers.setZipAlgorithm(compression);
         }
         return headers;
     }

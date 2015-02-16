@@ -18,27 +18,20 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-
-public class DirectKeyJweEncryption extends AbstractJweEncryption {
-    
-    public DirectKeyJweEncryption(ContentEncryptionAlgorithm ceAlgo) {
-        this(ceAlgo, new DirectKeyEncryptionAlgorithm());
+public class DirectKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
+    public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
+        if (headers.getKeyEncryptionAlgorithm() != null) {
+            throw new SecurityException();
+        }
+        return new byte[0];
     }
-    protected DirectKeyJweEncryption(ContentEncryptionAlgorithm ceAlgo,
-                                     DirectKeyEncryptionAlgorithm direct) {
-        super(ceAlgo, direct);
+    protected void checkKeyEncryptionAlgorithm(JweHeaders headers) {
+        if (headers.getKeyEncryptionAlgorithm() != null) {
+            throw new SecurityException();
+        }
     }
     @Override
-    protected byte[] getProvidedContentEncryptionKey(JweHeaders headers) {
-        return validateCek(super.getProvidedContentEncryptionKey(headers));
+    public String getAlgorithm() {
+        return null;
     }
-    private static byte[] validateCek(byte[] cek) {
-        if (cek == null) {
-            // to prevent the cek from being auto-generated which 
-            // does not make sense for the direct key case
-            throw new NullPointerException("CEK must not be null");
-        }
-        return cek;
-    }
-    
 }

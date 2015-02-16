@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 public class JweJsonProducer {
@@ -82,6 +83,7 @@ public class JweJsonProducer {
                                      unprotectedHeader.asMap().keySet())) {
                 throw new SecurityException("Protected and unprotected headers have duplicate values");
             }
+            checkCriticalHeaders(unprotectedHeader);
             unionHeaders.asMap().putAll(unprotectedHeader.asMap());
         }
         
@@ -95,13 +97,14 @@ public class JweJsonProducer {
             JweHeaders perRecipientUnprotected = 
                 recipientUnprotected == null ? null : recipientUnprotected.get(i);
             JweHeaders jsonHeaders = null;
-            if (recipientUnprotected != null) {
+            if (perRecipientUnprotected != null) {
+                checkCriticalHeaders(perRecipientUnprotected);
                 if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
                                           perRecipientUnprotected.asMap().keySet())) {
                     throw new SecurityException("Protected and unprotected headers have duplicate values");
                 }
                 jsonHeaders = new JweHeaders(unionHeaders.asMap());
-                jsonHeaders.asMap().putAll(unprotectedHeader.asMap());
+                jsonHeaders.asMap().putAll(perRecipientUnprotected.asMap());
             } else {  
                 jsonHeaders = unionHeaders;
             }
@@ -126,11 +129,11 @@ public class JweJsonProducer {
             } 
             
             byte[] encryptedCek = state.getContentEncryptionKey(); 
-            if (encryptedCek == null && encryptor.getKeyAlgorithm() != null) {
+            if (encryptedCek.length == 0 && encryptor.getKeyAlgorithm() != null) {
                 // can be null only if it is the direct key encryption
                 throw new SecurityException();
             }
-            String encodedCek = encryptedCek == null ? null : Base64UrlUtility.encode(encryptedCek);    
+            String encodedCek = encryptedCek.length == 0 ? null : Base64UrlUtility.encode(encryptedCek);    
             entries.add(new JweJsonEncryptionEntry(perRecipientUnprotected, encodedCek));
             
         }
@@ -146,7 +149,10 @@ public class JweJsonProducer {
             if (unprotectedEntryHeader != null) {
                 jweJsonMap.put("header", unprotectedEntryHeader);
             }
-            jweJsonMap.put("encrypted_key", entries.get(0).getEncodedEncryptedKey());
+            String encryptedKey = entries.get(0).getEncodedEncryptedKey();
+            if (encryptedKey != null) {
+                jweJsonMap.put("encrypted_key", encryptedKey);
+            }
         } else {
             jweJsonMap.put("recipients", entries);
         }
@@ -171,5 +177,9 @@ public class JweJsonProducer {
         }
         return set.iterator().next();
     }
-    
+    private static void checkCriticalHeaders(JweHeaders unprotected) {
+        if (unprotected.asMap().containsKey(JoseConstants.HEADER_CRITICAL)) {
+            throw new SecurityException();
+        }
+    }
 }
