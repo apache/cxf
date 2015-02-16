@@ -30,6 +30,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
@@ -87,7 +88,7 @@ public class JwsJsonConsumer {
             new JwsJsonSignatureEntry(encodedJwsPayload, 
                                       protectedHeader, 
                                       signature, 
-                                      header != null ? new JwsJsonUnprotectedHeader(header) : null);
+                                      header != null ? new JoseHeaders(header) : null);
     }
     public String getSignedDocument() {
         return this.jwsSignedDocument;

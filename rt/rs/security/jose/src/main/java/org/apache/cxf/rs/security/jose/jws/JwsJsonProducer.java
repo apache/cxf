@@ -27,13 +27,16 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 public class JwsJsonProducer {
     private boolean supportFlattened;
     private String plainPayload;
     private String encodedPayload;
     private List<JwsJsonSignatureEntry> signatures = new LinkedList<JwsJsonSignatureEntry>();
+    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
     public JwsJsonProducer(String tbsDocument) {
         this(tbsDocument, false);
     }
@@ -94,10 +97,10 @@ public class JwsJsonProducer {
     public String signWith(JwsSignatureProvider signer) {
         JoseHeaders headers = new JoseHeaders();
         headers.setAlgorithm(signer.getAlgorithm());
-        return signWith(signer, new JwsJsonProtectedHeader(headers));
+        return signWith(signer, headers);
     }
     public String signWith(JwsSignatureProvider signer, 
-                           JwsJsonProtectedHeader protectedHeader) {
+                           JoseHeaders protectedHeader) {
         return signWith(signer, protectedHeader, null);
     }
     public String signWith(JsonWebKey jwk) {
@@ -110,26 +113,27 @@ public class JwsJsonProducer {
         return signWith(JwsUtils.getHmacSignatureProvider(key, algo));
     }
     public String signWith(JwsSignatureProvider signer,
-                           JwsJsonProtectedHeader protectedHeader,
-                           JwsJsonUnprotectedHeader unprotectedHeader) {
+                           JoseHeaders protectedHeader,
+                           JoseHeaders unprotectedHeader) {
         JoseHeaders unionHeaders = new JoseHeaders();
          
         if (protectedHeader != null) {
-            unionHeaders.asMap().putAll(protectedHeader.getHeaderEntries().asMap());
+            unionHeaders.asMap().putAll(protectedHeader.asMap());
         }
         if (unprotectedHeader != null) {
+            checkCriticalHeaders(unprotectedHeader);
             if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
-                                     unprotectedHeader.getHeaderEntries().asMap().keySet())) {
+                                     unprotectedHeader.asMap().keySet())) {
                 throw new SecurityException("Protected and unprotected headers have duplicate values");
             }
-            unionHeaders.asMap().putAll(unprotectedHeader.getHeaderEntries().asMap());
+            unionHeaders.asMap().putAll(unprotectedHeader.asMap());
         }
         if (unionHeaders.getAlgorithm() == null) {
             throw new SecurityException("Algorithm header is not set");
         }
         String sequenceToBeSigned;
         if (protectedHeader != null) {
-            sequenceToBeSigned = protectedHeader.getEncodedHeaderEntries()
+            sequenceToBeSigned = Base64UrlUtility.encode(writer.toJson(protectedHeader))
                     + "." + getUnsignedEncodedPayload();
         } else {
             sequenceToBeSigned = "." + getUnsignedEncodedPayload();
@@ -142,7 +146,7 @@ public class JwsJsonProducer {
         JwsJsonSignatureEntry signature;
         if (protectedHeader != null) {
             signature = new JwsJsonSignatureEntry(encodedPayload,
-                    protectedHeader.getEncodedHeaderEntries(),
+                    Base64UrlUtility.encode(writer.toJson(protectedHeader)),
                     encodedSignatureBytes,
                     unprotectedHeader);
         } else {
@@ -156,5 +160,10 @@ public class JwsJsonProducer {
     private String updateJwsJsonSignedDocument(JwsJsonSignatureEntry signature) {
         signatures.add(signature);
         return getJwsJsonSignedDocument();
+    }
+    private static void checkCriticalHeaders(JoseHeaders unprotected) {
+        if (unprotected.asMap().containsKey(JoseConstants.HEADER_CRITICAL)) {
+            throw new SecurityException();
+        }
     }
 }
