@@ -26,7 +26,7 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
-import org.apache.cxf.rs.security.jose.jwe.DirectKeyJweDecryption;
+import org.apache.cxf.rs.security.jose.jwe.JweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
@@ -75,7 +75,7 @@ public final class JwtAccessTokenUtils {
         return new BearerAccessToken(client, tokenId, issuedAt, expiresIn);
     }
     public static JwtToken decryptFromfromAccessToken(String tokenId, SecretKey key) {
-        DirectKeyJweDecryption jweDecryption = JweUtils.getDirectKeyJweDecryption(key, Algorithm.A128GCM.getJwtName());
+        JweDecryption jweDecryption = JweUtils.getDirectKeyJweDecryption(key, Algorithm.A128GCM.getJwtName());
         return decryptFromAccessToken(tokenId, jweDecryption);
     }
     public static JwtToken decryptFromAccessToken(String tokenId, JweDecryptionProvider jweDecryption) {
