@@ -60,6 +60,24 @@ public class JweJsonProducerTest extends Assert {
         + "\"ciphertext\":\"KTuJBMk9QG59xPB-c_YLM5-J7VG40_eMPvyHDD7eB-WHj_34YiWgpBOydTBm4RW0zUCJZ09xqorhWJME-DcQ\","
         + "\"tag\":\"GxWlwvTPmHi4ZnQgafiHew\""
         + "}";
+    private static final String SINGLE_RECIPIENT_DIRECT_OUTPUT = 
+        "{" 
+        + "\"protected\":\"eyJlbmMiOiJBMTI4R0NNIn0\","
+        + "\"recipients\":" 
+        + "["
+        + "{}"
+        + "],"
+        + "\"iv\":\"48V1_ALb6US04U3b\","
+        + "\"ciphertext\":\"KTuJBMk9QG59xPB-c_YLM5-J7VG40_eMPvyHDD7eB-WHj_34YiWgpBOydTBm4RW0zUCJZ09xqorhWJME-DcQ\","
+        + "\"tag\":\"Te59ApbK8wNBDY_1_dgYSw\""
+        + "}";
+    private static final String SINGLE_RECIPIENT_DIRECT_FLAT_OUTPUT = 
+        "{" 
+        + "\"protected\":\"eyJlbmMiOiJBMTI4R0NNIn0\","
+        + "\"iv\":\"48V1_ALb6US04U3b\","
+        + "\"ciphertext\":\"KTuJBMk9QG59xPB-c_YLM5-J7VG40_eMPvyHDD7eB-WHj_34YiWgpBOydTBm4RW0zUCJZ09xqorhWJME-DcQ\","
+        + "\"tag\":\"Te59ApbK8wNBDY_1_dgYSw\""
+        + "}";
     private static final String SINGLE_RECIPIENT_ALL_HEADERS_AAD_OUTPUT = 
         "{" 
         + "\"protected\":\"eyJlbmMiOiJBMTI4R0NNIn0\","
@@ -117,12 +135,26 @@ public class JweJsonProducerTest extends Assert {
         + "\"ciphertext\":\"KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY\","
         + "\"tag\":\"U0m_YmjN04DJvceFICbCVQ\""
         + "}";
+    private static final String SINGLE_RECIPIENT_A128CBCHS256_DIRECT_OUTPUT = 
+        "{" 
+        + "\"protected\":\"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0\","
+        + "\"recipients\":" 
+        + "["
+        + "{}"
+        + "],"
+        + "\"iv\":\"AxY8DCtDaGlsbGljb3RoZQ\","
+        + "\"ciphertext\":\"KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY\","
+        + "\"tag\":\"Mz-VPPyU4RlcuYv1IwIvzw\""
+        + "}";
+
     private static final Boolean SKIP_AES_GCM_TESTS = isJava6();
     
     private static boolean isJava6() {
         String version = System.getProperty("java.version");
         return 1.6D == Double.parseDouble(version.substring(0, 3));    
     }
+
+
     @BeforeClass
     public static void registerBouncyCastleIfNeeded() throws Exception {
         try {
@@ -145,6 +177,20 @@ public class JweJsonProducerTest extends Assert {
                               CEK_BYTES, false);
     }
     @Test
+    public void testSingleRecipientDirectGcm() throws Exception {
+        final String text = "The true sign of intelligence is not knowledge but imagination.";
+        doTestSingleRecipient(text, SINGLE_RECIPIENT_DIRECT_OUTPUT, JoseConstants.A128GCM_ALGO, 
+                              null, JweCompactReaderWriterTest.INIT_VECTOR_A1, 
+                              CEK_BYTES, false);
+    }
+    @Test
+    public void testSingleRecipientDirectFlatGcm() throws Exception {
+        final String text = "The true sign of intelligence is not knowledge but imagination.";
+        doTestSingleRecipient(text, SINGLE_RECIPIENT_DIRECT_FLAT_OUTPUT, JoseConstants.A128GCM_ALGO, 
+                              null, JweCompactReaderWriterTest.INIT_VECTOR_A1, 
+                              CEK_BYTES, true);
+    }
+    @Test
     public void testSingleRecipientFlatGcm() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         doTestSingleRecipient(text, SINGLE_RECIPIENT_FLAT_OUTPUT, JoseConstants.A128GCM_ALGO, 
@@ -160,21 +206,42 @@ public class JweJsonProducerTest extends Assert {
                               JweCompactReaderWriterTest.CONTENT_ENCRYPTION_KEY_A3,
                               false);
     }
+    @Test
+    public void testSingleRecipientDirectA128CBCHS256() throws Exception {
+        String text = "Live long and prosper.";
+        doTestSingleRecipient(text, SINGLE_RECIPIENT_A128CBCHS256_DIRECT_OUTPUT, JoseConstants.A128CBC_HS256_ALGO, 
+                              null,
+                              JweCompactReaderWriterTest.INIT_VECTOR_A3,
+                              JweCompactReaderWriterTest.CONTENT_ENCRYPTION_KEY_A3,
+                              false);
+    }
     
     private String doTestSingleRecipient(String text,
                                          String expectedOutput, 
                                          String contentEncryptionAlgo,
-                                         byte[] wrapperKeyBytes,
+                                         final byte[] wrapperKeyBytes,
                                          final byte[] iv,
                                          final byte[] cek,
                                          boolean canBeFlat) throws Exception {
         if (contentEncryptionAlgo.equals(JoseConstants.A128GCM_ALGO) && SKIP_AES_GCM_TESTS) {
             return null;
         }
-        SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(wrapperKeyBytes, "AES");
         JweHeaders headers = new JweHeaders(JoseConstants.A128KW_ALGO,
                                             contentEncryptionAlgo);
-        JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(wrapperKey, headers);
+        JweEncryptionProvider jwe = null;
+        if (wrapperKeyBytes == null) {
+            headers.asMap().remove("alg");
+            if (Algorithm.isAesCbcHmac(contentEncryptionAlgo)) {
+                jwe = JweUtils.createJweEncryptionProvider(new DirectKeyEncryptionAlgorithm(), 
+                                                           contentEncryptionAlgo, null);
+            } else {
+                SecretKey cekKey = CryptoUtils.createSecretKeySpec(cek, "AES");
+                jwe = JweUtils.getDirectKeyJweEncryption(cekKey, JoseConstants.A128GCM_ALGO);
+            }
+        } else {
+            SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(wrapperKeyBytes, "AES");
+            jwe = JweUtils.createJweEncryptionProvider(wrapperKey, headers);
+        }
         JweJsonProducer p = new JweJsonProducer(headers, StringUtils.toBytesUTF8(text), canBeFlat) {
             protected JweEncryptionInput createEncryptionInput(JweHeaders jsonHeaders) {
                 JweEncryptionInput input = super.createEncryptionInput(jsonHeaders);
