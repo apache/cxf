@@ -25,7 +25,7 @@ import javax.crypto.spec.IvParameterSpec;
 
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
-public class AesCbcHmacJweDecryption extends AbstractJweDecryption {
+public class AesCbcHmacJweDecryption extends JweDecryption {
     private String supportedAlgo;
     public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo) {
         this(keyDecryptionAlgo, null);
