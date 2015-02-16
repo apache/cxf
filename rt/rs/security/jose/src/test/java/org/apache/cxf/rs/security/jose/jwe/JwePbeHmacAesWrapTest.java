@@ -63,11 +63,11 @@ public class JwePbeHmacAesWrapTest extends Assert {
         final String password = "Thus from my lips, by yours, my sin is purged."; 
         KeyEncryptionAlgorithm keyEncryption = 
             new PbesHmacAesWrapKeyEncryptionAlgorithm(password, JoseConstants.PBES2_HS256_A128KW_ALGO);
-        JweEncryptionProvider encryption = new WrappedKeyJweEncryption(keyEncryption,
+        JweEncryptionProvider encryption = new JweEncryption(keyEncryption,
             new AesGcmContentEncryptionAlgorithm(Algorithm.A128GCM.getJwtName()));
         String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
         PbesHmacAesWrapKeyDecryptionAlgorithm keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
-        JweDecryptionProvider decryption = new WrappedKeyJweDecryption(keyDecryption, 
+        JweDecryptionProvider decryption = new JweDecryption(keyDecryption, 
                                                new AesGcmContentDecryptionAlgorithm(JoseConstants.A128GCM_ALGO));
         String decryptedText = decryption.decrypt(jweContent).getContentText();
         assertEquals(specPlainText, decryptedText);

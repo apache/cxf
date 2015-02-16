@@ -226,11 +226,11 @@ public class JweCompactReaderWriterTest extends Assert {
                                                        Algorithm.RSA_OAEP.getJwtName()); 
         ContentEncryptionAlgorithm contentEncryptionAlgo = 
             new AesGcmContentEncryptionAlgorithm(key == null ? null : key.getEncoded(), INIT_VECTOR_A1, jwtKeyName);
-        JweEncryptionProvider encryptor = new WrappedKeyJweEncryption(keyEncryptionAlgo, contentEncryptionAlgo);
+        JweEncryptionProvider encryptor = new JweEncryption(keyEncryptionAlgo, contentEncryptionAlgo);
         return encryptor.encrypt(content.getBytes("UTF-8"), null);
     }
     private String encryptContentDirect(SecretKey key, String content) throws Exception {
-        DirectKeyJweEncryption encryptor = new DirectKeyJweEncryption(
+        JweEncryption encryptor = new JweEncryption(new DirectKeyEncryptionAlgorithm(),
             new AesGcmContentEncryptionAlgorithm(key, INIT_VECTOR_A1, JoseConstants.A128GCM_ALGO));
         return encryptor.encrypt(content.getBytes("UTF-8"), null);
     }
@@ -239,13 +239,13 @@ public class JweCompactReaderWriterTest extends Assert {
                                                                 RSA_PRIVATE_EXPONENT_ENCODED_A1);
         String algo = Cipher.getMaxAllowedKeyLength("AES") > 128 
             ? JoseConstants.A256GCM_ALGO : JoseConstants.A128GCM_ALGO; 
-        JweDecryptionProvider decryptor = new WrappedKeyJweDecryption(new RSAKeyDecryptionAlgorithm(privateKey),
+        JweDecryptionProvider decryptor = new JweDecryption(new RSAKeyDecryptionAlgorithm(privateKey),
                                               new AesGcmContentDecryptionAlgorithm(algo));
         String decryptedText = decryptor.decrypt(jweContent).getContentText();
         assertEquals(decryptedText, plainContent);
     }
     private void decryptDirect(SecretKey key, String jweContent, String plainContent) throws Exception {
-        DirectKeyJweDecryption decryptor = new DirectKeyJweDecryption(key, 
+        JweDecryption decryptor = new JweDecryption(new DirectKeyDecryptionAlgorithm(key), 
                                                new AesGcmContentDecryptionAlgorithm(JoseConstants.A128GCM_ALGO));
         String decryptedText = decryptor.decrypt(jweContent).getContentText();
         assertEquals(decryptedText, plainContent);

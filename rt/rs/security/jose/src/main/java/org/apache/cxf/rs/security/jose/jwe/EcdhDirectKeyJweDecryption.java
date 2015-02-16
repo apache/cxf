@@ -26,7 +26,7 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 
-public class EcdhDirectKeyJweDecryption extends DirectKeyJweDecryption {
+public class EcdhDirectKeyJweDecryption extends JweDecryption {
     public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, String supportedCtAlgo) {
         super(new EcdhDirectKeyDecryptionAlgorithm(privateKey), 
               new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));

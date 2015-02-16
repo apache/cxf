@@ -30,18 +30,18 @@ import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 
-public class EcdhDirectKeyJweEncryption extends DirectKeyJweEncryption {
+public class EcdhDirectKeyJweEncryption extends JweEncryption {
     public EcdhDirectKeyJweEncryption(ECPublicKey peerPublicKey,
                                       String curve,
                                       String apuString,
                                       String apvString,
                                       String ctAlgo) {
-        super(new EcdhAesGcmContentEncryptionAlgorithm(peerPublicKey,
+        super(new EcdhDirectKeyEncryptionAlgorithm(),
+              new EcdhAesGcmContentEncryptionAlgorithm(peerPublicKey,
                                                        curve,
                                                        apuString,
                                                        apvString,
-                                                       ctAlgo), 
-              new EcdhDirectKeyEncryptionAlgorithm());
+                                                       ctAlgo));
     }
     protected static class EcdhDirectKeyEncryptionAlgorithm extends DirectKeyEncryptionAlgorithm {
         protected void checkKeyEncryptionAlgorithm(JweHeaders headers) {
