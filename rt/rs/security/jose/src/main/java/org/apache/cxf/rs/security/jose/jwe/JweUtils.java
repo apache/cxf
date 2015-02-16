@@ -216,8 +216,13 @@ public final class JweUtils {
                                  getContentEncryptionAlgorithm(key, key.getAlgorithm()));
     }
     public static JweEncryption getDirectKeyJweEncryption(SecretKey key, String algorithm) {
-        return new JweEncryption(new DirectKeyEncryptionAlgorithm(), 
+        if (Algorithm.isAesCbcHmac(algorithm)) {
+            return new AesCbcHmacJweEncryption(algorithm, key.getEncoded(), 
+                                               null, new DirectKeyEncryptionAlgorithm());
+        } else {
+            return new JweEncryption(new DirectKeyEncryptionAlgorithm(), 
                                  getContentEncryptionAlgorithm(key, algorithm));
+        }
     }
     public static JweDecryption getDirectKeyJweDecryption(SecretKey key, String algorithm) {
         return new JweDecryption(new DirectKeyDecryptionAlgorithm(key), 

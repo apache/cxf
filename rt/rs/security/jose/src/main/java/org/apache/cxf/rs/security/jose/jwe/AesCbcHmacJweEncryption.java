@@ -29,7 +29,7 @@ import javax.crypto.spec.IvParameterSpec;
 import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 
-public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
+public class AesCbcHmacJweEncryption extends JweEncryption {
     private static final Map<String, String> AES_HMAC_MAP;
     private static final Map<String, Integer> AES_CEK_SIZE_MAP;
     static {
@@ -49,9 +49,9 @@ public class AesCbcHmacJweEncryption extends AbstractJweEncryption {
     }
     public AesCbcHmacJweEncryption(String cekAlgoJwt, byte[] cek, 
                                    byte[] iv, KeyEncryptionAlgorithm keyEncryptionAlgorithm) {
-        super(new AesCbcContentEncryptionAlgorithm(cek, iv, 
-                                                   validateCekAlgorithm(cekAlgoJwt)),
-              keyEncryptionAlgorithm);
+        super(keyEncryptionAlgorithm,
+              new AesCbcContentEncryptionAlgorithm(cek, iv, 
+                                                   validateCekAlgorithm(cekAlgoJwt)));
         
     }
     @Override

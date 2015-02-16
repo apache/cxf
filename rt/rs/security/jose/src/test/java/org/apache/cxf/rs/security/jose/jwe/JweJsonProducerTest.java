@@ -231,13 +231,8 @@ public class JweJsonProducerTest extends Assert {
         JweEncryptionProvider jwe = null;
         if (wrapperKeyBytes == null) {
             headers.asMap().remove("alg");
-            if (Algorithm.isAesCbcHmac(contentEncryptionAlgo)) {
-                jwe = JweUtils.createJweEncryptionProvider(new DirectKeyEncryptionAlgorithm(), 
-                                                           contentEncryptionAlgo, null);
-            } else {
-                SecretKey cekKey = CryptoUtils.createSecretKeySpec(cek, "AES");
-                jwe = JweUtils.getDirectKeyJweEncryption(cekKey, JoseConstants.A128GCM_ALGO);
-            }
+            SecretKey cekKey = CryptoUtils.createSecretKeySpec(cek, "AES");
+            jwe = JweUtils.getDirectKeyJweEncryption(cekKey, contentEncryptionAlgo);
         } else {
             SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(wrapperKeyBytes, "AES");
             jwe = JweUtils.createJweEncryptionProvider(wrapperKey, headers);
