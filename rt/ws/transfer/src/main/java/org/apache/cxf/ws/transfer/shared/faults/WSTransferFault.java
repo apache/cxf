@@ -20,9 +20,10 @@
 package org.apache.cxf.ws.transfer.shared.faults;
 
 import javax.xml.namespace.QName;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.ws.transfer.shared.TransferTools;
+import org.apache.cxf.helpers.DOMUtils;
 
 /**
  * The parent for all WS-Transfer-specific faults.
@@ -34,7 +35,8 @@ public abstract class WSTransferFault extends SoapFault {
     public WSTransferFault(String reason, String detail, QName faultCode) {
         super(reason, faultCode);
         if (detail != null) {
-            Element detailEl = TransferTools.createElement("detail");
+            Document doc = DOMUtils.createDocument();
+            Element detailEl = doc.createElement("detail");
             detailEl.setTextContent(detail);
             setDetail(detailEl);
         }

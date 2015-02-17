@@ -121,8 +121,8 @@ public class ResourceFactoryImpl implements ResourceFactory {
     
     private CreateResponse createLocally(Create body, ResourceReference ref) {
         Representation representation = body.getRepresentation();
-        ReferenceParametersType referenceParams = ref.getResourceManager().create(representation);
-            
+        ReferenceParametersType refParams = ref.getResourceManager().create(representation);
+
         CreateResponse response = new CreateResponse();
         response.setResourceCreated(new EndpointReferenceType());
         response.getResourceCreated().setAddress(new AttributedURIType());
@@ -130,7 +130,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
                 .getAddress()
                 .setValue(ref.getResourceURL());
         response.getResourceCreated()
-                .setReferenceParameters(referenceParams);
+                .setReferenceParameters(refParams);
         response.setRepresentation(body.getRepresentation());
 
         return response;

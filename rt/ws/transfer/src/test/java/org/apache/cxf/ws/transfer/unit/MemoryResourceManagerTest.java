@@ -19,11 +19,10 @@
 
 package org.apache.cxf.ws.transfer.unit;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
@@ -50,25 +49,17 @@ public class MemoryResourceManagerTest {
     
     public static final String ELEMENT_VALUE_NEW = "value2";
     
-    private static DocumentBuilderFactory documentBuilderFactory;
-    
-    private static DocumentBuilder documentBuilder;
-    
     private static Document document;
     
     private ResourceManager resourceManager;
     
     @BeforeClass
     public static void beforeClass() throws ParserConfigurationException {
-        documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        document = documentBuilder.newDocument();
+        document = DOMUtils.createDocument();
     }
     
     @AfterClass
     public static void afterClass() {
-        documentBuilderFactory = null;
-        documentBuilder = null;
         document = null;
     }
     
@@ -90,8 +81,8 @@ public class MemoryResourceManagerTest {
     @Test(expected = UnknownResource.class)
     public void getUnknownReferenceParamsTest() {
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = document.createElementNS(MemoryResourceManager.REF_NAMESPACE,
-                MemoryResourceManager.REF_LOCAL_NAME);
+        Element uuid = DOMUtils.createDocument().createElementNS(
+                MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent("123456");
         refParams.getAny().add(uuid);
         resourceManager.get(refParams);
@@ -105,8 +96,8 @@ public class MemoryResourceManagerTest {
     @Test(expected = UnknownResource.class)
     public void putUnknownReferenceParamsTest() {
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = document.createElementNS(MemoryResourceManager.REF_NAMESPACE,
-                MemoryResourceManager.REF_LOCAL_NAME);
+        Element uuid = DOMUtils.createDocument().createElementNS(
+                MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent("123456");
         refParams.getAny().add(uuid);
         resourceManager.put(refParams, new Representation());
@@ -120,8 +111,8 @@ public class MemoryResourceManagerTest {
     @Test(expected = UnknownResource.class)
     public void deleteUnknownReferenceParamsTest() {
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = document.createElementNS(MemoryResourceManager.REF_NAMESPACE,
-                MemoryResourceManager.REF_LOCAL_NAME);
+        Element uuid = DOMUtils.createDocument().createElementNS(
+                MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent("123456");
         refParams.getAny().add(uuid);
         resourceManager.delete(refParams);
@@ -133,7 +124,7 @@ public class MemoryResourceManagerTest {
         representationEl.setTextContent(ELEMENT_VALUE);
         Representation representation = new Representation();
         representation.setAny(representationEl);
-        
+
         ReferenceParametersType refParams = resourceManager.create(representation);
         Assert.assertTrue("ResourceManager returned unexpected count of reference elements.",
                 refParams.getAny().size() == 1);
@@ -145,7 +136,7 @@ public class MemoryResourceManagerTest {
         representationEl.setTextContent(ELEMENT_VALUE);
         Representation representation = new Representation();
         representation.setAny(representationEl);
-        
+
         ReferenceParametersType refParams = resourceManager.create(representation);
         Representation returnedRepresentation = resourceManager.get(refParams);
         
@@ -169,7 +160,7 @@ public class MemoryResourceManagerTest {
         representationElNew.setTextContent(ELEMENT_VALUE_NEW);
         Representation representationNew = new Representation();
         representationNew.setAny(representationElNew);
-        
+
         ReferenceParametersType refParams = resourceManager.create(representation);
         resourceManager.put(refParams, representationNew);
         Representation returnedRepresentation = resourceManager.get(refParams);
@@ -203,7 +194,7 @@ public class MemoryResourceManagerTest {
         representationEl.setTextContent(ELEMENT_VALUE);
         Representation representation = new Representation();
         representation.setAny(representationEl);
-        
+
         ReferenceParametersType refParams = resourceManager.create(representation);
         resourceManager.put(refParams, new Representation());
     }

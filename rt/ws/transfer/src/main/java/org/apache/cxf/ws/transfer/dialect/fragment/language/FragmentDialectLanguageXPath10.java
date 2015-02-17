@@ -23,13 +23,14 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;
 import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
-import org.apache.cxf.ws.transfer.shared.TransferTools;
 
 /**
  * Implementation of the XPath 1.0 language.
@@ -37,11 +38,13 @@ import org.apache.cxf.ws.transfer.shared.TransferTools;
  */
 public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
 
+    private static XPathFactory xpathFactory = XPathFactory.newInstance();
+
     @Override
     public Object getResourceFragment(final Representation representation, ExpressionType expression) {
         String expressionStr = getXPathFromExpression(expression);
         // Evaluate XPath
-        XPath xPath = TransferTools.getXPath();
+        XPath xPath = xpathFactory.newXPath();
         xPath.setNamespaceContext(new NamespaceContext() {
 
             @Override
@@ -67,7 +70,7 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
         try {
             Object resource = representation.getAny();
             if (resource == null) {
-                resource = TransferTools.createDocument();
+                resource = DOMUtils.createDocument();
             }
             NodeList result = (NodeList) xPath.evaluate(
                 expressionStr, resource, XPathConstants.NODESET);

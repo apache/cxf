@@ -20,17 +20,30 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.ws.BindingProvider;
 import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.ContextUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
+import org.apache.cxf.ws.transfer.Representation;
+import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resource.Resource;
 import org.apache.cxf.ws.transfer.resource.ResourceLocal;
@@ -159,5 +172,46 @@ public class IntegrationBaseTest {
         factory.setAddress(RESOURCE_LOCAL_ADDRESS);
         factory.setServiceBean(implementor);
         return factory.create();
+    }
+
+    protected Representation getRepresentation(String content) {
+        Document doc = null;
+        try {
+            doc = StaxUtils.read(new StringReader(content));
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+        Representation representation = new Representation();
+        representation.setAny(doc.getDocumentElement());
+        return representation;
+    }
+
+    protected Resource createClient(ReferenceParametersType refParams) {
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+
+        Map<String, Object> props = factory.getProperties();
+        if (props == null) {
+            props = new HashMap<String, Object>();
+        }
+        props.put("jaxb.additionalContextClasses",
+                ExpressionType.class);
+        factory.setProperties(props);
+
+        factory.setBus(bus);
+        factory.setServiceClass(Resource.class);
+        factory.setAddress(RESOURCE_ADDRESS);
+        factory.getInInterceptors().add(logInInterceptor);
+        factory.getOutInterceptors().add(logOutInterceptor);
+        Resource proxy = (Resource) factory.create();
+
+        // Add reference parameters
+        AddressingProperties addrProps = new AddressingProperties();
+        EndpointReferenceType endpoint = new EndpointReferenceType();
+        endpoint.setReferenceParameters(refParams);
+        endpoint.setAddress(ContextUtils.getAttributedURI(RESOURCE_ADDRESS));
+        addrProps.setTo(endpoint);
+        ((BindingProvider) proxy).getRequestContext().put(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES, addrProps);
+
+        return proxy;
     }
 }

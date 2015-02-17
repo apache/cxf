@@ -22,15 +22,12 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;
 import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
-import org.apache.cxf.ws.transfer.shared.TransferTools;
 
 /**
  * Implementation of the QName language.
@@ -74,37 +71,30 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
     
     @Override
     public Object getResourceFragment(final Representation representation, ExpressionType expression) {
-        try {
-            String expressionStr = getXPathFromQNameExpression(expression);
-            // Evaluate XPath
-            XPath xPath = TransferTools.getXPath();
-            xPath.setNamespaceContext(new NamespaceContext() {
-
-                @Override
-                public String getNamespaceURI(String prefix) {
-                    if (prefix != null && !prefix.isEmpty()) {
-                        Element resource = (Element) representation.getAny();
-                        return resource.getAttribute("xmlns:" + prefix);
-                    } else {
-                        return null;
-                    }
+        String expressionStr = getXPathFromQNameExpression(expression);
+        // Evaluate XPath
+        XPathUtils xu = new XPathUtils(new NamespaceContext() {
+            @Override
+            public String getNamespaceURI(String prefix) {
+                if (prefix != null && !prefix.isEmpty()) {
+                    Element resource = (Element) representation.getAny();
+                    return resource.getAttribute("xmlns:" + prefix);
+                } else {
+                    return null;
                 }
+            }
 
-                @Override
-                public String getPrefix(String string) {
-                    throw new UnsupportedOperationException();
-                }
+            @Override
+            public String getPrefix(String s) {
+                throw new UnsupportedOperationException();
+            }
 
-                @Override
-                public Iterator getPrefixes(String string) {
-                    throw new UnsupportedOperationException();
-                }
-            });
-            return (NodeList) xPath.evaluate(
-                    expressionStr, representation.getAny(), XPathConstants.NODESET);
-        } catch (XPathExpressionException ex) {
-            throw new RuntimeException(ex);
-        }
+            @Override
+            public Iterator getPrefixes(String s) {
+                throw new UnsupportedOperationException();
+            }
+        });
+        return xu.getValueList(expressionStr, (Node) representation.getAny());
     }
     
     /**

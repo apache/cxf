@@ -18,15 +18,10 @@
  */
 package org.apache.cxf.ws.transfer.integration;
 
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
 import javax.xml.ws.soap.SOAPFaultException;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Put;
 import org.apache.cxf.ws.transfer.PutResponse;
@@ -38,8 +33,6 @@ import org.apache.cxf.ws.transfer.dialect.fragment.ValueType;
 import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resource.Resource;
-import org.apache.cxf.ws.transfer.shared.TransferTools;
-import org.apache.cxf.ws.transfer.shared.handlers.ReferenceParameterAddingHandler;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,33 +41,6 @@ import org.junit.Test;
  * @author Erich Duda
  */
 public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
-    
-    private Resource createClient(ReferenceParametersType refParams) {
-        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        
-        Map<String, Object> props = factory.getProperties();
-        if (props == null) {
-            props = new HashMap<String, Object>();
-        }
-        props.put("jaxb.additionalContextClasses",
-                ExpressionType.class);
-        factory.setProperties(props);
-        
-        factory.setBus(bus);
-        factory.setServiceClass(Resource.class);
-        factory.setAddress(RESOURCE_ADDRESS);
-        factory.getHandlers().add(new ReferenceParameterAddingHandler(refParams));
-        factory.getInInterceptors().add(logInInterceptor);
-        factory.getOutInterceptors().add(logOutInterceptor);
-        return (Resource) factory.create();
-    }
-    
-    private Representation getRepresentation(String content) {
-        Document doc = TransferTools.parse(new InputSource(new StringReader(content)));
-        Representation representation = new Representation();
-        representation.setAny(doc.getDocumentElement());
-        return representation;
-    }
     
     @Test
     public void insertBefore1Test() {
@@ -91,7 +57,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/a/b");
-        Element addedElement = TransferTools.createElement("d");
+        Element addedElement = DOMUtils.createDocument().createElement("d");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -126,7 +92,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/a/b[1]");
-        Element addedElement = TransferTools.createElement("c");
+        Element addedElement = DOMUtils.createDocument().createElement("c");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -160,7 +126,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/");
-        Element addedElement = TransferTools.createElement("a");
+        Element addedElement = DOMUtils.createDocument().createElement("a");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -189,7 +155,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/");
-        Element addedElement = TransferTools.createElement("b");
+        Element addedElement = DOMUtils.createDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -216,7 +182,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_INSERT_BEFORE);
         expression.getContent().add("/a/@f");
-        Element addedElement = TransferTools.createElement("b");
+        Element addedElement = DOMUtils.createDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);

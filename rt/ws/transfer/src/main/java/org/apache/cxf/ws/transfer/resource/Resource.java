@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.transfer.resource;
 
-import javax.jws.HandlerChain;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -42,7 +41,6 @@ import org.apache.cxf.ws.transfer.shared.TransferConstants;
         name = TransferConstants.NAME_RESOURCE)
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @Addressing(enabled = true, required = true)
-@HandlerChain(file = "/handler-chains/reference-parameter-parsing.xml")
 public interface Resource {
 
     @Action(

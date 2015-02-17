@@ -19,14 +19,14 @@
 
 package org.apache.cxf.systest.ws.transfer;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.CreateResponse;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
-import org.apache.cxf.ws.transfer.shared.TransferTools;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -51,9 +51,9 @@ public class CreateTeacherTest {
     }
     
     @Test
-    public void createTeacherTest() {
-        Document createTeacherXML = TransferTools.parse(
-            new InputSource(getClass().getResourceAsStream("/xml/createTeacher.xml")));
+    public void createTeacherTest() throws XMLStreamException {
+        Document createTeacherXML = StaxUtils.read(
+                getClass().getResourceAsStream("/xml/createTeacher.xml"));
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createTeacherXML.getDocumentElement());
@@ -66,9 +66,9 @@ public class CreateTeacherTest {
     }
 
     @Test
-    public void createTeacherPartialTest() {
-        Document createTeacherPartialXML = TransferTools.parse(
-            new InputSource(getClass().getResourceAsStream("/xml/createTeacherPartial.xml")));
+    public void createTeacherPartialTest() throws XMLStreamException {
+        Document createTeacherPartialXML = StaxUtils.read(
+                getClass().getResourceAsStream("/xml/createTeacherPartial.xml"));
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createTeacherPartialXML.getDocumentElement());
@@ -81,9 +81,9 @@ public class CreateTeacherTest {
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void createTeacherWrongTest() {
-        Document createTeacherWrongXML = TransferTools.parse(
-            new InputSource(getClass().getResourceAsStream("/xml/createTeacherWrong.xml")));
+    public void createTeacherWrongTest() throws XMLStreamException {
+        Document createTeacherWrongXML = StaxUtils.read(
+                getClass().getResourceAsStream("/xml/createTeacherWrong.xml"));
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createTeacherWrongXML.getDocumentElement());

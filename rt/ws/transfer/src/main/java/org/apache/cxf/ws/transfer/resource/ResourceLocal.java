@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Delete;
 import org.apache.cxf.ws.transfer.DeleteResponse;
@@ -37,7 +39,6 @@ import org.apache.cxf.ws.transfer.dialect.Dialect;
 import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialect;
 import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialectConstants;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
-import org.apache.cxf.ws.transfer.shared.TransferConstants;
 import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
 import org.apache.cxf.ws.transfer.validationtransformation.ResourceTypeIdentifier;
 import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelper;
@@ -109,9 +110,12 @@ public class ResourceLocal implements Resource {
     @Override
     public GetResponse get(Get body) {
         // Getting reference paramaters
-        ReferenceParametersType refParams = (ReferenceParametersType) ((WrappedMessageContext) context
+        AddressingProperties addrProps = (AddressingProperties) ((WrappedMessageContext) context
                 .getMessageContext()).getWrappedMessage()
-                .getContextualProperty(TransferConstants.REF_PARAMS_CONTEXT_KEY);
+                .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
+        ReferenceParametersType refParams = addrProps
+                .getToEndpointReference()
+                .getReferenceParameters();
         GetResponse response = new GetResponse();
         // Getting representation from the ResourceManager
         Representation representation = manager.get(refParams);
@@ -134,9 +138,12 @@ public class ResourceLocal implements Resource {
     @Override
     public DeleteResponse delete(Delete body) {
         // Getting reference paramaters
-        ReferenceParametersType refParams = (ReferenceParametersType) ((WrappedMessageContext) context
+        AddressingProperties addrProps = (AddressingProperties) ((WrappedMessageContext) context
                 .getMessageContext()).getWrappedMessage()
-                .getContextualProperty(TransferConstants.REF_PARAMS_CONTEXT_KEY);
+                .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
+        ReferenceParametersType refParams = addrProps
+                .getToEndpointReference()
+                .getReferenceParameters();
         // Dialect processing
         if (body.getDialect() != null && !body.getDialect().isEmpty()) {
             if (dialects.containsKey(body.getDialect())) {
@@ -155,9 +162,12 @@ public class ResourceLocal implements Resource {
     @Override
     public PutResponse put(Put body) {
         // Getting reference paramaters
-        ReferenceParametersType refParams = (ReferenceParametersType) ((WrappedMessageContext) context
+        AddressingProperties addrProps = (AddressingProperties) ((WrappedMessageContext) context
                 .getMessageContext()).getWrappedMessage()
-                .getContextualProperty(TransferConstants.REF_PARAMS_CONTEXT_KEY);
+                .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
+        ReferenceParametersType refParams = addrProps
+                .getToEndpointReference()
+                .getReferenceParameters();
         // Getting representation from the ResourceManager
         Representation storedRepresentation = manager.get(refParams);
         // Getting representation from the incoming SOAP message. This representation will be stored.

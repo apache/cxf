@@ -19,10 +19,11 @@
 
 package org.apache.cxf.systest.ws.transfer;
 
+import javax.xml.stream.XMLStreamException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.Get;
@@ -30,7 +31,6 @@ import org.apache.cxf.ws.transfer.GetResponse;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.resource.Resource;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
-import org.apache.cxf.ws.transfer.shared.TransferTools;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -47,21 +47,21 @@ public class GetTest {
     private static EndpointReferenceType teacherRef;
     
     @BeforeClass
-    public static void beforeClass() {
+    public static void beforeClass() throws XMLStreamException {
         TestUtils.createStudentsServers();
         TestUtils.createTeachersServers();
 
         ResourceFactory rf = TestUtils.createResourceFactoryClient();
         
-        Document createStudentXML = TransferTools.parse(
-            new InputSource(GetTest.class.getResourceAsStream("/xml/createStudent.xml")));
+        Document createStudentXML = StaxUtils.read(
+                GetTest.class.getResourceAsStream("/xml/createStudent.xml"));
         Create studentRequest = new Create();
         studentRequest.setRepresentation(new Representation());
         studentRequest.getRepresentation().setAny(createStudentXML.getDocumentElement());
         studentRef = rf.create(studentRequest).getResourceCreated();
         
-        Document createTeacherXML = TransferTools.parse(
-            new InputSource(GetTest.class.getResourceAsStream("/xml/createTeacher.xml")));
+        Document createTeacherXML = StaxUtils.read(
+                GetTest.class.getResourceAsStream("/xml/createTeacher.xml"));
         Create teacherRequest = new Create();
         teacherRequest.setRepresentation(new Representation());
         teacherRequest.getRepresentation().setAny(createTeacherXML.getDocumentElement());

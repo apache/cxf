@@ -22,6 +22,7 @@ package org.apache.cxf.systest.ws.transfer;
 
 import java.io.PrintWriter;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.BindingProvider;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -30,7 +31,9 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.systest.ws.transfer.resolver.MyResourceResolver;
 import org.apache.cxf.systest.ws.transfer.validator.StudentPutResourceValidator;
 import org.apache.cxf.systest.ws.transfer.validator.TeacherResourceValidator;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resource.Resource;
@@ -39,7 +42,6 @@ import org.apache.cxf.ws.transfer.resource.ResourceRemote;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactoryImpl;
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
-import org.apache.cxf.ws.transfer.shared.handlers.ReferenceParameterAddingHandler;
 import org.apache.cxf.ws.transfer.validationtransformation.XSDResourceTypeIdentifier;
 import org.apache.cxf.ws.transfer.validationtransformation.XSLTResourceTransformer;
 
@@ -87,7 +89,6 @@ public final class TestUtils {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Resource.class);
         factory.setAddress(ref.getAddress().getValue());
-        factory.getHandlers().add(new ReferenceParameterAddingHandler(ref.getReferenceParameters()));
         LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
         loggingIn.setPrettyLogging(true);
         LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
@@ -96,7 +97,14 @@ public final class TestUtils {
         factory.getOutInterceptors().add(loggingOut);
         factory.getInFaultInterceptors().add(loggingIn);
         factory.getOutFaultInterceptors().add(loggingOut);
-        return (Resource) factory.create();
+        Resource proxy = (Resource) factory.create();
+
+        // Add reference parameters
+        AddressingProperties addrProps = new AddressingProperties();
+        addrProps.setTo(ref);
+        ((BindingProvider) proxy).getRequestContext().put(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES, addrProps);
+
+        return proxy;
     }
     
     protected static void createStudentsServers() {

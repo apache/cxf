@@ -19,9 +19,14 @@
 
 package org.apache.cxf.ws.transfer.integration;
 
+import javax.xml.ws.BindingProvider;
 import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.ContextUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Delete;
 import org.apache.cxf.ws.transfer.Get;
@@ -29,9 +34,9 @@ import org.apache.cxf.ws.transfer.GetResponse;
 import org.apache.cxf.ws.transfer.Put;
 import org.apache.cxf.ws.transfer.PutResponse;
 import org.apache.cxf.ws.transfer.Representation;
+import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resource.Resource;
-import org.apache.cxf.ws.transfer.shared.handlers.ReferenceParameterAddingHandler;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,10 +47,6 @@ import org.junit.Test;
  */
 public class ResourceTest extends IntegrationBaseTest {
     
-    private static final String UUID_NAME = "UUID";
-    
-    private static final String UUID_NAMESPACE = "test";
-    
     private static final String UUID_VALUE = "123456";
     
     private static final String REPRESENTATION_NAME = "name1";
@@ -54,15 +55,24 @@ public class ResourceTest extends IntegrationBaseTest {
     
     private static final String REPRESENTATION_VALUE = "value1";
     
-    private Resource createClient(ReferenceParametersType refParams) {
+    protected Resource createClient(ReferenceParametersType refParams) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setBus(bus);
         factory.setServiceClass(Resource.class);
         factory.setAddress(RESOURCE_LOCAL_ADDRESS);
         factory.getInInterceptors().add(logInInterceptor);
         factory.getOutInterceptors().add(logOutInterceptor);
-        factory.getHandlers().add(new ReferenceParameterAddingHandler(refParams));
-        return (Resource) factory.create();
+        Resource proxy = (Resource) factory.create();
+
+        // Add reference parameters
+        AddressingProperties addrProps = new AddressingProperties();
+        EndpointReferenceType endpoint = new EndpointReferenceType();
+        endpoint.setReferenceParameters(refParams);
+        endpoint.setAddress(ContextUtils.getAttributedURI(RESOURCE_ADDRESS));
+        addrProps.setTo(endpoint);
+        ((BindingProvider) proxy).getRequestContext().put(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES, addrProps);
+
+        return proxy;
     }
     
     @Test
@@ -76,9 +86,10 @@ public class ResourceTest extends IntegrationBaseTest {
         EasyMock.expect(manager.get(EasyMock.isA(ReferenceParametersType.class))).andReturn(representation);
         EasyMock.expectLastCall().once();
         EasyMock.replay(manager);
-        
+
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = document.createElementNS(UUID_NAMESPACE, UUID_NAME);
+        Element uuid = document.createElementNS(
+                MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent(UUID_VALUE);
         refParams.getAny().add(uuid);
         
@@ -107,9 +118,10 @@ public class ResourceTest extends IntegrationBaseTest {
         manager.put(EasyMock.isA(ReferenceParametersType.class), EasyMock.isA(Representation.class));
         EasyMock.expectLastCall().once();
         EasyMock.replay(manager);
-        
+
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = document.createElementNS(UUID_NAMESPACE, UUID_NAME);
+        Element uuid = document.createElementNS(
+                MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent(UUID_VALUE);
         refParams.getAny().add(uuid);
         
@@ -144,9 +156,10 @@ public class ResourceTest extends IntegrationBaseTest {
         manager.delete(EasyMock.isA(ReferenceParametersType.class));
         EasyMock.expectLastCall().once();
         EasyMock.replay(manager);
-        
+
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = document.createElementNS(UUID_NAMESPACE, UUID_NAME);
+        Element uuid = document.createElementNS(
+                MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent(UUID_VALUE);
         refParams.getAny().add(uuid);
         

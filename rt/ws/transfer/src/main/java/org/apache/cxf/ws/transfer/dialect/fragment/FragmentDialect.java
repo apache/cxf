@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import javax.xml.bind.JAXBElement;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.Delete;
 import org.apache.cxf.ws.transfer.Get;
@@ -43,7 +43,6 @@ import org.apache.cxf.ws.transfer.dialect.fragment.faults.UnsupportedMode;
 import org.apache.cxf.ws.transfer.dialect.fragment.language.FragmentDialectLanguage;
 import org.apache.cxf.ws.transfer.dialect.fragment.language.FragmentDialectLanguageQName;
 import org.apache.cxf.ws.transfer.dialect.fragment.language.FragmentDialectLanguageXPath10;
-import org.apache.cxf.ws.transfer.shared.TransferTools;
 import org.apache.cxf.ws.transfer.shared.faults.InvalidRepresentation;
 import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
 
@@ -203,12 +202,12 @@ public class FragmentDialect implements Dialect {
      * @return 
      */
     private JAXBElement<ValueType> generateGetResponseNode(Node node) {
+        Document doc = DOMUtils.createDocument();
         ValueType resultValue = new ValueType();
         if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
-            Element attrNodeEl = TransferTools.createElementNS(
-                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
-                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME
-            );
+            Element attrNodeEl = doc.createElementNS(
+                    FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                    FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME);
             attrNodeEl.setAttribute(
                 FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR,
                 node.getNodeName()
@@ -216,10 +215,9 @@ public class FragmentDialect implements Dialect {
             attrNodeEl.setTextContent(node.getNodeValue());
             resultValue.getContent().add(attrNodeEl);
         } else if (node.getNodeType() == Node.TEXT_NODE) {
-            Element textNodeEl = TransferTools.createElementNS(
-                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
-                FragmentDialectConstants.FRAGMENT_TEXT_NODE_NAME
-            );
+            Element textNodeEl = doc.createElementNS(
+                    FragmentDialectConstants.FRAGMENT_2011_03_IRI,
+                    FragmentDialectConstants.FRAGMENT_TEXT_NODE_NAME);
             textNodeEl.setNodeValue(node.getNodeValue());
             resultValue.getContent().add(textNodeEl);
         } else if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -368,11 +366,10 @@ public class FragmentDialect implements Dialect {
         Document ownerDocument = firstNode.getOwnerDocument();
         // if firstNode.getOwnerDocument == null the firstNode is ownerDocument
         ownerDocument = ownerDocument == null ? (Document) firstNode : ownerDocument;
-        
+
         for (Node node : nodeList) {
             addNode(ownerDocument, node, null, value);
         }
-        
         Representation representation = new Representation();
         representation.setAny(ownerDocument.getDocumentElement());
         return representation;
@@ -586,10 +583,8 @@ public class FragmentDialect implements Dialect {
                     FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
                     && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
                 ) {
-                    String attrName = ((Element)node).getAttributeNS(
-                        FragmentDialectConstants.FRAGMENT_2011_03_IRI,
-                        FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR    
-                    );
+                    String attrName = ((Element)node).getAttribute(
+                        FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR);
                     String attrValue = node.getTextContent();
                     if (attrName == null) {
                         throw new RuntimeException("wsf:AttributeNode@name is not present.");

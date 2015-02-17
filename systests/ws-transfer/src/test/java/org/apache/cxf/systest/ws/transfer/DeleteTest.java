@@ -19,9 +19,10 @@
 
 package org.apache.cxf.systest.ws.transfer;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.CreateResponse;
 import org.apache.cxf.ws.transfer.Delete;
@@ -29,7 +30,6 @@ import org.apache.cxf.ws.transfer.Get;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.resource.Resource;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
-import org.apache.cxf.ws.transfer.shared.TransferTools;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,14 +53,14 @@ public class DeleteTest {
     }
     
     @Test
-    public void deleteStudent() {
+    public void deleteStudent() throws XMLStreamException {
         CreateResponse response = createStudent();
         Resource client = TestUtils.createResourceClient(response.getResourceCreated());
         client.delete(new Delete());
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void getDeletedStudent() {
+    public void getDeletedStudent() throws XMLStreamException {
         CreateResponse response = createStudent();
         Resource client = TestUtils.createResourceClient(response.getResourceCreated());
         client.delete(new Delete());
@@ -68,7 +68,7 @@ public class DeleteTest {
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void deleteDeletedStudent() {
+    public void deleteDeletedStudent() throws XMLStreamException {
         CreateResponse response = createStudent();
         Resource client = TestUtils.createResourceClient(response.getResourceCreated());
         client.delete(new Delete());
@@ -76,14 +76,14 @@ public class DeleteTest {
     }
     
     @Test
-    public void deleteTeacher() {
+    public void deleteTeacher() throws XMLStreamException {
         CreateResponse response = createTeacher();
         Resource client = TestUtils.createResourceClient(response.getResourceCreated());
         client.delete(new Delete());
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void getDeletedTeacher() {
+    public void getDeletedTeacher() throws XMLStreamException {
         CreateResponse response = createTeacher();
         Resource client = TestUtils.createResourceClient(response.getResourceCreated());
         client.delete(new Delete());
@@ -91,16 +91,16 @@ public class DeleteTest {
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void deleteDeletedTeacher() {
+    public void deleteDeletedTeacher() throws XMLStreamException {
         CreateResponse response = createTeacher();
         Resource client = TestUtils.createResourceClient(response.getResourceCreated());
         client.delete(new Delete());
         client.delete(new Delete());
     }
     
-    private CreateResponse createStudent() {
-        Document createStudentXML = TransferTools.parse(
-            new InputSource(getClass().getResourceAsStream("/xml/createStudent.xml")));
+    private CreateResponse createStudent() throws XMLStreamException {
+        Document createStudentXML = StaxUtils.read(
+                getClass().getResourceAsStream("/xml/createStudent.xml"));
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createStudentXML.getDocumentElement());
@@ -109,9 +109,9 @@ public class DeleteTest {
         return rf.create(request);
     }
     
-    private CreateResponse createTeacher() {
-        Document createTeacherXML = TransferTools.parse(
-            new InputSource(getClass().getResourceAsStream("/xml/createTeacher.xml")));
+    private CreateResponse createTeacher() throws XMLStreamException {
+        Document createTeacherXML = StaxUtils.read(
+                getClass().getResourceAsStream("/xml/createTeacher.xml"));
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createTeacherXML.getDocumentElement());

@@ -19,12 +19,9 @@
 
 package org.apache.cxf.ws.transfer.integration;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Create;
@@ -49,18 +46,12 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
     private static final String REF_PARAM_LOCAL_NAME = "UUID";
     
     private ReferenceParametersType createReferenceParameters() {
-        try {
-            ReferenceParametersType refParam = new ReferenceParametersType();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.newDocument();
-            Element uuidEl = doc.createElementNS(REF_PARAM_NAMESPACE, REF_PARAM_LOCAL_NAME);
-            uuidEl.setTextContent(RESOURCE_UUID);
-            refParam.getAny().add(uuidEl);
-            return refParam;
-        } catch (ParserConfigurationException ex) {
-            throw new RuntimeException(ex);
-        }
+        ReferenceParametersType refParam = new ReferenceParametersType();
+        Element uuidEl = DOMUtils.createDocument().createElementNS(
+                REF_PARAM_NAMESPACE, REF_PARAM_LOCAL_NAME);
+        uuidEl.setTextContent(RESOURCE_UUID);
+        refParam.getAny().add(uuidEl);
+        return refParam;
     }
     
     private Element createXMLRepresentation() {
