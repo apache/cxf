@@ -60,8 +60,6 @@ public class ResourceTest extends IntegrationBaseTest {
         factory.setBus(bus);
         factory.setServiceClass(Resource.class);
         factory.setAddress(RESOURCE_LOCAL_ADDRESS);
-        factory.getInInterceptors().add(logInInterceptor);
-        factory.getOutInterceptors().add(logOutInterceptor);
         Resource proxy = (Resource) factory.create();
 
         // Add reference parameters

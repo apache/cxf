@@ -68,8 +68,6 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         factory.setBus(bus);
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_FACTORY_ADDRESS);
-        factory.getInInterceptors().add(logInInterceptor);
-        factory.getOutInterceptors().add(logOutInterceptor);
         return (ResourceFactory) factory.create();
     }
     

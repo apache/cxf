@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.transfer.integration;
 
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,8 +31,6 @@ import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -74,10 +71,6 @@ public class IntegrationBaseTest {
     
     public static final String RESOURCE_LOCAL_ADDRESS = "local://ResourceLocal";
     
-    protected static LoggingInInterceptor logInInterceptor;
-    
-    protected static LoggingOutInterceptor logOutInterceptor;
-    
     protected static DocumentBuilderFactory documentBuilderFactory;
     
     protected static DocumentBuilder documentBuilder;
@@ -88,10 +81,6 @@ public class IntegrationBaseTest {
     
     @BeforeClass
     public static void beforeClass() throws ParserConfigurationException {
-        logInInterceptor = new LoggingInInterceptor(new PrintWriter(System.out));
-        logInInterceptor.setPrettyLogging(true);
-        logOutInterceptor = new LoggingOutInterceptor(new PrintWriter(System.out));
-        logOutInterceptor.setPrettyLogging(true);
         documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilder = documentBuilderFactory.newDocumentBuilder();
         document = documentBuilder.newDocument();
@@ -99,8 +88,6 @@ public class IntegrationBaseTest {
     
     @AfterClass
     public static void afterClass() {
-        logInInterceptor = null;
-        logOutInterceptor = null;
         documentBuilderFactory = null;
         documentBuilder = null;
         document = null;
@@ -200,8 +187,6 @@ public class IntegrationBaseTest {
         factory.setBus(bus);
         factory.setServiceClass(Resource.class);
         factory.setAddress(RESOURCE_ADDRESS);
-        factory.getInInterceptors().add(logInInterceptor);
-        factory.getOutInterceptors().add(logOutInterceptor);
         Resource proxy = (Resource) factory.create();
 
         // Add reference parameters
