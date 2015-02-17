@@ -115,7 +115,11 @@ public class JsonMapObjectReaderWriter {
             out.append("\r\n ");
         }
     }
-        
+    public JsonMapObject fromJsonToJsonObject(String json) {
+        JsonMapObject obj = new JsonMapObject();
+        fromJson(obj, json);
+        return obj;
+    }    
     public void fromJson(JsonMapObject obj, String json) {
         String theJson = json.trim();
         JsonObjectSettable settable = new JsonObjectSettable(obj);
