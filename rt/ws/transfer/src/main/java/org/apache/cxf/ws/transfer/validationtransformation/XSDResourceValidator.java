@@ -32,8 +32,6 @@ import org.apache.cxf.ws.transfer.Representation;
 
 /**
  * Implementation of the ResourceValidator interface for Schema validation.
- * 
- * @author Erich Duda
  */
 public class XSDResourceValidator implements ResourceValidator {
     

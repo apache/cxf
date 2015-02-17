@@ -35,10 +35,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- *
- * @author erich
- */
 public class MemoryResourceManagerTest {
     
     public static final String ELEMENT_NAMESPACE = "test";

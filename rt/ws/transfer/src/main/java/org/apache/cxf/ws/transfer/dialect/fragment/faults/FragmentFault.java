@@ -26,8 +26,6 @@ import org.apache.cxf.helpers.DOMUtils;
 
 /**
  * The parent for all WS-Fragment-specific faults.
- * 
- * @author Erich Duda
  */
 public abstract class FragmentFault extends SoapFault {
     

@@ -25,8 +25,6 @@ import org.apache.cxf.ws.transfer.shared.TransferConstants;
 /**
  * This fault MUST be generated when a request specifies a resource
  * that is not known.
- * 
- * @author Erich Duda
  */
 public class UnknownResource extends WSTransferFault {
     

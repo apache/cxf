@@ -23,8 +23,6 @@ import org.apache.cxf.ws.transfer.Create;
 
 /**
  * The interface for resolving, where the Resource will be created.
- * 
- * @author Erich Duda
  */
 public interface ResourceResolver {
     

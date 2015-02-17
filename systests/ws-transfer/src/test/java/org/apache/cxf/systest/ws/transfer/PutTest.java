@@ -33,10 +33,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- *
- * @author erich
- */
 public class PutTest {
     
     @Before

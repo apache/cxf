@@ -24,8 +24,6 @@ import org.apache.cxf.ws.transfer.shared.TransferConstants;
 
 /**
  * Definition of the UnknownDialect SOAPFault.
- * 
- * @author Erich Duda
  */
 public class UnknownDialect extends WSTransferFault {
     

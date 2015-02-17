@@ -34,10 +34,6 @@ import org.apache.cxf.ws.transfer.resource.Resource;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- * @author erich
- */
 public class FragmentGetXPath10Test extends IntegrationBaseTest {
     
     @Test

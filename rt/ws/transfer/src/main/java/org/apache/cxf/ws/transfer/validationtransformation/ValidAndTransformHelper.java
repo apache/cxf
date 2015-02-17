@@ -25,8 +25,6 @@ import org.apache.cxf.ws.transfer.shared.faults.InvalidRepresentation;
 
 /**
  * Helper class for validation and transformation.
- * 
- * @author Erich Duda
  */
 public final class ValidAndTransformHelper {
     

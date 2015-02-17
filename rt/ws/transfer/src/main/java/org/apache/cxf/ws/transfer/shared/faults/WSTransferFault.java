@@ -27,8 +27,6 @@ import org.apache.cxf.helpers.DOMUtils;
 
 /**
  * The parent for all WS-Transfer-specific faults.
- * 
- * @author Erich Duda
  */
 public abstract class WSTransferFault extends SoapFault {
 

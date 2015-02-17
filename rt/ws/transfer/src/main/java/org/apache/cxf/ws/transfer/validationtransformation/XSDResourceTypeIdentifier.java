@@ -32,7 +32,6 @@ import org.apache.cxf.ws.transfer.Representation;
 
 /**
  * Implementation of the ResourceTypeIdentifier interface using by XSDSchema validation.
- * @author Erich Duda
  */
 public class XSDResourceTypeIdentifier implements ResourceTypeIdentifier {
 

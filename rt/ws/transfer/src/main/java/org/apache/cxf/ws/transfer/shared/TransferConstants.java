@@ -21,8 +21,6 @@ package org.apache.cxf.ws.transfer.shared;
 
 /**
  * Helper class for holding of constants.
- * 
- * @author Erich Duda
  */
 public final class TransferConstants {
     

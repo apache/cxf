@@ -35,8 +35,6 @@ import org.apache.cxf.ws.transfer.Representation;
 
 /**
  * Implementation of the ResourceTransformer for the XSL transformation.
- * 
- * @author Erich Duda
  */
 public class XSLTResourceTransformer implements ResourceTransformer {
     

@@ -36,10 +36,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- *
- * @author erich
- */
 public class GetTest {
     
     private static EndpointReferenceType studentRef;

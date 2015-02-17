@@ -29,10 +29,6 @@ import org.apache.cxf.ws.transfer.validationtransformation.XSDResourceValidator;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- * @author Erich Duda
- */
 public class XSDResourceValidatorTest {
     
 

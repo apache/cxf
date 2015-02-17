@@ -31,10 +31,6 @@ import org.apache.cxf.ws.transfer.validationtransformation.XSLTResourceTransform
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- * @author erich
- */
 public class XSLTResourceTransformerTest {
     
     private Representation loadRepresentation(InputStream input) throws XMLStreamException {

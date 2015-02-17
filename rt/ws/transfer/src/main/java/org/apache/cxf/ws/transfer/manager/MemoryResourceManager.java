@@ -36,7 +36,6 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownResource;
 
 /**
  * In memory implementation for ResourceManager interface.
- * @author Erich Duda
  */
 public class MemoryResourceManager implements ResourceManager {
 

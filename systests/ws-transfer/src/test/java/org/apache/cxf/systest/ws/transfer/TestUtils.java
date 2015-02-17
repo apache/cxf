@@ -44,8 +44,6 @@ import org.apache.cxf.ws.transfer.validationtransformation.XSLTResourceTransform
 
 /**
  * Parent test for all tests in WS-Transfer System Tests.
- * 
- * @author Erich Duda
  */
 public final class TestUtils {
     

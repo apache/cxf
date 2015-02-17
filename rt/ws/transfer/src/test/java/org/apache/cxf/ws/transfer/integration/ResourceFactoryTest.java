@@ -33,10 +33,6 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- * @author erich
- */
 public class ResourceFactoryTest extends IntegrationBaseTest {
     
     private static final String RESOURCE_UUID = "123456";

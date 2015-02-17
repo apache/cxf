@@ -24,8 +24,6 @@ import org.apache.cxf.ws.transfer.Representation;
 
 /**
  * Interface for managing resource representations.
- * 
- * @author Erich Duda
  */
 public interface ResourceManager {
     

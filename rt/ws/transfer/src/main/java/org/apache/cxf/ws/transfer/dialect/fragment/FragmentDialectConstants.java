@@ -20,7 +20,6 @@ package org.apache.cxf.ws.transfer.dialect.fragment;
 
 /**
  * Helper class for holding of constants.
- * @author Erich Duda
  */
 public final class FragmentDialectConstants {
     

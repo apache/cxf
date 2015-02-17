@@ -23,8 +23,6 @@ import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialectConstants;
 
 /**
  * Definition of the UnsupportedMode SOAPFault.
- * 
- * @author Erich Duda
  */
 public class UnsupportedMode extends FragmentFault {
     

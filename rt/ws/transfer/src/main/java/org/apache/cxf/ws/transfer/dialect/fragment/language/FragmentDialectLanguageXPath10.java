@@ -34,7 +34,6 @@ import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
 
 /**
  * Implementation of the XPath 1.0 language.
- * @author Erich Duda
  */
 public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
 

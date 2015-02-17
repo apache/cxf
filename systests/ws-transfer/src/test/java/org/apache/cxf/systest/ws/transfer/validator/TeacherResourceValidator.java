@@ -24,10 +24,6 @@ import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.shared.faults.PutDenied;
 import org.apache.cxf.ws.transfer.validationtransformation.ResourceValidator;
 
-/**
- *
- * @author erich
- */
 public class TeacherResourceValidator implements ResourceValidator {
     
     public static final String UID_NAMESPACE = "http://university.edu/teacher";

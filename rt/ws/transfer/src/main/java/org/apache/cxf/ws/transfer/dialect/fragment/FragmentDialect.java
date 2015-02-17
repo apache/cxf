@@ -48,8 +48,6 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
 
 /**
  * Implementation of the WS-Fragment dialect.
- * 
- * @author Erich Duda
  */
 public class FragmentDialect implements Dialect {
     

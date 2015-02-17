@@ -54,10 +54,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-/**
- *
- * @author erich
- */
 public class IntegrationBaseTest {
     
     public static final String RESOURCE_FACTORY_ADDRESS = "local://ResourceFactory";

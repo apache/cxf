@@ -23,7 +23,6 @@ import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;
 
 /**
  * Interface for FragmentDialect languages.
- * @author Erich Duda
  */
 public interface FragmentDialectLanguage {
     

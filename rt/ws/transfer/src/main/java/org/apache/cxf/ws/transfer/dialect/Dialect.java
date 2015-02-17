@@ -27,8 +27,6 @@ import org.apache.cxf.ws.transfer.Representation;
 
 /**
  * The interface for a Dialect objects.
- * 
- * @author Erich Duda
  */
 public interface Dialect {
     

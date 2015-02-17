@@ -31,7 +31,6 @@ import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
 
 /**
  * Implementation of the QName language.
- * @author Erich Duda
  */
 public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
 

@@ -26,10 +26,6 @@ import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceReference;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver;
 import org.apache.cxf.ws.transfer.shared.faults.InvalidRepresentation;
 
-/**
- *
- * @author erich
- */
 public class MyResourceResolver implements ResourceResolver {
 
     protected String studentURL;

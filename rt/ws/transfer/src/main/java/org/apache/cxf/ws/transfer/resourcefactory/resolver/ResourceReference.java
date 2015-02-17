@@ -24,8 +24,6 @@ import org.apache.cxf.ws.transfer.manager.ResourceManager;
 /**
  * Class intended as return value from the ResourceResolver.
  * @see ResourceResolver
- * 
- * @author erich
  */
 public class ResourceReference {
     

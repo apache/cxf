@@ -37,10 +37,6 @@ import org.apache.cxf.ws.transfer.resource.Resource;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- * @author Erich Duda
- */
 public class FragmentPutAddTest extends IntegrationBaseTest {
     
     @Test

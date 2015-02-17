@@ -30,8 +30,6 @@ import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelp
 /**
  * Implementation of the Resource interface for resources, which are created remotely.
  * @see org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver
- * 
- * @author Erich Duda
  */
 public class ResourceRemote extends ResourceLocal implements ResourceFactory {
 
