@@ -212,8 +212,13 @@ public final class JweUtils {
         return null;
     }
     public static JweEncryption getDirectKeyJweEncryption(JsonWebKey key) {
-        return new JweEncryption(new DirectKeyEncryptionAlgorithm(),
+        if (Algorithm.isAesCbcHmac(key.getAlgorithm())) {
+            return new AesCbcHmacJweEncryption(key.getAlgorithm(), JwkUtils.toSecretKey(key).getEncoded(), 
+                                               null, new DirectKeyEncryptionAlgorithm());
+        } else {
+            return new JweEncryption(new DirectKeyEncryptionAlgorithm(),
                                  getContentEncryptionAlgorithm(key, key.getAlgorithm()));
+        }
     }
     public static JweEncryption getDirectKeyJweEncryption(SecretKey key, String algorithm) {
         if (Algorithm.isAesCbcHmac(algorithm)) {
@@ -225,12 +230,21 @@ public final class JweUtils {
         }
     }
     public static JweDecryption getDirectKeyJweDecryption(SecretKey key, String algorithm) {
-        return new JweDecryption(new DirectKeyDecryptionAlgorithm(key), 
+        if (Algorithm.isAesCbcHmac(algorithm)) { 
+            return new AesCbcHmacJweDecryption(new DirectKeyDecryptionAlgorithm(key), algorithm);
+        } else {
+            return new JweDecryption(new DirectKeyDecryptionAlgorithm(key), 
                                  getContentDecryptionAlgorithm(algorithm));
+        }
     }
     public static JweDecryption getDirectKeyJweDecryption(JsonWebKey key) {
-        return new JweDecryption(new DirectKeyDecryptionAlgorithm(JwkUtils.toSecretKey(key)), 
+        if (Algorithm.isAesCbcHmac(key.getAlgorithm())) { 
+            return new AesCbcHmacJweDecryption(
+                new DirectKeyDecryptionAlgorithm(JwkUtils.toSecretKey(key).getEncoded()), key.getAlgorithm());
+        } else {
+            return new JweDecryption(new DirectKeyDecryptionAlgorithm(JwkUtils.toSecretKey(key)), 
                                  getContentDecryptionAlgorithm(key.getAlgorithm()));
+        }
     }
     public static JweEncryptionProvider loadEncryptionProvider(boolean required) {
         return loadEncryptionProvider(null, required);

@@ -38,10 +38,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JweJsonProducerTest extends Assert {
-    private static final byte[] WRAPPER_BYTES1 = {91, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, -39};
-    private static final byte[] WRAPPER_BYTES2 = {-39, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, 91};
-    private static final byte[] CEK_BYTES = {-43, 123, 77, 115, 40, 49, -4, -9, -48, -74, 62, 59, 60, 102, -22, -100};
-    private static final String SINGLE_RECIPIENT_OUTPUT = 
+    static final byte[] WRAPPER_BYTES1 = {91, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, -39};
+    static final byte[] WRAPPER_BYTES2 = {-39, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, 91};
+    static final byte[] CEK_BYTES = {-43, 123, 77, 115, 40, 49, -4, -9, -48, -74, 62, 59, 60, 102, -22, -100};
+    static final String SINGLE_RECIPIENT_OUTPUT = 
         "{" 
         + "\"protected\":\"eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4R0NNIn0\","
         + "\"recipients\":" 
@@ -52,7 +52,7 @@ public class JweJsonProducerTest extends Assert {
         + "\"ciphertext\":\"KTuJBMk9QG59xPB-c_YLM5-J7VG40_eMPvyHDD7eB-WHj_34YiWgpBOydTBm4RW0zUCJZ09xqorhWJME-DcQ\","
         + "\"tag\":\"GxWlwvTPmHi4ZnQgafiHew\""
         + "}";
-    private static final String SINGLE_RECIPIENT_FLAT_OUTPUT = 
+    static final String SINGLE_RECIPIENT_FLAT_OUTPUT = 
         "{" 
         + "\"protected\":\"eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4R0NNIn0\","
         + "\"encrypted_key\":\"b3-M9_CRgT3wEBhhXlpb-BoY7vtA4W_N\","
@@ -60,7 +60,7 @@ public class JweJsonProducerTest extends Assert {
         + "\"ciphertext\":\"KTuJBMk9QG59xPB-c_YLM5-J7VG40_eMPvyHDD7eB-WHj_34YiWgpBOydTBm4RW0zUCJZ09xqorhWJME-DcQ\","
         + "\"tag\":\"GxWlwvTPmHi4ZnQgafiHew\""
         + "}";
-    private static final String SINGLE_RECIPIENT_DIRECT_OUTPUT = 
+    static final String SINGLE_RECIPIENT_DIRECT_OUTPUT = 
         "{" 
         + "\"protected\":\"eyJlbmMiOiJBMTI4R0NNIn0\","
         + "\"recipients\":" 
@@ -71,14 +71,14 @@ public class JweJsonProducerTest extends Assert {
         + "\"ciphertext\":\"KTuJBMk9QG59xPB-c_YLM5-J7VG40_eMPvyHDD7eB-WHj_34YiWgpBOydTBm4RW0zUCJZ09xqorhWJME-DcQ\","
         + "\"tag\":\"Te59ApbK8wNBDY_1_dgYSw\""
         + "}";
-    private static final String SINGLE_RECIPIENT_DIRECT_FLAT_OUTPUT = 
+    static final String SINGLE_RECIPIENT_DIRECT_FLAT_OUTPUT = 
         "{" 
         + "\"protected\":\"eyJlbmMiOiJBMTI4R0NNIn0\","
         + "\"iv\":\"48V1_ALb6US04U3b\","
         + "\"ciphertext\":\"KTuJBMk9QG59xPB-c_YLM5-J7VG40_eMPvyHDD7eB-WHj_34YiWgpBOydTBm4RW0zUCJZ09xqorhWJME-DcQ\","
         + "\"tag\":\"Te59ApbK8wNBDY_1_dgYSw\""
         + "}";
-    private static final String SINGLE_RECIPIENT_ALL_HEADERS_AAD_OUTPUT = 
+    static final String SINGLE_RECIPIENT_ALL_HEADERS_AAD_OUTPUT = 
         "{" 
         + "\"protected\":\"eyJlbmMiOiJBMTI4R0NNIn0\","
         + "\"unprotected\":{\"jku\":\"https://server.example.com/keys.jwks\"},"    
@@ -89,14 +89,12 @@ public class JweJsonProducerTest extends Assert {
         + "\"encrypted_key\":\"b3-M9_CRgT3wEBhhXlpb-BoY7vtA4W_N\""
         + "}"
         + "],"
-        + "\"aad\":\"WyJ2Y2FyZCIsW1sidmVyc2lvbiIse30sInRleHQiLCI0LjAiXSxbImZuIix7fSwidGV4dCIsIk1lcmlhZG9jIEJyYW5keWJ1Y"
-                    + "2siXSxbIm4iLHt9LCJ0ZXh0IixbIkJyYW5keWJ1Y2siLCJNZXJpYWRvYyIsIk1yLiIsIiJdXSxbImJkYXkiLHt9LCJ0ZXh0"
-                    + "IiwiVEEgMjk4MiJdLFsiZ2VuZGVyIix7fSwidGV4dCIsIk0iXV1d\","
+        + "\"aad\":\"" + Base64UrlUtility.encode(JweJsonProducerTest.EXTRA_AAD_SOURCE) + "\","
         + "\"iv\":\"48V1_ALb6US04U3b\","
         + "\"ciphertext\":\"KTuJBMk9QG59xPB-c_YLM5-J7VG40_eMPvyHDD7eB-WHj_34YiWgpBOydTBm4RW0zUCJZ09xqorhWJME-DcQ\","
         + "\"tag\":\"oVUQGS9608D-INq61-vOaA\""
         + "}";
-    private static final String MULTIPLE_RECIPIENTS_OUTPUT = 
+    static final String MULTIPLE_RECIPIENTS_OUTPUT = 
         "{" 
         + "\"protected\":\"eyJlbmMiOiJBMTI4R0NNIn0\","
         + "\"unprotected\":{\"jku\":\"https://server.example.com/keys.jwks\",\"alg\":\"A128KW\"},"    
@@ -116,7 +114,7 @@ public class JweJsonProducerTest extends Assert {
         + "\"ciphertext\":\"KTuJBMk9QG59xPB-c_YLM5-J7VG40_eMPvyHDD7eB-WHj_34YiWgpBOydTBm4RW0zUCJZ09xqorhWJME-DcQ\","
         + "\"tag\":\"oVUQGS9608D-INq61-vOaA\""
         + "}";
-    private static final String EXTRA_AAD_SOURCE = 
+    static final String EXTRA_AAD_SOURCE = 
         "[\"vcard\",["
         + "[\"version\",{},\"text\",\"4.0\"],"
         + "[\"fn\",{},\"text\",\"Meriadoc Brandybuck\"],"
@@ -124,7 +122,7 @@ public class JweJsonProducerTest extends Assert {
         + "[\"bday\",{},\"text\",\"TA 2982\"],"
         + "[\"gender\",{},\"text\",\"M\"]"
         + "]]";
-    private static final String SINGLE_RECIPIENT_A128CBCHS256_OUTPUT = 
+    static final String SINGLE_RECIPIENT_A128CBCHS256_OUTPUT = 
         "{" 
         + "\"protected\":\"eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0\","
         + "\"recipients\":" 
@@ -135,7 +133,7 @@ public class JweJsonProducerTest extends Assert {
         + "\"ciphertext\":\"KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY\","
         + "\"tag\":\"U0m_YmjN04DJvceFICbCVQ\""
         + "}";
-    private static final String SINGLE_RECIPIENT_A128CBCHS256_DIRECT_OUTPUT = 
+    static final String SINGLE_RECIPIENT_A128CBCHS256_DIRECT_OUTPUT = 
         "{" 
         + "\"protected\":\"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0\","
         + "\"recipients\":" 
