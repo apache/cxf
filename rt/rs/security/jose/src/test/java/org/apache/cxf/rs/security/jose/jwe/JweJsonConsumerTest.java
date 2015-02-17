@@ -53,6 +53,14 @@ public class JweJsonConsumerTest extends Assert {
         + "\"tag\":\"oVUQGS9608D-INq61-vOaA\""
         + "}";
     
+    private static final Boolean SKIP_AES_GCM_TESTS = isJava6();
+    
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
+
+
     @BeforeClass
     public static void registerBouncyCastleIfNeeded() throws Exception {
         try {
@@ -114,6 +122,9 @@ public class JweJsonConsumerTest extends Assert {
     }
     @Test
     public void testSingleRecipientAllTypeOfHeadersAndAad() {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(JweJsonProducerTest.WRAPPER_BYTES1, 
@@ -127,6 +138,9 @@ public class JweJsonConsumerTest extends Assert {
     }
     @Test
     public void testSingleRecipientAllTypeOfHeadersAndAadModified() {
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(JweJsonProducerTest.WRAPPER_BYTES1, 
                                                                "AES");
         JweDecryptionProvider jwe = JweUtils.createJweDecryptionProvider(wrapperKey, JoseConstants.A128KW_ALGO, 
@@ -145,6 +159,9 @@ public class JweJsonConsumerTest extends Assert {
                                        String contentEncryptionAlgo,
                                        final byte[] wrapperKeyBytes,
                                        final byte[] cek) throws Exception {
+        if (contentEncryptionAlgo.equals(JoseConstants.A128GCM_ALGO) && SKIP_AES_GCM_TESTS) {
+            return;
+        }
         JweDecryptionProvider jwe = null;
         if (wrapperKeyBytes != null) {
             SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(wrapperKeyBytes, "AES");
