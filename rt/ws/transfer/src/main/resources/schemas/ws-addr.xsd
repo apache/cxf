@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
-    W3C XML Schema defined in the Web Services Addressing 1.0 specification
-    http://www.w3.org/TR/ws-addr-core
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
 
-   Copyright © 2005 World Wide Web Consortium,
+  http://www.apache.org/licenses/LICENSE-2.0
 
-   (Massachusetts Institute of Technology, European Research Consortium for
-   Informatics and Mathematics, Keio University). All Rights Reserved. This
-   work is distributed under the W3C® Software License [1] in the hope that
-   it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-   [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
-
-   $Id: ws-addr.xsd,v 1.2 2008/07/23 13:38:16 plehegar Exp $
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
 -->
+
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.w3.org/2005/08/addressing" targetNamespace="http://www.w3.org/2005/08/addressing" blockDefault="#all" elementFormDefault="qualified" finalDefault="" attributeFormDefault="unqualified">
 	
 	<!-- Constructs from the WS-Addressing Core -->
