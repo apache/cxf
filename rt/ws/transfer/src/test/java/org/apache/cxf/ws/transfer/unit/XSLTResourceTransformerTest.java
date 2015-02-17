@@ -48,11 +48,11 @@ public class XSLTResourceTransformerTest {
                 getClass().getResourceAsStream("/xml/xsltresourcetransformer/representation.xml"));
         
         transformer.transform(representation, null);
-        
+
         Element representationEl = (Element) representation.getAny();
         Assert.assertEquals("Expected root element with name \"person\".", "person",
                 representationEl.getLocalName());
-        Assert.assertTrue("Expected one element \"fistname\".",
+        Assert.assertTrue("Expected one element \"firstname\".",
                 representationEl.getElementsByTagName("firstname").getLength() == 1);
         Assert.assertTrue("Expected one element \"lastname\".",
                 representationEl.getElementsByTagName("lastname").getLength() == 1);

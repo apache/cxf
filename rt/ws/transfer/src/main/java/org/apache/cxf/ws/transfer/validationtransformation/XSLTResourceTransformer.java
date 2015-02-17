@@ -19,18 +19,14 @@
 
 package org.apache.cxf.ws.transfer.validationtransformation;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
+import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.apache.cxf.feature.transform.XSLTUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.transfer.Representation;
 
 /**
@@ -38,10 +34,8 @@ import org.apache.cxf.ws.transfer.Representation;
  */
 public class XSLTResourceTransformer implements ResourceTransformer {
     
-    protected Transformer transformer;
+    protected Templates templates;
     
-    protected DocumentBuilder documentBuilder;
-
     protected ResourceValidator validator;
 
     public XSLTResourceTransformer(Source xsl) {
@@ -51,30 +45,21 @@ public class XSLTResourceTransformer implements ResourceTransformer {
     public XSLTResourceTransformer(Source xsl, ResourceValidator validator) {
         this.validator = validator;
         try {
-            transformer = TransformerFactory.newInstance().newTransformer(xsl);
-        } catch (TransformerConfigurationException ex) {
-            throw new IllegalArgumentException("Error occured during creating the Transformer.", ex);
-        }
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            documentBuilder = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException ex) {
-            throw new IllegalArgumentException(
-                    "Exception occured during creation of the DocumentBuilder instance.", ex);
+            templates = TransformerFactory.newInstance().newTemplates(xsl);
+        } catch (TransformerConfigurationException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public ResourceValidator transform(Representation newRepresentation, Representation oldRepresentation) {
-        try {
-            Document result = documentBuilder.newDocument();
-            transformer.transform(new DOMSource((Node) newRepresentation.getAny()),
-                    new DOMResult((Node) result));
-            newRepresentation.setAny(result.getDocumentElement());
-            return validator;
-        } catch (TransformerException ex) {
-            throw new RuntimeException("Error occured during transformation.", ex);
-        }
+        Document doc = DOMUtils.createDocument();
+        Node representation = (Node) newRepresentation.getAny();
+        Node importedNode = doc.importNode(representation, true);
+        doc.appendChild(importedNode);
+        Document result = XSLTUtils.transform(templates, doc);
+        newRepresentation.setAny(result.getDocumentElement());
+        return validator;
     }
     
 }
