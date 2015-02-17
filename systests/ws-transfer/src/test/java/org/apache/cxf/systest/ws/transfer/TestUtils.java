@@ -20,12 +20,9 @@
 
 package org.apache.cxf.systest.ws.transfer;
 
-import java.io.PrintWriter;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.systest.ws.transfer.resolver.MyResourceResolver;
@@ -74,14 +71,6 @@ public final class TestUtils {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory.class);
         factory.setAddress(RESOURCE_FACTORY_URL);
-        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
-        loggingIn.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
-        loggingOut.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingIn);
-        factory.getOutInterceptors().add(loggingOut);
-        factory.getInFaultInterceptors().add(loggingIn);
-        factory.getOutFaultInterceptors().add(loggingOut);
         return (ResourceFactory) factory.create();
     }
     
@@ -89,14 +78,6 @@ public final class TestUtils {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Resource.class);
         factory.setAddress(ref.getAddress().getValue());
-        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
-        loggingIn.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
-        loggingOut.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingIn);
-        factory.getOutInterceptors().add(loggingOut);
-        factory.getInFaultInterceptors().add(loggingIn);
-        factory.getOutFaultInterceptors().add(loggingOut);
         Resource proxy = (Resource) factory.create();
 
         // Add reference parameters
@@ -156,15 +137,6 @@ public final class TestUtils {
         factory.setServiceClass(org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory.class);
         factory.setServiceBean(resourceFactory);
         factory.setAddress(RESOURCE_FACTORY_URL);
-        // Logging Interceptors
-        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
-        loggingIn.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
-        loggingOut.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingIn);
-        factory.getOutInterceptors().add(loggingOut);
-        factory.getInFaultInterceptors().add(loggingIn);
-        factory.getOutFaultInterceptors().add(loggingOut);
         
         return factory.create();
     }
@@ -182,15 +154,6 @@ public final class TestUtils {
         factory.setServiceClass(Resource.class);
         factory.setServiceBean(resourceLocal);
         factory.setAddress(RESOURCE_STUDENTS_URL);
-        // Logging Interceptors
-        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
-        loggingIn.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
-        loggingOut.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingIn);
-        factory.getOutInterceptors().add(loggingOut);
-        factory.getInFaultInterceptors().add(loggingIn);
-        factory.getOutFaultInterceptors().add(loggingOut);
         return factory.create();
     }
     
@@ -199,15 +162,6 @@ public final class TestUtils {
         factory.setServiceClass(ResourceFactory.class);
         factory.setServiceBean(resource);
         factory.setAddress(RESOURCE_TEACHERS_URL + TransferConstants.RESOURCE_REMOTE_SUFFIX);
-        // Logging Interceptors
-        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
-        loggingIn.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
-        loggingOut.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingIn);
-        factory.getOutInterceptors().add(loggingOut);
-        factory.getInFaultInterceptors().add(loggingIn);
-        factory.getOutFaultInterceptors().add(loggingOut);
         return factory.create();
     }
     
@@ -216,15 +170,6 @@ public final class TestUtils {
         factory.setServiceClass(Resource.class);
         factory.setServiceBean(resource);
         factory.setAddress(RESOURCE_TEACHERS_URL);
-        // Logging Interceptors
-        LoggingInInterceptor loggingIn = new LoggingInInterceptor(new PrintWriter(System.out));
-        loggingIn.setPrettyLogging(true);
-        LoggingOutInterceptor loggingOut = new LoggingOutInterceptor(new PrintWriter(System.out));
-        loggingOut.setPrettyLogging(true);
-        factory.getInInterceptors().add(loggingIn);
-        factory.getOutInterceptors().add(loggingOut);
-        factory.getInFaultInterceptors().add(loggingIn);
-        factory.getOutFaultInterceptors().add(loggingOut);
         return factory.create();
     }
     
