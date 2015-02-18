@@ -26,16 +26,18 @@ import org.apache.cxf.ws.transfer.shared.TransferConstants;
  * Definition of the UnknownDialect SOAPFault.
  */
 public class UnknownDialect extends WSTransferFault {
-    
+
+    private static final long serialVersionUID = 7139243705016686015L;
+
     private static final String SUBCODE = "UnknownDialect";
-    
+
     private static final String REASON = "The specified Dialect IRI is not known.";
-    
+
     private static final String DETAIL = "The unknown IRI if specified";
 
     public UnknownDialect() {
         super(REASON, DETAIL,
-             new QName(TransferConstants.TRANSFER_2011_03_NAMESPACE, SUBCODE));
+                new QName(TransferConstants.TRANSFER_2011_03_NAMESPACE, SUBCODE));
     }
-    
+
 }

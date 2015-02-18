@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.ws.transfer.integration;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.soap.SOAPFaultException;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.DOMUtils;
@@ -39,7 +41,7 @@ import org.junit.Test;
 public class FragmentPutReplaceTest extends IntegrationBaseTest {
     
     @Test
-    public void replaceElementTest() {
+    public void replaceElementTest() throws XMLStreamException {
         String content = "<root><a>Text</a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -69,7 +71,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void replaceElement2Test() {
+    public void replaceElement2Test() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -97,7 +99,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void replaceTextContentTest() {
+    public void replaceTextContentTest() throws XMLStreamException {
         String content = "<root><a>Text</a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -127,7 +129,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void replaceAttributeTest() {
+    public void replaceAttributeTest() throws XMLStreamException {
         String content = "<root><a foo=\"1\">Text</a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -194,7 +196,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void replaceDocumentTest() {
+    public void replaceDocumentTest() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -222,7 +224,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void replaceDocument2Test() {
+    public void replaceDocument2Test() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -250,7 +252,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void replaceOneElementTest() {
+    public void replaceOneElementTest() throws XMLStreamException {
         String content = "<a><b/><b/></a>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -279,7 +281,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void replaceAllElementsTest() {
+    public void replaceAllElementsTest() throws XMLStreamException {
         String content = "<a><b/><b/></a>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -308,7 +310,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
 
     @Test
-    public  void replaceNonExistingElementTest() {
+    public  void replaceNonExistingElementTest() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -364,7 +366,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
 
     @Test(expected = SOAPFaultException.class)
-    public  void replaceNonExistingElementFailTest() {
+    public  void replaceNonExistingElementFailTest() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -390,7 +392,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
 
     @Test(expected = SOAPFaultException.class)
-    public  void replaceNonExistingElementFail2Test() {
+    public  void replaceNonExistingElementFail2Test() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));

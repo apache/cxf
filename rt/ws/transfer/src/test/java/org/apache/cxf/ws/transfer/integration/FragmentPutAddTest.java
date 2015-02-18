@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.ws.transfer.integration;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.soap.SOAPFaultException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Server;
@@ -68,7 +70,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void addToNonEmptyDocumentTest() {
+    public void addToNonEmptyDocumentTest() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -95,7 +97,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void addTextElementTest() {
+    public void addTextElementTest() throws XMLStreamException {
         String content = "<a>f</a>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -123,7 +125,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void addAttributeTest() {
+    public void addAttributeTest() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -163,7 +165,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void addExistingAttributeTest() {
+    public void addExistingAttributeTest() throws XMLStreamException {
         String content = "<a foo=\"1\"/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -201,7 +203,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void addSiblingTest() {
+    public void addSiblingTest() throws XMLStreamException {
         String content = "<a><b/></a>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));

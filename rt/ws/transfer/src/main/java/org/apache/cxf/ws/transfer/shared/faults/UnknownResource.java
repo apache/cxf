@@ -27,14 +27,16 @@ import org.apache.cxf.ws.transfer.shared.TransferConstants;
  * that is not known.
  */
 public class UnknownResource extends WSTransferFault {
-    
+
+    private static final long serialVersionUID = 2925090710469446447L;
+
     private static final String SUBCODE = "UnknownResource";
-    
+
     private static final String REASON = "The resource is not known.";
-            
+
     public UnknownResource() {
         super(REASON, null,
-              new QName(TransferConstants.TRANSFER_2011_03_NAMESPACE, SUBCODE));
+                new QName(TransferConstants.TRANSFER_2011_03_NAMESPACE, SUBCODE));
     }
-    
+
 }

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.ws.transfer.integration;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
@@ -35,7 +37,7 @@ import org.junit.Test;
 public class FragmentPutRemoveTest extends IntegrationBaseTest {
     
     @Test
-    public void removeAttrTest() {
+    public void removeAttrTest() throws XMLStreamException {
         String content = "<a foo=\"1\"/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -60,7 +62,7 @@ public class FragmentPutRemoveTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void removeElementTest() {
+    public void removeElementTest() throws XMLStreamException {
         String content = "<a><b/></a>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -85,7 +87,7 @@ public class FragmentPutRemoveTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void removeElement2Test() {
+    public void removeElement2Test() throws XMLStreamException {
         String content = "<a><b/><b/></a>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));

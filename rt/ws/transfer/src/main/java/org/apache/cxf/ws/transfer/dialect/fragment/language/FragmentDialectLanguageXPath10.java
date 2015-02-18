@@ -62,7 +62,7 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
             }
 
             @Override
-            public Iterator getPrefixes(String string) {
+            public Iterator<String> getPrefixes(String string) {
                 throw new UnsupportedOperationException();
             }
         });

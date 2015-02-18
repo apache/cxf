@@ -22,11 +22,13 @@ package org.apache.cxf.ws.transfer.integration;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.BindingProvider;
+
 import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -157,13 +159,9 @@ public class IntegrationBaseTest {
         return factory.create();
     }
 
-    protected Representation getRepresentation(String content) {
+    protected Representation getRepresentation(String content) throws XMLStreamException {
         Document doc = null;
-        try {
-            doc = StaxUtils.read(new StringReader(content));
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
+        doc = StaxUtils.read(new StringReader(content));
         Representation representation = new Representation();
         representation.setAny(doc.getDocumentElement());
         return representation;

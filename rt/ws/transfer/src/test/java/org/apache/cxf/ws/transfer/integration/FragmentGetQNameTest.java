@@ -20,7 +20,9 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.soap.SOAPFaultException;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
@@ -39,7 +41,7 @@ import org.junit.Test;
 public class FragmentGetQNameTest extends IntegrationBaseTest {
     
     @Test
-    public void getTest() {
+    public void getTest() throws XMLStreamException {
         String content = "<root><a><b>Text</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -64,7 +66,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void getWithNamespaceTest() {
+    public void getWithNamespaceTest() throws XMLStreamException {
         String content = "<ns:root xmlns:ns=\"www.example.org\"><ns:a><ns:b>Text</ns:b></ns:a></ns:root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -90,7 +92,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void qetEmptyResultTest() {
+    public void qetEmptyResultTest() throws XMLStreamException {
         String content = "<root><a><b>Text</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -114,7 +116,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void getMoreValuesTest() {
+    public void getMoreValuesTest() throws XMLStreamException {
         String content = "<root><b>Text1</b><b>Text2</b><b>Text3</b></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -141,7 +143,7 @@ public class FragmentGetQNameTest extends IntegrationBaseTest {
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void getWrongQNameTest() {
+    public void getWrongQNameTest() throws XMLStreamException {
         String content = "<root><a><b>Text1</b><b>Text2</b><b>Text3</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));

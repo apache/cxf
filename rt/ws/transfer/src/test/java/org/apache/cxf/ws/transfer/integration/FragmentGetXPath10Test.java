@@ -19,6 +19,8 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.stream.XMLStreamException;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
@@ -37,7 +39,7 @@ import org.junit.Test;
 public class FragmentGetXPath10Test extends IntegrationBaseTest {
     
     @Test
-    public void getTest() {
+    public void getTest() throws XMLStreamException {
         String content = "<root><a><b>Text</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -62,7 +64,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void getImpliedLanguageTest() {
+    public void getImpliedLanguageTest() throws XMLStreamException {
         String content = "<root><a><b>Text</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -86,7 +88,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void getWithNamespaceTest() {
+    public void getWithNamespaceTest() throws XMLStreamException {
         String content = "<ns:root xmlns:ns=\"www.example.org\"><ns:a><ns:b>Text</ns:b></ns:a></ns:root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -112,7 +114,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void qetEmptyResultTest() {
+    public void qetEmptyResultTest() throws XMLStreamException {
         String content = "<root><a><b>Text</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -136,7 +138,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void getMoreValuesTest() {
+    public void getMoreValuesTest() throws XMLStreamException {
         String content = "<root><a><b>Text1</b><b>Text2</b><b>Text3</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -163,7 +165,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void getMoreValues2Test() {
+    public void getMoreValues2Test() throws XMLStreamException {
         String content = "<root><a><b>Text1</b><b>Text2</b><b><b>Text3</b></b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -188,7 +190,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void getAttrTest() {
+    public void getAttrTest() throws XMLStreamException {
         String content = "<root><a><b attr1=\"value1\">Text</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -218,7 +220,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void getAttrNSTest() {
+    public void getAttrNSTest() throws XMLStreamException {
         String content = "<root xmlns:ns=\"www.example.org\"><a><b ns:attr1=\"value1\">Text</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -248,7 +250,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void getNumberTest() {
+    public void getNumberTest() throws XMLStreamException {
         String content = "<root><a><b>Text</b><b>Text2</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -273,7 +275,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void getBooleanTrueTest() {
+    public void getBooleanTrueTest() throws XMLStreamException {
         String content = "<root><a><b>Text</b><b>Text2</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -298,7 +300,7 @@ public class FragmentGetXPath10Test extends IntegrationBaseTest {
     }
     
     @Test
-    public void getBooleanFalseTest() {
+    public void getBooleanFalseTest() throws XMLStreamException {
         String content = "<root><a><b>Text</b><b>Text2</b></a></root>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));

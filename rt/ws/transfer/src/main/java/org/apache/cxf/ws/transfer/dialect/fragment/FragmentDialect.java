@@ -24,13 +24,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
 import javax.xml.bind.JAXBElement;
+import javax.xml.ws.WebServiceContext;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.Delete;
 import org.apache.cxf.ws.transfer.Get;
@@ -50,13 +57,16 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownDialect;
  * Implementation of the WS-Fragment dialect.
  */
 public class FragmentDialect implements Dialect {
-    
+
+    @Resource
+    WebServiceContext context;
+
     private final Map<String, FragmentDialectLanguage> languages;
 
     private Pattern badXPathPattern;
 
     private Pattern goodXPathPattern;
-    
+
     public FragmentDialect() {
         languages = new HashMap<String, FragmentDialectLanguage>();
         languages.put(FragmentDialectConstants.QNAME_LANGUAGE_IRI, new FragmentDialectLanguageQName());
@@ -80,8 +90,8 @@ public class FragmentDialect implements Dialect {
     @Override
     public JAXBElement<ValueType> processGet(Get body, Representation representation) {
         for (Object o : body.getAny()) {
-            if (o instanceof JAXBElement && ((JAXBElement)o).getValue() instanceof ExpressionType) {
-                ExpressionType expression = (ExpressionType) ((JAXBElement)o).getValue();
+            if (o instanceof JAXBElement<?> && ((JAXBElement<?>)o).getDeclaredType() == ExpressionType.class) {
+                ExpressionType expression = (ExpressionType) ((JAXBElement<?>)o).getValue();
                 String languageIRI = expression.getLanguage();
                 languageIRI = languageIRI == null ? FragmentDialectConstants.XPATH10_LANGUAGE_IRI : languageIRI;
                 if (languages.containsKey(languageIRI)) {
@@ -92,7 +102,7 @@ public class FragmentDialect implements Dialect {
                 }
             }
         }
-        throw new RuntimeException("wsf:Expression is not present.");
+        throw new SoapFault("wsf:Expression is not present.", getSoapVersion().getSender());
     }
 
     @Override
@@ -102,9 +112,9 @@ public class FragmentDialect implements Dialect {
                 Fragment fragment = (Fragment) o;
                 ExpressionType expression = fragment.getExpression();
                 ValueType value = fragment.getValue();
-                
+
                 if (expression == null) {
-                    throw new RuntimeException("wsf:Expression is not present.");
+                    throw new SoapFault("wsf:Expression is not present.", getSoapVersion().getSender());
                 }
                 if (value == null) {
                     value = new ValueType();
@@ -127,7 +137,7 @@ public class FragmentDialect implements Dialect {
                 }
             }
         }
-        throw new RuntimeException("wsf:Fragment is not present.");
+        throw new SoapFault("wsf:Fragment is not present.", getSoapVersion().getSender());
     }
 
     @Override
@@ -139,11 +149,11 @@ public class FragmentDialect implements Dialect {
     public Representation processCreate(Create body) {
         throw new UnknownDialect();
     }
-    
+
     /**
      * Register FragmentDialectLanguage object for IRI.
      * @param iri
-     * @param language 
+     * @param language
      */
     public void registerLanguage(String iri, FragmentDialectLanguage language) {
         if (languages.containsKey(iri)) {
@@ -151,10 +161,10 @@ public class FragmentDialect implements Dialect {
         }
         languages.put(iri, language);
     }
-    
+
     /**
      * Unregister FragmentDialectLanguage object for IRI.
-     * @param iri 
+     * @param iri
      */
     public void unregisterLanguage(String iri) {
         if (!languages.containsKey(iri)) {
@@ -162,11 +172,11 @@ public class FragmentDialect implements Dialect {
         }
         languages.remove(iri);
     }
-    
+
     /**
      * Generates Value element, which is returned as response to Get request.
      * @param value Result of the XPath evaluation.
-     * @return 
+     * @return
      */
     private JAXBElement<ValueType> generateGetResponse(Object value) {
         if (value instanceof Node) {
@@ -179,11 +189,11 @@ public class FragmentDialect implements Dialect {
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createValue(new ValueType());
     }
-    
+
     /**
      * Generates Value element from NodeList.
      * @param nodeList
-     * @return 
+     * @return
      */
     private JAXBElement<ValueType> generateGetResponseNodeList(NodeList nodeList) {
         ValueType resultValue = new ValueType();
@@ -193,11 +203,11 @@ public class FragmentDialect implements Dialect {
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createValue(resultValue);
     }
-    
+
     /**
      * Generates Value element from Node.
      * @param node
-     * @return 
+     * @return
      */
     private JAXBElement<ValueType> generateGetResponseNode(Node node) {
         Document doc = DOMUtils.createDocument();
@@ -207,8 +217,8 @@ public class FragmentDialect implements Dialect {
                     FragmentDialectConstants.FRAGMENT_2011_03_IRI,
                     FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME);
             attrNodeEl.setAttribute(
-                FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR,
-                node.getNodeName()
+                    FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR,
+                    node.getNodeName()
             );
             attrNodeEl.setTextContent(node.getNodeValue());
             resultValue.getContent().add(attrNodeEl);
@@ -224,11 +234,11 @@ public class FragmentDialect implements Dialect {
         ObjectFactory objectFactory = new ObjectFactory();
         return objectFactory.createValue(resultValue);
     }
-    
+
     /**
      * Generates Value element from String.
      * @param value
-     * @return 
+     * @return
      */
     private JAXBElement<ValueType> generateGetResponseString(String value) {
         ValueType resultValue = new ValueType();
@@ -264,7 +274,7 @@ public class FragmentDialect implements Dialect {
             throw new InvalidExpression();
         }
     }
-    
+
     /**
      * Process Put requests.
      * @param resourceFragment Result of the XPath evaluation. It can be Node or NodeList.
@@ -291,7 +301,7 @@ public class FragmentDialect implements Dialect {
             throw new InvalidExpression();
         }
     }
-    
+
     /**
      * Process Put requests.
      * @param mode Mode defined in the Mode attribute.
@@ -326,7 +336,7 @@ public class FragmentDialect implements Dialect {
     private Representation modifyRepresentationModeReplace(
             List<Node> nodeList,
             ValueType value) {
-        
+
         if (nodeList.isEmpty()) {
             throw new InvalidExpression();
         }
@@ -336,19 +346,19 @@ public class FragmentDialect implements Dialect {
         ownerDocument = ownerDocument == null ? (Document) firstNode : ownerDocument;
         Node nextSibling = null;
         Node parent = null;
-        
+
         for (Node node : nodeList) {
             nextSibling = node.getNextSibling();
             parent = removeNode(node);
         }
-        
+
         addNode(ownerDocument, parent, nextSibling, value);
-        
+
         Representation representation = new Representation();
         representation.setAny(ownerDocument.getDocumentElement());
         return representation;
     }
-    
+
     /**
      * Process Put requests for Add mode.
      * @param value Value defined in the Value element.
@@ -372,7 +382,7 @@ public class FragmentDialect implements Dialect {
         representation.setAny(ownerDocument.getDocumentElement());
         return representation;
     }
-    
+
     /**
      * Process Put requests for InsertBefore mode.
      * @param value Value defined in the Value element.
@@ -399,19 +409,19 @@ public class FragmentDialect implements Dialect {
                 throw new InvalidExpression();
             }
         }
-        
+
         for (Node node : nodeList) {
             if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
                 throw new InvalidRepresentation();
             }
             insertBefore(ownerDocument, parent, node, value);
         }
-        
+
         Representation representation = new Representation();
         representation.setAny(ownerDocument.getDocumentElement());
         return representation;
     }
-    
+
     /**
      * Process Put requests for InsertAfter mode.
      * @param value Value defined in the Value element.
@@ -438,19 +448,19 @@ public class FragmentDialect implements Dialect {
                 throw new InvalidExpression();
             }
         }
-        
+
         for (Node node : nodeList) {
             if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
                 throw new InvalidRepresentation();
             }
             insertAfter(ownerDocument, parent, node, value);
         }
-        
+
         Representation representation = new Representation();
         representation.setAny(ownerDocument.getDocumentElement());
         return representation;
     }
-    
+
     /**
      * Process Put requests for Remove mode.
      * @param value Value defined in the Value element.
@@ -466,16 +476,16 @@ public class FragmentDialect implements Dialect {
         Document ownerDocument = firstNode.getOwnerDocument();
         // if firstNode.getOwnerDocument == null the firstNode is ownerDocument
         ownerDocument = ownerDocument == null ? (Document) firstNode : ownerDocument;
-        
+
         for (Node node : nodeList) {
             removeNode(node);
         }
-        
+
         Representation representation = new Representation();
         representation.setAny(ownerDocument.getDocumentElement());
         return representation;
     }
-    
+
     /**
      * Helper method. It removes Node and returns its parent.
      * @param resourceFragment Node to remove.
@@ -505,22 +515,21 @@ public class FragmentDialect implements Dialect {
                 }
             }
         }
-        
+
         return parent;
     }
-    
+
     private void insertAfter(Document ownerDocument, Node parent, Node refChild, ValueType value) {
         for (Object o : value.getContent()) {
             if (o instanceof Node) {
                 Node node = (Node) o;
-                
+
                 if (
-                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
-                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
-                ) {
+                        FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
+                                && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())) {
                     throw new InvalidRepresentation();
                 }
-                
+
                 Node importedNode = ownerDocument.importNode(node, true);
                 if (parent.getNodeType() == Node.DOCUMENT_NODE) {
                     parent.appendChild(importedNode);
@@ -537,19 +546,18 @@ public class FragmentDialect implements Dialect {
             }
         }
     }
-    
+
     private void insertBefore(Document ownerDocument, Node parent, Node refChild, ValueType value) {
         for (Object o : value.getContent()) {
             if (o instanceof Node) {
                 Node node = (Node) o;
-                
+
                 if (
-                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
-                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
-                ) {
+                        FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
+                                && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())) {
                     throw new InvalidRepresentation();
                 }
-                
+
                 Node importedNode = ownerDocument.importNode(node, true);
                 if (parent.getNodeType() == Node.DOCUMENT_NODE) {
                     parent.appendChild(importedNode);
@@ -561,7 +569,7 @@ public class FragmentDialect implements Dialect {
             }
         }
     }
-    
+
     /**
      * Helper method. It adds new Node as the last child of parent.
      * @param ownerDocument Document, where the Node is added.
@@ -578,14 +586,13 @@ public class FragmentDialect implements Dialect {
             } else if (o instanceof Node) {
                 Node node = (Node) o;
                 if (
-                    FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
-                    && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())
-                ) {
+                        FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
+                                && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())) {
                     String attrName = ((Element)node).getAttribute(
-                        FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR);
+                            FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR);
                     String attrValue = node.getTextContent();
                     if (attrName == null) {
-                        throw new RuntimeException("wsf:AttributeNode@name is not present.");
+                        throw new SoapFault("wsf:AttributeNode@name is not present.", getSoapVersion().getSender());
                     }
                     if (((Element) parent).hasAttribute(attrName)) {
                         throw new InvalidRepresentation();
@@ -604,5 +611,11 @@ public class FragmentDialect implements Dialect {
                 throw new InvalidExpression();
             }
         }
+    }
+
+    private SoapVersion getSoapVersion() {
+        WrappedMessageContext wmc = (WrappedMessageContext) context.getMessageContext();
+        SoapMessage message = (SoapMessage) wmc.getWrappedMessage();
+        return message.getVersion();
     }
 }

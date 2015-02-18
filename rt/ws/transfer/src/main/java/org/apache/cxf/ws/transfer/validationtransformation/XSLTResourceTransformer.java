@@ -19,24 +19,39 @@
 
 package org.apache.cxf.ws.transfer.validationtransformation;
 
+import java.util.logging.Logger;
+
+import javax.annotation.Resource;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.ws.WebServiceContext;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.SoapVersion;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.feature.transform.XSLTUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.ws.transfer.Representation;
 
 /**
  * Implementation of the ResourceTransformer for the XSL transformation.
  */
 public class XSLTResourceTransformer implements ResourceTransformer {
-    
+
+    private static final Logger LOG = LogUtils.getL7dLogger(XSLTResourceTransformer.class);
+
     protected Templates templates;
-    
+
     protected ResourceValidator validator;
+
+    @Resource
+    private WebServiceContext context;
 
     public XSLTResourceTransformer(Source xsl) {
         this(xsl, null);
@@ -47,7 +62,8 @@ public class XSLTResourceTransformer implements ResourceTransformer {
         try {
             templates = TransformerFactory.newInstance().newTemplates(xsl);
         } catch (TransformerConfigurationException e) {
-            throw new RuntimeException(e);
+            LOG.severe(e.getLocalizedMessage());
+            throw new SoapFault("Internal error", getSoapVersion().getReceiver());
         }
     }
 
@@ -61,5 +77,11 @@ public class XSLTResourceTransformer implements ResourceTransformer {
         newRepresentation.setAny(result.getDocumentElement());
         return validator;
     }
-    
+
+    private SoapVersion getSoapVersion() {
+        WrappedMessageContext wmc = (WrappedMessageContext) context.getMessageContext();
+        SoapMessage message = (SoapMessage) wmc.getWrappedMessage();
+        return message.getVersion();
+    }
+
 }

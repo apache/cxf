@@ -25,16 +25,18 @@ import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialectConstants;
  * Definition of the UnsupportedMode SOAPFault.
  */
 public class UnsupportedMode extends FragmentFault {
-    
+
+    private static final long serialVersionUID = -5824904523582078377L;
+
     private static final String SUBCODE = "UnsupportedMode";
-    
+
     private static final String REASON = "The specified mode is not supported.";
-    
+
     private static final String DETAIL = "The unsupported Mode.";
-    
+
     public UnsupportedMode() {
         super(REASON, DETAIL,
-             new QName(FragmentDialectConstants.FRAGMENT_2011_03_IRI, SUBCODE));
+                new QName(FragmentDialectConstants.FRAGMENT_2011_03_IRI, SUBCODE));
     }
-    
+
 }

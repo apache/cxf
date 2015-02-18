@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.ws.transfer.integration;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.soap.SOAPFaultException;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.DOMUtils;
@@ -39,7 +41,7 @@ import org.junit.Test;
 public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
     
     @Test
-    public void insertBefore1Test() {
+    public void insertBefore1Test() throws XMLStreamException {
         String content = "<a><b/><c/></a>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -74,7 +76,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
     }
     
     @Test
-    public void insertBefore2Test() {
+    public void insertBefore2Test() throws XMLStreamException {
         String content = "<a><b/><b/></a>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -137,7 +139,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void insertBeforeRootTest() {
+    public void insertBeforeRootTest() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -164,7 +166,7 @@ public class FragmentPutInsertBeforeTest extends IntegrationBaseTest {
     }
     
     @Test(expected = SOAPFaultException.class)
-    public void insertBeforeAttrTest() {
+    public void insertBeforeAttrTest() throws XMLStreamException {
         String content = "<a foo=\"1\"/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));

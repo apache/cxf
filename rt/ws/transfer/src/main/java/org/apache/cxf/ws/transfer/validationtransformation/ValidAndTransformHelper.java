@@ -45,7 +45,7 @@ public final class ValidAndTransformHelper {
         if (resourceTypeIdentifiers != null && !resourceTypeIdentifiers.isEmpty()) {
             for (ResourceTypeIdentifier resourceIdentifier : resourceTypeIdentifiers) {
                 ResourceTypeIdentifierResult valResult = resourceIdentifier.identify(newRepresentation);
-                if (valResult.getResult()) {
+                if (valResult.isCorrect()) {
                     if (valResult.getTransformer() != null) {
                         ResourceTransformer transformer = valResult.getTransformer();
                         ResourceValidator validator = transformer.transform(newRepresentation, oldRepresentation);

@@ -20,14 +20,24 @@
 package org.apache.cxf.ws.transfer.validationtransformation;
 
 import java.io.IOException;
+import java.util.logging.Logger;
+
+import javax.annotation.Resource;
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import javax.xml.ws.WebServiceContext;
+
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.SoapVersion;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.ws.transfer.Representation;
 
 /**
@@ -35,9 +45,14 @@ import org.apache.cxf.ws.transfer.Representation;
  */
 public class XSDResourceTypeIdentifier implements ResourceTypeIdentifier {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(XSDResourceTypeIdentifier.class);
+
     protected ResourceTransformer resourceTransformer;
 
     protected Validator validator;
+
+    @Resource
+    private WebServiceContext context;
 
     public XSDResourceTypeIdentifier(Source xsd, ResourceTransformer resourceTransformer) {
         try {
@@ -46,7 +61,8 @@ public class XSDResourceTypeIdentifier implements ResourceTypeIdentifier {
             Schema schema = schemaFactory.newSchema(xsd);
             this.validator = schema.newValidator();
         } catch (SAXException ex) {
-            throw new IllegalArgumentException("Error occured during creating the Validator.", ex);
+            LOG.severe(ex.getLocalizedMessage());
+            throw new SoapFault("Internal error", getSoapVersion().getReceiver());
         }
     }
 
@@ -57,9 +73,15 @@ public class XSDResourceTypeIdentifier implements ResourceTypeIdentifier {
         } catch (SAXException ex) {
             return new ResourceTypeIdentifierResult(false, resourceTransformer);
         } catch (IOException ex) {
-            throw new RuntimeException("Error occured during reading the XML representation.", ex);
+            LOG.severe(ex.getLocalizedMessage());
+            throw new SoapFault("Internal error", getSoapVersion().getReceiver());
         }
         return new ResourceTypeIdentifierResult(true, resourceTransformer);
     }
 
+    private SoapVersion getSoapVersion() {
+        WrappedMessageContext wmc = (WrappedMessageContext) context.getMessageContext();
+        SoapMessage message = (SoapMessage) wmc.getWrappedMessage();
+        return message.getVersion();
+    }
 }

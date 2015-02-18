@@ -25,15 +25,17 @@ import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialectConstants;
  * Definition of the UnsupportedLanguage SOAPFault.
  */
 public class UnsupportedLanguage extends FragmentFault {
-    
+
+    private static final long serialVersionUID = 7627652802987243575L;
+
     private static final String SUBCODE = "UnsupportedLanguage";
-    
+
     private static final String REASON = "The specified Language IRI is not supported.";
-    
+
     private static final String DETAIL = "The unsupported Language IRI.";
-    
+
     public UnsupportedLanguage() {
         super(REASON, DETAIL,
-             new QName(FragmentDialectConstants.FRAGMENT_2011_03_IRI, SUBCODE));
+                new QName(FragmentDialectConstants.FRAGMENT_2011_03_IRI, SUBCODE));
     }
 }

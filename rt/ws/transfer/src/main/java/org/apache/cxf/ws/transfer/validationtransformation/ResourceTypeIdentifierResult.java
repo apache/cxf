@@ -24,7 +24,7 @@ package org.apache.cxf.ws.transfer.validationtransformation;
  */
 public class ResourceTypeIdentifierResult {
     
-    private boolean result;
+    private boolean correct;
     
     private ResourceTransformer transformer;
     
@@ -33,16 +33,16 @@ public class ResourceTypeIdentifierResult {
     }
     
     public ResourceTypeIdentifierResult(boolean result, ResourceTransformer transformer) {
-        this.result = result;
+        this.correct = result;
         this.transformer = transformer;
     }
 
-    public boolean getResult() {
-        return result;
+    public boolean isCorrect() {
+        return correct;
     }
 
-    public void setResult(boolean result) {
-        this.result = result;
+    public void setCorrect(boolean correct) {
+        this.correct = correct;
     }
 
     public ResourceTransformer getTransformer() {

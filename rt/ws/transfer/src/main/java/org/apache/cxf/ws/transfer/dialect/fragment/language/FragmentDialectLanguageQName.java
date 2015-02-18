@@ -89,7 +89,7 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
             }
 
             @Override
-            public Iterator getPrefixes(String s) {
+            public Iterator<String> getPrefixes(String s) {
                 throw new UnsupportedOperationException();
             }
         });

@@ -23,12 +23,22 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
+
+import javax.annotation.Resource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.ws.WebServiceContext;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.SoapVersion;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Representation;
@@ -40,9 +50,16 @@ import org.apache.cxf.ws.transfer.shared.faults.UnknownResource;
 public class MemoryResourceManager implements ResourceManager {
 
     public static final String REF_NAMESPACE = "http://cxf.apache.org/rt/ws/transfer/MemoryResourceManager";
+
     public static final String REF_LOCAL_NAME = "uuid";
+
+    private static final Logger LOG = LogUtils.getL7dLogger(MemoryResourceManager.class);
+
     protected Map<String, String> storage;
-    
+
+    @Resource
+    private WebServiceContext context;
+
     public MemoryResourceManager() {
         storage = new HashMap<String, String>();
     }
@@ -61,7 +78,8 @@ public class MemoryResourceManager implements ResourceManager {
             try {
                 doc = StaxUtils.read(new StringReader(storage.get(uuid)));
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                LOG.severe(e.getLocalizedMessage());
+                throw new SoapFault("Internal Error", getSoapVersion().getReceiver());
             }
             Representation representation = new Representation();
             representation.setAny(doc.getDocumentElement());
@@ -111,28 +129,32 @@ public class MemoryResourceManager implements ResourceManager {
         refParam.getAny().add(uuidEl);
         return refParam;
     }
-    
+
     private String getUUID(ReferenceParametersType ref) {
         for (Object object : ref.getAny()) {
             if (object instanceof JAXBElement) {
-                JAXBElement element = (JAXBElement) object;
+                JAXBElement<?> element = (JAXBElement<?>) object;
                 QName qName = element.getName();
                 if (
-                    REF_NAMESPACE.equals(qName.getNamespaceURI())
-                    && REF_LOCAL_NAME.equals(qName.getLocalPart())
-                ) {
+                        REF_NAMESPACE.equals(qName.getNamespaceURI())
+                                && REF_LOCAL_NAME.equals(qName.getLocalPart())) {
                     return (String) element.getValue();
                 }
             } else if (object instanceof Element) {
                 Element element = (Element) object;
                 if (
-                    REF_NAMESPACE.equals(element.getNamespaceURI())
-                    && REF_LOCAL_NAME.equals(element.getLocalName())
-                ) {
+                        REF_NAMESPACE.equals(element.getNamespaceURI())
+                                && REF_LOCAL_NAME.equals(element.getLocalName())) {
                     return element.getTextContent();
                 }
             }
         }
         throw new UnknownResource();
+    }
+
+    private SoapVersion getSoapVersion() {
+        WrappedMessageContext wmc = (WrappedMessageContext) context.getMessageContext();
+        SoapMessage message = (SoapMessage) wmc.getWrappedMessage();
+        return message.getVersion();
     }
 }

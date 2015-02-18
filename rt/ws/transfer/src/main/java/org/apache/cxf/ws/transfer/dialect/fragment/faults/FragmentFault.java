@@ -28,7 +28,9 @@ import org.apache.cxf.helpers.DOMUtils;
  * The parent for all WS-Fragment-specific faults.
  */
 public abstract class FragmentFault extends SoapFault {
-    
+
+    private static final long serialVersionUID = 2111286624025926462L;
+
     public FragmentFault(String reason, String detail, QName faultCode) {
         super(reason, faultCode);
         if (detail != null) {
@@ -38,5 +40,5 @@ public abstract class FragmentFault extends SoapFault {
             setDetail(detailEl);
         }
     }
-    
+
 }

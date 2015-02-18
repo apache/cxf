@@ -30,6 +30,8 @@ import org.apache.cxf.helpers.DOMUtils;
  */
 public abstract class WSTransferFault extends SoapFault {
 
+    private static final long serialVersionUID = -7603229392321418734L;
+
     public WSTransferFault(String reason, String detail, QName faultCode) {
         super(reason, faultCode);
         if (detail != null) {
@@ -39,5 +41,5 @@ public abstract class WSTransferFault extends SoapFault {
             setDetail(detailEl);
         }
     }
-    
+
 }

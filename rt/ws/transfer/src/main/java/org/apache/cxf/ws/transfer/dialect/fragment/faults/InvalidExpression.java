@@ -25,16 +25,18 @@ import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialectConstants;
  * Definition of the InvalidExpression SOAPFault.
  */
 public class InvalidExpression extends FragmentFault {
-    
+
+    private static final long serialVersionUID = -1920756304737648952L;
+
     private static final String SUBCODE = "InvalidExpression";
-    
+
     private static final String REASON = "The specified Language expression is invalid.";
-    
+
     private static final String DETAIL = "The invalid language expression.";
-    
+
     public InvalidExpression() {
         super(REASON, DETAIL,
-             new QName(FragmentDialectConstants.FRAGMENT_2011_03_IRI, SUBCODE));
+                new QName(FragmentDialectConstants.FRAGMENT_2011_03_IRI, SUBCODE));
     }
-    
+
 }

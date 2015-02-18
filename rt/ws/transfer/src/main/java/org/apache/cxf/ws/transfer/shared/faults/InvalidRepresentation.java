@@ -26,14 +26,16 @@ import org.apache.cxf.ws.transfer.shared.TransferConstants;
  * Definition of the InvalidRepresentation SOAPFault.
  */
 public class InvalidRepresentation extends WSTransferFault {
-    
+
+    private static final long serialVersionUID = 330259919571428100L;
+
     private static final String SUBCODE = "InvalidRepresentation";
-    
+
     private static final String REASON = "The supplied representation is invalid";
-    
+
     public InvalidRepresentation() {
         super(REASON, null,
-             new QName(TransferConstants.TRANSFER_2011_03_NAMESPACE, SUBCODE));
+                new QName(TransferConstants.TRANSFER_2011_03_NAMESPACE, SUBCODE));
     }
-    
+
 }
