@@ -298,8 +298,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 // methods.
                 wsResult = new ArrayList<WSSecurityEngineResult>();
                 if (doc.getSOAPPart().getEnvelope().getBody().hasFault() && isRequestor(msg)) {
-                    LOG.warning("Request does not contain Security header, " 
-                                + "but it's a fault.");
+                    LOG.warning("The request is a SOAP Fault, but it is not secured");
                     // We allow lax action matching here for backwards compatibility
                     // with manually configured WSS4JInInterceptors that previously
                     // allowed faults to pass through even if their actions aren't
