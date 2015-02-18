@@ -155,16 +155,16 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
 
                 Resource[] exts = resolver.getResources(DEFAULT_CXF_EXT_CFG_FILE);
                 for (Resource r : exts) {
-                    InputStream is = r.getInputStream();
-                    BufferedReader rd = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                    String line = rd.readLine();
-                    while (line != null) {
-                        if (!"".equals(line)) {
-                            resources.add(resolver.getResource(line));
+                    try (InputStream is = r.getInputStream();
+                        BufferedReader rd = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+                        String line = rd.readLine();
+                        while (line != null) {
+                            if (!"".equals(line)) {
+                                resources.add(resolver.getResource(line));
+                            }
+                            line = rd.readLine();
                         }
-                        line = rd.readLine();
                     }
-                    is.close();
                 }
 
             } catch (IOException ex) {

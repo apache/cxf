@@ -402,9 +402,8 @@ public final class JAXBContextCache {
         } catch (Exception ex) {
             //ignore
         }
-        try {
-            InputStream ins = loader.getResourceAsStream("/" + pkg.replace('.', '/') + "/jaxb.index");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "UTF-8"));
+        try (InputStream ins = loader.getResourceAsStream("/" + pkg.replace('.', '/') + "/jaxb.index");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "UTF-8"))) {
             if (!StringUtils.isEmpty(pkg)) {
                 pkg += ".";
             }
@@ -426,7 +425,6 @@ public final class JAXBContextCache {
                 line = reader.readLine();
             }
 
-            ins.close();
         } catch (Exception ex) {
             //ignore
         }

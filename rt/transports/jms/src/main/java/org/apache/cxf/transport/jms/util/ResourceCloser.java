@@ -28,7 +28,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.naming.Context;
 
-public class ResourceCloser implements Closeable {
+public class ResourceCloser implements Closeable, AutoCloseable {
     private AbstractSequentialList<Object> resources;
 
     public ResourceCloser() {

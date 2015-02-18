@@ -65,8 +65,7 @@ public class TestReceiver {
     }
 
     private void drainQueue() {
-        ResourceCloser closer = new ResourceCloser();
-        try {
+        try (ResourceCloser closer = new ResourceCloser()) {
             Connection connection = closer.register(connectionFactory.createConnection());
             connection.start();
             Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
@@ -77,14 +76,11 @@ public class TestReceiver {
             } while (message != null);
         } catch (JMSException e) {
             throw JMSUtil.convertJmsException(e);
-        } finally {
-            closer.close();
         }
     }
 
     private void receiveAndRespond() {
-        ResourceCloser closer = new ResourceCloser();
-        try {
+        try (ResourceCloser closer = new ResourceCloser()) {
             Connection connection = closer.register(connectionFactory.createConnection());
             connection.start();
             Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
@@ -111,8 +107,6 @@ public class TestReceiver {
             }
         } catch (Throwable e) {
             ex = e;
-        } finally {
-            closer.close();
         }
     }
     

@@ -73,15 +73,12 @@ public class JMSUtilTest extends Assert {
         JMSConfiguration jmsConfig = new JMSConfiguration();
         jmsConfig.setConnectionFactory(new ActiveMQConnectionFactory("vm://tesstMarshal?broker.persistent=false"));
         
-        ResourceCloser closer = new ResourceCloser();
-        try {
+        try (ResourceCloser closer = new ResourceCloser()) {
             Connection connection = JMSFactory.createConnection(jmsConfig);
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             javax.jms.Message jmsMessage = 
                 JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);
-        } finally {
-            closer.close();
         }
         
     }

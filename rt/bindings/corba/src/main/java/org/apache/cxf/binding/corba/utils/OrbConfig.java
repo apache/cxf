@@ -182,11 +182,11 @@ public class OrbConfig {
         } else {
             f = new File(iorFile);
         }
-        FileOutputStream file = new FileOutputStream(f);
-        PrintWriter out = new PrintWriter(file);
-        out.println(ref);
-        out.flush();
-        file.close();
+        try (FileOutputStream file = new FileOutputStream(f);
+            PrintWriter out = new PrintWriter(file)) {
+            out.println(ref);
+            out.flush();
+        }
     }
 
 }

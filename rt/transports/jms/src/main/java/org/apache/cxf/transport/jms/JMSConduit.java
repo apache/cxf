@@ -134,8 +134,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         jmsConfig.ensureProperlyConfigured();        
         assertIsNotTextMessageAndMtom(outMessage);
 
-        ResourceCloser closer = new ResourceCloser();
-        try {
+        try (ResourceCloser closer = new ResourceCloser()) {
             Connection c = getConnection();
             Session session = closer.register(c.createSession(false, 
                                                               Session.AUTO_ACKNOWLEDGE));
@@ -160,8 +159,6 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 // Ignore
             }
             throw JMSUtil.convertJmsException(e);
-        } finally {
-            closer.close();
         }
     }
     

@@ -111,8 +111,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
 
         final Message outMessage = exchange.getOutMessage();
 
-        ResourceCloser closer = new ResourceCloser();
-        try {
+        try (ResourceCloser closer = new ResourceCloser()) {
             Session session = closer
                 .register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
 
@@ -163,8 +162,6 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
             sender.sendMessage(session, replyTo, reply);
         } catch (JMSException ex) {
             throw JMSUtil.convertJmsException(ex);
-        } finally {
-            closer.close();
         }
     }
     
