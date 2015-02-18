@@ -87,7 +87,7 @@ public class ManagedConnectionFactoryImpl
     }
 
     public Integer getEJBServicePropertiesPollInterval() {
-        return new Integer(getPluginProps().getProperty(MONITOR_POLL_INTERVAL, 
+        return Integer.valueOf(getPluginProps().getProperty(MONITOR_POLL_INTERVAL, 
                                                         DEFAULT_MONITOR_POLL_INTERVAL));
     }
    

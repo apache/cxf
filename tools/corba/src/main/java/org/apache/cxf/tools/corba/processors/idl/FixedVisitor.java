@@ -82,8 +82,8 @@ public class FixedVisitor extends VisitorBase {
         Scope scopedName = new Scope(getScope(), identifierNode);
 
         // validate digits and scale
-        Long digits = new Long(digitsNode.toString());
-        Long scale = new Long(scaleNode.toString());
+        Long digits = Long.valueOf(digitsNode.toString());
+        Long scale = Long.valueOf(scaleNode.toString());
         if (digits < 1 || digits > 31) {
             //throw IllegalIDLException();
             System.out.println("Digits cannot be greater than 31");

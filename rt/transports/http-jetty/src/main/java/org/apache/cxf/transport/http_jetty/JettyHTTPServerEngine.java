@@ -633,7 +633,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
                 .invoke(result, connectionFactories);
             
             if (getMaxIdleTime() > 0) {
-                result.getClass().getMethod("setIdleTimeout", Long.TYPE).invoke(result, new Long(getMaxIdleTime()));
+                result.getClass().getMethod("setIdleTimeout", Long.TYPE).invoke(result, Long.valueOf(getMaxIdleTime()));
             }
 
         } catch (RuntimeException rex) {

@@ -58,11 +58,11 @@ public class CacheCleanupListener implements ServerLifeCycleListener, ClientLife
             close((Closeable)ts);
         }
         ReplayCache rc = (ReplayCache)info.getProperty(SecurityConstants.NONCE_CACHE_INSTANCE);
-        if (rc instanceof Closeable) {
+        if (rc != null) {
             close((Closeable)rc);
         }
         rc = (ReplayCache)info.getProperty(SecurityConstants.TIMESTAMP_CACHE_INSTANCE);
-        if (rc instanceof Closeable) {
+        if (rc != null) {
             close((Closeable)rc);
         }
     }

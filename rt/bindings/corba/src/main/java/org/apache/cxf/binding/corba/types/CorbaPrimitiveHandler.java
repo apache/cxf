@@ -192,7 +192,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             break;
         case TCKind._tk_char:
             // A char is mapped to a byte, we need it as a character
-            Byte byteValue = new Byte(data);
+            Byte byteValue = Byte.valueOf(data);
             // for values < 0 + 256 
             // This means that we can directly write out the chars in the normal
             // range 0-127 even when using UTF-8
@@ -205,22 +205,22 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             obj = Character.valueOf(data.charAt(0));
             break;
         case TCKind._tk_octet:
-            obj = new Short(data).byteValue();
+            obj = Short.valueOf(data).byteValue();
             break;
         case TCKind._tk_short:
-            obj = new Short(data);
+            obj = Short.valueOf(data);
             break;
         case TCKind._tk_ushort:
-            obj = new Integer(data);
+            obj = Integer.valueOf(data);
             break;
         case TCKind._tk_long:
-            obj = new Integer(data);
+            obj = Integer.valueOf(data);
             break;
         case TCKind._tk_longlong:
-            obj = new Long(data);
+            obj = Long.valueOf(data);
             break;
         case TCKind._tk_ulong:
-            obj = new Long(data);
+            obj = Long.valueOf(data);
             break;
         case TCKind._tk_ulonglong:
             obj = new java.math.BigInteger(data);
@@ -231,7 +231,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             } else if ("-INF".equals(data)) {
                 obj = Float.NEGATIVE_INFINITY;
             } else {
-                obj = new Float(data);
+                obj = Float.valueOf(data);
             }
             break;
         case TCKind._tk_double:
@@ -240,7 +240,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             } else if ("-INF".equals(data)) {
                 obj = Double.NEGATIVE_INFINITY;
             } else {
-                obj = new Double(data);
+                obj = Double.valueOf(data);
             }
             break;
         case TCKind._tk_string:

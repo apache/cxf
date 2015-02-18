@@ -70,7 +70,7 @@ public class CustomerService {
 
     @WebMethod
     public void deleteCustomer(String id) {
-        customers.remove(new Long(id));
+        customers.remove(Long.valueOf(id));
     }
 
     final Customer createCustomer() {

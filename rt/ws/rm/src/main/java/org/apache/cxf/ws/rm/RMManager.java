@@ -261,7 +261,7 @@ public class RMManager {
      */
     public void setConfiguration(RMConfiguration configuration) {
         if (configuration.getBaseRetransmissionInterval() == null) {
-            Long value = new Long(RetransmissionQueue.DEFAULT_BASE_RETRANSMISSION_INTERVAL);
+            Long value = Long.valueOf(RetransmissionQueue.DEFAULT_BASE_RETRANSMISSION_INTERVAL);
             configuration.setBaseRetransmissionInterval(value);
         }
         if (configuration.getRMNamespace() == null) {

@@ -253,12 +253,14 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 
             if (sigParts.size() > 0) {
                 AbstractTokenWrapper sigAbstractTokenWrapper = getSignatureToken();
-                AbstractToken sigToken = sigAbstractTokenWrapper.getToken();
-                if (sigAbstractTokenWrapper != null && isRequestor()) {
-                    doSignature(sigAbstractTokenWrapper, sigToken, tok, sigParts);
-                } else if (!isRequestor()) {
-                    addSignatureConfirmation(sigParts);
-                    doSignature(sigAbstractTokenWrapper, sigToken, tok, sigParts);
+                if (sigAbstractTokenWrapper != null) {
+                    AbstractToken sigToken = sigAbstractTokenWrapper.getToken();
+                    if (isRequestor()) {
+                        doSignature(sigAbstractTokenWrapper, sigToken, tok, sigParts);
+                    } else {
+                        addSignatureConfirmation(sigParts);
+                        doSignature(sigAbstractTokenWrapper, sigToken, tok, sigParts);
+                    }
                 }
             }
             

@@ -112,7 +112,7 @@ public final class STSUtils {
         
         
         // Find out if we have an EPR to get the STS Address (possibly via WS-MEX)
-        if (itok != null && itok.getIssuer() != null && message != null) {
+        if (itok != null && itok.getIssuer() != null) {
             EndpointReferenceType epr = null;
             try {
                 epr = VersionTransformer.parseEndpointReference(itok.getIssuer());

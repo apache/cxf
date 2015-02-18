@@ -184,7 +184,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     
     private  Collection<Pattern> convertCertConstraints(String certConstraints) {
         String[] certConstraintsList = certConstraints.split(",");
-        if (certConstraintsList != null) {
+        if (certConstraintsList.length > 0) {
             Collection<Pattern> subjectCertConstraints = 
                 new ArrayList<Pattern>(certConstraintsList.length);
             for (String certConstraint : certConstraintsList) {

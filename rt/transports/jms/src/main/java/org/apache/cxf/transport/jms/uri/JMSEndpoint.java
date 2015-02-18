@@ -353,7 +353,7 @@ public class JMSEndpoint {
     }
     
     public void setConcurrentConsumers(String concurrentConsumers) {
-        this.concurrentConsumers = new Integer(concurrentConsumers);
+        this.concurrentConsumers = Integer.valueOf(concurrentConsumers);
     }
     
     public String getPassword() {

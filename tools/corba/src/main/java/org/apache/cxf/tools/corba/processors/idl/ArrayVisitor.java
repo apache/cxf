@@ -93,7 +93,7 @@ public class ArrayVisitor extends VisitorBase {
         }
 
         // process first array
-        Long size = new Long(firstSizeNode.toString());
+        Long size = Long.valueOf(firstSizeNode.toString());
         XmlSchemaType stype = null;
         CorbaType ctype = null;
         if (identifierNode != null) {
@@ -153,7 +153,7 @@ public class ArrayVisitor extends VisitorBase {
             result = doAnonarray(next, stype, ctype);
 
             Scope scopedName = TypesUtils.generateAnonymousScopedName(getScope(), schema);
-            Long size = new Long(node.toString());
+            Long size = Long.valueOf(node.toString());
 
             if (result.getSchemaType() == null) {
                 result.setSchemaType(generateSchemaArray(scopedName,
