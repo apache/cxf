@@ -71,7 +71,7 @@
     
     <httpj:engine-factory id="disallow-tls-via-configuration">
         <httpj:engine port="${testutil.ports.SSLv3Server.3}">
-            <httpj:tlsServerParameters>
+            <httpj:tlsServerParameters secureSocketProtocol="SSLv3">
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
