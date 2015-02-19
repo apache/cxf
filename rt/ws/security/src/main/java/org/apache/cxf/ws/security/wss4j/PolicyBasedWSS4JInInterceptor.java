@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,9 +42,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -132,46 +128,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (aim != null && !enableStax) {
             super.handleMessage(msg);
         }
-    }
-    
-    private static Properties getProps(Object o, URL propsURL, SoapMessage message) {
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (propsURL != null) {
-            try {
-                properties = new Properties();
-                InputStream ins = propsURL.openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                properties = null;
-            }
-        }
-        
-        return properties;
-    }
-    
-    private URL getPropertiesFileURL(Object o, SoapMessage message) {
-        if (o instanceof String) {
-            URL url = null;
-            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
-            url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, AbstractWSS4JInterceptor.class);
-                }
-                if (url == null) {
-                    url = new URL((String)o);
-                }
-                return url;
-            } catch (IOException e) {
-                // Do nothing
-            }
-        } else if (o instanceof URL) {
-            return (URL)o;        
-        }
-        return null;
     }
     
     private void handleWSS11(AssertionInfoMap aim, SoapMessage message) {
@@ -471,8 +427,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (e instanceof Crypto) {
             encrCrypto = (Crypto)e;
         } else if (e != null) {
-            URL propsURL = getPropertiesFileURL(e, message);
-            Properties props = getProps(e, propsURL, message);
+            ResourceManager manager = 
+                message.getExchange().getBus().getExtension(ResourceManager.class);
+            URL propsURL = WSS4JUtils.getPropertiesFileURL(e, manager, this.getClass());
+            Properties props = WSS4JUtils.getProps(e, propsURL);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Encryption properties: " + e);
                 Exception ex = new Exception("Cannot find Crypto Encryption properties: " + e);
@@ -518,8 +476,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (s instanceof Crypto) {
             signCrypto = (Crypto)s;
         } else if (s != null) {
-            URL propsURL = getPropertiesFileURL(s, message);
-            Properties props = getProps(s, propsURL, message);
+            ResourceManager manager = 
+                message.getExchange().getBus().getExtension(ResourceManager.class);
+            URL propsURL = WSS4JUtils.getPropertiesFileURL(s, manager, this.getClass());
+            Properties props = WSS4JUtils.getProps(s, propsURL);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Signature properties: " + s);
                 Exception ex = new Exception("Cannot find Crypto Signature properties: " + s);

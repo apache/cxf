@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.security.Principal;
 import java.security.cert.Certificate;
@@ -33,7 +31,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -331,48 +328,10 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             return null;
         }
 
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (o instanceof String) {
-            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
-            URL url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, this.getClass());
-                }
-                if (url == null) {
-                    try {
-                        url = new URL((String)o);
-                    } catch (Exception ex) {
-                        //ignore
-                    }
-                }
-                if (url != null) {
-                    InputStream ins = url.openStream();
-                    properties = new Properties();
-                    properties.load(ins);
-                    ins.close();
-                } else if (samlToken != null) {
-                    policyNotAsserted(samlToken, "Could not find properties file " + o, message);
-                }
-            } catch (IOException e) {
-                if (samlToken != null) {
-                    policyNotAsserted(samlToken, e.getMessage(), message);
-                }
-            }
-        } else if (o instanceof URL) {
-            properties = new Properties();
-            try {
-                InputStream ins = ((URL)o).openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                if (samlToken != null) {
-                    policyNotAsserted(samlToken, e.getMessage(), message);
-                }
-            }            
-        }
+        ResourceManager manager = 
+            message.getExchange().getBus().getExtension(ResourceManager.class);
+        URL propsURL = WSS4JUtils.getPropertiesFileURL(o, manager, this.getClass());
+        Properties properties = WSS4JUtils.getProps(o, propsURL);
 
         if (properties != null) {
             crypto = CryptoFactory.getInstance(properties);

@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -1473,48 +1471,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         if (crypto != null) {
             return crypto;
         }
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (o instanceof String) {
-            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
-            URL url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, this.getClass());
-                }
-                if (url == null) {
-                    try {
-                        url = new URL((String)o);
-                    } catch (Exception ex) {
-                        //ignore
-                    }
-                }
-                if (url != null) {
-                    InputStream ins = url.openStream();
-                    properties = new Properties();
-                    properties.load(ins);
-                    ins.close();
-                } else if (wrapper != null) {
-                    policyNotAsserted(wrapper, "Could not find properties file " + o);
-                }
-            } catch (IOException e) {
-                if (wrapper != null) {
-                    policyNotAsserted(wrapper, e);
-                }
-            }
-        } else if (o instanceof URL) {
-            properties = new Properties();
-            try {
-                InputStream ins = ((URL)o).openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                if (wrapper != null) {
-                    policyNotAsserted(wrapper, e);
-                }
-            }            
-        }
+        
+        ResourceManager manager = 
+            message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
+        URL propsURL = WSS4JUtils.getPropertiesFileURL(o, manager, this.getClass());
+        Properties properties = WSS4JUtils.getProps(o, propsURL);
         
         if (properties != null) {
             crypto = CryptoFactory.getInstance(properties, 

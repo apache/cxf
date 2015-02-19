@@ -19,9 +19,11 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.Key;
 import java.util.Date;
+import java.util.Properties;
 
 import javax.crypto.SecretKey;
 
@@ -30,6 +32,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -42,6 +45,9 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -268,4 +274,80 @@ public final class WSS4JUtils {
         }
         return fault;
     }
+    
+    public static Properties getProps(Object o, URL propsURL) {
+        Properties properties = null;
+        if (o instanceof Properties) {
+            properties = (Properties)o;
+        } else if (propsURL != null) {
+            try {
+                properties = new Properties();
+                try (InputStream ins = propsURL.openStream()) {
+                    properties.load(ins);
+                }
+            } catch (IOException e) {
+                properties = null;
+            }
+        }
+        
+        return properties;
+    }
+    
+    public static URL getPropertiesFileURL(
+        Object o, ResourceManager manager, Class<?> callingClass
+    ) {
+        if (o instanceof String) {
+            ClassLoaderHolder orig = null;
+            try {
+                URL url = ClassLoaderUtils.getResource((String)o, callingClass);
+                if (url == null) {
+                    ClassLoader loader = manager.resolveResource((String)o, ClassLoader.class);
+                    if (loader != null) {
+                        orig = ClassLoaderUtils.setThreadContextClassloader(loader);
+                    }
+                    url = manager.resolveResource((String)o, URL.class);
+                }
+                if (url == null) {
+                    try {
+                        url = new URL((String)o);
+                    } catch (IOException e) {
+                        // Do nothing
+                    }
+                }
+                return url;
+            } finally {
+                if (orig != null) {
+                    orig.reset();
+                }
+            }
+        } else if (o instanceof URL) {
+            return (URL)o;        
+        }
+        return null;
+    }
+    
+    public static Crypto loadCryptoFromPropertiesFile(
+        Message message,
+        String propFilename, 
+        Class<?> callingClass,
+        ClassLoader classLoader,
+        PasswordEncryptor passwordEncryptor
+    ) throws WSSecurityException {
+        try {
+            ResourceManager manager = 
+                message.getExchange().getBus().getExtension(ResourceManager.class);
+            URL url = getPropertiesFileURL(propFilename, manager, callingClass);
+            if (url != null) {
+                Properties props = new Properties();
+                try (InputStream in = url.openStream()) { 
+                    props.load(in);
+                }
+                return CryptoFactory.getInstance(props, classLoader, passwordEncryptor);
+            }
+        } catch (Exception e) {
+            //ignore
+        } 
+        return CryptoFactory.getInstance(propFilename, classLoader);
+    }
+    
 }

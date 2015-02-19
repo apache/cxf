@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.security.trust;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.security.PublicKey;
@@ -104,6 +103,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
 import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.neethi.All;
@@ -1591,30 +1591,11 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         }
 
         Object o = getProperty(SecurityConstants.STS_TOKEN_PROPERTIES + (decrypt ? ".decrypt" : ""));
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (o instanceof String) {
-            ResourceManager rm = bus.getExtension(ResourceManager.class);
-            URL url = rm.resolveResource((String)o, URL.class);
-            if (url == null) {
-                url = ClassLoaderUtils.getResource((String)o, this.getClass());
-            }
-            if (url != null) {
-                properties = new Properties();
-                InputStream ins = url.openStream();
-                properties.load(ins);
-                ins.close();
-            } else {
-                throw new Fault("Could not find properties file " + (String)o, LOG);
-            }
-        } else if (o instanceof URL) {
-            properties = new Properties();
-            InputStream ins = ((URL)o).openStream();
-            properties.load(ins);
-            ins.close();
-        }
-
+        
+        ResourceManager manager = bus.getExtension(ResourceManager.class);
+        URL propsURL = WSS4JUtils.getPropertiesFileURL(o, manager, this.getClass());
+        Properties properties = WSS4JUtils.getProps(o, propsURL);
+        
         if (properties != null) {
             return CryptoFactory.getInstance(properties);
         }
