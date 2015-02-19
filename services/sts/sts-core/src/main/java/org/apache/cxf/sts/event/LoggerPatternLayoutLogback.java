@@ -33,7 +33,7 @@ public class LoggerPatternLayoutLogback extends PatternLayout {
             return this.header + System.getProperty("line.separator");
         }
         MapEventLogger ll = new MapEventLogger();
-        StringBuffer line = new StringBuffer();
+        StringBuilder line = new StringBuilder();
         for (String item : ll.getFieldOrder()) {
             line.append(item).append(";");
         }

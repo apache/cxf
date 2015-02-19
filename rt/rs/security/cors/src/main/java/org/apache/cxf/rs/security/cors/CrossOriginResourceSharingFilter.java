@@ -512,7 +512,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     }
 
     private String concatValues(List<String> values, boolean spaceSeparated) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int x = 0; x < values.size(); x++) {
             sb.append(values.get(x));
             if (x != values.size() - 1) {

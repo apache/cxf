@@ -397,7 +397,7 @@ public class JavaToWSTest extends ToolTestBase {
 
     protected String getClassPath() throws URISyntaxException {
         ClassLoader loader = getClass().getClassLoader();
-        StringBuffer classPath = new StringBuffer();
+        StringBuilder classPath = new StringBuilder();
         if (loader instanceof URLClassLoader) {
             for (URL url : ((URLClassLoader)loader).getURLs()) {
                 File file;

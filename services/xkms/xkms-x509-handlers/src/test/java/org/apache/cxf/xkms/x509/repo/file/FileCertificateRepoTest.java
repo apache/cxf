@@ -72,7 +72,7 @@ public class FileCertificateRepoTest {
     }
 
     private String read(InputStream is) throws java.io.IOException {
-        StringBuffer fileData = new StringBuffer(1000);
+        StringBuilder fileData = new StringBuilder(1000);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         char[] buf = new char[1024];
         int numRead = 0;

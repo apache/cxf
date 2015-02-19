@@ -659,7 +659,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         String cmdLine = CommandLineUtils.toString(cmd.getCommandline());
 
         if (exitCode != 0) {
-            StringBuffer msg = new StringBuffer("\nExit code: ");
+            StringBuilder msg = new StringBuilder("\nExit code: ");
             msg.append(exitCode);
             msg.append('\n');
             msg.append("Command line was: ").append(cmdLine).append('\n').append('\n');
@@ -669,7 +669,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
         file.delete();
         if (b.toString().contains("WSDL2Java Error")) {
-            StringBuffer msg = new StringBuffer();
+            StringBuilder msg = new StringBuilder();
             msg.append(b.toString());
             msg.append('\n');
             msg.append("Command line was: ").append(cmdLine).append('\n').append('\n');

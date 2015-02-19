@@ -364,7 +364,7 @@ public class Java2WSMojo extends AbstractMojo {
             } catch (OutOfMemoryError e) {
                 getLog().debug(e);
 
-                StringBuffer msg = new StringBuffer();
+                StringBuilder msg = new StringBuilder();
                 msg.append(e.getMessage()).append('\n');
                 msg.append("Try to run this goal using the <fork>true</fork> and "
                         + "<additionalJvmArgs>-Xms128m -Xmx128m</additionalJvmArgs> parameters.");
@@ -408,7 +408,7 @@ public class Java2WSMojo extends AbstractMojo {
                     getLog().info(output);
                 }
 
-                StringBuffer msg = new StringBuffer("\nExit code: ");
+                StringBuilder msg = new StringBuilder("\nExit code: ");
                 msg.append(exitCode);
                 if (StringUtils.isNotEmpty(err.getOutput())) {
                     msg.append(" - ").append(err.getOutput());
@@ -420,7 +420,7 @@ public class Java2WSMojo extends AbstractMojo {
             }
 
             if (StringUtils.isNotEmpty(err.getOutput()) && err.getOutput().contains("JavaToWS Error")) {
-                StringBuffer msg = new StringBuffer();
+                StringBuilder msg = new StringBuilder();
                 msg.append(err.getOutput());
                 msg.append('\n');
                 msg.append("Command line was: ").append(cmdLine).append('\n').append('\n');

@@ -359,7 +359,7 @@ public class AttachmentDeserializerTest extends Assert {
     
     @Test
     public void testCXF2542() throws Exception {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("------=_Part_0_2180223.1203118300920\n");
         buf.append("Content-Type: application/xop+xml; charset=UTF-8; type=\"text/xml\"\n");
         buf.append("Content-Transfer-Encoding: 8bit\n");

@@ -238,7 +238,7 @@ public class WSDLToIDLTest extends ToolTestBase {
         String[] cmdArgs = {};
         int exc = execute(cmdArgs);
         assertEquals("WSDLToIDL Failed", error, exc);
-        StringBuffer strBuf = new StringBuffer();
+        StringBuilder strBuf = new StringBuilder();
         strBuf.append("Missing argument: wsdlurl\n\n");
         strBuf.append(usageBuf.toString());
         checkStrings(strBuf.toString().getBytes(), bout.toByteArray());
@@ -248,7 +248,7 @@ public class WSDLToIDLTest extends ToolTestBase {
         String[] cmdArgs = {"-i", " interfaceName"};
         int exc = execute(cmdArgs);
         assertEquals("WSDLToIDL Failed", error, exc);
-        StringBuffer expected = new StringBuffer();
+        StringBuilder expected = new StringBuilder();
         expected.append("Missing argument: wsdlurl\n\n");
         expected.append(usageBuf.toString());
         checkStrings(expected.toString().getBytes(), bout.toByteArray());

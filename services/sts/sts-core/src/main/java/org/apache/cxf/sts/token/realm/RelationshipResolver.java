@@ -43,7 +43,7 @@ public class RelationshipResolver {
     
     
     private String generateKey(String sourceRealm, String targetRealm) {
-        return new StringBuffer().append(sourceRealm).append(">").append(targetRealm).toString();
+        return new StringBuilder().append(sourceRealm).append(">").append(targetRealm).toString();
         
     }
     

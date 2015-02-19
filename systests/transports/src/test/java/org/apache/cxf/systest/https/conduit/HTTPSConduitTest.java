@@ -476,7 +476,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         }
         
         private String getTrustNames() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < trustName.length; i++) {
                 sb.append("\"OU=");
                 sb.append(trustName[i]);

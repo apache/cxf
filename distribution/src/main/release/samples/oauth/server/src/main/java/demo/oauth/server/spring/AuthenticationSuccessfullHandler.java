@@ -52,7 +52,7 @@ public class AuthenticationSuccessfullHandler extends SavedRequestAwareAuthentic
             return super.determineTargetUrl(request, response);
         }
 
-        StringBuffer url = new StringBuffer(confirmationUrl).append("?").append(OAuth.OAUTH_TOKEN).append("=")
+        StringBuilder url = new StringBuilder(confirmationUrl).append("?").append(OAuth.OAUTH_TOKEN).append("=")
                 .append(oauthToken).append("&").append(OAuthConstants.AUTHENTICITY_TOKEN)
                 .append("=")
                 .append(authToken);

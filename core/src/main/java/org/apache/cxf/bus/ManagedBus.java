@@ -54,7 +54,7 @@ public class ManagedBus implements ManagedComponent {
         // Added the instance id to make the ObjectName unique
         String instanceId = (String)bus.getProperties().get(INSTANCE_ID);
         if (StringUtils.isEmpty(instanceId)) {
-            instanceId = new StringBuffer().append(bus.hashCode()).toString();
+            instanceId = new StringBuilder().append(bus.hashCode()).toString();
         }
         buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(instanceId);
         

@@ -45,7 +45,7 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
     }
 
     public String arrayInput(String[] inputs) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (String s : inputs) {
             buf.append(s);
         }
@@ -53,7 +53,7 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
     }
 
     public String listInput(List<String> inputs) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (inputs != null) {
             for (String s : inputs) {
                 buf.append(s);
@@ -63,7 +63,7 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
     }
     
     public String multiListInput(List<String> inputs1, List<String> inputs2, String x, int y) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (String s : inputs1) {
             buf.append(s);
         }

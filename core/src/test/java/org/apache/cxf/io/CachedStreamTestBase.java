@@ -292,7 +292,7 @@ public abstract class CachedStreamTestBase extends Assert {
     }
  
     protected static String readFromReader(Reader is) throws IOException {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         try {
             char[] b = new char[100];
             for (;;) {
@@ -309,7 +309,7 @@ public abstract class CachedStreamTestBase extends Assert {
     }
     
     protected static String readPartiallyFromReader(Reader is, int len) throws IOException {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         char[] b = new char[len];
         int rn = 0;
         for (;;) {

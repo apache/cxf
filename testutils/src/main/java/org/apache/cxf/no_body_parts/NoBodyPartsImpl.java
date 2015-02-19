@@ -42,7 +42,7 @@ public class NoBodyPartsImpl implements NoBodyPartsSEI {
         algorithm.update(bytes);
         byte messageDigest[] = algorithm.digest();
 
-        StringBuffer hexString = new StringBuffer();
+        StringBuilder hexString = new StringBuilder();
         for (int i = 0; i < messageDigest.length; i++) {
             hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
         }

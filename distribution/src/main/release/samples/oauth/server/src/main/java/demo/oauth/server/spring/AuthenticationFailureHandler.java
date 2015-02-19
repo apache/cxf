@@ -41,7 +41,7 @@ public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailure
         String oauthToken = request.getParameter(OAuth.OAUTH_TOKEN);
         String xScope = request.getParameter(OAuthConstants.X_OAUTH_SCOPE);
 
-        StringBuffer url = new StringBuffer(authorizeUrl).append("?").append(OAuth.OAUTH_TOKEN).append("=")
+        StringBuilder url = new StringBuilder(authorizeUrl).append("?").append(OAuth.OAUTH_TOKEN).append("=")
             .append(oauthToken);
 
         if (!StringUtils.isEmpty(xScope)) {

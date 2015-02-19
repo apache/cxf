@@ -1330,7 +1330,7 @@ public class RMTxStore implements RMStore {
     }
      
     private static String buildCreateTableStatement(String name, String[][] cols, String[] keys) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("CREATE TABLE ").append(name).append(" (");
         for (String[] col : cols) {
             buf.append(col[0]).append(" ").append(col[1]).append(", ");

@@ -92,7 +92,7 @@ public final class TestUtil {
     }
     
     public static String getClassPath(ClassLoader loader) throws URISyntaxException {
-        StringBuffer classPath = new StringBuffer();
+        StringBuilder classPath = new StringBuilder();
         if (loader instanceof URLClassLoader) {
             URLClassLoader urlLoader = (URLClassLoader)loader;
             for (URL url : urlLoader.getURLs()) {

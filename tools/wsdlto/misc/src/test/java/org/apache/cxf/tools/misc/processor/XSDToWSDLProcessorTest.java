@@ -43,7 +43,7 @@ public class XSDToWSDLProcessorTest
         FileReader fileReader = new FileReader(outputFile);
         char[] chars = new char[100];
         int size = 0;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (size < outputFile.length()) {
             int readLen = fileReader.read(chars);
             sb.append(chars, 0, readLen);
@@ -73,7 +73,7 @@ public class XSDToWSDLProcessorTest
         FileReader fileReader = new FileReader(outputFile);
         char[] chars = new char[100];
         int size = 0;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (size < outputFile.length()) {
             int readLen = fileReader.read(chars);
             sb.append(chars, 0, readLen);

@@ -39,7 +39,7 @@ public class ArrayServiceImpl implements ArrayService {
     }
 
     public String arrayInput(@WebParam(name = "input")String[] inputs) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (String s : inputs) {
             buf.append(s);
         }
@@ -47,7 +47,7 @@ public class ArrayServiceImpl implements ArrayService {
     }
 
     public String listInput(@WebParam(name = "input")List<String> inputs) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (String s : inputs) {
             buf.append(s);
         }

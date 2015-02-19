@@ -523,7 +523,7 @@ public class MessageFlow extends Assert {
     }
     
     private String dump(List<byte[]> streams) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         try {
             buf.append(System.getProperty("line.separator"));
             for (int i = 0; i < streams.size(); i++) {

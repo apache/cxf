@@ -480,7 +480,7 @@ public class StructureImpl extends DataObjectBase implements Structure {
             return super.toString();
         }
 
-        StringBuffer result = new StringBuffer(super.toString());
+        StringBuilder result = new StringBuilder(super.toString());
         result.append(" (text: ");
         if (text_set_) {
             result.append(text);

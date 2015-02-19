@@ -71,7 +71,7 @@ public class ServerImpl implements ServerPortType  {
             
             QName portName = new QName(serviceName.getNamespaceURI(), portString);
             
-            StringBuffer seiName = new StringBuffer();
+            StringBuilder seiName = new StringBuilder();
             seiName.append(JAXBUtils.namespaceURIToPackage(interfaceName.getNamespaceURI()));
             seiName.append(".");
             seiName.append(JAXBUtils.nameToIdentifier(interfaceName.getLocalPart(),

@@ -506,7 +506,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
                 getLog().info(output);
             }
 
-            StringBuffer msg = new StringBuffer("\nExit code: ");
+            StringBuilder msg = new StringBuilder("\nExit code: ");
             msg.append(exitCode);
             if (StringUtils.isNotEmpty(err.getOutput())) {
                 msg.append(" - ").append(err.getOutput());
@@ -521,7 +521,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
             file.delete();
         }
         if (StringUtils.isNotEmpty(err.getOutput()) && err.getOutput().contains("WADL2Java Error")) {
-            StringBuffer msg = new StringBuffer();
+            StringBuilder msg = new StringBuilder();
             msg.append(err.getOutput());
             msg.append('\n');
             msg.append("Command line was: ").append(cmdLine).append('\n').append('\n');

@@ -36,7 +36,7 @@ class ParsingEvent {
     }
         
     public String toString() {
-        return new StringBuffer().append("Event(").
+        return new StringBuilder().append("Event(").
             append(event).append(", ").append(name).append(", ").append(value).append(")").
             toString();
     }

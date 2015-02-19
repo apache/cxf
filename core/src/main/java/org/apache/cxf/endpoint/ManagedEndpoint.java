@@ -112,7 +112,7 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
         buffer.append(ManagementConstants.PORT_NAME_PROP).append('=').append(endpointName).append(',');
         String instanceId = (String)endpoint.get(INSTANCE_ID);
         if (StringUtils.isEmpty(instanceId)) {
-            instanceId = new StringBuffer().append(endpoint.hashCode()).toString();
+            instanceId = new StringBuilder().append(endpoint.hashCode()).toString();
         }
         // Added the instance id to make the ObjectName unique
         buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(instanceId);

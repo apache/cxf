@@ -46,7 +46,7 @@ public class JarServiceContractResolver implements ServiceContractResolver {
         String[] hostStrings = ns.getHost().split("\\.");
         String[] pathStrings = ns.getPath().split("\\/");
         String local = qname.getLocalPart();
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder();
         for (int i = hostStrings.length - 1; i >= 0; i--) {
             path.append(hostStrings[i]).append("/");
         }

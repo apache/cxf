@@ -65,7 +65,7 @@ public final class OAuthTestUtils {
     }
 
     public static String readBody(OAuthMessage msg) throws IOException {
-        StringBuffer body = new StringBuffer();
+        StringBuilder body = new StringBuilder();
         InputStream responseBody = null;
         BufferedReader br = null;
         try {

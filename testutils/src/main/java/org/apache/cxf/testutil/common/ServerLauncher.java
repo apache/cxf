@@ -405,7 +405,7 @@ public class ServerLauncher {
         cmd.add("-classpath");
         
         ClassLoader loader = this.getClass().getClassLoader();
-        StringBuffer classpath = new StringBuffer(System.getProperty("java.class.path"));
+        StringBuilder classpath = new StringBuilder(System.getProperty("java.class.path"));
         if (classpath.indexOf("/.compatibility/") != -1) {
             classpath.append(":");
             //on OSX, the compatibility lib brclasspath.indexOf("/.compatibility/")

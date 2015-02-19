@@ -88,7 +88,7 @@ public class GetProtectedResourceController {
 
         msg = client.access(msg, ParameterStyle.QUERY_STRING);
 
-        StringBuffer bodyBuffer = readBody(msg);
+        StringBuilder bodyBuffer = readBody(msg);
 
         oAuthParams.setResourceResponse(bodyBuffer.toString());
         String authHeader = msg.getHeader("WWW-Authenticate");
@@ -109,8 +109,8 @@ public class GetProtectedResourceController {
         return new ModelAndView("accessToken");
     }
 
-    private StringBuffer readBody(OAuthMessage msg) throws IOException {
-        StringBuffer body = new StringBuffer();
+    private StringBuilder readBody(OAuthMessage msg) throws IOException {
+        StringBuilder body = new StringBuilder();
         InputStream responseBody = null;
         BufferedReader br = null;
         try {
