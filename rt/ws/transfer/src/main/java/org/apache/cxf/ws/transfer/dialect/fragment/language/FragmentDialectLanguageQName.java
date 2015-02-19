@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;
@@ -93,7 +94,22 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
                 throw new UnsupportedOperationException();
             }
         });
-        return xu.getValueList(expressionStr, (Node) representation.getAny());
+        Node resource = (Node) representation.getAny();
+        if (resource == null) {
+            // Returns empty NodeList
+            return new NodeList() {
+                @Override
+                public Node item(int i) {
+                    return null;
+                }
+
+                @Override
+                public int getLength() {
+                    return 0;
+                }
+            };
+        }
+        return xu.getValueList(expressionStr, resource);
     }
     
     /**
