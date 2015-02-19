@@ -143,6 +143,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookAcceptWildcard() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        Response r = wc.accept("text/*").get();
+        assertEquals(406, r.getStatus());
+    }
+    
+    @Test
     public void testGetBookSameUriAutoRedirect() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/redirect?sameuri=true";
         WebClient wc = WebClient.create(address);
@@ -287,7 +296,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testGetBookNameAsByteArray() {
         String address = "http://localhost:" + PORT + "/bookstore/booknames/123";
         WebClient wc = WebClient.create(address);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
         
         Response r = wc.accept("application/bar").get();
         String name = r.readEntity(String.class);
