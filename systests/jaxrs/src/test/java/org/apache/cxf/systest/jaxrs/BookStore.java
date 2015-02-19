@@ -158,6 +158,12 @@ public class BookStore {
     public Book getBookRoot() {
         return new Book("root", 124L);
     }
+    @GET
+    @Path("/books/wildcard")
+    @Produces("text/*")
+    public String getBookTextWildcard() {
+        return "book";
+    }
     
     @GET
     @Path("/bookarray")

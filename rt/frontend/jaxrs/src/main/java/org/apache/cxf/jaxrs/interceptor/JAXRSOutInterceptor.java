@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -229,7 +230,12 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             writeResponseErrorMessage(message, outOriginal, "NO_MSG_WRITER", targetType, responseMediaType);
             return;
         }
-        responseMediaType = checkFinalContentType(responseMediaType, writers);
+        try {
+            responseMediaType = checkFinalContentType(responseMediaType, writers);
+        } catch (Throwable ex) {
+            handleWriteException(providerFactory, message, ex, firstTry);
+            return;
+        }
         String finalResponseContentType = JAXRSUtils.mediaTypeToString(responseMediaType);
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Response content type is: " + finalResponseContentType);
@@ -384,7 +390,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     
     
     private MediaType checkFinalContentType(MediaType mt, List<WriterInterceptor> writers) {
-        if (mt.isWildcardType() || mt.isWildcardSubtype()) {
+        if (mt.isWildcardSubtype()) {
             int mbwIndex = writers.size() == 1 ? 0 : writers.size() - 1;
             MessageBodyWriter<Object> writer = ((WriterInterceptorMBW)writers.get(mbwIndex)).getMBW();
             Produces pm = writer.getClass().getAnnotation(Produces.class);
@@ -392,11 +398,13 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 List<MediaType> sorted = 
                     JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()), JAXRSUtils.MEDIA_TYPE_QS_PARAM);
                 mt = JAXRSUtils.intersectMimeTypes(sorted, mt).get(0);
-                if (mt.isWildcardType() || mt.isWildcardSubtype()) {
-                    return MediaType.APPLICATION_OCTET_STREAM_TYPE;    
-                }
+            }
+        }
+        if (mt.isWildcardType() || mt.isWildcardSubtype()) {
+            if ("application".equals(mt.getType()) || mt.isWildcardType()) {
+                mt = MediaType.APPLICATION_OCTET_STREAM_TYPE;
             } else {
-                return MediaType.APPLICATION_OCTET_STREAM_TYPE;
+                throw new NotAcceptableException();
             }
         }
         return mt;

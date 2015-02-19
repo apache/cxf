@@ -84,7 +84,7 @@ public class BookStoreWebSocket {
     
     @GET
     @Path("/bookbought")
-    @Produces("text/*")
+    @Produces("application/*")
     public StreamingOutput getBookBought() {
         return new StreamingOutput() {
             public void write(final OutputStream out) throws IOException, WebApplicationException {
