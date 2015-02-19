@@ -52,7 +52,7 @@ public interface Dialect {
      * @param representation XML representation stored in the ResourceManager
      * @return Representation, which will be stored in ResourceManager.
      */
-    Representation processDelete(Delete body, Representation representation);
+    boolean processDelete(Delete body, Representation representation);
     
     /**
      * Method for processing incoming Create message by Dialect extension.

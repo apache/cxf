@@ -141,7 +141,7 @@ public class FragmentDialect implements Dialect {
     }
 
     @Override
-    public Representation processDelete(Delete body, Representation representation) {
+    public boolean processDelete(Delete body, Representation representation) {
         throw new UnknownDialect();
     }
 

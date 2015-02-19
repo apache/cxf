@@ -142,16 +142,17 @@ public class ResourceLocal implements Resource {
         ReferenceParametersType refParams = addrProps
                 .getToEndpointReference()
                 .getReferenceParameters();
+        boolean delete = true;
         // Dialect processing
         if (body.getDialect() != null && !body.getDialect().isEmpty()) {
             if (dialects.containsKey(body.getDialect())) {
                 Dialect dialect = dialects.get(body.getDialect());
-                Representation representation = dialect.processDelete(body, manager.get(refParams));
-                manager.put(refParams, representation);
+                delete = dialect.processDelete(body, manager.get(refParams));
             } else {
                 throw new UnknownDialect();
             }
-        } else {
+        }
+        if (delete) {
             manager.delete(refParams);
         }
         return new DeleteResponse();
