@@ -282,9 +282,9 @@ public final class WSS4JUtils {
         } else if (propsURL != null) {
             try {
                 properties = new Properties();
-                try (InputStream ins = propsURL.openStream()) {
-                    properties.load(ins);
-                }
+                InputStream ins = propsURL.openStream();
+                properties.load(ins);
+                ins.close();
             } catch (IOException e) {
                 properties = null;
             }
@@ -339,9 +339,9 @@ public final class WSS4JUtils {
             URL url = getPropertiesFileURL(propFilename, manager, callingClass);
             if (url != null) {
                 Properties props = new Properties();
-                try (InputStream in = url.openStream()) { 
-                    props.load(in);
-                }
+                InputStream in = url.openStream();
+                props.load(in);
+                in.close();
                 return CryptoFactory.getInstance(props, classLoader, passwordEncryptor);
             }
         } catch (Exception e) {

@@ -388,7 +388,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         return 
             WSS4JUtils.loadCryptoFromPropertiesFile(
                 soapMessage, propFilename, this.getClass(), getClassLoader(), passwordEncryptor
-            );
+        );
     }
     
     protected PasswordEncryptor getPasswordEncryptor(
