@@ -19,7 +19,6 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -40,11 +39,9 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
@@ -387,36 +384,11 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     protected Crypto loadCryptoFromPropertiesFile(
         SoapMessage soapMessage, String propFilename, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        ClassLoaderHolder orig = null;
-        try {
-            try {
-                URL url = ClassLoaderUtils.getResource(propFilename, this.getClass());
-                if (url == null) {
-                    ResourceManager manager = soapMessage.getExchange()
-                            .getBus().getExtension(ResourceManager.class);
-                    ClassLoader loader = manager.resolveResource("", ClassLoader.class);
-                    if (loader != null) {
-                        orig = ClassLoaderUtils.setThreadContextClassloader(loader);
-                    }
-                    url = manager.resolveResource(propFilename, URL.class);
-                }
-                if (url != null) {
-                    Properties props = new Properties();
-                    InputStream in = url.openStream(); 
-                    props.load(in);
-                    in.close();
-                    return CryptoFactory.getInstance(props, getClassLoader(), 
-                                                     getPasswordEncryptor(soapMessage, securityProperties));
-                }
-            } catch (Exception e) {
-                //ignore
-            } 
-            return CryptoFactory.getInstance(propFilename, getClassLoader());
-        } finally {
-            if (orig != null) {
-                orig.reset();
-            }
-        }
+        PasswordEncryptor passwordEncryptor = getPasswordEncryptor(soapMessage, securityProperties);
+        return 
+            WSS4JUtils.loadCryptoFromPropertiesFile(
+                soapMessage, propFilename, this.getClass(), getClassLoader(), passwordEncryptor
+            );
     }
     
     protected PasswordEncryptor getPasswordEncryptor(
@@ -458,46 +430,6 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         return null;
     }
     
-    private static Properties getProps(Object o, URL propsURL, SoapMessage message) {
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (propsURL != null) {
-            try {
-                properties = new Properties();
-                InputStream ins = propsURL.openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                properties = null;
-            }
-        }
-        
-        return properties;
-    }
-    
-    private URL getPropertiesFileURL(Object o, SoapMessage message) {
-        if (o instanceof String) {
-            URL url = null;
-            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
-            url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, AbstractWSS4JInterceptor.class);
-                }
-                if (url == null) {
-                    url = new URL((String)o);
-                }
-                return url;
-            } catch (IOException e) {
-                // Do nothing
-            }
-        } else if (o instanceof URL) {
-            return (URL)o;        
-        }
-        return null;
-    }
-    
     protected Crypto getEncryptionCrypto(
             Object e, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
@@ -506,8 +438,10 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         } else if (e instanceof Crypto) {
             return (Crypto)e;
         } else {
-            URL propsURL = getPropertiesFileURL(e, message);
-            Properties props = getProps(e, propsURL, message);
+            ResourceManager manager = 
+                message.getExchange().getBus().getExtension(ResourceManager.class);
+            URL propsURL = WSS4JUtils.getPropertiesFileURL(e, manager, this.getClass());
+            Properties props = WSS4JUtils.getProps(e, propsURL);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Encryption properties: " + e);
                 Exception ex = new Exception("Cannot find Crypto Encryption properties: " + e);
@@ -534,8 +468,10 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         } else if (s instanceof Crypto) {
             return (Crypto)s;
         } else {
-            URL propsURL = getPropertiesFileURL(s, message);
-            Properties props = getProps(s, propsURL, message);
+            ResourceManager manager = 
+                message.getExchange().getBus().getExtension(ResourceManager.class);
+            URL propsURL = WSS4JUtils.getPropertiesFileURL(s, manager, this.getClass());
+            Properties props = WSS4JUtils.getProps(s, propsURL);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Signature properties: " + s);
                 Exception ex = new Exception("Cannot find Crypto Signature properties: " + s);

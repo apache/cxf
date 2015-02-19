@@ -18,13 +18,10 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,17 +29,13 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -207,37 +200,13 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         String propFilename, 
         RequestData reqData
     ) throws WSSecurityException {
-        ClassLoaderHolder orig = null;
-        try {
-            try {
-                URL url = ClassLoaderUtils.getResource(propFilename, this.getClass());
-                if (url == null) {
-                    ResourceManager manager = ((Message)reqData.getMsgContext()).getExchange()
-                            .getBus().getExtension(ResourceManager.class);
-                    ClassLoader loader = manager.resolveResource("", ClassLoader.class);
-                    if (loader != null) {
-                        orig = ClassLoaderUtils.setThreadContextClassloader(loader);
-                    }
-                    url = manager.resolveResource(propFilename, URL.class);
-                }
-                if (url != null) {
-                    Properties props = new Properties();
-                    InputStream in = url.openStream(); 
-                    props.load(in);
-                    in.close();
-                    return CryptoFactory.getInstance(props,
-                                                     this.getClassLoader(reqData.getMsgContext()),
-                                                     getPasswordEncryptor(reqData));
-                }
-            } catch (Exception e) {
-                //ignore
-            } 
-            return CryptoFactory.getInstance(propFilename, this.getClassLoader(reqData.getMsgContext()));
-        } finally {
-            if (orig != null) {
-                orig.reset();
-            }
-        }
+        Message message = (Message)reqData.getMsgContext();
+        ClassLoader classLoader = this.getClassLoader(reqData.getMsgContext());
+        PasswordEncryptor passwordEncryptor = getPasswordEncryptor(reqData);
+        return 
+            WSS4JUtils.loadCryptoFromPropertiesFile(
+                message, propFilename, this.getClass(), classLoader, passwordEncryptor
+            );
     }
     
 }
