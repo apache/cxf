@@ -24,9 +24,16 @@ import org.apache.cxf.rs.security.jose.jaxrs.PrivateKeyPasswordProvider;
 
 public class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvider {
 
+    private String password = "password";
+    public PrivateKeyPasswordProviderImpl() {
+        
+    }
+    public PrivateKeyPasswordProviderImpl(String password) {
+        this.password = password;
+    }
     @Override
     public char[] getPassword(Properties storeProperties) {
-        return "password".toCharArray();
+        return password.toCharArray();
     }
     
 }
