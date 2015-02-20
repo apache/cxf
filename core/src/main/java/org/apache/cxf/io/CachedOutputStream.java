@@ -334,11 +334,8 @@ public class CachedOutputStream extends OutputStream {
             }
         } else {
             // read the file
-            InputStream fin = null;
-            Reader reader = null;
-            try {
-                fin = createInputStream(tempFile);
-                reader = new InputStreamReader(fin, charsetName);
+            try (InputStream fin = createInputStream(tempFile);
+                Reader reader = new InputStreamReader(fin, charsetName)) {
                 char bytes[] = new char[1024];
                 long x = reader.read(bytes);
                 while (x != -1) {
@@ -353,13 +350,6 @@ public class CachedOutputStream extends OutputStream {
                     } else {
                         x = reader.read(bytes);
                     }
-                }
-            } finally {
-                if (reader != null) {
-                    reader.close();
-                }
-                if (fin != null) {
-                    fin.close();
                 }
             }
         }
@@ -383,23 +373,13 @@ public class CachedOutputStream extends OutputStream {
             }
         } else {
             // read the file
-            InputStream fin = null;
-            Reader reader = null;
-            try {
-                fin = createInputStream(tempFile);
-                reader = new InputStreamReader(fin, charsetName);
+            try (InputStream fin = createInputStream(tempFile);
+                Reader reader = new InputStreamReader(fin, charsetName)) {
                 char bytes[] = new char[1024];
                 int x = reader.read(bytes);
                 while (x != -1) {
                     out.append(bytes, 0, x);
                     x = reader.read(bytes);
-                }
-            } finally {
-                if (reader != null) {
-                    reader.close();
-                }
-                if (fin != null) {
-                    fin.close();
                 }
             }
         }
@@ -671,11 +651,8 @@ public class CachedOutputStream extends OutputStream {
             if (!transfered) {
                 // Data is in memory, or we failed to rename the file, try copying
                 // the stream instead.
-                FileOutputStream fout = new FileOutputStream(destinationFile);
-                try {
+                try (FileOutputStream fout = new FileOutputStream(destinationFile)) {
                     IOUtils.copyAndCloseInput(this, fout);
-                } finally {
-                    fout.close();
                 }
             }
         }

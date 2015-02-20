@@ -71,14 +71,11 @@ final class JDKBugHacks {
                     ins = ClassLoader.getSystemResourceAsStream("META-INF/cxf/" + key);
                 }
                 if (ins != null) {
-                    BufferedReader din = new BufferedReader(new InputStreamReader(ins));
-                    try {
+                    try (BufferedReader din = new BufferedReader(new InputStreamReader(ins))) {
                         cname = din.readLine();
                         if (cname != null) {
                             cname = cname.trim();
                         }
-                    } finally {
-                        din.close();
                     }
                 }
             }

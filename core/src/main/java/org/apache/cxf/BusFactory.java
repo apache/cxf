@@ -378,15 +378,9 @@ public abstract class BusFactory {
             }
 
             if (is != null) {
-                BufferedReader rd = null;
-                try {
-                    rd = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                try (BufferedReader rd = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
                     busFactoryClass = rd.readLine();
                     busFactoryCondition = rd.readLine();
-                } finally {
-                    if (rd != null) {
-                        rd.close();
-                    }
                 }
             }
             if (isValidBusFactoryClass(busFactoryClass) 

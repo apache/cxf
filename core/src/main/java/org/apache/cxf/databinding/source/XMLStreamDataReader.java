@@ -271,12 +271,9 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     private InputStream getInputStream(XMLStreamReader input) 
         throws XMLStreamException, IOException {
         
-        CachedOutputStream out = new CachedOutputStream();
-        try {
+        try (CachedOutputStream out = new CachedOutputStream()) {
             StaxUtils.copy(input, out);
             return out.getInputStream();
-        } finally {
-            out.close();
         }
     }
     public DOMSource read(XMLStreamReader reader) {

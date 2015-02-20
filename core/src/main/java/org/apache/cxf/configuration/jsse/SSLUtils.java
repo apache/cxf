@@ -108,17 +108,11 @@ public final class SSLUtils {
         KeyStore ks = KeyStore.getInstance(keyStoreType);
         
         if (keyStoreType.equalsIgnoreCase(PKCS12_TYPE)) {
-            DataInputStream dis = null;
             byte[] bytes = null;
-            try {
-                FileInputStream fis = new FileInputStream(keyStoreLocation);
-                dis = new DataInputStream(fis);
+            try (FileInputStream fis = new FileInputStream(keyStoreLocation);
+                DataInputStream dis = new DataInputStream(fis)) {
                 bytes = new byte[dis.available()];
                 dis.readFully(bytes);
-            } finally {
-                if (dis != null) {
-                    dis.close();
-                }
             }
             ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
             
@@ -252,14 +246,8 @@ public final class SSLUtils {
                              new Object[]{trustStoreLocation, e.getMessage()});
             } 
         } else {
-            FileInputStream trustStoreInputStream = null;
-            try {
-                trustStoreInputStream = new FileInputStream(trustStoreLocation);
+            try (FileInputStream trustStoreInputStream = new FileInputStream(trustStoreLocation)) {
                 trustedCertStore.load(trustStoreInputStream, null);
-            } finally {
-                if (trustStoreInputStream != null) {
-                    trustStoreInputStream.close();
-                }
             }
         }
         
@@ -274,10 +262,8 @@ public final class SSLUtils {
         if (fileName == null) {
             return null;
         }
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(fileName);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (FileInputStream in = new FileInputStream(fileName);
+            ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buf = new byte[512];
             int i = in.read(buf);
             while (i  > 0) {
@@ -285,10 +271,6 @@ public final class SSLUtils {
                 i = in.read(buf);
             }
             return out.toByteArray();
-        } finally {
-            if (in != null) {
-                in.close();
-            }
         }
     }
 
@@ -296,10 +278,8 @@ public final class SSLUtils {
         if (fileName == null) {
             return null;
         }
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(fileName);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (FileInputStream in = new FileInputStream(fileName);
+            ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buf = new byte[512];
             int i = in.read(buf);
         
@@ -308,10 +288,6 @@ public final class SSLUtils {
                 i = in.read(buf);
             }
             return out.toByteArray();
-        } finally {
-            if (in != null) {
-                in.close();
-            }
         }
     }
 

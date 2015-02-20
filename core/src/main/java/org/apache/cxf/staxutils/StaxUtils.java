@@ -1140,11 +1140,8 @@ public final class StaxUtils {
         }
     }
     public static Document read(File is) throws XMLStreamException, IOException {
-        InputStream fin = new FileInputStream(is);
-        try {
+        try (InputStream fin = new FileInputStream(is)) {
             return read(fin);
-        } finally {
-            fin.close();
         }
     }
     public static Document read(InputSource s) throws XMLStreamException {

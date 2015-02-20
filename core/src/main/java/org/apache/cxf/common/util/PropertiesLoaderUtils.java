@@ -75,14 +75,8 @@ public final class PropertiesLoaderUtils {
                 logger.log(level, msg, url.toString());
             }
             
-            InputStream is = null;
-            try {
-                is = url.openStream();
+            try (InputStream is = url.openStream()) {
                 properties.loadFromXML(new BufferedInputStream(is));
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
             }
         }
         return properties;

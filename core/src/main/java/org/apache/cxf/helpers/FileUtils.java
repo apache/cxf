@@ -344,16 +344,13 @@ public final class FileUtils {
         if (!file.exists()) {
             return new ArrayList<String>();
         }
-        BufferedReader reader = new BufferedReader(new FileReader(file));
         List<String> results = new ArrayList<String>();
-        try {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
             while (line != null) {
                 results.add(line);
                 line = reader.readLine();
             }
-        } finally {
-            reader.close();
         }
         return results;
     }

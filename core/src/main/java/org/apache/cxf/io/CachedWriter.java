@@ -304,9 +304,7 @@ public class CachedWriter extends Writer {
             }
         } else {
             // read the file
-            Reader fin = null;
-            try {
-                fin = createInputStreamReader(tempFile);
+            try (Reader fin = createInputStreamReader(tempFile)) {
                 CharArrayWriter out = new CharArrayWriter((int)tempFile.length());
                 char bytes[] = new char[1024];
                 int x = fin.read(bytes);
@@ -315,10 +313,6 @@ public class CachedWriter extends Writer {
                     x = fin.read(bytes);
                 }
                 return out.toCharArray();
-            } finally {
-                if (fin != null) {
-                    fin.close();
-                }
             }
         }
     }
@@ -333,18 +327,12 @@ public class CachedWriter extends Writer {
             }
         } else {
             // read the file
-            Reader fin = null;
-            try {
-                fin = createInputStreamReader(tempFile);
+            try (Reader fin = createInputStreamReader(tempFile)) {
                 char bytes[] = new char[1024];
                 int x = fin.read(bytes);
                 while (x != -1) {
                     out.write(bytes, 0, x);
                     x = fin.read(bytes);
-                }
-            } finally {
-                if (fin != null) {
-                    fin.close();
                 }
             }
         }
@@ -368,9 +356,7 @@ public class CachedWriter extends Writer {
             }
         } else {
             // read the file
-            Reader fin = null;
-            try {
-                fin = createInputStreamReader(tempFile);
+            try (Reader fin = createInputStreamReader(tempFile)) {
                 char bytes[] = new char[1024];
                 long x = fin.read(bytes);
                 while (x != -1) {
@@ -385,10 +371,6 @@ public class CachedWriter extends Writer {
                     } else {
                         x = fin.read(bytes);
                     }
-                }
-            } finally {
-                if (fin != null) {
-                    fin.close();
                 }
             }
         }
@@ -405,17 +387,12 @@ public class CachedWriter extends Writer {
             }
         } else {
             // read the file
-            Reader r = createInputStreamReader(tempFile);
-            try {
+            try (Reader r = createInputStreamReader(tempFile)) {
                 char chars[] = new char[1024];
                 int x = r.read(chars);
                 while (x != -1) {
                     out.append(chars, 0, x);
                     x = r.read(chars);
-                }
-            } finally {
-                if (r != null) {
-                    r.close();
                 }
             }
         }
