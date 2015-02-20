@@ -108,7 +108,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testNoClientCert() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ClientAuthTest.class.getResource("../ssl3/sslv3-client.xml");
+        URL busFile = ClientAuthTest.class.getResource("client-no-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
