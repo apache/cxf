@@ -121,18 +121,19 @@ public class JsonWebKeyTest extends Assert {
     }
     @Test
     public void testEncryptDecryptPrivateSet() throws Exception {
+        final String password = "Thus from my lips, by yours, my sin is purged.";
         Security.addProvider(new BouncyCastleProvider());    
         try {
             JsonWebKeys jwks = readKeySet("jwkPrivateSet.txt");
             validatePrivateSet(jwks);
-            String encryptedKeySet = JwkUtils.encryptJwkSet(jwks, "password".toCharArray());
+            String encryptedKeySet = JwkUtils.encryptJwkSet(jwks, password.toCharArray());
             JweCompactConsumer c = new JweCompactConsumer(encryptedKeySet);
             assertEquals("jwk-set+json", c.getJweHeaders().getContentType());
             assertEquals(Algorithm.PBES2_HS256_A128KW.getJwtName(), c.getJweHeaders().getKeyEncryptionAlgorithm());
             assertEquals(Algorithm.A128CBC_HS256.getJwtName(), c.getJweHeaders().getContentEncryptionAlgorithm());
             assertNotNull(c.getJweHeaders().getHeader("p2s"));
             assertNotNull(c.getJweHeaders().getHeader("p2c"));
-            jwks = JwkUtils.decryptJwkSet(encryptedKeySet, "password".toCharArray());
+            jwks = JwkUtils.decryptJwkSet(encryptedKeySet, password.toCharArray());
             validatePrivateSet(jwks);
         } finally {
             Security.removeProvider(BouncyCastleProvider.class.getName());
@@ -140,6 +141,7 @@ public class JsonWebKeyTest extends Assert {
     }
     @Test
     public void testEncryptDecryptPrivateKey() throws Exception {
+        final String password = "Thus from my lips, by yours, my sin is purged.";
         final String key = "{\"kty\":\"oct\","
             + "\"alg\":\"A128KW\","
             + "\"k\":\"GawgguFyGrWKav7AX4VKUg\","
@@ -148,14 +150,14 @@ public class JsonWebKeyTest extends Assert {
         try {
             JsonWebKey jwk = readKey(key);
             validateSecretAesKey(jwk);
-            String encryptedKey = JwkUtils.encryptJwkKey(jwk, "password".toCharArray());
+            String encryptedKey = JwkUtils.encryptJwkKey(jwk, password.toCharArray());
             JweCompactConsumer c = new JweCompactConsumer(encryptedKey);
             assertEquals("jwk+json", c.getJweHeaders().getContentType());
             assertEquals(Algorithm.PBES2_HS256_A128KW.getJwtName(), c.getJweHeaders().getKeyEncryptionAlgorithm());
             assertEquals(Algorithm.A128CBC_HS256.getJwtName(), c.getJweHeaders().getContentEncryptionAlgorithm());
             assertNotNull(c.getJweHeaders().getHeader("p2s"));
             assertNotNull(c.getJweHeaders().getHeader("p2c"));
-            jwk = JwkUtils.decryptJwkKey(encryptedKey, "password".toCharArray());
+            jwk = JwkUtils.decryptJwkKey(encryptedKey, password.toCharArray());
             validateSecretAesKey(jwk);
         } finally {
             Security.removeProvider(BouncyCastleProvider.class.getName());

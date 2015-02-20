@@ -169,7 +169,8 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         providers.add(new JweClientResponseFilter());
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.encryption.properties", propFile);
-        PrivateKeyPasswordProvider provider = new PrivateKeyPasswordProviderImpl();
+        PrivateKeyPasswordProvider provider = 
+            new PrivateKeyPasswordProviderImpl("Thus from my lips, by yours, my sin is purged.");
         bean.getProperties(true).put("rs.security.key.password.provider", provider);
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
@@ -406,10 +407,16 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
     
     private static class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvider {
-
+        private String password = "password";
+        public PrivateKeyPasswordProviderImpl() {
+            
+        }
+        public PrivateKeyPasswordProviderImpl(String password) {
+            this.password = password;
+        }
         @Override
         public char[] getPassword(Properties storeProperties) {
-            return "password".toCharArray();
+            return password.toCharArray();
         }
         
     }

@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 import org.apache.cxf.rs.security.jose.jwa.Algorithm;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -36,7 +37,6 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
-    
     private static final Map<String, Integer> PBES_HMAC_MAP;
     private static final Map<String, String> PBES_AES_MAP;
     private static final Map<String, Integer> DERIVED_KEY_SIZE_MAP;
@@ -64,24 +64,42 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
     public PbesHmacAesWrapKeyEncryptionAlgorithm(String password, String keyAlgoJwt) {
         this(stringToBytes(password), keyAlgoJwt);
     }
-    public PbesHmacAesWrapKeyEncryptionAlgorithm(String password, int pbesCount, String keyAlgoJwt) {
-        this(stringToBytes(password), pbesCount, keyAlgoJwt);
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(String password, int pbesCount, String keyAlgoJwt, 
+                                                 boolean hashLargePasswords) {
+        this(stringToBytes(password), pbesCount, keyAlgoJwt, hashLargePasswords);
     }
     public PbesHmacAesWrapKeyEncryptionAlgorithm(char[] password, String keyAlgoJwt) {
-        this(password, 4096, keyAlgoJwt);
+        this(password, 4096, keyAlgoJwt, false);
     }
-    public PbesHmacAesWrapKeyEncryptionAlgorithm(char[] password, int pbesCount, String keyAlgoJwt) {
-        this(charsToBytes(password), pbesCount, keyAlgoJwt);
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(char[] password, int pbesCount, String keyAlgoJwt, 
+                                                 boolean hashLargePasswords) {
+        this(charsToBytes(password), pbesCount, keyAlgoJwt, hashLargePasswords);
     }
     public PbesHmacAesWrapKeyEncryptionAlgorithm(byte[] password, String keyAlgoJwt) {
-        this(password, 4096, keyAlgoJwt);
+        this(password, 4096, keyAlgoJwt, false);
     }
-    public PbesHmacAesWrapKeyEncryptionAlgorithm(byte[] password, int pbesCount, String keyAlgoJwt) {
-        this.password = password;
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(byte[] password, int pbesCount, String keyAlgoJwt, 
+                                                 boolean hashLargePasswords) {
         this.keyAlgoJwt = validateKeyAlgorithm(keyAlgoJwt);
+        this.password = validatePassword(password, keyAlgoJwt, hashLargePasswords);
         this.pbesCount = validatePbesCount(pbesCount);
     }
     
+    static byte[] validatePassword(byte[] p, String keyAlgoJwt, boolean hashLargePasswords) {
+        int minLen = DERIVED_KEY_SIZE_MAP.get(keyAlgoJwt);
+        if (p.length < minLen || p.length > 128) {
+            throw new SecurityException();
+        }
+        if (p.length > minLen && hashLargePasswords) {
+            try {
+                return MessageDigestUtils.createDigest(p, MessageDigestUtils.ALGO_SHA_256);
+            } catch (Exception ex) {
+                throw new SecurityException(ex);
+            }
+        } else {
+            return p;
+        }
+    }
     @Override
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {
         int keySize = getKeySize(keyAlgoJwt);

@@ -74,6 +74,9 @@ under the License.
     <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter"/>
     <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor"/>
     <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jwt.PrivateKeyPasswordProviderImpl"/>
+    <bean id="keyPasswordProvider2" class="org.apache.cxf.systest.jaxrs.security.jwt.PrivateKeyPasswordProviderImpl">
+         <constructor-arg value="Thus from my lips, by yours, my sin is purged."/>
+    </bean>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsa">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -170,7 +173,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.properties"/>
-            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider2"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwshmac">

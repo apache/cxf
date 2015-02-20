@@ -25,22 +25,22 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgor
     private byte[] password;
     private String algo;
     public PbesHmacAesWrapKeyDecryptionAlgorithm(String password) {    
-        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName());
+        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName(), false);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(String password, String algo) {    
-        this(PbesHmacAesWrapKeyEncryptionAlgorithm.stringToBytes(password), algo);
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(String password, String algo, boolean hashLargePasswords) {    
+        this(PbesHmacAesWrapKeyEncryptionAlgorithm.stringToBytes(password), algo, hashLargePasswords);
     }
     public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password) {    
-        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName());
+        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName(), false);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password, String algo) {    
-        this(PbesHmacAesWrapKeyEncryptionAlgorithm.charsToBytes(password), algo);
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password, String algo, boolean hashLargePasswords) {    
+        this(PbesHmacAesWrapKeyEncryptionAlgorithm.charsToBytes(password), algo, hashLargePasswords);
     }
     public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password) {    
-        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName());
+        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName(), false);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password, String algo) {    
-        this.password = password;
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password, String algo, boolean hashLargePasswords) {    
+        this.password = PbesHmacAesWrapKeyEncryptionAlgorithm.validatePassword(password, algo, hashLargePasswords);
         this.algo = algo;
     }
     @Override
