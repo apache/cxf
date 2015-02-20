@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.https.ssl3;
+package org.apache.cxf.https.ssl3;
 
 import java.io.IOException;
 import java.net.URL;
@@ -81,7 +81,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         connection.setHostnameVerifier(new DisableCNCheckVerifier());
         
         SSLContext sslContext = SSLContext.getInstance("SSL");
-        URL keystore = SSLv3Test.class.getResource("../../../../../../keys/Truststore.jks");
+        URL keystore = SSLv3Test.class.getResource("../../../../../keys/Truststore.jks");
         TrustManager[] trustManagers = 
             SSLUtils.getTrustStoreManagers(false, "jks", keystore.getPath(), 
                                            "PKIX", LogUtils.getL7dLogger(SSLv3Test.class));
@@ -119,7 +119,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         connection.setHostnameVerifier(new DisableCNCheckVerifier());
         
         SSLContext sslContext = SSLContext.getInstance("SSL");
-        URL keystore = SSLv3Test.class.getResource("../../../../../../keys/Truststore.jks");
+        URL keystore = SSLv3Test.class.getResource("../../../../../keys/Truststore.jks");
         TrustManager[] trustManagers = 
             SSLUtils.getTrustStoreManagers(false, "jks", keystore.getPath(), 
                                            "PKIX", LogUtils.getL7dLogger(SSLv3Test.class));
