@@ -36,10 +36,11 @@
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             javax.enterprise*;version="[${cxf.cdi.api.version},2)",
             javax.ws.rs*;version="[1.0,3)",
-            org.apache.cxf*;version="${project.version}",
+            org.apache.cxf.interceptor;resolution:=optional,
+            *          
         </cxf.osgi.import>
         <cxf.osgi.export>
-            org.apache.cxf.jaxrs*
+            org.apache.cxf.cdi
         </cxf.osgi.export>
     </properties>
     
