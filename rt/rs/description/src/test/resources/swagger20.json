@@ -1,0 +1,31 @@
+{
+  "swagger": "2.0",
+  "basePath": "/base",
+  "paths": 
+  {
+    "/somepath": 
+    {
+      "post": {
+        "operationId": "postOp",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+         {
+          "in": "formData",
+          "name": "userName",
+          "type": "string"
+         }, 
+         {
+          "in": "formData",
+          "name": "password",
+          "type": "string"
+         }
+        ]
+      }
+    }
+  }
+}

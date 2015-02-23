@@ -225,7 +225,7 @@ public class JsonMapObjectReaderWriter {
         int nextOpenIndex = json.indexOf(openChar, from + 1);
         int closingIndex = json.indexOf(closeChar, from + 1);
         while (nextOpenIndex != -1 && nextOpenIndex < closingIndex) {
-            nextOpenIndex = json.indexOf(openChar, closingIndex + 1);
+            nextOpenIndex = json.indexOf(openChar, nextOpenIndex + 1);
             closingIndex = json.indexOf(closeChar, closingIndex + 1);
         }
         return closingIndex;

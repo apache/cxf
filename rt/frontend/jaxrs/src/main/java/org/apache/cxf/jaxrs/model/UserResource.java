@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 
 public class UserResource {
@@ -59,13 +60,13 @@ public class UserResource {
     }
     
     public void setConsumes(String types) {
-        if (!"".equals(types)) {
+        if (!StringUtils.isEmpty(types)) {
             consumesTypes = types;
         }
     }
     
     public void setProduces(String types) {
-        if (!"".equals(types)) {
+        if (!StringUtils.isEmpty(types)) {
             producesTypes = types;
         }
     }
@@ -75,7 +76,7 @@ public class UserResource {
     }
     
     public void setName(String name) {
-        if (!"".equals(name)) {
+        if (!StringUtils.isEmpty(name)) {
             className = name;
         }
     }
@@ -85,7 +86,7 @@ public class UserResource {
     }
     
     public void setPath(String path) {
-        if (!"".equals(path)) {
+        if (!StringUtils.isEmpty(path)) {
             pathValue = path;
         }
     }

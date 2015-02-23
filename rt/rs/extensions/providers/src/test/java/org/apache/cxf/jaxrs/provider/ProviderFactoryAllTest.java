@@ -26,7 +26,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.jaxrs.resources.Book;
-import org.apache.cxf.jaxrs.resources.Chapter;
+import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Assert;
@@ -51,8 +51,8 @@ public class ProviderFactoryAllTest extends Assert {
                                                new MessageImpl());
         assertSame(feedReader, provider);
         
-        MessageBodyReader<?> entryReader = pf.createMessageBodyReader(Chapter.class, 
-                                               Chapter.class, null, 
+        MessageBodyReader<?> entryReader = pf.createMessageBodyReader(TagVO.class, 
+                                               TagVO.class, null, 
                                                MediaType.valueOf("application/atom+xml;type=entry"), 
                                                new MessageImpl());
         assertSame(entryReader, provider);
