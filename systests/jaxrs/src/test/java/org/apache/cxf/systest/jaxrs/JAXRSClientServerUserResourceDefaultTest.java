@@ -86,7 +86,9 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             op.setPath("/books/{id}");
             op.setName("getBook");
             op.setVerb("GET");
-            op.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
+            Parameter param = new Parameter(ParameterType.PATH, "id");
+            param.setJavaType(Long.class);
+            op.setParameters(Collections.singletonList(param));
             
             UserOperation op2 = new UserOperation();
             op2.setPath("echobook");
@@ -226,7 +228,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             List<Object> params = CastUtils.cast((List<?>)request);
             String path = mc.getUriInfo().getPath();
             if ("default/books/999".equals(path)) {
-                Long bookId = Long.valueOf(params.get(0).toString());
+                Long bookId = (Long)params.get(0);
                 Book book = new Book("CXF in Action", bookId);
                 Response r = Response.ok(book, 
                                          mc.getHttpHeaders().getAcceptableMediaTypes().get(0)).build();

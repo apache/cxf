@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.provider.json;
+package org.apache.cxf.jaxrs.model.wadl;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Annotation;
@@ -37,8 +37,7 @@ import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
-import org.apache.cxf.jaxrs.resources.BookStore;
+import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -55,7 +54,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WadlGeneratorTest extends Assert {
+public class WadlGeneratorJsonTest extends Assert {
 
     private IMocksControl control;
     
@@ -68,7 +67,7 @@ public class WadlGeneratorTest extends Assert {
     @Test
     public void testWadlInJsonFormat() throws Exception {
         ClassResourceInfo cri = 
-            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+            ResourceUtils.createClassResourceInfo(BookChapters.class, BookChapters.class, true, true);
         final Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
         Map<String, List<String>> headers = new HashMap<String, List<String>>();
         headers.put("Accept", Collections.singletonList("application/json"));

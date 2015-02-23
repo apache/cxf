@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.resources;
+package org.apache.cxf.jaxrs.model.wadl;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -26,7 +26,7 @@ import javax.ws.rs.Produces;
 @Path("/bookstore/{id}")
 @Consumes({"application/xml", "application/json" })
 @Produces({"application/xml", "application/json" })
-public class BookStore {
+public class BookChapters {
 
     @GET
     @Path("chapter")

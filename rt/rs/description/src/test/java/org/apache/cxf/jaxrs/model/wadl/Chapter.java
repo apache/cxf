@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.resources;
+package org.apache.cxf.jaxrs.model.wadl;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.cxf.jaxrs.ext.xml.XMLName;
-import org.apache.cxf.jaxrs.model.wadl.Description;
 
 @XmlRootElement(name = "thechapter", namespace = "http://superbooks")
 @XmlType(name = "chapter", namespace = "http://superbooks")
