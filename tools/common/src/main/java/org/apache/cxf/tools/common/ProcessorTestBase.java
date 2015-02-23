@@ -112,8 +112,7 @@ public class ProcessorTestBase extends Assert {
         StringBuilder classPath = new StringBuilder();
         if (loader instanceof URLClassLoader) {
             for (URL url : ((URLClassLoader)loader).getURLs()) {
-                File file;
-                file = new File(url.toURI());
+                File file = new File(url.toURI());
                 String filename = file.getAbsolutePath();
                 if (filename.indexOf("junit") == -1) {
                     classPath.append(filename);
@@ -121,9 +120,7 @@ public class ProcessorTestBase extends Assert {
                 }
                 if (filename.indexOf("surefirebooter") != -1) {
                     //surefire 2.4 uses a MANIFEST classpath that javac doesn't like
-                    JarFile jar = null;
-                    try {
-                        jar = new JarFile(filename);
+                    try (JarFile jar = new JarFile(filename)) {
                         Attributes attr = jar.getManifest().getMainAttributes();
                         if (attr != null) {
                             String cp = attr.getValue("Class-Path");
@@ -143,10 +140,6 @@ public class ProcessorTestBase extends Assert {
                                     classPath.append(System.getProperty("path.separator"));
                                 }
                             }
-                        }
-                    } finally {
-                        if (jar != null) {
-                            jar.close();
                         }
                     }
                 }

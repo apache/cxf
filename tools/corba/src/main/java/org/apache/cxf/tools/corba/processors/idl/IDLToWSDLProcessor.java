@@ -636,9 +636,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 }
             } else if (mapping.startsWith(":")) {
                 mapping = mapping.substring(1);
-                BufferedReader reader = null;
-                try {
-                    reader = new BufferedReader(new FileReader(mapping));
+                try (BufferedReader reader = new BufferedReader(new FileReader(mapping))) {
                     String token = reader.readLine();
                     while (token != null) {
                         int pos = token.indexOf("=");
@@ -657,10 +655,6 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 } catch (Exception ex) {
                     throw new RuntimeException("Incorrect properties file for mns mapping - " + mapping
                                                + ". Cause: " + ex.getMessage());
-                } finally {
-                    if (reader != null) {
-                        reader.close();
-                    }
                 }
             } else {
                 throw new RuntimeException("Option mns should have a start([) & close(]) bracket"

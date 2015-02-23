@@ -1446,16 +1446,10 @@ public class SourceGenerator {
         
         try {
             file.createNewFile();
-            Writer writer = null;
-            try {
-                writer = new OutputStreamWriter(new FileOutputStream(file), 
-                                                encoding == null ? "UTF-8" : encoding);
+            try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), 
+                                                encoding == null ? "UTF-8" : encoding)) {
                 writer.write(content);
                 writer.flush();
-            } finally {
-                if (writer != null) {
-                    writer.close();
-                }
             }
         } catch (FileNotFoundException ex) {
             LOG.warning(file.getAbsolutePath() + " is not found");

@@ -127,14 +127,8 @@ public abstract class SchemaFactory {
             try {
                 Properties properties = new Properties();
                 File propFile = new File(propFileName);
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(propFile);
+                try (FileInputStream fis = new FileInputStream(propFile)) {
                     properties.load(fis);
-                } finally {
-                    if (fis != null) {
-                        fis.close();
-                    }
                 }
 
                 factoryImplName = properties.getProperty(PROPERTY_NAME);

@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.validator.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -55,10 +54,8 @@ public class Stax2DOM {
     }
 
     public Document getDocument(URL url) throws ToolException {
-        InputStream input = null;
         XMLStreamReader reader = null;
-        try {
-            input = url.openStream();
+        try (InputStream input = url.openStream()) {
             StreamSource src = new StreamSource(input, url.toExternalForm());
             reader = StaxUtils.createXMLStreamReader(src);
             return StaxUtils.read(reader, true);
@@ -69,14 +66,6 @@ public class Stax2DOM {
                 StaxUtils.close(reader);
             } catch (XMLStreamException e1) {
                 throw new ToolException(e1);
-            }
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    // throw or change do nothing.
-                    throw new ToolException(e);
-                }
             }
         }
     }

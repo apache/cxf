@@ -127,15 +127,12 @@ public class ClassUtils {
     
     private void copyXmlFile(File from, File to) throws ToolException, IOException {
 
-        FileInputStream input = null;
-        FileOutputStream output = null;
-        try {
-            String dir = to.getCanonicalPath()
+        String dir = to.getCanonicalPath()
                 .substring(0, to.getCanonicalPath().lastIndexOf(File.separator));
-            File dirFile = new File(dir);
-            dirFile.mkdirs();
-            input = new FileInputStream(from);
-            output = new FileOutputStream(to);
+        File dirFile = new File(dir);
+        dirFile.mkdirs();
+        try (FileInputStream input = new FileInputStream(from);
+            FileOutputStream output = new FileOutputStream(to)) {
             byte[] b = new byte[1024 * 3];
             int len = 0;
             while (len != -1) {
@@ -148,13 +145,6 @@ public class ClassUtils {
         } catch (Exception e) {
             Message msg = new Message("FAIL_TO_COPY_GENERATED_RESOURCE_FILE", LOG);
             throw new ToolException(msg, e);
-        } finally {
-            if (output != null) {
-                output.close();
-            }
-            if (input != null) {
-                input.close();
-            }
         }
     }    
 }

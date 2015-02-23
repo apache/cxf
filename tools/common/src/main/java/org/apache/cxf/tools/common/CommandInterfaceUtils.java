@@ -41,14 +41,10 @@ public final class CommandInterfaceUtils {
             // configure it.
             System.setProperty("org.apache.commons.logging.Log",
                                "org.apache.commons.logging.impl.Jdk14Logger");
-            InputStream commandConfig = CommandInterfaceUtils.class
-                .getResourceAsStream("commandLogging.properties");
-            try {
-                try {
-                    LogManager.getLogManager().readConfiguration(commandConfig);
-                } finally {
-                    commandConfig.close();
-                }
+
+            try (InputStream commandConfig = CommandInterfaceUtils.class
+                .getResourceAsStream("commandLogging.properties")) {
+                LogManager.getLogManager().readConfiguration(commandConfig);
             } catch (IOException ioe) {
                 throw new RuntimeException(ioe);
             }
