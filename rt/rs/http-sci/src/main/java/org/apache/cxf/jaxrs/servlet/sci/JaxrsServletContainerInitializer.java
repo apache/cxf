@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.servlet;
+package org.apache.cxf.jaxrs.servlet.sci;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -39,6 +39,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 
 @HandlesTypes({ Application.class, Provider.class, Path.class })
 public class JaxrsServletContainerInitializer implements ServletContainerInitializer {  
