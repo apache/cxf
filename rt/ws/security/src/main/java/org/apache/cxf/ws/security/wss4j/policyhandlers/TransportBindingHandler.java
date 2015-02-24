@@ -87,7 +87,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                                     SOAPMessage saaj,
                                     WSSecHeader secHeader,
                                     AssertionInfoMap aim,
-                                    SoapMessage message) {
+                                    SoapMessage message) throws SOAPException {
         super(config, binding, saaj, secHeader, aim, message);
         this.tbinding = binding;
     }
@@ -364,6 +364,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             encrKey.appendToHeader(secHeader);
             
             WSSecDKSign dkSig = new WSSecDKSign(wssConfig);
+            dkSig.setCallbackLookup(callbackLookup);
             if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkSig.setWscVersion(ConversationConstants.VERSION_05_02);
             }
@@ -452,6 +453,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     ) throws Exception {
         //Do Signature with derived keys
         WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+        dkSign.setCallbackLookup(callbackLookup);
         AlgorithmSuite algorithmSuite = tbinding.getAlgorithmSuite();
 
         //Setting the AttachedReference or the UnattachedReference according to the flag
@@ -501,6 +503,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         List<WSEncryptionPart> sigParts
     ) throws Exception {
         WSSecSignature sig = new WSSecSignature(wssConfig);
+        sig.setCallbackLookup(callbackLookup);
         
         //Setting the AttachedReference or the UnattachedReference according to the flag
         Element ref;

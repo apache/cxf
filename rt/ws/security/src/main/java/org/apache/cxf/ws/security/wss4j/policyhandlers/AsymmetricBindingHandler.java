@@ -90,7 +90,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                     SOAPMessage saaj,
                                     WSSecHeader secHeader,
                                     AssertionInfoMap aim,
-                                    SoapMessage message) {
+                                    SoapMessage message) throws SOAPException {
         super(config, binding, saaj, secHeader, aim, message);
         this.abinding = binding;
         protectionOrder = binding.getProtectionOrder();
@@ -452,6 +452,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             if (encrToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 try {
                     WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
+                    dkEncr.setCallbackLookup(callbackLookup);
                     if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                         dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
                     }
@@ -480,6 +481,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             } else {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
+                    encr.setCallbackLookup(callbackLookup);
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
                     
                     encr.setDocument(saaj.getSOAPPart());
@@ -615,6 +617,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             setupEncryptedKey(wrapper, sigToken);
             
             WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+            dkSign.setCallbackLookup(callbackLookup);
             if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
             }

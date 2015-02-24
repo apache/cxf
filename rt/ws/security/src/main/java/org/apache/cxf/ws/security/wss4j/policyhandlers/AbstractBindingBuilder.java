@@ -71,6 +71,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
+import org.apache.cxf.ws.security.wss4j.CXFCallbackLookup;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.neethi.Assertion;
@@ -95,6 +96,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.CallbackLookup;
 import org.apache.wss4j.dom.message.WSSecBase;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
@@ -169,6 +171,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected Element bstElement;
     protected Element lastEncryptedKeyElement;
     
+    protected final CallbackLookup callbackLookup;
+    
     private Element lastSupportingTokenElement;
     private Element lastDerivedKeyElement;
     
@@ -182,7 +186,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                            SOAPMessage saaj,
                            WSSecHeader secHeader,
                            AssertionInfoMap aim,
-                           SoapMessage message) {
+                           SoapMessage message) throws SOAPException {
         super(message);
         this.wssConfig = config;
         this.binding = binding;
@@ -190,6 +194,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         this.secHeader = secHeader;
         this.saaj = saaj;
         message.getExchange().put(WSHandlerConstants.SEND_SIGV, signatures);
+        
+        Element soapBody = SAAJUtils.getBody(saaj);
+        if (soapBody != null) {
+            callbackLookup = new CXFCallbackLookup(soapBody.getOwnerDocument(), soapBody);
+        } else {
+            callbackLookup = null;
+        }
     }
     
     protected void insertAfter(Element child, Element sib) {
@@ -450,7 +461,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                                             getSignedParts(suppTokens))
                     );
                 } else {
-                    WSSecSignature sig = new WSSecSignature(wssConfig);                    
+                    WSSecSignature sig = new WSSecSignature(wssConfig);
+                    sig.setCallbackLookup(callbackLookup);
                     sig.setX509Certificate(secToken.getX509Certificate());
                     sig.setCustomTokenId(id);
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
@@ -1375,6 +1387,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected WSSecEncryptedKey getEncryptedKeyBuilder(AbstractTokenWrapper wrapper, 
                                                        AbstractToken token) throws WSSecurityException {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey(wssConfig);
+        encrKey.setCallbackLookup(callbackLookup);
         Crypto crypto = getEncryptionCrypto(wrapper);
         message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
         setKeyIdentifierType(encrKey, wrapper, token);
@@ -1668,6 +1681,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         AbstractTokenWrapper wrapper, AbstractToken token, boolean attached, boolean endorse
     ) throws WSSecurityException {
         WSSecSignature sig = new WSSecSignature(wssConfig);
+        sig.setCallbackLookup(callbackLookup);
         sig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
         checkForX509PkiPath(sig, token);
         if (token instanceof IssuedToken || token instanceof SamlToken) {
@@ -1881,7 +1895,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         throws WSSecurityException {
         
         Document doc = saaj.getSOAPPart();
-        WSSecDKSign dkSign = new WSSecDKSign(wssConfig);  
+        WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+        dkSign.setCallbackLookup(callbackLookup);
         
         //Check whether it is security policy 1.2 and use the secure conversation accordingly
         if (policyToken.getVersion() == SPConstants.SPVersion.SP11) {
@@ -1964,6 +1979,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         
         Document doc = saaj.getSOAPPart();
         WSSecSignature sig = new WSSecSignature(wssConfig);
+        sig.setCallbackLookup(callbackLookup);
+        
         // If a EncryptedKeyToken is used, set the correct value type to
         // be used in the wsse:Reference in ds:KeyInfo
         if (policyToken instanceof X509Token) {

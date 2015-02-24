@@ -273,6 +273,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 || MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
             reqData.setEnableRevocation(enableRevocation);
             
+            Element soapBody = SAAJUtils.getBody(doc);
+            if (soapBody != null) {
+                engine.setCallbackLookup(new CXFCallbackLookup(soapBody.getOwnerDocument(), soapBody));
+            }
+            
             Element elem = 
                 WSSecurityUtil.getSecurityHeader(doc.getSOAPHeader(), actor, version.getVersion() != 1.1);
 
