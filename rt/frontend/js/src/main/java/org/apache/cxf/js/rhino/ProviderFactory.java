@@ -74,10 +74,8 @@ public class ProviderFactory {
             throw new Exception(f.getPath() + NO_SUCH_FILE);
         }
         boolean isE4X = f.getName().endsWith(".jsx");
-        BufferedReader bufrd = null;
         StringBuilder sb = new StringBuilder();
-        try {
-            bufrd = new BufferedReader(new FileReader(f));
+        try (BufferedReader bufrd = new BufferedReader(new FileReader(f))) {
             String line = null;
             for (;;) {
                 line = bufrd.readLine();
@@ -86,11 +84,8 @@ public class ProviderFactory {
                 }
                 sb.append(line).append("\n");
             }
-        } finally {
-            if (bufrd != null) {
-                bufrd.close();
-            }
         }
+
         String scriptStr = sb.toString();
 
         Context cx = ContextFactory.getGlobal().enterContext();

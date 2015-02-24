@@ -102,14 +102,11 @@ public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> 
         
         if (StreamSource.class.isAssignableFrom(type)) {
             try {
-                CachedOutputStream out = new CachedOutputStream();
-                try {
+                try (CachedOutputStream out = new CachedOutputStream()) {
                     XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
                     StaxUtils.copy(new DOMSource(m.getSOAPPart()), xsw);
                     xsw.close();
                     o = new StreamSource(out.getInputStream());
-                } finally {
-                    out.close();
                 }
             } catch (Exception e) {
                 throw new Fault(e);

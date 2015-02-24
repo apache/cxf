@@ -165,14 +165,11 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
     private InputStream getStreamFromReader(XMLStreamReader input) 
         throws IOException {
         
-        CachedOutputStream out = new CachedOutputStream();
-        try {
+        try (CachedOutputStream out = new CachedOutputStream()) {
             StaxUtils.copy(input, out);
             return out.getInputStream();
         } catch (XMLStreamException ex) {
             throw new IOException("XMLStreamException:" + ex.getMessage());
-        } finally {
-            out.close();
         }
     }
     

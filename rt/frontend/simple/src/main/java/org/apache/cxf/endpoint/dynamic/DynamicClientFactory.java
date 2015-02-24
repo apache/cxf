@@ -614,9 +614,7 @@ public class DynamicClientFactory {
     static void addClasspathFromManifest(StringBuilder classPath, File file) 
         throws URISyntaxException, IOException {
         
-        JarFile jar = null;
-        try {
-            jar = new JarFile(file);
+        try (JarFile jar = new JarFile(file)) {
             Attributes attr = null;
             if (jar.getManifest() != null) {
                 attr = jar.getManifest().getMainAttributes();
@@ -644,10 +642,6 @@ public class DynamicClientFactory {
                         classPath.append(File.pathSeparator);
                     }
                 }
-            }
-        } finally {
-            if (jar != null) {
-                jar.close();
             }
         }
     }
