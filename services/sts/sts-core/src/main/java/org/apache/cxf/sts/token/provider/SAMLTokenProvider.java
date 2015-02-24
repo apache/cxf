@@ -54,7 +54,7 @@ import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.dom.WSConstants;
 import org.joda.time.DateTime;
-import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml.common.SAMLVersion;
 
 /**
  * A TokenProvider implementation that provides a SAML Token.

@@ -40,7 +40,7 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
-import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml.common.SAMLVersion;
 
 /**
  * Validate a SamlToken policy.

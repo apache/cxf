@@ -57,14 +57,15 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
 import org.joda.time.DateTime;
-import org.opensaml.security.SAMLSignatureProfileValidator;
-import org.opensaml.xml.encryption.EncryptedData;
-import org.opensaml.xml.security.x509.BasicX509Credential;
-import org.opensaml.xml.signature.KeyInfo;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.SignatureValidator;
-import org.opensaml.xml.validation.ValidationException;
-import org.opensaml.xml.validation.ValidatorSuite;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.security.impl.SAMLSignatureProfileValidator;
+import org.opensaml.security.credential.BasicCredential;
+import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.encryption.EncryptedData;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.support.SignatureException;
+import org.opensaml.xmlsec.signature.support.SignatureValidator;
 
 /**
  * Validate a SAML (1.1 or 2.0) Protocol Response. It validates the Response against the specs,
@@ -97,7 +98,7 @@ public class SAMLProtocolResponseValidator {
      * @throws WSSecurityException
      */
     public void validateSamlResponse(
-        org.opensaml.saml2.core.Response samlResponse,
+        org.opensaml.saml.saml2.core.Response samlResponse,
         Crypto sigCrypto,
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
@@ -124,13 +125,20 @@ public class SAMLProtocolResponseValidator {
             }
         }
         
-        validateResponseAgainstSchemas(samlResponse);
+        if (SAMLVersion.VERSION_20 != samlResponse.getVersion()) {
+            LOG.fine(
+                "SAML Version of " + samlResponse.getVersion()
+                + "does not equal " + SAMLVersion.VERSION_20
+            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+        
         validateResponseSignature(samlResponse, sigCrypto, callbackHandler);
 
         Document doc = samlResponse.getDOM().getOwnerDocument();
         // Decrypt any encrypted Assertions and add them to the Response (note that this will break any
         // signature on the Response)
-        for (org.opensaml.saml2.core.EncryptedAssertion assertion : samlResponse.getEncryptedAssertions()) {
+        for (org.opensaml.saml.saml2.core.EncryptedAssertion assertion : samlResponse.getEncryptedAssertions()) {
             
             Element decAssertion = decryptAssertion(assertion, sigCrypto, callbackHandler);
             
@@ -139,7 +147,7 @@ public class SAMLProtocolResponseValidator {
         }
 
         // Validate Assertions
-        for (org.opensaml.saml2.core.Assertion assertion : samlResponse.getAssertions()) {
+        for (org.opensaml.saml.saml2.core.Assertion assertion : samlResponse.getAssertions()) {
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper(assertion);
             validateAssertion(wrapper, sigCrypto, callbackHandler, doc);
         }
@@ -153,7 +161,7 @@ public class SAMLProtocolResponseValidator {
      * @throws WSSecurityException
      */
     public void validateSamlResponse(
-        org.opensaml.saml1.core.Response samlResponse,
+        org.opensaml.saml.saml1.core.Response samlResponse,
         Crypto sigCrypto,
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
@@ -182,11 +190,18 @@ public class SAMLProtocolResponseValidator {
             }
         }
         
-        validateResponseAgainstSchemas(samlResponse);
+        if (SAMLVersion.VERSION_11 != samlResponse.getVersion()) {
+            LOG.fine(
+                "SAML Version of " + samlResponse.getVersion()
+                + "does not equal " + SAMLVersion.VERSION_11
+            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+        
         validateResponseSignature(samlResponse, sigCrypto, callbackHandler);
 
         // Validate Assertions
-        for (org.opensaml.saml1.core.Assertion assertion : samlResponse.getAssertions()) {
+        for (org.opensaml.saml.saml1.core.Assertion assertion : samlResponse.getAssertions()) {
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper(assertion);
             validateAssertion(
                 wrapper, sigCrypto, callbackHandler, samlResponse.getDOM().getOwnerDocument()
@@ -195,44 +210,10 @@ public class SAMLProtocolResponseValidator {
     }
     
     /**
-     * Validate the Response against the schemas
-     */
-    private void validateResponseAgainstSchemas(
-        org.opensaml.saml2.core.Response samlResponse
-    ) throws WSSecurityException {
-        // Validate SAML Response against schemas
-        ValidatorSuite schemaValidators = 
-            org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
-        try {
-            schemaValidators.validate(samlResponse);
-        } catch (ValidationException e) {
-            LOG.log(Level.FINE, "Saml Validation error: " + e.getMessage(), e);
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-        }
-    }
-    
-    /**
-     * Validate the Response against the schemas
-     */
-    private void validateResponseAgainstSchemas(
-        org.opensaml.saml1.core.Response samlResponse
-    ) throws WSSecurityException {
-        // Validate SAML Response against schemas
-        ValidatorSuite schemaValidators = 
-            org.opensaml.Configuration.getValidatorSuite("saml1-core-schema-validator");
-        try {
-            schemaValidators.validate(samlResponse);
-        } catch (ValidationException e) {
-            LOG.log(Level.FINE, "Saml Validation error: " + e.getMessage(), e);
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-        }
-    }
-    
-    /**
      * Validate the Response signature (if it exists)
      */
     private void validateResponseSignature(
-        org.opensaml.saml2.core.Response samlResponse,
+        org.opensaml.saml.saml2.core.Response samlResponse,
         Crypto sigCrypto,
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
@@ -250,7 +231,7 @@ public class SAMLProtocolResponseValidator {
      * Validate the Response signature (if it exists)
      */
     private void validateResponseSignature(
-        org.opensaml.saml1.core.Response samlResponse,
+        org.opensaml.saml.saml1.core.Response samlResponse,
         Crypto sigCrypto,
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
@@ -340,24 +321,23 @@ public class SAMLProtocolResponseValidator {
         SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
         try {
             validator.validate(signature);
-        } catch (ValidationException ex) {
+        } catch (SignatureException ex) {
             LOG.log(Level.FINE, "Error in validating the SAML Signature: " + ex.getMessage(), ex);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
-        BasicX509Credential credential = new BasicX509Credential();
+        BasicCredential credential = null;
         if (samlKeyInfo.getCerts() != null) {
-            credential.setEntityCertificate(samlKeyInfo.getCerts()[0]);
+            credential = new BasicX509Credential(samlKeyInfo.getCerts()[0]);
         } else if (samlKeyInfo.getPublicKey() != null) {
-            credential.setPublicKey(samlKeyInfo.getPublicKey());
+            credential = new BasicCredential(samlKeyInfo.getPublicKey());
         } else {
             LOG.fine("Can't get X509Certificate or PublicKey to verify signature");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        SignatureValidator sigValidator = new SignatureValidator(credential);
         try {
-            sigValidator.validate(signature);
-        } catch (ValidationException ex) {
+            SignatureValidator.validate(signature, credential);
+        } catch (SignatureException ex) {
             LOG.log(Level.FINE, "Error in validating the SAML Signature: " + ex.getMessage(), ex);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
@@ -432,7 +412,7 @@ public class SAMLProtocolResponseValidator {
     }
     
     private Element decryptAssertion(
-        org.opensaml.saml2.core.EncryptedAssertion assertion, Crypto sigCrypto, CallbackHandler callbackHandler
+        org.opensaml.saml.saml2.core.EncryptedAssertion assertion, Crypto sigCrypto, CallbackHandler callbackHandler
     ) throws WSSecurityException {
         EncryptedData encryptedData = assertion.getEncryptedData();
         Element encryptedDataDOM = encryptedData.getDOM();

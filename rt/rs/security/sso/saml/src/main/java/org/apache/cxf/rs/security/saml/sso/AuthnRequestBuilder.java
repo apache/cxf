@@ -20,7 +20,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import org.apache.cxf.message.Message;
-import org.opensaml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.core.AuthnRequest;
 
 /**
  * This interface defines a method to create a SAML 2.0 Protocol AuthnRequest.

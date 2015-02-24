@@ -48,10 +48,10 @@ import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.joda.time.DateTime;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
@@ -79,9 +79,9 @@ public class SamlCallbackHandler implements CallbackHandler {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 if (saml2) {
-                    callback.setSamlVersion(SAMLVersion.VERSION_20);
+                    callback.setSamlVersion(Version.SAML_20);
                 } else {
-                    callback.setSamlVersion(SAMLVersion.VERSION_11);
+                    callback.setSamlVersion(Version.SAML_11);
                 }
                 callback.setIssuer("https://idp.example.org/SAML2");
                 

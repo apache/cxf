@@ -36,7 +36,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.IssuedToken;
-import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml.common.SAMLVersion;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a SAML Assertion

@@ -47,6 +47,28 @@
             <version>${cxf.wss4j.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-xacml-impl</artifactId>
+            <version>${cxf.opensaml.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-xacml-saml-impl</artifactId>
+            <version>${cxf.opensaml.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <scope>test</scope>

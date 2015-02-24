@@ -87,6 +87,7 @@ import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -139,7 +140,6 @@ import org.apache.wss4j.policy.model.Wss10;
 import org.apache.wss4j.policy.model.Wss11;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.X509Token.TokenType;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * 
@@ -841,9 +841,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         SAMLCallback samlCallback = new SAMLCallback();
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
-            samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+            samlCallback.setSamlVersion(Version.SAML_11);
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
-            samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+            samlCallback.setSamlVersion(Version.SAML_20);
         }
         SAMLUtil.doSAMLCallback(handler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
@@ -1945,7 +1945,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             sigParts.add(new WSEncryptionPart(sigTokId));
         }
         
-        dkSign.setParts(sigParts);
+        dkSign.getParts().addAll(sigParts);
         
         List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
         
@@ -2014,7 +2014,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
         sig.prepare(doc, getSignatureCrypto(null), secHeader);
 
-        sig.setParts(sigParts);
+        sig.getParts().addAll(sigParts);
         List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
 
         //Do signature

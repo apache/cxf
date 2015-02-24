@@ -72,10 +72,10 @@ import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml1.core.Audience;
-import org.opensaml.saml1.core.AudienceRestrictionCondition;
-import org.opensaml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml1.core.Audience;
+import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
 
 /**
  * A TokenRenewer implementation that renews a (valid or expired) SAML Token.
@@ -410,7 +410,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
         if (audienceRestrictions != null && !audienceRestrictions.isEmpty()) {
             for (AudienceRestriction audienceRestriction : audienceRestrictions) {
                 if (audienceRestriction.getAudiences() != null) {
-                    for (org.opensaml.saml2.core.Audience audience : audienceRestriction.getAudiences()) {
+                    for (org.opensaml.saml.saml2.core.Audience audience : audienceRestriction.getAudiences()) {
                         if (appliesTo.equals(audience.getAudienceURI())) {
                             return true;
                         }
@@ -514,18 +514,18 @@ public class SAMLTokenRenewer implements TokenRenewer {
             conditionsProvider.getConditions(convertToProviderParameters(tokenParameters));
         
         if (assertion.getSaml1() != null) {
-            org.opensaml.saml1.core.Assertion saml1Assertion = assertion.getSaml1();
+            org.opensaml.saml.saml1.core.Assertion saml1Assertion = assertion.getSaml1();
             saml1Assertion.setIssueInstant(new DateTime());
             
-            org.opensaml.saml1.core.Conditions saml1Conditions =
+            org.opensaml.saml.saml1.core.Conditions saml1Conditions =
                 SAML1ComponentBuilder.createSamlv1Conditions(conditions);
             
             saml1Assertion.setConditions(saml1Conditions);
         } else {
-            org.opensaml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
+            org.opensaml.saml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
             saml2Assertion.setIssueInstant(new DateTime());
             
-            org.opensaml.saml2.core.Conditions saml2Conditions =
+            org.opensaml.saml.saml2.core.Conditions saml2Conditions =
                 SAML2ComponentBuilder.createConditions(conditions);
             
             saml2Assertion.setConditions(saml2Conditions);
@@ -560,13 +560,13 @@ public class SAMLTokenRenewer implements TokenRenewer {
     
     private String createNewId(SamlAssertionWrapper assertion) {
         if (assertion.getSaml1() != null) {
-            org.opensaml.saml1.core.Assertion saml1Assertion = assertion.getSaml1();
+            org.opensaml.saml.saml1.core.Assertion saml1Assertion = assertion.getSaml1();
             String oldId = saml1Assertion.getID();
             saml1Assertion.setID(IDGenerator.generateID("_"));
             
             return oldId;
         } else {
-            org.opensaml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
+            org.opensaml.saml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
             String oldId = saml2Assertion.getID();
             saml2Assertion.setID(IDGenerator.generateID("_"));
             

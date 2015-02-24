@@ -51,6 +51,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
@@ -66,7 +67,7 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
-import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml.common.SAMLVersion;
 
 /**
  * An interceptor to create and add a SAML token to the security header of an outbound
@@ -267,12 +268,12 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         SAMLCallback samlCallback = new SAMLCallback();
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
-            samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+            samlCallback.setSamlVersion(Version.SAML_11);
             assertPolicy(aim, "WssSamlV11Token10");
             assertPolicy(aim, "WssSamlV11Token11");
             
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
-            samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+            samlCallback.setSamlVersion(Version.SAML_20);
             assertPolicy(aim, "WssSamlV20Token11");
         }
         SAMLUtil.doSAMLCallback(handler, samlCallback);

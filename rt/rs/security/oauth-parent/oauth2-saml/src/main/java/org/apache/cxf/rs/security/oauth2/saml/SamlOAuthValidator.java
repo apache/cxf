@@ -29,12 +29,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.opensaml.saml2.core.Audience;
-import org.opensaml.saml2.core.AudienceRestriction;
-import org.opensaml.saml2.core.Conditions;
-import org.opensaml.saml2.core.Issuer;
-import org.opensaml.saml2.core.SubjectConfirmation;
-import org.opensaml.saml2.core.SubjectConfirmationData;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.SubjectConfirmation;
+import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 
 public class SamlOAuthValidator {
     private String accessTokenServiceAddress;
@@ -116,7 +116,7 @@ public class SamlOAuthValidator {
     
     private boolean validateAuthenticationSubject(Message m, 
                                                   Conditions cs,
-                                                  org.opensaml.saml2.core.Subject subject) {
+                                                  org.opensaml.saml.saml2.core.Subject subject) {
         if (subject.getSubjectConfirmations() == null) {
             return false;
         }

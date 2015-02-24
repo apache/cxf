@@ -31,7 +31,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.TokenContext;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.core.xml.XMLObject;
 
 /**
  * This class validates a SAML Assertion and checks that it has an "AuthenticatedRole" attribute
@@ -88,17 +88,17 @@ public class StaxClaimsValidator extends SamlTokenValidatorImpl {
     }
     
     private boolean handleSAML1Assertion(
-        org.opensaml.saml1.core.Assertion assertion
+        org.opensaml.saml.saml1.core.Assertion assertion
     ) throws WSSecurityException {
-        List<org.opensaml.saml1.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
-        for (org.opensaml.saml1.core.AttributeStatement statement : attributeStatements) {
-            List<org.opensaml.saml1.core.Attribute> attributes = statement.getAttributes();
-            for (org.opensaml.saml1.core.Attribute attribute : attributes) {
+        for (org.opensaml.saml.saml1.core.AttributeStatement statement : attributeStatements) {
+            List<org.opensaml.saml.saml1.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml.saml1.core.Attribute attribute : attributes) {
                 
                 if (!ClaimTypes.URI_BASE.toString().equals(attribute.getAttributeNamespace())) {
                     continue;
@@ -117,17 +117,17 @@ public class StaxClaimsValidator extends SamlTokenValidatorImpl {
     }
     
     private boolean handleSAML2Assertion(
-        org.opensaml.saml2.core.Assertion assertion
+        org.opensaml.saml.saml2.core.Assertion assertion
     ) throws WSSecurityException {
-        List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
-        for (org.opensaml.saml2.core.AttributeStatement statement : attributeStatements) {
-            List<org.opensaml.saml2.core.Attribute> attributes = statement.getAttributes();
-            for (org.opensaml.saml2.core.Attribute attribute : attributes) {
+        for (org.opensaml.saml.saml2.core.AttributeStatement statement : attributeStatements) {
+            List<org.opensaml.saml.saml2.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml.saml2.core.Attribute attribute : attributes) {
                 if (!attribute.getName().startsWith(ClaimTypes.URI_BASE.toString())) {
                     continue;
                 }

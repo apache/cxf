@@ -31,11 +31,11 @@ import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.common.CustomClaimParser.CustomRequestClaim;
-import org.opensaml.Configuration;
-import org.opensaml.saml2.core.AttributeValue;
-import org.opensaml.xml.XMLObjectBuilder;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.schema.XSInteger;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSInteger;
+import org.opensaml.saml.saml2.core.AttributeValue;
 
 /**
  * A custom ClaimsHandler implementation for use in the tests.
@@ -84,7 +84,8 @@ public class CustomClaimsHandler implements ClaimsHandler {
                     claim.addValue("1234 1st Street");
                 } else if (ClaimTypes.MOBILEPHONE.equals(requestClaim.getClaimType())) {
                     // Test custom (Integer) attribute value
-                    XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+                    XMLObjectBuilderFactory builderFactory = 
+                        XMLObjectProviderRegistrySupport.getBuilderFactory();
                     
                     @SuppressWarnings("unchecked")
                     XMLObjectBuilder<XSInteger> xsIntegerBuilder = 

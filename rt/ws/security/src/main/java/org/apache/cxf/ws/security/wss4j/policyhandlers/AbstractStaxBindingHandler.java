@@ -51,6 +51,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SPConstants;
@@ -100,7 +101,6 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * 
@@ -357,9 +357,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                                 samlCallback.setSubject(subjectBean);
                                 
                                 if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
-                                    samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+                                    samlCallback.setSamlVersion(Version.SAML_11);
                                 } else {
-                                    samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+                                    samlCallback.setSamlVersion(Version.SAML_20);
                                 }
                             }
                         }

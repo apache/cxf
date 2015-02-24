@@ -39,7 +39,7 @@
         <module>xkms-features</module>
         <module>xkms-osgi</module>
         <module>xkms-war</module>
-        <module>xkms-itests</module>
+        <!--<module>xkms-itests</module>-->
         <module>xkms-x509-repo-ldap</module>
     </modules>
 </project>

@@ -70,7 +70,7 @@ import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.SamlToken;
-import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml.common.SAMLVersion;
 
 /**
  * 
@@ -461,7 +461,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     
                     dkEncr.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
-                    dkEncr.setParts(encrParts);
+                    dkEncr.getParts().addAll(encrParts);
                     dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                             + WSConstants.ENC_KEY_VALUE_TYPE);
                     AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
@@ -648,7 +648,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                 }
 
-                dkSign.setParts(sigParts);
+                dkSign.getParts().addAll(sigParts);
 
                 List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
 

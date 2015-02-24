@@ -30,8 +30,8 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * A Callback Handler implementation for a SAML 2 assertion. By default it creates an
@@ -57,7 +57,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setSamlVersion(SAMLVersion.VERSION_20);
+                callback.setSamlVersion(Version.SAML_20);
                 callback.setIssuer(issuer);
                 if (conditions != null) {
                     callback.setConditions(conditions);

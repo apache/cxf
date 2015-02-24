@@ -30,10 +30,10 @@ import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.Attribute;
-import org.opensaml.saml2.core.AttributeStatement;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.core.AttributeStatement;
 
 public final class SAMLUtils {
     
@@ -67,11 +67,11 @@ public final class SAMLUtils {
                 }
             }
         } else {
-            List<org.opensaml.saml1.core.AttributeStatement> attributeStatements = 
+            List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements = 
                 assertion.getSaml1().getAttributeStatements();
             
-            for (org.opensaml.saml1.core.AttributeStatement statement : attributeStatements) {
-                for (org.opensaml.saml1.core.Attribute atr : statement.getAttributes()) {
+            for (org.opensaml.saml.saml1.core.AttributeStatement statement : attributeStatements) {
+                for (org.opensaml.saml.saml1.core.Attribute atr : statement.getAttributes()) {
                     SAMLClaim claim = new SAMLClaim();
                     
                     String claimType = atr.getAttributeName();

@@ -164,17 +164,17 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         boolean resourceURISatisfied = false;
         for (AttributeType attribute : resource.getAttributes()) {
             String attributeValue = attribute.getAttributeValues().get(0).getValue();
-            if (XACMLConstants.RESOURCE_ID.equals(attribute.getAttributeID())
+            if (XACMLConstants.RESOURCE_ID.equals(attribute.getAttributeId())
                 && "{http://www.example.org/contract/DoubleIt}DoubleItService#DoubleIt".equals(
                     attributeValue)) {
                 resourceIdSatisfied = true;
-            } else if (XACMLConstants.RESOURCE_WSDL_SERVICE_ID.equals(attribute.getAttributeID())
+            } else if (XACMLConstants.RESOURCE_WSDL_SERVICE_ID.equals(attribute.getAttributeId())
                 && service.equals(attributeValue)) {
                 soapServiceSatisfied = true;
-            } else if (XACMLConstants.RESOURCE_WSDL_OPERATION_ID.equals(attribute.getAttributeID())
+            } else if (XACMLConstants.RESOURCE_WSDL_OPERATION_ID.equals(attribute.getAttributeId())
                 && operation.equals(attributeValue)) {
                 soapOperationSatisfied = true;
-            } else if (XACMLConstants.RESOURCE_WSDL_ENDPOINT.equals(attribute.getAttributeID())
+            } else if (XACMLConstants.RESOURCE_WSDL_ENDPOINT.equals(attribute.getAttributeId())
                 && resourceURL.equals(attributeValue)) {
                 resourceURISatisfied = true;
             }
@@ -221,16 +221,16 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
             service + "#" + operation;
         for (AttributeType attribute : resource.getAttributes()) {
             String attributeValue = attribute.getAttributeValues().get(0).getValue();
-            if (XACMLConstants.RESOURCE_ID.equals(attribute.getAttributeID())
+            if (XACMLConstants.RESOURCE_ID.equals(attribute.getAttributeId())
                 && expectedResourceId.equals(attributeValue)) {
                 resourceIdSatisfied = true;
-            } else if (XACMLConstants.RESOURCE_WSDL_SERVICE_ID.equals(attribute.getAttributeID())
+            } else if (XACMLConstants.RESOURCE_WSDL_SERVICE_ID.equals(attribute.getAttributeId())
                 && service.equals(attributeValue)) {
                 soapServiceSatisfied = true;
-            } else if (XACMLConstants.RESOURCE_WSDL_OPERATION_ID.equals(attribute.getAttributeID())
+            } else if (XACMLConstants.RESOURCE_WSDL_OPERATION_ID.equals(attribute.getAttributeId())
                 && operation.equals(attributeValue)) {
                 soapOperationSatisfied = true;
-            } else if (XACMLConstants.RESOURCE_WSDL_ENDPOINT.equals(attribute.getAttributeID())
+            } else if (XACMLConstants.RESOURCE_WSDL_ENDPOINT.equals(attribute.getAttributeId())
                 && resourceURL.equals(attributeValue)) {
                 resourceURISatisfied = true;
             }

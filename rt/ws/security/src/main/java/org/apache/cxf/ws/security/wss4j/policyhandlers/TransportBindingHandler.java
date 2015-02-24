@@ -377,7 +377,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             dkSig.prepare(doc, secHeader);
             
-            dkSig.setParts(sigParts);
+            dkSig.getParts().addAll(sigParts);
             List<Reference> referenceList = dkSig.addReferencesToSign(sigParts, secHeader);
             
             //Do signature
@@ -484,7 +484,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
         addDerivedKeyElement(dkSign.getdktElement());
 
-        dkSign.setParts(sigParts);
+        dkSign.getParts().addAll(sigParts);
         List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
 
         //Do signature
@@ -583,7 +583,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         Document doc = saaj.getSOAPPart();
         sig.prepare(doc, crypto, secHeader);
 
-        sig.setParts(sigParts);
+        sig.getParts().addAll(sigParts);
         List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
 
         //Do signature

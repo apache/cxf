@@ -87,17 +87,17 @@ public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
         return false;
     }
     
-    private boolean findClaimInAssertion(org.opensaml.saml2.core.Assertion assertion, URI claimURI) {
-        List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
+    private boolean findClaimInAssertion(org.opensaml.saml.saml2.core.Assertion assertion, URI claimURI) {
+        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             return false;
         }
         
-        for (org.opensaml.saml2.core.AttributeStatement statement : attributeStatements) {
+        for (org.opensaml.saml.saml2.core.AttributeStatement statement : attributeStatements) {
             
-            List<org.opensaml.saml2.core.Attribute> attributes = statement.getAttributes();
-            for (org.opensaml.saml2.core.Attribute attribute : attributes) {
+            List<org.opensaml.saml.saml2.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml.saml2.core.Attribute attribute : attributes) {
                 
                 if (attribute.getName().equals(claimURI.toString())
                     && attribute.getAttributeValues() != null && !attribute.getAttributeValues().isEmpty()) {
@@ -108,17 +108,17 @@ public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
         return false;
     }
     
-    private boolean findClaimInAssertion(org.opensaml.saml1.core.Assertion assertion, URI claimURI) {
-        List<org.opensaml.saml1.core.AttributeStatement> attributeStatements = 
+    private boolean findClaimInAssertion(org.opensaml.saml.saml1.core.Assertion assertion, URI claimURI) {
+        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             return false;
         }
         
-        for (org.opensaml.saml1.core.AttributeStatement statement : attributeStatements) {
+        for (org.opensaml.saml.saml1.core.AttributeStatement statement : attributeStatements) {
             
-            List<org.opensaml.saml1.core.Attribute> attributes = statement.getAttributes();
-            for (org.opensaml.saml1.core.Attribute attribute : attributes) {
+            List<org.opensaml.saml.saml1.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml.saml1.core.Attribute attribute : attributes) {
                 
                 URI attributeNamespace = URI.create(attribute.getAttributeNamespace());
                 String desiredRole = attributeNamespace.relativize(claimURI).toString();

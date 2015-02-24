@@ -61,7 +61,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.opensaml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.core.AuthnRequest;
 
 @PreMatching
 @Priority(Priorities.AUTHENTICATION + 1)

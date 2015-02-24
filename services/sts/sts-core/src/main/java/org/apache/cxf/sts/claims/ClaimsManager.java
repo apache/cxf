@@ -37,8 +37,8 @@ import org.apache.cxf.sts.token.realm.RealmSupport;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.saml.common.SAMLVersion;
 
 
 /**
@@ -299,8 +299,8 @@ public class ClaimsManager {
     }
 
 
-    protected List<ProcessedClaim> parseClaimsInAssertion(org.opensaml.saml1.core.Assertion assertion) {
-        List<org.opensaml.saml1.core.AttributeStatement> attributeStatements = 
+    protected List<ProcessedClaim> parseClaimsInAssertion(org.opensaml.saml.saml1.core.Assertion assertion) {
+        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             if (LOG.isLoggable(Level.FINEST)) {
@@ -310,13 +310,13 @@ public class ClaimsManager {
         }
         ProcessedClaimCollection collection = new ProcessedClaimCollection();
 
-        for (org.opensaml.saml1.core.AttributeStatement statement : attributeStatements) {
+        for (org.opensaml.saml.saml1.core.AttributeStatement statement : attributeStatements) {
             if (LOG.isLoggable(Level.FINEST)) {
                 LOG.finest("parsing statement: " + statement.getElementQName());
             }
 
-            List<org.opensaml.saml1.core.Attribute> attributes = statement.getAttributes();
-            for (org.opensaml.saml1.core.Attribute attribute : attributes) {
+            List<org.opensaml.saml.saml1.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml.saml1.core.Attribute attribute : attributes) {
                 if (LOG.isLoggable(Level.FINEST)) {
                     LOG.finest("parsing attribute: " + attribute.getAttributeName());
                 }
@@ -343,8 +343,8 @@ public class ClaimsManager {
         return collection;
     }
 
-    protected List<ProcessedClaim> parseClaimsInAssertion(org.opensaml.saml2.core.Assertion assertion) {
-        List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
+    protected List<ProcessedClaim> parseClaimsInAssertion(org.opensaml.saml.saml2.core.Assertion assertion) {
+        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             if (LOG.isLoggable(Level.FINEST)) {
@@ -355,12 +355,12 @@ public class ClaimsManager {
 
         List<ProcessedClaim> collection = new ArrayList<ProcessedClaim>();
 
-        for (org.opensaml.saml2.core.AttributeStatement statement : attributeStatements) {
+        for (org.opensaml.saml.saml2.core.AttributeStatement statement : attributeStatements) {
             if (LOG.isLoggable(Level.FINEST)) {
                 LOG.finest("parsing statement: " + statement.getElementQName());
             }
-            List<org.opensaml.saml2.core.Attribute> attributes = statement.getAttributes();
-            for (org.opensaml.saml2.core.Attribute attribute : attributes) {
+            List<org.opensaml.saml.saml2.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml.saml2.core.Attribute attribute : attributes) {
                 if (LOG.isLoggable(Level.FINEST)) {
                     LOG.finest("parsing attribute: " + attribute.getName());
                 }

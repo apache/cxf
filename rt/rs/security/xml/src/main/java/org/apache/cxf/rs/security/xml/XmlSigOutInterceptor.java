@@ -30,7 +30,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -44,7 +43,8 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
-import org.opensaml.xml.signature.SignatureConstants;
+
+import org.opensaml.xmlsec.signature.support.SignatureConstants;
 
 //TODO: Make sure that enveloped signatures can be applied to individual
 //      child nodes of an envelope root element, a new property such as 

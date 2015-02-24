@@ -54,8 +54,8 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
-import org.opensaml.saml2.core.Attribute;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.saml.saml2.core.Attribute;
 
 /**
  * A unit test for creating a SAML Tokens with various Attributes populated by a ClaimsHandler.

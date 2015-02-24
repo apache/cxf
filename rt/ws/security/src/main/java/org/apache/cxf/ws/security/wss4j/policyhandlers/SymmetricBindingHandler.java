@@ -718,7 +718,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 new QName(sbinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
         }
         
-        dkSign.setParts(sigs);
+        dkSign.getParts().addAll(sigs);
         List<Reference> referenceList = dkSign.addReferencesToSign(sigs, secHeader);
         
         //Add elements to header
@@ -838,7 +838,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
             this.message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
             sig.prepare(saaj.getSOAPPart(), crypto, secHeader);
-            sig.setParts(sigs);
+            sig.getParts().addAll(sigs);
             List<Reference> referenceList = sig.addReferencesToSign(sigs, secHeader);
 
             //Do signature
