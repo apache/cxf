@@ -44,7 +44,7 @@ public final class MEXUtils {
 
     public static List<Element> getWSDLs(Server server) {
         Message message = PhaseInterceptorChain.getCurrentMessage();
-        
+        message.setContextualProperty(WSDLGetUtils.AUTO_REWRITE_ADDRESS_ALL, true);
         String base = (String)message.get(Message.REQUEST_URL);
         String ctxUri = (String)message.get(Message.PATH_INFO);
 
