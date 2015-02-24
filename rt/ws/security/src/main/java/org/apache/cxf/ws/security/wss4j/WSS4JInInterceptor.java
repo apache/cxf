@@ -273,13 +273,14 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 || MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
             reqData.setEnableRevocation(enableRevocation);
             
-            Element elem = WSSecurityUtil.getSecurityHeader(doc.getSOAPPart(), actor);
+            Element elem = 
+                WSSecurityUtil.getSecurityHeader(doc.getSOAPHeader(), actor, version.getVersion() != 1.1);
 
             List<WSSecurityEngineResult> wsResult = engine.processSecurityHeader(
                 elem, reqData
             );
             
-            if (wsResult != null && !wsResult.isEmpty()) { // security header found
+            if (!wsResult.isEmpty()) { // security header found
                 if (reqData.getWssConfig().isEnableSignatureConfirmation()) {
                     checkSignatureConfirmation(reqData, wsResult);
                 }
@@ -294,9 +295,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     wsResult, utWithCallbacks
                 );
             } else { // no security header found
-                // Create an empty result list to pass into the required validation
-                // methods.
-                wsResult = new ArrayList<WSSecurityEngineResult>();
                 if (doc.getSOAPPart().getEnvelope().getBody().hasFault() && isRequestor(msg)) {
                     LOG.warning("The request is a SOAP Fault, but it is not secured");
                     // We allow lax action matching here for backwards compatibility
