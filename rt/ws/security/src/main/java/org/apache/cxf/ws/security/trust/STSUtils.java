@@ -89,10 +89,18 @@ public final class STSUtils {
     }
     
     public static STSClient getClient(Message message, String type) {
-        return getClient(message, type, null);
+        return getClientWithIssuer(message, type, null);
     }
     
     public static STSClient getClient(Message message, String type, IssuedToken itok) {
+        if (itok != null) {
+            return getClientWithIssuer(message, type, itok.getIssuer());
+        } else {
+            return getClientWithIssuer(message, type, null);
+        }
+    }
+    
+    public static STSClient getClientWithIssuer(Message message, String type, Element issuer) {
         
         // Retrieve or create the STSClient
         STSClient client = (STSClient)message
@@ -112,10 +120,10 @@ public final class STSUtils {
         
         
         // Find out if we have an EPR to get the STS Address (possibly via WS-MEX)
-        if (itok != null && itok.getIssuer() != null) {
+        if (issuer != null) {
             EndpointReferenceType epr = null;
             try {
-                epr = VersionTransformer.parseEndpointReference(itok.getIssuer());
+                epr = VersionTransformer.parseEndpointReference(issuer);
             } catch (JAXBException e) {
                 throw new IllegalArgumentException(e);
             }
@@ -147,6 +155,7 @@ public final class STSUtils {
         
         return client;
     }
+
     public static boolean configureViaEPR(STSClient client, EndpointReferenceType epr) {
         if (epr != null && client.getLocation() == null && client.getWsdlLocation() == null) {
             return true;
