@@ -127,14 +127,9 @@ class ParamReader extends ClassReader {
         }
 
         try {
-            // get a parameter reader
-            ParamReader pr = new ParamReader(c);
-            
             // get the parameter names
-            try {
+            try (ParamReader pr = new ParamReader(c)) {
                 return pr.getParameterNames(method);
-            } finally {
-                pr.close();
             }
         } catch (IOException e) {
             // log it and leave

@@ -85,12 +85,11 @@ class ClassReader extends ByteArrayInputStream {
      * @throws IOException
      */
     protected static byte[] getBytes(Class<?> c) throws IOException {
-        InputStream fin = c.getResourceAsStream('/' + c.getName().replace('.', '/') + ".class");
-        if (fin == null) {
-            throw new IOException();
-        }
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (InputStream fin = c.getResourceAsStream('/' + c.getName().replace('.', '/') + ".class");
+            ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            if (fin == null) {
+                throw new IOException();
+            }
             byte[] buf = new byte[1024];
             int actual;
             do {
@@ -100,8 +99,6 @@ class ClassReader extends ByteArrayInputStream {
                 }
             } while (actual > 0);
             return out.toByteArray();
-        } finally {
-            fin.close();
         }
     }
 
