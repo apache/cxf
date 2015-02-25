@@ -340,20 +340,14 @@ public class CXFOSGiTestSupport {
      */
     public static boolean isPortAvailable(int port) {
         ServerSocket ss = null;
-        DatagramSocket ds = null;
-        try {
+        try (DatagramSocket ds = new DatagramSocket(port)) {
             ss = new ServerSocket(port);
             ss.setReuseAddress(true);
-            ds = new DatagramSocket(port);
             ds.setReuseAddress(true);
             return true;
         } catch (IOException e) {
             // ignore
         } finally {
-            if (ds != null) {
-                ds.close();
-            }
-
             if (ss != null) {
                 try {
                     ss.close();

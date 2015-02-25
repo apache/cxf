@@ -265,15 +265,9 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         doneFile.createNewFile();
         URI basedir = project.getBasedir().toURI();
         String options = wsdlOption.generateCommandLine(null, basedir, wsdlURI, false).toString();
-        DataOutputStream writer = null;
-        try {
-            writer = new DataOutputStream(new FileOutputStream(doneFile));
+        try (DataOutputStream writer = new DataOutputStream(new FileOutputStream(doneFile))) {
             writer.writeUTF(options);
             writer.flush();
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
     

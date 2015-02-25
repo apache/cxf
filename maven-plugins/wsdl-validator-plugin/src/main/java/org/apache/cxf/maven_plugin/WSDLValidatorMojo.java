@@ -147,14 +147,8 @@ public class WSDLValidatorMojo extends AbstractMojo {
                 String[] pargs = list.toArray(new String[list.size()]);
                 
                 ToolSpec spec = null;
-                InputStream toolspecStream = null;
-                try {
-                    toolspecStream = WSDLValidator.class .getResourceAsStream("wsdlvalidator.xml");
+                try (InputStream toolspecStream = WSDLValidator.class .getResourceAsStream("wsdlvalidator.xml")) {
                     spec = new ToolSpec(toolspecStream, false);
-                } finally {
-                    if (toolspecStream != null) {
-                        toolspecStream.close();
-                    }
                 }
                 WSDLValidator validator = new WSDLValidator(spec);
                 validator.setArguments(pargs);

@@ -294,13 +294,10 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
          
         byte[] tmp = new byte[4096];
         int i = 0;
-        InputStream is = new FileInputStream(inputFile);
-        try {
+        try (InputStream is = new FileInputStream(inputFile)) {
             while ((i = is.read(tmp)) >= 0) {
                 outputstream.write(tmp, 0, i);
             }
-        } finally {
-            is.close();
         }
 
         outputstream.flush();

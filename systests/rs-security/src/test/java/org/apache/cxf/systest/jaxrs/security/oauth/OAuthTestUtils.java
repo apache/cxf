@@ -66,25 +66,17 @@ public final class OAuthTestUtils {
 
     public static String readBody(OAuthMessage msg) throws IOException {
         StringBuilder body = new StringBuilder();
-        InputStream responseBody = null;
-        BufferedReader br = null;
-        try {
-            responseBody = msg.getBodyAsStream();
+        try (InputStream responseBody = msg.getBodyAsStream()) {
             if (responseBody != null) {
-                br = new BufferedReader(new InputStreamReader(responseBody));
-                String buf;
-                while ((buf = br.readLine()) != null) {
-                    body.append(buf);
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(responseBody))) {
+                    String buf;
+                    while ((buf = br.readLine()) != null) {
+                        body.append(buf);
+                    }
                 }
             }
-        } finally {
-            if (br != null) {
-                br.close();
-            }
-            if (responseBody != null) {
-                responseBody.close();
-            }
         }
+
         return body.toString().trim();
     }
 

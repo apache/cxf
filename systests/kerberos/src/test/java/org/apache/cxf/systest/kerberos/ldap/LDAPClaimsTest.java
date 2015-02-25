@@ -93,16 +93,10 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     public static void startServers() throws Exception {
         props = new Properties();
 
-        InputStream is = null;
-        try {
-            is = LDAPClaimsTest.class.getResourceAsStream("/ldap.properties");
+        try (InputStream is = LDAPClaimsTest.class.getResourceAsStream("/ldap.properties")) {
             props.load(is);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (is != null) {
-                is.close();
-            }
         }
     }
 
