@@ -57,6 +57,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectUtils;
 import org.apache.maven.settings.Proxy;
+import org.apache.maven.toolchain.Toolchain;
+import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
 import org.codehaus.plexus.archiver.jar.Manifest.Attribute;
@@ -206,7 +208,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     /**
      * Sets the Java executable to use when fork parameter is <code>true</code>.
      * 
-     * @parameter default-value="${java.home}/bin/java"
+     * @parameter
      * @since 2.4
      */
     private String javaExecutable;
@@ -226,6 +228,12 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * @required
      */
     private ArtifactRepositoryFactory artifactRepositoryFactory;
+    /**
+     * The toolchain manager.
+     */
+    @Component
+    private ToolchainManager toolchainManager;
+
     /**
      * The Maven session.
      * 
@@ -838,17 +846,28 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     private File getJavaExecutable() throws IOException {
+        if (javaExecutable != null) {
+            getLog().debug("Plugin configuration set the 'javaExecutable' parameter to " + javaExecutable);
+        } else {
+            Toolchain tc = toolchainManager.getToolchainFromBuildContext("jdk", mavenSession);
+            if (tc != null) {
+                getLog().info("Using toolchain " + tc + " to find the java executable");
+                javaExecutable = tc.findTool("java");
+            } else {
+                getLog().debug("The java executable is set to default value");
+                javaExecutable = SystemUtils.getJavaHome() + File.separator + "bin" + File.separator + "java";
+            }
+        }
         String exe = SystemUtils.IS_OS_WINDOWS && !javaExecutable.endsWith(".exe") ? ".exe" : "";
         File javaExe = new File(javaExecutable + exe);
-
         if (!javaExe.isFile()) {
             throw new IOException(
                                   "The java executable '"
                                       + javaExe
                                       + "' doesn't exist or is not a file." 
-                                      + "Verify the <javaExecutable/> parameter.");
+                                      + "Verify the <javaExecutable/> parameter or toolchain configuration.");
         }
-
+        getLog().info("The java executable is " + javaExe.getAbsolutePath());
         return javaExe;
     }
     
