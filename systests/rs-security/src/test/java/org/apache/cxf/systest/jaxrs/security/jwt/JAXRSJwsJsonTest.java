@@ -40,7 +40,7 @@ import org.apache.cxf.rs.security.jose.jaxrs.JweClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsJsonClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsJsonWriterInterceptor;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -67,7 +67,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     private static void registerBouncyCastleIfNeeded() throws Exception {
         try {
             // Java 8 apparently has it
-            Cipher.getInstance(Algorithm.AES_GCM_ALGO_JAVA);
+            Cipher.getInstance(AlgorithmUtils.AES_GCM_ALGO_JAVA);
         } catch (Throwable t) {
             // Oracle Java 7
             Security.addProvider(new BouncyCastleProvider());    

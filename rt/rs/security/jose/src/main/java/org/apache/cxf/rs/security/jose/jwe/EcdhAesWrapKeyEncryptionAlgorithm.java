@@ -22,49 +22,49 @@ import java.security.interfaces.ECPublicKey;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.EcdhDirectKeyJweEncryption.EcdhHelper;
 
-public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
+public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
     
     private static final Map<String, String> ECDH_AES_MAP;
     static {
         ECDH_AES_MAP = new HashMap<String, String>();
-        ECDH_AES_MAP.put(Algorithm.ECDH_ES_A128KW.getJwtName(), Algorithm.A128KW.getJwtName());
-        ECDH_AES_MAP.put(Algorithm.ECDH_ES_A192KW.getJwtName(), Algorithm.A192KW.getJwtName());
-        ECDH_AES_MAP.put(Algorithm.ECDH_ES_A256KW.getJwtName(), Algorithm.A256KW.getJwtName());
+        ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A128KW.getJwaName(), KeyAlgorithm.A128KW.getJwaName());
+        ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A192KW.getJwaName(), KeyAlgorithm.A192KW.getJwaName());
+        ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A256KW.getJwaName(), KeyAlgorithm.A256KW.getJwaName());
     }
-    private String keyAlgo;
+    private KeyAlgorithm keyAlgo;
     private EcdhHelper helper;
     
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              String curve,
                                              String apuString,
                                              String apvString,
-                                             String keyAlgo) {
+                                             KeyAlgorithm keyAlgo) {
         
         this.keyAlgo = keyAlgo;
-        helper = new EcdhHelper(peerPublicKey, curve, apuString, apvString, keyAlgo);
+        helper = new EcdhHelper(peerPublicKey, curve, apuString, apvString, keyAlgo.getJwaName());
     }
     
     @Override
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {
         final byte[] derivedKey = helper.getDerivedKey(headers);
-        Algorithm jwtAlgo = Algorithm.valueOf(ECDH_AES_MAP.get(keyAlgo));
-        KeyEncryptionAlgorithm aesWrap = new AesWrapKeyEncryptionAlgorithm(derivedKey, 
-                                                                           jwtAlgo.getJwtName()) {
+        KeyEncryptionProvider aesWrap = new AesWrapKeyEncryptionAlgorithm(derivedKey, 
+                                                                           keyAlgo) {
             protected void checkAlgorithms(JweHeaders headers) {
                 // complete
             }
             protected String getKeyEncryptionAlgoJava(JweHeaders headers) {
-                return Algorithm.AES_WRAP_ALGO_JAVA;
+                return AlgorithmUtils.AES_WRAP_ALGO_JAVA;
             }
         };
         return aesWrap.getEncryptedContentEncryptionKey(headers, cek);
     }
     
     @Override
-    public String getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return keyAlgo;
     }
 }

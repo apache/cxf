@@ -22,9 +22,9 @@ import java.security.interfaces.RSAPrivateKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactProducer {
@@ -105,7 +105,7 @@ public class JwsCompactProducer {
         this.signature = sig;
     }
     private boolean isPlainText() {
-        return JoseConstants.PLAIN_TEXT_ALGO.equals(getAlgorithm());
+        return AlgorithmUtils.PLAIN_TEXT_ALGO.equals(getAlgorithm());
     }
     private String getAlgorithm() {
         return getJoseHeaders().getAlgorithm();

@@ -25,8 +25,8 @@ import java.security.interfaces.ECPublicKey;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 
@@ -35,7 +35,7 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
                                       String curve,
                                       String apuString,
                                       String apvString,
-                                      String ctAlgo) {
+                                      ContentAlgorithm ctAlgo) {
         super(new EcdhDirectKeyEncryptionAlgorithm(),
               new EcdhAesGcmContentEncryptionAlgorithm(peerPublicKey,
                                                        curve,
@@ -45,7 +45,7 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
     }
     protected static class EcdhDirectKeyEncryptionAlgorithm extends DirectKeyEncryptionAlgorithm {
         protected void checkKeyEncryptionAlgorithm(JweHeaders headers) {
-            headers.setKeyEncryptionAlgorithm(JoseConstants.ECDH_ES_DIRECT_ALGO);
+            headers.setKeyEncryptionAlgorithm(AlgorithmUtils.ECDH_ES_DIRECT_ALGO);
         }
     }
     protected static class EcdhAesGcmContentEncryptionAlgorithm extends AesGcmContentEncryptionAlgorithm {
@@ -54,9 +54,9 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
                                                     String curve,
                                                     String apuString,
                                                     String apvString,
-                                                    String ctAlgo) {
+                                                    ContentAlgorithm ctAlgo) {
             super(ctAlgo);
-            helper = new EcdhHelper(peerPublicKey, curve, apuString, apvString, ctAlgo);
+            helper = new EcdhHelper(peerPublicKey, curve, apuString, apvString, ctAlgo.getJwaName());
         }
         public byte[] getContentEncryptionKey(JweHeaders headers) {
             return helper.getDerivedKey(headers);
@@ -84,14 +84,14 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
             KeyPair pair = CryptoUtils.generateECKeyPair(ecurve);
             ECPublicKey publicKey = (ECPublicKey)pair.getPublic();
             ECPrivateKey privateKey = (ECPrivateKey)pair.getPrivate();
-            Algorithm jwtAlgo = Algorithm.valueOf(ctAlgo);
+            ContentAlgorithm jwtAlgo = ContentAlgorithm.valueOf(ctAlgo);
         
             headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
             headers.setHeader("apv", Base64UrlUtility.encode(apvBytes));
             headers.setJsonWebKey("epv", JwkUtils.fromECPublicKey(publicKey, ecurve));
             
             return JweUtils.getECDHKey(privateKey, peerPublicKey, apuBytes, apvBytes, 
-                                       jwtAlgo.getJwtName(), jwtAlgo.getKeySizeBits());
+                                       jwtAlgo.getJwaName(), jwtAlgo.getKeySizeBits());
             
         }
         private byte[] toBytes(String str) {

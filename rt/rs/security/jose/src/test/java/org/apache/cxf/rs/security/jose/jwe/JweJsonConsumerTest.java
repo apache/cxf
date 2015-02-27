@@ -25,8 +25,7 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.AfterClass;
@@ -64,8 +63,8 @@ public class JweJsonConsumerTest extends Assert {
     @BeforeClass
     public static void registerBouncyCastleIfNeeded() throws Exception {
         try {
-            Cipher.getInstance(Algorithm.AES_GCM_ALGO_JAVA);
-            Cipher.getInstance(Algorithm.AES_CBC_ALGO_JAVA);
+            Cipher.getInstance(AlgorithmUtils.AES_GCM_ALGO_JAVA);
+            Cipher.getInstance(AlgorithmUtils.AES_CBC_ALGO_JAVA);
         } catch (Throwable t) {
             Security.addProvider(new BouncyCastleProvider());    
         }
@@ -80,7 +79,7 @@ public class JweJsonConsumerTest extends Assert {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_OUTPUT, 
-                              JoseConstants.A128GCM_ALGO, 
+                              AlgorithmUtils.A128GCM_ALGO, 
                               JweJsonProducerTest.WRAPPER_BYTES1,
                               null);
     }
@@ -89,7 +88,7 @@ public class JweJsonConsumerTest extends Assert {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_FLAT_OUTPUT, 
-                              JoseConstants.A128GCM_ALGO, 
+                              AlgorithmUtils.A128GCM_ALGO, 
                               JweJsonProducerTest.WRAPPER_BYTES1,
                               null);
     }
@@ -98,7 +97,7 @@ public class JweJsonConsumerTest extends Assert {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_DIRECT_OUTPUT, 
-                              JoseConstants.A128GCM_ALGO, 
+                              AlgorithmUtils.A128GCM_ALGO, 
                               null, 
                               JweJsonProducerTest.CEK_BYTES);
     }
@@ -107,7 +106,7 @@ public class JweJsonConsumerTest extends Assert {
         String text = "Live long and prosper.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_A128CBCHS256_DIRECT_OUTPUT, 
-                              JoseConstants.A128CBC_HS256_ALGO, 
+                              AlgorithmUtils.A128CBC_HS256_ALGO, 
                               null,
                               JweCompactReaderWriterTest.CONTENT_ENCRYPTION_KEY_A3);
     }
@@ -116,7 +115,7 @@ public class JweJsonConsumerTest extends Assert {
         String text = "Live long and prosper.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_A128CBCHS256_OUTPUT, 
-                              JoseConstants.A128CBC_HS256_ALGO, 
+                              AlgorithmUtils.A128CBC_HS256_ALGO, 
                               Base64UrlUtility.decode(JweCompactReaderWriterTest.KEY_ENCRYPTION_KEY_A3),
                               null);
     }
@@ -129,8 +128,8 @@ public class JweJsonConsumerTest extends Assert {
         
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(JweJsonProducerTest.WRAPPER_BYTES1, 
                                                                "AES");
-        JweDecryptionProvider jwe = JweUtils.createJweDecryptionProvider(wrapperKey, JoseConstants.A128KW_ALGO, 
-                                                                         JoseConstants.A128GCM_ALGO);
+        JweDecryptionProvider jwe = JweUtils.createJweDecryptionProvider(wrapperKey, AlgorithmUtils.A128KW_ALGO, 
+                                                                         AlgorithmUtils.A128GCM_ALGO);
         JweJsonConsumer consumer = new JweJsonConsumer(JweJsonProducerTest.SINGLE_RECIPIENT_ALL_HEADERS_AAD_OUTPUT);
         JweDecryptionOutput out = consumer.decryptWith(jwe);
         assertEquals(text, out.getContentText());
@@ -143,8 +142,8 @@ public class JweJsonConsumerTest extends Assert {
         }
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(JweJsonProducerTest.WRAPPER_BYTES1, 
                                                                "AES");
-        JweDecryptionProvider jwe = JweUtils.createJweDecryptionProvider(wrapperKey, JoseConstants.A128KW_ALGO, 
-                                                                         JoseConstants.A128GCM_ALGO);
+        JweDecryptionProvider jwe = JweUtils.createJweDecryptionProvider(wrapperKey, AlgorithmUtils.A128KW_ALGO, 
+                                                                         AlgorithmUtils.A128GCM_ALGO);
         JweJsonConsumer consumer = new JweJsonConsumer(SINGLE_RECIPIENT_ALL_HEADERS_AAD_MODIFIED_OUTPUT);
         try {
             consumer.decryptWith(jwe);
@@ -159,13 +158,13 @@ public class JweJsonConsumerTest extends Assert {
                                        String contentEncryptionAlgo,
                                        final byte[] wrapperKeyBytes,
                                        final byte[] cek) throws Exception {
-        if (contentEncryptionAlgo.equals(JoseConstants.A128GCM_ALGO) && SKIP_AES_GCM_TESTS) {
+        if (contentEncryptionAlgo.equals(AlgorithmUtils.A128GCM_ALGO) && SKIP_AES_GCM_TESTS) {
             return;
         }
         JweDecryptionProvider jwe = null;
         if (wrapperKeyBytes != null) {
             SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(wrapperKeyBytes, "AES");
-            jwe = JweUtils.createJweDecryptionProvider(wrapperKey, JoseConstants.A128KW_ALGO, contentEncryptionAlgo);
+            jwe = JweUtils.createJweDecryptionProvider(wrapperKey, AlgorithmUtils.A128KW_ALGO, contentEncryptionAlgo);
         } else {
             SecretKey cekKey = CryptoUtils.createSecretKeySpec(cek, "AES");
             jwe = JweUtils.getDirectKeyJweDecryption(cekKey, contentEncryptionAlgo);

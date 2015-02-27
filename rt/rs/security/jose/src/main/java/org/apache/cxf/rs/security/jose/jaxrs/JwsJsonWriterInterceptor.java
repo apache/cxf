@@ -93,7 +93,7 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
     private JoseHeaders prepareProtectedHeader(WriterInterceptorContext ctx, 
                                                           JwsSignatureProvider signer) {
         JoseHeaders headers = new JoseHeaders();
-        headers.setAlgorithm(signer.getAlgorithm());
+        headers.setAlgorithm(signer.getAlgorithm().getJwaName());
         setContentTypeIfNeeded(headers, ctx);
         return headers;
     }

@@ -19,28 +19,30 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     private byte[] password;
-    private String algo;
+    private KeyAlgorithm algo;
     public PbesHmacAesWrapKeyDecryptionAlgorithm(String password) {    
-        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName(), false);
+        this(password, KeyAlgorithm.PBES2_HS256_A128KW, false);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(String password, String algo, boolean hashLargePasswords) {    
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(String password, KeyAlgorithm algo, boolean hashLargePasswords) {    
         this(PbesHmacAesWrapKeyEncryptionAlgorithm.stringToBytes(password), algo, hashLargePasswords);
     }
     public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password) {    
-        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName(), false);
+        this(password, KeyAlgorithm.PBES2_HS256_A128KW, false);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password, String algo, boolean hashLargePasswords) {    
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password, KeyAlgorithm algo, boolean hashLargePasswords) {    
         this(PbesHmacAesWrapKeyEncryptionAlgorithm.charsToBytes(password), algo, hashLargePasswords);
     }
     public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password) {    
-        this(password, Algorithm.PBES2_HS256_A128KW.getJwtName(), false);
+        this(password, KeyAlgorithm.PBES2_HS256_A128KW, false);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password, String algo, boolean hashLargePasswords) {    
-        this.password = PbesHmacAesWrapKeyEncryptionAlgorithm.validatePassword(password, algo, hashLargePasswords);
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password, KeyAlgorithm algo, boolean hashLargePasswords) {    
+        this.password = 
+            PbesHmacAesWrapKeyEncryptionAlgorithm.validatePassword(password, algo.getJwaName(), hashLargePasswords);
         this.algo = algo;
     }
     @Override
@@ -54,7 +56,7 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgor
             .createDerivedKey(keyAlgoJwt, keySize, password, saltInput, pbesCount);
         KeyDecryptionAlgorithm aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey) {
             protected boolean isValidAlgorithmFamily(String wrapAlgo) {
-                return Algorithm.isPbesHsWrap(wrapAlgo);
+                return AlgorithmUtils.isPbesHsWrap(wrapAlgo);
             }    
         };
         return aesWrap.getDecryptedContentEncryptionKey(jweDecryptionInput);
@@ -67,7 +69,7 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgor
         }
     }
     @Override
-    public String getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return algo;
     }
     

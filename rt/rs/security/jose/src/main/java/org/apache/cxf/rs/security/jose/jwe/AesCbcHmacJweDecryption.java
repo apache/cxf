@@ -23,7 +23,8 @@ import java.util.Arrays;
 
 import javax.crypto.spec.IvParameterSpec;
 
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 
 public class AesCbcHmacJweDecryption extends JweDecryption {
     private String supportedAlgo;
@@ -31,9 +32,9 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
         this(keyDecryptionAlgo, null);
     }
     public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                   String supportedAlgo) {
+                                   ContentAlgorithm supportedAlgo) {
         super(keyDecryptionAlgo, new AesCbcContentDecryptionAlgorithm(supportedAlgo));
-        this.supportedAlgo = supportedAlgo;
+        this.supportedAlgo = supportedAlgo == null ? null : supportedAlgo.getJwaName();
     }
     protected JweDecryptionOutput doDecrypt(JweDecryptionInput jweDecryptionInput, byte[] cek) {
         validateAuthenticationTag(jweDecryptionInput, cek);
@@ -62,7 +63,7 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
     }
     private static class AesCbcContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
         implements ContentDecryptionAlgorithm {
-        public AesCbcContentDecryptionAlgorithm(String supportedAlgo) {
+        public AesCbcContentDecryptionAlgorithm(ContentAlgorithm supportedAlgo) {
             super(supportedAlgo);
         }
         @Override
@@ -79,7 +80,7 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
         }
     }
     private String validateCekAlgorithm(String cekAlgo) {
-        if (!Algorithm.isAesCbcHmac(cekAlgo) 
+        if (!AlgorithmUtils.isAesCbcHmac(cekAlgo) 
             || supportedAlgo != null && !supportedAlgo.equals(cekAlgo)) {
             throw new SecurityException();
         }

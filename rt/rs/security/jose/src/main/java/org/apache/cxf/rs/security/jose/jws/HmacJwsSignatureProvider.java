@@ -26,21 +26,22 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
     private byte[] key;
     private AlgorithmParameterSpec hmacSpec;
     
-    public HmacJwsSignatureProvider(byte[] key, String algo) {
+    public HmacJwsSignatureProvider(byte[] key, SignatureAlgorithm algo) {
         this(key, null, algo);
     }
-    public HmacJwsSignatureProvider(byte[] key, AlgorithmParameterSpec spec, String algo) {
+    public HmacJwsSignatureProvider(byte[] key, AlgorithmParameterSpec spec, SignatureAlgorithm algo) {
         super(algo);
         this.key = key;
         this.hmacSpec = spec;
     }
-    public HmacJwsSignatureProvider(String encodedKey, String algo) {
+    public HmacJwsSignatureProvider(String encodedKey, SignatureAlgorithm algo) {
         super(algo);
         try {
             this.key = Base64UrlUtility.decode(encodedKey);
@@ -50,7 +51,7 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
     }
     
     protected JwsSignature doCreateJwsSignature(JoseHeaders headers) {
-        final Mac mac = HmacUtils.getInitializedMac(key, Algorithm.toJavaName(headers.getAlgorithm()),
+        final Mac mac = HmacUtils.getInitializedMac(key, AlgorithmUtils.toJavaName(headers.getAlgorithm()),
                                                     hmacSpec);
         return new JwsSignature() {
 
@@ -69,7 +70,7 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
     @Override
     protected void checkAlgorithm(String algo) {
         super.checkAlgorithm(algo);
-        if (!Algorithm.isHmacSign(algo)) {
+        if (!AlgorithmUtils.isHmacSign(algo)) {
             throw new SecurityException();
         }
     }

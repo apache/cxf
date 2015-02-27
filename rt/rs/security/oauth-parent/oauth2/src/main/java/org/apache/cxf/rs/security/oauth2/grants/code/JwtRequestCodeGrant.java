@@ -26,7 +26,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
@@ -78,7 +78,7 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
         } 
         if (signWithClientSecret) {
             byte[] hmac = CryptoUtils.decodeSequence(clientSecret);
-            return JwsUtils.getHmacSignatureProvider(hmac, JoseConstants.HMAC_SHA_256_ALGO);
+            return JwsUtils.getHmacSignatureProvider(hmac, AlgorithmUtils.HMAC_SHA_256_ALGO);
         } else {
             return JwsUtils.loadSignatureProvider(true);
         }
@@ -113,7 +113,7 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
         } 
         if (encryptWithClientSecret) {
             SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
-            return JweUtils.getDirectKeyJweEncryption(key, JoseConstants.A128GCM_ALGO);
+            return JweUtils.getDirectKeyJweEncryption(key, AlgorithmUtils.A128GCM_ALGO);
         } else {
             return JweUtils.loadEncryptionProvider(false);
         }

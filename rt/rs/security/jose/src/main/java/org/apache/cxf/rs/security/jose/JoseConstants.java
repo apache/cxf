@@ -44,48 +44,6 @@ public final class JoseConstants {
     public static final String MEDIA_TYPE_JOSE = "application/jose";
     public static final String MEDIA_TYPE_JOSE_JSON = "application/jose+json";
     
-    public static final String PLAIN_TEXT_ALGO = "none";
-    public static final String HMAC_SHA_256_ALGO = "HS256";
-    public static final String HMAC_SHA_384_ALGO = "HS384";
-    public static final String HMAC_SHA_512_ALGO = "HS512";
-    public static final String RS_SHA_256_ALGO = "RS256";
-    public static final String RS_SHA_384_ALGO = "RS384";
-    public static final String RS_SHA_512_ALGO = "RS512";
-    public static final String PS_SHA_256_ALGO = "PS256";
-    public static final String PS_SHA_384_ALGO = "PS384";
-    public static final String PS_SHA_512_ALGO = "PS512";
-    public static final String ES_SHA_256_ALGO = "ES256";
-    public static final String ES_SHA_384_ALGO = "ES384";
-    public static final String ES_SHA_512_ALGO = "ES512";
-    
-    // Key Encryption
-    public static final String RSA_OAEP_ALGO = "RSA-OAEP";
-    public static final String RSA_OAEP_256_ALGO = "RSA-OAEP-256";
-    public static final String RSA_1_5_ALGO = "RSA1_5";
-    public static final String A128KW_ALGO = "A128KW";
-    public static final String A192KW_ALGO = "A192KW";
-    public static final String A256KW_ALGO = "A256KW";
-    public static final String A128GCMKW_ALGO = "A128GCMKW";
-    public static final String A192GCMKW_ALGO = "A192GCMKW";
-    public static final String A256GCMKW_ALGO = "A256GCMKW";
-    
-    public static final String ECDH_ES_DIRECT_ALGO = "ECDH-ES";
-    
-    public static final String ECDH_ES_A128KW_ALGO = "ECDH-ES+A128KW";
-    public static final String ECDH_ES_A192KW_ALGO = "ECDH-ES+A192KW";
-    public static final String ECDH_ES_A256KW_ALGO = "ECDH-ES+A256KW";
-    
-    public static final String PBES2_HS256_A128KW_ALGO = "PBES2-HS256+A128KW";
-    public static final String PBES2_HS384_A192KW_ALGO = "PBES2-HS384+A192KW";
-    public static final String PBES2_HS512_A256KW_ALGO = "PBES2-HS512+A256KW";
-    // Content Encryption
-    public static final String A128CBC_HS256_ALGO = "A128CBC-HS256";
-    public static final String A192CBC_HS384_ALGO = "A192CBC-HS384";
-    public static final String A256CBC_HS512_ALGO = "A256CBC-HS512";
-    public static final String A128GCM_ALGO = "A128GCM";
-    public static final String A192GCM_ALGO = "A192GCM";
-    public static final String A256GCM_ALGO = "A256GCM";
-    
     public static final String JOSE_CONTEXT_PROPERTY = "org.apache.cxf.jose.context";
     
     private JoseConstants() {

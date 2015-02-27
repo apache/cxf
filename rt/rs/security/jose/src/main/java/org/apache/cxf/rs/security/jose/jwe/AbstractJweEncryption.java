@@ -28,19 +28,21 @@ import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
-    private ContentEncryptionAlgorithm contentEncryptionAlgo;
-    private KeyEncryptionAlgorithm keyEncryptionAlgo;
+    private ContentEncryptionProvider contentEncryptionAlgo;
+    private KeyEncryptionProvider keyEncryptionAlgo;
     private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
-    protected AbstractJweEncryption(ContentEncryptionAlgorithm contentEncryptionAlgo,
-                                    KeyEncryptionAlgorithm keyEncryptionAlgo) {
+    protected AbstractJweEncryption(ContentEncryptionProvider contentEncryptionAlgo,
+                                    KeyEncryptionProvider keyEncryptionAlgo) {
         this.keyEncryptionAlgo = keyEncryptionAlgo;
         this.contentEncryptionAlgo = contentEncryptionAlgo;
     }
-    protected ContentEncryptionAlgorithm getContentEncryptionAlgorithm() {
+    protected ContentEncryptionProvider getContentEncryptionAlgorithm() {
         return contentEncryptionAlgo;
     }
     protected AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] theIv) {
@@ -52,14 +54,14 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         if (cek == null) {
             String algoJava = getContentEncryptionAlgoJava();
             String algoJwt = getContentEncryptionAlgoJwt();
-            cek = CryptoUtils.getSecretKey(Algorithm.stripAlgoProperties(algoJava), 
+            cek = CryptoUtils.getSecretKey(AlgorithmUtils.stripAlgoProperties(algoJava), 
                                            getCekSize(algoJwt)).getEncoded();
         }
         return cek;
     }
    
     protected int getCekSize(String algoJwt) {
-        return Algorithm.valueOf(algoJwt.replace('-', '_')).getKeySizeBits();
+        return ContentAlgorithm.valueOf(algoJwt.replace('-', '_')).getKeySizeBits();
     }
     
     protected byte[] getProvidedContentEncryptionKey(JweHeaders headers) {
@@ -71,10 +73,10 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     }
     
     protected String getContentEncryptionAlgoJwt() {
-        return getContentEncryptionAlgorithm().getAlgorithm();
+        return getContentEncryptionAlgorithm().getAlgorithm().getJwaName();
     }
     protected String getContentEncryptionAlgoJava() {
-        return Algorithm.toJavaName(getContentEncryptionAlgoJwt());
+        return getContentEncryptionAlgorithm().getAlgorithm().getJavaName();
     }
     protected byte[] getAAD(String protectedHeaders, byte[] aad) {
         return getContentEncryptionAlgorithm().getAdditionalAuthenticationData(protectedHeaders, aad);
@@ -128,11 +130,12 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         return Arrays.copyOfRange(cipher, cipher.length - DEFAULT_AUTH_TAG_LENGTH / 8, cipher.length);
     }
     @Override
-    public String getKeyAlgorithm() {
-        return getKeyEncryptionAlgo().getAlgorithm();
+    public KeyAlgorithm getKeyAlgorithm() {
+        KeyAlgorithm keyAlgo = getKeyEncryptionAlgo().getAlgorithm();
+        return keyAlgo != null ? keyAlgo : null;
     }
     @Override
-    public String getContentAlgorithm() {
+    public ContentAlgorithm getContentAlgorithm() {
         return getContentEncryptionAlgorithm().getAlgorithm();
     }
     protected JoseHeadersReaderWriter getJwtHeadersWriter() {
@@ -154,17 +157,17 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     private JweEncryptionInternal getInternalState(JweHeaders jweInHeaders, JweEncryptionInput jweInput) {
         JweHeaders theHeaders = new JweHeaders();
         if (getKeyAlgorithm() != null) {
-            theHeaders.setKeyEncryptionAlgorithm(getKeyAlgorithm());
+            theHeaders.setKeyEncryptionAlgorithm(getKeyAlgorithm().getJwaName());
         }
-        theHeaders.setContentEncryptionAlgorithm(getContentAlgorithm());
+        theHeaders.setContentEncryptionAlgorithm(getContentEncryptionAlgoJwt());
         
         JweHeaders protectedHeaders = null;
         if (jweInHeaders != null) {
             if (jweInHeaders.getKeyEncryptionAlgorithm() != null 
                 && (getKeyAlgorithm() == null 
-                    || !getKeyAlgorithm().equals(jweInHeaders.getKeyEncryptionAlgorithm()))
+                    || !getKeyAlgorithm().getJwaName().equals(jweInHeaders.getKeyEncryptionAlgorithm()))
                 || jweInHeaders.getContentEncryptionAlgorithm() != null 
-                    && !getContentAlgorithm().equals(jweInHeaders.getContentEncryptionAlgorithm())) {
+                    && !getContentEncryptionAlgoJwt().equals(jweInHeaders.getContentEncryptionAlgorithm())) {
                 throw new SecurityException();
             }
             theHeaders.asMap().putAll(jweInHeaders.asMap());
@@ -178,7 +181,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         
         byte[] theCek = jweInput != null && jweInput.getCek() != null 
             ? jweInput.getCek() : getContentEncryptionKey(theHeaders);
-        String contentEncryptionAlgoJavaName = Algorithm.toJavaName(getContentEncryptionAlgoJwt());
+        String contentEncryptionAlgoJavaName = getContentEncryptionAlgoJava();
         KeyProperties keyProps = new KeyProperties(contentEncryptionAlgoJavaName);
         keyProps.setCompressionSupported(compressionRequired(theHeaders));
         
@@ -209,7 +212,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     private boolean compressionRequired(JweHeaders theHeaders) {
         return JoseConstants.DEFLATE_ZIP_ALGORITHM.equals(theHeaders.getZipAlgorithm());
     }
-    protected KeyEncryptionAlgorithm getKeyEncryptionAlgo() {
+    protected KeyEncryptionProvider getKeyEncryptionAlgo() {
         return keyEncryptionAlgo;
     }
     protected static class JweEncryptionInternal {

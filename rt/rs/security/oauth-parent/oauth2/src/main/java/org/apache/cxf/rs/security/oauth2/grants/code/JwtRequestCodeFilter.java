@@ -30,7 +30,7 @@ import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -106,7 +106,7 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
         } 
         if (decryptWithClientSecret) {
             SecretKey key = CryptoUtils.decodeSecretKey(c.getClientSecret());
-            return JweUtils.getDirectKeyJweDecryption(key, JoseConstants.A128GCM_ALGO);
+            return JweUtils.getDirectKeyJweDecryption(key, AlgorithmUtils.A128GCM_ALGO);
         }
         return JweUtils.loadDecryptionProvider(false);
     }
@@ -116,12 +116,12 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
         } 
         if (verifyWithClientSecret) {
             byte[] hmac = CryptoUtils.decodeSequence(c.getClientSecret());
-            return JwsUtils.getHmacSignatureVerifier(hmac, JoseConstants.HMAC_SHA_256_ALGO);
+            return JwsUtils.getHmacSignatureVerifier(hmac, AlgorithmUtils.HMAC_SHA_256_ALGO);
         } else if (verifyWithClientCertificates) {
             X509Certificate cert = 
                 (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
             return JwsUtils.getRSAKeySignatureVerifier((RSAPublicKey)cert.getPublicKey(), 
-                                                       JoseConstants.RS_SHA_256_ALGO);
+                                                       AlgorithmUtils.RS_SHA_256_ALGO);
         } 
         return JwsUtils.loadSignatureVerifier(true);
     }

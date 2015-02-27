@@ -24,7 +24,7 @@ import java.security.interfaces.RSAPublicKey;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
@@ -48,7 +48,7 @@ public abstract class AbstractJwsJweProducer {
         
         if (signWithClientSecret) {
             byte[] hmac = CryptoUtils.decodeSequence(c.getClientSecret());
-            return JwsUtils.getHmacSignatureProvider(hmac, JoseConstants.HMAC_SHA_256_ALGO);
+            return JwsUtils.getHmacSignatureProvider(hmac, AlgorithmUtils.HMAC_SHA_256_ALGO);
         } else {
             return JwsUtils.loadSignatureProvider(required);
         }
@@ -60,13 +60,13 @@ public abstract class AbstractJwsJweProducer {
         JweEncryptionProvider theEncryptionProvider = null;
         if (encryptWithClientSecret) {
             SecretKey key = CryptoUtils.decodeSecretKey(c.getClientSecret());
-            theEncryptionProvider = JweUtils.getDirectKeyJweEncryption(key, JoseConstants.A128GCM_ALGO);
+            theEncryptionProvider = JweUtils.getDirectKeyJweEncryption(key, AlgorithmUtils.A128GCM_ALGO);
         } else if (encryptWithClientCertificates) {
             X509Certificate cert = 
                 (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
             theEncryptionProvider = JweUtils.createJweEncryptionProvider((RSAPublicKey)cert.getPublicKey(), 
-                                                                         JoseConstants.RSA_OAEP_ALGO, 
-                                                                         JoseConstants.A128GCM_ALGO, 
+                                                                         AlgorithmUtils.RSA_OAEP_ALGO, 
+                                                                         AlgorithmUtils.A128GCM_ALGO, 
                                                                          null);
         }
         if (theEncryptionProvider == null) {

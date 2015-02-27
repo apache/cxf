@@ -25,21 +25,21 @@ import java.util.Set;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class AesWrapKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgorithm {
     private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
-        Arrays.asList(Algorithm.A128KW.getJwtName(),
-                      Algorithm.A192KW.getJwtName(),
-                      Algorithm.A256KW.getJwtName()));
-    public AesWrapKeyEncryptionAlgorithm(String encodedKey, String keyAlgoJwt) {    
+        Arrays.asList(KeyAlgorithm.A128KW.getJwaName(),
+                      KeyAlgorithm.A192KW.getJwaName(),
+                      KeyAlgorithm.A256KW.getJwaName()));
+    public AesWrapKeyEncryptionAlgorithm(String encodedKey, KeyAlgorithm keyAlgoJwt) {    
         this(CryptoUtils.decodeSequence(encodedKey), keyAlgoJwt);
     }
-    public AesWrapKeyEncryptionAlgorithm(byte[] keyBytes, String keyAlgoJwt) {
-        this(CryptoUtils.createSecretKeySpec(keyBytes, Algorithm.toJavaName(keyAlgoJwt)),
+    public AesWrapKeyEncryptionAlgorithm(byte[] keyBytes, KeyAlgorithm keyAlgoJwt) {
+        this(CryptoUtils.createSecretKeySpec(keyBytes, keyAlgoJwt.getJavaName()),
              keyAlgoJwt);
     }
-    public AesWrapKeyEncryptionAlgorithm(SecretKey key, String keyAlgoJwt) {
+    public AesWrapKeyEncryptionAlgorithm(SecretKey key, KeyAlgorithm keyAlgoJwt) {
         super(key, keyAlgoJwt, SUPPORTED_ALGORITHMS);
     }
     

@@ -47,7 +47,9 @@ import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.PrivateKeyPasswordProvider;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
@@ -55,7 +57,7 @@ import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jwe.KeyDecryptionAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.KeyEncryptionAlgorithm;
+import org.apache.cxf.rs.security.jose.jwe.KeyEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
@@ -395,10 +397,10 @@ public final class JwkUtils {
     
     public static SecretKey toSecretKey(JsonWebKey jwk) {
         return CryptoUtils.createSecretKeySpec((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE), 
-                                               Algorithm.toJavaName(jwk.getAlgorithm()));
+                                               AlgorithmUtils.toJavaName(jwk.getAlgorithm()));
     }
     public static JsonWebKey fromSecretKey(SecretKey secretKey, String algo) {
-        if (!Algorithm.isOctet(algo)) {
+        if (!AlgorithmUtils.isOctet(algo)) {
             throw new SecurityException("Invalid algorithm");
         }
         JsonWebKey jwk = new JsonWebKey();
@@ -411,16 +413,16 @@ public final class JwkUtils {
     
     
     private static JweEncryptionProvider createDefaultEncryption(char[] password) {
-        KeyEncryptionAlgorithm keyEncryption = 
-            new PbesHmacAesWrapKeyEncryptionAlgorithm(password, Algorithm.PBES2_HS256_A128KW.getJwtName());
-        return new AesCbcHmacJweEncryption(Algorithm.A128CBC_HS256.getJwtName(), keyEncryption);
+        KeyEncryptionProvider keyEncryption = 
+            new PbesHmacAesWrapKeyEncryptionAlgorithm(password, KeyAlgorithm.PBES2_HS256_A128KW);
+        return new AesCbcHmacJweEncryption(ContentAlgorithm.A128CBC_HS256, keyEncryption);
     }
     private static JweDecryptionProvider createDefaultDecryption(char[] password) {
         KeyDecryptionAlgorithm keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
         return new AesCbcHmacJweDecryption(keyDecryption);
     }
     private static JsonWebKey prepareRSAJwk(BigInteger modulus, String algo) {
-        if (!Algorithm.isRsa(algo)) {
+        if (!AlgorithmUtils.isRsa(algo)) {
             throw new SecurityException("Invalid algorithm");
         }
         JsonWebKey jwk = new JsonWebKey();

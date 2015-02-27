@@ -42,7 +42,7 @@ under the License.
     <bean id="jweOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor"/>
     
     <bean id="aesWrapEncryptionAlgo" class="org.apache.cxf.rs.security.jose.jwe.AesWrapKeyEncryptionAlgorithm">
-        <constructor-arg value="GawgguFyGrWKav7AX4VKUg"/>
+        <constructor-arg type="java.lang.String" value="GawgguFyGrWKav7AX4VKUg"/>
         <constructor-arg value="A128KW"/>
     </bean>
     <bean id="aesCbcHmacEncryption" class="org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption">
@@ -65,7 +65,7 @@ under the License.
     </bean>
     
     <bean id="hmacSigVerifier" class="org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureVerifier">
-        <constructor-arg value="AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"/>
+        <constructor-arg type="java.lang.String" value="AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"/>
         <constructor-arg value="HS256"/>
     </bean>
     <bean id="jwsHmacInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter">

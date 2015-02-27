@@ -24,12 +24,13 @@ import java.util.Set;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.KeyProperties;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
-public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
+public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
     private Key keyEncryptionKey;
     private boolean wrap;
-    private String algorithm;
+    private KeyAlgorithm algorithm;
     private Set<String> supportedAlgorithms;
     protected AbstractWrapKeyEncryptionAlgorithm(Key key, Set<String> supportedAlgorithms) {
         this(key, null, true, supportedAlgorithms);
@@ -37,10 +38,10 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
     protected AbstractWrapKeyEncryptionAlgorithm(Key key, boolean wrap, Set<String> supportedAlgorithms) {
         this(key, null, wrap, supportedAlgorithms);
     }
-    protected AbstractWrapKeyEncryptionAlgorithm(Key key, String jweAlgo, Set<String> supportedAlgorithms) {
+    protected AbstractWrapKeyEncryptionAlgorithm(Key key, KeyAlgorithm jweAlgo, Set<String> supportedAlgorithms) {
         this(key, jweAlgo, true, supportedAlgorithms);
     }
-    protected AbstractWrapKeyEncryptionAlgorithm(Key key, String jweAlgo, boolean wrap, 
+    protected AbstractWrapKeyEncryptionAlgorithm(Key key, KeyAlgorithm jweAlgo, boolean wrap, 
                                                  Set<String> supportedAlgorithms) {
         this.keyEncryptionKey = key;
         this.algorithm = jweAlgo;
@@ -48,7 +49,7 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
         this.supportedAlgorithms = supportedAlgorithms;
     }
     @Override
-    public String getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return algorithm;
     }
     @Override
@@ -69,10 +70,10 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
         }
     }
     protected String getKeyEncryptionAlgoJava(JweHeaders headers) {
-        return Algorithm.toJavaName(headers.getKeyEncryptionAlgorithm());
+        return AlgorithmUtils.toJavaName(headers.getKeyEncryptionAlgorithm());
     }
     protected String getContentEncryptionAlgoJava(JweHeaders headers) {
-        return Algorithm.toJavaName(headers.getContentEncryptionAlgorithm());
+        return AlgorithmUtils.toJavaName(headers.getContentEncryptionAlgorithm());
     }
     protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweHeaders headers) {
         return null;
@@ -86,14 +87,14 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
     protected void checkAlgorithms(JweHeaders headers) {
         String providedAlgo = headers.getKeyEncryptionAlgorithm();
         if ((providedAlgo == null && algorithm == null)
-            || (providedAlgo != null && algorithm != null && !providedAlgo.equals(algorithm))) {
+            || (providedAlgo != null && algorithm != null && !providedAlgo.equals(algorithm.getJwaName()))) {
             throw new SecurityException();
         }
         if (providedAlgo != null) {
             checkAlgorithm(providedAlgo);
         } else if (algorithm != null) {
-            headers.setKeyEncryptionAlgorithm(algorithm);
-            checkAlgorithm(algorithm);
+            headers.setKeyEncryptionAlgorithm(algorithm.getJwaName());
+            checkAlgorithm(algorithm.getJwaName());
         }
     }
     

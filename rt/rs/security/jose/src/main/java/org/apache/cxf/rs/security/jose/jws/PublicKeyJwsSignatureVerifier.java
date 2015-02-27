@@ -24,17 +24,18 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     private PublicKey key;
     private AlgorithmParameterSpec signatureSpec;
-    private String supportedAlgo;
+    private SignatureAlgorithm supportedAlgo;
     
-    public PublicKeyJwsSignatureVerifier(PublicKey key, String supportedAlgorithm) {
+    public PublicKeyJwsSignatureVerifier(PublicKey key, SignatureAlgorithm supportedAlgorithm) {
         this(key, null, supportedAlgorithm);
     }
-    public PublicKeyJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, String supportedAlgo) {
+    public PublicKeyJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, SignatureAlgorithm supportedAlgo) {
         this.key = key;
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
@@ -45,7 +46,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
             return CryptoUtils.verifySignature(StringUtils.toBytesUTF8(unsignedText), 
                                                signature, 
                                                key, 
-                                               Algorithm.toJavaName(checkAlgorithm(headers.getAlgorithm())),
+                                               AlgorithmUtils.toJavaName(checkAlgorithm(headers.getAlgorithm())),
                                                signatureSpec);
         } catch (Exception ex) {
             throw new SecurityException(ex);
@@ -54,16 +55,16 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     protected String checkAlgorithm(String algo) {
         if (algo == null 
             || !isValidAlgorithmFamily(algo)
-            || !algo.equals(supportedAlgo)) {
+            || !algo.equals(supportedAlgo.getJwaName())) {
             throw new SecurityException();
         }
         return algo;
     }
     protected boolean isValidAlgorithmFamily(String algo) {
-        return Algorithm.isRsaSign(algo);
+        return AlgorithmUtils.isRsaSign(algo);
     }
     @Override
-    public String getAlgorithm() {
+    public SignatureAlgorithm getAlgorithm() {
         return supportedAlgo;
     }
 

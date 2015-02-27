@@ -21,26 +21,26 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.security.interfaces.ECPrivateKey;
 
 import org.apache.cxf.rs.security.jose.JoseUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 
 public class EcdhDirectKeyJweDecryption extends JweDecryption {
-    public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, String supportedCtAlgo) {
+    public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, ContentAlgorithm supportedCtAlgo) {
         super(new EcdhDirectKeyDecryptionAlgorithm(privateKey), 
               new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
     }
     protected static byte[] getDecryptedContentEncryptionKeyFromHeaders(JweHeaders headers,
                                                                         ECPrivateKey privateKey) {
-        Algorithm jwtAlgo = Algorithm.valueOf(headers.getContentEncryptionAlgorithm());
+        ContentAlgorithm jwtAlgo = ContentAlgorithm.valueOf(headers.getContentEncryptionAlgorithm());
         JsonWebKey publicJwk = headers.getJsonWebKey("epv");
         String apuHeader = (String)headers.getHeader("apu");
         byte[] apuBytes = apuHeader == null ? null : JoseUtils.decode(apuHeader);
         String apvHeader = (String)headers.getHeader("apv");
         byte[] apvBytes = apvHeader == null ? null : JoseUtils.decode(apvHeader);
         return JweUtils.getECDHKey(privateKey, JwkUtils.toECPublicKey(publicJwk), 
-                                   apuBytes, apvBytes, jwtAlgo.getJwtName(), jwtAlgo.getKeySizeBits());
+                                   apuBytes, apvBytes, jwtAlgo.getJwaName(), jwtAlgo.getKeySizeBits());
     }
     protected static class EcdhDirectKeyDecryptionAlgorithm extends DirectKeyDecryptionAlgorithm {
         private ECPrivateKey privateKey;

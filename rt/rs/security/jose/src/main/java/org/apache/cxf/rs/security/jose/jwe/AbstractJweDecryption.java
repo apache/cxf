@@ -24,7 +24,9 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public abstract class AbstractJweDecryption implements JweDecryptionProvider {
     private KeyDecryptionAlgorithm keyDecryptionAlgo;
@@ -70,7 +72,7 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
             getContentEncryptionCipherInitVector(jweDecryptionInput));
     }
     protected String getContentEncryptionAlgorithm(JweDecryptionInput jweDecryptionInput) {
-        return Algorithm.toJavaName(jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm());
+        return AlgorithmUtils.toJavaName(jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm());
     }
     protected byte[] getContentEncryptionCipherAAD(JweDecryptionInput jweDecryptionInput) {
         return contentDecryptionAlgo.getAdditionalAuthenticationData(
@@ -94,11 +96,11 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
         return theCek;
     }
     @Override
-    public String getKeyAlgorithm() {
+    public KeyAlgorithm getKeyAlgorithm() {
         return keyDecryptionAlgo.getAlgorithm();
     }
     @Override
-    public String getContentAlgorithm() {
+    public ContentAlgorithm getContentAlgorithm() {
         return contentDecryptionAlgo.getAlgorithm();
     }
 }

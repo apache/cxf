@@ -20,9 +20,11 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.spec.AlgorithmParameterSpec;
 
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+
 
 public interface ContentEncryptionCipherProperties {
-    String getAlgorithm();
+    ContentAlgorithm getAlgorithm();
     byte[] getAdditionalAuthenticationData(String headersJson, byte[] aad);
     AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] iv);
 }

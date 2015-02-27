@@ -110,7 +110,7 @@ public class JwsJsonConsumer {
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         List<JwsJsonSignatureEntry> theSignatureEntries = 
-            getSignatureEntryMap().get(validator.getAlgorithm());
+            getSignatureEntryMap().get(validator.getAlgorithm().getJwaName());
         if (theSignatureEntries != null) {
             for (JwsJsonSignatureEntry signatureEntry : theSignatureEntries) {
                 if (signatureEntry.verifySignatureWith(validator)) {
@@ -143,7 +143,7 @@ public class JwsJsonConsumer {
         for (JwsSignatureVerifier validator : validators) {
             boolean validated = false;
             List<JwsJsonSignatureEntry> theSignatureEntries = 
-                getSignatureEntryMap().get(validator.getAlgorithm());
+                getSignatureEntryMap().get(validator.getAlgorithm().getJwaName());
             if (theSignatureEntries != null) {
                 for (JwsJsonSignatureEntry sigEntry : theSignatureEntries) {
                     if (sigEntry.verifySignatureWith(validator)) {     

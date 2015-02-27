@@ -21,13 +21,14 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.security.spec.AlgorithmParameterSpec;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 
 
 public abstract class AbstractContentEncryptionCipherProperties implements ContentEncryptionCipherProperties {
     private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
-    private String algo;
-    public AbstractContentEncryptionCipherProperties(String algo) {
+    private ContentAlgorithm algo;
+    public AbstractContentEncryptionCipherProperties(ContentAlgorithm algo) {
         this.algo = algo;
     }
     public AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] theIv) {
@@ -40,7 +41,7 @@ public abstract class AbstractContentEncryptionCipherProperties implements Conte
         return authTagLen;
     }
     @Override
-    public String getAlgorithm() {
+    public ContentAlgorithm getAlgorithm() {
         return algo;    
     }
 }

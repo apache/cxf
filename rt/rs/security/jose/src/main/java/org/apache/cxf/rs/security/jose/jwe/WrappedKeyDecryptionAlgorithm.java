@@ -23,16 +23,17 @@ import java.security.spec.AlgorithmParameterSpec;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.KeyProperties;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     private Key cekDecryptionKey;
     private boolean unwrap;
-    private String supportedAlgo;
-    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, String supportedAlgo) {    
+    private KeyAlgorithm supportedAlgo;
+    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, KeyAlgorithm supportedAlgo) {    
         this(cekDecryptionKey, supportedAlgo, true);
     }
-    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, String supportedAlgo, boolean unwrap) {    
+    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, KeyAlgorithm supportedAlgo, boolean unwrap) {    
         this.cekDecryptionKey = cekDecryptionKey;
         this.supportedAlgo = supportedAlgo;
         this.unwrap = unwrap;
@@ -64,15 +65,15 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     protected String getKeyEncryptionAlgorithm(JweDecryptionInput jweDecryptionInput) {
         String keyAlgo = jweDecryptionInput.getJweHeaders().getKeyEncryptionAlgorithm();
         validateKeyEncryptionAlgorithm(keyAlgo);
-        return Algorithm.toJavaName(keyAlgo);
+        return AlgorithmUtils.toJavaName(keyAlgo);
     }
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
-        if (keyAlgo == null || supportedAlgo != null && !supportedAlgo.equals(keyAlgo)) {
+        if (keyAlgo == null || supportedAlgo != null && !supportedAlgo.getJwaName().equals(keyAlgo)) {
             throw new SecurityException();
         }
     }
     protected String getContentEncryptionAlgorithm(JweDecryptionInput jweDecryptionInput) {
-        return Algorithm.toJavaName(jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm());
+        return AlgorithmUtils.toJavaName(jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm());
     }
     protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweDecryptionInput jweDecryptionInput) {
         return null;
@@ -81,7 +82,7 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
         return jweDecryptionInput.getEncryptedCEK();
     }
     @Override
-    public String getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return supportedAlgo;
     }
 }

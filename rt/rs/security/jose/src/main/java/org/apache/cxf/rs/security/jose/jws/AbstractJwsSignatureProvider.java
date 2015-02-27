@@ -19,12 +19,13 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
-    private String algorithm;
+    private SignatureAlgorithm algorithm;
     
-    protected AbstractJwsSignatureProvider(String algo) {
+    protected AbstractJwsSignatureProvider(SignatureAlgorithm algo) {
         this.algorithm = algo;
     }
     
@@ -36,13 +37,13 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         if (algo != null) {
             checkAlgorithm(algo);
         } else {
-            checkAlgorithm(algorithm);
-            headers.setAlgorithm(algorithm);
+            checkAlgorithm(algorithm.getJwaName());
+            headers.setAlgorithm(algorithm.getJwaName());
         }
         return headers;
     }
     @Override
-    public String getAlgorithm() {
+    public SignatureAlgorithm getAlgorithm() {
         return algorithm;    
     }
     @Override

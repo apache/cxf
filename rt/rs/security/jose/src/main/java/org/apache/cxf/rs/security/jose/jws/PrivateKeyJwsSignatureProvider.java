@@ -26,21 +26,22 @@ import java.security.spec.AlgorithmParameterSpec;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider {
     private PrivateKey key;
     private SecureRandom random; 
     private AlgorithmParameterSpec signatureSpec;
     
-    public PrivateKeyJwsSignatureProvider(PrivateKey key, String algo) {
+    public PrivateKeyJwsSignatureProvider(PrivateKey key, SignatureAlgorithm algo) {
         this(key, null, algo);
     }
-    public PrivateKeyJwsSignatureProvider(PrivateKey key, AlgorithmParameterSpec spec, String algo) {
+    public PrivateKeyJwsSignatureProvider(PrivateKey key, AlgorithmParameterSpec spec, SignatureAlgorithm algo) {
         this(key, null, spec, algo);
     }
     public PrivateKeyJwsSignatureProvider(PrivateKey key, SecureRandom random, 
-                                          AlgorithmParameterSpec spec, String algo) {
+                                          AlgorithmParameterSpec spec, SignatureAlgorithm algo) {
         super(algo);
         this.key = key;
         this.random = random;
@@ -48,7 +49,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
     }
     protected JwsSignature doCreateJwsSignature(JoseHeaders headers) {
         final Signature s = CryptoUtils.getSignature(key, 
-                                                     Algorithm.toJavaName(headers.getAlgorithm()),
+                                                     AlgorithmUtils.toJavaName(headers.getAlgorithm()),
                                                      random,
                                                      signatureSpec);
         return doCreateJwsSignature(s);
@@ -66,7 +67,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
     }
     
     protected boolean isValidAlgorithmFamily(String algo) {
-        return Algorithm.isRsaSign(algo);
+        return AlgorithmUtils.isRsaSign(algo);
     }
 
     protected static class PrivateKeyJwsSignature implements JwsSignature {
