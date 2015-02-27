@@ -39,7 +39,10 @@ import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.PrivateKeyPasswordProvider;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption;
 import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyDecryptionAlgorithm;
@@ -72,7 +75,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     private static void registerBouncyCastleIfNeeded() throws Exception {
         try {
             // Java 8 apparently has it
-            Cipher.getInstance(Algorithm.AES_GCM_ALGO_JAVA);
+            Cipher.getInstance(AlgorithmUtils.AES_GCM_ALGO_JAVA);
         } catch (Throwable t) {
             // Oracle Java 7
             Security.addProvider(new BouncyCastleProvider());    
@@ -232,7 +235,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     public void testJweRsaJwsPlainTextHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwshmac";
         HmacJwsSignatureProvider hmacProvider = 
-            new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName());
+            new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256);
         BookStore bs = createJweJwsBookStore(address, hmacProvider, null);
         String text = bs.echoText("book");
         assertEquals("book", text);
@@ -241,7 +244,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     public void testJweRsaJwsBookHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwshmac";
         HmacJwsSignatureProvider hmacProvider = 
-            new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName());
+            new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256);
         BookStore bs = createJweJwsBookStore(address, hmacProvider,
                                              Collections.singletonList(new JacksonJsonProvider()));
         Book book = bs.echoBook(new Book("book", 123L));
@@ -388,8 +391,8 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         
         final String cekEncryptionKey = "GawgguFyGrWKav7AX4VKUg";
         AesWrapKeyEncryptionAlgorithm keyEncryption = 
-            new AesWrapKeyEncryptionAlgorithm(cekEncryptionKey, Algorithm.A128KW.getJwtName());
-        jweWriter.setEncryptionProvider(new AesCbcHmacJweEncryption(Algorithm.A128CBC_HS256.getJwtName(),
+            new AesWrapKeyEncryptionAlgorithm(cekEncryptionKey, KeyAlgorithm.A128KW);
+        jweWriter.setEncryptionProvider(new AesCbcHmacJweEncryption(ContentAlgorithm.A128CBC_HS256,
                                                                     keyEncryption));
         
         // reader 

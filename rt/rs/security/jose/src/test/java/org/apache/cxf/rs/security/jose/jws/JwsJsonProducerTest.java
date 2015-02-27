@@ -17,8 +17,9 @@
  * under the License.
  */
 package org.apache.cxf.rs.security.jose.jws;
-import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -72,10 +73,9 @@ public class JwsJsonProducerTest extends Assert {
     public void testSignWithProtectedHeaderOnly() {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_JSON_DOCUMENT);
         JoseHeaders headerEntries = new JoseHeaders();
-        headerEntries.setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+        headerEntries.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
                
-        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1,
-                          JoseConstants.HMAC_SHA_256_ALGO),
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headerEntries);
         assertEquals(SIGNED_JWS_JSON_DOCUMENT,
                      producer.getJwsJsonSignedDocument());
@@ -84,10 +84,9 @@ public class JwsJsonProducerTest extends Assert {
     public void testSignWithProtectedHeaderOnlyFlat() {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_JSON_DOCUMENT, true);
         JoseHeaders headerEntries = new JoseHeaders();
-        headerEntries.setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+        headerEntries.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
                
-        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1,
-                          JoseConstants.HMAC_SHA_256_ALGO),
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headerEntries);
         assertEquals(SIGNED_JWS_JSON_FLAT_DOCUMENT,
                      producer.getJwsJsonSignedDocument());
@@ -96,13 +95,11 @@ public class JwsJsonProducerTest extends Assert {
     public void testDualSignWithProtectedHeaderOnly() {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_JSON_DOCUMENT);
         JoseHeaders headerEntries = new JoseHeaders();
-        headerEntries.setAlgorithm(JoseConstants.HMAC_SHA_256_ALGO);
+        headerEntries.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
                
-        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1,
-                          JoseConstants.HMAC_SHA_256_ALGO),
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headerEntries);
-        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_2,
-                          JoseConstants.HMAC_SHA_256_ALGO),
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_2, SignatureAlgorithm.HS256),
                           headerEntries);
         assertEquals(DUAL_SIGNED_JWS_JSON_DOCUMENT,
                      producer.getJwsJsonSignedDocument());

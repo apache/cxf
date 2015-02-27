@@ -24,25 +24,26 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey) {    
         this(encodedKey, null);
     }
-    public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey, String supportedAlgo) {    
+    public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey, KeyAlgorithm supportedAlgo) {    
         this(CryptoUtils.decodeSequence(encodedKey), supportedAlgo);
     }
     public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey) {    
         this(secretKey, null);
     }
-    public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey, String supportedAlgo) {    
-        this(CryptoUtils.createSecretKeySpec(secretKey, Algorithm.AES_ALGO_JAVA), supportedAlgo);
+    public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey, KeyAlgorithm supportedAlgo) {    
+        this(CryptoUtils.createSecretKeySpec(secretKey, AlgorithmUtils.AES), supportedAlgo);
     }
     public AesGcmWrapKeyDecryptionAlgorithm(SecretKey secretKey) {    
         this(secretKey, null);
     }
-    public AesGcmWrapKeyDecryptionAlgorithm(SecretKey secretKey, String supportedAlgo) {    
+    public AesGcmWrapKeyDecryptionAlgorithm(SecretKey secretKey, KeyAlgorithm supportedAlgo) {    
         super(secretKey, supportedAlgo);
     }
     @Override
@@ -65,7 +66,7 @@ public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgori
     }
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
         super.validateKeyEncryptionAlgorithm(keyAlgo);
-        if (!Algorithm.isAesGcmKeyWrap(keyAlgo)) {
+        if (!AlgorithmUtils.isAesGcmKeyWrap(keyAlgo)) {
             throw new SecurityException();
         }
     }

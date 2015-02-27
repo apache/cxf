@@ -23,27 +23,28 @@ import java.security.Signature;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
-    public EcDsaJwsSignatureProvider(ECPrivateKey key, String algo) {
+    public EcDsaJwsSignatureProvider(ECPrivateKey key, SignatureAlgorithm algo) {
         this(key, null, algo);
     }
-    public EcDsaJwsSignatureProvider(ECPrivateKey key, AlgorithmParameterSpec spec, String algo) {
+    public EcDsaJwsSignatureProvider(ECPrivateKey key, AlgorithmParameterSpec spec, SignatureAlgorithm algo) {
         this(key, null, spec, algo);
     }
     public EcDsaJwsSignatureProvider(ECPrivateKey key, SecureRandom random, AlgorithmParameterSpec spec, 
-                                     String algo) {
+                                     SignatureAlgorithm algo) {
         super(key, random, spec, algo);
     }
     @Override
     protected boolean isValidAlgorithmFamily(String algo) {
-        return Algorithm.isEcDsaSign(algo);
+        return AlgorithmUtils.isEcDsaSign(algo);
     }
     @Override
     protected JwsSignature doCreateJwsSignature(Signature s) {
         return new EcDsaPrivateKeyJwsSignature(s, 
-            EcDsaJwsSignatureVerifier.SIGNATURE_LENGTH_MAP.get(super.getAlgorithm()));
+            EcDsaJwsSignatureVerifier.SIGNATURE_LENGTH_MAP.get(super.getAlgorithm().getJwaName()));
     }
     
     protected static class EcDsaPrivateKeyJwsSignature extends PrivateKeyJwsSignature {

@@ -37,7 +37,8 @@ import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
@@ -88,16 +89,16 @@ public final class JwsUtils {
             theSigProvider = getHmacSignatureProvider(key, rsaSignatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
             theSigProvider = new EcDsaJwsSignatureProvider(JwkUtils.toECPrivateKey(jwk),
-                                                           rsaSignatureAlgo);
+                                                           SignatureAlgorithm.getAlgorithm(rsaSignatureAlgo));
         }
         return theSigProvider;
     }
     public static JwsSignatureProvider getRSAKeySignatureProvider(RSAPrivateKey key, String algo) {
-        return new PrivateKeyJwsSignatureProvider(key, algo);
+        return new PrivateKeyJwsSignatureProvider(key, SignatureAlgorithm.getAlgorithm(algo));
     }
     public static JwsSignatureProvider getHmacSignatureProvider(byte[] key, String algo) {
-        if (Algorithm.isHmacSign(algo)) {
-            return new HmacJwsSignatureProvider(key, algo);
+        if (AlgorithmUtils.isHmacSign(algo)) {
+            return new HmacJwsSignatureProvider(key, SignatureAlgorithm.getAlgorithm(algo));
         }
         return null;
     }
@@ -113,16 +114,17 @@ public final class JwsUtils {
             byte[] key = JoseUtils.decode((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
             theVerifier = getHmacSignatureVerifier(key, rsaSignatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
-            theVerifier = new EcDsaJwsSignatureVerifier(JwkUtils.toECPublicKey(jwk), rsaSignatureAlgo);
+            theVerifier = new EcDsaJwsSignatureVerifier(JwkUtils.toECPublicKey(jwk), 
+                                                        SignatureAlgorithm.getAlgorithm(rsaSignatureAlgo));
         }
         return theVerifier;
     }
     public static JwsSignatureVerifier getRSAKeySignatureVerifier(RSAPublicKey key, String algo) {
-        return new PublicKeyJwsSignatureVerifier(key, algo);
+        return new PublicKeyJwsSignatureVerifier(key, SignatureAlgorithm.getAlgorithm(algo));
     }
     public static JwsSignatureVerifier getHmacSignatureVerifier(byte[] key, String algo) {
-        if (Algorithm.isHmacSign(algo)) {
-            return new HmacJwsSignatureVerifier(key, algo);
+        if (AlgorithmUtils.isHmacSign(algo)) {
+            return new HmacJwsSignatureVerifier(key, SignatureAlgorithm.getAlgorithm(algo));
         }
         return null;
     }
@@ -146,7 +148,7 @@ public final class JwsUtils {
         }
         JwsSignatureProvider theSigProvider = loadSignatureProvider(m, props, headers, false);
         if (headers != null) {
-            headers.setAlgorithm(theSigProvider.getAlgorithm());
+            headers.setAlgorithm(theSigProvider.getAlgorithm().getJwaName());
         }
         return theSigProvider;
     }
@@ -287,7 +289,7 @@ public final class JwsUtils {
     private static String getSignatureAlgo(Message m, Properties props, String algo, String defaultAlgo) {
         if (algo == null) {
             if (defaultAlgo == null) {
-                defaultAlgo = JoseConstants.RS_SHA_256_ALGO;
+                defaultAlgo = AlgorithmUtils.RS_SHA_256_ALGO;
             }
             return KeyManagementUtils.getKeyAlgorithm(m, props, JSON_WEB_SIGNATURE_ALGO_PROP, defaultAlgo);
         }
@@ -295,11 +297,11 @@ public final class JwsUtils {
     }
     private static String getDefaultKeyAlgo(JsonWebKey jwk) {
         if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
-            return JoseConstants.HMAC_SHA_256_ALGO;
+            return AlgorithmUtils.HMAC_SHA_256_ALGO;
         } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
-            return JoseConstants.ES_SHA_256_ALGO;
+            return AlgorithmUtils.ES_SHA_256_ALGO;
         } else {
-            return JoseConstants.RS_SHA_256_ALGO;
+            return AlgorithmUtils.RS_SHA_256_ALGO;
         }
     }
     public static JwsCompactConsumer verify(JwsSignatureVerifier v, String content) {

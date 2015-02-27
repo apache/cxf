@@ -21,28 +21,29 @@ package org.apache.cxf.rs.security.jose.jwe;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 
 
 public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
     private static final int DEFAULT_IV_SIZE = 96;
-    public AesGcmContentEncryptionAlgorithm(String algo) {
+    public AesGcmContentEncryptionAlgorithm(ContentAlgorithm algo) {
         this((byte[])null, null, algo);
     }
-    public AesGcmContentEncryptionAlgorithm(String encodedCek, String encodedIv, String algo) {
+    public AesGcmContentEncryptionAlgorithm(String encodedCek, String encodedIv, ContentAlgorithm algo) {
         this((byte[])CryptoUtils.decodeSequence(encodedCek), CryptoUtils.decodeSequence(encodedIv), algo);
     }
-    public AesGcmContentEncryptionAlgorithm(SecretKey key, byte[] iv, String algo) { 
+    public AesGcmContentEncryptionAlgorithm(SecretKey key, byte[] iv, ContentAlgorithm algo) { 
         this(key.getEncoded(), iv, algo);    
     }
-    public AesGcmContentEncryptionAlgorithm(byte[] cek, byte[] iv, String algo) { 
+    public AesGcmContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) { 
         super(cek, iv, checkAlgorithm(algo));    
     }
     protected int getIvSize() { 
         return DEFAULT_IV_SIZE;
     }
-    private static String checkAlgorithm(String algo) {
-        if (Algorithm.isAesGcm(algo)) {       
+    private static ContentAlgorithm checkAlgorithm(ContentAlgorithm algo) {
+        if (AlgorithmUtils.isAesGcm(algo.getJwaName())) {       
             return algo;
         }
         throw new SecurityException();

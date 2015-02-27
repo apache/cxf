@@ -22,26 +22,26 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 
 import org.apache.cxf.common.util.crypto.HmacUtils;
-import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     private byte[] key;
     private AlgorithmParameterSpec hmacSpec;
-    private String supportedAlgo;
+    private SignatureAlgorithm supportedAlgo;
     
     public HmacJwsSignatureVerifier(String encodedKey) {
-        this(JoseUtils.decode(encodedKey), JoseConstants.HMAC_SHA_256_ALGO);
+        this(JoseUtils.decode(encodedKey), SignatureAlgorithm.HS256);
     }
-    public HmacJwsSignatureVerifier(String encodedKey, String supportedAlgo) {
+    public HmacJwsSignatureVerifier(String encodedKey, SignatureAlgorithm supportedAlgo) {
         this(JoseUtils.decode(encodedKey), supportedAlgo);
     }
-    public HmacJwsSignatureVerifier(byte[] key, String supportedAlgo) {
+    public HmacJwsSignatureVerifier(byte[] key, SignatureAlgorithm supportedAlgo) {
         this(key, null, supportedAlgo);
     }
-    public HmacJwsSignatureVerifier(byte[] key, AlgorithmParameterSpec spec, String supportedAlgo) {
+    public HmacJwsSignatureVerifier(byte[] key, AlgorithmParameterSpec spec, SignatureAlgorithm supportedAlgo) {
         this.key = key;
         this.hmacSpec = spec;
         this.supportedAlgo = supportedAlgo;
@@ -56,21 +56,21 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     
     private byte[] computeMac(JoseHeaders headers, String text) {
         return HmacUtils.computeHmac(key, 
-                                     Algorithm.toJavaName(checkAlgorithm(headers.getAlgorithm())),
+                                     AlgorithmUtils.toJavaName(checkAlgorithm(headers.getAlgorithm())),
                                      hmacSpec,
                                      text);
     }
     
     protected String checkAlgorithm(String algo) {
         if (algo == null 
-            || !Algorithm.isHmacSign(algo)
-            || !algo.equals(supportedAlgo)) {
+            || !AlgorithmUtils.isHmacSign(algo)
+            || !algo.equals(supportedAlgo.getJwaName())) {
             throw new SecurityException();
         }
         return algo;
     }
     @Override
-    public String getAlgorithm() {
+    public SignatureAlgorithm getAlgorithm() {
         return supportedAlgo;
     }
 }

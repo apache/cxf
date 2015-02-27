@@ -28,8 +28,7 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.AfterClass;
@@ -147,8 +146,8 @@ public class JweJsonProducerTest extends Assert {
     @BeforeClass
     public static void registerBouncyCastleIfNeeded() throws Exception {
         try {
-            Cipher.getInstance(Algorithm.AES_GCM_ALGO_JAVA);
-            Cipher.getInstance(Algorithm.AES_CBC_ALGO_JAVA);
+            Cipher.getInstance(AlgorithmUtils.AES_GCM_ALGO_JAVA);
+            Cipher.getInstance(AlgorithmUtils.AES_CBC_ALGO_JAVA);
         } catch (Throwable t) {
             Security.addProvider(new BouncyCastleProvider());    
         }
@@ -161,35 +160,35 @@ public class JweJsonProducerTest extends Assert {
     @Test
     public void testSingleRecipientGcm() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
-        doTestSingleRecipient(text, SINGLE_RECIPIENT_OUTPUT, JoseConstants.A128GCM_ALGO, 
+        doTestSingleRecipient(text, SINGLE_RECIPIENT_OUTPUT, AlgorithmUtils.A128GCM_ALGO, 
                               WRAPPER_BYTES1, JweCompactReaderWriterTest.INIT_VECTOR_A1, 
                               CEK_BYTES, false);
     }
     @Test
     public void testSingleRecipientDirectGcm() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
-        doTestSingleRecipient(text, SINGLE_RECIPIENT_DIRECT_OUTPUT, JoseConstants.A128GCM_ALGO, 
+        doTestSingleRecipient(text, SINGLE_RECIPIENT_DIRECT_OUTPUT, AlgorithmUtils.A128GCM_ALGO, 
                               null, JweCompactReaderWriterTest.INIT_VECTOR_A1, 
                               CEK_BYTES, false);
     }
     @Test
     public void testSingleRecipientDirectFlatGcm() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
-        doTestSingleRecipient(text, SINGLE_RECIPIENT_DIRECT_FLAT_OUTPUT, JoseConstants.A128GCM_ALGO, 
+        doTestSingleRecipient(text, SINGLE_RECIPIENT_DIRECT_FLAT_OUTPUT, AlgorithmUtils.A128GCM_ALGO, 
                               null, JweCompactReaderWriterTest.INIT_VECTOR_A1, 
                               CEK_BYTES, true);
     }
     @Test
     public void testSingleRecipientFlatGcm() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
-        doTestSingleRecipient(text, SINGLE_RECIPIENT_FLAT_OUTPUT, JoseConstants.A128GCM_ALGO, 
+        doTestSingleRecipient(text, SINGLE_RECIPIENT_FLAT_OUTPUT, AlgorithmUtils.A128GCM_ALGO, 
                               WRAPPER_BYTES1, JweCompactReaderWriterTest.INIT_VECTOR_A1, 
                               CEK_BYTES, true);
     }
     @Test
     public void testSingleRecipientA128CBCHS256() throws Exception {
         String text = "Live long and prosper.";
-        doTestSingleRecipient(text, SINGLE_RECIPIENT_A128CBCHS256_OUTPUT, JoseConstants.A128CBC_HS256_ALGO, 
+        doTestSingleRecipient(text, SINGLE_RECIPIENT_A128CBCHS256_OUTPUT, AlgorithmUtils.A128CBC_HS256_ALGO, 
                               Base64UrlUtility.decode(JweCompactReaderWriterTest.KEY_ENCRYPTION_KEY_A3),
                               JweCompactReaderWriterTest.INIT_VECTOR_A3,
                               JweCompactReaderWriterTest.CONTENT_ENCRYPTION_KEY_A3,
@@ -198,7 +197,7 @@ public class JweJsonProducerTest extends Assert {
     @Test
     public void testSingleRecipientDirectA128CBCHS256() throws Exception {
         String text = "Live long and prosper.";
-        doTestSingleRecipient(text, SINGLE_RECIPIENT_A128CBCHS256_DIRECT_OUTPUT, JoseConstants.A128CBC_HS256_ALGO, 
+        doTestSingleRecipient(text, SINGLE_RECIPIENT_A128CBCHS256_DIRECT_OUTPUT, AlgorithmUtils.A128CBC_HS256_ALGO, 
                               null,
                               JweCompactReaderWriterTest.INIT_VECTOR_A3,
                               JweCompactReaderWriterTest.CONTENT_ENCRYPTION_KEY_A3,
@@ -212,7 +211,7 @@ public class JweJsonProducerTest extends Assert {
                                          final byte[] iv,
                                          final byte[] cek,
                                          boolean canBeFlat) throws Exception {
-        JweHeaders headers = new JweHeaders(JoseConstants.A128KW_ALGO,
+        JweHeaders headers = new JweHeaders(AlgorithmUtils.A128KW_ALGO,
                                             contentEncryptionAlgo);
         JweEncryptionProvider jwe = null;
         if (wrapperKeyBytes == null) {
@@ -240,13 +239,13 @@ public class JweJsonProducerTest extends Assert {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(WRAPPER_BYTES1, "AES");
         
-        JweHeaders protectedHeaders = new JweHeaders(JoseConstants.A128GCM_ALGO);
+        JweHeaders protectedHeaders = new JweHeaders(AlgorithmUtils.A128GCM_ALGO);
         JweHeaders sharedUnprotectedHeaders = new JweHeaders();
         sharedUnprotectedHeaders.setJsonWebKeysUrl("https://server.example.com/keys.jwks");
         
         JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(wrapperKey, 
-                                                                         JoseConstants.A128KW_ALGO,
-                                                                         JoseConstants.A128GCM_ALGO,
+                                                                         AlgorithmUtils.A128KW_ALGO,
+                                                                         AlgorithmUtils.A128GCM_ALGO,
                                                                          null);
         JweJsonProducer p = new JweJsonProducer(protectedHeaders,
                                                 sharedUnprotectedHeaders,
@@ -261,7 +260,7 @@ public class JweJsonProducerTest extends Assert {
             }
         };
         JweHeaders recepientUnprotectedHeaders = new JweHeaders();
-        recepientUnprotectedHeaders.setKeyEncryptionAlgorithm(JoseConstants.A128KW_ALGO);
+        recepientUnprotectedHeaders.setKeyEncryptionAlgorithm(AlgorithmUtils.A128KW_ALGO);
         String jweJson = p.encryptWith(jwe, recepientUnprotectedHeaders);
         assertEquals(SINGLE_RECIPIENT_ALL_HEADERS_AAD_OUTPUT, jweJson);
     }
@@ -271,20 +270,20 @@ public class JweJsonProducerTest extends Assert {
         SecretKey wrapperKey1 = CryptoUtils.createSecretKeySpec(WRAPPER_BYTES1, "AES");
         SecretKey wrapperKey2 = CryptoUtils.createSecretKeySpec(WRAPPER_BYTES2, "AES");
         
-        JweHeaders protectedHeaders = new JweHeaders(JoseConstants.A128GCM_ALGO);
+        JweHeaders protectedHeaders = new JweHeaders(AlgorithmUtils.A128GCM_ALGO);
         JweHeaders sharedUnprotectedHeaders = new JweHeaders();
         sharedUnprotectedHeaders.setJsonWebKeysUrl("https://server.example.com/keys.jwks");
-        sharedUnprotectedHeaders.setKeyEncryptionAlgorithm(JoseConstants.A128KW_ALGO);
+        sharedUnprotectedHeaders.setKeyEncryptionAlgorithm(AlgorithmUtils.A128KW_ALGO);
         
         List<JweEncryptionProvider> jweList = new LinkedList<JweEncryptionProvider>();
         
-        KeyEncryptionAlgorithm keyEncryption1 = 
-            JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, JoseConstants.A128KW_ALGO);
-        ContentEncryptionAlgorithm contentEncryption = 
-            JweUtils.getContentEncryptionAlgorithm(JoseConstants.A128GCM_ALGO);
+        KeyEncryptionProvider keyEncryption1 = 
+            JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, AlgorithmUtils.A128KW_ALGO);
+        ContentEncryptionProvider contentEncryption = 
+            JweUtils.getContentEncryptionAlgorithm(AlgorithmUtils.A128GCM_ALGO);
         JweEncryptionProvider jwe1 = new JweEncryption(keyEncryption1, contentEncryption);
-        KeyEncryptionAlgorithm keyEncryption2 = 
-            JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey2, JoseConstants.A128KW_ALGO);
+        KeyEncryptionProvider keyEncryption2 = 
+            JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey2, AlgorithmUtils.A128KW_ALGO);
         JweEncryptionProvider jwe2 = new JweEncryption(keyEncryption2, contentEncryption);
         jweList.add(jwe1);
         jweList.add(jwe2);

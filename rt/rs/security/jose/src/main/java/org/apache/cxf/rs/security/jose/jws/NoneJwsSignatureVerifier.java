@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class NoneJwsSignatureVerifier implements JwsSignatureVerifier {
 
@@ -28,8 +29,8 @@ public class NoneJwsSignatureVerifier implements JwsSignatureVerifier {
     }
 
     @Override
-    public String getAlgorithm() {
-        return "none";
+    public SignatureAlgorithm getAlgorithm() {
+        return SignatureAlgorithm.PLAIN;
     }
 
 }

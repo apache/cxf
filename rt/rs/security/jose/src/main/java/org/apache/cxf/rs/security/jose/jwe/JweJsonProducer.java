@@ -170,7 +170,7 @@ public class JweJsonProducer {
     private String checkAndGetContentAlgorithm(List<JweEncryptionProvider> encryptors) {
         Set<String> set = new HashSet<String>();
         for (JweEncryptionProvider encryptor : encryptors) {
-            set.add(encryptor.getContentAlgorithm());
+            set.add(encryptor.getContentAlgorithm().getJwaName());
         }
         if (set.size() != 1) {
             throw new SecurityException("Invalid content encryption algorithm");

@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-public class DirectKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+
+public class DirectKeyEncryptionAlgorithm implements KeyEncryptionProvider {
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
         if (headers.getKeyEncryptionAlgorithm() != null) {
             throw new SecurityException();
@@ -31,7 +33,7 @@ public class DirectKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
         }
     }
     @Override
-    public String getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return null;
     }
 }

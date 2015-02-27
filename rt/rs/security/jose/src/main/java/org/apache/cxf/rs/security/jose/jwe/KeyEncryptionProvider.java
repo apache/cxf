@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
-public interface KeyEncryptionAlgorithm {
-    String getAlgorithm();
+
+public interface KeyEncryptionProvider {
+    KeyAlgorithm getAlgorithm();
     byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek);
 }

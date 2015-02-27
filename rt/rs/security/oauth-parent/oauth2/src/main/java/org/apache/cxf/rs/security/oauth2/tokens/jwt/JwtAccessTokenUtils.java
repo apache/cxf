@@ -24,8 +24,8 @@ import java.security.interfaces.RSAPublicKey;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryption;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
@@ -51,7 +51,7 @@ public final class JwtAccessTokenUtils {
                                                   Client client,
                                                   SecretKey key) {
         JweEncryptionProvider jweEncryption = 
-            JweUtils.getDirectKeyJweEncryption(key, Algorithm.A128GCM.getJwtName());
+            JweUtils.getDirectKeyJweEncryption(key, ContentAlgorithm.A128GCM.getJwaName());
         return encryptToAccessToken(jwt, client, jweEncryption);
         
     }
@@ -75,7 +75,7 @@ public final class JwtAccessTokenUtils {
         return new BearerAccessToken(client, tokenId, issuedAt, expiresIn);
     }
     public static JwtToken decryptFromfromAccessToken(String tokenId, SecretKey key) {
-        JweDecryption jweDecryption = JweUtils.getDirectKeyJweDecryption(key, Algorithm.A128GCM.getJwtName());
+        JweDecryption jweDecryption = JweUtils.getDirectKeyJweDecryption(key, ContentAlgorithm.A128GCM.getJwaName());
         return decryptFromAccessToken(tokenId, jweDecryption);
     }
     public static JwtToken decryptFromAccessToken(String tokenId, JweDecryptionProvider jweDecryption) {
@@ -87,7 +87,7 @@ public final class JwtAccessTokenUtils {
                                                       Client client,
                                                       RSAPrivateKey key) {
         JwsSignatureProvider jws = 
-            JwsUtils.getRSAKeySignatureProvider(key, JoseConstants.RS_SHA_256_ALGO);
+            JwsUtils.getRSAKeySignatureProvider(key, AlgorithmUtils.RS_SHA_256_ALGO);
         return signToAccessToken(jwt, client, jws);
        
     }
@@ -98,7 +98,7 @@ public final class JwtAccessTokenUtils {
         return toAccessToken(jwt, client, jwtString);
     }
     public static JwtToken verifyAccessToken(String tokenId, RSAPublicKey key) {
-        JwsSignatureVerifier jws = JwsUtils.getRSAKeySignatureVerifier(key, JoseConstants.RS_SHA_256_ALGO);
+        JwsSignatureVerifier jws = JwsUtils.getRSAKeySignatureVerifier(key, AlgorithmUtils.RS_SHA_256_ALGO);
         return verifyAccessToken(tokenId, jws);
     }
     public static JwtToken verifyAccessToken(String tokenId, JwsSignatureVerifier jws) {

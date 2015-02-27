@@ -19,12 +19,13 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class NoneJwsSignatureProvider implements JwsSignatureProvider {
 
     @Override
-    public String getAlgorithm() {
-        return "none";
+    public SignatureAlgorithm getAlgorithm() {
+        return SignatureAlgorithm.PLAIN;
     }
 
     @Override

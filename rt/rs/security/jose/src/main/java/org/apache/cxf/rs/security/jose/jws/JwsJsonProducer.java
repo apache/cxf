@@ -96,7 +96,7 @@ public class JwsJsonProducer {
     }
     public String signWith(JwsSignatureProvider signer) {
         JoseHeaders headers = new JoseHeaders();
-        headers.setAlgorithm(signer.getAlgorithm());
+        headers.setAlgorithm(signer.getAlgorithm().getJwaName());
         return signWith(signer, headers);
     }
     public String signWith(JwsSignatureProvider signer, 

@@ -20,16 +20,17 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.interfaces.RSAPrivateKey;
 
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {    
         this(privateKey, null);
     }
-    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, String supportedAlgo) {    
+    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo) {    
         this(privateKey, supportedAlgo, true);
     }
-    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, String supportedAlgo, boolean unwrap) {    
+    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo, boolean unwrap) {    
         super(privateKey, supportedAlgo, unwrap);
     }
     protected int getKeyCipherBlockSize() {
@@ -38,7 +39,7 @@ public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     @Override
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
         super.validateKeyEncryptionAlgorithm(keyAlgo);
-        if (!Algorithm.isRsaKeyWrap(keyAlgo)) {
+        if (!AlgorithmUtils.isRsaKeyWrap(keyAlgo)) {
             throw new SecurityException();
         }
     }

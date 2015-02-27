@@ -21,29 +21,26 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 
 
 public abstract class AbstractContentEncryptionAlgorithm extends AbstractContentEncryptionCipherProperties
-    implements ContentEncryptionAlgorithm {
+    implements ContentEncryptionProvider {
     private static final int DEFAULT_IV_SIZE = 128;
     private byte[] cek;
     private byte[] iv;
     private AtomicInteger providedIvUsageCount;
-    private String algorithm;
     
-    protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv, String algo) { 
+    
+    protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) { 
         super(algo);
         this.cek = cek;
         this.iv = iv;
         if (iv != null && iv.length > 0) {
             providedIvUsageCount = new AtomicInteger();
         }    
-        this.algorithm = algo;
     }
-    @Override
-    public String getAlgorithm() { 
-        return algorithm;
-    }
+    
     public byte[] getContentEncryptionKey(JweHeaders headers) {
         return cek;
     }

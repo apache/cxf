@@ -24,25 +24,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     static final Map<String, Integer> SIGNATURE_LENGTH_MAP;
     static {
         SIGNATURE_LENGTH_MAP = new HashMap<String, Integer>();
-        SIGNATURE_LENGTH_MAP.put(Algorithm.SHA256withECDSA.getJwtName(), 64);
-        SIGNATURE_LENGTH_MAP.put(Algorithm.SHA384withECDSA.getJwtName(), 96);
-        SIGNATURE_LENGTH_MAP.put(Algorithm.SHA512withECDSA.getJwtName(), 132);
+        SIGNATURE_LENGTH_MAP.put(SignatureAlgorithm.ES256.getJwaName(), 64);
+        SIGNATURE_LENGTH_MAP.put(SignatureAlgorithm.ES384.getJwaName(), 96);
+        SIGNATURE_LENGTH_MAP.put(SignatureAlgorithm.ES512.getJwaName(), 132);
     }
-    public EcDsaJwsSignatureVerifier(PublicKey key, String supportedAlgo) {
+    public EcDsaJwsSignatureVerifier(PublicKey key, SignatureAlgorithm supportedAlgo) {
         this(key, null, supportedAlgo);
     }
-    public EcDsaJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, String supportedAlgo) {
+    public EcDsaJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, SignatureAlgorithm supportedAlgo) {
         super(key, spec, supportedAlgo);
     }
     @Override
     public boolean verify(JoseHeaders headers, String unsignedText, byte[] signature) {
-        if (SIGNATURE_LENGTH_MAP.get(super.getAlgorithm()) != signature.length) {
+        if (SIGNATURE_LENGTH_MAP.get(super.getAlgorithm().getJwaName()) != signature.length) {
             throw new SecurityException();
         }
         byte[] der = signatureToDer(signature);
@@ -50,7 +51,7 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     }
     @Override
     protected boolean isValidAlgorithmFamily(String algo) {
-        return Algorithm.isEcDsaSign(algo);
+        return AlgorithmUtils.isEcDsaSign(algo);
     }
     private static byte[] signatureToDer(byte joseSig[]) {
         int partLen = joseSig.length / 2;

@@ -18,9 +18,12 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+
 
 
 public interface JweKeyProperties {
-    String getKeyAlgorithm();
-    String getContentAlgorithm();
+    KeyAlgorithm getKeyAlgorithm();
+    ContentAlgorithm getContentAlgorithm();
 }

@@ -28,7 +28,8 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.MessageDigestUtils;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA384Digest;
@@ -36,52 +37,55 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 
-public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgorithm {
+public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
     private static final Map<String, Integer> PBES_HMAC_MAP;
     private static final Map<String, String> PBES_AES_MAP;
     private static final Map<String, Integer> DERIVED_KEY_SIZE_MAP;
     static {
         PBES_HMAC_MAP = new HashMap<String, Integer>();
-        PBES_HMAC_MAP.put(Algorithm.PBES2_HS256_A128KW.getJwtName(), 256);
-        PBES_HMAC_MAP.put(Algorithm.PBES2_HS384_A192KW.getJwtName(), 384);
-        PBES_HMAC_MAP.put(Algorithm.PBES2_HS512_A256KW.getJwtName(), 512);
+        PBES_HMAC_MAP.put(KeyAlgorithm.PBES2_HS256_A128KW.getJwaName(), 256);
+        PBES_HMAC_MAP.put(KeyAlgorithm.PBES2_HS384_A192KW.getJwaName(), 384);
+        PBES_HMAC_MAP.put(KeyAlgorithm.PBES2_HS512_A256KW.getJwaName(), 512);
         
         PBES_AES_MAP = new HashMap<String, String>();
-        PBES_AES_MAP.put(Algorithm.PBES2_HS256_A128KW.getJwtName(), Algorithm.A128KW.getJwtName());
-        PBES_AES_MAP.put(Algorithm.PBES2_HS384_A192KW.getJwtName(), Algorithm.A192KW.getJwtName());
-        PBES_AES_MAP.put(Algorithm.PBES2_HS512_A256KW.getJwtName(), Algorithm.A256KW.getJwtName());
+        PBES_AES_MAP.put(KeyAlgorithm.PBES2_HS256_A128KW.getJwaName(), KeyAlgorithm.A128KW.getJwaName());
+        PBES_AES_MAP.put(KeyAlgorithm.PBES2_HS384_A192KW.getJwaName(), KeyAlgorithm.A192KW.getJwaName());
+        PBES_AES_MAP.put(KeyAlgorithm.PBES2_HS512_A256KW.getJwaName(), KeyAlgorithm.A256KW.getJwaName());
         
         DERIVED_KEY_SIZE_MAP = new HashMap<String, Integer>();
-        DERIVED_KEY_SIZE_MAP.put(Algorithm.PBES2_HS256_A128KW.getJwtName(), 16);
-        DERIVED_KEY_SIZE_MAP.put(Algorithm.PBES2_HS384_A192KW.getJwtName(), 24);
-        DERIVED_KEY_SIZE_MAP.put(Algorithm.PBES2_HS512_A256KW.getJwtName(), 32);
+        DERIVED_KEY_SIZE_MAP.put(KeyAlgorithm.PBES2_HS256_A128KW.getJwaName(), 16);
+        DERIVED_KEY_SIZE_MAP.put(KeyAlgorithm.PBES2_HS384_A192KW.getJwaName(), 24);
+        DERIVED_KEY_SIZE_MAP.put(KeyAlgorithm.PBES2_HS512_A256KW.getJwaName(), 32);
     }
     
     
     private byte[] password;
     private int pbesCount;
-    private String keyAlgoJwt;
-    public PbesHmacAesWrapKeyEncryptionAlgorithm(String password, String keyAlgoJwt) {
+    private KeyAlgorithm keyAlgoJwt;
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(String password, KeyAlgorithm keyAlgoJwt) {
         this(stringToBytes(password), keyAlgoJwt);
     }
-    public PbesHmacAesWrapKeyEncryptionAlgorithm(String password, int pbesCount, String keyAlgoJwt, 
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(String password, int pbesCount, 
+                                                 KeyAlgorithm keyAlgoJwt, 
                                                  boolean hashLargePasswords) {
         this(stringToBytes(password), pbesCount, keyAlgoJwt, hashLargePasswords);
     }
-    public PbesHmacAesWrapKeyEncryptionAlgorithm(char[] password, String keyAlgoJwt) {
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(char[] password, KeyAlgorithm keyAlgoJwt) {
         this(password, 4096, keyAlgoJwt, false);
     }
-    public PbesHmacAesWrapKeyEncryptionAlgorithm(char[] password, int pbesCount, String keyAlgoJwt, 
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(char[] password, int pbesCount, 
+                                                 KeyAlgorithm keyAlgoJwt, 
                                                  boolean hashLargePasswords) {
         this(charsToBytes(password), pbesCount, keyAlgoJwt, hashLargePasswords);
     }
-    public PbesHmacAesWrapKeyEncryptionAlgorithm(byte[] password, String keyAlgoJwt) {
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(byte[] password, KeyAlgorithm keyAlgoJwt) {
         this(password, 4096, keyAlgoJwt, false);
     }
-    public PbesHmacAesWrapKeyEncryptionAlgorithm(byte[] password, int pbesCount, String keyAlgoJwt, 
+    public PbesHmacAesWrapKeyEncryptionAlgorithm(byte[] password, int pbesCount, 
+                                                 KeyAlgorithm keyAlgoJwt, 
                                                  boolean hashLargePasswords) {
         this.keyAlgoJwt = validateKeyAlgorithm(keyAlgoJwt);
-        this.password = validatePassword(password, keyAlgoJwt, hashLargePasswords);
+        this.password = validatePassword(password, keyAlgoJwt.getJwaName(), hashLargePasswords);
         this.pbesCount = validatePbesCount(pbesCount);
     }
     
@@ -102,20 +106,20 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
     }
     @Override
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {
-        int keySize = getKeySize(keyAlgoJwt);
+        int keySize = getKeySize(keyAlgoJwt.getJwaName());
         byte[] saltInput = CryptoUtils.generateSecureRandomBytes(keySize);
-        byte[] derivedKey = createDerivedKey(keyAlgoJwt, keySize, password, saltInput, pbesCount);
+        byte[] derivedKey = createDerivedKey(keyAlgoJwt.getJwaName(), 
+                                             keySize, password, saltInput, pbesCount);
         
         headers.setHeader("p2s", Base64UrlUtility.encode(saltInput));
         headers.setIntegerHeader("p2c", pbesCount);
         
-        final String aesAlgoJwt = PBES_AES_MAP.get(keyAlgoJwt);
-        KeyEncryptionAlgorithm aesWrap = new AesWrapKeyEncryptionAlgorithm(derivedKey, aesAlgoJwt) {
+        KeyEncryptionProvider aesWrap = new AesWrapKeyEncryptionAlgorithm(derivedKey, keyAlgoJwt) {
             protected void checkAlgorithms(JweHeaders headers) {
                 // complete
             }
             protected String getKeyEncryptionAlgoJava(JweHeaders headers) {
-                return Algorithm.AES_WRAP_ALGO_JAVA;
+                return AlgorithmUtils.AES_WRAP_ALGO_JAVA;
             }
         };
         return aesWrap.getEncryptedContentEncryptionKey(headers, cek);
@@ -151,8 +155,8 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
         System.arraycopy(saltInput, 0, saltValue, algoBytes.length + 1, saltInput.length);
         return saltValue;
     }
-    static String validateKeyAlgorithm(String algo) {
-        if (!Algorithm.isPbesHsWrap(algo)) {
+    static KeyAlgorithm validateKeyAlgorithm(KeyAlgorithm algo) {
+        if (!AlgorithmUtils.isPbesHsWrap(algo.getJwaName())) {
             throw new SecurityException();
         }
         return algo;
@@ -174,7 +178,7 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionAlgor
         return b;
     }
     @Override
-    public String getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return keyAlgoJwt;
     }
     

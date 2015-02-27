@@ -21,8 +21,8 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -121,7 +121,7 @@ public class JwsCompactHeaderTest extends Assert {
         JwsCompactConsumer jwsConsumer = new JwsCompactConsumer(MISSING_ALG_HEADER_FIELD_IN_JWS);
 
         assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY, 
-                                                                                 Algorithm.HmacSHA256.getJwtName())));
+                                                        SignatureAlgorithm.HS256)));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class JwsCompactHeaderTest extends Assert {
         JwsCompactConsumer jwsConsumer = new JwsCompactConsumer(TWO_ALG_HEADER_FIELDS_IN_JWS_BOGUS_FIRST);
 
         assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
-                                                                                 Algorithm.HmacSHA256.getJwtName())));
+                                                        SignatureAlgorithm.HS256)));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class JwsCompactHeaderTest extends Assert {
         JwsCompactConsumer jwsConsumer = new JwsCompactConsumer(TWO_ALG_HEADER_FIELDS_IN_JWS_BOGUS_LAST);
 
         assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
-                                                                                 Algorithm.HmacSHA256.getJwtName())));
+                                                        SignatureAlgorithm.HS256)));
     }
     
     @Test
@@ -147,10 +147,10 @@ public class JwsCompactHeaderTest extends Assert {
         JwsCompactConsumer jwsConsumerAltered = new JwsCompactConsumer(ALG_HEADER_VALUE_NONE_IN_JWS);
 
         assertTrue(jwsConsumerOriginal.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
-                                                               Algorithm.HmacSHA256.getJwtName())));
+                                                           SignatureAlgorithm.HS256)));
         
         assertFalse(jwsConsumerAltered.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
-                                                               Algorithm.HmacSHA256.getJwtName())));
+                                                           SignatureAlgorithm.HS256)));
     }
 
     @Test
@@ -165,11 +165,11 @@ public class JwsCompactHeaderTest extends Assert {
         String criticalValue2 = "criticalValue2";
         String criticalValue3 = "criticalValue3";
         JwsCompactProducer producer = new JwsCompactProducer(payload);
-        producer.getJoseHeaders().setAlgorithm(JoseConstants.HMAC_SHA_512_ALGO);
+        producer.getJoseHeaders().setAlgorithm(AlgorithmUtils.HMAC_SHA_512_ALGO);
         List<String> criticalHeader = new ArrayList<String>();
         criticalHeader.add(criticalParameter1);
         producer.getJoseHeaders().setCritical(criticalHeader);
-        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName()));
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256));
         String signedJws = producer.getSignedEncodedJws();
         JwsCompactConsumer consumer = new JwsCompactConsumer(signedJws);
         assertFalse(consumer.validateCriticalHeaders());
@@ -177,12 +177,12 @@ public class JwsCompactHeaderTest extends Assert {
         criticalHeader.add(criticalParameter2);
         criticalHeader.add(criticalParameter3);
         producer = new JwsCompactProducer(payload);
-        producer.getJoseHeaders().setAlgorithm(JoseConstants.HMAC_SHA_512_ALGO);
+        producer.getJoseHeaders().setAlgorithm(AlgorithmUtils.HMAC_SHA_512_ALGO);
         producer.getJoseHeaders().setCritical(criticalHeader);
         producer.getJoseHeaders().setHeader(criticalParameter1, criticalValue1);
         producer.getJoseHeaders().setHeader(criticalParameter2, criticalValue2);
         producer.getJoseHeaders().setHeader(criticalParameter3, criticalValue3);
-        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName()));
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256));
         signedJws = producer.getSignedEncodedJws();
         consumer = new JwsCompactConsumer(signedJws);
         assertTrue(consumer.validateCriticalHeaders());
@@ -191,10 +191,10 @@ public class JwsCompactHeaderTest extends Assert {
         criticalHeader.add(criticalParameter);
         criticalHeader.add(criticalParameter);
         producer = new JwsCompactProducer(payload);
-        producer.getJoseHeaders().setAlgorithm(JoseConstants.HMAC_SHA_512_ALGO);
+        producer.getJoseHeaders().setAlgorithm(AlgorithmUtils.HMAC_SHA_512_ALGO);
         producer.getJoseHeaders().setHeader(criticalParameter, criticalValue);
         producer.getJoseHeaders().setCritical(criticalHeader);
-        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, Algorithm.HmacSHA256.getJwtName()));
+        producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256));
         signedJws = producer.getSignedEncodedJws();
         consumer = new JwsCompactConsumer(signedJws);
         assertFalse(consumer.validateCriticalHeaders());

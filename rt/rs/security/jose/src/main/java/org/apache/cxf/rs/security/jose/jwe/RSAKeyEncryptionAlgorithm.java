@@ -20,14 +20,15 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.interfaces.RSAPublicKey;
 
-import org.apache.cxf.rs.security.jose.jwa.Algorithm;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class RSAKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgorithm {
-    public RSAKeyEncryptionAlgorithm(RSAPublicKey publicKey, String jweAlgo) {
+    public RSAKeyEncryptionAlgorithm(RSAPublicKey publicKey, KeyAlgorithm jweAlgo) {
         this(publicKey, jweAlgo, true);
     }
-    public RSAKeyEncryptionAlgorithm(RSAPublicKey publicKey, String jweAlgo, boolean wrap) {
-        super(publicKey, jweAlgo, wrap, Algorithm.RSA_CEK_SET);
+    public RSAKeyEncryptionAlgorithm(RSAPublicKey publicKey, KeyAlgorithm jweAlgo, boolean wrap) {
+        super(publicKey, jweAlgo, wrap, AlgorithmUtils.RSA_CEK_SET);
     }
     
 }

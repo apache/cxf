@@ -67,7 +67,6 @@ public class BookServer extends AbstractBusTestServerBase {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class, SimpleBookStore.class, BookStorePerRequest.class);
-        sf.getInInterceptors().add(new LoggingInInterceptor());
         List<Object> providers = new ArrayList<Object>();
         
         //default lifecycle is per-request, change it to singleton
@@ -94,6 +93,8 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.setProviders(providers);
         List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
         inInts.add(new CustomInFaultyInterceptor());
+        inInts.add(new LoggingInInterceptor());
+        
         sf.setInInterceptors(inInts);
         List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());

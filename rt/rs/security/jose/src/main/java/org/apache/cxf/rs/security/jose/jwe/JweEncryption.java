@@ -20,8 +20,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 
 public class JweEncryption extends AbstractJweEncryption {
-    public JweEncryption(KeyEncryptionAlgorithm keyEncryptionAlgorithm,
-                         ContentEncryptionAlgorithm contentEncryptionAlgo) {
+    public JweEncryption(KeyEncryptionProvider keyEncryptionAlgorithm,
+                         ContentEncryptionProvider contentEncryptionAlgo) {
         super(contentEncryptionAlgo, keyEncryptionAlgorithm);
     }
     

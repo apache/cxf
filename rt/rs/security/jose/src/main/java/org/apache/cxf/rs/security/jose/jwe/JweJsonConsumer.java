@@ -78,7 +78,7 @@ public class JweJsonConsumer {
     private JweJsonEncryptionEntry getJweDecryptionEntry(JweDecryptionProvider jwe) {
         for (Map.Entry<JweJsonEncryptionEntry, JweHeaders> entry : recipientsMap.entrySet()) {
             String keyAlgo = entry.getValue().getKeyEncryptionAlgorithm();
-            if (keyAlgo != null && keyAlgo.equals(jwe.getKeyAlgorithm())
+            if (keyAlgo != null && keyAlgo.equals(jwe.getKeyAlgorithm().getJwaName())
                 || keyAlgo == null && jwe.getKeyAlgorithm() == null) {
                 return entry.getKey();        
             }    

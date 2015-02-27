@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.Key;
 
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+
 public class DirectKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     private byte[] contentDecryptionKey;
     public DirectKeyDecryptionAlgorithm(Key contentDecryptionKey) {    
@@ -34,7 +36,7 @@ public class DirectKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
         return contentDecryptionKey;
     }
     @Override
-    public String getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return null;
     }
     protected void validateKeyEncryptionKey(JweDecryptionInput jweDecryptionInput) {
