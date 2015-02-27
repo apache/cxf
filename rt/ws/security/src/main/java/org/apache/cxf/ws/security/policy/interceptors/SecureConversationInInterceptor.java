@@ -62,6 +62,7 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -172,8 +173,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             SecureConversationToken tok = (SecureConversationToken)ais.iterator()
                 .next().getAssertion();
             Policy pol = tok.getBootstrapPolicy().getPolicy();
-            if (s.endsWith("Cancel") || s.endsWith("/Renew")) {
-                //Cancel and Renew just sign with the token
+            if (s.endsWith("Cancel")) {
+                //Cancel just sign with the token
                 Policy p = new Policy();
                 ExactlyOne ea = new ExactlyOne();
                 p.addPolicyComponent(ea);
@@ -314,11 +315,34 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             String prefix, 
             String namespace
         ) throws Exception {
+            doIssueOrRenew(requestEl, exchange, binaryExchange, writer, prefix, namespace, null);
+        }
+
+        void doRenew(Element requestEl,
+                     Exchange exchange,
+                     SecurityToken renewToken,
+                     Element binaryExchange,
+                     W3CDOMStreamWriter writer,
+                     String prefix,
+                     String namespace) throws Exception {
+            doIssueOrRenew(requestEl, exchange, binaryExchange, writer, prefix, namespace,
+                    renewToken.getId());
+        }
+
+
+        private void doIssueOrRenew(Element requestEl,
+                               Exchange exchange,
+                               Element binaryExchange,
+                               W3CDOMStreamWriter writer,
+                               String prefix,
+                               String namespace,
+                               String tokenIdToRenew
+        ) throws Exception {
             if (STSUtils.WST_NS_05_12.equals(namespace)) {
                 writer.writeStartElement(prefix, "RequestSecurityTokenResponseCollection", namespace);
             }
             writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
-            
+
             byte clientEntropy[] = null;
             int keySize = 256;
             long ttl = 300000L;
@@ -338,53 +362,64 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         tokenType = el.getTextContent();
                     }
                 }
-                
+
                 el = DOMUtils.getNextElement(el);
             }
-            
+
             // Check received KeySize
             if (keySize < 128 || keySize > 512) {
                 keySize = 256;
             }
-            
+
             writer.writeStartElement(prefix, "RequestedSecurityToken", namespace);
-            SecurityContextToken sct =
-                new SecurityContextToken(NegotiationUtils.getWSCVersion(tokenType), writer.getDocument());
-            
+            SecurityContextToken sct;
+            if (tokenIdToRenew != null) {
+                ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
+                    .getProperty(TokenStore.class.getName())).remove(tokenIdToRenew);
+                sct = new SecurityContextToken(
+                        NegotiationUtils.getWSCVersion(tokenType), writer.getDocument(),
+                        tokenIdToRenew);
+                sct.setID(WSSConfig.getNewInstance().getIdAllocator()
+                        .createSecureId("sctId-", sct.getElement()));
+            } else {
+                sct = new SecurityContextToken(
+                        NegotiationUtils.getWSCVersion(tokenType), writer.getDocument());
+            }
+
             Date created = new Date();
             Date expires = new Date();
             expires.setTime(created.getTime() + ttl);
-            
+
             SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());
             token.setTokenType(sct.getTokenType());
-            
+
             writer.getCurrentNode().appendChild(sct.getElement());
-            writer.writeEndElement();        
-            
+            writer.writeEndElement();
+
             writer.writeStartElement(prefix, "RequestedAttachedReference", namespace);
             token.setAttachedReference(
                 writeSecurityTokenReference(writer, "#" + sct.getID(), tokenType)
             );
             writer.writeEndElement();
-            
+
             writer.writeStartElement(prefix, "RequestedUnattachedReference", namespace);
             token.setUnattachedReference(
                 writeSecurityTokenReference(writer, sct.getIdentifier(), tokenType)
             );
             writer.writeEndElement();
-            
+
             writeLifetime(writer, created, expires, prefix, namespace);
 
             byte[] secret = writeProofToken(prefix, namespace, writer, clientEntropy, keySize);
-            
+
             token.setSecret(secret);
-            
+
             SecurityContext sc = exchange.getInMessage().get(SecurityContext.class);
             if (sc != null) {
                 token.setSecurityContext(sc);
             }
-            
+
             // Get Bootstrap Token
             SecurityToken bootstrapToken = getBootstrapToken(exchange.getInMessage());
             if (bootstrapToken != null) {
@@ -392,11 +427,11 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 properties.put(SecurityToken.BOOTSTRAP_TOKEN_ID, bootstrapToken.getId());
                 token.setProperties(properties);
             }
-            
+
             ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).add(token);
-            
-            
+
+
             writer.writeEndElement();
             if (STSUtils.WST_NS_05_12.equals(namespace)) {
                 writer.writeEndElement();
