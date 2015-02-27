@@ -84,7 +84,7 @@ abstract class STSInvoker implements Invoker {
         }
         String namespace = requestEl.getNamespaceURI();
         String prefix = requestEl.getPrefix();
-        SecurityToken cancelToken = null;
+        SecurityToken cancelOrRenewToken = null;
         if ("RequestSecurityToken".equals(requestEl.getLocalName())) {
             try {
                 String requestType = null;
@@ -96,8 +96,8 @@ abstract class STSInvoker implements Invoker {
                     if (namespace.equals(el.getNamespaceURI())) {
                         if ("RequestType".equals(localName)) {
                             requestType = el.getTextContent();
-                        } else if ("CancelTarget".equals(localName)) {
-                            cancelToken = findCancelToken(exchange, el);
+                        } else if ("CancelTarget".equals(localName) || "RenewTarget".equals(localName)) {
+                            cancelOrRenewToken = findCancelOrRenewToken(exchange, el);
                         } else if ("BinaryExchange".equals(localName)) {
                             binaryExchange = el;
                         } else if ("TokenType".equals(localName)) {
@@ -121,10 +121,10 @@ abstract class STSInvoker implements Invoker {
                 if (requestType.endsWith("/Issue")) { 
                     doIssue(requestEl, exchange, binaryExchange, writer, prefix, namespace);
                 } else if (requestType.endsWith("/Cancel")) {
-                    doCancel(exchange, cancelToken, writer, prefix, namespace);
-                } //else if (requestType.endsWith("/Renew")) {
-                //REVISIT - implement
-                //}
+                    doCancel(exchange, cancelOrRenewToken, writer, prefix, namespace);
+                } else if (requestType.endsWith("/Renew")) {
+                    doRenew(requestEl, exchange, cancelOrRenewToken, binaryExchange, writer, prefix, namespace);
+                }
 
                 return new MessageContentsList(new DOMSource(writer.getDocument()));
             } catch (RuntimeException ex) {
@@ -146,9 +146,19 @@ abstract class STSInvoker implements Invoker {
         String namespace
     ) throws Exception;
 
+    abstract void doRenew(
+            Element requestEl,
+            Exchange exchange,
+            SecurityToken renewToken,
+            Element binaryExchange,
+            W3CDOMStreamWriter writer,
+            String prefix,
+            String namespace
+    ) throws Exception;
+
     private void doCancel(
         Exchange exchange, 
-        SecurityToken cancelToken, 
+        SecurityToken cancelToken,
         W3CDOMStreamWriter writer,
         String prefix, 
         String namespace
@@ -171,7 +181,7 @@ abstract class STSInvoker implements Invoker {
         }
     }
 
-    private SecurityToken findCancelToken(Exchange exchange, Element el) throws WSSecurityException {
+    private SecurityToken findCancelOrRenewToken(Exchange exchange, Element el) throws WSSecurityException {
         Element childElement = DOMUtils.getFirstElement(el);
         String uri = "";
         if ("SecurityContextToken".equals(childElement.getLocalName())) {

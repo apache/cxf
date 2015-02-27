@@ -251,7 +251,19 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).add(token);
         }
-        
+
+        void doRenew(
+                Element requestEl,
+                Exchange exchange,
+                SecurityToken securityToken,
+                Element binaryExchange,
+                W3CDOMStreamWriter writer,
+                String prefix,
+                String namespace
+        ) {
+            //Not implemented
+        }
+
         private SpnegoTokenContext handleBinaryExchange(
             Element binaryExchange,
             Message message,

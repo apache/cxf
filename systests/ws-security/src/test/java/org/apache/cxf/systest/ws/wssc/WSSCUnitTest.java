@@ -220,6 +220,41 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         
         assertTrue(stsClient.cancelSecurityToken(securityToken));
     }
+    
+    @Test
+    public void testIssueAndRenewUnitTest() throws Exception {
+        if (test.isStreaming()) {
+            return;
+        }
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = WSSCUnitTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        STSClient stsClient = new STSClient(bus);
+        stsClient.setSecureConv(true);
+        stsClient.setLocation("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
+        
+        stsClient.setPolicy(createSymmetricBindingPolicy());
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("ws-security.encryption.username", "bob");
+        TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
+        properties.put("ws-security.callback-handler", callbackHandler);
+        properties.put("ws-security.signature.properties", "alice.properties");
+        properties.put("ws-security.encryption.properties", "bob.properties");
+        stsClient.setProperties(properties);
+        
+        SecurityToken securityToken = 
+            stsClient.requestSecurityToken("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
+        assertNotNull(securityToken);
+        callbackHandler.setSecurityToken(securityToken);
+        
+        assertNotNull(stsClient.renewSecurityToken(securityToken));
+    }
 
     // mock up a SymmetricBinding policy to talk to the STS
     private Policy createSymmetricBindingPolicy() {

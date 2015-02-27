@@ -253,14 +253,15 @@ public final class STSUtils {
         
         OperationInfo ioi = addIssueOperation(ii, namespace, ns);
         OperationInfo coi = addCancelOperation(ii, namespace, ns);
-        
+        OperationInfo roi = addRenewOperation(ii, namespace, ns);
+
         si.setInterface(ii);
         service = new ServiceImpl(si);
         
         BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
         BindingFactory bindingFactory = bfm.getBindingFactory(soapVersion);
-        BindingInfo bi = bindingFactory.createBindingInfo(service, 
-                                                          soapVersion, null);
+        BindingInfo bi = bindingFactory.createBindingInfo(service,
+                soapVersion, null);
         si.addBinding(bi);
         if (transportId == null) {
             ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
@@ -283,7 +284,7 @@ public final class STSUtils {
             boi.addExtensor(soi);
         }
         soi.setAction(namespace + (sc ? "/RST/SCT" : "/RST/Issue"));
-        
+
         boi = bi.getOperation(coi);
         soi = boi.getExtensor(SoapOperationInfo.class);
         if (soi == null) {
@@ -291,6 +292,15 @@ public final class STSUtils {
             boi.addExtensor(soi);
         }
         soi.setAction(namespace + (sc ? "/RST/SCT/Cancel" : "/RST/Cancel"));
+
+        boi = bi.getOperation(roi);
+        soi = boi.getExtensor(SoapOperationInfo.class);
+        if (soi == null) {
+            soi = new SoapOperationInfo();
+            boi.addExtensor(soi);
+        }
+        soi.setAction(namespace + (sc ? "/RST/SCT/Renew" : "/RST/Renew"));
+
         service.setDataBinding(new SourceDataBinding());
         return new EndpointImpl(bus, service, ei);
     }
@@ -341,4 +351,29 @@ public final class STSUtils {
         }
         return oi;
     }
+
+    private static OperationInfo addRenewOperation(InterfaceInfo ii,
+                                                   String namespace,
+                                                   String servNamespace) {
+        OperationInfo oi = ii.addOperation(new QName(servNamespace, "RenewSecurityToken"));
+        MessageInfo mii = oi.createMessage(new QName(servNamespace, "RenewSecurityTokenMsg"),
+                MessageInfo.Type.INPUT);
+        oi.setInput("RenewSecurityTokenMsg", mii);
+        MessagePartInfo mpi = mii.addMessagePart("request");
+        mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
+
+        MessageInfo mio = oi.createMessage(new QName(servNamespace,
+                        "RenewSecurityTokenResponseMsg"),
+                MessageInfo.Type.OUTPUT);
+        oi.setOutput("RenewSecurityTokenResponseMsg", mio);
+        mpi = mio.addMessagePart("response");
+
+        if (WST_NS_05_02.equals(namespace)) {
+            mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
+        } else {
+            mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponseCollection"));
+        }
+        return oi;
+    }
+
 }
