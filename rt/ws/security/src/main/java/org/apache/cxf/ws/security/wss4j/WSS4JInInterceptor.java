@@ -26,6 +26,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -541,7 +542,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
          */
         List<WSHandlerResult> results = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.RECV_RESULTS));
         if (results == null) {
-            results = new ArrayList<WSHandlerResult>();
+            results = new LinkedList<WSHandlerResult>();
             msg.put(WSHandlerConstants.RECV_RESULTS, results);
         }
         WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
