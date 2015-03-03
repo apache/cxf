@@ -59,6 +59,7 @@ public class STSTokenValidator implements Validator {
     private boolean useOnBehalfOf = true;
     private STSClient stsClient;
     private TokenStore tokenStore;
+    private boolean disableCaching;
     
     public STSTokenValidator() {
     }
@@ -105,17 +106,20 @@ public class STSTokenValidator implements Validator {
             }
             token.setToken(tokenElement);
             
-            TokenStore ts = getTokenStore(message);
-            if (ts == null) {
-                ts = tokenStore;
-            }
-            if (ts != null && hash != 0) {
-                SecurityToken transformedToken = getTransformedToken(ts, hash);
-                if (transformedToken != null && !transformedToken.isExpired()) {
-                    SamlAssertionWrapper assertion = new SamlAssertionWrapper(transformedToken.getToken());
-                    credential.setPrincipal(new SAMLTokenPrincipalImpl(assertion));
-                    credential.setTransformedToken(assertion);
-                    return credential;
+            TokenStore ts = null;
+            if (!disableCaching) {
+                ts = getTokenStore(message);
+                if (ts == null) {
+                    ts = tokenStore;
+                }
+                if (ts != null && hash != 0) {
+                    SecurityToken transformedToken = getTransformedToken(ts, hash);
+                    if (transformedToken != null && !transformedToken.isExpired()) {
+                        SamlAssertionWrapper assertion = new SamlAssertionWrapper(transformedToken.getToken());
+                        credential.setPrincipal(new SAMLTokenPrincipalImpl(assertion));
+                        credential.setTransformedToken(assertion);
+                        return credential;
+                    }
                 }
             }
             token.setTokenHash(hash);
@@ -152,7 +156,7 @@ public class STSTokenValidator implements Validator {
                     SamlAssertionWrapper assertion = new SamlAssertionWrapper(returnedToken.getToken());
                     credential.setTransformedToken(assertion);
                     credential.setPrincipal(new SAMLTokenPrincipalImpl(assertion));
-                    if (hash != 0 && ts != null) {
+                    if (!disableCaching && hash != 0 && ts != null) {
                         ts.add(returnedToken);
                         token.setTransformedTokenIdentifier(returnedToken.getId());
                         ts.add(Integer.toString(hash), token);
@@ -249,6 +253,14 @@ public class STSTokenValidator implements Validator {
 
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
+    }
+
+    public boolean isDisableCaching() {
+        return disableCaching;
+    }
+
+    public void setDisableCaching(boolean disableCaching) {
+        this.disableCaching = disableCaching;
     }
 
     private static class ElementCallbackHandler implements CallbackHandler {
