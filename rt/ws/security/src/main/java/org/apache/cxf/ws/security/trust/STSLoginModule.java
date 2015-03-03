@@ -96,6 +96,13 @@ public class STSLoginModule implements LoginModule {
     public static final String DISABLE_ON_BEHALF_OF = "disable.on.behalf.of";
     
     /**
+     * Whether to disable caching of validated credentials or not. The default is "false", meaning that
+     * caching is enabled. However, caching only applies when token transformation takes place, i.e. when
+     * the "require.roles" property is set to "true".
+     */
+    public static final String DISABLE_CACHING = "disable.caching";
+    
+    /**
      * The WSDL Location of the STS
      */
     public static final String WSDL_LOCATION = "wsdl.location";
@@ -146,6 +153,7 @@ public class STSLoginModule implements LoginModule {
     private CallbackHandler callbackHandler;
     private boolean requireRoles;
     private boolean disableOnBehalfOf;
+    private boolean disableCaching;
     private String wsdlLocation;
     private String serviceName;
     private String endpointName;
@@ -166,6 +174,9 @@ public class STSLoginModule implements LoginModule {
         }
         if (options.containsKey(DISABLE_ON_BEHALF_OF)) {
             disableOnBehalfOf = Boolean.parseBoolean((String)options.get(DISABLE_ON_BEHALF_OF));
+        }
+        if (options.containsKey(DISABLE_CACHING)) {
+            disableCaching = Boolean.parseBoolean((String)options.get(DISABLE_CACHING));
         }
         if (options.containsKey(WSDL_LOCATION)) {
             wsdlLocation = (String)options.get(WSDL_LOCATION);
@@ -230,6 +241,7 @@ public class STSLoginModule implements LoginModule {
         STSTokenValidator validator = new STSTokenValidator(true);
         validator.setUseIssueBinding(requireRoles);
         validator.setUseOnBehalfOf(!disableOnBehalfOf);
+        validator.setDisableCaching(!requireRoles || disableCaching);
         
         // Authenticate token
         try {
