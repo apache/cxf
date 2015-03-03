@@ -119,6 +119,9 @@ public final class JwsUtils {
         }
         return theVerifier;
     }
+    public static JwsSignatureVerifier getRSAKeySignatureVerifier(X509Certificate cert, String algo) {
+        return getRSAKeySignatureVerifier((RSAPublicKey)cert.getPublicKey(), algo);
+    }
     public static JwsSignatureVerifier getRSAKeySignatureVerifier(RSAPublicKey key, String algo) {
         return new PublicKeyJwsSignatureVerifier(key, SignatureAlgorithm.getAlgorithm(algo));
     }

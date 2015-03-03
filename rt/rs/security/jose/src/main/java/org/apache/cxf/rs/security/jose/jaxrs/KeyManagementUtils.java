@@ -243,6 +243,10 @@ public final class KeyManagementUtils {
             return null;
         }
     }
+    public static X509Certificate[] toX509CertificateChainArray(List<String> base64EncodedChain) {
+        List<X509Certificate> chain = toX509CertificateChain(base64EncodedChain);
+        return chain == null ? null : chain.toArray(new X509Certificate[]{});
+    }
     public static String getKeyAlgorithm(Message m, Properties props, String propName, String defaultAlg) {
         String algo = props.getProperty(propName);
         if (algo == null && PropertyUtils.isTrue(m.getContextualProperty(RSSEC_DEFAULT_ALGORITHMS))) {
