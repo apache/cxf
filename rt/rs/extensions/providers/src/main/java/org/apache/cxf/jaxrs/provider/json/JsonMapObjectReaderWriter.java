@@ -35,6 +35,13 @@ import org.apache.cxf.common.util.StringUtils;
 public class JsonMapObjectReaderWriter {
     private boolean format;
     
+    public JsonMapObjectReaderWriter() {
+        
+    }
+    public JsonMapObjectReaderWriter(boolean format) {
+        this.format = format;
+    }
+    
     public String toJson(JsonMapObject obj) {
         return toJson(obj.asMap());
     }
