@@ -25,6 +25,7 @@ import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
@@ -381,6 +382,20 @@ public final class JwkUtils {
         JsonWebKey jwk = prepareRSAJwk(pk.getModulus(), algo);
         String encodedPrivateExponent = Base64UrlUtility.encode(pk.getPrivateExponent().toByteArray());
         jwk.setProperty(JsonWebKey.RSA_PRIVATE_EXP, encodedPrivateExponent);
+        if (pk instanceof RSAPrivateCrtKey) {
+            RSAPrivateCrtKey pkCrt = (RSAPrivateCrtKey)pk;
+            jwk.setProperty(JsonWebKey.RSA_FIRST_PRIME_FACTOR, 
+                            Base64UrlUtility.encode(pkCrt.getPrimeP().toByteArray()));
+            jwk.setProperty(JsonWebKey.RSA_SECOND_PRIME_FACTOR, 
+                            Base64UrlUtility.encode(pkCrt.getPrimeQ().toByteArray()));
+            jwk.setProperty(JsonWebKey.RSA_FIRST_PRIME_CRT, 
+                            Base64UrlUtility.encode(pkCrt.getPrimeExponentP().toByteArray()));
+            jwk.setProperty(JsonWebKey.RSA_SECOND_PRIME_CRT, 
+                            Base64UrlUtility.encode(pkCrt.getPrimeExponentQ().toByteArray()));
+            jwk.setProperty(JsonWebKey.RSA_FIRST_CRT_COEFFICIENT, 
+                            Base64UrlUtility.encode(pkCrt.getCrtCoefficient().toByteArray()));
+        }
+        // "oth" can be populated too if needed
         return jwk;
     }
     public static ECPublicKey toECPublicKey(JsonWebKey jwk) {

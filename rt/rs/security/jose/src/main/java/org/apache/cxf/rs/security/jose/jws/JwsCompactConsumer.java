@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -106,6 +107,9 @@ public class JwsCompactConsumer {
     }
     public boolean verifySignatureWith(JsonWebKey key, String algo) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key, algo));
+    }
+    public boolean verifySignatureWith(X509Certificate cert, String algo) {
+        return verifySignatureWith(JwsUtils.getRSAKeySignatureVerifier(cert, algo));
     }
     public boolean verifySignatureWith(RSAPublicKey key, String algo) {
         return verifySignatureWith(JwsUtils.getRSAKeySignatureVerifier(key, algo));
