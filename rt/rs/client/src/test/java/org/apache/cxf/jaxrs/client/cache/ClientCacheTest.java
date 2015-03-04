@@ -44,7 +44,6 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ClientCacheTest extends Assert {
@@ -68,7 +67,6 @@ public class ClientCacheTest extends Assert {
     }
 
     @Test
-    @Ignore
     public void testGetTimeString() {
         CacheControlFeature feature = new CacheControlFeature();
         try {
@@ -85,7 +83,6 @@ public class ClientCacheTest extends Assert {
     }
     
     @Test
-    @Ignore
     public void testGetTimeStringAsInputStream() throws Exception {
         CacheControlFeature feature = new CacheControlFeature();
         try {
@@ -105,7 +102,6 @@ public class ClientCacheTest extends Assert {
     }
     
     @Test
-    @Ignore
     public void testGetTimeStringAsInputStreamAndString() throws Exception {
         CacheControlFeature feature = new CacheControlFeature();
         try {
@@ -125,7 +121,6 @@ public class ClientCacheTest extends Assert {
         }
     }
     @Test
-    @Ignore
     public void testGetTimeStringAsStringAndInputStream() throws Exception {
         CacheControlFeature feature = new CacheControlFeature();
         try {
@@ -146,7 +141,6 @@ public class ClientCacheTest extends Assert {
     }
     
     @Test
-    @Ignore
     public void testGetJaxbBookCache() {
         CacheControlFeature feature = new CacheControlFeature();
         try {
