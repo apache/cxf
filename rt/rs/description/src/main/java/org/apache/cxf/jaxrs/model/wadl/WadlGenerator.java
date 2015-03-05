@@ -779,6 +779,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             List<Class<?>> parentBeanClasses = new LinkedList<Class<?>>();
             parentBeanClasses.add(type);
             doWriteBeanParam(ori, sb, type, pm, null, parentBeanClasses, isJson);
+            parentBeanClasses.remove(type);
         } 
     }
     private void doWriteJaxrsBeanParams(StringBuilder sb, 
@@ -851,6 +852,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             } else if (!parentBeanClasses.contains(paramCls)) {
                 parentBeanClasses.add(paramCls);
                 doWriteBeanParam(ori, sb, paramCls, entry.getKey(), name, parentBeanClasses, isJson);
+                parentBeanClasses.remove(paramCls);
             }
         }
     }

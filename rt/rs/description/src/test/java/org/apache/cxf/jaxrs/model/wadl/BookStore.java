@@ -236,6 +236,10 @@ public class BookStore implements BookDescription {
         public QueryBean3 getD() {
             return bean;
         }
+
+        public QueryBean3 getD2() {
+            return bean;
+        }
         
         public QueryBean2 getIt() {
             return this;
