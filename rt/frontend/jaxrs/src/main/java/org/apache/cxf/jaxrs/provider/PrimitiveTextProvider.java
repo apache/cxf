@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,7 +38,8 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public class PrimitiveTextProvider<T> 
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
-
+    private int bufferSize = IOUtils.DEFAULT_BUFFER_SIZE;
+    
     private static boolean isSupported(Class<?> type) { 
         return InjectionUtils.isPrimitive(type);
     }
@@ -75,7 +77,14 @@ public class PrimitiveTextProvider<T>
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
         String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
-        os.write(obj.toString().getBytes(encoding));
+        byte[] bytes = obj.toString().getBytes(encoding);
+        if (bytes.length > bufferSize) {
+            IOUtils.copy(new ByteArrayInputStream(bytes), os, bufferSize);
+        } else {
+            os.write(bytes);
+        }
     }
-
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 }

@@ -58,7 +58,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     private static final String HTTP_RANGE_PROPERTY = "http.range.support";
     private static final Logger LOG = LogUtils.getL7dLogger(BinaryDataProvider.class);
     
-    private static final int BUFFER_SIZE = 4096;
+    private int bufferSize = IOUtils.DEFAULT_BUFFER_SIZE;
     private boolean reportByteArraySize;
     private boolean closeResponseInputStream = true;
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -94,7 +94,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                 if (enc == null) {
                     return clazz.cast(IOUtils.readBytesFromStream(is));
                 } else {
-                    return clazz.cast(IOUtils.toString(is, enc).getBytes(enc));
+                    return clazz.cast(IOUtils.toString(is, bufferSize, enc).getBytes(enc));
                 }
             }
             if (File.class.isAssignableFrom(clazz)) {
@@ -106,7 +106,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                                                   null,
                                                   true);
                 FileOutputStream fos = new FileOutputStream(f);
-                IOUtils.copy(is, fos);
+                IOUtils.copy(is, fos, bufferSize);
                 fos.close();
                 return clazz.cast(f);
             }
@@ -154,7 +154,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                 Writer writer = new OutputStreamWriter(os, getEncoding(type));
                 IOUtils.copy((Reader)o, 
                               writer,
-                              BUFFER_SIZE);
+                              bufferSize);
                 writer.flush();
             } finally {
                 ((Reader)o).close();
@@ -183,9 +183,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
             handleRangeRequest(is, os, new HttpHeadersImpl(inMessage), outHeaders);
         } else {
             if (closeResponseInputStream) {
-                IOUtils.copyAndCloseInput(is, os);
+                IOUtils.copyAndCloseInput(is, os, bufferSize);
             } else {
-                IOUtils.copy(is, os);
+                IOUtils.copy(is, os, bufferSize);
             }
         }
     }
@@ -196,7 +196,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                                       MultivaluedMap<String, Object> outHeaders) throws IOException {
         String range = inHeaders.getRequestHeaders().getFirst("Range"); 
         if (range == null) {
-            IOUtils.copyAndCloseInput(is, os);    
+            IOUtils.copyAndCloseInput(is, os, bufferSize);    
         } else {
             // implement
         }
@@ -218,5 +218,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
 
     public void setCloseResponseInputStream(boolean closeResponseInputStream) {
         this.closeResponseInputStream = closeResponseInputStream;
+    }
+
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
     }
 }
