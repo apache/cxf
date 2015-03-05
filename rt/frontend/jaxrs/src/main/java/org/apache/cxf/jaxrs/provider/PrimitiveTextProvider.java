@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.provider;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -77,9 +76,18 @@ public class PrimitiveTextProvider<T>
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
         String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
+        //REVISIT try to avoid instantiating the whole byte array
         byte[] bytes = obj.toString().getBytes(encoding);
         if (bytes.length > bufferSize) {
-            IOUtils.copy(new ByteArrayInputStream(bytes), os, bufferSize);
+            int pos = 0;
+            while (pos < bytes.length) {
+                int bl = bytes.length - pos;
+                if (bl > bufferSize) {
+                    bl = bufferSize;
+                }
+                os.write(bytes, pos, bl);
+                pos += bl;
+            }
         } else {
             os.write(bytes);
         }
