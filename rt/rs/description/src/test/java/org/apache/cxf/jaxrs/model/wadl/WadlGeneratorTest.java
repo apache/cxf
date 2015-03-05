@@ -590,12 +590,13 @@ public class WadlGeneratorTest extends Assert {
         List<Element> requestEls = getElements(methodEl, "request", 1);
         
         // 6 parameters are expected
-        verifyParameters(requestEls.get(0), 6,
+        verifyParameters(requestEls.get(0), 7,
                          new Param("b", "query", "xs:int"),
                          new Param("aProp", "query", "xs:int"),
                          new Param("c.a", "query", "xs:int"),
                          new Param("c.b", "query", "xs:int"),
                          new Param("c.d.a", "query", "xs:boolean"),
+                         new Param("c.d2.a", "query", "xs:boolean"),
                          new Param("e", "query", "xs:string", Collections.singleton("A")));
         
         assertEquals(0, DOMUtils.getChildrenWithName(requestEls.get(0), 

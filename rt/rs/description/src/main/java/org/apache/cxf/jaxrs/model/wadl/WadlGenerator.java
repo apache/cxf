@@ -851,6 +851,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             } else if (!parentBeanClasses.contains(paramCls)) {
                 parentBeanClasses.add(paramCls);
                 doWriteBeanParam(ori, sb, paramCls, entry.getKey(), name, parentBeanClasses, isJson);
+                parentBeanClasses.remove(paramCls);
             }
         }
     }
