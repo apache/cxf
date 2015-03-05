@@ -40,13 +40,14 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.keys.content.X509Data;
 
 /**
  * This class validates an X.509 V.3 certificate (received as a BinarySecurityToken or an X509Data
@@ -148,8 +149,18 @@ public class X509TokenValidator implements TokenValidator {
             ((Text)binarySecurity.getElement().getFirstChild()).setData(data);
         } else if (validateTarget.isDOMElement()) {
             try {
-                binarySecurity = new X509Security((Element)validateTarget.getToken(), new BSPEnforcer());
+                Document doc = DOMUtils.createDocument();
+                binarySecurity = new X509Security(doc);
+                binarySecurity.setEncodingType(BASE64_ENCODING);
+                X509Data x509Data = new X509Data((Element)validateTarget.getToken(), "");
+                if (x509Data.containsCertificate()) {
+                    X509Certificate cert = x509Data.itemCertificate(0).getX509Certificate();
+                    ((X509Security)binarySecurity).setX509Certificate(cert);
+                }
             } catch (WSSecurityException ex) {
+                LOG.log(Level.WARNING, "", ex);
+                return response;
+            } catch (XMLSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 return response;
             }
