@@ -269,7 +269,15 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         } catch (AddNumbersException e) {
             fail("should throw AddNumbersSubException");
         }
-
+        try (AutoCloseable c = (AutoCloseable)proxy) {
+            assertEquals("Result = 2", proxy.addNumbers(1, 1));
+        }
+        try {
+            proxy.addNumbers(1, 1);
+            fail("Proxy should be closed");
+        } catch (IllegalStateException t) {
+            //this is expected as the client is closed.
+        }
     }
 
     

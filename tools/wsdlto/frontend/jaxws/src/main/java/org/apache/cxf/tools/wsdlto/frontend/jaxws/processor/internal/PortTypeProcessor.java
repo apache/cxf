@@ -108,6 +108,13 @@ public class PortTypeProcessor extends AbstractProcessor {
                                       intf.getPackageName() + "." + intf.getName());
         
             interfaceInfo.setProperty("JavaInterface", intf);
+            
+            if (context.containsKey(ToolConstants.CFG_SEI_SUPER)) {
+                String supers[] = context.getArray(ToolConstants.CFG_SEI_SUPER);
+                for (String s : supers) {
+                    intf.addSuperInterface(s);
+                }
+            }
         }
         return intf;
     }

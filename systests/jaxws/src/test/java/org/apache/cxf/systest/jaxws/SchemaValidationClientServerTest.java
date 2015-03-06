@@ -23,10 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -93,56 +91,57 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
         Service service = new Service();
         assertNotNull(service);
 
-        ServicePortType greeter = service.getPort(portName, ServicePortType.class);
-        ClientProxy.getClient(greeter).getInInterceptors().add(new LoggingInInterceptor());
-        ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor());
-        updateAddressPort(greeter, PORT);
-
-        RequestIdType requestId = new RequestIdType();
-        requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
-        CkRequestType request = new CkRequestType();
-        request.setRequest(requestId);
-        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
-        RequestHeader header = new RequestHeader();
-        header.setHeaderValue("AABBCC");
-        CkResponseType response = greeter.ckR(request, header); 
-        assertEquals(response.getProduct().get(0).getAction().getStatus(), 4);
-        
-        try {
-            requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeeez");
-            request.setRequest(requestId);
-            greeter.ckR(request, header);
-            fail("should catch marshall exception as the invalid outgoing message per schema");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Marshalling Error"));
-            assertTrue(e.getMessage().contains("is not facet-valid with respect to pattern"));
-        }
-
-        try {
+        try (ServicePortType greeter = service.getPort(portName, ServicePortType.class)) {
+            greeter.getInInterceptors().add(new LoggingInInterceptor());
+            greeter.getOutInterceptors().add(new LoggingOutInterceptor());
+            updateAddressPort(greeter, PORT);
+    
+            RequestIdType requestId = new RequestIdType();
             requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+            CkRequestType request = new CkRequestType();
             request.setRequest(requestId);
-            header.setHeaderValue("AABBCCDDEEFFGGHHIIJJ");
+            greeter.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
+            RequestHeader header = new RequestHeader();
+            header.setHeaderValue("AABBCC");
+            CkResponseType response = greeter.ckR(request, header); 
+            assertEquals(response.getProduct().get(0).getAction().getStatus(), 4);
             
-            //Check if incoming validation on server side works, turn off outgoing
-            greeter.ckR(request, header);
-            fail("should catch marshall exception as the invalid outgoing message per schema");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Marshalling Error"));
-            assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
-        }
-        
-        try {
-            requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
-            request.setRequest(requestId);
-            header.setHeaderValue("AABBCCDDEEFFGGHHIIJJ");
+            try {
+                requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeeez");
+                request.setRequest(requestId);
+                greeter.ckR(request, header);
+                fail("should catch marshall exception as the invalid outgoing message per schema");
+            } catch (Exception e) {
+                assertTrue(e.getMessage().contains("Marshalling Error"));
+                assertTrue(e.getMessage().contains("is not facet-valid with respect to pattern"));
+            }
+    
+            try {
+                requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+                request.setRequest(requestId);
+                header.setHeaderValue("AABBCCDDEEFFGGHHIIJJ");
+                
+                //Check if incoming validation on server side works, turn off outgoing
+                greeter.ckR(request, header);
+                fail("should catch marshall exception as the invalid outgoing message per schema");
+            } catch (Exception e) {
+                assertTrue(e.getMessage().contains("Marshalling Error"));
+                assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+            }
             
-            //Check if incoming validation on server side works, turn off outgoing
-            ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);
-            greeter.ckR(request, header);
-            fail("should catch marshall exception as the invalid outgoing message per schema");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Could not validate soapheader "));
-            assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+            try {
+                requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+                request.setRequest(requestId);
+                header.setHeaderValue("AABBCCDDEEFFGGHHIIJJ");
+                
+                //Check if incoming validation on server side works, turn off outgoing
+                greeter.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);
+                greeter.ckR(request, header);
+                fail("should catch marshall exception as the invalid outgoing message per schema");
+            } catch (Exception e) {
+                assertTrue(e.getMessage().contains("Could not validate soapheader "));
+                assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+            }
         }
         
     }

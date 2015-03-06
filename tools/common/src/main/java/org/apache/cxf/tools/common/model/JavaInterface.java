@@ -45,6 +45,7 @@ public class JavaInterface implements JavaAnnotatable {
     private final List<JavaMethod> methods = new ArrayList<JavaMethod>();
     private final List<JAnnotation> annotations = new ArrayList<JAnnotation>();
     private final Set<String> imports = new TreeSet<String>();
+    private final List<String> supers = new ArrayList<String>();
 
     private String webserviceName;
     private Element handlerChains;
@@ -145,6 +146,9 @@ public class JavaInterface implements JavaAnnotatable {
         return this.location;
     }
 
+    public List<String> getSuperInterfaces() {
+        return supers;
+    }
     public List<JavaMethod> getMethods() {
         return methods;
     }
@@ -192,6 +196,16 @@ public class JavaInterface implements JavaAnnotatable {
         } else {
             methods.add(method);
         }
+    }
+    
+    public void addSuperInterface(String s) {
+        if (s.contains(".")) {
+            if (!s.startsWith("java.lang.")) {
+                addImport(s);
+            }
+            s = s.substring(s.lastIndexOf('.') + 1);
+        }
+        supers.add(s);
     }
 
     public String getPackageName() {

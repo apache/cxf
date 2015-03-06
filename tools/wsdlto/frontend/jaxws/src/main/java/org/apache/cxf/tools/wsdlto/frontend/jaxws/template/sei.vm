@@ -44,7 +44,7 @@ $annotation
 #if ($mark-generated == "true")
 @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
 #end
-public interface $intf.Name {
+public interface $intf.Name ${sei-superinterface-string}{
 #foreach ($method in $intf.Methods)
 
 #if ($method.JavaDoc != "")

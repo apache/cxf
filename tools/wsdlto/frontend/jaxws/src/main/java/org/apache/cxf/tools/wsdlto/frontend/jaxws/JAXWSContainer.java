@@ -50,6 +50,7 @@ public class JAXWSContainer extends WSDLToJavaContainer {
         set.add(ToolConstants.CFG_ASYNCMETHODS);
         set.add(ToolConstants.CFG_BAREMETHODS);
         set.add(ToolConstants.CFG_MIMEMETHODS);
+        set.add(ToolConstants.CFG_SEI_SUPER);
         return set;
     }
 

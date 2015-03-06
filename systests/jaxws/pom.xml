@@ -47,6 +47,11 @@
                             <defaultOptions>
                                 <extendedSoapHeaders>true</extendedSoapHeaders>
                                 <validate>basic</validate>
+                                <seiSuper>
+                                  <super>java.lang.AutoCloseable</super>
+                                  <super>javax.xml.ws.BindingProvider</super>
+                                  <super>org.apache.cxf.endpoint.Client</super>
+                                </seiSuper>
                             </defaultOptions>
                         </configuration>
                         <goals>

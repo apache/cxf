@@ -160,6 +160,11 @@ public class Option {
     String exceptionSuper;
 
     /**
+     * The superinterfaces to use for generated SEIs
+     */
+    List<String> seiSuper = new ArrayList<String>();
+
+    /**
      * Uses @Generated annotation in all generated java classes if the flag is set to true.
      */
     Boolean markGenerated;
@@ -389,6 +394,14 @@ public class Option {
     public void setExceptionSuper(String exceptionSuper) {
         this.exceptionSuper = exceptionSuper;
     }
+    public List<String> getSeiSuper() {
+        return seiSuper;
+    }
+    
+    public void setSeiSuper(List<String> seiSuper) {
+        this.seiSuper.clear();
+        this.seiSuper.addAll(seiSuper);
+    }
 
     public Boolean isMarkGenerated() {
         return markGenerated;
@@ -489,6 +502,7 @@ public class Option {
     public void merge(Option defaultOptions) {
         wsdlList = setIfNull(wsdlList, defaultOptions.wsdlList);
         exceptionSuper = setIfNull(exceptionSuper, defaultOptions.exceptionSuper);
+        seiSuper.addAll(defaultOptions.seiSuper);
         extendedSoapHeaders = setIfNull(extendedSoapHeaders, defaultOptions.extendedSoapHeaders);
         noTypes = setIfNull(noTypes, defaultOptions.noTypes);
         validateWsdl = setIfNull(validateWsdl, defaultOptions.validateWsdl);

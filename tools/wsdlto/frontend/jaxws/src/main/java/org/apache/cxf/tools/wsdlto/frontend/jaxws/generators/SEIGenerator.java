@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
@@ -121,6 +122,19 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                 }
                 clearAttributes();
                 setAttributes("intf", intf);
+                String seiSc = "";
+                for (String s : intf.getSuperInterfaces()) {
+                    if (!seiSc.isEmpty()) {
+                        seiSc += ", ";
+                    } else {
+                        seiSc = "extends ";
+                    }
+                    seiSc += s;
+                }
+                if (!StringUtils.isEmpty(seiSc)) {
+                    seiSc += " ";
+                }
+                setAttributes("sei-superinterface-string", seiSc);                        
                 setCommonAttributes();
     
                 doWrite(SEI_TEMPLATE, parseOutputName(intf.getPackageName(), intf.getName()));
@@ -128,7 +142,7 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
             }
         }
     }
-
+    
     public void register(final ClassCollector collector, String packageName, String fileName) {
         collector.addSeiClassName(packageName , fileName , packageName + "." + fileName);
     }

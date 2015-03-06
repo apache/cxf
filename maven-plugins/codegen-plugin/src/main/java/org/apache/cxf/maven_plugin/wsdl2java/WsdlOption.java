@@ -177,6 +177,9 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
                      + ToolConstants.CFG_FAULT_SERIAL_VERSION_UID);
         addIfNotNull(list, getExceptionSuper(), "-"
                      + ToolConstants.CFG_EXCEPTION_SUPER);
+        addList(list, "-" + ToolConstants.CFG_SEI_SUPER, true,
+                getSeiSuper());
+        
         addIfTrue(list, isAutoNameResolution(), "-" 
                      + ToolConstants.CFG_AUTORESOLVE);
         addIfTrue(list, isNoAddressBinding(), "-" 

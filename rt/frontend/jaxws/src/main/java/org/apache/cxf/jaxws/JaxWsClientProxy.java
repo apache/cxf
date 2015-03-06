@@ -112,7 +112,8 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         try {
             if (method.getDeclaringClass().equals(BindingProvider.class)
                 || method.getDeclaringClass().equals(Object.class)
-                || method.getDeclaringClass().equals(Closeable.class)) {
+                || method.getDeclaringClass().equals(Closeable.class)
+                || method.getDeclaringClass().equals(AutoCloseable.class)) {
                 return method.invoke(this, params);
             } else if (method.getDeclaringClass().isInstance(client)) {
                 return method.invoke(client, params);
