@@ -33,6 +33,7 @@
         <entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" value="sn"/>
         <entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" value="mail"/>
         <entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country" value="c"/>
+        <entry key="http://custom/x509" value="usercertificate"/>
     </util:map>
     <bean id="testClaimsHandler" class="org.apache.cxf.sts.claims.LdapClaimsHandler">
         <property name="ldapTemplate" ref="ldapTemplate" />

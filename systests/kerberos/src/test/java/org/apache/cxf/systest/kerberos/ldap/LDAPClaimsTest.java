@@ -19,11 +19,14 @@
 
 package org.apache.cxf.systest.kerberos.ldap;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -266,7 +269,53 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             );
         }
     }
+    
+    @org.junit.Test
+    public void testRetrieveBinaryClaims() throws Exception {
+        LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
 
+        String user = props.getProperty("binaryClaimUser");
+        Assert.notNull(user, "Property 'binaryClaimUser' not configured");
+
+        ClaimCollection requestedClaims = createRequestClaimCollection();
+        // Ask for the (binary) cert as well
+        Claim claim = new Claim();
+        claim.setClaimType(URI.create("http://custom/x509"));
+        claim.setOptional(true);
+        requestedClaims.add(claim);
+        
+        List<URI> expectedClaims = new ArrayList<URI>();
+        expectedClaims.add(ClaimTypes.FIRSTNAME);
+        expectedClaims.add(ClaimTypes.LASTNAME);
+        expectedClaims.add(ClaimTypes.EMAILADDRESS);
+        expectedClaims.add(URI.create("http://custom/x509"));
+       
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal(user));
+        ProcessedClaimCollection retrievedClaims = 
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
+
+        Assert.isTrue(
+                      retrievedClaims.size() == expectedClaims.size(), 
+                      "Retrieved number of claims [" + retrievedClaims.size() 
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+        );
+
+        boolean foundCert = false;
+        for (ProcessedClaim c : retrievedClaims) {
+            if (URI.create("http://custom/x509").equals(c.getClaimType())) {
+                foundCert = true;
+                Assert.isTrue(c.getValues().get(0) instanceof byte[]);
+                CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+                InputStream in = new ByteArrayInputStream((byte[])c.getValues().get(0));
+                X509Certificate cert = (X509Certificate)certFactory.generateCertificate(in);
+                Assert.isTrue(cert != null);
+            }
+        }
+        
+        Assert.isTrue(foundCert);
+    }
+    
     private ClaimCollection createRequestClaimCollection() {
         ClaimCollection claims = new ClaimCollection();
         Claim claim = new Claim();

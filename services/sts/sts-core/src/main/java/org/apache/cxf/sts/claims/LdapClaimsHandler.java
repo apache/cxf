@@ -234,32 +234,38 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                     NamingEnumeration<?> list = (NamingEnumeration<?>)attr.getAll();
                     while (list.hasMore()) {
                         Object obj = list.next();
-                        if (!(obj instanceof String)) {
+                        if (obj instanceof String) {
+                            String itemValue = (String)obj;
+                            if (this.isX500FilterEnabled()) {
+                                try {
+                                    X500Principal x500p = new X500Principal(itemValue);
+                                    itemValue = x500p.getName();
+                                    int index = itemValue.indexOf('=');
+                                    itemValue = itemValue.substring(index + 1, itemValue.indexOf(',', index));
+                                } catch (Exception ex) {
+                                    //Ignore, not X500 compliant thus use the whole string as the value
+                                }
+                            }
+                            claimValue.append(itemValue);
+                            if (list.hasMore()) {
+                                claimValue.append(this.getDelimiter());
+                            }
+                        } else if (obj instanceof byte[]) {
+                            // Just store byte[]
+                            c.addValue(obj);
+                        } else {
                             LOG.warning("LDAP attribute '" + ldapAttribute 
                                     + "' has got an unsupported value type");
                             break;
-                        }
-                        String itemValue = (String)obj;
-                        if (this.isX500FilterEnabled()) {
-                            try {
-                                X500Principal x500p = new X500Principal(itemValue);
-                                itemValue = x500p.getName();
-                                int index = itemValue.indexOf('=');
-                                itemValue = itemValue.substring(index + 1, itemValue.indexOf(',', index));
-                            } catch (Exception ex) {
-                                //Ignore, not X500 compliant thus use the whole string as the value
-                            }
-                        }
-                        claimValue.append(itemValue);
-                        if (list.hasMore()) {
-                            claimValue.append(this.getDelimiter());
                         }
                     }
                 } catch (NamingException ex) {
                     LOG.warning("Failed to read value of LDAP attribute '" + ldapAttribute + "'");
                 }
                 
-                c.addValue(claimValue.toString());
+                if (claimValue.length() > 0) {
+                    c.addValue(claimValue.toString());
+                }
                 // c.setIssuer(issuer);
                 // c.setOriginalIssuer(originalIssuer);
                 // c.setNamespace(namespace);
