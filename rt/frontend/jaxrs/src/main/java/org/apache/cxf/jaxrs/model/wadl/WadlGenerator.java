@@ -767,6 +767,7 @@ public class WadlGenerator implements RequestHandler {
             } else if (!parentBeanClasses.contains(paramCls)) {
                 parentBeanClasses.add(paramCls);
                 doWriteBeanParam(sb, paramCls, entry.getKey(), name, parentBeanClasses, isJson);
+                parentBeanClasses.remove(paramCls); 
             }
         }
     }
