@@ -84,6 +84,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -213,10 +214,7 @@ public abstract class AbstractOperation {
         }
         
         if (tokenReference.isUseKeyIdentifier()) {
-            String identifier = tokenReference.getIdentifier();
-            if (identifier.charAt(0) == '#') {
-                identifier = identifier.substring(1);
-            }
+            String identifier = WSSecurityUtil.getIDFromReference(tokenReference.getIdentifier());
             
             KeyIdentifierType keyIdentifierType = 
                 QNameConstants.WSSE_FACTORY.createKeyIdentifierType();

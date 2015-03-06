@@ -85,6 +85,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Constants;
 
 /**
@@ -738,9 +739,8 @@ public class RequestParser {
         }
    
         // Find processed token corresponding to the URI
-        if (referenceURI.charAt(0) == '#') {
-            referenceURI = referenceURI.substring(1);
-        }
+        referenceURI = WSSecurityUtil.getIDFromReference(referenceURI);
+
         MessageContext messageContext = wsContext.getMessageContext();
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));

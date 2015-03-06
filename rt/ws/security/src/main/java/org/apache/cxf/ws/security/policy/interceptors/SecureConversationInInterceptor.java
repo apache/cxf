@@ -28,7 +28,6 @@ import java.util.Properties;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -62,6 +61,7 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -350,6 +350,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             writer.writeStartElement(prefix, "RequestedSecurityToken", namespace);
             SecurityContextToken sct =
                 new SecurityContextToken(NegotiationUtils.getWSCVersion(tokenType), writer.getDocument());
+            WSSConfig wssConfig = WSSConfig.getNewInstance();
+            sct.setID(wssConfig.getIdAllocator().createId("sctId-", sct));
             
             Date created = new Date();
             Date expires = new Date();

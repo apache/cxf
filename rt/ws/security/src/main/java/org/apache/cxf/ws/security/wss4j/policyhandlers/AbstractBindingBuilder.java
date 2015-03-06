@@ -445,10 +445,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 secToken.setToken(clone);
                 addSupportingElement(clone);
                 
-                String id = secToken.getId();
-                if (id != null && id.charAt(0) == '#') {
-                    id = id.substring(1);
-                }
+                String id = WSSecurityUtil.getIDFromReference(secToken.getId());
+
                 if (suppTokens.isEncryptedToken()) {
                     WSEncryptionPart part = new WSEncryptionPart(id, "Element");
                     part.setElement(clone);
@@ -661,10 +659,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     part.setId(secRef.getID());
                     part.setElement(clone);
                 } else {
-                    String id = token.getId();
-                    if (id != null && id.charAt(0) == '#') {
-                        id = id.substring(1);
-                    }
+                    String id = WSSecurityUtil.getIDFromReference(token.getId());
+
                     part = new WSEncryptionPart(id);
                     part.setElement(token.getToken());
                 }

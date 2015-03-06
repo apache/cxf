@@ -35,6 +35,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
 /**
@@ -118,6 +119,8 @@ public class SCTProvider implements TokenProvider {
             Document doc = DOMUtils.createDocument();
             SecurityContextToken sct =
                 new SecurityContextToken(getWSCVersion(tokenRequirements.getTokenType()), doc);
+            WSSConfig wssConfig = WSSConfig.getNewInstance();
+            sct.setID(wssConfig.getIdAllocator().createId("sctId-", sct));
     
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(sct.getElement());
