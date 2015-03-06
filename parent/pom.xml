@@ -112,7 +112,7 @@
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.3.7</cxf.jettison.version>
         <cxf.jetty8.version>8.1.15.v20140411</cxf.jetty8.version>
-        <cxf.jetty9.version>9.2.3.v20140905</cxf.jetty9.version>
+        <cxf.jetty9.version>9.2.9.v20150224</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
         <cxf.jetty.osgi.version>[8.1,10)</cxf.jetty.osgi.version>
         <cxf.jibx.version>1.2.6</cxf.jibx.version>
