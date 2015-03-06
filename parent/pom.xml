@@ -43,12 +43,10 @@
         <cxf.codegen.jvmArgs />
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <!-- stuff related to ASM -->
-        <!-- use asm 3.x for now to avoid breaking 3rd party components -->
-        <cxf.asm.groupId>asm</cxf.asm.groupId>
+        <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
-        <cxf.asm.version>3.3.1</cxf.asm.version>
-        <cxf.asm.bundle.version>3.3.1_1</cxf.asm.bundle.version>
-        <cxf.osgi.asm.version>[2.0,6)</cxf.osgi.asm.version>
+        <cxf.asm.version>5.0.3</cxf.asm.version>
+        <cxf.osgi.asm.version>[3.0,6)</cxf.osgi.asm.version>
         <!-- OSGi related properties -->
         <cxf.fragment.host />
         <cxf.bundle.activator />

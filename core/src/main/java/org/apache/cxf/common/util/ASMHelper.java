@@ -131,6 +131,7 @@ public class ASMHelper {
         public static int ACC_STATIC = 0;
         public static int V1_5 = 0;
         public static int V1_6 = 0;
+        public static int V1_7 = 0;
         public static int ACC_ABSTRACT = 0;
         public static int ACC_INTERFACE = 0;
         public static int ACC_SYNTHETIC = 0;

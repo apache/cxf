@@ -57,7 +57,6 @@ public final class CorbaAnyHelper {
         if ("com.sun.corba.se.impl.corba.AnyImpl".equals(value.getClass().getName())) {
             value = createFixedAny(orb, value);
         }
-        
         return value;
     }
 
@@ -290,7 +289,7 @@ public final class CorbaAnyHelper {
         ClassWriter cw = helper.createClassWriter();
         FieldVisitor fv;
 
-        cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
+        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
                  "org/apache/cxf/binding/corba/utils/FixedAnyImpl", 
                  null, "com/sun/corba/se/impl/corba/AnyImpl", null);
 
@@ -301,8 +300,8 @@ public final class CorbaAnyHelper {
         addFixedAnyConstructor(helper, cw);
         addInsertOverride(helper, cw);
         addExtractOverride(helper, cw);
-        addReadOverride(helper, cw);
         addWriteOverride(helper, cw);
+        addReadOverride(helper, cw);
         
         cw.visitEnd();
 
@@ -337,7 +336,7 @@ public final class CorbaAnyHelper {
                           "obj", "Lorg/omg/CORBA/portable/Streamable;");
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable", 
-                           "_read", "(Lorg/omg/CORBA/portable/InputStream;)V", false);
+                           "_read", "(Lorg/omg/CORBA/portable/InputStream;)V", true);
         Label l3 = helper.createLabel();
         mv.visitJumpInsn(Opcodes.GOTO, l3);
         mv.visitLabel(l1);
@@ -379,10 +378,11 @@ public final class CorbaAnyHelper {
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                           "obj", "Lorg/omg/CORBA/portable/Streamable;");
+        
+        Label l3 = helper.createLabel();
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable",
-                           "_write", "(Lorg/omg/CORBA/portable/OutputStream;)V", false);
-        Label l3 = helper.createLabel();
+                           "_write", "(Lorg/omg/CORBA/portable/OutputStream;)V", true);
         mv.visitJumpInsn(Opcodes.GOTO, l3);
         mv.visitLabel(l1);
         mv.visitLineNumber(64, l1);
