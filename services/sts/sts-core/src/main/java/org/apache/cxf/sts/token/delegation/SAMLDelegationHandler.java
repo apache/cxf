@@ -24,9 +24,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
@@ -66,7 +66,7 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
         ReceivedToken delegateTarget = tokenParameters.getToken();
         response.setToken(delegateTarget);
         
-        if (!delegateTarget.isDOMElement()) {
+        if (delegateTarget.getState() != STATE.VALID || !delegateTarget.isDOMElement()) {
             return response;
         }
         
