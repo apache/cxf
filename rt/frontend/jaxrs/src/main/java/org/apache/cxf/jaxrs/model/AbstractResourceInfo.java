@@ -309,7 +309,7 @@ public abstract class AbstractResourceInfo {
                                  V proxy) {
         Map<T, V> proxies = proxyMap.get(serviceClass);
         if (proxies == null) {
-            proxies = new HashMap<T, V>();
+            proxies = Collections.synchronizedMap(new WeakHashMap<T, V>());
             proxyMap.put(serviceClass, proxies);
         }
         if (!proxies.containsKey(f)) {
