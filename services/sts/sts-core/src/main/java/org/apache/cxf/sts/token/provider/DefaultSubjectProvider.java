@@ -27,6 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
@@ -61,7 +63,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
     
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultSubjectProvider.class);
     private String subjectNameQualifier = "http://cxf.apache.org/sts";
-    private String subjectNameIDFormat;
+    private String subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_UNSPECIFIED;
     
     /**
      * Set the SubjectNameQualifier.
@@ -121,8 +123,23 @@ public class DefaultSubjectProvider implements SubjectProvider {
             throw new STSException("Error in getting principal", STSException.REQUEST_FAILED);
         }
         
+        String subjectName = principal.getName();
+        if (SAML2Constants.NAMEID_FORMAT_UNSPECIFIED.equals(subjectNameIDFormat)
+            && principal instanceof X500Principal) {
+            // Just use the "cn" instead of the entire DN
+            try {
+                String principalName = principal.getName();
+                int index = principalName.indexOf('=');
+                principalName = principalName.substring(index + 1, principalName.indexOf(',', index));
+                subjectName = principalName;
+            } catch (Throwable ex) {
+                subjectName = principal.getName();
+                //Ignore, not X500 compliant thus use the whole string as the value
+            }
+        }
+        
         SubjectBean subjectBean = 
-            new SubjectBean(principal.getName(), subjectNameQualifier, confirmationMethod);
+            new SubjectBean(subjectName, subjectNameQualifier, confirmationMethod);
         LOG.fine("Creating new subject with principal name: " + principal.getName());
         if (subjectNameIDFormat != null && subjectNameIDFormat.length() > 0) {
             subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);

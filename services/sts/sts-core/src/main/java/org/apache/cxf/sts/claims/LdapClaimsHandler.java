@@ -242,7 +242,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                                     itemValue = x500p.getName();
                                     int index = itemValue.indexOf('=');
                                     itemValue = itemValue.substring(index + 1, itemValue.indexOf(',', index));
-                                } catch (Exception ex) {
+                                } catch (Throwable ex) {
                                     //Ignore, not X500 compliant thus use the whole string as the value
                                 }
                             }
