@@ -24,14 +24,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
+<<<<<<< HEAD
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+=======
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.WSConstants;
+>>>>>>> 57822c1... Make sure delegation is only allowed if the token is valid for the SAML case
 import org.opensaml.saml1.core.AudienceRestrictionCondition;
 
 /**
@@ -66,7 +74,7 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
         ReceivedToken delegateTarget = tokenParameters.getToken();
         response.setToken(delegateTarget);
         
-        if (!delegateTarget.isDOMElement()) {
+        if (delegateTarget.getState() != STATE.VALID || !delegateTarget.isDOMElement()) {
             return response;
         }
         
