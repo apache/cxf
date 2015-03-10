@@ -96,7 +96,7 @@ public class SwaggerFeature extends AbstractFeature {
         
         if ((resourceInfo != null) 
             && (getResourcePackage() == null || getResourcePackage().length() == 0)) {
-            setResourcePackage(resourceInfo.getResourceClass().getPackage().getName());
+            setResourcePackage(resourceInfo.getServiceClass().getPackage().getName());
         }
     }
     
