@@ -53,6 +53,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.validation.Schema;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.Customer;
@@ -87,20 +88,21 @@ public class ProviderFactoryTest extends Assert {
     
     @Before
     public void setUp() {
-        ProviderFactory.getInstance().clearProviders();
         AbstractResourceInfo.clearAllMaps();
     }
     
     @Test
     public void testMultipleFactories() {
-        assertNotSame(ProviderFactory.getInstance(), ProviderFactory.getSharedInstance());
+        assertNotSame(ProviderFactory.createInstance(BusFactory.newInstance().createBus()), 
+                      ProviderFactory.getSharedInstance());
         assertSame(ProviderFactory.getSharedInstance(), ProviderFactory.getSharedInstance());
-        assertNotSame(ProviderFactory.getInstance(), ProviderFactory.getInstance());
+        assertNotSame(ProviderFactory.createInstance(BusFactory.newInstance().createBus()), 
+                      ProviderFactory.createInstance(BusFactory.newInstance().createBus()));
     }
     
     @Test
     public void testCustomWadlHandler() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         assertEquals(1, pf.getRequestHandlers().size());
         assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
         
@@ -113,7 +115,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testCustomTestHandler() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         assertEquals(1, pf.getRequestHandlers().size());
         assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
         
@@ -126,7 +128,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testCustomTestAndWadlHandler() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         assertEquals(1, pf.getRequestHandlers().size());
         assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
         
@@ -143,7 +145,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testDefaultJaxbProvider() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         doTestDefaultJaxbProviderCloned(pf, "http://localhost:8080/base/");
         checkJaxbProvider(pf);
     }
@@ -157,7 +159,7 @@ public class ProviderFactoryTest extends Assert {
     
     
     public void doTestDefaultJaxbProviderClonedMultipleThreads() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         ThreadPoolExecutor executor = new ThreadPoolExecutor(50, 50, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
@@ -224,7 +226,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testCustomJaxbProvider() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
         pf.registerUserProvider(provider);
         MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(Book.class, null, null, 
@@ -238,7 +240,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testDataSourceReader() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new DataSourceProvider<Object>());
         MessageBodyReader<DataSource> reader = pf.createMessageBodyReader(
               DataSource.class, null, null, 
@@ -252,7 +254,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testDataSourceWriter() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new DataSourceProvider<Object>());
         MessageBodyWriter<DataSource> writer = pf.createMessageBodyWriter(
               DataSource.class, null, null, 
@@ -266,7 +268,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testNoDataSourceWriter() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new DataSourceProvider<Object>());
         MessageBodyWriter<DataSource> writer = pf.createMessageBodyWriter(
               DataSource.class, null, null, 
@@ -277,7 +279,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testSchemaLocations() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.setSchemaLocations(Collections.singletonList("classpath:/test.xsd"));
         MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(Book.class, null, null, 
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
@@ -293,7 +295,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testGetFactoryInboundMessage() {
-        ProviderFactory factory = ProviderFactory.getInstance();
+        ProviderFactory factory = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
@@ -307,7 +309,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testDefaultUserExceptionMappers() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         ExceptionMapper<?> mapper = 
             pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertNotNull(mapper);
@@ -321,7 +323,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testExceptionMappersHierarchy1() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
         pf.registerUserProvider(wm);
         assertSame(wm, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
@@ -334,7 +336,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testExceptionMappersHierarchy2() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         
         TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper(); 
         pf.registerUserProvider(rm);
@@ -349,7 +351,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testExceptionMappersHierarchyWithGenerics() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         RuntimeExceptionMapper1 exMapper1 = new RuntimeExceptionMapper1(); 
         pf.registerUserProvider(exMapper1);
         RuntimeExceptionMapper2 exMapper2 = new RuntimeExceptionMapper2(); 
@@ -361,7 +363,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testMessageBodyHandlerHierarchy() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         List<Object> providers = new ArrayList<Object>();
         BookReaderWriter bookHandler = new BookReaderWriter();
         providers.add(bookHandler);
@@ -384,7 +386,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testMessageBodyWriterNoTypes() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         List<Object> providers = new ArrayList<Object>();
         SuperBookReaderWriter2<SuperBook> superBookHandler = new SuperBookReaderWriter2<SuperBook>();
         providers.add(superBookHandler);
@@ -399,7 +401,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testSortEntityProviders() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new TestStringProvider());
         pf.registerUserProvider(new PrimitiveTextProvider<Object>());
         
@@ -417,7 +419,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testParameterHandlerProvider() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         ParameterHandler<Customer> h = new CustomerParameterHandler();
         pf.registerUserProvider(h);
         ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class, null);
@@ -434,7 +436,7 @@ public class ProviderFactoryTest extends Assert {
     public void testGetBinaryProvider() throws Exception {
         verifyProvider(byte[].class, BinaryDataProvider.class, "*/*");
         verifyProvider(InputStream.class, BinaryDataProvider.class, "image/png");
-        MessageBodyWriter<File> writer = ProviderFactory.getInstance()
+        MessageBodyWriter<File> writer = ProviderFactory.createInstance(BusFactory.newInstance().createBus())
             .createMessageBodyWriter(File.class, null, null, MediaType.APPLICATION_OCTET_STREAM_TYPE, 
                                      new MessageImpl());
         assertTrue(BinaryDataProvider.class == writer.getClass());
@@ -442,7 +444,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testGetComplexProvider() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new ComplexMessageBodyReader());
         Message m = new MessageImpl();
         Exchange ex = new ExchangeImpl();
@@ -456,7 +458,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testGetComplexProvider2() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new ComplexMessageBodyReader());
         MessageBodyReader<Book> reader =
             pf.createMessageBodyReader(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE, 
@@ -468,7 +470,7 @@ public class ProviderFactoryTest extends Assert {
         throws Exception {
         
         if (pf == null) {
-            pf = ProviderFactory.getInstance();
+            pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         }
         
         MediaType mType = MediaType.valueOf(mediaType);
@@ -495,14 +497,14 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testGetStringProviderUsingProviderDeclaration() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new TestStringProvider());
         verifyProvider(pf, String.class, TestStringProvider.class, "text/html");
     }    
     
     @Test
     public void testRegisterCustomJSONEntityProvider() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new CustomJSONProvider());
         verifyProvider(pf, Book.class, CustomJSONProvider.class, 
                        "application/json");
@@ -510,7 +512,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testComplexExceptionMapper() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new SecurityExceptionMapper());
         ExceptionMapper<SecurityException> mapper = 
             pf.createExceptionMapper(SecurityException.class, new MessageImpl());
@@ -522,7 +524,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testRegisterCustomResolver() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new JAXBContextProvider());
         Message message = prepareMessage("*/*", null);
         ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
@@ -534,7 +536,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testRegisterCustomResolver2() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new JAXBContextProvider());
         pf.registerUserProvider(new JAXBContextProvider2());
         Message message = prepareMessage("text/xml+b", null);
@@ -547,7 +549,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testNoCustomResolver() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new JAXBContextProvider());
         pf.registerUserProvider(new JAXBContextProvider2());
         Message message = prepareMessage("text/xml+c", null);
@@ -557,7 +559,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testCustomResolverOut() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new JAXBContextProvider());
         pf.registerUserProvider(new JAXBContextProvider2());
         Message message = prepareMessage("text/xml+c", "text/xml+a");
@@ -569,7 +571,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testCustomResolverProxy() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new JAXBContextProvider());
         pf.registerUserProvider(new JAXBContextProvider2());
         Message message = prepareMessage("text/xml+*", null);
@@ -599,7 +601,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testRegisterCustomEntityProvider() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(new CustomWidgetProvider());
         
         verifyProvider(pf, org.apache.cxf.jaxrs.resources.Book.class, CustomWidgetProvider.class, 
@@ -729,7 +731,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testSetSchemasFromClasspath() {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         pf.registerUserProvider(provider);
         
         List<String> locations = new ArrayList<String>();
@@ -972,7 +974,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testBadCustomExceptionMappersHierarchyWithGenerics() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         BadExceptionMapperA badExceptionMapperA = new BadExceptionMapperA();
         pf.registerUserProvider(badExceptionMapperA);
         BadExceptionMapperB badExceptionMapperB = new BadExceptionMapperB();
@@ -989,7 +991,7 @@ public class ProviderFactoryTest extends Assert {
 
     @Test
     public void testGoodExceptionMappersHierarchyWithGenerics() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.createInstance(BusFactory.newInstance().createBus());
         GoodRuntimeExceptionAMapper runtimeExceptionAMapper = new GoodRuntimeExceptionAMapper();
         pf.registerUserProvider(runtimeExceptionAMapper);
         GoodRuntimeExceptionBMapper runtimeExceptionBMapper = new GoodRuntimeExceptionBMapper();
