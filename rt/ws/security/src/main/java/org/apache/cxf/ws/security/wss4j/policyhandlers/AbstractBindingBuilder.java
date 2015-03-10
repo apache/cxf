@@ -22,6 +22,7 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -164,7 +165,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     protected Set<WSEncryptionPart> encryptedTokensList = new HashSet<WSEncryptionPart>();
 
-    protected List<byte[]> signatures = new ArrayList<byte[]>();
+    protected Set<Integer> signatures = new HashSet<>();
 
     protected Element bottomUpElement;
     protected Element topDownElement;
@@ -1829,7 +1830,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
                     sig.computeSignature(referenceList, false, null);
                     
-                    signatures.add(sig.getSignatureValue());
+                    addSig(sig.getSignatureValue());
                     if (isSigProtect) {
                         WSEncryptionPart part = new WSEncryptionPart(sig.getId(), "Element");
                         encryptedTokensList.add(part);
@@ -1966,7 +1967,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         //Do signature
         dkSign.computeSignature(referenceList, false, null);
         
-        signatures.add(dkSign.getSignatureValue());
+        addSig(dkSign.getSignatureValue());
     }
     
     private void doSymmSignature(AbstractToken policyToken, SecurityToken tok,
@@ -2032,7 +2033,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
         //Do signature
         sig.computeSignature(referenceList, false, null);
-        signatures.add(sig.getSignatureValue());
+        addSig(sig.getSignatureValue());
     }
     
     protected void addSupportingTokens(List<WSEncryptionPart> sigs) throws WSSecurityException {
@@ -2240,5 +2241,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             return signedParts;
         }
 
+    }
+    
+    protected void addSig(byte[] val) {
+        if (val != null && val.length > 0) {
+            signatures.add(Arrays.hashCode(val));
+        }
     }
 }

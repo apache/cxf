@@ -211,7 +211,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 //Sign the message
                 //We should use the same key in the case of EncryptBeforeSig
                 if (sigParts.size() > 0) {
-                    signatures.add(this.doSignature(sigParts, encryptionWrapper, encryptionToken, 
+                    addSig(this.doSignature(sigParts, encryptionWrapper, encryptionToken, 
                                                     tok, attached));
                 }
                 
@@ -338,7 +338,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             sigs.addAll(getSignedParts(null));
             if (isRequestor()) {
                 if (!sigs.isEmpty()) {
-                    signatures.add(doSignature(sigs, sigAbstractTokenWrapper, sigToken, sigTok, tokIncluded));
+                    addSig(
+                        doSignature(sigs, sigAbstractTokenWrapper, sigToken, sigTok, tokIncluded));
                 }
                 doEndorse();
             } else {

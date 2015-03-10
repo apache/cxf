@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,7 +33,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
@@ -98,7 +98,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         //
         // Save the signature for future confirmation
         //
-        List<WSHandlerResult> sigv = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.SEND_SIGV));
+        Set<Integer> sigv = CastUtils.cast((Set<?>)msg.get(WSHandlerConstants.SEND_SIGV));
         assertNotNull(sigv);
         assertTrue(sigv.size() != 0);
         
@@ -144,7 +144,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
     
    
     private void testSignatureConfirmationResponse(
-        List<WSHandlerResult> sigSaved,
+        Set<Integer> sigSaved,
         List<WSHandlerResult> sigReceived
     ) throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");

@@ -665,7 +665,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     dkSign.computeSignature(referenceList, true, bottomUpElement);
                 }
                 bottomUpElement = dkSign.getSignatureElement();
-                signatures.add(dkSign.getSignatureValue());
+                addSig(dkSign.getSignatureValue());
                 
                 mainSigId = dkSign.getSignatureId();
             } catch (Exception ex) {
@@ -704,7 +704,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 }
             }
             
-            signatures.add(sig.getSignatureValue());
+            addSig(sig.getSignatureValue());
                         
             mainSigId = sig.getId();
         }

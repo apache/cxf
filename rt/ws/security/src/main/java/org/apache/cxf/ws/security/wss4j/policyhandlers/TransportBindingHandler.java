@@ -126,12 +126,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         
     }
     
-    private void addSig(byte[] val) {
-        if (val != null && val.length > 0) {
-            signatures.add(val);
-        }
-    }
-    
     public void handleBinding() {
         WSSecTimestamp timestamp = createTimestamp();
         handleLayout(timestamp);
