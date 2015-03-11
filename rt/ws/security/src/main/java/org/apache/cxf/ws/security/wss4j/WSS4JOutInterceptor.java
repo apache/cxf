@@ -228,11 +228,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                     }
                 }
     
-                /*
-                 * Now we perform some set-up for UsernameToken and Signature
-                 * functions. No need to do it for encryption only. Check if
-                 * username is available and then get a passowrd.
-                 */
+                // Check to see if we require a username (+ if it's missing)
                 boolean userNameRequired = false;
                 for (HandlerAction handlerAction : actions) {
                     if ((handlerAction.getAction() == WSConstants.SIGN
@@ -246,13 +242,10 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 }
                 if (userNameRequired && (reqData.getUsername() == null || reqData.getUsername().equals(""))
                         && (String)getOption(WSHandlerConstants.SIGNATURE_USER) == null) {
-                    /*
-                     * We need a username - if none throw an SoapFault. For
-                     * encryption there is a specific parameter to get a username.
-                     */
                     throw new SoapFault(new Message("NO_USERNAME", LOG), version
                             .getReceiver());
                 }
+            
                 if (doDebug) {
                     LOG.fine("Actor: " + reqData.getActor());
                 }
