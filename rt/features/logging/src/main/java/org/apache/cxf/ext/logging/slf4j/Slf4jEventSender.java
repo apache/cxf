@@ -33,7 +33,7 @@ public class Slf4jEventSender implements LogEventSender {
 
     @Override
     public void send(LogEvent event) {
-        String cat = "org.apache.cxf.services." + event.getPortTypeName() + "." + event.getType();
+        String cat = "org.apache.cxf.services." + event.getPortTypeName().getLocalPart() + "." + event.getType();
         Logger log = LoggerFactory.getLogger(cat);
         Set<String> keys = new HashSet<String>(); 
         try {

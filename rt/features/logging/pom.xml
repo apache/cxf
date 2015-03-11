@@ -9,9 +9,9 @@
         <version>3.1.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-    <artifactId>logging</artifactId>
-    <name>logging</name>
     <groupId>org.apache.cxf.ext</groupId>
+    <artifactId>cxf-rt-ext-logging</artifactId>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
@@ -23,16 +23,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-bindings-soap</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.7</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

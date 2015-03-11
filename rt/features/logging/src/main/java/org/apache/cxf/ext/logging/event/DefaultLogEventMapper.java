@@ -32,7 +32,7 @@ import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.cxf.binding.soap.SoapBinding;
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -183,7 +183,8 @@ public class DefaultLogEventMapper implements LogEventMapper {
      * @return
      */
     private boolean isSOAPMessage(Message message) {
-        return message.getExchange().getBinding() instanceof SoapBinding;
+        Binding binding = message.getExchange().getBinding();
+        return binding != null && binding.getClass().getSimpleName().equals("SoapBinding");
     }
 
     /**
