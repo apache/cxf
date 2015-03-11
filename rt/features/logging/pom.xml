@@ -10,7 +10,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <groupId>org.apache.cxf.ext</groupId>
-    <artifactId>cxf-rt-ext-logging</artifactId>
+    <artifactId>cxf-rt-features-logging</artifactId>
     <packaging>bundle</packaging>
 
     <dependencies>
