@@ -39,6 +39,7 @@
         <module>databinding/jibx</module>
         <module>bindings</module>
         <module>features/clustering</module>
+        <module>features/logging</module>
         <module>frontend/simple</module>
         <module>frontend/jaxws</module>
         <module>frontend/jaxrs</module>
