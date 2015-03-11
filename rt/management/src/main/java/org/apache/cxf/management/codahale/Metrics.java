@@ -22,6 +22,8 @@ package org.apache.cxf.management.codahale;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.MalformedObjectNameException;
@@ -29,6 +31,7 @@ import javax.management.ObjectName;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;
 import com.codahale.metrics.Timer;
@@ -36,6 +39,7 @@ import com.codahale.metrics.Timer;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
+import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.MessageSenderInterceptor;
 import org.apache.cxf.interceptor.ServiceInvokerInterceptor;
@@ -95,11 +99,14 @@ public class Metrics {
         ResponseTimeMessageInInterceptor in = new ResponseTimeMessageInInterceptor();
         ResponseTimeMessageInOneWayInterceptor oneway = new ResponseTimeMessageInOneWayInterceptor();
         ResponseTimeMessageOutInterceptor out = new ResponseTimeMessageOutInterceptor();
+        CountingOutInterceptor countingOut = new CountingOutInterceptor();
         //ResponseTimeMessageInvokerInterceptor invoker = new ResponseTimeMessageInvokerInterceptor();
         
         bus.getInInterceptors().add(in);
         bus.getInInterceptors().add(oneway);
+        bus.getOutInterceptors().add(countingOut);
         bus.getOutInterceptors().add(out);
+        bus.getOutFaultInterceptors().add(countingOut);
         bus.getOutFaultInterceptors().add(out);
         //bus.setExtension(this, CounterRepository.class); 
         
@@ -115,6 +122,8 @@ public class Metrics {
         Timer checkedApplicationFaults;
         Timer runtimeFaults;
         Timer logicalRuntimeFaults;
+        Meter incomingData;
+        Meter outgoingData;
      
         Context start() {
             inFlight.inc();
@@ -209,6 +218,8 @@ public class Metrics {
             ti.runtimeFaults = registry.timer(baseName + "Attribute=Runtime Faults");
             ti.logicalRuntimeFaults = registry.timer(baseName + "Attribute=Logical Runtime Faults");
             ti.inFlight = registry.counter(baseName + "Attribute=In Flight");
+            ti.incomingData = registry.meter(baseName + "Attribute=Data Read");
+            ti.outgoingData = registry.meter(baseName + "Attribute=Data Written");
             endpoint.put(TimerInfo.class.getName(), ti);
             endpoint.addCleanupHook(new Closeable() {
                 public void close() throws IOException {
@@ -219,6 +230,8 @@ public class Metrics {
                         registry.remove(baseName + "Attribute=Runtime Faults");
                         registry.remove(baseName + "Attribute=Logical Runtime Faults");
                         registry.remove(baseName + "Attribute=In Flight");
+                        registry.remove(baseName + "Attribute=Data Read");
+                        registry.remove(baseName + "Attribute=Data Written");
                         endpoint.remove(TimerInfo.class.getName());
                         System.out.println(endpoint.getBinding().getBindingInfo().getOperations());
                         for (BindingOperationInfo boi : endpoint.getBinding().getBindingInfo().getOperations()) {
@@ -264,6 +277,15 @@ public class Metrics {
         BindingOperationInfo bi = m.getExchange().getBindingOperationInfo();
         FaultMode fm = m.getExchange().get(FaultMode.class);
         TimerInfo op = null;
+        CountingInputStream in = m.getExchange().get(CountingInputStream.class);
+        if (in != null) {
+            ctx.info.incomingData.mark(in.getCount());
+        }
+        CountingOutputStream out = m.getExchange().get(CountingOutputStream.class);
+        if (out != null) {
+            ctx.info.outgoingData.mark(out.getCount());
+        }
+
         if (bi != null) {
             op = getTimerInfo(m, bi);
             op.totals.update(l, TimeUnit.NANOSECONDS);
@@ -300,6 +322,12 @@ public class Metrics {
             } else {
                 TimerInfo.Context ctx = ti.start();
                 message.getExchange().put(TimerInfo.Context.class, ctx);
+                InputStream in = message.getContent(InputStream.class);
+                if (in != null) {
+                    CountingInputStream newIn = new CountingInputStream(in);
+                    message.setContent(InputStream.class, newIn);
+                    message.getExchange().put(CountingInputStream.class, newIn);
+                }
             }
         }
         public void handleFault(Message message) {
@@ -307,6 +335,26 @@ public class Metrics {
                 stopTimers(message);
             }
         }
+    };
+    
+    class CountingOutInterceptor extends AbstractPhaseInterceptor<Message> {
+        public CountingOutInterceptor() {
+            super(Phase.PRE_STREAM);
+            addBefore(AttachmentOutInterceptor.class.getName());
+        }
+        public void handleMessage(Message message) throws Fault {
+            if (isRequestor(message)) {
+                //
+            } else {
+                OutputStream out = message.getContent(OutputStream.class);
+                if (out != null) {
+                    CountingOutputStream newOut = new CountingOutputStream(out);
+                    message.setContent(OutputStream.class, newOut);
+                    message.getExchange().put(CountingOutputStream.class, newOut);
+                }
+               
+            }
+        }    
     };
 
     class ResponseTimeMessageOutInterceptor extends AbstractPhaseInterceptor<Message> {
