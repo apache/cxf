@@ -260,6 +260,7 @@ public final class JwsUtils {
                 return getSignatureVerifier(publicJwk, inHeaders.getAlgorithm());
             } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_CHAIN) != null) {
                 List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
+                KeyManagementUtils.validateCertificateChain(props, chain);
                 return getRSAKeySignatureVerifier((RSAPublicKey)chain.get(0).getPublicKey(), inHeaders.getAlgorithm());
             }
         }
@@ -322,5 +323,12 @@ public final class JwsUtils {
         JwsCompactProducer jws = new JwsCompactProducer(headers, content);
         jws.signWith(jwsSig);
         return jws.getSignedEncodedJws();
+    }
+    public static void validateJwsCertificateChain(List<X509Certificate> certs) {
+        
+        Message m = JAXRSUtils.getCurrentMessage();        
+        Properties props = KeyManagementUtils.loadStoreProperties(m, true, 
+                                                                  RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
+        KeyManagementUtils.validateCertificateChain(props, certs);
     }
 }

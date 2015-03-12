@@ -24,7 +24,15 @@ import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertPath;
+import java.security.cert.CertPathBuilder;
+import java.security.cert.CertPathBuilderResult;
+import java.security.cert.CertPathValidator;
+import java.security.cert.CertStore;
 import java.security.cert.Certificate;
+import java.security.cert.CollectionCertStoreParameters;
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
@@ -36,6 +44,7 @@ import java.util.Properties;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -237,10 +246,30 @@ public final class KeyManagementUtils {
                     throw new SecurityException(ex);
                 }
             }
-            //TODO: validate the chain
             return certs;
         } else {
             return null;
+        }
+    }
+    public static void validateCertificateChain(Properties storeProperties, List<X509Certificate> inCerts) {
+        KeyStore ks = loadPersistKeyStore(JAXRSUtils.getCurrentMessage(), storeProperties);
+        validateCertificateChain(ks, inCerts);
+    }
+    public static void validateCertificateChain(KeyStore ks, List<X509Certificate> inCerts) {
+        // Initial chain validation, to be enhanced as needed
+        try {
+            X509CertSelector certSelect = new X509CertSelector();
+            certSelect.setCertificate((X509Certificate) inCerts.get(0));
+            PKIXBuilderParameters pbParams = new PKIXBuilderParameters(ks, certSelect);
+            pbParams.addCertStore(CertStore.getInstance("Collection", 
+                                                        new CollectionCertStoreParameters(inCerts)));
+            pbParams.setMaxPathLength(-1);
+            pbParams.setRevocationEnabled(false);
+            CertPathBuilderResult buildResult = CertPathBuilder.getInstance("PKIX").build(pbParams);               
+            CertPath certPath = buildResult.getCertPath();
+            CertPathValidator.getInstance("PKIX").validate(certPath, pbParams);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
         }
     }
     public static X509Certificate[] toX509CertificateChainArray(List<String> base64EncodedChain) {
@@ -290,21 +319,25 @@ public final class KeyManagementUtils {
         return props; 
     }
     public static RSAPrivateKey loadPrivateKey(Message m, Properties props, 
-                                               List<X509Certificate> inCert, String keyOper) {
-        KeyStore keyStore = loadPersistKeyStore(m, props);
+                                               List<X509Certificate> inCerts, String keyOper) {
+        KeyStore ks = loadPersistKeyStore(m, props);
+        
         try {
-            Object[] inCertArray = inCert.toArray();
-            // perhaps inCert properties can be optionally used as aliases
-            for (Enumeration<String> e = keyStore.aliases(); e.hasMoreElements();) {
-                String alias = e.nextElement();
-                X509Certificate[] chain = loadX509CertificateOrChain(keyStore, alias);
-                if (chain != null && Arrays.equals(chain, inCertArray)) {
-                    return loadPrivateKey(keyStore, m, props, keyOper, alias);
+            String alias = ks.getCertificateAlias(inCerts.get(0));
+            if (alias != null) {
+                for (Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
+                    String currentAlias = e.nextElement();
+                    X509Certificate[] currentCertArray = loadX509CertificateOrChain(ks, currentAlias);
+                    if (currentCertArray != null) {
+                        alias = currentAlias;
+                        break;
+                    }
                 }
             }
+            return loadPrivateKey(ks, m, props, keyOper, alias);
+            
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
-        return null;
     }
 }
