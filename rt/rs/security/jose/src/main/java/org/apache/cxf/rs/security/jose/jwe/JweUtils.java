@@ -320,6 +320,7 @@ public final class JweUtils {
             //TODO: optionally validate inHeaders.getAlgorithm against a property in props
             // Supporting loading a private key via a certificate for now
             List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
+            KeyManagementUtils.validateCertificateChain(props, chain);
             RSAPrivateKey privateKey = 
                 KeyManagementUtils.loadPrivateKey(m, props, chain, JsonWebKey.KEY_OPER_DECRYPT);
             contentEncryptionAlgo = inHeaders.getContentEncryptionAlgorithm();
@@ -588,5 +589,12 @@ public final class JweUtils {
     }
     private static JweHeaders toJweHeaders(String ct) {
         return new JweHeaders(Collections.<String, Object>singletonMap(JoseConstants.HEADER_CONTENT_TYPE, ct));
+    }
+    public static void validateJweCertificateChain(List<X509Certificate> certs) {
+        
+        Message m = JAXRSUtils.getCurrentMessage();        
+        Properties props = KeyManagementUtils.loadStoreProperties(m, true, 
+                                                                  RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
+        KeyManagementUtils.validateCertificateChain(props, certs);
     }
 }
