@@ -33,6 +33,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.security.DigestInputStream;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -44,6 +45,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.MessageDigestInputStream;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
@@ -84,6 +86,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         throws IOException {
         try {
             if (InputStream.class.isAssignableFrom(clazz)) {
+                if (DigestInputStream.class.isAssignableFrom(clazz)) {
+                    is = new MessageDigestInputStream(is);
+                }
                 return clazz.cast(is);
             }
             if (Reader.class.isAssignableFrom(clazz)) {
