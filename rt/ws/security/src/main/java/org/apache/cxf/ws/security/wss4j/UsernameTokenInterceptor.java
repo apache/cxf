@@ -31,6 +31,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
@@ -205,8 +206,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                 return getCallback(message);
             }
             public Validator getValidator(QName qName) throws WSSecurityException {
-                Object validator = 
-                        message.getContextualProperty(SecurityConstants.USERNAME_TOKEN_VALIDATOR);
+                Object validator = loadValidator(SecurityConstants.USERNAME_TOKEN_VALIDATOR, message);
                 if (validator == null) {
                     return super.getValidator(qName);
                 }
@@ -234,6 +234,31 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             return results.get(0);
         } catch (WSSecurityException ex) {
             throw WSS4JUtils.createSoapFault(message, message.getVersion(), ex);
+        }
+    }
+    
+    private Validator loadValidator(String validatorKey, SoapMessage message) throws WSSecurityException {
+        Object o = message.getContextualProperty(validatorKey);
+        if (o == null) {
+            return null;
+        }
+        try {
+            if (o instanceof Validator) {
+                return (Validator)o;
+            } else if (o instanceof Class) {
+                return (Validator)((Class<?>)o).newInstance();
+            } else if (o instanceof String) {
+                return (Validator)ClassLoaderUtils.loadClass(o.toString(),
+                                                             UsernameTokenInterceptor.class)
+                                                             .newInstance();
+            } else {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                                  "Cannot load Validator: " + o);
+            }
+        } catch (RuntimeException t) {
+            throw t;
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
     }
 
