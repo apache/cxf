@@ -103,9 +103,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     public static final String SAML_ROLE_ATTRIBUTENAME_DEFAULT =
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
     
-    public static final String TIMESTAMP_RESULT = "wss4j.timestamp.result";
-    public static final String SIGNATURE_RESULT = "wss4j.signature.result";
-    public static final String PRINCIPAL_RESULT = "wss4j.principal.result";
     public static final String PROCESSOR_MAP = "wss4j.processor.map";
     public static final String VALIDATOR_MAP = "wss4j.validator.map";
 
@@ -291,8 +288,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     checkSignatureConfirmation(reqData, wsResult);
                 }
 
-                storeSignature(msg, reqData, wsResult);
-                storeTimestamp(msg, reqData, wsResult);
                 checkActions(msg, reqData, wsResult, actions, SAAJUtils.getBody(doc));
                 doResults(
                     msg, actor, 
@@ -352,7 +347,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                                               SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
                                               true);
         if (enableAudienceRestriction) {
-            List<String> audiences = new ArrayList<String>();
+            List<String> audiences = new ArrayList<>();
             if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
                 audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
             }
@@ -391,31 +386,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             LOG.warning(warning);
         }
         
-    }
-    
-    private void storeSignature(
-        SoapMessage msg, RequestData reqData, List<WSSecurityEngineResult> wsResult
-    ) throws WSSecurityException {
-        // Extract the signature action result from the action list
-        List<WSSecurityEngineResult> signatureResults = 
-            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.SIGN);
-
-        // Store the last signature result
-        if (!signatureResults.isEmpty()) {
-            msg.put(SIGNATURE_RESULT, signatureResults.get(signatureResults.size() - 1));
-        }
-    }
-    
-    private void storeTimestamp(
-        SoapMessage msg, RequestData reqData, List<WSSecurityEngineResult> wsResult
-    ) throws WSSecurityException {
-        // Extract the timestamp action result from the action list
-        List<WSSecurityEngineResult> timestampResults = 
-            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.TS);
-
-        if (!timestampResults.isEmpty()) {
-            msg.put(TIMESTAMP_RESULT, timestampResults.get(timestampResults.size() - 1));
-        }
     }
     
     /**
@@ -542,7 +512,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
          */
         List<WSHandlerResult> results = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.RECV_RESULTS));
         if (results == null) {
-            results = new LinkedList<WSHandlerResult>();
+            results = new LinkedList<>();
             msg.put(WSHandlerConstants.RECV_RESULTS, results);
         }
         WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
@@ -609,7 +579,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 return new DefaultSecurityContext(p, subject);
             }
         } else if (p != null) {
-            msg.put(PRINCIPAL_RESULT, p);
             if (!utWithCallbacks) {
                 WSS4JTokenConverter.convertToken(msg, p);
             }
@@ -653,12 +622,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new DOMSource(body));
         // advance just past body
         int evt = reader.next();
-        int i = 0;
-        while (reader.hasNext() && i < 1
-               && (evt != XMLStreamConstants.END_ELEMENT || evt != XMLStreamConstants.START_ELEMENT)) {
+        
+        if (reader.hasNext() && (evt != XMLStreamConstants.END_ELEMENT || evt != XMLStreamConstants.START_ELEMENT)) {
             reader.next();
-            i++;
         }
+
         msg.setContent(XMLStreamReader.class, reader);
     }
     
@@ -697,9 +665,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         
         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            for (int i = 0; i < callbacks.length; i++) {
-                if (callbacks[i] instanceof WSPasswordCallback) {
-                    WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+            for (Callback callback : callbacks) {
+                if (callback instanceof WSPasswordCallback) {
+                    WSPasswordCallback pc = (WSPasswordCallback)callback;
                     
                     String id = pc.getIdentifier();
                     SecurityToken tok = store.getToken(id);
@@ -840,51 +808,4 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         return WSS4JUtils.getReplayCache(message, booleanKey, instanceKey);
     }
 
-    static class CXFRequestData extends RequestData {
-        public CXFRequestData() {
-        }
-
-        public Validator getValidator(QName qName) throws WSSecurityException {
-            String key = null;
-            if (WSSecurityEngine.SAML_TOKEN.equals(qName)) {
-                key = SecurityConstants.SAML1_TOKEN_VALIDATOR;
-            } else if (WSSecurityEngine.SAML2_TOKEN.equals(qName)) {
-                key = SecurityConstants.SAML2_TOKEN_VALIDATOR;
-            } else if (WSSecurityEngine.USERNAME_TOKEN.equals(qName)) {
-                key = SecurityConstants.USERNAME_TOKEN_VALIDATOR;
-            } else if (WSSecurityEngine.SIGNATURE.equals(qName)) {
-                key = SecurityConstants.SIGNATURE_TOKEN_VALIDATOR;
-            } else if (WSSecurityEngine.TIMESTAMP.equals(qName)) {
-                key = SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR;
-            } else if (WSSecurityEngine.BINARY_TOKEN.equals(qName)) {
-                key = SecurityConstants.BST_TOKEN_VALIDATOR;
-            } else if (WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02.equals(qName)
-                || WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_12.equals(qName)) {
-                key = SecurityConstants.SCT_TOKEN_VALIDATOR;
-            }
-            if (key != null) {
-                Object o = ((SoapMessage)this.getMsgContext()).getContextualProperty(key);
-                try {
-                    if (o instanceof Validator) {
-                        return (Validator)o;
-                    } else if (o instanceof Class) {
-                        return (Validator)((Class<?>)o).newInstance();
-                    } else if (o instanceof String) {
-                        return (Validator)ClassLoaderUtils.loadClass(o.toString(),
-                                                                     WSS4JInInterceptor.class)
-                                                                     .newInstance();
-                    } else if (o != null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
-                                                      "Cannot load Validator: " + o);
-                    }
-                } catch (RuntimeException t) {
-                    throw t;
-                } catch (Exception ex) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
-                }
-            }
-            return super.getValidator(qName);
-        }
-    };
-    
 }

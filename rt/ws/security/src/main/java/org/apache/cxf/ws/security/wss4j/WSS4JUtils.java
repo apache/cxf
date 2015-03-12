@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.crypto.SecretKey;
@@ -218,16 +219,16 @@ public final class WSS4JUtils {
                 }
             }
 
-            for (String key : securityToken.getSecretKey().keySet()) {
-                Key keyObject = securityToken.getSecretKey().get(key);
-                if (keyObject != null) {
-                    cachedTok.setKey(keyObject);
-                    if (keyObject instanceof SecretKey) {
-                        cachedTok.setSecret(keyObject.getEncoded());
+            for (Map.Entry<String, Key> entry : securityToken.getSecretKey().entrySet()) {
+                if (entry.getValue() != null) {
+                    cachedTok.setKey(entry.getValue());
+                    if (entry.getValue() instanceof SecretKey) {
+                        cachedTok.setSecret(entry.getValue().getEncoded());
                     }
                     break;
                 }
             }
+
             getTokenStore(message).add(cachedTok);
 
             return cachedTok.getId();

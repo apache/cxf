@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -63,7 +61,6 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.processor.UsernameTokenProcessor;
-import org.apache.wss4j.dom.validate.Validator;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
@@ -168,13 +165,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         return context;
     }
     
-    @Deprecated
-    protected UsernameTokenPrincipal getPrincipal(Element tokenElement, final SoapMessage message) {
-        return null;
-    }
-    
     private void storeResults(UsernameTokenPrincipal principal, SoapMessage message) {
-        List<WSSecurityEngineResult> v = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> v = new ArrayList<>();
         int action = WSConstants.UT;
         if (principal.getPassword() == null) {
             action = WSConstants.UT_NOPASSWORD;
@@ -183,14 +175,13 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         List<WSHandlerResult> results = CastUtils.cast((List<?>)message
                                                   .get(WSHandlerConstants.RECV_RESULTS));
         if (results == null) {
-            results = new ArrayList<WSHandlerResult>();
+            results = new ArrayList<>();
             message.put(WSHandlerConstants.RECV_RESULTS, results);
         }
         WSHandlerResult rResult = new WSHandlerResult(null, v);
         results.add(0, rResult);
 
         assertTokens(message, principal, false);
-        message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, principal);   
     }
 
     protected WSSecurityEngineResult validateToken(Element tokenElement, final SoapMessage message)
@@ -200,19 +191,10 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         boolean allowNoPassword = isAllowNoPassword(message.get(AssertionInfoMap.class));
         UsernameTokenProcessor p = new UsernameTokenProcessor();
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
-        RequestData data = new RequestData() {
-            public CallbackHandler getCallbackHandler() {
-                return getCallback(message);
-            }
-            public Validator getValidator(QName qName) throws WSSecurityException {
-                Object validator = 
-                        message.getContextualProperty(SecurityConstants.USERNAME_TOKEN_VALIDATOR);
-                if (validator == null) {
-                    return super.getValidator(qName);
-                }
-                return (Validator)validator;
-            }
-        };
+        
+        RequestData data = new CXFRequestData();
+        data.setCallbackHandler(getCallback(message));
+        data.setMsgContext(message);
 
         // Configure replay caching
         ReplayCache nonceCache = 

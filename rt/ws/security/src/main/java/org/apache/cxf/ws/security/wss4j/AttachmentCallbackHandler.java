@@ -49,13 +49,11 @@ public class AttachmentCallbackHandler implements CallbackHandler {
 
     @Override
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            Callback callback = callbacks[i];
+        for (Callback callback : callbacks) {
             if (callback instanceof AttachmentRequestCallback) {
                 AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callback;
 
-                List<org.apache.wss4j.common.ext.Attachment> attachmentList =
-                    new ArrayList<org.apache.wss4j.common.ext.Attachment>();
+                List<org.apache.wss4j.common.ext.Attachment> attachmentList = new ArrayList<>();
                 attachmentRequestCallback.setAttachments(attachmentList);
                 
                 String attachmentId = attachmentRequestCallback.getAttachmentId();
@@ -78,11 +76,10 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                                 attachmentResultCallback.getAttachment().getSourceStream())
                         )
                     );
+                
                 Map<String, String> headers = attachmentResultCallback.getAttachment().getHeaders();
-                Iterator<Map.Entry<String, String>> iterator = headers.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry<String, String> next = iterator.next();
-                    securedAttachment.setHeader(next.getKey(), next.getValue());
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    securedAttachment.setHeader(entry.getKey(), entry.getValue());
                 }
                 attachments.add(securedAttachment);
 

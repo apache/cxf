@@ -312,7 +312,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             
             final Map<Integer, Object> actionMap = CastUtils.cast(
                 (Map<?, ?>)getProperty(mc, WSS4J_ACTION_MAP));
-            if (actionMap != null) {
+            if (actionMap != null && !actionMap.isEmpty()) {
                 for (Map.Entry<Integer, Object> entry : actionMap.entrySet()) {
                     Class<?> removedAction = null;
                     

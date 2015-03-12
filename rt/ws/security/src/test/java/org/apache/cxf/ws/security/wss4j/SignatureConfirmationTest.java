@@ -41,7 +41,6 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 
@@ -130,10 +129,6 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         //
         // Check that the inbound signature result was saved
         //
-        WSSecurityEngineResult result = 
-            (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
-        assertNotNull(result);
-        
         List<WSHandlerResult> sigReceived = 
             CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(sigReceived);
