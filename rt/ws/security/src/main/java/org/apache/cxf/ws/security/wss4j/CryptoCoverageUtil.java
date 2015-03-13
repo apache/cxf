@@ -64,6 +64,9 @@ public final class CryptoCoverageUtil {
      * 
      * @param signedRefs references to the signed content in the message
      * @param encryptedRefs references to the encrypted content in the message
+     * 
+     * TODO Replace the isSignedEncryptionRef when we pick up WSS4J 2.0.5, and directly
+     * check the encrypted Element instead of the WSDataRef (as per master code)
      */
     public static void reconcileEncryptedSignedRefs(final Collection<WSDataRef> signedRefs, 
             final Collection<WSDataRef> encryptedRefs) {
