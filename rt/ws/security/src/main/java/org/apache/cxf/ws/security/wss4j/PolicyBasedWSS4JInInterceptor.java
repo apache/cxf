@@ -720,7 +720,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         //
         // Pre-fetch various results
         //
-        final List<Integer> actions = new ArrayList<Integer>(2);
+        final List<Integer> actions = new ArrayList<Integer>(3);
         actions.add(WSConstants.SIGN);
         actions.add(WSConstants.UT_SIGN);
         actions.add(WSConstants.ST_SIGNED);

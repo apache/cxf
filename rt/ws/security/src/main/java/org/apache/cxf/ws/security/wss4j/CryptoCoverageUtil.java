@@ -22,7 +22,6 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,14 +67,11 @@ public final class CryptoCoverageUtil {
     public static void reconcileEncryptedSignedRefs(final Collection<WSDataRef> signedRefs, 
             final Collection<WSDataRef> encryptedRefs) {
         
-        final List<WSDataRef> encryptedSignedRefs = new LinkedList<WSDataRef>();
+        final List<WSDataRef> encryptedSignedRefs = new LinkedList<>();
         
         for (WSDataRef encryptedRef : encryptedRefs) {
-            final Iterator<WSDataRef> signedRefsIt = signedRefs.iterator();
-            while (signedRefsIt.hasNext()) {
-                final WSDataRef signedRef = signedRefsIt.next();
-                
-                if (isSignedEncryptionRef(encryptedRef, signedRef)) {
+            for (WSDataRef signedRef : signedRefs) {
+                if (signedRef.getProtectedElement() == encryptedRef.getEncryptedElement()) {
 
                     final WSDataRef encryptedSignedRef = new WSDataRef();
                     encryptedSignedRef.setWsuId(signedRef.getWsuId());
@@ -84,11 +80,7 @@ public final class CryptoCoverageUtil {
                     encryptedSignedRef.setName(encryptedRef.getName());
                     encryptedSignedRef.setProtectedElement(encryptedRef
                             .getProtectedElement());
-                    // This value is the ID of the encrypted element, not
-                    // the value of the ID in the decrypted content 
-                    // (WSS4J 1.5.8).  Therefore, passing it along does
-                    // not provide much value.
-                    //encryptedSignedRef.setWsuId(encryptedRef.getWsuId());
+                    
                     encryptedSignedRef.setXpath(encryptedRef.getXpath());
                     
                     encryptedSignedRefs.add(encryptedSignedRef);
@@ -350,53 +342,6 @@ public final class CryptoCoverageUtil {
         }
     }
     
-    /**
-     * Determines if {@code signedRef} points to the encrypted content represented by
-     * {@code encryptedRef} using the following algorithm.
-     *
-     * <ol>
-     * <li>Check that the signed content is an XML Encryption element.</li>
-     * <li>Check that the reference Ids of the signed content and encrypted content
-     * (not the decrypted version of the encrypted content) match.  Check that the
-     * reference Id of the signed content matches the reference Id of the encrypted
-     * content prepended with a #.
-     * <li>Check for other Id attributes on the signed element that may match the
-     * referenced identifier for the encrypted content.  This is a workaround for
-     * WSS-242.</li>
-     * </ol>
-     *
-     * @param encryptedRef the ref representing the encrpted content
-     * @param signedRef the ref representing the signed content
-     */
-    private static boolean isSignedEncryptionRef(WSDataRef encryptedRef, WSDataRef signedRef) {
-        
-        // Don't even bother if the signed element wasn't an XML Enc element.
-        if (!WSConstants.ENC_NS.equals(signedRef.getProtectedElement()
-                                       .getNamespaceURI())) {
-            return false;
-        }
-        
-        if (signedRef.getWsuId().equals(encryptedRef.getWsuId())
-            || signedRef.getWsuId().equals("#" + encryptedRef.getWsuId())) {
-            return true;
-        }
-        
-        // There should be no other Ids on an EncryptedData or EncryptedKey element;
-        // however, WSS4J will happily add them on the outbound side.  See WSS-242.
-        // The following code looks for the specific behavior that exists in
-        // 1.5.8 and earlier version.
-        
-        String wsuId = signedRef.getProtectedElement().getAttributeNS(
-                WSConstants.WSU_NS, "Id");
-        
-        if (signedRef.getWsuId().equals(wsuId)
-            || signedRef.getWsuId().equals("#" + wsuId)) {
-            return true;
-        }
-        
-        return false;
-    }
-
     private static boolean matchElement(Collection<WSDataRef> refs,
             CoverageType type, CoverageScope scope, Element el) {
         final boolean content;
