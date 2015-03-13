@@ -32,7 +32,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
-import org.opensaml.saml1.core.AudienceRestrictionCondition;
+import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
 
 /**
  * The SAML TokenDelegationHandler implementation. It disallows ActAs or OnBehalfOf for
@@ -116,14 +116,14 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
         if (assertion.getSaml1() != null) {
             for (AudienceRestrictionCondition restriction 
                 : assertion.getSaml1().getConditions().getAudienceRestrictionConditions()) {
-                for (org.opensaml.saml1.core.Audience audience : restriction.getAudiences()) {
+                for (org.opensaml.saml.saml1.core.Audience audience : restriction.getAudiences()) {
                     addresses.add(audience.getUri());
                 }
             }
         } else if (assertion.getSaml2() != null) {
-            for (org.opensaml.saml2.core.AudienceRestriction restriction 
+            for (org.opensaml.saml.saml2.core.AudienceRestriction restriction 
                 : assertion.getSaml2().getConditions().getAudienceRestrictions()) {
-                for (org.opensaml.saml2.core.Audience audience : restriction.getAudiences()) {
+                for (org.opensaml.saml.saml2.core.Audience audience : restriction.getAudiences()) {
                     addresses.add(audience.getAudienceURI());
                 }
             }

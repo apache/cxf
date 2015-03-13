@@ -37,7 +37,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -53,7 +52,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.core.xml.XMLObject;
 
 public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSSOSpHandler {
     private static final Logger LOG = 
@@ -162,7 +161,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
                                            String relayState,
                                            boolean postBinding) {
            
-        org.opensaml.saml2.core.Response samlResponse = 
+        org.opensaml.saml.saml2.core.Response samlResponse = 
                readSAMLResponse(postBinding, encodedSamlResponse);
 
         // Validate the Response
@@ -221,7 +220,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         return requestState;
     }
     
-    private org.opensaml.saml2.core.Response readSAMLResponse(
+    private org.opensaml.saml.saml2.core.Response readSAMLResponse(
         boolean postBinding,
         String samlResponse
     ) {
@@ -276,17 +275,17 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         } catch (WSSecurityException ex) {
             throw ExceptionUtils.toBadRequestException(ex, null);
         }
-        if (!(responseObject instanceof org.opensaml.saml2.core.Response)) {
+        if (!(responseObject instanceof org.opensaml.saml.saml2.core.Response)) {
             throw ExceptionUtils.toBadRequestException(null, null);
         }
-        return (org.opensaml.saml2.core.Response)responseObject;
+        return (org.opensaml.saml.saml2.core.Response)responseObject;
     }
     
     /**
      * Validate the received SAML Response as per the protocol
      */
     protected void validateSamlResponseProtocol(
-        org.opensaml.saml2.core.Response samlResponse
+        org.opensaml.saml.saml2.core.Response samlResponse
     ) {
         try {
             SAMLProtocolResponseValidator protocolValidator = new SAMLProtocolResponseValidator();
@@ -304,7 +303,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
      */
     protected SSOValidatorResponse validateSamlSSOResponse(
         boolean postBinding,
-        org.opensaml.saml2.core.Response samlResponse,
+        org.opensaml.saml.saml2.core.Response samlResponse,
         RequestState requestState
     ) {
         try {

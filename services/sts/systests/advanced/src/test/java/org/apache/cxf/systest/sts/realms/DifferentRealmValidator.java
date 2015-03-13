@@ -23,7 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.Credential;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 
 /**
  * This class validates a SAML Assertion by dispatching it to an STS. It then

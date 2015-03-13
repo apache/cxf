@@ -57,9 +57,9 @@ import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 import org.apache.wss4j.dom.validate.Validator;
 import org.joda.time.DateTime;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.xml.signature.KeyInfo;
-import org.opensaml.xml.signature.Signature;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.Signature;
 
 /**
  * Validate a SAML Assertion. It is valid if it was issued and signed by this STS.
@@ -274,7 +274,9 @@ public class SAMLTokenValidator implements TokenValidator {
      * Validate the assertion against schemas/profiles
      */
     protected void validateAssertion(SamlAssertionWrapper assertion) throws WSSecurityException {
-        assertion.validateAssertion(validateSignatureAgainstProfile);
+        if (validateSignatureAgainstProfile) {
+            assertion.validateSignatureAgainstProfile();
+        }
     }
     
     protected boolean validateConditions(

@@ -432,9 +432,13 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
     }
     
     protected void verifyWss4jSigResults(SoapMessage inmsg) {
-        WSSecurityEngineResult result = 
-            (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
-        assertNotNull(result);
+        List<WSHandlerResult> results = 
+            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
+        assertTrue(results != null && results.size() == 1);
+        
+        List<WSSecurityEngineResult> signatureResults = 
+            WSSecurityUtil.fetchAllActionResults(results.get(0).getResults(), WSConstants.SIGN);
+        assertTrue(!signatureResults.isEmpty());
     }
     
     protected void verifyWss4jEncResults(SoapMessage inmsg) {

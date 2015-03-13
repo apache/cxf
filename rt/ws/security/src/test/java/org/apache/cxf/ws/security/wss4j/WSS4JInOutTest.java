@@ -40,7 +40,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
@@ -54,6 +53,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
@@ -62,7 +62,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-
 import org.junit.Test;
 
 
@@ -246,8 +245,9 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         
         Principal utPrincipal = p1 instanceof UsernameTokenPrincipal ? p1 : p2;
         
-        Principal secContextPrincipal = (Principal)inmsg.get(WSS4JInInterceptor.PRINCIPAL_RESULT);
-        assertSame(secContextPrincipal, utPrincipal);
+        SecurityContext securityContext = inmsg.get(SecurityContext.class);
+        assertNotNull(securityContext);
+        assertSame(securityContext.getUserPrincipal(), utPrincipal);
     }
     
     @Test
@@ -339,9 +339,11 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
         inHandler.handleMessage(inmsg);
         
-        WSSecurityEngineResult result = 
-            (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
-        assertNull(result);
+        List<WSHandlerResult> results = getResults(inmsg);
+        assertTrue(results != null && results.size() == 1);
+        List<WSSecurityEngineResult> signatureResults = 
+            WSSecurityUtil.fetchAllActionResults(results.get(0).getResults(), WSConstants.SIGN);
+        assertTrue(signatureResults.size() == 0);
     }
     
     @Test
@@ -411,11 +413,13 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
         inHandler.handleMessage(inmsg);
         
-        WSSecurityEngineResult result = 
-            (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
-        assertNotNull(result);
+        List<WSHandlerResult> results = getResults(inmsg);
+        assertTrue(results != null && results.size() == 1);
+        List<WSSecurityEngineResult> signatureResults = 
+            WSSecurityUtil.fetchAllActionResults(results.get(0).getResults(), WSConstants.SIGN);
+        assertTrue(signatureResults.size() == 1);
         
-        Object obj = result.get("foo");
+        Object obj = signatureResults.get(0).get("foo");
         assertNotNull(obj);
         assertEquals(obj.getClass().getName(), CustomProcessor.class.getName());
     }

@@ -67,7 +67,7 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
-import org.opensaml.xml.signature.SignatureConstants;
+import org.opensaml.xmlsec.signature.support.SignatureConstants;
 
 /**
  * A new StAX-based interceptor for creating messages with XML Signature + Encryption content.

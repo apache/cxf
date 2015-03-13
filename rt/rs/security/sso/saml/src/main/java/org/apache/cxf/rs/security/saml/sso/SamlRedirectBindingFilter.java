@@ -42,7 +42,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.xml.security.utils.Base64;
-import org.opensaml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.core.AuthnRequest;
 
 public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
     

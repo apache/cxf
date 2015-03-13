@@ -33,7 +33,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -69,8 +68,8 @@ import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.wss4j.dom.validate.Validator;
-import org.opensaml.xml.signature.KeyInfo;
-import org.opensaml.xml.signature.Signature;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.Signature;
 
 /**
  * The "SAML2 Bearer" grant handler

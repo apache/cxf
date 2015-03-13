@@ -22,15 +22,15 @@ package org.apache.cxf.rt.security.xacml;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
-import org.opensaml.Configuration;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.Issuer;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.saml.common.SAMLObjectBuilder;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.Issuer;
 import org.opensaml.xacml.XACMLObjectBuilder;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.profile.saml.SAMLProfileConstants;
 import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionQueryType;
-import org.opensaml.xml.XMLObjectBuilderFactory;
 
 /**
  * A set of utility methods to construct XACML SAML Request statements, based on the
@@ -41,7 +41,8 @@ public final class SamlRequestComponentBuilder {
     
     private static volatile SAMLObjectBuilder<Issuer> issuerBuilder;
     
-    private static volatile XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    private static volatile XMLObjectBuilderFactory builderFactory = 
+        XMLObjectProviderRegistrySupport.getBuilderFactory();
     
     private SamlRequestComponentBuilder() {
         // complete

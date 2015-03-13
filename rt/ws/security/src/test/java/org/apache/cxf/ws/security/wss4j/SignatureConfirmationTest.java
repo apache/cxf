@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,7 +33,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
@@ -41,7 +41,6 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 
@@ -98,7 +97,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         //
         // Save the signature for future confirmation
         //
-        List<byte[]> sigv = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.SEND_SIGV));
+        Set<Integer> sigv = CastUtils.cast((Set<?>)msg.get(WSHandlerConstants.SEND_SIGV));
         assertNotNull(sigv);
         assertTrue(sigv.size() != 0);
         
@@ -130,10 +129,6 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         //
         // Check that the inbound signature result was saved
         //
-        WSSecurityEngineResult result = 
-            (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
-        assertNotNull(result);
-        
         List<WSHandlerResult> sigReceived = 
             CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(sigReceived);
@@ -144,7 +139,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
     
    
     private void testSignatureConfirmationResponse(
-        List<byte[]> sigSaved,
+        Set<Integer> sigSaved,
         List<WSHandlerResult> sigReceived
     ) throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");

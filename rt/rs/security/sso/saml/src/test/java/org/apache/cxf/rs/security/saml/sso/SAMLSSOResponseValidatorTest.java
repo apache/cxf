@@ -46,15 +46,15 @@ import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.joda.time.DateTime;
-import org.opensaml.common.SignableSAMLObject;
-import org.opensaml.saml2.core.AuthnStatement;
-import org.opensaml.saml2.core.Response;
-import org.opensaml.saml2.core.Status;
-import org.opensaml.xml.security.x509.BasicX509Credential;
-import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
-import org.opensaml.xml.signature.KeyInfo;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.SignatureConstants;
+import org.opensaml.saml.common.SignableSAMLObject;
+import org.opensaml.saml.saml2.core.AuthnStatement;
+import org.opensaml.saml.saml2.core.Response;
+import org.opensaml.saml.saml2.core.Status;
+import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.keyinfo.impl.X509KeyInfoGeneratorFactory;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.support.SignatureConstants;
 
 /**
  * Some unit tests for the SAMLSSOResponseValidator.
@@ -665,9 +665,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
 
         signature.setSignatureAlgorithm(sigAlgo);
 
-        BasicX509Credential signingCredential = new BasicX509Credential();
-        signingCredential.setEntityCertificate(issuerCerts[0]);
-        signingCredential.setPrivateKey(privateKey);
+        BasicX509Credential signingCredential = new BasicX509Credential(issuerCerts[0], privateKey);
 
         signature.setSigningCredential(signingCredential);
 
@@ -678,7 +676,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             try {
                 KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
                 signature.setKeyInfo(keyInfo);
-            } catch (org.opensaml.xml.security.SecurityException ex) {
+            } catch (org.opensaml.security.SecurityException ex) {
                 throw new Exception(
                         "Error generating KeyInfo from signing credential", ex);
             }

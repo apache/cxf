@@ -30,13 +30,13 @@ import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.AuthnContextClassRef;
-import org.opensaml.saml2.core.AuthnContextComparisonTypeEnumeration;
-import org.opensaml.saml2.core.AuthnRequest;
-import org.opensaml.saml2.core.Issuer;
-import org.opensaml.saml2.core.NameIDPolicy;
-import org.opensaml.saml2.core.RequestedAuthnContext;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.AuthnContextClassRef;
+import org.opensaml.saml.saml2.core.AuthnContextComparisonTypeEnumeration;
+import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.NameIDPolicy;
+import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 
 /**
  * Some unit tests for the SamlpRequestComponentBuilder and AuthnRequestBuilder

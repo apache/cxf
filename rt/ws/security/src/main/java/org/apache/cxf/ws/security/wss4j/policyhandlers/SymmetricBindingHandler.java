@@ -27,6 +27,7 @@ import java.util.logging.Level;
 
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
@@ -81,15 +82,15 @@ import org.apache.wss4j.policy.model.X509Token;
  * 
  */
 public class SymmetricBindingHandler extends AbstractBindingBuilder {
-    SymmetricBinding sbinding;
-    TokenStore tokenStore;
+    private final SymmetricBinding sbinding;
+    private final TokenStore tokenStore;
     
     public SymmetricBindingHandler(WSSConfig config, 
                                    SymmetricBinding binding,
                                     SOAPMessage saaj,
                                     WSSecHeader secHeader,
                                     AssertionInfoMap aim,
-                                    SoapMessage message) {
+                                    SoapMessage message) throws SOAPException {
         super(config, binding, saaj, secHeader, aim, message);
         this.sbinding = binding;
         tokenStore = getTokenStore();
@@ -210,7 +211,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 //Sign the message
                 //We should use the same key in the case of EncryptBeforeSig
                 if (sigParts.size() > 0) {
-                    signatures.add(this.doSignature(sigParts, encryptionWrapper, encryptionToken, 
+                    addSig(this.doSignature(sigParts, encryptionWrapper, encryptionToken, 
                                                     tok, attached));
                 }
                 
@@ -337,7 +338,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             sigs.addAll(getSignedParts(null));
             if (isRequestor()) {
                 if (!sigs.isEmpty()) {
-                    signatures.add(doSignature(sigs, sigAbstractTokenWrapper, sigToken, sigTok, tokIncluded));
+                    addSig(
+                        doSignature(sigs, sigAbstractTokenWrapper, sigToken, sigTok, tokIncluded));
                 }
                 doEndorse();
             } else {
@@ -398,6 +400,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                           boolean atEnd) {
         try {
             WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
+            dkEncr.setCallbackLookup(callbackLookup);
             if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
             }
@@ -511,6 +514,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             } else {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
+                    encr.setCallbackLookup(callbackLookup);
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
                     String encrTokId = encrTok.getId();
                     if (attached) {
@@ -622,6 +626,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                boolean included) throws WSSecurityException {
         Document doc = saaj.getSOAPPart();
         WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+        dkSign.setCallbackLookup(callbackLookup);
         if (policyAbstractTokenWrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
             dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
@@ -718,7 +723,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 new QName(sbinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
         }
         
-        dkSign.setParts(sigs);
+        dkSign.getParts().addAll(sigs);
         List<Reference> referenceList = dkSign.addReferencesToSign(sigs, secHeader);
         
         //Add elements to header
@@ -747,6 +752,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             return doSignatureDK(sigs, policyAbstractTokenWrapper, policyToken, tok, included);
         } else {
             WSSecSignature sig = new WSSecSignature(wssConfig);
+            sig.setCallbackLookup(callbackLookup);
             sig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
             // If a EncryptedKeyToken is used, set the correct value type to
             // be used in the wsse:Reference in ds:KeyInfo
@@ -838,7 +844,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
             this.message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
             sig.prepare(saaj.getSOAPPart(), crypto, secHeader);
-            sig.setParts(sigs);
+            sig.getParts().addAll(sigs);
             List<Reference> referenceList = sig.addReferencesToSign(sigs, secHeader);
 
             //Do signature

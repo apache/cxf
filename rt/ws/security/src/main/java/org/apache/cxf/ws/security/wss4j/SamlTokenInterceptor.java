@@ -51,22 +51,21 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 import org.apache.wss4j.dom.saml.DOMSAMLUtil;
-import org.apache.wss4j.dom.validate.Validator;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
-import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml.common.SAMLVersion;
 
 /**
  * An interceptor to create and add a SAML token to the security header of an outbound
@@ -95,7 +94,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                         List<WSHandlerResult> results = CastUtils.cast((List<?>)message
                                 .get(WSHandlerConstants.RECV_RESULTS));
                         if (results == null) {
-                            results = new ArrayList<WSHandlerResult>();
+                            results = new ArrayList<>();
                             message.put(WSHandlerConstants.RECV_RESULTS, results);
                         }
                         WSHandlerResult rResult = new WSHandlerResult(null, samlResults);
@@ -143,7 +142,6 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                         if (signed) {
                             Principal principal = 
                                 (Principal)samlResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                            message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, principal);                   
                             
                             SecurityContext sc = message.get(SecurityContext.class);
                             if (sc == null || sc.getUserPrincipal() == null) {
@@ -162,47 +160,17 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     private List<WSSecurityEngineResult> processToken(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
-        RequestData data = new RequestData() {
-            public CallbackHandler getCallbackHandler() {
-                return getCallback(message);
-            }
-            public Validator getValidator(QName qName) throws WSSecurityException {
-                String key = null;
-                if (WSSecurityEngine.SAML_TOKEN.equals(qName)) {
-                    key = SecurityConstants.SAML1_TOKEN_VALIDATOR;
-                } else if (WSSecurityEngine.SAML2_TOKEN.equals(qName)) {
-                    key = SecurityConstants.SAML2_TOKEN_VALIDATOR;
-                } 
-                if (key != null) {
-                    Object o = message.getContextualProperty(key);
-                    try {
-                        if (o instanceof Validator) {
-                            return (Validator)o;
-                        } else if (o instanceof Class) {
-                            return (Validator)((Class<?>)o).newInstance();
-                        } else if (o instanceof String) {
-                            return (Validator)ClassLoaderUtils.loadClass(o.toString(),
-                                                                         SamlTokenInterceptor.class)
-                                                                         .newInstance();
-                        }
-                    } catch (RuntimeException t) {
-                        throw t;
-                    } catch (Exception ex) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
-                    }
-                }
-                return super.getValidator(qName);
-            }
-        };
+        
+        RequestData data = new CXFRequestData();
+        data.setCallbackHandler(getCallback(message));
+        data.setMsgContext(message);
         data.setWssConfig(WSSConfig.getNewInstance());
         
         data.setSigVerCrypto(getCrypto(null, SecurityConstants.SIGNATURE_CRYPTO,
                                      SecurityConstants.SIGNATURE_PROPERTIES, message));
         
         SAMLTokenProcessor p = new SAMLTokenProcessor();
-        List<WSSecurityEngineResult> results = 
-            p.handleToken(tokenElement, data, wsDocInfo);
-        return results;
+        return p.handleToken(tokenElement, data, wsDocInfo);
     }
 
     protected AbstractToken assertTokens(SoapMessage message) {
@@ -267,12 +235,12 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         SAMLCallback samlCallback = new SAMLCallback();
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
-            samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+            samlCallback.setSamlVersion(Version.SAML_11);
             assertPolicy(aim, "WssSamlV11Token10");
             assertPolicy(aim, "WssSamlV11Token11");
             
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
-            samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+            samlCallback.setSamlVersion(Version.SAML_20);
             assertPolicy(aim, "WssSamlV20Token11");
         }
         SAMLUtil.doSAMLCallback(handler, samlCallback);

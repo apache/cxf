@@ -28,7 +28,6 @@ import java.util.Properties;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -384,6 +383,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             } else {
                 sct = new SecurityContextToken(
                         NegotiationUtils.getWSCVersion(tokenType), writer.getDocument());
+                sct.setID(WSSConfig.getNewInstance().getIdAllocator()
+                        .createSecureId("sctId-", sct.getElement()));
             }
 
             Date created = new Date();

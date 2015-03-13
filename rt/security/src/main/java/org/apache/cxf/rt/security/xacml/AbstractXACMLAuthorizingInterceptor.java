@@ -128,25 +128,29 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
         
         ResponseType response = performRequest(request, message);
         
-        ResultType result = response.getResult();
+        List<ResultType> results = response.getResults();
         
-        // Handle any Obligations returned by the PDP
-        handleObligations(request, principal, message, result);
-        
-        if (result == null) {
+        if (results == null) {
             return false;
         }
-
-        DECISION decision = result.getDecision() != null ? result.getDecision().getDecision() : DECISION.Deny; 
-        String code = "";
-        String statusMessage = "";
-        if (result.getStatus() != null) {
-            StatusType status = result.getStatus();
-            code = status.getStatusCode() != null ? status.getStatusCode().getValue() : "";
-            statusMessage = status.getStatusMessage() != null ? status.getStatusMessage().getValue() : "";
+        
+        for (ResultType result : results) {
+            // Handle any Obligations returned by the PDP
+            handleObligations(request, principal, message, result);
+            
+            DECISION decision = result.getDecision() != null ? result.getDecision().getDecision() : DECISION.Deny; 
+            String code = "";
+            String statusMessage = "";
+            if (result.getStatus() != null) {
+                StatusType status = result.getStatus();
+                code = status.getStatusCode() != null ? status.getStatusCode().getValue() : "";
+                statusMessage = status.getStatusMessage() != null ? status.getStatusMessage().getValue() : "";
+            }
+            LOG.fine("XACML authorization result: " + decision + ", code: " + code + ", message: " + statusMessage);
+            return decision == DECISION.Permit;
         }
-        LOG.fine("XACML authorization result: " + decision + ", code: " + code + ", message: " + statusMessage);
-        return decision == DECISION.Permit;
+        
+        return false;
     }
     
     public abstract ResponseType performRequest(RequestType request, Message message) throws Exception;

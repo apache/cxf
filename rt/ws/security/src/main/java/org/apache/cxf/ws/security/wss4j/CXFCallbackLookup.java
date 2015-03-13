@@ -16,23 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.ws.security.wss4j;
 
-package org.apache.cxf.rs.security.saml.sso;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import org.apache.cxf.message.Message;
-import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.apache.wss4j.dom.message.DOMCallbackLookup;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
- * This interface defines a method to create a SAML 2.0 Protocol AuthnRequest.
+ * This class uses a DOM-based approach to locate Elements that are referenced via an Id.
  */
-public interface AuthnRequestBuilder {
+public class CXFCallbackLookup extends DOMCallbackLookup {
+    
+    private Document doc;
+    private Element soapBody;
+    
+    public CXFCallbackLookup(Document doc, Element soapBody) {
+        super(doc);
+        this.soapBody = soapBody;
+    }
     
     /**
-     * Create a SAML 2.0 Protocol AuthnRequest
+     * Get the SOAP Body
      */
-    AuthnRequest createAuthnRequest(
-        Message message, 
-        String issuerId,
-        String assertionConsumerServiceAddress
-    ) throws Exception;
+    @Override
+    public Element getSOAPBody() {
+        if (soapBody != null) {
+            return soapBody;
+        }
+        return WSSecurityUtil.findBodyElement(doc);
+    }
 }

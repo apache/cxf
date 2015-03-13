@@ -123,10 +123,8 @@
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.oauth.version>20100527</cxf.oauth.version>
-        <cxf.opensaml.version>2.6.1</cxf.opensaml.version>
-        <cxf.opensaml.osgi.version>2.6.1_1</cxf.opensaml.osgi.version>
-        <cxf.opensaml.xmltooling.version>1.4.0_1</cxf.opensaml.xmltooling.version>
-        <cxf.opensamlws.version>1.5.0_1</cxf.opensamlws.version>
+        <cxf.opensaml.version>3.1.0</cxf.opensaml.version>
+        <cxf.opensaml.osgi.version>3.1.0_1</cxf.opensaml.osgi.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
@@ -145,7 +143,7 @@
         <cxf.woodstox.core.version>4.4.1</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.4</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
-        <cxf.wss4j.version>2.0.3</cxf.wss4j.version>
+        <cxf.wss4j.version>2.1.0-SNAPSHOT</cxf.wss4j.version>
         <cxf.xerces.version>2.11.0</cxf.xerces.version>
         <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
         <cxf.xmlschema.version>2.2.1</cxf.xmlschema.version>

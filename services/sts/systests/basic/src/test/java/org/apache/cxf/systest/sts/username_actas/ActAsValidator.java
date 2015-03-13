@@ -21,16 +21,15 @@ package org.apache.cxf.systest.sts.username_actas;
 import java.util.List;
 
 import org.w3c.dom.Element;
-
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.Attribute;
-import org.opensaml.saml2.core.AttributeStatement;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.core.AttributeStatement;
 
 /**
  * This class validates a SAML 2 Assertion and checks that it has a CustomActAs Attribute with

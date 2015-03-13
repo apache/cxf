@@ -25,10 +25,10 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.AttributeStatement;
-import org.opensaml.saml2.core.NameID;
-import org.opensaml.saml2.core.Subject;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.NameID;
+import org.opensaml.saml.saml2.core.Subject;
 
 /**
  * This class validates a SAML 2 Assertion and checks that it has a Subject with a value 

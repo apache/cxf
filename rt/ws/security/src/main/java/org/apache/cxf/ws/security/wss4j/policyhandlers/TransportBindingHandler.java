@@ -87,7 +87,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                                     SOAPMessage saaj,
                                     WSSecHeader secHeader,
                                     AssertionInfoMap aim,
-                                    SoapMessage message) {
+                                    SoapMessage message) throws SOAPException {
         super(config, binding, saaj, secHeader, aim, message);
         this.tbinding = binding;
     }
@@ -124,12 +124,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
         }
         
-    }
-    
-    private void addSig(byte[] val) {
-        if (val != null && val.length > 0) {
-            signatures.add(val);
-        }
     }
     
     public void handleBinding() {
@@ -364,6 +358,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             encrKey.appendToHeader(secHeader);
             
             WSSecDKSign dkSig = new WSSecDKSign(wssConfig);
+            dkSig.setCallbackLookup(callbackLookup);
             if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkSig.setWscVersion(ConversationConstants.VERSION_05_02);
             }
@@ -377,7 +372,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             dkSig.prepare(doc, secHeader);
             
-            dkSig.setParts(sigParts);
+            dkSig.getParts().addAll(sigParts);
             List<Reference> referenceList = dkSig.addReferencesToSign(sigParts, secHeader);
             
             //Do signature
@@ -452,6 +447,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     ) throws Exception {
         //Do Signature with derived keys
         WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+        dkSign.setCallbackLookup(callbackLookup);
         AlgorithmSuite algorithmSuite = tbinding.getAlgorithmSuite();
 
         //Setting the AttachedReference or the UnattachedReference according to the flag
@@ -484,7 +480,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
         addDerivedKeyElement(dkSign.getdktElement());
 
-        dkSign.setParts(sigParts);
+        dkSign.getParts().addAll(sigParts);
         List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
 
         //Do signature
@@ -501,6 +497,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         List<WSEncryptionPart> sigParts
     ) throws Exception {
         WSSecSignature sig = new WSSecSignature(wssConfig);
+        sig.setCallbackLookup(callbackLookup);
         
         //Setting the AttachedReference or the UnattachedReference according to the flag
         Element ref;
@@ -583,7 +580,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         Document doc = saaj.getSOAPPart();
         sig.prepare(doc, crypto, secHeader);
 
-        sig.setParts(sigParts);
+        sig.getParts().addAll(sigParts);
         List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
 
         //Do signature

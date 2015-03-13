@@ -120,7 +120,6 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         }
         
         private void handleMessageInternal(SoapMessage message) throws Fault {
-            Collection<AssertionInfo> ais;
             SOAPMessage saaj = message.getContent(SOAPMessage.class);
 
             boolean mustUnderstand = 
@@ -133,7 +132,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             // extract Assertion information
             if (aim != null) {
                 AbstractBinding transport = null;
-                ais = getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+                Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
                 if (!ais.isEmpty()) {
                     for (AssertionInfo ai : ais) {
                         transport = (AbstractBinding)ai.getAssertion();
@@ -191,15 +190,21 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                         transport.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
                     }
 
-                    if (transport instanceof TransportBinding) {
-                        new TransportBindingHandler(config, (TransportBinding)transport, saaj,
-                                                    secHeader, aim, message).handleBinding();
-                    } else if (transport instanceof SymmetricBinding) {
-                        new SymmetricBindingHandler(config, (SymmetricBinding)transport, saaj,
-                                                     secHeader, aim, message).handleBinding();
-                    } else {
-                        new AsymmetricBindingHandler(config, (AsymmetricBinding)transport, saaj,
-                                                     secHeader, aim, message).handleBinding();
+                    try {
+                        if (transport instanceof TransportBinding) {
+                            new TransportBindingHandler(config, (TransportBinding)transport, saaj,
+                                                        secHeader, aim, message).handleBinding();
+                        } else if (transport instanceof SymmetricBinding) {
+                            new SymmetricBindingHandler(config, (SymmetricBinding)transport, saaj,
+                                                         secHeader, aim, message).handleBinding();
+                        } else {
+                            new AsymmetricBindingHandler(config, (AsymmetricBinding)transport, saaj,
+                                                         secHeader, aim, message).handleBinding();
+                        }
+                    } catch (SOAPException e) {
+                        throw new SoapFault(
+                            new Message("SECURITY_FAILED", LOG), e, message.getVersion().getSender()
+                        );
                     }
                     
                     if (el.getFirstChild() == null) {

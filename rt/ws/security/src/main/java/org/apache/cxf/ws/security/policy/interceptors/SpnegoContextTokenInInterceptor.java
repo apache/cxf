@@ -54,6 +54,7 @@ import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -187,6 +188,8 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 new SecurityContextToken(
                     NegotiationUtils.getWSCVersion(tokenType), writer.getDocument()
                 );
+            WSSConfig wssConfig = WSSConfig.getNewInstance();
+            sct.setID(wssConfig.getIdAllocator().createId("sctId-", sct));
             
             // Lifetime
             Date created = new Date();

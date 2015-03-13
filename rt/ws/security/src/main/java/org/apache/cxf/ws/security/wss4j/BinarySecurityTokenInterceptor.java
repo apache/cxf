@@ -23,12 +23,8 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.namespace.QName;
-
 import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -46,7 +42,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.processor.BinarySecurityTokenProcessor;
-import org.apache.wss4j.dom.validate.Validator;
 import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
@@ -76,7 +71,7 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
                         List<WSHandlerResult> results = CastUtils.cast((List<?>)message
                                 .get(WSHandlerConstants.RECV_RESULTS));
                         if (results == null) {
-                            results = new ArrayList<WSHandlerResult>();
+                            results = new ArrayList<>();
                             message.put(WSHandlerConstants.RECV_RESULTS, results);
                         }
                         WSHandlerResult rResult = new WSHandlerResult(null, bstResults);
@@ -86,7 +81,6 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
                         
                         Principal principal = 
                             (Principal)bstResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                        message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, principal);                   
                         
                         SecurityContext sc = message.get(SecurityContext.class);
                         if (sc == null || sc.getUserPrincipal() == null) {
@@ -105,31 +99,9 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
     private List<WSSecurityEngineResult> processToken(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
-        RequestData data = new RequestData() {
-            public CallbackHandler getCallbackHandler() {
-                return getCallback(message);
-            }
-            public Validator getValidator(QName qName) throws WSSecurityException {
-                String key = SecurityConstants.BST_TOKEN_VALIDATOR;
-                Object o = message.getContextualProperty(key);
-                try {
-                    if (o instanceof Validator) {
-                        return (Validator)o;
-                    } else if (o instanceof Class) {
-                        return (Validator)((Class<?>)o).newInstance();
-                    } else if (o instanceof String) {
-                        return (Validator)ClassLoaderUtils.loadClass(o.toString(),
-                                                                     BinarySecurityTokenInterceptor.class)
-                                                                     .newInstance();
-                    }
-                } catch (RuntimeException t) {
-                    throw t;
-                } catch (Exception ex) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
-                }
-                return super.getValidator(qName);
-            }
-        };
+        RequestData data = new CXFRequestData();
+        data.setCallbackHandler(getCallback(message));
+        data.setMsgContext(message);
         data.setWssConfig(WSSConfig.getNewInstance());
         
         BinarySecurityTokenProcessor p = new BinarySecurityTokenProcessor();

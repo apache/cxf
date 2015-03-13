@@ -21,7 +21,8 @@ package org.apache.cxf.rt.security.xacml;
 
 import java.util.List;
 
-import org.opensaml.Configuration;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.xacml.XACMLObjectBuilder;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
@@ -31,7 +32,6 @@ import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResourceContentType;
 import org.opensaml.xacml.ctx.ResourceType;
 import org.opensaml.xacml.ctx.SubjectType;
-import org.opensaml.xml.XMLObjectBuilderFactory;
 
 /**
  * A set of utility methods to construct XACML 2.0 Request statements
@@ -51,7 +51,8 @@ public final class RequestComponentBuilder {
     
     private static volatile XACMLObjectBuilder<RequestType> requestTypeBuilder;
     
-    private static volatile XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    private static volatile XMLObjectBuilderFactory builderFactory = 
+        XMLObjectProviderRegistrySupport.getBuilderFactory();
     
     private RequestComponentBuilder() {
         // complete

@@ -37,7 +37,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.opensaml.saml2.core.NameID;
+import org.opensaml.saml.saml2.core.NameID;
 
 public final class SAMLUtils {
     private static final Logger LOG = 
@@ -48,7 +48,7 @@ public final class SAMLUtils {
     }
     
     public static Subject getSubject(Message message, SamlAssertionWrapper assertionW) {
-        org.opensaml.saml2.core.Subject s = assertionW.getSaml2().getSubject();
+        org.opensaml.saml.saml2.core.Subject s = assertionW.getSaml2().getSubject();
         Subject subject = new Subject();
         NameID nameId = s.getNameID();
         subject.setNameQualifier(nameId.getNameQualifier());
