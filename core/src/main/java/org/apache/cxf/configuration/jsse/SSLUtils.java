@@ -454,17 +454,23 @@ public final class SSLUtils {
                                            String[] supportedCipherSuites,
                                            FiltersType filters,
                                            Logger log, boolean exclude) {
-        String[] cipherSuites = null;
-        if (!(cipherSuitesList == null || cipherSuitesList.isEmpty())) {
-            cipherSuites = getCiphersFromList(cipherSuitesList, log, exclude);
-            return cipherSuites;
-        }
+        
+        // First check the "include" case only. If we have defined explicit "cipherSuite"
+        // configuration, then just return these. Otherwise see if we have defined ciphersuites
+        // via a system property.
         if (!exclude) {
-            cipherSuites = getSystemCiphersuites(log);
-            if (cipherSuites != null) {
-                return cipherSuites;
+            if (!(cipherSuitesList == null || cipherSuitesList.isEmpty())) {
+                return getCiphersFromList(cipherSuitesList, log, exclude);
+            } else {
+                String[] cipherSuites = getSystemCiphersuites(log);
+                if (cipherSuites != null) {
+                    return cipherSuites;
+                }
             }
         }
+    
+        // Otherwise check the "include/exclude" cipherSuiteFilter configuration
+        
         LogUtils.log(log, Level.FINE, "CIPHERSUITES_NOT_SET");
         if (filters == null) {
             LogUtils.log(log, Level.FINE, "CIPHERSUITE_FILTERS_NOT_SET");
@@ -504,11 +510,10 @@ public final class SSLUtils {
                      "CIPHERSUITES_EXCLUDED",
                      excludedCipherSuites);
         if (exclude) {
-            cipherSuites = getCiphersFromList(excludedCipherSuites, log, exclude);
+            return getCiphersFromList(excludedCipherSuites, log, exclude);
         } else {
-            cipherSuites = getCiphersFromList(filteredCipherSuites, log, exclude);
+            return getCiphersFromList(filteredCipherSuites, log, exclude);
         }
-        return cipherSuites;
     }
 
     private static String[] getSystemCiphersuites(Logger log) {

@@ -38,6 +38,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(CipherSuitesServer.class);
     static final String PORT2 = allocatePort(CipherSuitesServer.class, 2);
     static final String PORT3 = allocatePort(CipherSuitesServer.class, 3);
+    static final String PORT4 = allocatePort(CipherSuitesServer.class, 4);
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -98,6 +99,30 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
         
         updateAddressPort(port, PORT);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // Both client + server include a specific AES CipherSuite (not via a filter)
+    @org.junit.Test
+    public void testAESIncludedExplicitly() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-explicit-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT4);
         
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
         
@@ -389,5 +414,5 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+  
 }
