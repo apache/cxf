@@ -442,5 +442,28 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-  
+
+    // Both client + server include AES, client enables a TLS v1.2 CipherSuite
+    @org.junit.Test
+    public void testAESIncludedTLSv12() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-tlsv12.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 }

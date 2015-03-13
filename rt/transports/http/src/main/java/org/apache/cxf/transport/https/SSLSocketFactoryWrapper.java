@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
@@ -97,19 +96,21 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
     private Socket enableCipherSuites(Socket s, Object[] logParams) {
         SSLSocket socket = (SSLSocket)s;
         
-        if ((socket != null) && (ciphers != null)) {
-            socket.setEnabledCipherSuites(ciphers);
+        if (socket == null) {
+            LogUtils.log(LOG, Level.SEVERE,
+                         "PROBLEM_CREATING_OUTBOUND_REQUEST_SOCKET", 
+                         logParams);
+            return socket;
         }
-        if ((socket != null) && (protocol != null)) {
+
+        if (protocol != null) {
             String p[] = findProtocols(protocol, socket.getSupportedProtocols());
             if (p != null) {
                 socket.setEnabledProtocols(p);
             }
         }
-        if (socket == null) {
-            LogUtils.log(LOG, Level.SEVERE,
-                         "PROBLEM_CREATING_OUTBOUND_REQUEST_SOCKET", 
-                         logParams);
+        if (ciphers != null) {
+            socket.setEnabledCipherSuites(ciphers);
         }
 
         return socket;        
