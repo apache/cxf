@@ -44,6 +44,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -83,7 +84,6 @@ import org.apache.wss4j.policy.model.Wss11;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.X509Token.TokenType;
 import org.apache.wss4j.policy.model.XPath;
-import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -472,7 +472,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     }
     
     protected void configureLayout(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.LAYOUT);
+        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.LAYOUT);
         Layout layout = null;
         for (AssertionInfo ai : ais) {
             layout = (Layout)ai.getAssertion();
@@ -828,13 +828,13 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         SignedElements elements = null;
         
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        AssertionInfo assertionInfo = getFirstAssertionByLocalname(aim, SPConstants.SIGNED_PARTS);
+        AssertionInfo assertionInfo = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_PARTS);
         if (assertionInfo != null) {
             parts = (SignedParts)assertionInfo.getAssertion();
             assertionInfo.setAsserted(true);
         }
         
-        assertionInfo = getFirstAssertionByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+        assertionInfo = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
         if (assertionInfo != null) {
             elements = (SignedElements)assertionInfo.getAssertion();
             assertionInfo.setAsserted(true);
@@ -871,7 +871,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         
         if (elements != null && elements.getXPaths() != null) {
             for (XPath xPath : elements.getXPaths()) {
-                List<QName> qnames = PolicyUtils.getElementPath(xPath);
+                List<QName> qnames = 
+                    org.apache.wss4j.policy.stax.PolicyUtils.getElementPath(xPath);
                 if (!qnames.isEmpty()) {
                     SecurePart securePart = 
                         new SecurePart(qnames.get(qnames.size() - 1), Modifier.Element);
@@ -892,7 +893,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         ContentEncryptedElements celements = null;
         
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
+        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 parts = (EncryptedParts)ai.getAssertion();
@@ -900,7 +901,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             }            
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 elements = (EncryptedElements)ai.getAssertion();
@@ -908,7 +909,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             }            
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 celements = (ContentEncryptedElements)ai.getAssertion();
@@ -944,7 +945,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         
         if (elements != null && elements.getXPaths() != null) {
             for (XPath xPath : elements.getXPaths()) {
-                List<QName> qnames = PolicyUtils.getElementPath(xPath);
+                List<QName> qnames = 
+                    org.apache.wss4j.policy.stax.PolicyUtils.getElementPath(xPath);
                 if (!qnames.isEmpty()) {
                     SecurePart securePart = 
                         new SecurePart(qnames.get(qnames.size() - 1), Modifier.Element);
@@ -955,7 +957,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         
         if (celements != null && celements.getXPaths() != null) {
             for (XPath xPath : celements.getXPaths()) {
-                List<QName> qnames = PolicyUtils.getElementPath(xPath);
+                List<QName> qnames = 
+                    org.apache.wss4j.policy.stax.PolicyUtils.getElementPath(xPath);
                 if (!qnames.isEmpty()) {
                     SecurePart securePart = 
                         new SecurePart(qnames.get(qnames.size() - 1), Modifier.Content);

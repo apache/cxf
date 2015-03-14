@@ -32,6 +32,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -57,7 +58,8 @@ public class LayoutPolicyValidator extends AbstractTokenPolicyValidator {
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.LAYOUT);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.LAYOUT);
         if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, results, signedResults);
         }
@@ -82,10 +84,10 @@ public class LayoutPolicyValidator extends AbstractTokenPolicyValidator {
             }
         }
         
-        assertPolicy(aim, SPConstants.LAYOUT_LAX);
-        assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
-        assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
-        assertPolicy(aim, SPConstants.LAYOUT_STRICT);
+        PolicyUtils.assertPolicy(aim, SPConstants.LAYOUT_LAX);
+        PolicyUtils.assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
+        PolicyUtils.assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
+        PolicyUtils.assertPolicy(aim, SPConstants.LAYOUT_STRICT);
     }
     
     public boolean validatePolicy(

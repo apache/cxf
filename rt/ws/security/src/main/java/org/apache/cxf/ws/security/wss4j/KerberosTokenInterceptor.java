@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 
@@ -38,8 +39,8 @@ public class KerberosTokenInterceptor extends BinarySecurityTokenInterceptor {
     
     protected AbstractToken assertTokens(SoapMessage message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        assertPolicy(aim, "WssKerberosV5ApReqToken11");
-        assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
+        PolicyUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
+        PolicyUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
         return assertTokens(message, SPConstants.KERBEROS_TOKEN, false);
     }
 

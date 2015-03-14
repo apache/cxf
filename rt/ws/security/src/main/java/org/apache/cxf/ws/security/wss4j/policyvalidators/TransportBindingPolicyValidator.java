@@ -23,12 +23,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -48,15 +48,16 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
         if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, results, signedResults);
             
             // We don't need to check these policies for the Transport binding
-            assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
-            assertPolicy(aim, SP11Constants.ENCRYPTED_PARTS);
-            assertPolicy(aim, SP12Constants.SIGNED_PARTS);
-            assertPolicy(aim, SP11Constants.SIGNED_PARTS);
+            PolicyUtils.assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
+            PolicyUtils.assertPolicy(aim, SP11Constants.ENCRYPTED_PARTS);
+            PolicyUtils.assertPolicy(aim, SP12Constants.SIGNED_PARTS);
+            PolicyUtils.assertPolicy(aim, SP11Constants.SIGNED_PARTS);
         }
         
         return true;
@@ -83,7 +84,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             
             // HttpsToken is validated by the HttpsTokenInterceptorProvider
             if (binding.getTransportToken() != null) {
-                assertPolicy(aim, binding.getTransportToken());
+                PolicyUtils.assertPolicy(aim, binding.getTransportToken().getName());
             }
             
             // Check the IncludeTimestamp
@@ -92,7 +93,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted(error);
                 continue;
             }
-            assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
+            PolicyUtils.assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
         }
 
     }

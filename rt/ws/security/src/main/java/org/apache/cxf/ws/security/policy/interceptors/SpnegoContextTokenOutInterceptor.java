@@ -32,6 +32,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -52,7 +53,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         // extract Assertion information
         if (aim != null) {
             Collection<AssertionInfo> ais = 
-                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
             if (ais.isEmpty()) {
                 return;
             }

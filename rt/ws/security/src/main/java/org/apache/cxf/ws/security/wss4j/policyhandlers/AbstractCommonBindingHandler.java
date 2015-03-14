@@ -20,8 +20,6 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,13 +33,12 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
@@ -408,48 +405,11 @@ public abstract class AbstractCommonBindingHandler {
         }
     }
     
-    protected AssertionInfo getFirstAssertionByLocalname(
-        AssertionInfoMap aim, String localname
-    ) {
-        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        if (sp11Ais != null && !sp11Ais.isEmpty()) {
-            return sp11Ais.iterator().next();
-        }
-
-        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-        if (sp12Ais != null && !sp12Ais.isEmpty()) {
-            return sp12Ais.iterator().next();
-        }
-
-        return null;
-    }
-    
     protected Collection<AssertionInfo> getAllAssertionsByLocalname(String localname) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        return getAllAssertionsByLocalname(aim, localname);
+        return PolicyUtils.getAllAssertionsByLocalname(aim, localname);
     }
     
-    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
-        AssertionInfoMap aim,
-        String localname
-    ) {
-        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-
-        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
-            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
-            if (sp11Ais != null) {
-                ais.addAll(sp11Ais);
-            }
-            if (sp12Ais != null) {
-                ais.addAll(sp12Ais);
-            }
-            return ais;
-        }
-
-        return Collections.emptySet();
-    }
-
     protected SoapMessage getMessage() {
         return message;
     }
@@ -487,14 +447,15 @@ public abstract class AbstractCommonBindingHandler {
     
     protected Wss10 getWss10() {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.WSS10);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS10);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 return (Wss10)ai.getAssertion();
             }            
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.WSS11);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS11);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 return (Wss10)ai.getAssertion();
@@ -515,14 +476,9 @@ public abstract class AbstractCommonBindingHandler {
         return st;
     }
    
-    protected void assertPolicy(QName n) {
+    protected void assertPolicy(QName name) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }
-        }
+        PolicyUtils.assertPolicy(aim, name);
     } 
     
     protected void assertPolicy(Assertion assertion) {

@@ -22,21 +22,18 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.neethi.Assertion;
-
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -47,8 +44,6 @@ import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding.ProtectionOrder;
@@ -170,7 +165,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             ai.setNotAsserted(error);
             return false;
         }
-        assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
+        PolicyUtils.assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
         
         // Check the EntireHeaderAndBodySignatures property
         if (binding.isOnlySignEntireHeadersAndBody()
@@ -179,15 +174,15 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             ai.setNotAsserted(error);
             return false;
         }
-        assertPolicy(aim, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
+        PolicyUtils.assertPolicy(aim, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
         
         // Check whether the signatures were encrypted or not
         if (binding.isEncryptSignature() && !isSignatureEncrypted(results)) {
             ai.setNotAsserted("The signature is not protected");
             return false;
         }
-        assertPolicy(aim, SPConstants.ENCRYPT_SIGNATURE);
-        assertPolicy(aim, SPConstants.PROTECT_TOKENS);
+        PolicyUtils.assertPolicy(aim, SPConstants.ENCRYPT_SIGNATURE);
+        PolicyUtils.assertPolicy(aim, SPConstants.PROTECT_TOKENS);
         
         /*
         // Check ProtectTokens
@@ -215,13 +210,13 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
                 ai.setNotAsserted("Not encrypted before signed");
                 return false;
             }
-            assertPolicy(aim, SPConstants.ENCRYPT_BEFORE_SIGNING);
+            PolicyUtils.assertPolicy(aim, SPConstants.ENCRYPT_BEFORE_SIGNING);
         } else if (protectionOrder == ProtectionOrder.SignBeforeEncrypting) { 
             if (isEncryptedBeforeSigned(results)) {
                 ai.setNotAsserted("Not signed before encrypted");
                 return false;
             }
-            assertPolicy(aim, SPConstants.SIGN_BEFORE_ENCRYPTING);
+            PolicyUtils.assertPolicy(aim, SPConstants.SIGN_BEFORE_ENCRYPTING);
         }
         return true;
     }
@@ -447,17 +442,6 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         return false;
     }
     
-    protected void assertPolicy(AssertionInfoMap aim, Assertion token) {
-        Collection<AssertionInfo> ais = aim.get(token.getName());
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == token) {
-                    ai.setAsserted(true);
-                }
-            }    
-        }
-    }
-    
     protected void notAssertPolicy(AssertionInfoMap aim, Assertion token, String msg) {
         Collection<AssertionInfo> ais = aim.get(token.getName());
         if (ais != null && !ais.isEmpty()) {
@@ -469,28 +453,6 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         }
     }
     
-    protected boolean assertPolicy(AssertionInfoMap aim, String localname) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }    
-            return true;
-        }
-        return false;
-    }
-    
-    protected boolean assertPolicy(AssertionInfoMap aim, QName q) {
-        Collection<AssertionInfo> ais = aim.get(q);
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }    
-            return true;
-        }
-        return false;
-    }
-    
     protected void notAssertPolicy(AssertionInfoMap aim, QName q, String msg) {
         Collection<AssertionInfo> ais = aim.get(q);
         if (ais != null && !ais.isEmpty()) {
@@ -500,24 +462,4 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         }
     }
     
-    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
-        AssertionInfoMap aim,
-        String localname
-    ) {
-        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-        
-        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
-            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
-            if (sp11Ais != null) {
-                ais.addAll(sp11Ais);
-            }
-            if (sp12Ais != null) {
-                ais.addAll(sp12Ais);
-            }
-            return ais;
-        }
-            
-        return Collections.emptySet();
-    }
 }

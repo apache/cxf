@@ -44,6 +44,7 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -243,7 +244,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     }
     
     private boolean isAllowNoPassword(AssertionInfoMap aim) throws WSSecurityException {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
 
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
@@ -283,12 +285,12 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     
     protected UsernameToken assertTokens(SoapMessage message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
-        assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
-        assertPolicy(aim, SPConstants.HASH_PASSWORD);
-        assertPolicy(aim, SPConstants.NO_PASSWORD);
-        assertPolicy(aim, SP13Constants.NONCE);
-        assertPolicy(aim, SP13Constants.CREATED);
+        PolicyUtils.assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
+        PolicyUtils.assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
+        PolicyUtils.assertPolicy(aim, SPConstants.HASH_PASSWORD);
+        PolicyUtils.assertPolicy(aim, SPConstants.NO_PASSWORD);
+        PolicyUtils.assertPolicy(aim, SP13Constants.NONCE);
+        PolicyUtils.assertPolicy(aim, SP13Constants.CREATED);
 
         return (UsernameToken)assertTokens(message, SPConstants.USERNAME_TOKEN, true);
     }
@@ -299,7 +301,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         boolean signed
     ) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
         UsernameToken tok = null;
         for (AssertionInfo ai : ais) {
             tok = (UsernameToken)ai.getAssertion();
@@ -308,7 +311,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                 && (princ == null || !princ.isPasswordDigest())) {
                 ai.setNotAsserted("Password hashing policy not enforced");
             } else {
-                assertPolicy(aim, SPConstants.HASH_PASSWORD);
+                PolicyUtils.assertPolicy(aim, SPConstants.HASH_PASSWORD);
             }
             
             if ((tok.getPasswordType() != UsernameToken.PasswordType.NoPassword)
@@ -316,28 +319,28 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                 && (princ == null || princ.getPassword() == null)) {
                 ai.setNotAsserted("Username Token No Password supplied");
             } else {
-                assertPolicy(aim, SPConstants.NO_PASSWORD);
+                PolicyUtils.assertPolicy(aim, SPConstants.NO_PASSWORD);
             }
             
             if (tok.isCreated() && princ.getCreatedTime() == null) {
                 ai.setNotAsserted("No Created Time");
             } else {
-                assertPolicy(aim, SP13Constants.CREATED);
+                PolicyUtils.assertPolicy(aim, SP13Constants.CREATED);
             }
             
             if (tok.isNonce() && princ.getNonce() == null) {
                 ai.setNotAsserted("No Nonce");
             } else {
-                assertPolicy(aim, SP13Constants.NONCE);
+                PolicyUtils.assertPolicy(aim, SP13Constants.NONCE);
             }
         }
         
-        assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
-        assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
-        assertPolicy(aim, SPConstants.SUPPORTING_TOKENS);
+        PolicyUtils.assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
+        PolicyUtils.assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
+        PolicyUtils.assertPolicy(aim, SPConstants.SUPPORTING_TOKENS);
 
         if (signed || isTLSInUse(message)) {
-            assertPolicy(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
+            PolicyUtils.assertPolicy(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         }
         return tok;
     }
@@ -366,7 +369,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         if (utBuilder == null) {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             Collection<AssertionInfo> ais = 
-                getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
             for (AssertionInfo ai : ais) {
                 if (ai.isAsserted()) {
                     ai.setAsserted(false);

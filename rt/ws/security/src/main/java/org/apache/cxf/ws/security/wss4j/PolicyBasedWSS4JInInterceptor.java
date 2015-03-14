@@ -23,7 +23,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +55,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AlgorithmSuitePolicyValidator;
@@ -133,7 +133,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     private void handleWSS11(AssertionInfoMap aim, SoapMessage message) {
         if (isRequestor(message)) {
             message.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "false");
-            Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.WSS11);
+            Collection<AssertionInfo> ais = 
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS11);
             if (!ais.isEmpty()) {
                 for (AssertionInfo ai : ais) {
                     Wss11 wss11 = (Wss11)ai.getAssertion();
@@ -168,7 +169,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
     
     private boolean assertPolicy(AssertionInfoMap aim, String localname) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
+        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, localname);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
@@ -178,32 +179,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return false;
     }
     
-    private Collection<AssertionInfo> getAllAssertionsByLocalname(
-        AssertionInfoMap aim,
-        String localname
-    ) {
-        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-        
-        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
-            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
-            if (sp11Ais != null) {
-                ais.addAll(sp11Ais);
-            }
-            if (sp12Ais != null) {
-                ais.addAll(sp12Ais);
-            }
-            return ais;
-        }
-            
-        return Collections.emptySet();
-    }
-
     private String checkAsymmetricBinding(
         AssertionInfoMap aim, String action, SoapMessage message, RequestData data
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (ais.isEmpty()) {
             return action;
         }
@@ -289,7 +269,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
             Collection<AssertionInfo> ais = 
-                getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
             
             if (!ais.isEmpty()) {
                 return true;
@@ -307,7 +287,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
             Collection<AssertionInfo> ais = 
-                getAllAssertionsByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
             
             if (!ais.isEmpty()) {
                 return true;
@@ -325,7 +305,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
             Collection<AssertionInfo> ais = 
-                getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
             
             if (!ais.isEmpty()) {
                 return true;
@@ -339,7 +319,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim, SoapMessage message
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
         
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
@@ -355,7 +335,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim, String action, SoapMessage message, RequestData data
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
         if (ais.isEmpty()) {
             return action;
         }
@@ -505,7 +485,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                    CoverageType type,
                                    CoverageScope scope,
                                    final XPath xpath) throws SOAPException {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, name);
+        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, name);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
@@ -548,7 +528,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                               Element soapHeader,
                               Element soapBody,
                               CoverageType type) throws SOAPException {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, name);
+        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, name);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
@@ -654,7 +634,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             assertPolicy(aim, SPConstants.RSA_KEY_VALUE);
             
             // WSS10
-            ais = getAllAssertionsByLocalname(aim, SPConstants.WSS10);
+            ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS10);
             if (!ais.isEmpty()) {
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
@@ -666,7 +646,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
             
             // Trust 1.0
-            ais = getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
+            ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
             boolean trust10Asserted = false;
             if (!ais.isEmpty()) {
                 for (AssertionInfo ai : ais) {
@@ -681,7 +661,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
             
             // Trust 1.3
-            ais = getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
+            ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
             if (!ais.isEmpty()) {
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
@@ -973,7 +953,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     private boolean assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, Node header) 
         throws SOAPException {
         
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.REQUIRED_PARTS);
+        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.REQUIRED_PARTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 RequiredParts rp = (RequiredParts)ai.getAssertion();
@@ -988,7 +968,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.REQUIRED_ELEMENTS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.REQUIRED_ELEMENTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 RequiredElements rp = (RequiredElements)ai.getAssertion();
@@ -1025,17 +1005,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
 
     private boolean isTransportBinding(AssertionInfoMap aim, SoapMessage message) {
         Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
         if (ais.size() > 0) {
             return false;
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (ais.size() > 0) {
             return false;
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
         if (ais.size() > 0) {
             return true;
         }
@@ -1055,15 +1035,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
     
     private boolean containsXPathPolicy(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
         if (ais.size() > 0) {
             return true;
         }
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
         if (ais.size() > 0) {
             return true;
         }
-        ais = getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
         if (ais.size() > 0) {
             return true;
         }

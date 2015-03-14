@@ -69,6 +69,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
@@ -1057,7 +1058,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             return new ArrayList<WSEncryptionPart>();
         }
         
-        List<WSEncryptionPart> signedParts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> signedParts = new ArrayList<>();
         if (parts != null) {
             isBody = parts.isBody();
             for (Header head : parts.getHeaders()) {
@@ -2038,36 +2039,36 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     protected void addSupportingTokens(List<WSEncryptionPart> sigs) throws WSSecurityException {
         Collection<AssertionInfo> sgndSuppTokens = 
-            getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         List<SupportingToken> sigSuppTokList = this.handleSupportingTokens(sgndSuppTokens, false);
         
         Collection<AssertionInfo> endSuppTokens = 
-            getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_SUPPORTING_TOKENS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_SUPPORTING_TOKENS);
         endSuppTokList = this.handleSupportingTokens(endSuppTokens, true);
 
         Collection<AssertionInfo> sgndEndSuppTokens =
-            getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         sgndEndSuppTokList = this.handleSupportingTokens(sgndEndSuppTokens, true);
         
         Collection<AssertionInfo> sgndEncryptedSuppTokens =
-            getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         List<SupportingToken> sgndEncSuppTokList 
             = this.handleSupportingTokens(sgndEncryptedSuppTokens, false);
         
         Collection<AssertionInfo> endorsingEncryptedSuppTokens =
-            getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         endSuppTokList.addAll(this.handleSupportingTokens(endorsingEncryptedSuppTokens, true));
 
         Collection<AssertionInfo> sgndEndEncSuppTokens =
-            getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         sgndEndSuppTokList.addAll(this.handleSupportingTokens(sgndEndEncSuppTokens, true));
 
         Collection<AssertionInfo> supportingToks =
-            getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
         this.handleSupportingTokens(supportingToks, false);
 
         Collection<AssertionInfo> encryptedSupportingToks =
-            getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_SUPPORTING_TOKENS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_SUPPORTING_TOKENS);
         this.handleSupportingTokens(encryptedSupportingToks, false);
 
         //Setup signature parts

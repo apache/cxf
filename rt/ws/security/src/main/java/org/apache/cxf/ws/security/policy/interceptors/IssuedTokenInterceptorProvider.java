@@ -45,6 +45,7 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
@@ -149,7 +150,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             
             if (aim != null) {
                 Collection<AssertionInfo> ais = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }
@@ -196,7 +197,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         
         private Trust10 getTrust10(AssertionInfoMap aim) {
             Collection<AssertionInfo> ais = 
-                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
             if (ais.isEmpty()) {
                 return null;
             }
@@ -204,7 +205,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         }
         private Trust13 getTrust13(AssertionInfoMap aim) {
             Collection<AssertionInfo> ais = 
-                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
             if (ais.isEmpty()) {
                 return null;
             }
@@ -550,7 +551,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }

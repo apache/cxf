@@ -50,6 +50,7 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.policy.SP11Constants;
@@ -127,7 +128,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }
@@ -171,7 +172,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             }
                         };
                         message.put(MessageTrustDecider.class, trust);
-                        NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
+                        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
                     }
                     if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication) {
                         List<String> auth = headers.get("Authorization");
@@ -179,7 +180,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             || !auth.get(0).startsWith("Basic")) {
                             ai.setNotAsserted("HttpBasicAuthentication is set, but not being used");
                         } else {
-                            NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
+                            PolicyUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
                         }
                     }
                     if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
@@ -188,7 +189,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             || !auth.get(0).startsWith("Digest")) {
                             ai.setNotAsserted("HttpDigestAuthentication is set, but not being used");
                         } else {
-                            NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
+                            PolicyUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
                         }
                     }
                 } else {
@@ -213,7 +214,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
                 boolean requestor = isRequestor(message);
                 if (ais.isEmpty()) {
                     if (!requestor) {
@@ -252,9 +253,9 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         ai.setAsserted(true);
                     }
                     
-                    NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
-                    NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
-                    NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
+                    PolicyUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
+                    PolicyUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
+                    PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
                 }
             }
         }
@@ -287,7 +288,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             new HttpsSecurityTokenImpl(true, policy.getUserName());
                         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
                         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
-                        NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
+                        PolicyUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
                     }
                 }
                 if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
@@ -303,7 +304,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             new HttpsSecurityTokenImpl(false, policy.getUserName());
                         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
                         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
-                        NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
+                        PolicyUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
                     }
                 }
 
@@ -315,7 +316,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             || tlsInfo.getPeerCertificates().length == 0) {
                             asserted = false;
                         } else {
-                            NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
+                            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
                         }
                     }
                     

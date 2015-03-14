@@ -47,6 +47,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -84,15 +85,15 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     }
     private AbstractBinding getBinding(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = 
-            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
         if (!ais.isEmpty()) {
             return (AbstractBinding)ais.iterator().next().getAssertion();
         }
-        ais = NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (!ais.isEmpty()) {
             return (AbstractBinding)ais.iterator().next().getAssertion();
         }
-        ais = NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
         if (!ais.isEmpty()) {
             return (AbstractBinding)ais.iterator().next().getAssertion();
         }
@@ -104,7 +105,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         // extract Assertion information
         if (aim != null) {
             final Collection<AssertionInfo> ais = 
-                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
             if (ais.isEmpty()) {
                 return;
             }
@@ -255,7 +256,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     
     private SignedParts getSignedParts(AssertionInfoMap aim, String addNs) {
         Collection<AssertionInfo> signedPartsAis = 
-            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
         SignedParts signedParts = null;
         if (!signedPartsAis.isEmpty()) {
             signedParts = (SignedParts)signedPartsAis.iterator().next().getAssertion();
@@ -279,16 +280,16 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     }
     
     private void assertPolicies(AssertionInfoMap aim) {
-        NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
-        NegotiationUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_AMEND);
-        NegotiationUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_CANCEL);
-        NegotiationUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_RENEW);
+        PolicyUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
+        PolicyUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_AMEND);
+        PolicyUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_CANCEL);
+        PolicyUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_RENEW);
         QName oldCancelQName = 
             new QName(
                 "http://schemas.microsoft.com/ws/2005/07/securitypolicy", 
                 SPConstants.MUST_NOT_SEND_CANCEL
             );
-        NegotiationUtils.assertPolicy(aim, oldCancelQName);
+        PolicyUtils.assertPolicy(aim, oldCancelQName);
     }
 
     private void unmapSecurityProps(Message message) {
@@ -473,7 +474,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }
@@ -507,7 +508,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 return;
             }
             Collection<AssertionInfo> ais = 
-                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
             if (ais.isEmpty()) {
                 return;
             }

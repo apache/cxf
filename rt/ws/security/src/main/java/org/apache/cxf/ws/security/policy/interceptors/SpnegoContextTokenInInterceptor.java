@@ -42,6 +42,7 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -74,7 +75,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         // extract Assertion information
         if (aim != null) {
             Collection<AssertionInfo> ais = 
-                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
             if (ais.isEmpty()) {
                 return;
             }
@@ -375,7 +376,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }

@@ -44,6 +44,7 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -113,7 +114,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                         
                         // Check version against policy
                         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-                        for (AssertionInfo ai : getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN)) {
+                        for (AssertionInfo ai 
+                            : PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN)) {
                             SamlToken samlToken = (SamlToken)ai.getAssertion();
                             for (WSSecurityEngineResult result : samlResults) {
                                 SamlAssertionWrapper assertionWrapper = 
@@ -175,9 +177,9 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
     protected AbstractToken assertTokens(SoapMessage message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        assertPolicy(aim, "WssSamlV11Token10");
-        assertPolicy(aim, "WssSamlV11Token11");
-        assertPolicy(aim, "WssSamlV20Token11");
+        PolicyUtils.assertPolicy(aim, "WssSamlV11Token10");
+        PolicyUtils.assertPolicy(aim, "WssSamlV11Token11");
+        PolicyUtils.assertPolicy(aim, "WssSamlV20Token11");
         return assertTokens(message, SPConstants.SAML_TOKEN, true);
     }
 
@@ -191,7 +193,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             if (wrapper == null) {
                 AssertionInfoMap aim = message.get(AssertionInfoMap.class);
                 Collection<AssertionInfo> ais = 
-                    getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
                 for (AssertionInfo ai : ais) {
                     if (ai.isAsserted()) {
                         ai.setAsserted(false);
@@ -236,12 +238,12 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
             samlCallback.setSamlVersion(Version.SAML_11);
-            assertPolicy(aim, "WssSamlV11Token10");
-            assertPolicy(aim, "WssSamlV11Token11");
+            PolicyUtils.assertPolicy(aim, "WssSamlV11Token10");
+            PolicyUtils.assertPolicy(aim, "WssSamlV11Token11");
             
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
             samlCallback.setSamlVersion(Version.SAML_20);
-            assertPolicy(aim, "WssSamlV20Token11");
+            PolicyUtils.assertPolicy(aim, "WssSamlV20Token11");
         }
         SAMLUtil.doSAMLCallback(handler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
@@ -324,7 +326,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
             return false;
         }
-        assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), tokenType.name()));
+        PolicyUtils.assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), tokenType.name()));
         return true;
     }
     

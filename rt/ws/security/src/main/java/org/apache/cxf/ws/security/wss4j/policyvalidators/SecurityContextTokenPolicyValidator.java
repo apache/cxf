@@ -23,10 +23,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -49,7 +49,7 @@ public class SecurityContextTokenPolicyValidator
         List<WSSecurityEngineResult> signedResults
     ) {
         Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.SECURITY_CONTEXT_TOKEN);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURITY_CONTEXT_TOKEN);
         if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, results);
         }
@@ -70,9 +70,9 @@ public class SecurityContextTokenPolicyValidator
             SecurityContextToken sctPolicy = (SecurityContextToken)ai.getAssertion();
             ai.setAsserted(true);
             
-            assertPolicy(aim, SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE);
-            assertPolicy(aim, SP12Constants.SC13_SECURITY_CONTEXT_TOKEN);
-            assertPolicy(aim, SP11Constants.SC10_SECURITY_CONTEXT_TOKEN);
+            PolicyUtils.assertPolicy(aim, SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE);
+            PolicyUtils.assertPolicy(aim, SP12Constants.SC13_SECURITY_CONTEXT_TOKEN);
+            PolicyUtils.assertPolicy(aim, SP11Constants.SC10_SECURITY_CONTEXT_TOKEN);
 
             if (!isTokenRequired(sctPolicy, message)) {
                 continue;

@@ -43,6 +43,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.kerberos.KerberosClient;
 import org.apache.cxf.ws.security.kerberos.KerberosUtils;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.KerberosTokenInterceptor;
@@ -112,7 +113,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }
@@ -150,8 +151,8 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                     }                    
                 }
                 
-                NegotiationUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
-                NegotiationUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
+                PolicyUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                PolicyUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
             }
         }
         
@@ -172,7 +173,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
             if (aim != null && !enableStax) {
                 Collection<AssertionInfo> ais = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }
@@ -189,8 +190,8 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                     }                    
                 }
                 
-                NegotiationUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
-                NegotiationUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
+                PolicyUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                PolicyUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
             }
         }
         
@@ -252,7 +253,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
             if (aim != null && enableStax) {
                 Collection<AssertionInfo> ais = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }
@@ -275,8 +276,8 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                     }                    
                 }
                 
-                NegotiationUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
-                NegotiationUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
+                PolicyUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                PolicyUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
             }
         }
         

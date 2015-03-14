@@ -24,10 +24,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -51,16 +51,17 @@ public class UsernameTokenPolicyValidator
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
         if (!ais.isEmpty()) {
             parsePolicies(ais, message, results);
             
-            assertPolicy(aim, SP13Constants.CREATED);
-            assertPolicy(aim, SP13Constants.NONCE);
-            assertPolicy(aim, SPConstants.NO_PASSWORD);
-            assertPolicy(aim, SPConstants.HASH_PASSWORD);
-            assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
-            assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
+            PolicyUtils.assertPolicy(aim, SP13Constants.CREATED);
+            PolicyUtils.assertPolicy(aim, SP13Constants.NONCE);
+            PolicyUtils.assertPolicy(aim, SPConstants.NO_PASSWORD);
+            PolicyUtils.assertPolicy(aim, SPConstants.HASH_PASSWORD);
+            PolicyUtils.assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
+            PolicyUtils.assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
         }
         
         return true;

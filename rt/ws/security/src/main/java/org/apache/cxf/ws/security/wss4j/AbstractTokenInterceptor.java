@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -30,7 +29,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -49,11 +47,10 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 
@@ -118,62 +115,19 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     
     protected abstract AbstractToken assertTokens(SoapMessage message);
     
-    protected boolean assertPolicy(AssertionInfoMap aim, String localname) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }    
-            return true;
-        }
-        return false;
-    }
-    
-    protected boolean assertPolicy(AssertionInfoMap aim, QName name) {
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(name);
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }    
-            return true;
-        }
-        return false;
-    }
-    
-    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
-        AssertionInfoMap aim,
-        String localname
-    ) {
-        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-        
-        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
-            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
-            if (sp11Ais != null) {
-                ais.addAll(sp11Ais);
-            }
-            if (sp12Ais != null) {
-                ais.addAll(sp12Ais);
-            }
-            return ais;
-        }
-            
-        return Collections.emptySet();
-    }
-    
     protected AbstractToken assertTokens(SoapMessage message, String localname, boolean signed) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
+        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, localname);
         AbstractToken tok = null;
         for (AssertionInfo ai : ais) {
             tok = (AbstractToken)ai.getAssertion();
             ai.setAsserted(true);                
         }
         
-        assertPolicy(aim, SPConstants.SUPPORTING_TOKENS);
+        PolicyUtils.assertPolicy(aim, SPConstants.SUPPORTING_TOKENS);
         
         if (signed || isTLSInUse(message)) {
-            assertPolicy(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
+            PolicyUtils.assertPolicy(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         }
         return tok;
     }

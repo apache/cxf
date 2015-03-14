@@ -27,11 +27,11 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -60,11 +60,12 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
         body = soapBody;
         signed = signedResults;
         
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
         if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, results, signedResults);
             
-            assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
+            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
         }
         
         return true;
@@ -88,7 +89,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
             ai.setAsserted(true);
 
             if (!isTokenRequired(samlToken, message)) {
-                assertPolicy(
+                PolicyUtils.assertPolicy(
                     aim, 
                     new QName(samlToken.getVersion().getNamespace(), samlToken.getSamlTokenType().name())
                 );
@@ -166,7 +167,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
         }
         
         if (samlTokenType != null) {
-            assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), samlTokenType.name()));
+            PolicyUtils.assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), samlTokenType.name()));
         }
         return true;
     }

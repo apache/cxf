@@ -31,6 +31,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 
@@ -77,38 +78,38 @@ public class SecurityVerificationOutInterceptor extends AbstractPhaseInterceptor
     
     private boolean isThereASecurityBinding(AssertionInfoMap aim) {
         return 
-            NegotiationUtils.isThereAnAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING)
-            || NegotiationUtils.isThereAnAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING)
-            || NegotiationUtils.isThereAnAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+            PolicyUtils.isThereAnAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING)
+            || PolicyUtils.isThereAnAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING)
+            || PolicyUtils.isThereAnAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
     }
     
     private AssertionInfo getSecuredPart(AssertionInfoMap aim) {
         Collection<AssertionInfo> assertions = 
-            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
         if (!assertions.isEmpty()) {
             return assertions.iterator().next();
         }
         
         assertions = 
-            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
         if (!assertions.isEmpty()) {
             return assertions.iterator().next();
         }
         
         assertions = 
-            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
         if (!assertions.isEmpty()) {
             return assertions.iterator().next();
         }
         
         assertions = 
-            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
         if (!assertions.isEmpty()) {
             return assertions.iterator().next();
         }
         
         assertions = 
-            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
         if (!assertions.isEmpty()) {
             return assertions.iterator().next();
         }

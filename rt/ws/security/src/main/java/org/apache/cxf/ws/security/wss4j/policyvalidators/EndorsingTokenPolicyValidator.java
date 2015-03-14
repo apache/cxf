@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -57,7 +58,7 @@ public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicy
         List<WSSecurityEngineResult> encryptedResults
     ) {
         Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_SUPPORTING_TOKENS);
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_SUPPORTING_TOKENS);
         if (!ais.isEmpty()) {
             setMessage(message);
             setResults(results);

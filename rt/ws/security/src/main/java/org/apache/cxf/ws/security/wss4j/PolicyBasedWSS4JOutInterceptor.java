@@ -21,16 +21,13 @@ package org.apache.cxf.ws.security.wss4j;
 import java.security.Provider;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
@@ -45,6 +42,7 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
@@ -54,8 +52,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
@@ -120,6 +116,11 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         }
         
         private void handleMessageInternal(SoapMessage message) throws Fault {
+            AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+            if (aim == null) {
+                // no policies available
+                return;
+            }
             SOAPMessage saaj = message.getContent(SOAPMessage.class);
 
             boolean mustUnderstand = 
@@ -128,91 +129,100 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 );
             String actor = (String)message.getContextualProperty(SecurityConstants.ACTOR);
             
-            AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
-            if (aim != null) {
-                AbstractBinding transport = null;
-                Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-                if (!ais.isEmpty()) {
-                    for (AssertionInfo ai : ais) {
-                        transport = (AbstractBinding)ai.getAssertion();
-                        ai.setAsserted(true);
-                    }                    
+            AbstractBinding binding = getSecurityBinding(aim);
+
+            if (binding == null && isRequestor(message)) {
+                Policy policy = new Policy();
+                binding = new TransportBinding(org.apache.wss4j.policy.SPConstants.SPVersion.SP11,
+                                                 policy);
+            }
+
+            if (binding != null) {
+                WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand);
+                Element el = null;
+                try {
+                    el = secHeader.insertSecurityHeader(saaj.getSOAPPart());
+                } catch (WSSecurityException e) {
+                    throw new SoapFault(
+                        new Message("SECURITY_FAILED", LOG), e, message.getVersion().getSender()
+                    );
                 }
-                ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-                if (!ais.isEmpty()) {
-                    for (AssertionInfo ai : ais) {
-                        transport = (AbstractBinding)ai.getAssertion();
-                        ai.setAsserted(true);
-                    }                    
-                }
-                ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-                if (!ais.isEmpty()) {
-                    for (AssertionInfo ai : ais) {
-                        transport = (AbstractBinding)ai.getAssertion();
-                        ai.setAsserted(true);
-                    }                    
+                try {
+                    //move to end
+                    SAAJUtils.getHeader(saaj).removeChild(el);
+                    SAAJUtils.getHeader(saaj).appendChild(el);
+                } catch (SOAPException e) {
+                    //ignore
                 }
 
-                if (transport == null && isRequestor(message)) {
-                    Policy policy = new Policy();
-                    transport = new TransportBinding(org.apache.wss4j.policy.SPConstants.SPVersion.SP11,
-                                                     policy);
+                WSSConfig config = (WSSConfig)message.getContextualProperty(WSSConfig.class.getName());
+                if (config == null) {
+                    config = WSSConfig.getNewInstance();
                 }
-                
-                if (transport != null) {
-                    WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand);
-                    Element el = null;
-                    try {
-                        el = secHeader.insertSecurityHeader(saaj.getSOAPPart());
-                    } catch (WSSecurityException e) {
-                        throw new SoapFault(
-                            new Message("SECURITY_FAILED", LOG), e, message.getVersion().getSender()
-                        );
-                    }
-                    try {
-                        //move to end
-                        SAAJUtils.getHeader(saaj).removeChild(el);
-                        SAAJUtils.getHeader(saaj).appendChild(el);
-                    } catch (SOAPException e) {
-                        //ignore
-                    }
-                    
-                    WSSConfig config = (WSSConfig)message.getContextualProperty(WSSConfig.class.getName());
-                    if (config == null) {
-                        config = WSSConfig.getNewInstance();
-                    }
-                    translateProperties(message);
-                    
-                    String asymSignatureAlgorithm = 
-                        (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
-                    if (asymSignatureAlgorithm != null && transport.getAlgorithmSuite() != null) {
-                        transport.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
-                    }
+                translateProperties(message);
 
-                    try {
-                        if (transport instanceof TransportBinding) {
-                            new TransportBindingHandler(config, (TransportBinding)transport, saaj,
-                                                        secHeader, aim, message).handleBinding();
-                        } else if (transport instanceof SymmetricBinding) {
-                            new SymmetricBindingHandler(config, (SymmetricBinding)transport, saaj,
-                                                         secHeader, aim, message).handleBinding();
-                        } else {
-                            new AsymmetricBindingHandler(config, (AsymmetricBinding)transport, saaj,
-                                                         secHeader, aim, message).handleBinding();
-                        }
-                    } catch (SOAPException e) {
-                        throw new SoapFault(
-                            new Message("SECURITY_FAILED", LOG), e, message.getVersion().getSender()
-                        );
+                String asymSignatureAlgorithm = 
+                    (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
+                if (asymSignatureAlgorithm != null && binding.getAlgorithmSuite() != null) {
+                    binding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
+                }
+
+                try {
+                    if (binding instanceof TransportBinding) {
+                        new TransportBindingHandler(config, (TransportBinding)binding, saaj,
+                                                    secHeader, aim, message).handleBinding();
+                    } else if (binding instanceof SymmetricBinding) {
+                        new SymmetricBindingHandler(config, (SymmetricBinding)binding, saaj,
+                                                    secHeader, aim, message).handleBinding();
+                    } else {
+                        new AsymmetricBindingHandler(config, (AsymmetricBinding)binding, saaj,
+                                                     secHeader, aim, message).handleBinding();
                     }
-                    
-                    if (el.getFirstChild() == null) {
-                        el.getParentNode().removeChild(el);
-                    }
+                } catch (SOAPException e) {
+                    throw new SoapFault(
+                        new Message("SECURITY_FAILED", LOG), e, message.getVersion().getSender()
+                    );
+                }
+
+                if (el.getFirstChild() == null) {
+                    el.getParentNode().removeChild(el);
                 }
             }
             
+        }
+        
+        private AbstractBinding getSecurityBinding(AssertionInfoMap aim) {
+            Collection<AssertionInfo> ais = 
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+            if (!ais.isEmpty()) {
+                AbstractBinding binding = null;
+                for (AssertionInfo ai : ais) {
+                    binding = (AbstractBinding)ai.getAssertion();
+                    ai.setAsserted(true);
+                }
+                return binding;
+            }
+            ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+            if (!ais.isEmpty()) {
+                AbstractBinding binding = null;
+                for (AssertionInfo ai : ais) {
+                    binding = (AbstractBinding)ai.getAssertion();
+                    ai.setAsserted(true);
+                }
+                return binding;
+            }
+            ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+            if (!ais.isEmpty()) {
+                AbstractBinding binding = null;
+                for (AssertionInfo ai : ais) {
+                    binding = (AbstractBinding)ai.getAssertion();
+                    ai.setAsserted(true);
+                }
+                return binding;
+            }
+            
+            return null;
         }
 
         public Set<String> getAfter() {
@@ -246,27 +256,6 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             if (bspCompliant != null) {
                 msg.put(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
             }
-        }
-        
-        private Collection<AssertionInfo> getAllAssertionsByLocalname(
-            AssertionInfoMap aim,
-            String localname
-        ) {
-            Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-            Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-            
-            if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
-                Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
-                if (sp11Ais != null) {
-                    ais.addAll(sp11Ais);
-                }
-                if (sp12Ais != null) {
-                    ais.addAll(sp12Ais);
-                }
-                return ais;
-            }
-                
-            return Collections.emptySet();
         }
     }
 }

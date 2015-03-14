@@ -30,11 +30,11 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
@@ -57,7 +57,8 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
         if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, results);
         }

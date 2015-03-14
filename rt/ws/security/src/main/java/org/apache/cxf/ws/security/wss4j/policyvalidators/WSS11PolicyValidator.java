@@ -23,11 +23,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -47,19 +47,20 @@ public class WSS11PolicyValidator
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.WSS11);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS11);
         if (!ais.isEmpty()) {
             parsePolicies(ais, message, results);
             
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_THUMBPRINT);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY);
-            assertPolicy(aim, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION);
+            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_THUMBPRINT);
+            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY);
+            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION);
             
             // WSS 1.0
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
-            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
+            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER);
+            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL);
+            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
+            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
         }
         
         return true;

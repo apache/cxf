@@ -24,10 +24,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SPConstants;
@@ -49,7 +49,8 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, soapBody, results, signedResults, encryptedResults);
         }
@@ -163,14 +164,14 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
                 return false;
             }
         }
-        assertPolicy(aim, wrapper);
+        PolicyUtils.assertPolicy(aim, wrapper.getName());
         if (!checkDerivedKeys(wrapper, hasDerivedKeys, signedResults, encryptedResults)) {
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
-        assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
-        assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
 
         return true;
     }
@@ -184,14 +185,14 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults) {
 
-        assertPolicy(aim, wrapper);
+        PolicyUtils.assertPolicy(aim, wrapper.getName());
         if (!checkDerivedKeys(wrapper, hasDerivedKeys, signedResults, encryptedResults)) {
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
-        assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
-        assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
 
         return true;
     }

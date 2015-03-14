@@ -30,6 +30,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -59,21 +60,22 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
         if (!ais.isEmpty()) {
             parsePolicies(ais, message, signedResults, results);
             
-            assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10);
-            assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11);
-            assertPolicy(aim, SPConstants.WSS_X509_V1_TOKEN10);
-            assertPolicy(aim, SPConstants.WSS_X509_V1_TOKEN11);
-            assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN10);
-            assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN11);
+            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10);
+            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11);
+            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_V1_TOKEN10);
+            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_V1_TOKEN11);
+            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN10);
+            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN11);
             
-            assertPolicy(aim, SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE);
-            assertPolicy(aim, SPConstants.REQUIRE_THUMBPRINT_REFERENCE);
-            assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
-            assertPolicy(aim, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE);
+            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE);
+            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_THUMBPRINT_REFERENCE);
+            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
+            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE);
         }
         
         return true;

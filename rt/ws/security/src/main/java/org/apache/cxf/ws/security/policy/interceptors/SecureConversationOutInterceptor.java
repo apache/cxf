@@ -36,6 +36,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProvider.IssuedTokenOutInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
@@ -61,7 +62,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         // extract Assertion information
         if (aim != null) {
             Collection<AssertionInfo> ais = 
-                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
             if (ais.isEmpty()) {
                 return;
             }
@@ -92,13 +93,13 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     message.getExchange().put(SecurityConstants.TOKEN, tok);
                     NegotiationUtils.getTokenStore(message).add(tok);
                 }
-                NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
+                PolicyUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
             } else {
                 //server side should be checked on the way in
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
                 }
-                NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
+                PolicyUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
             }
         }
     }

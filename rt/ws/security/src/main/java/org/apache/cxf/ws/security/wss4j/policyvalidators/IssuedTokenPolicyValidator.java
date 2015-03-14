@@ -29,6 +29,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -107,8 +108,8 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         }
         
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
-        assertPolicy(aim, SPConstants.REQUIRE_EXTERNAL_REFERENCE);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EXTERNAL_REFERENCE);
         
         return true;
     }
@@ -143,8 +144,8 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         }
         
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
-        assertPolicy(aim, SPConstants.REQUIRE_EXTERNAL_REFERENCE);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
+        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EXTERNAL_REFERENCE);
         
         return true;
     }

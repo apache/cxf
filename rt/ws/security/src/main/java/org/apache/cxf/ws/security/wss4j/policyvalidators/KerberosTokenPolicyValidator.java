@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.KerberosToken;
@@ -49,11 +50,12 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
         AssertionInfoMap aim,
         KerberosSecurity kerberosToken
     ) {
-        Collection<AssertionInfo> krbAis = getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
+        Collection<AssertionInfo> krbAis = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
         if (!krbAis.isEmpty()) {
             parsePolicies(aim, krbAis, kerberosToken);
             
-            assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
+            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
         }
         
         return true;
@@ -69,12 +71,12 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
             ai.setAsserted(true);
             
             if (!isTokenRequired(kerberosTokenPolicy, message)) {
-                assertPolicy(
+                PolicyUtils.assertPolicy(
                     aim, 
                     new QName(kerberosTokenPolicy.getVersion().getNamespace(), 
                               "WssKerberosV5ApReqToken11")
                 );
-                assertPolicy(
+                PolicyUtils.assertPolicy(
                     aim, 
                     new QName(kerberosTokenPolicy.getVersion().getNamespace(), 
                               "WssGssKerberosV5ApReqToken11")
@@ -98,14 +100,14 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
 
         if (apReqTokenType == ApReqTokenType.WssKerberosV5ApReqToken11 
             && kerberosToken.isV5ApReq()) {
-            assertPolicy(
+            PolicyUtils.assertPolicy(
                 aim, 
                 new QName(kerberosTokenPolicy.getVersion().getNamespace(), "WssKerberosV5ApReqToken11")
             );
             return true;
         } else if (apReqTokenType == ApReqTokenType.WssGssKerberosV5ApReqToken11 
             && kerberosToken.isGssV5ApReq()) {
-            assertPolicy(
+            PolicyUtils.assertPolicy(
                 aim, 
                 new QName(kerberosTokenPolicy.getVersion().getNamespace(), "WssGssKerberosV5ApReqToken11")
             );

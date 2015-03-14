@@ -33,6 +33,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.policy.SP11Constants;
@@ -57,7 +58,6 @@ import org.apache.wss4j.policy.model.TransportToken;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.XPath;
-import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
@@ -159,7 +159,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     private void handleNonEndorsingSupportingTokens(AssertionInfoMap aim) throws Exception {
         Collection<AssertionInfo> ais;
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 SupportingTokens sgndSuppTokens = (SupportingTokens)ai.getAssertion();
@@ -170,7 +170,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             }
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 SupportingTokens sgndSuppTokens = (SupportingTokens)ai.getAssertion();
@@ -181,7 +181,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             }
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_SUPPORTING_TOKENS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_SUPPORTING_TOKENS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 SupportingTokens encrSuppTokens = (SupportingTokens)ai.getAssertion();
@@ -192,7 +192,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             }
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 SupportingTokens suppTokens = (SupportingTokens)ai.getAssertion();
@@ -233,7 +233,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     private void handleEndorsingSupportingTokens(AssertionInfoMap aim) throws Exception {
         Collection<AssertionInfo> ais;
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         if (!ais.isEmpty()) {
             SupportingTokens sgndSuppTokens = null;
             for (AssertionInfo ai : ais) {
@@ -247,7 +247,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             }
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_SUPPORTING_TOKENS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_SUPPORTING_TOKENS);
         if (!ais.isEmpty()) {
             SupportingTokens endSuppTokens = null;
             for (AssertionInfo ai : ais) {
@@ -261,7 +261,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 }
             }
         }
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         if (!ais.isEmpty()) {
             SupportingTokens endSuppTokens = null;
             for (AssertionInfo ai : ais) {
@@ -275,7 +275,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 }
             }
         }
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         if (!ais.isEmpty()) {
             SupportingTokens endSuppTokens = null;
             for (AssertionInfo ai : ais) {
@@ -412,7 +412,8 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         // Handle SignedElements
         if (signedElements != null && signedElements.getXPaths() != null) {
             for (XPath xPath : signedElements.getXPaths()) {
-                List<QName> qnames = PolicyUtils.getElementPath(xPath);
+                List<QName> qnames = 
+                    org.apache.wss4j.policy.stax.PolicyUtils.getElementPath(xPath);
                 if (!qnames.isEmpty()) {
                     SecurePart part = 
                         new SecurePart(qnames.get(qnames.size() - 1), Modifier.Element);

@@ -350,5 +350,5 @@ public final class WSS4JUtils {
         } 
         return CryptoFactory.getInstance(propFilename, classLoader);
     }
-    
+ 
 }
