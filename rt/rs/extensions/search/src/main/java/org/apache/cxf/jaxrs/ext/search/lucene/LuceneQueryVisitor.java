@@ -247,7 +247,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             final String luceneDateValue = getString(Date.class, getFieldTypeConverter(), date);
                 
             if (type == ConditionType.LESS_THAN || type == ConditionType.LESS_OR_EQUALS) {
-                return TermRangeQuery.newStringRange(name, "", luceneDateValue, minInclusive, maxInclusive);
+                return TermRangeQuery.newStringRange(name, null, luceneDateValue, minInclusive, maxInclusive);
             } else {
                 return TermRangeQuery.newStringRange(name, luceneDateValue, 
                     DateTools.dateToString(new Date(), Resolution.MILLISECOND), minInclusive, maxInclusive);
