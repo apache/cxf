@@ -22,11 +22,8 @@ package org.apache.cxf.ws.security.policy.interceptors;
 import java.util.Collection;
 import java.util.List;
 
-import javax.security.auth.callback.CallbackHandler;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -282,21 +279,6 @@ final class NegotiationUtils {
             }
         }
         return false;
-    }
-    
-    static CallbackHandler getCallbackHandler(Object o, Class<?> clazz) {
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = 
-                    (CallbackHandler)ClassLoaderUtils.loadClass((String)o, clazz).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        return handler;
     }
     
 }

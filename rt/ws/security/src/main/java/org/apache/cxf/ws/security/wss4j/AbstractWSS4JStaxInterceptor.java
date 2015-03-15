@@ -41,7 +41,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
@@ -53,6 +52,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -201,28 +201,23 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         SoapMessage soapMessage, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Object o = soapMessage.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-        if (o instanceof String) {
-            try {
-                o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-            }
+        CallbackHandler callbackHandler = SecurityUtils.getCallbackHandler(o);
             
-            if (o instanceof CallbackHandler) {
-                EndpointInfo info = soapMessage.getExchange().get(Endpoint.class).getEndpointInfo();
-                synchronized (info) {
-                    info.setProperty(SecurityConstants.CALLBACK_HANDLER, o);
-                }
-                soapMessage.getExchange().get(Endpoint.class).put(SecurityConstants.CALLBACK_HANDLER, o);
-                soapMessage.getExchange().put(SecurityConstants.CALLBACK_HANDLER, o);
+        if (callbackHandler != null) {
+            EndpointInfo info = soapMessage.getExchange().get(Endpoint.class).getEndpointInfo();
+            synchronized (info) {
+                info.setProperty(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
             }
-        }            
-        
+            soapMessage.getExchange().get(Endpoint.class).put(SecurityConstants.CALLBACK_HANDLER, 
+                                                              callbackHandler);
+            soapMessage.getExchange().put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
+        }
+
         
         // If we have a "password" but no CallbackHandler then construct one
-        if (o == null && getPassword(soapMessage) != null) {
+        if (callbackHandler == null && getPassword(soapMessage) != null) {
             final String password = getPassword(soapMessage);
-            o = new CallbackHandler() {
+            callbackHandler = new CallbackHandler() {
 
                 @Override
                 public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -236,7 +231,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             };
         }
         
-        if (o instanceof CallbackHandler) {
+        if (callbackHandler != null) {
             securityProperties.setCallbackHandler((CallbackHandler)o);
         }
     }

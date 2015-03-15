@@ -44,6 +44,7 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -164,7 +165,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         
         RequestData data = new CXFRequestData();
-        data.setCallbackHandler(getCallback(message));
+        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        data.setCallbackHandler(SecurityUtils.getCallbackHandler(o));
         data.setMsgContext(message);
         data.setWssConfig(WSSConfig.getNewInstance());
         

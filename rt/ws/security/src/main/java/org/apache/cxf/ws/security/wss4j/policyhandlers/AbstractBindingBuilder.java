@@ -69,6 +69,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -925,8 +926,15 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     public String getPassword(String userName, Assertion info, int usage) {
         //Then try to get the password from the given callback handler
-        CallbackHandler handler = getCallbackHandler();
-        if (handler == null) {
+        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        CallbackHandler handler = null;
+        try {
+            handler = SecurityUtils.getCallbackHandler(o);
+            if (handler == null) {
+                policyNotAsserted(info, "No callback handler and no password available");
+                return null;
+            }
+        } catch (WSSecurityException ex) {
             policyNotAsserted(info, "No callback handler and no password available");
             return null;
         }
@@ -942,25 +950,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return cb[0].getPassword();
     }
     
-    protected CallbackHandler getCallbackHandler() {
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-        
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-                message.put(SecurityConstants.CALLBACK_HANDLER, handler);
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        
-        return handler;
-    }
-
     /**
      * Generates a wsu:Id attribute for the provided {@code Element} and returns the attribute value
      * or finds and returns the value of the attribute if it already exists.
@@ -1506,9 +1495,14 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             return passwordEncryptor;
         }
         
-        CallbackHandler callbackHandler = getCallbackHandler();
-        if (callbackHandler != null) {
-            return new JasyptPasswordEncryptor(callbackHandler);
+        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        try {
+            CallbackHandler callbackHandler = SecurityUtils.getCallbackHandler(o);
+            if (callbackHandler != null) {
+                return new JasyptPasswordEncryptor(callbackHandler);
+            }
+        } catch (WSSecurityException ex) {
+            return null;
         }
         
         return null;

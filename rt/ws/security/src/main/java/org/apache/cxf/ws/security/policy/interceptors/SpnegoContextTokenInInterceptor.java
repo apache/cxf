@@ -42,6 +42,7 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -294,8 +295,8 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             String kerberosSpn = 
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_SPN);
             CallbackHandler callbackHandler = 
-                NegotiationUtils.getCallbackHandler(
-                    message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER), this.getClass()
+                SecurityUtils.getCallbackHandler(
+                    message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER)
                 );
 
             SpnegoTokenContext spnegoToken = new SpnegoTokenContext();

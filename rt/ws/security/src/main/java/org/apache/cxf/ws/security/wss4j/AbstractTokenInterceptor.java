@@ -32,7 +32,6 @@ import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -47,9 +46,11 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -141,24 +142,6 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         return false;
     }
     
-    protected CallbackHandler getCallback(SoapMessage message) {
-        //Then try to get the password from the given callback handler
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-    
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        return handler;
-    }
-
     protected TokenStore getTokenStore(SoapMessage message) {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
@@ -195,13 +178,19 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     protected String getPassword(String userName, AbstractToken info, 
                                  int usage, SoapMessage message) {
         //Then try to get the password from the given callback handler
-    
-        CallbackHandler handler = getCallback(message);
-        if (handler == null) {
+        CallbackHandler handler = null;
+        try {
+            Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+            handler = SecurityUtils.getCallbackHandler(o);
+            if (handler == null) {
+                policyNotAsserted(info, "No callback handler and no password available", message);
+                return null;
+            }
+        } catch (WSSecurityException ex) {
             policyNotAsserted(info, "No callback handler and no password available", message);
             return null;
         }
-        
+            
         WSPasswordCallback[] cb = {new WSPasswordCallback(userName, usage)};
         try {
             handler.handle(cb);

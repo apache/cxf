@@ -31,6 +31,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -100,7 +101,8 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
         throws WSSecurityException {
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         RequestData data = new CXFRequestData();
-        data.setCallbackHandler(getCallback(message));
+        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        data.setCallbackHandler(SecurityUtils.getCallbackHandler(o));
         data.setMsgContext(message);
         data.setWssConfig(WSSConfig.getNewInstance());
         

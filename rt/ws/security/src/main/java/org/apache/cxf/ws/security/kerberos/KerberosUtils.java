@@ -21,10 +21,11 @@ package org.apache.cxf.ws.security.kerberos;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
+import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
  * 
@@ -35,7 +36,7 @@ public final class KerberosUtils {
         //utility class
     }
     
-    public static KerberosClient getClient(Message message, String type) {
+    public static KerberosClient getClient(Message message, String type) throws WSSecurityException {
         KerberosClient client = (KerberosClient)message
             .getContextualProperty(SecurityConstants.KERBEROS_CLIENT);
         if (client == null) {
@@ -46,7 +47,7 @@ public final class KerberosUtils {
             String kerberosSpn = 
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_SPN);
             CallbackHandler callbackHandler = 
-                getCallbackHandler(
+                SecurityUtils.getCallbackHandler(
                     message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER)
                 );
             boolean useCredentialDelegation = 
@@ -72,21 +73,6 @@ public final class KerberosUtils {
             client.setRequestCredentialDelegation(requestCredentialDelegation);
         }
         return client;
-    }
-    
-    private static CallbackHandler getCallbackHandler(Object o) {
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils.loadClass((String)o, 
-                                                                      KerberosUtils.class).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        return handler;
     }
     
 }

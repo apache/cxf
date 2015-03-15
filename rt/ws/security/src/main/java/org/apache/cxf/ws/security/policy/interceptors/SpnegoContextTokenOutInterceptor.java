@@ -32,6 +32,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
@@ -100,10 +101,6 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             (String)message.getContextualProperty(SecurityConstants.KERBEROS_JAAS_CONTEXT_NAME);
         String kerberosSpn = 
             (String)message.getContextualProperty(SecurityConstants.KERBEROS_SPN);
-        CallbackHandler callbackHandler = 
-            NegotiationUtils.getCallbackHandler(
-                message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER), this.getClass()
-            );
         
         SpnegoTokenContext spnegoToken = new SpnegoTokenContext();
         Object spnegoClientAction = 
@@ -113,6 +110,11 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         }
         
         try {
+            CallbackHandler callbackHandler = 
+                SecurityUtils.getCallbackHandler(
+                    message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER)
+                );
+            
             spnegoToken.retrieveServiceTicket(jaasContext, callbackHandler, kerberosSpn);
         } catch (WSSecurityException e) {
             throw new Fault(e);

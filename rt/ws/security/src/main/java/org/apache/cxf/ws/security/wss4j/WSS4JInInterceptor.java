@@ -53,7 +53,6 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -70,6 +69,7 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.cache.ReplayCache;
@@ -703,17 +703,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     protected CallbackHandler getCallback(RequestData reqData) throws WSSecurityException {
         Object o = ((SoapMessage)reqData.getMsgContext())
             .getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-        if (o instanceof String) {
-            try {
-                o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-            }
-        }         
-        CallbackHandler cbHandler = null;
-        if (o instanceof CallbackHandler) {
-            cbHandler = (CallbackHandler)o;
-        }
+        CallbackHandler cbHandler = SecurityUtils.getCallbackHandler(o);
+        
         if (cbHandler == null) {
             try {
                 cbHandler = getPasswordCallbackHandler(reqData);
