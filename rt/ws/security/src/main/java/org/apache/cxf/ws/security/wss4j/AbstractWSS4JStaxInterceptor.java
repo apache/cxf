@@ -232,7 +232,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         }
         
         if (callbackHandler != null) {
-            securityProperties.setCallbackHandler((CallbackHandler)o);
+            securityProperties.setCallbackHandler(callbackHandler);
         }
     }
     
