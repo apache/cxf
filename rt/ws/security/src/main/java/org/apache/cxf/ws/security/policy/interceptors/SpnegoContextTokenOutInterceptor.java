@@ -62,12 +62,12 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                 SecurityToken tok = null;
                 if (tokId != null) {
-                    tok = NegotiationUtils.getTokenStore(message).getToken(tokId);
+                    tok = SecurityUtils.getTokenStore(message).getToken(tokId);
                     
                     if (tok != null && tok.isExpired()) {
                         message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
                         message.getExchange().remove(SecurityConstants.TOKEN_ID);
-                        NegotiationUtils.getTokenStore(message).remove(tokId);
+                        SecurityUtils.getTokenStore(message).remove(tokId);
                         tok = null;
                     }
                 }
@@ -81,7 +81,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     }
                     message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-                    NegotiationUtils.getTokenStore(message).add(tok);
+                    SecurityUtils.getTokenStore(message).add(tok);
                 }
             } else {
                 // server side should be checked on the way in

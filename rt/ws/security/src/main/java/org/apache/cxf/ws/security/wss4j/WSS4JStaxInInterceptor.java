@@ -44,6 +44,7 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ConfigurationConstants;
@@ -127,7 +128,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             
             final TokenStoreCallbackHandler callbackHandler = 
                 new TokenStoreCallbackHandler(
-                    secProps.getCallbackHandler(), WSS4JUtils.getTokenStore(soapMessage)
+                    secProps.getCallbackHandler(), SecurityUtils.getTokenStore(soapMessage)
                 );
             secProps.setCallbackHandler(callbackHandler);
 

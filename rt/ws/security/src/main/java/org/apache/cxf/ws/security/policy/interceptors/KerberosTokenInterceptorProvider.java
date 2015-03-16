@@ -41,18 +41,17 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.kerberos.KerberosClient;
 import org.apache.cxf.ws.security.kerberos.KerberosUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.KerberosTokenInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.StaxSecurityContextInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.KerberosTokenPolicyValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -99,11 +98,6 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
     }
     
-    
-    static final TokenStore getTokenStore(Message message) {
-        return WSS4JUtils.getTokenStore(message);
-    }
-
     static class KerberosTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         public KerberosTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
@@ -137,11 +131,11 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                                                                       tok.getId());
                         message.getExchange().put(SecurityConstants.TOKEN_ID, 
                                                   tok.getId());
-                        getTokenStore(message).add(tok);
+                        SecurityUtils.getTokenStore(message).add(tok);
                         
                         // Create another cache entry with the SHA1 Identifier as the key for easy retrieval
                         if (tok.getSHA1() != null) {
-                            getTokenStore(message).add(tok.getSHA1(), tok);
+                            SecurityUtils.getTokenStore(message).add(tok.getSHA1(), tok);
                         }
                     }
                 } else {
@@ -210,7 +204,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 if (valid) {
                     SecurityToken token = createSecurityToken(kerberosToken);
                     token.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
-                    getTokenStore(message).add(token);
+                    SecurityUtils.getTokenStore(message).add(token);
                     message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
                     return;
                 }
@@ -298,7 +292,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 // Just consume this for now as it isn't critical...
             }
             
-            getTokenStore(message).add(token);
+            SecurityUtils.getTokenStore(message).add(token);
             message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
         }
         

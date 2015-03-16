@@ -202,7 +202,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         PasswordEncryptor passwordEncryptor = getPasswordEncryptor(reqData);
         return 
             WSS4JUtils.loadCryptoFromPropertiesFile(
-                message, propFilename, this.getClass(), classLoader, passwordEncryptor
+                message, propFilename, classLoader, passwordEncryptor
             );
     }
     

@@ -19,13 +19,7 @@
 
 package org.apache.cxf.ws.security.tokenstore;
 
-import java.io.IOException;
-import java.net.URL;
-
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.ws.security.SecurityConstants;
 
 /**
  * An abstract factory to return a TokenStore instance. It returns an EHCacheTokenStoreFactory
@@ -59,32 +53,5 @@ public abstract class TokenStoreFactory {
     }
     
     public abstract TokenStore newTokenStore(String key, Message message);
-    
-    protected URL getConfigFileURL(Message message) {
-        Object o = message.getContextualProperty(SecurityConstants.CACHE_CONFIG_FILE);
-        if (o == null) {
-            o = "cxf-ehcache.xml";
-        }
-        
-        if (o instanceof String) {
-            URL url = null;
-            ResourceManager rm = message.getExchange().getBus().getExtension(ResourceManager.class);
-            url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, TokenStoreFactory.class);
-                }
-                if (url == null) {
-                    url = new URL((String)o);
-                }
-                return url;
-            } catch (IOException e) {
-                // Do nothing
-            }
-        } else if (o instanceof URL) {
-            return (URL)o;        
-        }
-        return null;
-    }
     
 }

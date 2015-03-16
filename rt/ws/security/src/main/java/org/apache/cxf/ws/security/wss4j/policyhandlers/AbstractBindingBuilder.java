@@ -51,7 +51,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -63,7 +62,6 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -303,7 +301,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected final TokenStore getTokenStore() {
-        return WSS4JUtils.getTokenStore(message);
+        return SecurityUtils.getTokenStore(message);
     }
     
     protected WSSecTimestamp createTimestamp() {
@@ -1472,9 +1470,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             return crypto;
         }
         
-        ResourceManager manager = 
-            message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
-        URL propsURL = WSS4JUtils.getPropertiesFileURL(o, manager, this.getClass());
+        URL propsURL = SecurityUtils.loadResource(message, o);
         Properties properties = WSS4JUtils.getProps(o, propsURL);
         
         if (properties != null) {

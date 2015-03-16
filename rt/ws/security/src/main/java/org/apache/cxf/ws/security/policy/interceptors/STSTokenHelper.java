@@ -26,7 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
@@ -36,12 +35,12 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -98,7 +97,7 @@ public final class STSTokenHelper {
             message.put(SecurityConstants.TOKEN_ID, tok.getId());
         }
         // ?
-        WSS4JUtils.getTokenStore(message).add(tok);
+        SecurityUtils.getTokenStore(message).add(tok);
 
         return tok;
     }
@@ -115,7 +114,7 @@ public final class STSTokenHelper {
             if (tok == null) {
                 String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                 if (tokId != null) {
-                    tok = WSS4JUtils.getTokenStore(message).getToken(tokId);
+                    tok = SecurityUtils.getTokenStore(message).getToken(tokId);
                 }
             }
         } else {
@@ -123,7 +122,7 @@ public final class STSTokenHelper {
             if (tok == null) {
                 String tokId = (String)message.get(SecurityConstants.TOKEN_ID);
                 if (tokId != null) {
-                    tok = WSS4JUtils.getTokenStore(message).getToken(tokId);
+                    tok = SecurityUtils.getTokenStore(message).getToken(tokId);
                 }
             }
         }
@@ -213,7 +212,7 @@ public final class STSTokenHelper {
         message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN);
-        NegotiationUtils.getTokenStore(message).remove(tok.getId());
+        SecurityUtils.getTokenStore(message).remove(tok.getId());
 
         // If the user has explicitly disabled Renewing then we can't renew a token,
         // so just get a new one
@@ -322,7 +321,7 @@ public final class STSTokenHelper {
                                            Element actAsToken,
                                            String appliesTo,
                                            boolean enableAppliesTo) throws Exception {
-        TokenStore tokenStore = WSS4JUtils.getTokenStore(message);
+        TokenStore tokenStore = SecurityUtils.getTokenStore(message);
         String key = appliesTo;
         if (!enableAppliesTo || key == null || "".equals(key)) {
             key = ASSOCIATED_TOKEN;
@@ -387,7 +386,7 @@ public final class STSTokenHelper {
         if (issuedToken == null) {
             return;
         }
-        TokenStore tokenStore = WSS4JUtils.getTokenStore(message);
+        TokenStore tokenStore = SecurityUtils.getTokenStore(message);
         String key = appliesTo;
         if (!enableAppliesTo || key == null || "".equals(key)) {
             key = ASSOCIATED_TOKEN;

@@ -33,9 +33,9 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -315,7 +315,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 // Set up CallbackHandler which wraps the configured Handler
                 TokenStoreCallbackHandler callbackHandler = 
                     new TokenStoreCallbackHandler(
-                        properties.getCallbackHandler(), WSS4JUtils.getTokenStore(message)
+                        properties.getCallbackHandler(), SecurityUtils.getTokenStore(message)
                     );
                 
                 properties.setCallbackHandler(callbackHandler);

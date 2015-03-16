@@ -49,12 +49,12 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
@@ -407,9 +407,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (e instanceof Crypto) {
             encrCrypto = (Crypto)e;
         } else if (e != null) {
-            ResourceManager manager = 
-                message.getExchange().getBus().getExtension(ResourceManager.class);
-            URL propsURL = WSS4JUtils.getPropertiesFileURL(e, manager, this.getClass());
+            URL propsURL = SecurityUtils.loadResource(message, e);
             Properties props = WSS4JUtils.getProps(e, propsURL);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Encryption properties: " + e);
@@ -456,9 +454,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (s instanceof Crypto) {
             signCrypto = (Crypto)s;
         } else if (s != null) {
-            ResourceManager manager = 
-                message.getExchange().getBus().getExtension(ResourceManager.class);
-            URL propsURL = WSS4JUtils.getPropertiesFileURL(s, manager, this.getClass());
+            URL propsURL = SecurityUtils.loadResource(message, s);
             Properties props = WSS4JUtils.getProps(s, propsURL);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Signature properties: " + s);

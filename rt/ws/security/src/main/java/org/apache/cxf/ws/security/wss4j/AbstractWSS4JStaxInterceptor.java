@@ -47,7 +47,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -382,7 +381,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         PasswordEncryptor passwordEncryptor = getPasswordEncryptor(soapMessage, securityProperties);
         return 
             WSS4JUtils.loadCryptoFromPropertiesFile(
-                soapMessage, propFilename, this.getClass(), getClassLoader(), passwordEncryptor
+                soapMessage, propFilename, getClassLoader(), passwordEncryptor
             );
     }
     
@@ -433,9 +432,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         } else if (e instanceof Crypto) {
             return (Crypto)e;
         } else {
-            ResourceManager manager = 
-                message.getExchange().getBus().getExtension(ResourceManager.class);
-            URL propsURL = WSS4JUtils.getPropertiesFileURL(e, manager, this.getClass());
+            URL propsURL = SecurityUtils.loadResource(message, e);
             Properties props = WSS4JUtils.getProps(e, propsURL);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Encryption properties: " + e);
@@ -463,9 +460,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         } else if (s instanceof Crypto) {
             return (Crypto)s;
         } else {
-            ResourceManager manager = 
-                message.getExchange().getBus().getExtension(ResourceManager.class);
-            URL propsURL = WSS4JUtils.getPropertiesFileURL(s, manager, this.getClass());
+            URL propsURL = SecurityUtils.loadResource(message, s);
             Properties props = WSS4JUtils.getProps(s, propsURL);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Signature properties: " + s);

@@ -54,7 +54,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 //import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
@@ -75,7 +74,6 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -100,6 +98,7 @@ import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.RemoteReferenceResolver;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
 import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
@@ -191,16 +190,12 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected String context;
     protected X509Certificate useKeyCertificate;
 
-    protected Map<String, Object> ctx = new HashMap<String, Object>();
+    protected Map<String, Object> ctx = new HashMap<>();
     
-    protected List<Interceptor<? extends Message>> in 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    protected List<Interceptor<? extends Message>> out 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    protected List<Interceptor<? extends Message>> outFault  
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    protected List<Interceptor<? extends Message>> inFault 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    protected List<Interceptor<? extends Message>> in = new ModCountCopyOnWriteArrayList<>();
+    protected List<Interceptor<? extends Message>> out = new ModCountCopyOnWriteArrayList<>();
+    protected List<Interceptor<? extends Message>> outFault = new ModCountCopyOnWriteArrayList<>();
+    protected List<Interceptor<? extends Message>> inFault = new ModCountCopyOnWriteArrayList<>();
     protected List<Feature> features;
 
     public AbstractSTSClient(Bus b) {
@@ -1559,15 +1554,11 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
     protected CallbackHandler createHandler() {
         Object o = getProperty(SecurityConstants.CALLBACK_HANDLER);
-        if (o instanceof String) {
-            try {
-                Class<?> cls = ClassLoaderUtils.loadClass((String)o, this.getClass());
-                o = cls.newInstance();
-            } catch (Exception e) {
-                throw new Fault(e);
-            }
+        try {
+            return SecurityUtils.getCallbackHandler(o);
+        } catch (Exception e) {
+            throw new Fault(e);
         }
-        return (CallbackHandler)o;
     }
 
     protected Object getProperty(String s) {
@@ -1592,8 +1583,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
         Object o = getProperty(SecurityConstants.STS_TOKEN_PROPERTIES + (decrypt ? ".decrypt" : ""));
         
-        ResourceManager manager = bus.getExtension(ResourceManager.class);
-        URL propsURL = WSS4JUtils.getPropertiesFileURL(o, manager, this.getClass());
+        URL propsURL = SecurityUtils.loadResource(message, o);
         Properties properties = WSS4JUtils.getProps(o, propsURL);
         
         if (properties != null) {

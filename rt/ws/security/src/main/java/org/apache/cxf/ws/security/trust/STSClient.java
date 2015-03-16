@@ -114,7 +114,7 @@ public class STSClient extends AbstractSTSClient {
         el = DOMUtils.getFirstElement(el);
         String reason = null;
         boolean valid = false;
-        List<SecurityToken> tokens = new LinkedList<SecurityToken>();
+        List<SecurityToken> tokens = new LinkedList<>();
         while (el != null) {
             if ("Status".equals(el.getLocalName())) {
                 Element e2 = DOMUtils.getFirstChildWithName(el, el.getNamespaceURI(), "Code");

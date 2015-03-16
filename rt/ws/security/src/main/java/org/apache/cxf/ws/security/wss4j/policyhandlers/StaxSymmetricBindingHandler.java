@@ -35,6 +35,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
@@ -117,7 +118,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         WSSSecurityProperties properties = getProperties();
         TokenStoreCallbackHandler callbackHandler = 
             new TokenStoreCallbackHandler(
-                properties.getCallbackHandler(), WSS4JUtils.getTokenStore(message)
+                properties.getCallbackHandler(), SecurityUtils.getTokenStore(message)
             );
         properties.setCallbackHandler(callbackHandler);
         
@@ -202,7 +203,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 }
 
                 // Get hold of the token from the token storage
-                tok = WSS4JUtils.getTokenStore(message).getToken(tokenId);
+                tok = SecurityUtils.getTokenStore(message).getToken(tokenId);
             }
             
             // Store key
@@ -334,7 +335,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 return;
             }
             if (sigTok == null) {
-                sigTok = WSS4JUtils.getTokenStore(message).getToken(sigTokId);
+                sigTok = SecurityUtils.getTokenStore(message).getToken(sigTokId);
             }
             
             // Store key
@@ -603,7 +604,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         tempTok.setKey(symmetricKey);
         tempTok.setSecret(symmetricKey.getEncoded());
         
-        WSS4JUtils.getTokenStore(message).add(tempTok);
+        SecurityUtils.getTokenStore(message).add(tempTok);
         
         return tempTok.getId();
     }

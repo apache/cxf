@@ -147,7 +147,7 @@ public class STSLoginModule implements LoginModule {
     private static final Logger LOG = LogUtils.getL7dLogger(STSLoginModule.class);
     private static final String TOKEN_STORE_KEY = "sts.login.module.tokenstore";
     
-    private Set<Principal> roles = new HashSet<Principal>();
+    private Set<Principal> roles = new HashSet<>();
     private Principal userPrincipal;
     private Subject subject;
     private CallbackHandler callbackHandler;
@@ -162,7 +162,7 @@ public class STSLoginModule implements LoginModule {
     private String keyType = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
     private String tokenType = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
     private String namespace;
-    private Map<String, Object> stsClientProperties = new HashMap<String, Object>();
+    private Map<String, Object> stsClientProperties = new HashMap<>();
     
     @Override
     public void initialize(Subject subj, CallbackHandler cbHandler, Map<String, ?> sharedState,

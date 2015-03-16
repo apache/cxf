@@ -47,6 +47,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -57,7 +58,6 @@ import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
@@ -445,7 +445,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (st == null) {
                 String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                 if (id != null) {
-                    st = WSS4JUtils.getTokenStore(message).getToken(id);
+                    st = SecurityUtils.getTokenStore(message).getToken(id);
                 }
             }
             if (st != null && !st.isExpired()) {
@@ -526,7 +526,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (tok == null) {
                 String tokId = (String)m2.getContextualProperty(SecurityConstants.TOKEN_ID);
                 if (tokId != null) {
-                    tok = NegotiationUtils.getTokenStore(m2).getToken(tokId);
+                    tok = SecurityUtils.getTokenStore(m2).getToken(tokId);
                 }
             }
 
@@ -549,7 +549,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     }
                     
                     client.cancelSecurityToken(tok);
-                    NegotiationUtils.getTokenStore(m2).remove(tok.getId());
+                    SecurityUtils.getTokenStore(m2).remove(tok.getId());
                     m2.put(SecurityConstants.TOKEN, null);
                 } catch (RuntimeException e) {
                     throw e;

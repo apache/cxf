@@ -33,9 +33,9 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -470,7 +470,7 @@ public abstract class AbstractCommonBindingHandler {
         if (st == null) {
             String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
             if (id != null) {
-                st = WSS4JUtils.getTokenStore(message).getToken(id);
+                st = SecurityUtils.getTokenStore(message).getToken(id);
             }
         }
         return st;

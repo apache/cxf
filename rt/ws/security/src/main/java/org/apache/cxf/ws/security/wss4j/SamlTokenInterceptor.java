@@ -38,7 +38,6 @@ import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -300,9 +299,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             return null;
         }
 
-        ResourceManager manager = 
-            message.getExchange().getBus().getExtension(ResourceManager.class);
-        URL propsURL = WSS4JUtils.getPropertiesFileURL(o, manager, this.getClass());
+        URL propsURL = SecurityUtils.loadResource(message, o);
         Properties properties = WSS4JUtils.getProps(o, propsURL);
 
         if (properties != null) {

@@ -32,18 +32,14 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.cache.CXFEHCacheReplayCache;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -109,7 +105,8 @@ public final class WSS4JUtils {
                             cacheKey += "-" + hashcode;
                         }
                     }
-                    URL configFile = getConfigFileURL(message);
+                    URL configFile = SecurityUtils.getConfigFileURL(message, SecurityConstants.CACHE_CONFIG_FILE,
+                                                                    "cxf-ehcache.xml");
 
                     if (ReplayCacheFactory.isEhCacheInstalled()) {
                         Bus bus = message.getExchange().getBus();
@@ -127,67 +124,6 @@ public final class WSS4JUtils {
         return null;
     }
     
-    private static URL getConfigFileURL(Message message) {
-        Object o = message.getContextualProperty(SecurityConstants.CACHE_CONFIG_FILE);
-        if (o == null) {
-            o = "/cxf-ehcache.xml";
-        }
-        
-        if (o instanceof String) {
-            URL url = null;
-            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
-            url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, ReplayCacheFactory.class);
-                }
-                if (url == null) {
-                    url = new URL((String)o);
-                }
-                return url;
-            } catch (IOException e) {
-                // Do nothing
-            }
-        } else if (o instanceof URL) {
-            return (URL)o;        
-        }
-        return null;
-    }
-    
-    public static TokenStore getTokenStore(Message message) {
-        return getTokenStore(message, true);
-    }
-    
-    public static TokenStore getTokenStore(Message message, boolean create) {
-        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-        synchronized (info) {
-            TokenStore tokenStore = 
-                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
-            if (tokenStore == null) {
-                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
-            }
-            if (create && tokenStore == null) {
-                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
-                String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
-                String cacheIdentifier = 
-                    (String)message.getContextualProperty(SecurityConstants.CACHE_IDENTIFIER);
-                if (cacheIdentifier != null) {
-                    cacheKey += "-" + cacheIdentifier;
-                } else if (info.getName() != null) {
-                    int hashcode = info.getName().toString().hashCode();
-                    if (hashcode < 0) {
-                        cacheKey += hashcode;
-                    } else {
-                        cacheKey += "-" + hashcode;
-                    }
-                }
-                tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
-                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
-            }
-            return tokenStore;
-        }
-    }
-    
     public static String parseAndStoreStreamingSecurityToken(
         org.apache.xml.security.stax.securityToken.SecurityToken securityToken,
         Message message
@@ -195,7 +131,7 @@ public final class WSS4JUtils {
         if (securityToken == null) {
             return null;
         }
-        SecurityToken existingToken = getTokenStore(message).getToken(securityToken.getId());
+        SecurityToken existingToken = SecurityUtils.getTokenStore(message).getToken(securityToken.getId());
         if (existingToken == null || existingToken.isExpired()) {
             Date created = new Date();
             Date expires = new Date();
@@ -229,7 +165,7 @@ public final class WSS4JUtils {
                 }
             }
 
-            getTokenStore(message).add(cachedTok);
+            SecurityUtils.getTokenStore(message).add(cachedTok);
 
             return cachedTok.getId();
         }
@@ -294,50 +230,14 @@ public final class WSS4JUtils {
         return properties;
     }
     
-    public static URL getPropertiesFileURL(
-        Object o, ResourceManager manager, Class<?> callingClass
-    ) {
-        if (o instanceof String) {
-            ClassLoaderHolder orig = null;
-            try {
-                URL url = ClassLoaderUtils.getResource((String)o, callingClass);
-                if (url == null) {
-                    ClassLoader loader = manager.resolveResource((String)o, ClassLoader.class);
-                    if (loader != null) {
-                        orig = ClassLoaderUtils.setThreadContextClassloader(loader);
-                    }
-                    url = manager.resolveResource((String)o, URL.class);
-                }
-                if (url == null) {
-                    try {
-                        url = new URL((String)o);
-                    } catch (IOException e) {
-                        // Do nothing
-                    }
-                }
-                return url;
-            } finally {
-                if (orig != null) {
-                    orig.reset();
-                }
-            }
-        } else if (o instanceof URL) {
-            return (URL)o;        
-        }
-        return null;
-    }
-    
     public static Crypto loadCryptoFromPropertiesFile(
         Message message,
         String propFilename, 
-        Class<?> callingClass,
         ClassLoader classLoader,
         PasswordEncryptor passwordEncryptor
     ) throws WSSecurityException {
         try {
-            ResourceManager manager = 
-                message.getExchange().getBus().getExtension(ResourceManager.class);
-            URL url = getPropertiesFileURL(propFilename, manager, callingClass);
+            URL url = SecurityUtils.loadResource(message, propFilename);
             if (url != null) {
                 Properties props = new Properties();
                 try (InputStream in = url.openStream()) { 

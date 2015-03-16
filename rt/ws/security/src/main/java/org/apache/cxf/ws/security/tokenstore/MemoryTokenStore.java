@@ -33,7 +33,7 @@ public class MemoryTokenStore implements TokenStore {
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     
-    private Map<String, CacheEntry> tokens = new ConcurrentHashMap<String, CacheEntry>();
+    private Map<String, CacheEntry> tokens = new ConcurrentHashMap<>();
     private long ttl = DEFAULT_TTL;
     
     public void add(SecurityToken token) {
