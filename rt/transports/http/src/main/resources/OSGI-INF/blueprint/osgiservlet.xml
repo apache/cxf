@@ -23,7 +23,7 @@ under the License.
   <cm:property-placeholder persistent-id="org.apache.cxf.osgi" id="cxfOsgiProperties" update-strategy="reload">
 
     <cm:default-properties>
-
+      <cm:property name="org.apache.cxf.servlet.init-prefix" value="org.apache.cxf.servlet."/>
       <cm:property name="org.apache.cxf.servlet.context" value="/cxf"/>
       <cm:property name="org.apache.cxf.servlet.name" value="cxf-osgi-transport-servlet"/>
       <cm:property name="org.apache.cxf.servlet.hide-service-list-page" value="false"/>
@@ -50,7 +50,7 @@ under the License.
 
   <service ref="osgiServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="init-prefix" value=""/>
+      <entry key="init-prefix" value="${org.apache.cxf.servlet.init-prefix}"/>
       <entry key="alias" value="${org.apache.cxf.servlet.context}"/>
       <entry key="servlet-name" value="${org.apache.cxf.servlet.name}"/>
       <entry key="hide-service-list-page" value="${org.apache.cxf.servlet.hide-service-list-page}"/>
