@@ -31,7 +31,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -42,6 +41,7 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.common.TestUtils;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
@@ -401,6 +401,9 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testIssueSaml1TokenRealmBCustomCryptoPKCS12() throws Exception {
+        if (!TestUtils.checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider

@@ -433,6 +433,9 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testDefaultSaml1BearerAssertionPKCS12() throws Exception {
+        if (!TestUtils.checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters = 
             createProviderParametersPKCS12(

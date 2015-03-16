@@ -21,6 +21,9 @@ package org.apache.cxf.systest.https.ciphersuites;
 
 import java.net.URL;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
@@ -35,6 +38,27 @@ import org.junit.BeforeClass;
  * A set of tests for TLS ciphersuites
  */
 public class CipherSuitesTest extends AbstractBusClientServerTestBase {
+    static final boolean UNRESTRICTED_POLICIES_INSTALLED;
+    static {
+        boolean ok = false;
+        try {
+            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+
+            SecretKey key192 = new SecretKeySpec(
+                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
+                            "AES");
+            Cipher c = Cipher.getInstance("AES");
+            c.init(Cipher.ENCRYPT_MODE, key192);
+            c.doFinal(data);
+            ok = true;
+        } catch (Exception e) {
+            //
+        }
+        UNRESTRICTED_POLICIES_INSTALLED = ok;
+    }
+    
     static final String PORT = allocatePort(CipherSuitesServer.class);
     static final String PORT2 = allocatePort(CipherSuitesServer.class, 2);
     static final String PORT3 = allocatePort(CipherSuitesServer.class, 3);
@@ -109,6 +133,10 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     // Both client + server include a specific AES CipherSuite (not via a filter)
     @org.junit.Test
     public void testAESIncludedExplicitly() throws Exception {
+        
+        if (!UNRESTRICTED_POLICIES_INSTALLED) {
+            return;
+        }
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-explicit-client.xml");
 
