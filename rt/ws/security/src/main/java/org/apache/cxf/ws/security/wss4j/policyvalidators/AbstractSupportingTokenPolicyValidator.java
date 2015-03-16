@@ -57,8 +57,6 @@ import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.X509Security;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.EncryptedElements;
@@ -159,9 +157,9 @@ public abstract class AbstractSupportingTokenPolicyValidator
             return true;
         }
         
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
         tokenResults.addAll(utResults);
-        List<WSSecurityEngineResult> dktResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> dktResults = new ArrayList<>();
         for (WSSecurityEngineResult wser : utResults) {
             if (derived) {
                 byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
@@ -221,8 +219,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Process Kerberos Tokens.
      */
     protected boolean processKerberosTokens() {
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
-        List<WSSecurityEngineResult> dktResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
+        List<WSSecurityEngineResult> dktResults = new ArrayList<>();
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.BST) {
@@ -268,8 +266,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Process X509 Tokens.
      */
     protected boolean processX509Tokens() {
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
-        List<WSSecurityEngineResult> dktResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
+        List<WSSecurityEngineResult> dktResults = new ArrayList<>();
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.BST) {
@@ -314,7 +312,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Process KeyValue Tokens.
      */
     protected boolean processKeyValueTokens() {
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
         for (WSSecurityEngineResult wser : signedResults) {
             PublicKey publicKey = 
                 (PublicKey)wser.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
@@ -373,8 +371,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Process Security Context Tokens.
      */
     protected boolean processSCTokens() {
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
-        List<WSSecurityEngineResult> dktResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
+        List<WSSecurityEngineResult> dktResults = new ArrayList<>();
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.SCT) {
@@ -729,13 +727,29 @@ public abstract class AbstractSupportingTokenPolicyValidator
         //Map<String, String> namespaces = elements.getDeclaredNamespaces();
         //List<String> xpaths = elements.getXPathExpressions();
         
-        if (xpaths != null) {
+        if (xpaths != null && !xpaths.isEmpty()) {
             SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
             Element soapEnvelope = soapMessage.getSOAPPart().getDocumentElement();
             
+            // XPathFactory and XPath are not thread-safe so we must recreate them
+            // each request.
+            final XPathFactory factory = XPathFactory.newInstance();
+            final XPath xpath = factory.newXPath();
+            
+            List<String> expressions = new ArrayList<>();
+            MapNamespaceContext namespaceContext = new MapNamespaceContext();
+            
             for (org.apache.wss4j.policy.model.XPath xPath : xpaths) {
-                if (!checkXPathResult(soapEnvelope, xPath.getXPath(), xPath.getPrefixNamespaceMap(), 
-                                      protResults, tokenResults)) {
+                expressions.add(xPath.getXPath());
+                Map<String, String> namespaceMap = xPath.getPrefixNamespaceMap();
+                if (namespaceMap != null) {
+                    namespaceContext.addNamespaces(namespaceMap);
+                }
+            }
+            xpath.setNamespaceContext(namespaceContext);
+            
+            for (org.apache.wss4j.policy.model.XPath xPath : xpaths) {
+                if (!checkXPathResult(soapEnvelope, xpath, xPath.getXPath(), protResults, tokenResults)) {
                     return false;
                 }
             }
@@ -749,44 +763,31 @@ public abstract class AbstractSupportingTokenPolicyValidator
      */
     private boolean checkXPathResult(
         Element soapEnvelope,
-        String xPath,
-        Map<String, String> namespaces,
+        XPath xpath,
+        String xPathString,
         List<WSSecurityEngineResult> protResults,
         List<WSSecurityEngineResult> tokenResults
     ) {
-        // XPathFactory and XPath are not thread-safe so we must recreate them
-        // each request.
-        final XPathFactory factory = XPathFactory.newInstance();
-        final XPath xpath = factory.newXPath();
-        
-        if (namespaces != null) {
-            xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
+        // Get the matching nodes
+        NodeList list;
+        try {
+            list = (NodeList)xpath.evaluate(xPathString, 
+                                            soapEnvelope,
+                                            XPathConstants.NODESET);
+        } catch (XPathExpressionException e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
+            return false;
         }
-        
-        // For each XPath
-        for (String xpathString : Arrays.asList(xPath)) {
-            // Get the matching nodes
-            NodeList list;
-            try {
-                list = (NodeList)xpath.evaluate(
-                        xpathString, 
-                        soapEnvelope,
-                        XPathConstants.NODESET);
-            } catch (XPathExpressionException e) {
-                LOG.log(Level.FINE, e.getMessage(), e);
-                return false;
-            }
-            
-            // If we found nodes then we need to do the check.
-            if (list.getLength() != 0) {
-                // For each matching element, check for a ref that
-                // covers it.
-                for (int x = 0; x < list.getLength(); x++) {
-                    final Element el = (Element)list.item(x);
-                    
-                    if (!checkProtectionResult(el, false, protResults, tokenResults)) {
-                        return false;
-                    }
+
+        // If we found nodes then we need to do the check.
+        if (list.getLength() != 0) {
+            // For each matching element, check for a ref that
+            // covers it.
+            for (int x = 0; x < list.getLength(); x++) {
+                final Element el = (Element)list.item(x);
+
+                if (!checkProtectionResult(el, false, protResults, tokenResults)) {
+                    return false;
                 }
             }
         }
@@ -883,39 +884,31 @@ public abstract class AbstractSupportingTokenPolicyValidator
     protected void assertSecurePartsIfTokenNotRequired(
         SupportingTokens supportingToken, AssertionInfoMap aim
     ) {
+        String namespace = supportingToken.getName().getNamespaceURI();
         if (supportingToken.getSignedParts() != null) {
             assertSecurePartsIfTokenNotRequired(supportingToken.getSignedParts(),
-                                                SPConstants.SIGNED_PARTS, aim);
+                                                new QName(namespace, SPConstants.SIGNED_PARTS), aim);
         }
         if (supportingToken.getSignedElements() != null) {
             assertSecurePartsIfTokenNotRequired(supportingToken.getSignedElements(),
-                                                SPConstants.SIGNED_ELEMENTS, aim);
+                                                new QName(namespace, SPConstants.SIGNED_ELEMENTS), aim);
         }
         if (supportingToken.getEncryptedParts() != null) {
             assertSecurePartsIfTokenNotRequired(supportingToken.getEncryptedParts(),
-                                                SPConstants.ENCRYPTED_PARTS, aim);
+                                                new QName(namespace, SPConstants.ENCRYPTED_PARTS), aim);
         }
         if (supportingToken.getEncryptedElements() != null) {
             assertSecurePartsIfTokenNotRequired(supportingToken.getEncryptedElements(),
-                                                SPConstants.ENCRYPTED_ELEMENTS, aim);
+                                                new QName(namespace, SPConstants.ENCRYPTED_ELEMENTS), aim);
         }
     }
 
     protected void assertSecurePartsIfTokenNotRequired(
-        AbstractSecurityAssertion securedPart, String localName, AssertionInfoMap aim
+        AbstractSecurityAssertion securedPart, QName name, AssertionInfoMap aim
     ) {
-        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localName));
-        if (sp11Ais != null && !sp11Ais.isEmpty()) {
-            for (AssertionInfo ai : sp11Ais) {
-                if (ai.getAssertion().equals(securedPart)) {
-                    ai.setAsserted(true);
-                }
-            }    
-        }
-
-        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localName));
-        if (sp12Ais != null && !sp12Ais.isEmpty()) {
-            for (AssertionInfo ai : sp12Ais) {
+        Collection<AssertionInfo> ais = aim.get(name);
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
                 if (ai.getAssertion().equals(securedPart)) {
                     ai.setAsserted(true);
                 }

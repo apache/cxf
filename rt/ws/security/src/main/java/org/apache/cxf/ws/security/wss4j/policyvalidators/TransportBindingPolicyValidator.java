@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -93,7 +95,8 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted(error);
                 continue;
             }
-            PolicyUtils.assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
+            PolicyUtils.assertPolicy(aim,
+                                     new QName(binding.getName().getNamespaceURI(), SPConstants.INCLUDE_TIMESTAMP));
         }
 
     }

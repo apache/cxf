@@ -23,6 +23,8 @@ import java.security.cert.Certificate;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
@@ -68,6 +70,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         for (AssertionInfo ai : ais) {
             IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
             ai.setAsserted(true);
+            assertToken(issuedToken, message.get(AssertionInfoMap.class));
 
             if (!isTokenRequired(issuedToken, message)) {
                 continue;
@@ -107,10 +110,6 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             }
         }
         
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EXTERNAL_REFERENCE);
-        
         return true;
     }
     
@@ -125,6 +124,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         for (AssertionInfo ai : ais) {
             IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
             ai.setAsserted(true);
+            assertToken(issuedToken, message.get(AssertionInfoMap.class));
 
             if (!isTokenRequired(issuedToken, message)) {
                 continue;
@@ -143,11 +143,18 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             }
         }
         
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EXTERNAL_REFERENCE);
-        
         return true;
+    }
+    
+    private void assertToken(IssuedToken token, AssertionInfoMap aim) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.isRequireExternalReference()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_EXTERNAL_REFERENCE));
+        }
+        if (token.isRequireInternalReference()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_INTERNAL_REFERENCE));
+        }
     }
     
     /**

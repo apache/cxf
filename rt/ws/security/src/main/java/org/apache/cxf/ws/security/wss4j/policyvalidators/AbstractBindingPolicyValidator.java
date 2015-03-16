@@ -165,7 +165,8 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             ai.setNotAsserted(error);
             return false;
         }
-        PolicyUtils.assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
+        String namespace = binding.getName().getNamespaceURI();
+        PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.INCLUDE_TIMESTAMP));
         
         // Check the EntireHeaderAndBodySignatures property
         if (binding.isOnlySignEntireHeadersAndBody()
@@ -174,15 +175,15 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             ai.setNotAsserted(error);
             return false;
         }
-        PolicyUtils.assertPolicy(aim, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
+        PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
         
         // Check whether the signatures were encrypted or not
         if (binding.isEncryptSignature() && !isSignatureEncrypted(results)) {
             ai.setNotAsserted("The signature is not protected");
             return false;
         }
-        PolicyUtils.assertPolicy(aim, SPConstants.ENCRYPT_SIGNATURE);
-        PolicyUtils.assertPolicy(aim, SPConstants.PROTECT_TOKENS);
+        PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.ENCRYPT_SIGNATURE));
+        PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.PROTECT_TOKENS));
         
         /*
         // Check ProtectTokens
@@ -205,18 +206,20 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         List<WSSecurityEngineResult> results
     ) {
         ProtectionOrder protectionOrder = binding.getProtectionOrder();
+        String namespace = binding.getName().getNamespaceURI();
+        
         if (protectionOrder == ProtectionOrder.EncryptBeforeSigning) {
             if (!binding.isProtectTokens() && isSignedBeforeEncrypted(results)) {
                 ai.setNotAsserted("Not encrypted before signed");
                 return false;
             }
-            PolicyUtils.assertPolicy(aim, SPConstants.ENCRYPT_BEFORE_SIGNING);
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.ENCRYPT_BEFORE_SIGNING));
         } else if (protectionOrder == ProtectionOrder.SignBeforeEncrypting) { 
             if (isEncryptedBeforeSigned(results)) {
                 ai.setNotAsserted("Not signed before encrypted");
                 return false;
             }
-            PolicyUtils.assertPolicy(aim, SPConstants.SIGN_BEFORE_ENCRYPTING);
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.SIGN_BEFORE_ENCRYPTING));
         }
         return true;
     }

@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -37,6 +39,7 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.SupportingTokens;
 import org.apache.wss4j.policy.model.UsernameToken.PasswordType;
+import org.apache.wss4j.policy.model.UsernameToken.UsernameTokenType;
 
 /**
  * Validate a UsernameToken policy.
@@ -54,20 +57,14 @@ public class UsernameTokenPolicyValidator
         Collection<AssertionInfo> ais = 
             PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
         if (!ais.isEmpty()) {
-            parsePolicies(ais, message, results);
-            
-            PolicyUtils.assertPolicy(aim, SP13Constants.CREATED);
-            PolicyUtils.assertPolicy(aim, SP13Constants.NONCE);
-            PolicyUtils.assertPolicy(aim, SPConstants.NO_PASSWORD);
-            PolicyUtils.assertPolicy(aim, SPConstants.HASH_PASSWORD);
-            PolicyUtils.assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
-            PolicyUtils.assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
+            parsePolicies(aim, ais, message, results);
         }
         
         return true;
     }
     
     private void parsePolicies(
+        AssertionInfoMap aim,
         Collection<AssertionInfo> ais, 
         Message message,
         List<WSSecurityEngineResult> results
@@ -82,6 +79,8 @@ public class UsernameTokenPolicyValidator
             org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy = 
                 (org.apache.wss4j.policy.model.UsernameToken)ai.getAssertion();
             ai.setAsserted(true);
+            assertToken(usernameTokenPolicy, aim);
+            
             if (!isTokenRequired(usernameTokenPolicy, message)) {
                 continue;
             }
@@ -96,6 +95,27 @@ public class UsernameTokenPolicyValidator
             if (!checkTokens(usernameTokenPolicy, ai, utResults)) {
                 continue;
             }
+        }
+    }
+    
+    private void assertToken(org.apache.wss4j.policy.model.UsernameToken token, AssertionInfoMap aim) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.isCreated()) {
+            PolicyUtils.assertPolicy(aim, SP13Constants.CREATED);
+        }
+        if (token.isNonce()) {
+            PolicyUtils.assertPolicy(aim, SP13Constants.NONCE);
+        }
+        
+        PasswordType passwordType = token.getPasswordType();
+        if (passwordType != null) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, passwordType.name()));
+        }
+        
+        UsernameTokenType usernameTokenType = token.getUsernameTokenType();
+        if (usernameTokenType != null) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, usernameTokenType.name()));
         }
     }
     

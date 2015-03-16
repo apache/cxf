@@ -77,17 +77,22 @@ public class LayoutPolicyValidator extends AbstractTokenPolicyValidator {
         for (AssertionInfo ai : ais) {
             Layout layout = (Layout)ai.getAssertion();
             ai.setAsserted(true);
+            assertToken(layout, aim);
             
             if (!validatePolicy(layout, results, signedResults)) {
                 String error = "Layout does not match the requirements";
                 ai.setNotAsserted(error);
             }
         }
-        
-        PolicyUtils.assertPolicy(aim, SPConstants.LAYOUT_LAX);
-        PolicyUtils.assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
-        PolicyUtils.assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
-        PolicyUtils.assertPolicy(aim, SPConstants.LAYOUT_STRICT);
+    }
+    
+    private void assertToken(Layout token, AssertionInfoMap aim) {
+        String namespace = token.getName().getNamespaceURI();
+
+        LayoutType layoutType = token.getLayoutType();
+        if (layoutType != null) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, layoutType.name()));
+        }
     }
     
     public boolean validatePolicy(

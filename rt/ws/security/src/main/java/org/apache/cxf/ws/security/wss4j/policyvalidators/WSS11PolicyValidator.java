@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -50,23 +52,14 @@ public class WSS11PolicyValidator
         Collection<AssertionInfo> ais = 
             PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS11);
         if (!ais.isEmpty()) {
-            parsePolicies(ais, message, results);
-            
-            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_THUMBPRINT);
-            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY);
-            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION);
-            
-            // WSS 1.0
-            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER);
-            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL);
-            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
-            PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
+            parsePolicies(aim, ais, message, results);
         }
         
         return true;
     }
     
     private void parsePolicies(
+        AssertionInfoMap aim,
         Collection<AssertionInfo> ais, 
         Message message,  
         List<WSSecurityEngineResult> results
@@ -77,6 +70,7 @@ public class WSS11PolicyValidator
         for (AssertionInfo ai : ais) {
             Wss11 wss11 = (Wss11)ai.getAssertion();
             ai.setAsserted(true);
+            assertToken(wss11, aim);
 
             if (!MessageUtils.isRequestor(message)) {
                 continue;
@@ -91,5 +85,33 @@ public class WSS11PolicyValidator
             }
         }
     }
+    
+    private void assertToken(Wss11 token, AssertionInfoMap aim) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.isMustSupportRefEmbeddedToken()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN));
+        }
+        if (token.isMustSupportRefEncryptedKey()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY));
+        }
+        if (token.isMustSupportRefExternalURI()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI));
+        }
+        if (token.isMustSupportRefIssuerSerial()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL));
+        }
+        if (token.isMustSupportRefKeyIdentifier()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER));
+        }
+        if (token.isMustSupportRefThumbprint()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.MUST_SUPPORT_REF_THUMBPRINT));
+        }
+        if (token.isRequireSignatureConfirmation()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION));
+        }
+        
+    }
+    
     
 }

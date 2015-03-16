@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
@@ -63,25 +65,14 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
         Collection<AssertionInfo> ais = 
             PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
         if (!ais.isEmpty()) {
-            parsePolicies(ais, message, signedResults, results);
-            
-            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10);
-            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11);
-            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_V1_TOKEN10);
-            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_V1_TOKEN11);
-            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN10);
-            PolicyUtils.assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN11);
-            
-            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE);
-            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_THUMBPRINT_REFERENCE);
-            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
-            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE);
+            parsePolicies(aim, ais, message, signedResults, results);
         }
         
         return true;
     }
     
     private void parsePolicies(
+        AssertionInfoMap aim,
         Collection<AssertionInfo> ais, 
         Message message,
         List<WSSecurityEngineResult> signedResults,
@@ -93,7 +84,8 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
         for (AssertionInfo ai : ais) {
             X509Token x509TokenPolicy = (X509Token)ai.getAssertion();
             ai.setAsserted(true);
-
+            assertToken(x509TokenPolicy, aim);
+            
             if (!isTokenRequired(x509TokenPolicy, message)) {
                 continue;
             }
@@ -109,6 +101,30 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
                 ai.setNotAsserted("An incorrect X.509 Token Type is detected");
                 continue;
             }
+        }
+    }
+    
+    private void assertToken(X509Token token, AssertionInfoMap aim) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        // Assert references
+        if (token.isRequireIssuerSerialReference()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE));
+        }
+        if (token.isRequireThumbprintReference()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_THUMBPRINT_REFERENCE));
+        }
+        if (token.isRequireEmbeddedTokenReference()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE));
+        }
+        if (token.isRequireKeyIdentifierReference()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE));
+        }
+       
+        // Assert TokenType
+        TokenType tokenType = token.getTokenType();
+        if (tokenType != null) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, tokenType.name()));
         }
     }
     

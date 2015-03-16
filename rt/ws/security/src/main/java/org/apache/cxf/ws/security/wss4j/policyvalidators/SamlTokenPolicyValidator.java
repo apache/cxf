@@ -64,8 +64,6 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
             PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
         if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, results, signedResults);
-            
-            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
         }
         
         return true;
@@ -87,6 +85,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
         for (AssertionInfo ai : ais) {
             SamlToken samlToken = (SamlToken)ai.getAssertion();
             ai.setAsserted(true);
+            assertToken(samlToken, aim);
 
             if (!isTokenRequired(samlToken, message)) {
                 PolicyUtils.assertPolicy(
@@ -170,6 +169,14 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
             PolicyUtils.assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), samlTokenType.name()));
         }
         return true;
+    }
+    
+    private void assertToken(SamlToken token, AssertionInfoMap aim) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.isRequireKeyIdentifierReference()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE));
+        }
     }
     
 }

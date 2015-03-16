@@ -54,8 +54,6 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
             PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
         if (!krbAis.isEmpty()) {
             parsePolicies(aim, krbAis, kerberosToken);
-            
-            PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
         }
         
         return true;
@@ -69,6 +67,7 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
         for (AssertionInfo ai : ais) {
             KerberosToken kerberosTokenPolicy = (KerberosToken)ai.getAssertion();
             ai.setAsserted(true);
+            assertToken(kerberosTokenPolicy, aim);
             
             if (!isTokenRequired(kerberosTokenPolicy, message)) {
                 PolicyUtils.assertPolicy(
@@ -88,6 +87,14 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
                 ai.setNotAsserted("An incorrect Kerberos Token Type is detected");
                 continue;
             }
+        }
+    }
+    
+    private void assertToken(KerberosToken token, AssertionInfoMap aim) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.isRequireKeyIdentifierReference()) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE));
         }
     }
     

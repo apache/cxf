@@ -69,11 +69,8 @@ public class SecurityContextTokenPolicyValidator
         for (AssertionInfo ai : ais) {
             SecurityContextToken sctPolicy = (SecurityContextToken)ai.getAssertion();
             ai.setAsserted(true);
+            assertToken(sctPolicy, aim);
             
-            PolicyUtils.assertPolicy(aim, SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE);
-            PolicyUtils.assertPolicy(aim, SP12Constants.SC13_SECURITY_CONTEXT_TOKEN);
-            PolicyUtils.assertPolicy(aim, SP11Constants.SC10_SECURITY_CONTEXT_TOKEN);
-
             if (!isTokenRequired(sctPolicy, message)) {
                 continue;
             }
@@ -84,6 +81,18 @@ public class SecurityContextTokenPolicyValidator
                 );
                 continue;
             }
+        }
+    }
+    
+    private void assertToken(SecurityContextToken token, AssertionInfoMap aim) {
+        if (token.isRequireExternalUriReference()) {
+            PolicyUtils.assertPolicy(aim, SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE);
+        }
+        if (token.isSc10SecurityContextToken()) {
+            PolicyUtils.assertPolicy(aim, SP11Constants.SC10_SECURITY_CONTEXT_TOKEN);
+        }
+        if (token.isSc13SecurityContextToken()) {
+            PolicyUtils.assertPolicy(aim, SP12Constants.SC13_SECURITY_CONTEXT_TOKEN);
         }
     }
 }

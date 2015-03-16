@@ -23,6 +23,8 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -32,6 +34,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.X509Token;
@@ -169,9 +172,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
+        assertToken(wrapper, aim);
 
         return true;
     }
@@ -190,11 +191,19 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
-        PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
+        assertToken(wrapper, aim);
 
         return true;
+    }
+    
+    private void assertToken(AbstractTokenWrapper tokenWrapper, AssertionInfoMap aim) {
+        String namespace = tokenWrapper.getName().getNamespaceURI();
+        
+        AbstractToken token = tokenWrapper.getToken();
+        DerivedKeys derivedKeys = token.getDerivedKeys();
+        if (derivedKeys != null) {
+            PolicyUtils.assertPolicy(aim, new QName(namespace, derivedKeys.name()));
+        }
     }
     
 }
