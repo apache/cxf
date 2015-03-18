@@ -193,33 +193,23 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         }
         
         private AbstractBinding getSecurityBinding(AssertionInfoMap aim) {
-            Collection<AssertionInfo> ais = 
-                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-            if (!ais.isEmpty()) {
-                AbstractBinding binding = null;
-                for (AssertionInfo ai : ais) {
-                    binding = (AbstractBinding)ai.getAssertion();
-                    ai.setAsserted(true);
-                }
-                return binding;
+            
+            AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+            if (transAis != null) {
+                transAis.setAsserted(true);
+                return (AbstractBinding)transAis.getAssertion();
             }
-            ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-            if (!ais.isEmpty()) {
-                AbstractBinding binding = null;
-                for (AssertionInfo ai : ais) {
-                    binding = (AbstractBinding)ai.getAssertion();
-                    ai.setAsserted(true);
-                }
-                return binding;
+            
+            AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+            if (asymAis != null) {
+                asymAis.setAsserted(true);
+                return (AbstractBinding)asymAis.getAssertion();
             }
-            ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-            if (!ais.isEmpty()) {
-                AbstractBinding binding = null;
-                for (AssertionInfo ai : ais) {
-                    binding = (AbstractBinding)ai.getAssertion();
-                    ai.setAsserted(true);
-                }
-                return binding;
+
+            AssertionInfo symAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+            if (symAis != null) {
+                symAis.setAsserted(true);
+                return (AbstractBinding)symAis.getAssertion();
             }
             
             return null;

@@ -25,6 +25,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.StaxAsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.StaxSymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.StaxTransportBindingHandler;
@@ -182,19 +183,22 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     ) throws WSSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         
-        AssertionInfo asymAis = getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (asymAis != null) {
             checkAsymmetricBinding(msg, securityProperties);
+            asymAis.setAsserted(true);
         }
         
-        AssertionInfo symAis = getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        AssertionInfo symAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
         if (symAis != null) {
             checkSymmetricBinding(msg, securityProperties);
+            symAis.setAsserted(true);
         }
         
-        AssertionInfo transAis = getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
         if (transAis != null) {
             checkTransportBinding(msg, securityProperties);
+            transAis.setAsserted(true);
         }
         
         super.configureProperties(msg, outboundSecurityContext, securityProperties);

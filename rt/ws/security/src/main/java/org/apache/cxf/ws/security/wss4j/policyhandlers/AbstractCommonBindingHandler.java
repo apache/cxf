@@ -447,21 +447,14 @@ public abstract class AbstractCommonBindingHandler {
     
     protected Wss10 getWss10() {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS10);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                return (Wss10)ai.getAssertion();
-            }            
+        AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.WSS10);
+        if (ai == null) {
+            ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.WSS11);
         }
         
-        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS11);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                return (Wss10)ai.getAssertion();
-            }            
-        }  
-        
+        if (ai != null) {
+            return (Wss10)ai.getAssertion();
+        }
         return null;
     }
     

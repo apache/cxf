@@ -25,6 +25,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
@@ -32,6 +33,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -46,6 +48,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -55,6 +58,8 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
  * UsernameTokenInterceptor.
  */
 public final class WSS4JUtils {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(WSS4JUtils.class);
     
     private WSS4JUtils() {
         // complete
@@ -251,4 +256,59 @@ public final class WSS4JUtils {
         return CryptoFactory.getInstance(propFilename, classLoader);
     }
  
+    public static Crypto getEncryptionCrypto(
+        Object e, 
+        SoapMessage message, 
+        PasswordEncryptor passwordEncryptor
+    ) throws WSSecurityException {
+        Crypto encrCrypto = null;
+        if (e instanceof Crypto) {
+            encrCrypto = (Crypto)e;
+        } else if (e != null) {
+            URL propsURL = SecurityUtils.loadResource(message, e);
+            Properties props = WSS4JUtils.getProps(e, propsURL);
+            if (props == null) {
+                LOG.fine("Cannot find Crypto Encryption properties: " + e);
+                Exception ex = new Exception("Cannot find Crypto Encryption properties: " + e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+            }
+            
+            encrCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
+                                                   passwordEncryptor);
+
+            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            synchronized (info) {
+                info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
+            }
+        }
+        return encrCrypto;
+    }
+    
+    public static Crypto getSignatureCrypto(
+        Object s, 
+        SoapMessage message, 
+        PasswordEncryptor passwordEncryptor
+    ) throws WSSecurityException {
+        Crypto signCrypto = null;
+        if (s instanceof Crypto) {
+            signCrypto = (Crypto)s;
+        } else if (s != null) {
+            URL propsURL = SecurityUtils.loadResource(message, s);
+            Properties props = WSS4JUtils.getProps(s, propsURL);
+            if (props == null) {
+                LOG.fine("Cannot find Crypto Signature properties: " + s);
+                Exception ex = new Exception("Cannot find Crypto Signature properties: " + s);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+            }
+            
+            signCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
+                                                   passwordEncryptor);
+
+            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            synchronized (info) {
+                info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
+            }
+        }
+        return signCrypto;
+    }
 }

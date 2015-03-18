@@ -19,14 +19,12 @@
 
 package org.apache.cxf.ws.security.wss4j;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -43,18 +41,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.transport.TLSSessionInfo;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
@@ -80,11 +75,9 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyVali
 import org.apache.cxf.ws.security.wss4j.policyvalidators.WSS11PolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -403,28 +396,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     private Crypto getEncryptionCrypto(Object e, 
                                        SoapMessage message, 
                                        RequestData requestData) throws WSSecurityException {
-        Crypto encrCrypto = null;
-        if (e instanceof Crypto) {
-            encrCrypto = (Crypto)e;
-        } else if (e != null) {
-            URL propsURL = SecurityUtils.loadResource(message, e);
-            Properties props = WSS4JUtils.getProps(e, propsURL);
-            if (props == null) {
-                LOG.fine("Cannot find Crypto Encryption properties: " + e);
-                Exception ex = new Exception("Cannot find Crypto Encryption properties: " + e);
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
-            }
-            
-            PasswordEncryptor passwordEncryptor = getPasswordEncryptor(message, requestData);
-            encrCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
-                                                   passwordEncryptor);
-
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-            synchronized (info) {
-                info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
-            }
-        }
-        return encrCrypto;
+        PasswordEncryptor passwordEncryptor = getPasswordEncryptor(message, requestData);
+        return WSS4JUtils.getEncryptionCrypto(e, message, passwordEncryptor);
     }
     
     private PasswordEncryptor getPasswordEncryptor(SoapMessage soapMessage, RequestData requestData) {
@@ -450,28 +423,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     
     private Crypto getSignatureCrypto(Object s, SoapMessage message, 
                                       RequestData requestData) throws WSSecurityException {
-        Crypto signCrypto = null;
-        if (s instanceof Crypto) {
-            signCrypto = (Crypto)s;
-        } else if (s != null) {
-            URL propsURL = SecurityUtils.loadResource(message, s);
-            Properties props = WSS4JUtils.getProps(s, propsURL);
-            if (props == null) {
-                LOG.fine("Cannot find Crypto Signature properties: " + s);
-                Exception ex = new Exception("Cannot find Crypto Signature properties: " + s);
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
-            }
-            
-            PasswordEncryptor passwordEncryptor = getPasswordEncryptor(message, requestData);
-            signCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
-                                                   passwordEncryptor);
-
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-            synchronized (info) {
-                info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
-            }
-        }
-        return signCrypto;
+        PasswordEncryptor passwordEncryptor = getPasswordEncryptor(message, requestData);
+        return WSS4JUtils.getSignatureCrypto(s, message, passwordEncryptor);
     }
     
     private boolean assertXPathTokens(AssertionInfoMap aim, 

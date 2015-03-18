@@ -44,6 +44,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -86,7 +87,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     private void checkAsymmetricBinding(
         AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        AssertionInfo ais = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (ais == null) {
             return;
         }
@@ -123,10 +124,10 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws XMLSecurityException {
         boolean transportPolicyInEffect = 
-            getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING) != null;
+            PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING) != null;
         if (!transportPolicyInEffect 
-            && !(getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING) == null
-                && getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING) == null)) {
+            && !(PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING) == null
+                && PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING) == null)) {
             return;
         }
         
@@ -191,7 +192,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     private void checkSymmetricBinding(
         AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        AssertionInfo ais = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
         if (ais == null) {
             return;
         }
@@ -281,7 +282,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     protected boolean isNonceCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
-            AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.USERNAME_TOKEN);
+            AssertionInfo ais = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.USERNAME_TOKEN);
             if (ais != null) {
                 return true;
             }
@@ -297,7 +298,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     protected boolean isTimestampCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
-            AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
+            AssertionInfo ais = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
             if (ais != null) {
                 return true;
             }
@@ -313,7 +314,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     protected boolean isSamlCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
-            AssertionInfo ais = getFirstAssertionByLocalname(aim, SPConstants.SAML_TOKEN);
+            AssertionInfo ais = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SAML_TOKEN);
             if (ais != null) {
                 return true;
             }

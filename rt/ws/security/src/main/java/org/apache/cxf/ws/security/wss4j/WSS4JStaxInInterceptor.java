@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import java.io.IOException;
 import java.security.Provider;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,9 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
@@ -45,14 +41,11 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.SecurityUtils;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
@@ -183,7 +176,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     protected List<SecurityEventListener> configureSecurityEventListeners(
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
-        final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
+        final List<SecurityEvent> incomingSecurityEventList = new LinkedList<>();
         msg.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         
@@ -426,33 +419,4 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
     }
 
-    private class TokenStoreCallbackHandler implements CallbackHandler {
-        private CallbackHandler internal;
-        private TokenStore store;
-        public TokenStoreCallbackHandler(CallbackHandler in, TokenStore st) {
-            internal = in;
-            store = st;
-        }
-        
-        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            for (int i = 0; i < callbacks.length; i++) {
-                if (callbacks[i] instanceof WSPasswordCallback) {
-                    WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-                    
-                    String id = pc.getIdentifier();
-                    SecurityToken tok = store.getToken(id);
-                    if (tok != null && !tok.isExpired()) {
-                        pc.setKey(tok.getSecret());
-                        pc.setKey(tok.getKey());
-                        pc.setCustomToken(tok.getToken());
-                        return;
-                    }
-                }
-            }
-            if (internal != null) {
-                internal.handle(callbacks);
-            }
-        }
-        
-    }
 }

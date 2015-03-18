@@ -164,7 +164,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
             
             // Add timestamp
-            List<WSEncryptionPart> sigs = new ArrayList<WSEncryptionPart>();
+            List<WSEncryptionPart> sigs = new ArrayList<>();
             if (timestampEl != null) {
                 WSEncryptionPart timestampPart = 
                     convertToEncryptionPart(timestampEl.getElement());
@@ -309,7 +309,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             assertToken(initiatorToken);
         }
         
-        List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> sigParts = new ArrayList<>();
         if (timestampEl != null) {
             WSEncryptionPart timestampPart = 
                 convertToEncryptionPart(timestampEl.getElement());
@@ -722,14 +722,17 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 CastUtils.cast(
                     (List<?>)message.getExchange().getInMessage().get(WSHandlerConstants.RECV_RESULTS));
             if (results != null) {
-                encryptedKeyId = getRequestEncryptedKeyId(results);
-                encryptedKeyValue = getRequestEncryptedKeyValue(results);
+                WSSecurityEngineResult encryptedKeyResult = getEncryptedKeyResult();
+                if (encryptedKeyResult != null) {
+                    encryptedKeyId = (String)encryptedKeyResult.get(WSSecurityEngineResult.TAG_ID);
+                    encryptedKeyValue = (byte[])encryptedKeyResult.get(WSSecurityEngineResult.TAG_SECRET);
+                }
                 
                 //In the case where we don't have the EncryptedKey in the 
                 //request, for the control to have reached this state,
                 //the scenario MUST be a case where this is the response
                 //message by a listener created for an async client
-                //Therefor we will create a new EncryptedKey
+                //Therefore we will create a new EncryptedKey
                 if (encryptedKeyId == null && encryptedKeyValue == null) {
                     createEncryptedKey(wrapper, token);
                 }
@@ -739,49 +742,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         } else {
             createEncryptedKey(wrapper, token);
         }
-    }
-    
-    public static String getRequestEncryptedKeyId(List<WSHandlerResult> results) {
-        
-        for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
-            /*
-             * Scan the results for the first Signature action. Use the
-             * certificate of this Signature to set the certificate for the
-             * encryption action :-).
-             */
-            for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                String encrKeyId = (String)wser.get(WSSecurityEngineResult.TAG_ID);
-                if (actInt.intValue() == WSConstants.ENCR && encrKeyId != null) {
-                    return encrKeyId;
-                }
-            }
-        }
-        
-        return null;
-    }
-    
-    public static byte[] getRequestEncryptedKeyValue(List<WSHandlerResult> results) {
-        
-        for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
-
-            /*
-            * Scan the results for the first Signature action. Use the
-            * certificate of this Signature to set the certificate for the
-            * encryption action :-).
-            */
-            for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                byte[] decryptedKey = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                if (actInt.intValue() == WSConstants.ENCR && decryptedKey != null) {
-                    return decryptedKey;
-                }
-            }
-        }
-        
-        return null;
     }
     
     private void createEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken token)
@@ -798,10 +758,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         this.addEncryptedKeyElement(encrKey.getEncryptedKeyElement());
         encryptedKeyValue = encrKey.getEphemeralKey();
         encryptedKeyId = encrKey.getId();
-        
-        //Store the token for client - response verification 
-        // and server - response creation
-        message.put(WSSecEncryptedKey.class.getName(), encrKey);
     }
 
     private String getSAMLToken() {

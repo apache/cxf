@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.security.Provider;
 import java.security.PublicKey;
@@ -34,9 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -70,12 +67,10 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.SecurityUtils;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -655,36 +650,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         return action;
     }
     
-    private class TokenStoreCallbackHandler implements CallbackHandler {
-        private CallbackHandler internal;
-        private TokenStore store;
-        public TokenStoreCallbackHandler(CallbackHandler in,
-                                         TokenStore st) {
-            internal = in;
-            store = st;
-        }
-        
-        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            for (Callback callback : callbacks) {
-                if (callback instanceof WSPasswordCallback) {
-                    WSPasswordCallback pc = (WSPasswordCallback)callback;
-                    
-                    String id = pc.getIdentifier();
-                    SecurityToken tok = store.getToken(id);
-                    if (tok != null && !tok.isExpired()) {
-                        pc.setKey(tok.getSecret());
-                        pc.setCustomToken(tok.getToken());
-                        return;
-                    }
-                }
-            }
-            if (internal != null) {
-                internal.handle(callbacks);
-            }
-        }
-        
-    }
-
     protected CallbackHandler getCallback(RequestData reqData, boolean utWithCallbacks) 
         throws WSSecurityException {
         if (!utWithCallbacks) {

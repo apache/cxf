@@ -603,8 +603,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         SignedElements signedElements
     ) throws SOAPException {
         
-        List<WSEncryptionPart> result = new ArrayList<WSEncryptionPart>();
-        List<Element> found = new ArrayList<Element>();
+        List<WSEncryptionPart> result = new ArrayList<>();
+        List<Element> found = new ArrayList<>();
         
         // Add timestamp
         if (timestampEl != null) {
@@ -620,7 +620,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
         // Add SignedParts
         if (signedParts != null) {
-            List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+            List<WSEncryptionPart> parts = new ArrayList<>();
             boolean isSignBody = signedParts.isBody();
             
             for (Header head : signedParts.getHeaders()) {

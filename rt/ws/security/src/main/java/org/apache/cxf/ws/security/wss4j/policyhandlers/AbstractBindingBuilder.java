@@ -53,7 +53,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -163,7 +162,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected String mainSigId;
     protected List<WSEncryptionPart> sigConfList;
     
-    protected Set<WSEncryptionPart> encryptedTokensList = new HashSet<WSEncryptionPart>();
+    protected Set<WSEncryptionPart> encryptedTokensList = new HashSet<>();
 
     protected Set<Integer> signatures = new HashSet<>();
 
@@ -177,7 +176,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     private Element lastSupportingTokenElement;
     private Element lastDerivedKeyElement;
     
-    private List<AbstractSecurityAssertion> suppTokenParts = new ArrayList<AbstractSecurityAssertion>();
+    private List<AbstractSecurityAssertion> suppTokenParts = new ArrayList<>();
     private List<SupportingToken> endSuppTokList;
     private List<SupportingToken> sgndEndSuppTokList;
     
@@ -320,22 +319,15 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             timestampEl.setTimeToLive(ttl);
             timestampEl.prepare(saaj.getSOAPPart());
             
-            Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.INCLUDE_TIMESTAMP);
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }                    
+            String namespace = binding.getName().getNamespaceURI();
+            PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.INCLUDE_TIMESTAMP));
         }
         return timestampEl;
     }
     
     protected WSSecTimestamp handleLayout(WSSecTimestamp timestamp) {
         if (binding.getLayout() != null) {
-            Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.LAYOUT);
-            AssertionInfo ai = null;
-            for (AssertionInfo layoutAi : ais) {
-                layoutAi.setAsserted(true);
-                ai = layoutAi;
-            }   
+            AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.LAYOUT);
             
             if (binding.getLayout().getLayoutType() == LayoutType.LaxTsLast) {
                 if (timestamp == null) {
@@ -397,7 +389,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         Collection<AssertionInfo> tokensInfos, 
         boolean endorse
     ) throws WSSecurityException {
-        List<SupportingToken> ret = new ArrayList<SupportingToken>();
+        List<SupportingToken> ret = new ArrayList<>();
         if (tokensInfos != null) {
             for (AssertionInfo assertionInfo : tokensInfos) {
                 if (assertionInfo.getAssertion() instanceof SupportingTokens) {
@@ -588,8 +580,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return (Element)secHeader.getSecurityHeader().getOwnerDocument().importNode(el, true);
     }
 
-    protected void addSignatureParts(List<SupportingToken> tokenList,
-                                       List<WSEncryptionPart> sigParts) {
+    protected void addSignatureParts(List<SupportingToken> tokenList, List<WSEncryptionPart> sigParts) {
         
         for (SupportingToken supportingToken : tokenList) {
             
@@ -831,17 +822,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
         }
         
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
+        CallbackHandler handler = SecurityUtils.getCallbackHandler(o);
         if (handler == null) {
             policyNotAsserted(token, "No SAML CallbackHandler available");
             return null;
@@ -1011,8 +992,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     public List<WSEncryptionPart> getEncryptedParts() 
         throws SOAPException {
         
-        boolean isBody = false;
-        
         EncryptedParts parts = null;
         EncryptedElements elements = null;
         ContentEncryptedElements celements = null;
@@ -1042,23 +1021,24 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         }
         
         if (parts == null && elements == null && celements == null) {
-            return new ArrayList<WSEncryptionPart>();
+            return new ArrayList<>();
         }
         
-        List<WSEncryptionPart> signedParts = new ArrayList<>();
+        List<WSEncryptionPart> securedParts = new ArrayList<>();
+        boolean isBody = false;
         if (parts != null) {
             isBody = parts.isBody();
             for (Header head : parts.getHeaders()) {
                 WSEncryptionPart wep = new WSEncryptionPart(head.getName(),
                                                             head.getNamespace(),
                                                             "Element");
-                signedParts.add(wep);
+                securedParts.add(wep);
             }
             
             Attachments attachments = parts.getAttachments();
             if (attachments != null) {
                 WSEncryptionPart wep = new WSEncryptionPart("cid:Attachments", "Element");
-                signedParts.add(wep);
+                securedParts.add(wep);
             }
         }
     
@@ -1068,7 +1048,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         // the encrypted list to prevent duplication / errors in encryption.
         return getPartsAndElements(false, 
                                    isBody,
-                                   signedParts,
+                                   securedParts,
                                    elements == null ? null : elements.getXPaths(),
                                    celements == null ? null : celements.getXPaths());
     }    
@@ -1116,10 +1096,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         }
         
         if (parts == null && elements == null) {
-            return new ArrayList<WSEncryptionPart>();
+            return new ArrayList<>();
         }
         
-        List<WSEncryptionPart> signedParts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> signedParts = new ArrayList<>();
         if (parts != null) {
             isSignBody = parts.isBody();
             for (Header head : parts.getHeaders()) {
@@ -1139,10 +1119,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
         }
         
-        // REVISIT consider catching exceptions and unassert failed assertions or
-        // to process and assert them one at a time.  Additionally, a found list
-        // should be applied to all operations that involve adding anything to
-        // the signed list to prevent duplication in the signature.
         return getPartsAndElements(true, 
                                    isSignBody,
                                    signedParts,
@@ -1171,9 +1147,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
      * @throws SOAPException
      *             if there is an error extracting SOAP content from the SAAJ
      *             model
-     *             
-     * @deprecated Use {@link #getSignedParts()} and {@link #getEncryptedParts()}
-     *             instead.
      */
     public List<WSEncryptionPart> getPartsAndElements(boolean sign, 
                                                     boolean includeBody,
@@ -1182,9 +1155,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                                                     List<org.apache.wss4j.policy.model.XPath> contentXpaths) 
         throws SOAPException {
         
-        List<WSEncryptionPart> result = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> result = new ArrayList<>();
         
-        List<Element> found = new ArrayList<Element>();
+        List<Element> found = new ArrayList<>();
         
         // Handle sign/enc parts
         result.addAll(this.getParts(sign, includeBody, parts, found));
@@ -1227,7 +1200,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             boolean includeBody, List<WSEncryptionPart> parts,
             List<Element> found) throws SOAPException {
         
-        List<WSEncryptionPart> result = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> result = new ArrayList<>();
         
         if (includeBody && !found.contains(SAAJUtils.getBody(this.saaj))) {
             found.add(SAAJUtils.getBody(saaj));
@@ -1311,7 +1284,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             List<Element> found,
             boolean forceId) throws SOAPException {
         
-        List<WSEncryptionPart> result = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> result = new ArrayList<>();
         
         if (xpaths != null && !xpaths.isEmpty()) {
             XPathFactory factory = XPathFactory.newInstance();
@@ -1334,6 +1307,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                         Element el = (Element)list.item(x);
                         
                         if (!found.contains(el)) {
+                            found.add(el);
                             String id = setIdOnElement(el, forceId);
                             WSEncryptionPart part = 
                                 new WSEncryptionPart(id, encryptionModifier);
@@ -1416,7 +1390,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(encrUser);
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        return certs[0];
+        if (certs != null && certs.length > 0) {
+            return certs[0];
+        }
+        
+        return null;
     }
     
     public Crypto getSignatureCrypto(AbstractTokenWrapper wrapper) throws WSSecurityException {
@@ -1648,6 +1626,27 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
     
+    protected WSSecurityEngineResult getEncryptedKeyResult() {
+        
+        List<WSHandlerResult> results = CastUtils.cast((List<?>)message.getExchange().getInMessage()
+            .get(WSHandlerConstants.RECV_RESULTS));
+        
+        for (WSHandlerResult rResult : results) {
+            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
+            
+            for (WSSecurityEngineResult wser : wsSecEngineResults) {
+                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                String encryptedKeyID = (String)wser.get(WSSecurityEngineResult.TAG_ID);
+                if (actInt.intValue() == WSConstants.ENCR
+                    && encryptedKeyID != null
+                    && encryptedKeyID.length() != 0) {
+                    return wser;
+                }
+            }
+        }
+        return null;
+    }
+    
     private void checkForX509PkiPath(WSSecSignature sig, AbstractToken token) {
         if (token instanceof X509Token) {
             X509Token x509Token = (X509Token) token;
@@ -1798,7 +1797,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         for (SupportingToken supportingToken : tokenList) {
             Object tempTok = supportingToken.getTokenImplementation();
             
-            List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
+            List<WSEncryptionPart> sigParts = new ArrayList<>();
             WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId);
             sigPart.setElement(bottomUpElement);
             sigParts.add(sigPart);
@@ -1939,12 +1938,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         dkSign.prepare(doc, secHeader);
         
         if (isTokenProtection) {
-            //Hack to handle reference id issues
-            //TODO Need a better fix
-            String sigTokId = tok.getId();
-            if (sigTokId.startsWith("#")) {
-                sigTokId = sigTokId.substring(1);
-            }
+            String sigTokId = WSSecurityUtil.getIDFromReference(tok.getId());
             sigParts.add(new WSEncryptionPart(sigTokId));
         }
         
@@ -2007,12 +2001,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             sigTokId = tok.getId();
         }
                        
-        //Hack to handle reference id issues
-        //TODO Need a better fix
-        if (sigTokId.startsWith("#")) {
-            sigTokId = sigTokId.substring(1);
-        }
-        
+        sigTokId = WSSecurityUtil.getIDFromReference(sigTokId);
         sig.setCustomTokenId(sigTokId);
         sig.setSecretKey(tok.getSecret());
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
@@ -2101,8 +2090,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
          * handler result get the various actions. After that loop we have all
          * signature results in the signatureActions list
          */
-        List<WSSecurityEngineResult> signatureActions = new ArrayList<WSSecurityEngineResult>();
-        final List<Integer> signedActions = new ArrayList<Integer>(2);
+        List<WSSecurityEngineResult> signatureActions = new ArrayList<>();
+        final List<Integer> signedActions = new ArrayList<>(2);
         signedActions.add(WSConstants.SIGN);
         signedActions.add(WSConstants.UT_SIGN);
         for (WSHandlerResult wshResult : results) {
@@ -2111,7 +2100,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             );
         }
         
-        sigConfList = new ArrayList<WSEncryptionPart>();
+        sigConfList = new ArrayList<>();
         // prepare a SignatureConfirmation token
         WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation(wssConfig);
         if (signatureActions.size() > 0) {
@@ -2161,7 +2150,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     public void handleEncryptedSignedHeaders(List<WSEncryptionPart> encryptedParts, 
             List<WSEncryptionPart> signedParts) {
 
-        final List<WSEncryptionPart> signedEncryptedParts = new ArrayList<WSEncryptionPart>();
+        final List<WSEncryptionPart> signedEncryptedParts = new ArrayList<>();
         
         for (WSEncryptionPart encryptedPart : encryptedParts) {
             final Iterator<WSEncryptionPart> signedPartsIt = signedParts.iterator();

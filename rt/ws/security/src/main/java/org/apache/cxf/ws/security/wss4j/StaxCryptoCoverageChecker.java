@@ -83,7 +83,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
         final List<SecurityEvent> incomingSecurityEventList = 
             (List<SecurityEvent>)soapMessage.get(SecurityEvent.class.getName() + ".in");
         
-        List<SecurityEvent> results = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> results = new ArrayList<>();
         if (incomingSecurityEventList != null) {
             // Get all Signed/Encrypted Results
             results.addAll(
@@ -139,7 +139,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
     }
     
     private List<SecurityEvent> getEventFromResults(Event event, List<SecurityEvent> incomingSecurityEventList) {
-        List<SecurityEvent> results = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> results = new ArrayList<>();
         for (SecurityEvent incomingEvent : incomingSecurityEventList) {
             if (event == incomingEvent.getSecurityEventType()) {
                 results.add(incomingEvent);
