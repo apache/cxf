@@ -100,6 +100,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         return doCreateAccessToken(client, 
                                    subject, 
                                    OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)), 
+                                   null,
                                    params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
     }
     
@@ -107,28 +108,31 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                                     UserSubject subject,
                                                     List<String> requestedScope) {
         
-        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScope, null);
+        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScope, 
+                                   null, null);
     }
     
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     List<String> requestedScope,
+                                                    List<String> approvedScope,
                                                     String audience) {
         
-        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScope, audience);
+        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScope, approvedScope, audience);
     }
     
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScope) {
-        return doCreateAccessToken(client, subject, requestedGrant, requestedScope, null);
+        return doCreateAccessToken(client, subject, requestedGrant, requestedScope, null, null);
     }
     
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScope,
+                                                    List<String> approvedScope,
                                                     String audience) {
         if (!OAuthUtils.validateScopes(requestedScope, client.getRegisteredScopes(), 
                                        partialMatchScopeValidation)) {
@@ -150,7 +154,11 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         reg.setClient(client);
         reg.setGrantType(requestedGrant);
         reg.setSubject(subject);
-        reg.setRequestedScope(requestedScope);        
+        reg.setRequestedScope(requestedScope);
+        if (approvedScope == null) {
+            approvedScope = Collections.emptyList();
+        }
+        reg.setApprovedScope(approvedScope);
         reg.setAudience(audience);
         
         return dataProvider.createAccessToken(reg);
