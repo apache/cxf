@@ -182,6 +182,15 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
     }
     
     @Test
+    public void testThatResponseValidationForOneBookSubNotFails()  {
+        Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234").param("name", "cxf"));
+        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
+
+        r = createWebClient("/bookstore/sub/books/1234").get();
+        assertEquals(200, r.getStatus());
+    }
+    
+    @Test
     public void testThatResponseValidationForNullBookFails()  {
         Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234").param("name", "cxf"));
         assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
