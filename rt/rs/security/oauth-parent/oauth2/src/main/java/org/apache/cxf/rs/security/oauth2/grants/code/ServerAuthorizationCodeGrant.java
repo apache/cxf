@@ -36,6 +36,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private long expiresIn;
     private Client client;
     private List<String> approvedScopes = Collections.emptyList();
+    private List<String> requestedScopes = Collections.emptyList();
     private UserSubject subject;
     private String audience;
     private String clientCodeChallenge;
@@ -155,5 +156,13 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
 
     public void setClientCodeChallenge(String clientCodeChallenge) {
         this.clientCodeChallenge = clientCodeChallenge;
+    }
+
+    public List<String> getRequestedScopes() {
+        return requestedScopes;
+    }
+
+    public void setRequestedScopes(List<String> requestedScopes) {
+        this.requestedScopes = requestedScopes;
     }
 }
