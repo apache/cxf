@@ -35,6 +35,9 @@ public final class ValidationUtils {
         if (ori == null) {
             return null;
         }
+        if (!ori.getClassResourceInfo().isRoot()) {
+            return message.getExchange().get("org.apache.cxf.service.object.last");
+        }
         final ResourceProvider resourceProvider = ori.getClassResourceInfo().getResourceProvider();
         if (!resourceProvider.isSingleton()) {
             String error = "Service object is not a singleton, use a custom invoker to validate";

@@ -67,6 +67,11 @@ public class BookStoreWithValidation extends AbstractBookStoreWithValidation imp
         return Response.ok(books.get(id)).build();
     }
     
+    @Path("/sub")
+    public BookStoreWithValidation getBookResponseSub() {
+        return this;
+    }
+    
     @POST
     @Path("/books")
     public Response addBook(@Context final UriInfo uriInfo, 
