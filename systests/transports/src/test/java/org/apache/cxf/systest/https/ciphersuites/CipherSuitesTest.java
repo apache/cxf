@@ -20,15 +20,24 @@
 package org.apache.cxf.systest.https.ciphersuites;
 
 import java.net.URL;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Collections;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 import org.junit.AfterClass;
@@ -465,5 +474,65 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
+    }
+    
+    // Both client + server include AES, client enables a TLS v1.2 CipherSuite
+    @org.junit.Test
+    public void testAESIncludedTLSv12ViaCode() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT);
+        
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit conduit = (HTTPConduit) client.getConduit();
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        X509TrustManager trustManager = new NoOpX509TrustManager();
+        TrustManager[] trustManagers = new TrustManager[1];
+        trustManagers[0] = trustManager;
+        tlsParams.setTrustManagers(trustManagers);
+        tlsParams.setDisableCNCheck(true);
+        
+        tlsParams.setSecureSocketProtocol("TLSv1.2");
+        tlsParams.setCipherSuites(Collections.singletonList("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"));
+
+        conduit.setTlsClientParameters(tlsParams);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    private static class NoOpX509TrustManager implements X509TrustManager {
+
+        public NoOpX509TrustManager() {
+
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
     }
 }
