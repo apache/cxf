@@ -60,6 +60,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private SessionAuthenticityTokenProvider sessionAuthenticityTokenProvider;
     private SubjectCreator subjectCreator;
     private ResourceOwnerNameProvider resourceOwnerNameProvider;
+    private boolean matchRedirectUriWithApplicationUri;
     
     protected RedirectionBasedGrantService(String supportedResponseType,
                                            String supportedGrantType) {
@@ -333,6 +334,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         if (redirectUri == null && uris.size() == 0 && !canRedirectUriBeEmpty(client)) {
             reportInvalidRequestError("Client Redirect Uri is invalid");    
         }
+        if (redirectUri != null && matchRedirectUriWithApplicationUri
+            && client.getApplicationWebUri() != null
+            && !redirectUri.startsWith(client.getApplicationWebUri())) {
+            reportInvalidRequestError("Client Redirect Uri is invalid");
+        }
         return redirectUri;
     }
     
@@ -419,4 +425,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     protected abstract boolean canSupportPublicClient(Client c);
     
     protected abstract boolean canRedirectUriBeEmpty(Client c);
+
+    public void setMatchRedirectUriWithApplicationUri(boolean matchRedirectUriWithApplicationUri) {
+        this.matchRedirectUriWithApplicationUri = matchRedirectUriWithApplicationUri;
+    }
 }

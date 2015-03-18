@@ -40,7 +40,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * Abstract OAuth service
  */
 public abstract class AbstractOAuthService {
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractOAuthService.class);
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractOAuthService.class);
     private MessageContext mc;
     private OAuthDataProvider dataProvider;
     private boolean blockUnsecureRequests;
