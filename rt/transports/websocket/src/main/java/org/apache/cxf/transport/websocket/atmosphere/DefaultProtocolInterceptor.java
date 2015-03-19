@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +40,7 @@ import org.atmosphere.cpr.Action;
 import org.atmosphere.cpr.AsyncIOInterceptor;
 import org.atmosphere.cpr.AsyncIOInterceptorAdapter;
 import org.atmosphere.cpr.AsyncIOWriter;
+import org.atmosphere.cpr.AtmosphereConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereInterceptorAdapter;
 import org.atmosphere.cpr.AtmosphereInterceptorWriter;
@@ -48,6 +50,7 @@ import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.FrameworkConfig;
 
 /**
+ * DefaultProtocolInterceptor provides the default CXF's WebSocket protocol that uses.
  * 
  */
 @AtmosphereInterceptorService
@@ -58,6 +61,44 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
     private static final String RESPONSE_PARENT = "response.parent";
 
     private final AsyncIOInterceptor interceptor = new Interceptor();
+
+    private Pattern includedheaders;
+    private Pattern excludedheaders;
+
+    @Override
+    public void configure(AtmosphereConfig config) {
+        super.configure(config);
+        String p = config.getInitParameter("org.apache.cxf.transport.websocket.atmosphere.transport.includedheaders");
+        if (p != null) {
+            includedheaders = Pattern.compile(p, Pattern.CASE_INSENSITIVE);
+        }
+        p = config.getInitParameter("org.apache.cxf.transport.websocket.atmosphere.transport.excludedheaders");
+        if (p != null) {
+            excludedheaders = Pattern.compile(p, Pattern.CASE_INSENSITIVE);
+        }
+    }
+
+    public DefaultProtocolInterceptor includedheaders(String p) {
+        if (p != null) {
+            this.includedheaders = Pattern.compile(p, Pattern.CASE_INSENSITIVE);
+        }
+        return this;
+    }
+
+    public void setIncludedheaders(Pattern includedheaders) {
+        this.includedheaders = includedheaders;
+    }
+
+    public DefaultProtocolInterceptor excludedheaders(String p) {
+        if (p != null) {
+            this.excludedheaders = Pattern.compile(p, Pattern.CASE_INSENSITIVE);
+        }
+        return this;
+    }
+
+    public void setExcludedheaders(Pattern excludedheaders) {
+        this.excludedheaders = excludedheaders;
+    }
 
     @Override
     public Action inspect(final AtmosphereResource r) {
@@ -130,7 +171,15 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         }
     }
 
-    private static AtmosphereRequest createAtmosphereRequest(AtmosphereRequest r, byte[] data) throws IOException {
+    /**
+     * Creates a virtual request using the specified parent request and the actual data.
+     * 
+     * @param r
+     * @param data
+     * @return
+     * @throws IOException
+     */
+    protected AtmosphereRequest createAtmosphereRequest(AtmosphereRequest r, byte[] data) throws IOException {
         AtmosphereRequest.Builder b = new AtmosphereRequest.Builder();
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         Map<String, String> hdrs = WebSocketUtils.readHeaders(in);
@@ -161,6 +210,40 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         return b.build();
     }
 
+    /**
+     * Creates a response data based on the specified payload.
+     * 
+     * @param response
+     * @param payload
+     * @param parent
+     * @return
+     */
+    protected byte[] createResponse(AtmosphereResponse response, byte[] payload, boolean parent) {
+        AtmosphereRequest request = response.request();
+        String refid = (String)request.getAttribute(WebSocketConstants.DEFAULT_REQUEST_ID_KEY);
+
+        Map<String, String> headers = new HashMap<String, String>();
+        if (refid != null) {
+            response.addHeader(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, refid);
+            headers.put(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, refid);
+        }
+        if (parent) {
+            // include the status code and content-type and those matched headers
+            headers.put(WebSocketUtils.SC_KEY, Integer.toString(response.getStatus()));
+            if (payload != null && payload.length > 0) {
+                headers.put("Content-Type",  response.getContentType());
+            }
+            for (Map.Entry<String, String> hv : response.headers().entrySet()) {
+                if (!"Content-Type".equalsIgnoreCase(hv.getKey()) 
+                    && includedheaders != null && includedheaders.matcher(hv.getKey()).matches()
+                    && !(excludedheaders != null && excludedheaders.matcher(hv.getKey()).matches())) {
+                    headers.put(hv.getKey(), hv.getValue());
+                }
+            }
+        }
+        return WebSocketUtils.buildResponse(headers, payload, 0, payload == null ? 0 : payload.length);
+    }
+
     private final class Interceptor extends AsyncIOInterceptorAdapter {
 
         @Override
@@ -188,26 +271,8 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         }
     }
 
-    private static byte[] createResponse(AtmosphereResponse response, byte[] payload, boolean parent) {
-        AtmosphereRequest request = response.request();
-        String refid = (String)request.getAttribute(WebSocketConstants.DEFAULT_REQUEST_ID_KEY);
-
-        Map<String, String> headers = new HashMap<String, String>();
-        if (refid != null) {
-            response.addHeader(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, refid);
-            headers.put(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, refid);
-        }
-        if (parent) {
-            headers.put(WebSocketUtils.SC_KEY, Integer.toString(response.getStatus()));
-            if (payload != null && payload.length > 0) {
-                headers.put("Content-Type",  response.getContentType());
-            }
-        }
-        return WebSocketUtils.buildResponse(headers, payload, 0, payload == null ? 0 : payload.length);
-    }
-
     // a workaround to flush the header data upon close when no write operation occurs  
-    private static class WrappedAtmosphereResponse extends AtmosphereResponse {
+    private class WrappedAtmosphereResponse extends AtmosphereResponse {
         public WrappedAtmosphereResponse(AtmosphereResponse resp, AtmosphereRequest req) {
             super((HttpServletResponse)resp.getResponse(), resp.getAsyncIOWriter(), req, resp.isDestroyable());
         }
