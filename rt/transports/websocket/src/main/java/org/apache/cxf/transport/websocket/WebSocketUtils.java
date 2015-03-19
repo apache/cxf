@@ -50,19 +50,24 @@ public final class WebSocketUtils {
      * - charset other than utf-8. (although i would have preferred iso-8859-1 ;-)
      * 
      * @param in the input stream
+     * @param req true if the input stream includes the request line
      * @return a map of name value pairs.
      * @throws IOException
      */
-    public static Map<String, String> readHeaders(InputStream in) throws IOException {
+    public static Map<String, String> readHeaders(InputStream in, boolean req) throws IOException {
         Map<String, String> headers = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
-        // read the request line
-        String line = readLine(in);
-        int del = line.indexOf(' ');
-        if (del < 0) {
-            throw new IOException("invalid request: " + line);
+        String line;
+        int del;
+        if (req) {
+            // read the request line
+            line = readLine(in);
+            del = line.indexOf(' ');
+            if (del < 0) {
+                throw new IOException("invalid request: " + line);
+            }
+            headers.put(METHOD_KEY, line.substring(0, del).trim());
+            headers.put(URI_KEY, line.substring(del + 1).trim());
         }
-        headers.put(METHOD_KEY, line.substring(0, del).trim());
-        headers.put(URI_KEY, line.substring(del + 1).trim());
         
         // read headers
         while ((line = readLine(in)) != null) {
@@ -77,6 +82,10 @@ public final class WebSocketUtils {
         }
 
         return headers;
+    }
+
+    public static Map<String, String> readHeaders(InputStream in) throws IOException {
+        return readHeaders(in, true);
     }
 
 

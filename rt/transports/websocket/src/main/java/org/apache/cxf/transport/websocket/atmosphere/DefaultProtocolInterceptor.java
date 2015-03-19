@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +40,7 @@ import org.atmosphere.cpr.Action;
 import org.atmosphere.cpr.AsyncIOInterceptor;
 import org.atmosphere.cpr.AsyncIOInterceptorAdapter;
 import org.atmosphere.cpr.AsyncIOWriter;
+import org.atmosphere.cpr.AtmosphereConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereInterceptorAdapter;
 import org.atmosphere.cpr.AtmosphereInterceptorWriter;
@@ -59,6 +61,44 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
     private static final String RESPONSE_PARENT = "response.parent";
 
     private final AsyncIOInterceptor interceptor = new Interceptor();
+
+    private Pattern includedheaders;
+    private Pattern excludedheaders;
+
+    @Override
+    public void configure(AtmosphereConfig config) {
+        super.configure(config);
+        String p = config.getInitParameter("org.apache.cxf.transport.websocket.atmosphere.transport.includedheaders");
+        if (p != null) {
+            includedheaders = Pattern.compile(p, Pattern.CASE_INSENSITIVE);
+        }
+        p = config.getInitParameter("org.apache.cxf.transport.websocket.atmosphere.transport.excludedheaders");
+        if (p != null) {
+            excludedheaders = Pattern.compile(p, Pattern.CASE_INSENSITIVE);
+        }
+    }
+
+    public DefaultProtocolInterceptor includedheaders(String p) {
+        if (p != null) {
+            this.includedheaders = Pattern.compile(p, Pattern.CASE_INSENSITIVE);
+        }
+        return this;
+    }
+
+    public void setIncludedheaders(Pattern includedheaders) {
+        this.includedheaders = includedheaders;
+    }
+
+    public DefaultProtocolInterceptor excludedheaders(String p) {
+        if (p != null) {
+            this.excludedheaders = Pattern.compile(p, Pattern.CASE_INSENSITIVE);
+        }
+        return this;
+    }
+
+    public void setExcludedheaders(Pattern excludedheaders) {
+        this.excludedheaders = excludedheaders;
+    }
 
     @Override
     public Action inspect(final AtmosphereResource r) {
@@ -188,10 +228,17 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
             headers.put(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, refid);
         }
         if (parent) {
-            // include the status code and content-type
+            // include the status code and content-type and those matched headers
             headers.put(WebSocketUtils.SC_KEY, Integer.toString(response.getStatus()));
             if (payload != null && payload.length > 0) {
                 headers.put("Content-Type",  response.getContentType());
+            }
+            for (Map.Entry<String, String> hv : response.headers().entrySet()) {
+                if (!"Content-Type".equalsIgnoreCase(hv.getKey()) 
+                    && includedheaders != null && includedheaders.matcher(hv.getKey()).matches()
+                    && !(excludedheaders != null && excludedheaders.matcher(hv.getKey()).matches())) {
+                    headers.put(hv.getKey(), hv.getValue());
+                }
             }
         }
         return WebSocketUtils.buildResponse(headers, payload, 0, payload == null ? 0 : payload.length);
