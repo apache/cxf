@@ -26,13 +26,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.DOM2Writer;
 
 public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
     private static final Logger LOG = 
@@ -49,7 +51,9 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
                 assertionWrapper = createAssertion(message);
             }
             
-            String encodedToken = encodeToken(assertionWrapper.assertionToString());
+            Document doc = DOMUtils.newDocument();
+            Element assertionElement = assertionWrapper.toDOM(doc);
+            String encodedToken = encodeToken(DOM2Writer.nodeToString(assertionElement));
             
             Map<String, List<String>> headers = getHeaders(message);
             

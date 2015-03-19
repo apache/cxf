@@ -26,9 +26,13 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -45,7 +49,8 @@ import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.SAMLUtils.SelfSignInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.crypto.Crypto;
-
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.DOM2Writer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -68,8 +73,12 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
         SelfSignInfo signInfo = new SelfSignInfo(crypto, "alice", "password"); 
         
-        String assertion =  SAMLUtils.createAssertion(new SamlCallbackHandler(),
-                                                      signInfo).assertionToString();
+        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(new SamlCallbackHandler(),
+                                                                          signInfo);
+        Document doc = DOMUtils.newDocument();
+        Element assertionElement = assertionWrapper.toDOM(doc);
+        String assertion = DOM2Writer.nodeToString(assertionElement);
+        
         Saml2BearerGrant grant = new Saml2BearerGrant(assertion);
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
                                         new Consumer("alice", "alice"), 
@@ -86,8 +95,11 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
         SelfSignInfo signInfo = new SelfSignInfo(crypto, "alice", "password"); 
         
-        String assertion =  SAMLUtils.createAssertion(new SamlCallbackHandler2(),
-                                                      signInfo).assertionToString();
+        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(new SamlCallbackHandler2(),
+                                                                          signInfo);
+        Document doc = DOMUtils.newDocument();
+        Element assertionElement = assertionWrapper.toDOM(doc);
+        String assertion = DOM2Writer.nodeToString(assertionElement);
         
         String encodedAssertion = Base64UrlUtility.encode(assertion);
         

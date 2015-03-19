@@ -26,13 +26,15 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.DOM2Writer;
 
 public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
     private static final Logger LOG = 
@@ -55,7 +57,9 @@ public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
                 assertionWrapper = createAssertion(message);
             }
             
-            String encodedToken = encodeToken(assertionWrapper.assertionToString());
+            Document doc = DOMUtils.newDocument();
+            Element assertionElement = assertionWrapper.toDOM(doc);
+            String encodedToken = encodeToken(DOM2Writer.nodeToString(assertionElement));
                 
             updateForm(form, encodedToken);
         } catch (Exception ex) {
