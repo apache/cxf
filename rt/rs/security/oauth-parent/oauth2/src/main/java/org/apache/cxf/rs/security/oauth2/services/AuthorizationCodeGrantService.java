@@ -62,13 +62,15 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     public AuthorizationCodeGrantService() {
         super(OAuthConstants.CODE_RESPONSE_TYPE, OAuthConstants.AUTHORIZATION_CODE_GRANT);
     }
+    @Override
     protected OAuthAuthorizationData createAuthorizationData(Client client, 
                                                              MultivaluedMap<String, String> params,
+                                                             String redirectUri,
                                                              UserSubject subject,
                                                              List<OAuthPermission> perms,
                                                              boolean preAuthorizedTokenAvailable) {
         OAuthAuthorizationData data = 
-            super.createAuthorizationData(client, params, subject, perms, preAuthorizedTokenAvailable);
+            super.createAuthorizationData(client, params, redirectUri, subject, perms, preAuthorizedTokenAvailable);
         setCodeQualifier(data, params);
         return data;
     }

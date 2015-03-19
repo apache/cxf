@@ -165,7 +165,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         // Populate the authorization challenge data 
         OAuthAuthorizationData data = 
-            createAuthorizationData(client, params, userSubject, permissions, preAuthorizedTokenAvailable);
+            createAuthorizationData(client, params, redirectUri, userSubject, permissions, 
+                                    preAuthorizedTokenAvailable);
         
         if (preAuthorizedTokenAvailable) {
             return createGrant(data,
@@ -185,6 +186,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      */
     protected OAuthAuthorizationData createAuthorizationData(Client client, 
                                                              MultivaluedMap<String, String> params,
+                                                             String redirectUri, 
                                                              UserSubject subject,
                                                              List<OAuthPermission> perms,
                                                              boolean preAuthorizedTokenAvailable) {
@@ -192,7 +194,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         OAuthAuthorizationData secData = new OAuthAuthorizationData();
         
         secData.setState(params.getFirst(OAuthConstants.STATE));
-        secData.setRedirectUri(params.getFirst(OAuthConstants.REDIRECT_URI));
+        secData.setRedirectUri(redirectUri);
         secData.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
         secData.setClientId(client.getClientId());
         secData.setProposedScope(params.getFirst(OAuthConstants.SCOPE));
