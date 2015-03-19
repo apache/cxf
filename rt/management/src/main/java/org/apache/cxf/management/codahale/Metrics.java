@@ -24,17 +24,13 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.TimeUnit;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;
-import com.codahale.metrics.Timer;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
@@ -46,7 +42,6 @@ import org.apache.cxf.interceptor.ServiceInvokerInterceptor;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -100,79 +95,44 @@ public class Metrics {
         ResponseTimeMessageInOneWayInterceptor oneway = new ResponseTimeMessageInOneWayInterceptor();
         ResponseTimeMessageOutInterceptor out = new ResponseTimeMessageOutInterceptor();
         CountingOutInterceptor countingOut = new CountingOutInterceptor();
-        //ResponseTimeMessageInvokerInterceptor invoker = new ResponseTimeMessageInvokerInterceptor();
         
         bus.getInInterceptors().add(in);
         bus.getInInterceptors().add(oneway);
+        bus.getInInterceptors().add(new ResponseTimeMessageInPreInvokeInterceptor());
         bus.getOutInterceptors().add(countingOut);
         bus.getOutInterceptors().add(out);
         bus.getOutFaultInterceptors().add(countingOut);
         bus.getOutFaultInterceptors().add(out);
-        //bus.setExtension(this, CounterRepository.class); 
-        
-        //create CounterRepositroyMoniter to writer the counter log
-        
-        //if the service is stopped or removed, the counters should remove itself
     }
-    
-    static class TimerInfo {
-        Counter inFlight;
-        Timer totals;
-        Timer uncheckedApplicationFaults;
-        Timer checkedApplicationFaults;
-        Timer runtimeFaults;
-        Timer logicalRuntimeFaults;
-        Meter incomingData;
-        Meter outgoingData;
-     
-        Context start() {
-            inFlight.inc();
-            Context ctx = new Context();
-            ctx.info = this;
-            ctx.t = totals.time();
-            return ctx;
-        }
-        static class Context {
-            TimerInfo info;
-            Timer.Context t;
-        }
-    }
-    
-    TimerInfo getTimerInfo(Message message) {
-        TimerInfo ti = (TimerInfo)message.getExchange().getEndpoint().get(TimerInfo.class.getName());
+        
+    MetricsContext getMetricsContextForEndpoint(Message message) {
+        MetricsContext ti = (MetricsContext)message.getExchange().getEndpoint().get(MetricsContext.class.getName());
         if (ti == null) {
             synchronized (message.getExchange().getEndpoint()) {
-                return createTimerInfo(message);
+                return createMetricsContextForEndpoint(message);
             }
         }
         return ti;
     }
-    TimerInfo getTimerInfo(Message message, BindingOperationInfo boi) {
+    MetricsContext getMetricsContextForOperation(Message message, BindingOperationInfo boi) {
         if (boi.isUnwrapped()) {
             boi = boi.getWrappedOperation();
         }
-        TimerInfo ti = (TimerInfo)boi.getProperty(TimerInfo.class.getName());
+        MetricsContext ti = (MetricsContext)boi.getProperty(MetricsContext.class.getName());
         if (ti == null) {
             synchronized (boi) {
-                return createTimerInfo(message, boi);
+                return createMetricsContextForOperation(message, boi);
             }
         }
         return ti;
     }
-    private TimerInfo createTimerInfo(Message message, BindingOperationInfo boi) {
-        TimerInfo ti = (TimerInfo)boi.getProperty(TimerInfo.class.getName());
+    private MetricsContext createMetricsContextForOperation(Message message, BindingOperationInfo boi) {
+        MetricsContext ti = (MetricsContext)boi.getProperty(MetricsContext.class.getName());
         if (ti == null) {
-            ti = new TimerInfo();
             StringBuilder buffer = getBaseServiceName(message);
             buffer.append("Operation=").append(boi.getName().getLocalPart()).append(',');
-            ti.totals = registry.timer(buffer.toString() + "Attribute=Totals");
-            ti.uncheckedApplicationFaults = registry.timer(buffer.toString() 
-                                                           + "Attribute=Unchecked Application Faults");
-            ti.checkedApplicationFaults = registry.timer(buffer.toString() + "Attribute=Checked Application Faults");
-            ti.runtimeFaults = registry.timer(buffer.toString() + "Attribute=Runtime Faults");
-            ti.logicalRuntimeFaults = registry.timer(buffer.toString() + "Attribute=Logical Runtime Faults");
-            
-            boi.setProperty(TimerInfo.class.getName(), ti);
+            ti = new CodahaleMetricsContext(buffer.toString(), registry);
+            boi.setProperty(MetricsContext.class.getName(), ti);
         }
         return ti;
     }
@@ -203,47 +163,28 @@ public class Metrics {
         }
         return buffer;
     }
-    private TimerInfo createTimerInfo(Message message) {
+    private MetricsContext createMetricsContextForEndpoint(Message message) {
         Exchange ex = message.getExchange();
         final Endpoint endpoint = ex.get(Endpoint.class);
-        TimerInfo ti = (TimerInfo)endpoint.get(TimerInfo.class.getName());
+        MetricsContext ti = (MetricsContext)endpoint.get(MetricsContext.class.getName());
         if (ti == null) {
-            ti = new TimerInfo();
             StringBuilder buffer = getBaseServiceName(message);
             final String baseName = buffer.toString();
-            ti.totals = registry.timer(baseName + "Attribute=Totals");
-            ti.uncheckedApplicationFaults = registry.timer(baseName 
-                                                           + "Attribute=Unchecked Application Faults");
-            ti.checkedApplicationFaults = registry.timer(baseName + "Attribute=Checked Application Faults");
-            ti.runtimeFaults = registry.timer(baseName + "Attribute=Runtime Faults");
-            ti.logicalRuntimeFaults = registry.timer(baseName + "Attribute=Logical Runtime Faults");
-            ti.inFlight = registry.counter(baseName + "Attribute=In Flight");
-            ti.incomingData = registry.meter(baseName + "Attribute=Data Read");
-            ti.outgoingData = registry.meter(baseName + "Attribute=Data Written");
-            endpoint.put(TimerInfo.class.getName(), ti);
+            ti = new CodahaleMetricsContext(baseName, registry);
+            
+
+            endpoint.put(MetricsContext.class.getName(), ti);
             endpoint.addCleanupHook(new Closeable() {
                 public void close() throws IOException {
                     try {
-                        registry.remove(baseName + "Attribute=Totals");
-                        registry.remove(baseName + "Attribute=Unchecked Application Faults");
-                        registry.remove(baseName + "Attribute=Checked Application Faults");
-                        registry.remove(baseName + "Attribute=Runtime Faults");
-                        registry.remove(baseName + "Attribute=Logical Runtime Faults");
-                        registry.remove(baseName + "Attribute=In Flight");
-                        registry.remove(baseName + "Attribute=Data Read");
-                        registry.remove(baseName + "Attribute=Data Written");
-                        endpoint.remove(TimerInfo.class.getName());
-                        System.out.println(endpoint.getBinding().getBindingInfo().getOperations());
+                        MetricsContext mct = (MetricsContext)endpoint.remove(MetricsContext.class.getName());
+                        if (mct instanceof Closeable) {
+                            ((Closeable)mct).close();
+                        }
                         for (BindingOperationInfo boi : endpoint.getBinding().getBindingInfo().getOperations()) {
-                            TimerInfo ti = (TimerInfo)boi.removeProperty(TimerInfo.class.getName());
-                            if (ti != null) {
-                                String name = baseName + "Operation=" + boi.getName().getLocalPart() + ",";
-                                System.out.println("Removing beans for " + boi.getName().getLocalPart());
-                                registry.remove(name + "Attribute=Totals");
-                                registry.remove(name + "Attribute=Unchecked Application Faults");
-                                registry.remove(name + "Attribute=Checked Application Faults");
-                                registry.remove(name + "Attribute=Runtime Faults");
-                                registry.remove(name + "Attribute=Logical Runtime Faults");                            
+                            MetricsContext ti = (MetricsContext)boi.removeProperty(MetricsContext.class.getName());
+                            if (ti instanceof Closeable) {
+                                ((Closeable)ti).close();
                             }
                         }
                     } catch (Throwable t) {
@@ -262,50 +203,10 @@ public class Metrics {
         return value;
     }
 
-    static void update(Timer t1, Timer t2, long t) {
-        if (t1 != null) {
-            t1.update(t,  TimeUnit.NANOSECONDS);
-        }
-        if (t2 != null) {
-            t2.update(t,  TimeUnit.NANOSECONDS);
-        }
-    }
     public void stopTimers(Message m) {
-        TimerInfo.Context ctx = m.getExchange().get(TimerInfo.Context.class);
-        long l = ctx.t.stop();
-        ctx.info.inFlight.dec();
-        BindingOperationInfo bi = m.getExchange().getBindingOperationInfo();
-        FaultMode fm = m.getExchange().get(FaultMode.class);
-        TimerInfo op = null;
-        CountingInputStream in = m.getExchange().get(CountingInputStream.class);
-        if (in != null) {
-            ctx.info.incomingData.mark(in.getCount());
-        }
-        CountingOutputStream out = m.getExchange().get(CountingOutputStream.class);
-        if (out != null) {
-            ctx.info.outgoingData.mark(out.getCount());
-        }
-
-        if (bi != null) {
-            op = getTimerInfo(m, bi);
-            op.totals.update(l, TimeUnit.NANOSECONDS);
-        }
-        if (fm != null) {
-            switch (fm) {
-            case CHECKED_APPLICATION_FAULT:
-                update(ctx.info.checkedApplicationFaults, op != null ? op.checkedApplicationFaults : null, l);
-                break;
-            case UNCHECKED_APPLICATION_FAULT:
-                update(ctx.info.uncheckedApplicationFaults, op != null ? op.uncheckedApplicationFaults : null, l);
-                break;
-            case RUNTIME_FAULT:
-                update(ctx.info.runtimeFaults, op != null ? op.runtimeFaults : null, l);
-                break;
-            case LOGICAL_RUNTIME_FAULT:
-                update(ctx.info.logicalRuntimeFaults, op != null ? op.logicalRuntimeFaults : null, l);
-                break;
-            default:
-            }
+        MessageMetrics ctx = m.getExchange().get(MessageMetrics.class);
+        if (ctx != null) {
+            ctx.stop(m);
         }
     }
     
@@ -316,18 +217,23 @@ public class Metrics {
             addBefore(AttachmentInInterceptor.class.getName());
         }
         public void handleMessage(Message message) throws Fault {
-            TimerInfo ti = getTimerInfo(message);
             if (isRequestor(message)) {
                 //
             } else {
-                TimerInfo.Context ctx = ti.start();
-                message.getExchange().put(TimerInfo.Context.class, ctx);
+                MessageMetrics ctx = message.getExchange().get(MessageMetrics.class);
+                if (ctx == null) {
+                    ctx = new MessageMetrics();
+                    MetricsContext ti = getMetricsContextForEndpoint(message);
+                    ctx.addContext(ti);
+                    message.getExchange().put(MessageMetrics.class, ctx);
+                }
                 InputStream in = message.getContent(InputStream.class);
                 if (in != null) {
                     CountingInputStream newIn = new CountingInputStream(in);
                     message.setContent(InputStream.class, newIn);
                     message.getExchange().put(CountingInputStream.class, newIn);
                 }
+                ctx.start();
             }
         }
         public void handleFault(Message message) {
@@ -370,6 +276,23 @@ public class Metrics {
             }
         }    
     };
+    class ResponseTimeMessageInPreInvokeInterceptor extends AbstractPhaseInterceptor<Message> {
+        public ResponseTimeMessageInPreInvokeInterceptor() {
+            super(Phase.PRE_INVOKE);
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            Exchange ex = message.getExchange();
+            if (ex.getBindingOperationInfo() != null) {
+                //we now know the operation, start metrics for it
+                MessageMetrics ctx = message.getExchange().get(MessageMetrics.class);
+                if (ctx != null) {
+                    MetricsContext ti = getMetricsContextForOperation(message, ex.getBindingOperationInfo());
+                    ctx.addContext(ti);
+                }
+            }
+        }               
+    }
     class ResponseTimeMessageInOneWayInterceptor extends AbstractPhaseInterceptor<Message> {
         public ResponseTimeMessageInOneWayInterceptor() {
             super(Phase.INVOKE);
