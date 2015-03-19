@@ -102,6 +102,7 @@
         <module>jax_rs/minimal_osgi</module>
         <module>ws_discovery</module>
         <module>ws_eventing</module>
+        <module>throttling</module>
     </modules>
     <dependencyManagement>
         <dependencies>

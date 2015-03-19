@@ -106,4 +106,44 @@ public class CodahaleMetricsContext implements MetricsContext, Closeable {
         inFlight.dec();
     }
 
+    public Counter getInFlight() {
+        return inFlight;
+    }
+
+    public Timer getTotals() {
+        return totals;
+    }
+
+    public Timer getUncheckedApplicationFaults() {
+        return uncheckedApplicationFaults;
+    }
+
+    public Timer getCheckedApplicationFaults() {
+        return checkedApplicationFaults;
+    }
+
+    public Timer getRuntimeFaults() {
+        return runtimeFaults;
+    }
+
+    public Timer getLogicalRuntimeFaults() {
+        return logicalRuntimeFaults;
+    }
+
+    public Meter getIncomingData() {
+        return incomingData;
+    }
+
+    public Meter getOutgoingData() {
+        return outgoingData;
+    }
+
+    public String getBaseName() {
+        return baseName;
+    }
+
+    public MetricRegistry getRegistry() {
+        return registry;
+    }
+
 }
