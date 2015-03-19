@@ -62,15 +62,20 @@ public class Metrics {
     public Metrics(MetricRegistry reg) {
         registry = reg;
     }
-    
-    public void setBus(Bus b) {
+    public Metrics(Bus b) {
+        registry = b.getExtension(MetricRegistry.class);
         bus = b;
-        if (bus != null) {
-            registerInterceptorsToBus();
+        registerInterceptorsToBus();
+        if (registry == null) {
+            registry = new MetricRegistry();
+            setupJMXReporter(b, registry);
         }
-        InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
+    }
+    
+    protected final void setupJMXReporter(Bus b, MetricRegistry reg) {
+        InstrumentationManager im = b.getExtension(InstrumentationManager.class);
         if (im != null) {
-            JmxReporter reporter = JmxReporter.forRegistry(registry).registerWith(im.getMBeanServer())
+            JmxReporter reporter = JmxReporter.forRegistry(reg).registerWith(im.getMBeanServer())
                 .inDomain("org.apache.cxf")
                 .createsObjectNamesWith(new ObjectNameFactory() {
                     public ObjectName createName(String type, String domain, String name) {
@@ -85,12 +90,19 @@ public class Metrics {
             reporter.start();
         }
     }
+    public void setBus(Bus b) {
+        bus = b;
+        if (bus != null) {
+            registerInterceptorsToBus();
+            setupJMXReporter(bus, registry);
+        }
+    }
 
     public Bus getBus() {
         return bus;
     }
             
-    void registerInterceptorsToBus() {
+    private void registerInterceptorsToBus() {
         ResponseTimeMessageInInterceptor in = new ResponseTimeMessageInInterceptor();
         ResponseTimeMessageInOneWayInterceptor oneway = new ResponseTimeMessageInOneWayInterceptor();
         ResponseTimeMessageOutInterceptor out = new ResponseTimeMessageOutInterceptor();
