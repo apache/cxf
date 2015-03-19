@@ -24,6 +24,7 @@ import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,14 +40,13 @@ import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -108,7 +108,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHandler {
     protected boolean timestampAdded;
     protected boolean signatureConfirmationAdded;
-    protected Set<SecurePart> encryptedTokensList = new HashSet<SecurePart>();
+    protected Set<SecurePart> encryptedTokensList = new HashSet<>();
     
     protected Map<AbstractToken, SecurePart> endEncSuppTokMap;
     protected Map<AbstractToken, SecurePart> endSuppTokMap;
@@ -285,18 +285,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         // Get the SAML CallbackHandler
         //
         Object o = message.getContextualProperty(SecurityConstants.SAML_CALLBACK_HANDLER);
-    
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
+        CallbackHandler handler = SecurityUtils.getCallbackHandler(o);
         if (handler == null) {
             policyNotAsserted(token, "No SAML CallbackHandler available");
             return null;
@@ -472,18 +461,13 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     }
     
     protected void configureLayout(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.LAYOUT);
+        AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.LAYOUT);
         Layout layout = null;
-        for (AssertionInfo ai : ais) {
+        if (ai != null) {
             layout = (Layout)ai.getAssertion();
-            Collection<AssertionInfo> layoutTypeAis = aim.get(layout.getName());
-            if (layoutTypeAis != null) {
-                for (AssertionInfo layoutAi : layoutTypeAis) {
-                    layoutAi.setAsserted(true);
-                }
-            }
             ai.setAsserted(true);
         }
+        
         if (layout != null && layout.getLayoutType() != null) {
             assertPolicy(new QName(layout.getName().getNamespaceURI(), layout.getLayoutType().name()));
         }
@@ -610,9 +594,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         boolean signed,
         boolean endorse
     ) throws Exception {
-        Map<AbstractToken, SecurePart> ret = null;
-        if (tokenAssertions != null) {
-            ret = new HashMap<AbstractToken, SecurePart>();
+        if (tokenAssertions != null && !tokenAssertions.isEmpty()) {
+            Map<AbstractToken, SecurePart> ret = new HashMap<AbstractToken, SecurePart>();
             for (AssertionInfo assertionInfo : tokenAssertions) {
                 if (assertionInfo.getAssertion() instanceof SupportingTokens) {
                     assertionInfo.setAsserted(true);
@@ -620,8 +603,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                             signed, endorse, ret);
                 }
             }
+            return ret;
         }
-        return ret;
+        return Collections.emptyMap();
     }
                                                             
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
@@ -840,7 +824,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             assertionInfo.setAsserted(true);
         }
         
-        List<SecurePart> signedParts = new ArrayList<SecurePart>();
+        List<SecurePart> signedParts = new ArrayList<>();
         if (parts != null) {
             if (parts.isBody()) {
                 QName soapBody = new QName(WSSConstants.NS_SOAP12, "Body");
@@ -917,7 +901,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             }            
         }
         
-        List<SecurePart> encryptedParts = new ArrayList<SecurePart>();
+        List<SecurePart> encryptedParts = new ArrayList<>();
         if (parts != null) {
             if (parts.isBody()) {
                 QName soapBody = new QName(WSSConstants.NS_SOAP12, "Body");
@@ -968,38 +952,6 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
         
         return encryptedParts;
-    }
-    
-    protected static class TokenStoreCallbackHandler implements CallbackHandler {
-        private CallbackHandler internal;
-        private TokenStore store;
-        public TokenStoreCallbackHandler(CallbackHandler in, TokenStore st) {
-            internal = in;
-            store = st;
-        }
-        
-        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            for (int i = 0; i < callbacks.length; i++) {
-                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-                
-                String id = pc.getIdentifier();
-                SecurityToken token = store.getToken(id);
-                if (token != null) {
-                    if (token.getSHA1() == null && pc.getKey() != null) {
-                        token.setSHA1(getSHA1(pc.getKey()));
-                        // Create another cache entry with the SHA1 Identifier as the key 
-                        // for easy retrieval
-                        store.add(token.getSHA1(), token);
-                    }
-                    pc.setKey(token.getSecret());
-                    pc.setCustomToken(token.getToken());
-                    return;
-                }
-            }
-            if (internal != null) {
-                internal.handle(callbacks);
-            }
-        }
     }
     
     protected org.apache.xml.security.stax.securityToken.SecurityToken 

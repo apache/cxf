@@ -182,7 +182,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         List<SecurityEvent> securityEvents = 
             (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".out");
         if (securityEvents == null) {
-            securityEvents = new ArrayList<SecurityEvent>();
+            securityEvents = new ArrayList<>();
             message.getExchange().put(SecurityEvent.class.getName() + ".out", securityEvents);
         }
         
@@ -327,7 +327,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     protected List<SecurityEventListener> configureSecurityEventListeners(
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
-        final List<SecurityEventListener> securityEventListeners = new ArrayList<SecurityEventListener>(2);
+        final List<SecurityEventListener> securityEventListeners = new ArrayList<>(2);
         securityEventListeners.addAll(super.configureSecurityEventListeners(msg, securityProperties));
         
         Endpoint endoint = msg.getExchange().get(Endpoint.class);
@@ -343,7 +343,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         EndpointInfo endpointInfo, SoapMessage msg
     ) throws WSSPolicyException {
         EffectivePolicy dispatchPolicy = null;
-        List<OperationPolicy> operationPolicies = new ArrayList<OperationPolicy>();
+        List<OperationPolicy> operationPolicies = new ArrayList<>();
         Collection<BindingOperationInfo> bindingOperationInfos = endpointInfo.getBinding().getOperations();
         for (Iterator<BindingOperationInfo> bindingOperationInfoIterator =
                      bindingOperationInfos.iterator(); bindingOperationInfoIterator.hasNext();) {
@@ -420,8 +420,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
         
         String actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
-        final Collection<org.apache.cxf.message.Attachment> attachments = 
-            msg.getAttachments();
+        final Collection<org.apache.cxf.message.Attachment> attachments = msg.getAttachments();
         int attachmentCount = 0;
         if (attachments != null && !attachments.isEmpty()) {
             attachmentCount = attachments.size();

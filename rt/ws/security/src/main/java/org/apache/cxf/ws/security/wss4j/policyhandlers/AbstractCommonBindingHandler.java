@@ -37,8 +37,6 @@ import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.neethi.Assertion;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
@@ -60,7 +58,6 @@ import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.Wss10;
 import org.apache.wss4j.policy.model.Wss11;
 import org.apache.wss4j.policy.model.X509Token;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * Some common functionality to be shared between the two binding handlers (DOM + StAX)
@@ -412,16 +409,6 @@ public abstract class AbstractCommonBindingHandler {
     
     protected SoapMessage getMessage() {
         return message;
-    }
-    
-    protected static String getSHA1(byte[] input) {
-        try {
-            byte[] digestBytes = WSSecurityUtil.generateDigest(input);
-            return Base64.encode(digestBytes);
-        } catch (WSSecurityException e) {
-            //REVISIT
-        }
-        return null;
     }
     
     protected boolean isRequestor() {

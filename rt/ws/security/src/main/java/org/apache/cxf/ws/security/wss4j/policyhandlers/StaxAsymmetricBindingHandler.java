@@ -34,6 +34,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.wss4j.TokenStoreCallbackHandler;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.SPConstants;
@@ -144,7 +145,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             
             // Add timestamp
-            List<SecurePart> sigs = new ArrayList<SecurePart>();
+            List<SecurePart> sigs = new ArrayList<>();
             if (timestampAdded) {
                 SecurePart part = 
                     new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);

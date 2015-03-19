@@ -61,6 +61,7 @@ import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -76,6 +77,7 @@ import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * 
@@ -891,6 +893,16 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             encrKey.prependBSTElementToHeader(secHeader);
         }
         return id;
+    }
+    
+    private static String getSHA1(byte[] input) {
+        try {
+            byte[] digestBytes = WSSecurityUtil.generateDigest(input);
+            return Base64.encode(digestBytes);
+        } catch (WSSecurityException e) {
+            //REVISIT
+        }
+        return null;
     }
     
     private String setupUTDerivedKey(UsernameToken sigToken) throws WSSecurityException {

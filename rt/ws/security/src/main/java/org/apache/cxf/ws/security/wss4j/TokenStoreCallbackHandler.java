@@ -28,8 +28,11 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 
-class TokenStoreCallbackHandler implements CallbackHandler {
+public class TokenStoreCallbackHandler implements CallbackHandler {
     private CallbackHandler internal;
     private TokenStore store;
     public TokenStoreCallbackHandler(CallbackHandler in, TokenStore st) {
@@ -38,13 +41,18 @@ class TokenStoreCallbackHandler implements CallbackHandler {
     }
     
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-                
+        for (Callback callback : callbacks) {
+            if (callback instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback)callback;
+
                 String id = pc.getIdentifier();
                 SecurityToken tok = store.getToken(id);
                 if (tok != null && !tok.isExpired()) {
+                    if (tok.getSHA1() == null && pc.getKey() != null) {
+                        tok.setSHA1(getSHA1(pc.getKey()));
+                        // Create another cache entry with the SHA1 Identifier as the key for easy retrieval
+                        store.add(tok.getSHA1(), tok);
+                    }
                     pc.setKey(tok.getSecret());
                     pc.setKey(tok.getKey());
                     pc.setCustomToken(tok.getToken());
@@ -57,4 +65,13 @@ class TokenStoreCallbackHandler implements CallbackHandler {
         }
     }
     
+    private static String getSHA1(byte[] input) {
+        try {
+            byte[] digestBytes = WSSecurityUtil.generateDigest(input);
+            return Base64.encode(digestBytes);
+        } catch (WSSecurityException e) {
+            //REVISIT
+        }
+        return null;
+    }
 }

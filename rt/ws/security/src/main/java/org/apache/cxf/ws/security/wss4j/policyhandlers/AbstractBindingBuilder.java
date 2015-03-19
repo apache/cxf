@@ -292,7 +292,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             Map<Object, Crypto> o = 
                 CastUtils.cast((Map<?, ?>)message.getContextualProperty(CRYPTO_CACHE));
             if (o == null) {
-                o = new ConcurrentHashMap<Object, Crypto>();
+                o = new ConcurrentHashMap<>();
                 info.setProperty(CRYPTO_CACHE, o);
             }
             return o;

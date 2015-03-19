@@ -37,11 +37,13 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.wss4j.TokenStoreCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -198,9 +200,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             assertToken(encryptionToken);
             if (tok == null) {
-                if (tokenId != null && tokenId.startsWith("#")) {
-                    tokenId = tokenId.substring(1);
-                }
+                tokenId = WSSecurityUtil.getIDFromReference(tokenId);
 
                 // Get hold of the token from the token storage
                 tok = SecurityUtils.getTokenStore(message).getToken(tokenId);
@@ -344,7 +344,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
 
             // Add timestamp
-            List<SecurePart> sigs = new ArrayList<SecurePart>();
+            List<SecurePart> sigs = new ArrayList<>();
             if (timestampAdded) {
                 SecurePart part = 
                     new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);

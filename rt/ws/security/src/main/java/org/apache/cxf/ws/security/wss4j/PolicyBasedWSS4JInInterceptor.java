@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
@@ -75,7 +74,6 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyVali
 import org.apache.cxf.ws.security.wss4j.policyvalidators.WSS11PolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -150,34 +148,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return action + " " + val;
     }
     
-    private boolean assertPolicy(AssertionInfoMap aim, QName name) {
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(name);
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }    
-            return true;
-        }
-        return false;
-    }
-    
-    private boolean assertPolicy(AssertionInfoMap aim, String localname) {
-        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, localname);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }    
-            return true;
-        }
-        return false;
-    }
-    
     private String checkAsymmetricBinding(
         AssertionInfoMap aim, String action, SoapMessage message, RequestData data
     ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (ais.isEmpty()) {
+        AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (ai == null) {
             return action;
         }
         
@@ -261,10 +236,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     protected boolean isNonceCacheRequired(List<Integer> actions, SoapMessage msg) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
-                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
-            
-            if (!ais.isEmpty()) {
+            AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.USERNAME_TOKEN);
+            if (ai != null) {
                 return true;
             }
         }
@@ -279,10 +252,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     protected boolean isTimestampCacheRequired(List<Integer> actions, SoapMessage msg) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
-                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
-            
-            if (!ais.isEmpty()) {
+            AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
+            if (ai != null) {
                 return true;
             }
         }
@@ -297,10 +268,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     protected boolean isSamlCacheRequired(List<Integer> actions, SoapMessage msg) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
-                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
-            
-            if (!ais.isEmpty()) {
+            AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SAML_TOKEN);
+            if (ai != null) {
                 return true;
             }
         }
@@ -327,9 +296,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     private String checkSymmetricBinding(
         AssertionInfoMap aim, String action, SoapMessage message, RequestData data
     ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (ais.isEmpty()) {
+        AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (ai == null) {
             return action;
         }
         
@@ -409,16 +377,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             return passwordEncryptor;
         }
         
-        if (requestData.getPasswordEncryptor() != null) {
-            return requestData.getPasswordEncryptor();
-        }
-        
-        CallbackHandler callbackHandler = requestData.getCallbackHandler();
-        if (callbackHandler != null) {
-            return new JasyptPasswordEncryptor(callbackHandler);
-        }
-        
-        return null;
+        return super.getPasswordEncryptor(requestData);
     }
     
     private Crypto getSignatureCrypto(Object s, SoapMessage message, 
@@ -441,9 +400,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 
                 RequiredElements elements = (RequiredElements)ai.getAssertion();
                 
-                if (elements != null && elements.getXPaths() != null 
-                    && !elements.getXPaths().isEmpty()) {
-                    List<String> expressions = new ArrayList<String>();
+                if (elements != null && elements.getXPaths() != null && !elements.getXPaths().isEmpty()) {
+                    List<String> expressions = new ArrayList<>();
                     MapNamespaceContext namespaceContext = new MapNamespaceContext();
                     
                     for (org.apache.wss4j.policy.model.XPath xPath : elements.getXPaths()) {
@@ -579,8 +537,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             checkUsernameToken(aim, message);
             
             // stuff we can default to asserted and un-assert if a condition isn't met
-            assertPolicy(aim, SPConstants.KEY_VALUE_TOKEN);
-            assertPolicy(aim, SPConstants.RSA_KEY_VALUE);
+            PolicyUtils.assertPolicy(aim, SPConstants.KEY_VALUE_TOKEN);
+            PolicyUtils.assertPolicy(aim, SPConstants.RSA_KEY_VALUE);
             
             // WSS10
             ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS10);
@@ -588,10 +546,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
                 }
-                assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER);
-                assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL);
-                assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
-                assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
+                PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER);
+                PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL);
+                PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
+                PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
             }
             
             // Trust 1.0
@@ -601,11 +559,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
                 }
-                assertPolicy(aim, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE);
-                assertPolicy(aim, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE);
-                assertPolicy(aim, SPConstants.REQUIRE_CLIENT_ENTROPY);
-                assertPolicy(aim, SPConstants.REQUIRE_SERVER_ENTROPY);
-                assertPolicy(aim, SPConstants.MUST_SUPPORT_ISSUED_TOKENS);
+                PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE);
+                PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE);
+                PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_ENTROPY);
+                PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_SERVER_ENTROPY);
+                PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_ISSUED_TOKENS);
                 trust10Asserted = true;
             }
             
@@ -615,17 +573,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
                 }
-                assertPolicy(aim, SP12Constants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION);
-                assertPolicy(aim, SP12Constants.REQUIRE_APPLIES_TO);
-                assertPolicy(aim, SP13Constants.SCOPE_POLICY_15);
-                assertPolicy(aim, SP13Constants.MUST_SUPPORT_INTERACTIVE_CHALLENGE);
+                PolicyUtils.assertPolicy(aim, SP12Constants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION);
+                PolicyUtils.assertPolicy(aim, SP12Constants.REQUIRE_APPLIES_TO);
+                PolicyUtils.assertPolicy(aim, SP13Constants.SCOPE_POLICY_15);
+                PolicyUtils.assertPolicy(aim, SP13Constants.MUST_SUPPORT_INTERACTIVE_CHALLENGE);
                 
                 if (!trust10Asserted) {
-                    assertPolicy(aim, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE);
-                    assertPolicy(aim, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE);
-                    assertPolicy(aim, SPConstants.REQUIRE_CLIENT_ENTROPY);
-                    assertPolicy(aim, SPConstants.REQUIRE_SERVER_ENTROPY);
-                    assertPolicy(aim, SPConstants.MUST_SUPPORT_ISSUED_TOKENS);
+                    PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE);
+                    PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE);
+                    PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_ENTROPY);
+                    PolicyUtils.assertPolicy(aim, SPConstants.REQUIRE_SERVER_ENTROPY);
+                    PolicyUtils.assertPolicy(aim, SPConstants.MUST_SUPPORT_ISSUED_TOKENS);
                 }
             }
             
@@ -642,19 +600,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         List<WSSecurityEngineResult> results, 
         boolean utWithCallbacks
     ) throws SOAPException, XMLStreamException, WSSecurityException {
-        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
-        Collection<WSDataRef> signed = new HashSet<WSDataRef>();
-        Collection<WSDataRef> encrypted = new HashSet<WSDataRef>();
-        
         //
         // Pre-fetch various results
         //
-        final List<Integer> actions = new ArrayList<Integer>(3);
+        final List<Integer> actions = new ArrayList<>(3);
         actions.add(WSConstants.SIGN);
         actions.add(WSConstants.UT_SIGN);
         actions.add(WSConstants.ST_SIGNED);
         List<WSSecurityEngineResult> signedResults = 
             WSSecurityUtil.fetchAllActionResults(results, actions);
+        Collection<WSDataRef> signed = new HashSet<>();
         for (WSSecurityEngineResult result : signedResults) {
             List<WSDataRef> sl = 
                 CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
@@ -667,6 +622,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         List<WSSecurityEngineResult> encryptResults = 
             WSSecurityUtil.fetchAllActionResults(results, WSConstants.ENCR);
+        Collection<WSDataRef> encrypted = new HashSet<>();
         for (WSSecurityEngineResult result : encryptResults) {
             List<WSDataRef> sl = 
                 CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
@@ -680,6 +636,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         //
         // Check policies
         //
+        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (!checkSignedEncryptedCoverage(aim, msg, soapHeader, soapBody, signed, encrypted)) {
             LOG.fine("Incoming request failed signed-encrypted policy validation");
         }
@@ -826,13 +783,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         List<WSSecurityEngineResult> encryptedResults,
         boolean utWithCallbacks
     ) {
-        final List<Integer> utActions = new ArrayList<Integer>(2);
+        final List<Integer> utActions = new ArrayList<>(2);
         utActions.add(WSConstants.UT);
         utActions.add(WSConstants.UT_NOPASSWORD);
         List<WSSecurityEngineResult> utResults = 
             WSSecurityUtil.fetchAllActionResults(results, utActions);
         
-        final List<Integer> samlActions = new ArrayList<Integer>(2);
+        final List<Integer> samlActions = new ArrayList<>(2);
         samlActions.add(WSConstants.ST_SIGNED);
         samlActions.add(WSConstants.ST_UNSIGNED);
         List<WSSecurityEngineResult> samlResults = 
@@ -909,8 +866,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 ai.setAsserted(true);
                 for (Header h : rp.getHeaders()) {
                     QName qName = new QName(h.getNamespace(), h.getName());
-                    if (header == null 
-                        || DOMUtils.getFirstChildWithName((Element)header, qName) == null) {
+                    if (header == null || DOMUtils.getFirstChildWithName((Element)header, qName) == null) {
                         ai.setNotAsserted("No header element of name " + qName + " found.");
                     }
                 }
@@ -953,19 +909,18 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
 
     private boolean isTransportBinding(AssertionInfoMap aim, SoapMessage message) {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (ais.size() > 0) {
+        AssertionInfo symAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (symAis != null) {
             return false;
         }
         
-        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (ais.size() > 0) {
+        AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (asymAis != null) {
             return false;
         }
         
-        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (ais.size() > 0) {
+        AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (transAis != null) {
             return true;
         }
         
@@ -973,10 +928,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
         if (tlsInfo != null) {
             // We don't need to check these policies for TLS
-            assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
-            assertPolicy(aim, SP11Constants.ENCRYPTED_PARTS);
-            assertPolicy(aim, SP12Constants.SIGNED_PARTS);
-            assertPolicy(aim, SP11Constants.SIGNED_PARTS);
+            PolicyUtils.assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
+            PolicyUtils.assertPolicy(aim, SP11Constants.ENCRYPTED_PARTS);
+            PolicyUtils.assertPolicy(aim, SP12Constants.SIGNED_PARTS);
+            PolicyUtils.assertPolicy(aim, SP11Constants.SIGNED_PARTS);
             return true;
         }
         
@@ -984,19 +939,21 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
     
     private boolean containsXPathPolicy(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
-        if (ais.size() > 0) {
+        AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+        if (ai != null) {
             return true;
         }
-        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
-        if (ais.size() > 0) {
+        
+        ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+        if (ai != null) {
             return true;
         }
-        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
-        if (ais.size() > 0) {
+        
+        ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+        if (ai != null) {
             return true;
         }
+        
         return false;
     }
 
