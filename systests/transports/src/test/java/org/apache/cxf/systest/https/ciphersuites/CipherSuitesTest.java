@@ -455,6 +455,12 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     // Both client + server include AES, client enables a TLS v1.2 CipherSuite
     @org.junit.Test
     public void testAESIncludedTLSv12() throws Exception {
+        // TLS v1.2 ciphersuites not supported in JDK 1.6
+        String javaVersion = System.getProperty("java.version");
+        if (javaVersion != null && javaVersion.contains("1.6")) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-tlsv12.xml");
 
@@ -479,6 +485,12 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     // Both client + server include AES, client enables a TLS v1.2 CipherSuite
     @org.junit.Test
     public void testAESIncludedTLSv12ViaCode() throws Exception {
+        // TLS v1.2 ciphersuites not supported in JDK 1.6
+        String javaVersion = System.getProperty("java.version");
+        if (javaVersion != null && javaVersion.contains("1.6")) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
 
