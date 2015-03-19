@@ -24,9 +24,12 @@ import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 
@@ -35,7 +38,7 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
     
 
     public ServerFactoryBeanDefinitionParser() {
-        this(ServerFactoryBean.class);
+        this(BPServerFactoryBean.class);
     }
     public ServerFactoryBeanDefinitionParser(Class<?> cls) {
         super(cls);
@@ -97,4 +100,39 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
     protected boolean hasBusProperty() {
         return true;
     }
+    
+    
+    @NoJSR250Annotations
+    public static class BPServerFactoryBean extends ServerFactoryBean {
+
+        private Server server;
+
+        public BPServerFactoryBean() {
+            super();
+        }
+        public BPServerFactoryBean(ReflectionServiceFactoryBean fact) {
+            super(fact);
+        }
+        public Server getServer() {
+            return server;
+        }
+        
+        public void init() {
+            create();
+        }
+        @Override
+        public Server create() {
+            if (server == null) {
+                server = super.create();
+            }
+            return server;
+        }
+        public void destroy() {
+            if (server != null) {
+                server.destroy();
+                server = null;
+            }
+        }
+    }
+    
 }

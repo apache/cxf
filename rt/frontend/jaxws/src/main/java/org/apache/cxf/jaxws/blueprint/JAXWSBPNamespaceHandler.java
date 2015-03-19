@@ -27,10 +27,13 @@ import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.blueprint.ClientProxyFactoryBeanDefinitionParser;
 import org.apache.cxf.frontend.blueprint.ServerFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
@@ -54,7 +57,7 @@ public class JAXWSBPNamespaceHandler implements NamespaceHandler {
         if ("endpoint".equals(s)) {
             return new EndpointDefinitionParser().parse(element, context);
         } else if ("server".equals(s)) {
-            return new ServerFactoryBeanDefinitionParser(JaxWsServerFactoryBean.class)
+            return new ServerFactoryBeanDefinitionParser(BPJaxWsServerFactoryBean.class)
                 .parse(element, context);
         } else if ("client".equals(s)) {
             return new ClientProxyFactoryBeanDefinitionParser(JaxWsProxyFactoryBean.class)
@@ -79,5 +82,41 @@ public class JAXWSBPNamespaceHandler implements NamespaceHandler {
     public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
         this.blueprintContainer = blueprintContainer;
     }
+    
+    
+    
+    @NoJSR250Annotations
+    public static class BPJaxWsServerFactoryBean extends JaxWsServerFactoryBean {
+
+        private Server server;
+
+        public BPJaxWsServerFactoryBean() {
+            super();
+        }
+        public BPJaxWsServerFactoryBean(JaxWsServiceFactoryBean fact) {
+            super(fact);
+        }
+        public Server getServer() {
+            return server;
+        }
+        
+        public void init() {
+            create();
+        }
+        @Override
+        public Server create() {
+            if (server == null) {
+                server = super.create();
+            }
+            return server;
+        }
+        public void destroy() {
+            if (server != null) {
+                server.destroy();
+                server = null;
+            }
+        }
+    }
+    
     
 }
