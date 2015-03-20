@@ -736,9 +736,10 @@ public abstract class AbstractClient implements Client {
         return pValue.toString();
     }
     
-    protected static void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, Throwable cause) {
+    protected static void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, Throwable ex) {
         String errorMessage = JAXRSUtils.logMessageHandlerProblem("NO_MSG_WRITER", cls, ct);
-        throw new ProcessingException(errorMessage, cause);
+        Throwable actualEx = ex instanceof Fault ? ((Fault)ex).getCause() : ex;
+        throw new ProcessingException(errorMessage, actualEx);
     }
     
     protected static void setAllHeaders(MultivaluedMap<String, String> headers, HttpURLConnection conn) {
