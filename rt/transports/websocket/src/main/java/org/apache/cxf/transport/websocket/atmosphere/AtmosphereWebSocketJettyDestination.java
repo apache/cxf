@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
@@ -33,9 +34,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
-import org.apache.cxf.transport.servlet.ServletDestination;
+import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
+import org.apache.cxf.transport.http_jetty.JettyHTTPHandler;
+import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.atmosphere.cpr.ApplicationConfig;
@@ -45,20 +49,21 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.atmosphere.util.Utils;
+import org.eclipse.jetty.server.Request;
+
 
 /**
  * 
  */
-public class AtmosphereWebSocketServletDestination extends ServletDestination implements
+public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination implements 
     WebSocketDestinationService {
-    private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketServletDestination.class);
-
+    private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketJettyDestination.class);
     private AtmosphereFramework framework;
     private Executor executor;
-
-    public AtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei, 
-                                                 String path) throws IOException {
-        super(bus, registry, ei, path);
+    
+    public AtmosphereWebSocketJettyDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
+                                     JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
+        super(bus, registry, ei, serverEngineFactory);
         framework = new AtmosphereFramework(false, true);
         framework.setUseNativeImplementation(false);
         framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
@@ -72,30 +77,34 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
         // synchronously blocked
         executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
-
-    @Override
-    public void invoke(ServletConfig config, ServletContext context, HttpServletRequest req,
-                       HttpServletResponse resp) throws IOException {
-        if (Utils.webSocketEnabled(req)) {
-            try {
-                framework.doCometSupport(AtmosphereRequest.wrap(req), 
-                                         AtmosphereResponse.wrap(resp));
-            } catch (ServletException e) {
-                throw new IOException(e);
-            }
-            return;
-        }
-        super.invoke(config, context, req, resp);
-    }
-
+    
     @Override
     public void invokeInternal(ServletConfig config, ServletContext context, HttpServletRequest req,
                                HttpServletResponse resp) throws IOException {
         super.invoke(config, context, req, resp);
     }
 
-    Executor getExecutor() {
-        return executor;
+    @Override
+    protected String getAddress(EndpointInfo endpointInfo) {
+        String address = endpointInfo.getAddress();
+        if (address.startsWith("ws")) {
+            address = "http" + address.substring(2);
+        }
+        return address;
+    }
+
+
+    @Override
+    protected String getBasePath(String contextPath) throws IOException {
+        if (StringUtils.isEmpty(endpointInfo.getAddress())) {
+            return "";
+        }
+        return new URL(getAddress(endpointInfo)).getPath();
+    }
+    
+    @Override
+    protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
+        return new AtmosphereJettyWebSocketHandler(jhd, cmExact);
     }
 
     @Override
@@ -106,6 +115,29 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
             // ignore
         } finally {
             super.shutdown();
+        }
+    }
+
+    private class AtmosphereJettyWebSocketHandler extends JettyHTTPHandler {
+        public AtmosphereJettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact) {
+            super(jhd, cmExact);
+        }
+        
+        @Override
+        public void handle(String target, Request baseRequest, HttpServletRequest request,
+                           HttpServletResponse response) throws IOException, ServletException {
+            if (Utils.webSocketEnabled(request)) {
+                try {
+                    framework.doCometSupport(AtmosphereRequest.wrap(request), 
+                                             AtmosphereResponse.wrap(response));
+                    baseRequest.setHandled(true);
+                } catch (ServletException e) {
+                    throw new IOException(e);
+                }
+                return;
+            } else {
+                super.handle(target, baseRequest, request, response);
+            }
         }
     }
 

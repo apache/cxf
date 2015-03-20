@@ -30,6 +30,7 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http.HttpDestinationFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
+import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketJettyDestination;
 import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketServletDestination;
 import org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination;
 import org.apache.cxf.transport.websocket.jetty.JettyWebSocketServletDestination;
@@ -51,13 +52,18 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
     public AbstractHTTPDestination createDestination(EndpointInfo endpointInfo, Bus bus,
                                                      DestinationRegistry registry) throws IOException {
         if (endpointInfo.getAddress().startsWith("ws")) {
-            // for the embedded mode, we stick with jetty. 
+            // for the embedded mode, we stick to jetty
             JettyHTTPServerEngineFactory serverEngineFactory = bus
                 .getExtension(JettyHTTPServerEngineFactory.class);
-            if (serverEngineFactory.isJetty8()) {
-                return new JettyWebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+            if (ATMOSPHERE_AVAILABLE) {
+                // use atmosphere if available
+                return new AtmosphereWebSocketJettyDestination(bus, registry, endpointInfo, serverEngineFactory);
             } else {
-                return new Jetty9WebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+                if (serverEngineFactory.isJetty8()) {
+                    return new JettyWebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+                } else {
+                    return new Jetty9WebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+                }
             }
         } else {
             //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
@@ -65,14 +71,14 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
             
             // choose atmosphere if available, otherwise assume jetty is available
             if (ATMOSPHERE_AVAILABLE) {
-                // use atmosphere
+                // use atmosphere if available
                 return new AtmosphereWebSocketServletDestination(bus, registry,
                                                                  endpointInfo, endpointInfo.getAddress());
             } else {
                 JettyHTTPServerEngineFactory serverEngineFactory = bus
                     .getExtension(JettyHTTPServerEngineFactory.class);
+                // use jetty-websocket
                 if (serverEngineFactory.isJetty8()) { 
-                    // use jetty-websocket
                     return new JettyWebSocketServletDestination(bus, registry,
                                                                 endpointInfo, endpointInfo.getAddress());
                 } else { 
