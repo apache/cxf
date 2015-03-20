@@ -79,6 +79,9 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
         } else {
             token = preAuthorizedToken;
         }
+        if (token.getRefreshToken() != null) {
+            LOG.warning("Implicit grant tokens MUST not have refresh tokens, refresh token will not be reported");
+        }
         ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(token, isWriteOptionalParameters());
         processClientAccessToken(clientToken, token);
    
