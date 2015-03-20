@@ -753,7 +753,8 @@ public abstract class AbstractClient implements Client, Retryable {
                                                    cls,
                                                    JAXRSUtils.mediaTypeToString(ct));
         LOG.severe(errorMsg.toString());
-        throw new ClientException(errorMsg.toString(), cause);
+        Throwable actualEx = ex instanceof Fault ? ((Fault)ex).getCause() : ex;
+        throw new ClientException(errorMsg.toString(), actualEx);
     }
     
     private static MediaType getResponseContentType(Response r) {
