@@ -47,8 +47,8 @@ public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
         if (assertionInfo.getAssertion() != null 
-            && (SP12Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName())
-                || SP11Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName()))) {
+            && (SP12Constants.WSS11.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.WSS11.equals(assertionInfo.getAssertion().getName()))) {
             return true;
         }
         

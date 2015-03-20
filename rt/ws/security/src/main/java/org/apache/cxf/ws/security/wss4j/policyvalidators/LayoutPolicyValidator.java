@@ -57,8 +57,8 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
         if (assertionInfo.getAssertion() != null 
-            && (SP12Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName())
-                || SP11Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName()))) {
+            && (SP12Constants.LAYOUT.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.LAYOUT.equals(assertionInfo.getAssertion().getName()))) {
             return true;
         }
         
@@ -92,7 +92,7 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
         }
     }
     
-    public boolean validatePolicy(
+    private boolean validatePolicy(
         Layout layout, 
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults

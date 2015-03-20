@@ -88,7 +88,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
         return true;
     }
     
-    public boolean validatePolicy(
+    private boolean validatePolicy(
         AssertionInfo ai, AlgorithmSuite algorithmPolicy, List<WSSecurityEngineResult> results
     ) {
         boolean success = true;
