@@ -39,9 +39,11 @@ public class ClientCredentialsGrantHandler extends AbstractGrantHandler {
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
         
-        return doCreateAccessToken(client, 
-                                   client.getSubject(), 
-                                   params);
+        ServerAccessToken at = doCreateAccessToken(client, client.getSubject(), params);
+        if (at.getRefreshToken() != null) {
+            LOG.warning("Client credentials grant tokens SHOULD not have refresh tokens");
+        }
+        return at;
     }
 
 

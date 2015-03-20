@@ -43,7 +43,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  * Abstract access token grant handler
  */
 public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractGrantHandler.class);
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractGrantHandler.class);
     
     private List<String> supportedGrants;
     private OAuthDataProvider dataProvider;

@@ -70,7 +70,9 @@ public class HawkAccessToken extends ServerAccessToken {
         super(checkClient(client), OAuthConstants.HAWK_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
         this.setExtraParameters(algo, macKey);
     }
-    
+    public HawkAccessToken(ServerAccessToken token) {
+        this(token, OAuthUtils.generateRandomTokenKey());
+    }
     public HawkAccessToken(ServerAccessToken token, String newKey) {
         super(validateTokenType(token, OAuthConstants.HAWK_TOKEN_TYPE), newKey);
     }

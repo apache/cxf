@@ -43,6 +43,9 @@ public class BearerAccessToken extends ServerAccessToken {
                              long issuedAt) {
         super(client, OAuthConstants.BEARER_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
     }
+    public BearerAccessToken(ServerAccessToken token) {
+        this(token, OAuthUtils.generateRandomTokenKey());
+    }
     public BearerAccessToken(ServerAccessToken token, String newKey) {
         super(validateTokenType(token, OAuthConstants.BEARER_TOKEN_TYPE), newKey);
     }
