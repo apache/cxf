@@ -166,12 +166,11 @@ public class AccessTokenService extends AbstractTokenService {
                     return handler;
                 }
             }
-            // Lets try the default grant handler
-            if (grantHandlers.size() == 0) {
+            // Lets try the well-known grant handlers
+            if (super.getDataProvider() instanceof AuthorizationCodeDataProvider) {
                 AuthorizationCodeGrantHandler handler = new AuthorizationCodeGrantHandler();
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
-                    handler.setDataProvider(
-                            (AuthorizationCodeDataProvider)super.getDataProvider());
+                    handler.setDataProvider((AuthorizationCodeDataProvider)super.getDataProvider());
                     return handler;
                 }
             }
