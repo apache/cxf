@@ -97,7 +97,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     
     @Test
     public void testGetBookWebEx4() throws Exception {
-        final String address = "http://localhost:" + PORT + "/the/thebooks3/bookstore/books/webex2"; 
+        final String address = "http://localhost:" + PORT + "/the/thebooks%203/bookstore/books/webex2"; 
         doTestGetBookWebEx(address);
         
     }
@@ -377,7 +377,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetBookByUriInfo2() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks3/bookstore/bookinfo?"
+            "http://localhost:" + PORT + "/the/thebooks%203/bookstore/bookinfo?"
                                + "param1=12&param2=3"; 
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }

@@ -55,7 +55,7 @@
             <bean class="org.apache.cxf.systest.jaxrs.CustomWebApplicationExceptionMapper"/>
         </jaxrs:providers>
     </jaxrs:server>
-    <jaxrs:server id="bookservice3" address="/thebooks3/bookstore">
+    <jaxrs:server id="bookservice3" address="/thebooks%203/bookstore">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>

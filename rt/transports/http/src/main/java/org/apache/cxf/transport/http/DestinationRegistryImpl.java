@@ -85,9 +85,19 @@ public class DestinationRegistryImpl implements DestinationRegistry {
     }
     
     public AbstractHTTPDestination checkRestfulRequest(String address) {
+        AbstractHTTPDestination ret = getRestfulDestination(getDestinationsPaths(), address);
+        if (ret == null) {
+            ret = getRestfulDestination(decodedDestinations.keySet(), address);
+        }
+        if (ret != null && ret.getMessageObserver() == null) {
+            return null;
+        }
+        return ret; 
+    }
+    private AbstractHTTPDestination getRestfulDestination(Set<String> destPaths, String address) {
         int len = -1;
         AbstractHTTPDestination ret = null;
-        for (String path : getDestinationsPaths()) {
+        for (String path : destPaths) {
             String thePath = path.length() > 1 && path.endsWith(SLASH) 
                 ? path.substring(0, path.length() - 1) : path;
             if ((address.equals(thePath) 
@@ -99,10 +109,7 @@ public class DestinationRegistryImpl implements DestinationRegistry {
                 len = path.length();
             }
         }
-        if (ret != null && ret.getMessageObserver() == null) {
-            return null;
-        }
-        return ret; 
+        return ret;
     }
 
     public Collection<AbstractHTTPDestination> getDestinations() {
