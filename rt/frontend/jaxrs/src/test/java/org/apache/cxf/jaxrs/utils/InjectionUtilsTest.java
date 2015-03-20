@@ -177,8 +177,8 @@ public class InjectionUtilsTest extends Assert {
             return d;
         }
         
-        public void setE(String e) {
-            this.e = e;
+        public void setE(String ee) {
+            this.e = ee;
         }
         public String getE() {
             return e;

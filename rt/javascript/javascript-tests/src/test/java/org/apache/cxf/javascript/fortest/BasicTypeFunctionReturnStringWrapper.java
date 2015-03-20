@@ -38,32 +38,32 @@ public class BasicTypeFunctionReturnStringWrapper {
     public String getS() {
         return s;
     }
-    public void setS(String s) {
-        this.s = s;
+    public void setS(String ss) {
+        this.s = ss;
     }
     public int getI() {
         return i;
     }
-    public void setI(int i) {
-        this.i = i;
+    public void setI(int ii) {
+        this.i = ii;
     }
     public long getL() {
         return l;
     }
-    public void setL(long l) {
-        this.l = l;
+    public void setL(long ll) {
+        this.l = ll;
     }
     public float getF() {
         return f;
     }
-    public void setF(float f) {
-        this.f = f;
+    public void setF(float ff) {
+        this.f = ff;
     }
     public double getD() {
         return d;
     }
-    public void setD(double d) {
-        this.d = d;
+    public void setD(double dd) {
+        this.d = dd;
     }
 
 }

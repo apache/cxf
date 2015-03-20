@@ -30,14 +30,14 @@ public class QueryResult<Q, T> {
     public Q getQ() {
         return q;
     }
-    public void setQ(Q q) {
-        this.q = q;
+    public void setQ(Q pq) {
+        this.q = pq;
     }
     public T getT() {
         return t;
     }
-    public void setT(T t) {
-        this.t = t;
+    public void setT(T pt) {
+        this.t = pt;
     }
     
 }

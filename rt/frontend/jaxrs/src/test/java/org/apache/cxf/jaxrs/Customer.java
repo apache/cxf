@@ -110,8 +110,8 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         public CustomerBean getD() {
             return d;
         }
-        public void setG(Map<String, List<String>> g) {
-            this.g = g;
+        public void setG(Map<String, List<String>> gg) {
+            this.g = gg;
         }
         public Map<String, List<String>> getG() {
             return g;

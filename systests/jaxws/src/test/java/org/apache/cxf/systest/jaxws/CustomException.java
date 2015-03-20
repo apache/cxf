@@ -37,15 +37,15 @@ public class CustomException extends Exception {
         return a;
     }
 
-    public void setA(String a) {
-        this.a = a;
+    public void setA(String aa) {
+        this.a = aa;
     }
 
     public String getB() {
         return b;
     }
 
-    public void setB(String b) {
-        this.b = b;
+    public void setB(String bb) {
+        this.b = bb;
     }
 }

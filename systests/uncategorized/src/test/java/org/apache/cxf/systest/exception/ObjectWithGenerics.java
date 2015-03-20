@@ -36,15 +36,15 @@ public class ObjectWithGenerics<A, B> {
         return a;
     }
     
-    public void setA(A a) {
-        this.a = a;
+    public void setA(A aa) {
+        this.a = aa;
     }
     
     public B getB() {
         return b;
     }
     
-    public void setB(B b) {
-        this.b = b;
+    public void setB(B bb) {
+        this.b = bb;
     }
 }

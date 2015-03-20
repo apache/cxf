@@ -184,15 +184,15 @@ public class BookStore implements BookDescription {
             return a;
         }
         @PathParam("a")
-        public void setA(int a) {
-            this.a = a;
+        public void setA(int aa) {
+            this.a = aa;
         }
         public int getB() {
             return b;
         }
         @QueryParam("b")
-        public void setB(int b) {
-            this.b = b;
+        public void setB(int bb) {
+            this.b = bb;
         }
     }
     
