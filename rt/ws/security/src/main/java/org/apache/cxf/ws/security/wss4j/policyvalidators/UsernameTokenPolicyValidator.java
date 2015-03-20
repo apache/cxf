@@ -19,21 +19,18 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
@@ -44,58 +41,49 @@ import org.apache.wss4j.policy.model.UsernameToken.UsernameTokenType;
 /**
  * Validate a UsernameToken policy.
  */
-public class UsernameTokenPolicyValidator 
-    extends AbstractTokenPolicyValidator implements TokenPolicyValidator {
+public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidator {
     
-    public boolean validatePolicy(
-        AssertionInfoMap aim,
-        Message message,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
-        if (!ais.isEmpty()) {
-            parsePolicies(aim, ais, message, results);
+    /**
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * policy defined by the AssertionInfo parameter
+     */
+    public boolean canValidatePolicy(AssertionInfo assertionInfo) {
+        if (assertionInfo.getAssertion() != null 
+            && (SP12Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName()))) {
+            return true;
         }
         
-        return true;
+        return false;
     }
     
-    private void parsePolicies(
-        AssertionInfoMap aim,
-        Collection<AssertionInfo> ais, 
-        Message message,
-        List<WSSecurityEngineResult> results
-    ) {
-        final List<Integer> actions = new ArrayList<Integer>(2);
-        actions.add(WSConstants.UT);
-        actions.add(WSConstants.UT_NOPASSWORD);
-        List<WSSecurityEngineResult> utResults = 
-            WSSecurityUtil.fetchAllActionResults(results, actions);
-        
+    /**
+     * Validate policies. Return true if all of the policies are valid.
+     */
+    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy = 
                 (org.apache.wss4j.policy.model.UsernameToken)ai.getAssertion();
             ai.setAsserted(true);
-            assertToken(usernameTokenPolicy, aim);
+            assertToken(usernameTokenPolicy, parameters.getAssertionInfoMap());
             
-            if (!isTokenRequired(usernameTokenPolicy, message)) {
+            if (!isTokenRequired(usernameTokenPolicy, parameters.getMessage())) {
                 continue;
             }
 
-            if (utResults.isEmpty()) {
+            if (parameters.getUsernameTokenResults().isEmpty()) {
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
                 continue;
             }
 
-            if (!checkTokens(usernameTokenPolicy, ai, utResults)) {
+            if (!checkTokens(usernameTokenPolicy, ai, parameters.getUsernameTokenResults())) {
                 continue;
             }
         }
+        
+        return true;
     }
     
     private void assertToken(org.apache.wss4j.policy.model.UsernameToken token, AssertionInfoMap aim) {

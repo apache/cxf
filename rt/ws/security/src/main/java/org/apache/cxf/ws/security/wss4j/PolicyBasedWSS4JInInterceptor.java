@@ -54,21 +54,20 @@ import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AlgorithmSuitePolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AsymmetricBindingPolicyValidator;
-import org.apache.cxf.ws.security.wss4j.policyvalidators.BindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.ConcreteSupportingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingEncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.LayoutPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityContextTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEndorsingEncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedTokenPolicyValidator;
-import org.apache.cxf.ws.security.wss4j.policyvalidators.SupportingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SymmetricBindingPolicyValidator;
-import org.apache.cxf.ws.security.wss4j.policyvalidators.TokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.TransportBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.WSS11PolicyValidator;
@@ -641,16 +640,47 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             LOG.fine("Incoming request failed signed-encrypted policy validation");
         }
         
-        if (!checkTokenCoverage(aim, msg, soapBody, results, signedResults)) {
+        PolicyValidatorParameters parameters = new PolicyValidatorParameters();
+        parameters.setAssertionInfoMap(aim);
+        parameters.setMessage(msg);
+        parameters.setSoapBody(soapBody);
+        parameters.setResults(results);
+        parameters.setSignedResults(signedResults);
+        parameters.setEncryptedResults(encryptResults);
+        parameters.setUtWithCallbacks(utWithCallbacks);
+        
+        final List<Integer> utActions = new ArrayList<>(2);
+        utActions.add(WSConstants.UT);
+        utActions.add(WSConstants.UT_NOPASSWORD);
+        List<WSSecurityEngineResult> utResults = 
+            WSSecurityUtil.fetchAllActionResults(results, utActions);
+        parameters.setUsernameTokenResults(utResults);
+        
+        final List<Integer> samlActions = new ArrayList<>(2);
+        samlActions.add(WSConstants.ST_SIGNED);
+        samlActions.add(WSConstants.ST_UNSIGNED);
+        List<WSSecurityEngineResult> samlResults = 
+            WSSecurityUtil.fetchAllActionResults(results, samlActions);
+        parameters.setSamlResults(samlResults);
+        
+        // Store the timestamp element
+        WSSecurityEngineResult tsResult = WSSecurityUtil.fetchActionResult(results, WSConstants.TS);
+        Element timestamp = null;
+        if (tsResult != null) {
+            Timestamp ts = (Timestamp)tsResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
+            timestamp = ts.getElement();
+        }
+        parameters.setTimestampElement(timestamp);
+        
+        if (!checkTokenCoverage(parameters)) {
             LOG.fine("Incoming request failed token policy validation");
         }
         
-        if (!checkBindingCoverage(aim, msg, soapBody, results, signedResults, encryptResults)) {
+        if (!checkBindingCoverage(parameters)) {
             LOG.fine("Incoming request failed binding policy validation");
         }
 
-        if (!checkSupportingTokenCoverage(aim, msg, results, signedResults, 
-            encryptResults, utWithCallbacks)) {
+        if (!checkSupportingTokenCoverage(parameters)) {
             LOG.fine("Incoming request failed supporting token policy validation");
         }
         
@@ -704,28 +734,31 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     /**
      * Check the token coverage
      */
-    private boolean checkTokenCoverage(
-        AssertionInfoMap aim,
-        SoapMessage msg,
-        Element soapBody,
-        List<WSSecurityEngineResult> results, 
-        List<WSSecurityEngineResult> signedResults
-    ) {
+    private boolean checkTokenCoverage(PolicyValidatorParameters parameters) {
+        
         boolean check = true;
-        TokenPolicyValidator x509Validator = new X509TokenPolicyValidator();
-        check &= x509Validator.validatePolicy(aim, msg, soapBody, results, signedResults);
+        AssertionInfoMap aim = parameters.getAssertionInfoMap();
         
-        TokenPolicyValidator utValidator = new UsernameTokenPolicyValidator();
-        check &= utValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
+        SecurityPolicyValidator x509Validator = new X509TokenPolicyValidator();
+        check &= x509Validator.validatePolicies(parameters, ais);
         
-        TokenPolicyValidator samlValidator = new SamlTokenPolicyValidator();
-        check &= samlValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+        SecurityPolicyValidator utValidator = new UsernameTokenPolicyValidator();
+        check &= utValidator.validatePolicies(parameters, ais);
         
-        TokenPolicyValidator sctValidator = new SecurityContextTokenPolicyValidator();
-        check &= sctValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+        SecurityPolicyValidator samlValidator = new SamlTokenPolicyValidator();
+        check &= samlValidator.validatePolicies(parameters, ais);
         
-        TokenPolicyValidator wss11Validator = new WSS11PolicyValidator();
-        check &= wss11Validator.validatePolicy(aim, msg, soapBody, results, signedResults);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURITY_CONTEXT_TOKEN);
+        SecurityPolicyValidator sctValidator = new SecurityContextTokenPolicyValidator();
+        check &= sctValidator.validatePolicies(parameters, ais);
+        
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS11);
+        SecurityPolicyValidator wss11Validator = new WSS11PolicyValidator();
+        check &= wss11Validator.validatePolicies(parameters, ais);
         
         return check;
     }
@@ -733,41 +766,31 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     /**
      * Check the binding coverage
      */
-    private boolean checkBindingCoverage(
-        AssertionInfoMap aim, 
-        SoapMessage msg,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults,
-        List<WSSecurityEngineResult> encryptedResults
-    ) {
+    private boolean checkBindingCoverage(PolicyValidatorParameters parameters) {
         boolean check = true;
+        AssertionInfoMap aim = parameters.getAssertionInfoMap();
         
-        BindingPolicyValidator transportValidator = new TransportBindingPolicyValidator();
-        check &= 
-            transportValidator.validatePolicy(
-                aim, msg, soapBody, results, signedResults, encryptedResults
-            );
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        SecurityPolicyValidator transportValidator = new TransportBindingPolicyValidator();
+        check &= transportValidator.validatePolicies(parameters, ais);
             
-        BindingPolicyValidator symmetricValidator = new SymmetricBindingPolicyValidator();
-        check &= 
-            symmetricValidator.validatePolicy(
-                aim, msg, soapBody, results, signedResults, encryptedResults
-            );
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        SecurityPolicyValidator symmetricValidator = new SymmetricBindingPolicyValidator();
+        check &= symmetricValidator.validatePolicies(parameters, ais);
 
-        BindingPolicyValidator asymmetricValidator = new AsymmetricBindingPolicyValidator();
-        check &= 
-            asymmetricValidator.validatePolicy(
-                aim, msg, soapBody, results, signedResults, encryptedResults
-            );
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        SecurityPolicyValidator asymmetricValidator = new AsymmetricBindingPolicyValidator();
+        check &= asymmetricValidator.validatePolicies(parameters, ais);
         
         // Check AlgorithmSuite + Layout that might not be tied to a binding
-        AlgorithmSuitePolicyValidator algorithmSuiteValidator = new AlgorithmSuitePolicyValidator();
-        check &= 
-            algorithmSuiteValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
+        SecurityPolicyValidator algorithmSuiteValidator = new AlgorithmSuitePolicyValidator();
+        check &= algorithmSuiteValidator.validatePolicies(parameters, ais);
         
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.LAYOUT);
         LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator();
-        check &= layoutValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
+        check &= layoutValidator.validatePolicies(parameters, ais);
         
         return check;
     }
@@ -775,83 +798,42 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     /**
      * Check the supporting token coverage
      */
-    private boolean checkSupportingTokenCoverage(
-        AssertionInfoMap aim,
-        SoapMessage msg,
-        List<WSSecurityEngineResult> results, 
-        List<WSSecurityEngineResult> signedResults,
-        List<WSSecurityEngineResult> encryptedResults,
-        boolean utWithCallbacks
-    ) {
-        final List<Integer> utActions = new ArrayList<>(2);
-        utActions.add(WSConstants.UT);
-        utActions.add(WSConstants.UT_NOPASSWORD);
-        List<WSSecurityEngineResult> utResults = 
-            WSSecurityUtil.fetchAllActionResults(results, utActions);
-        
-        final List<Integer> samlActions = new ArrayList<>(2);
-        samlActions.add(WSConstants.ST_SIGNED);
-        samlActions.add(WSConstants.ST_UNSIGNED);
-        List<WSSecurityEngineResult> samlResults = 
-            WSSecurityUtil.fetchAllActionResults(results, samlActions);
-        
-        // Store the timestamp element
-        WSSecurityEngineResult tsResult = WSSecurityUtil.fetchActionResult(results, WSConstants.TS);
-        Element timestamp = null;
-        if (tsResult != null) {
-            Timestamp ts = (Timestamp)tsResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-            timestamp = ts.getElement();
-        }
-        
+    private boolean checkSupportingTokenCoverage(PolicyValidatorParameters parameters) {
         boolean check = true;
+        AssertionInfoMap aim = parameters.getAssertionInfoMap();
         
-        SupportingTokenPolicyValidator validator = new ConcreteSupportingTokenPolicyValidator();
-        validator.setUsernameTokenResults(utResults, utWithCallbacks);
-        validator.setSAMLTokenResults(samlResults);
-        validator.setTimestampElement(timestamp);
-        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
+        Collection<AssertionInfo> ais = 
+            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
+        SecurityPolicyValidator validator = new ConcreteSupportingTokenPolicyValidator();
+        check &= validator.validatePolicies(parameters, ais);
         
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         validator = new SignedTokenPolicyValidator();
-        validator.setUsernameTokenResults(utResults, utWithCallbacks);
-        validator.setSAMLTokenResults(samlResults);
-        validator.setTimestampElement(timestamp);
-        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
-
+        check &= validator.validatePolicies(parameters, ais);
+        
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_SUPPORTING_TOKENS);
         validator = new EndorsingTokenPolicyValidator();
-        validator.setUsernameTokenResults(utResults, utWithCallbacks);
-        validator.setSAMLTokenResults(samlResults);
-        validator.setTimestampElement(timestamp);
-        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
-
+        check &= validator.validatePolicies(parameters, ais);
+        
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         validator = new SignedEndorsingTokenPolicyValidator();
-        validator.setUsernameTokenResults(utResults, utWithCallbacks);
-        validator.setSAMLTokenResults(samlResults);
-        validator.setTimestampElement(timestamp);
-        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
-
+        check &= validator.validatePolicies(parameters, ais);
+        
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         validator = new SignedEncryptedTokenPolicyValidator();
-        validator.setUsernameTokenResults(utResults, utWithCallbacks);
-        validator.setSAMLTokenResults(samlResults);
-        validator.setTimestampElement(timestamp);
-        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
-
+        check &= validator.validatePolicies(parameters, ais);
+        
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_SUPPORTING_TOKENS);
         validator = new EncryptedTokenPolicyValidator();
-        validator.setUsernameTokenResults(utResults, utWithCallbacks);
-        validator.setSAMLTokenResults(samlResults);
-        validator.setTimestampElement(timestamp);
-        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
-
+        check &= validator.validatePolicies(parameters, ais);
+        
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         validator = new EndorsingEncryptedTokenPolicyValidator();
-        validator.setUsernameTokenResults(utResults, utWithCallbacks);
-        validator.setSAMLTokenResults(samlResults);
-        validator.setTimestampElement(timestamp);
-        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
+        check &= validator.validatePolicies(parameters, ais);
 
+        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         validator = new SignedEndorsingEncryptedTokenPolicyValidator();
-        validator.setUsernameTokenResults(utResults, utWithCallbacks);
-        validator.setSAMLTokenResults(samlResults);
-        validator.setTimestampElement(timestamp);
-        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
+        check &= validator.validatePolicies(parameters, ais);
         
         return check;
     }

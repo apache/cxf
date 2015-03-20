@@ -19,27 +19,23 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.List;
+import java.util.Collection;
 
-import org.w3c.dom.Element;
-
-import org.apache.cxf.message.Message;
-import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.cxf.ws.policy.AssertionInfo;
 
 /**
- * Validate a WS-SecurityPolicy corresponding to a received token.
+ * Validate a WS-SecurityPolicy
  */
-public interface TokenPolicyValidator {
+public interface SecurityPolicyValidator {
     
     /**
-     * Validate a particular policy from the AssertionInfoMap argument. Return true if the policy is valid.
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * policy defined by the AssertionInfo parameter
      */
-    boolean validatePolicy(
-        AssertionInfoMap aim, 
-        Message message,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    );
+    boolean canValidatePolicy(AssertionInfo assertionInfo);
+    
+    /**
+     * Validate policies. Return true if all of the policies are valid.
+     */
+    boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais);
 }

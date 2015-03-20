@@ -22,8 +22,6 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.List;
 
-import org.w3c.dom.Element;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
@@ -32,46 +30,40 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
-import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SecurityContextToken;
 
 /**
  * Validate a SecurityContextToken policy.
  */
-public class SecurityContextTokenPolicyValidator 
-    extends AbstractTokenPolicyValidator implements TokenPolicyValidator {
+public class SecurityContextTokenPolicyValidator extends AbstractSecurityPolicyValidator {
     
-    public boolean validatePolicy(
-        AssertionInfoMap aim,
-        Message message,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURITY_CONTEXT_TOKEN);
-        if (!ais.isEmpty()) {
-            parsePolicies(aim, ais, message, results);
+    /**
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * policy defined by the AssertionInfo parameter
+     */
+    public boolean canValidatePolicy(AssertionInfo assertionInfo) {
+        if (assertionInfo.getAssertion() != null 
+            && (SP12Constants.SECURITY_CONTEXT_TOKEN.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.SECURITY_CONTEXT_TOKEN.equals(assertionInfo.getAssertion().getName()))) {
+            return true;
         }
         
-        return true;
+        return false;
     }
     
-    private void parsePolicies(
-        AssertionInfoMap aim,
-        Collection<AssertionInfo> ais, 
-        Message message,
-        List<WSSecurityEngineResult> results
-    ) {
+    /**
+     * Validate policies. Return true if all of the policies are valid.
+     */
+    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> sctResults = 
-            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SCT);
+            WSSecurityUtil.fetchAllActionResults(parameters.getResults(), WSConstants.SCT);
 
         for (AssertionInfo ai : ais) {
             SecurityContextToken sctPolicy = (SecurityContextToken)ai.getAssertion();
             ai.setAsserted(true);
-            assertToken(sctPolicy, aim);
+            assertToken(sctPolicy, parameters.getAssertionInfoMap());
             
-            if (!isTokenRequired(sctPolicy, message)) {
+            if (!isTokenRequired(sctPolicy, parameters.getMessage())) {
                 continue;
             }
 
@@ -82,6 +74,8 @@ public class SecurityContextTokenPolicyValidator
                 continue;
             }
         }
+        
+        return true;
     }
     
     private void assertToken(SecurityContextToken token, AssertionInfoMap aim) {

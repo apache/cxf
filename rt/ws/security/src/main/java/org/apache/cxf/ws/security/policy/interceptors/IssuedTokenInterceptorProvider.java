@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,13 +43,12 @@ import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
-import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -186,88 +184,26 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             Message message,
             Collection<AssertionInfo> issuedAis
         ) {
-            List<WSSecurityEngineResult> signedResults = 
-                WSSecurityUtil.fetchAllActionResults(rResult.getResults(), WSConstants.SIGN);
+            PolicyValidatorParameters parameters = new PolicyValidatorParameters();
+            parameters.setAssertionInfoMap(message.get(AssertionInfoMap.class));
+            parameters.setMessage(message);
+            parameters.setResults(rResult.getResults());
             
-            IssuedTokenPolicyValidator issuedValidator = 
-                new IssuedTokenPolicyValidator(signedResults, message);
-
-            for (SamlAssertionWrapper assertionWrapper : findSamlTokenResults(rResult.getResults())) {
-                boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);
-                if (valid) {
-                    SecurityToken token = createSecurityToken(assertionWrapper);
-                    message.getExchange().put(SecurityConstants.TOKEN, token);
-                    return;
-                }
-            }
-            for (BinarySecurity binarySecurityToken : findBinarySecurityTokenResults(rResult.getResults())) {
-                boolean valid = issuedValidator.validatePolicy(issuedAis, binarySecurityToken);
-                if (valid) {
-                    SecurityToken token = createSecurityToken(binarySecurityToken);
-                    message.getExchange().put(SecurityConstants.TOKEN, token);
-                    return;
-                }
-            }
-        }
-        
-        private List<SamlAssertionWrapper> findSamlTokenResults(
-            List<WSSecurityEngineResult> wsSecEngineResults
-        ) {
-            List<SamlAssertionWrapper> results = new ArrayList<SamlAssertionWrapper>();
-            for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt.intValue() == WSConstants.ST_SIGNED
-                    || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                    results.add((SamlAssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION));
-                }
-            }
-            return results;
-        }
-        
-        private List<BinarySecurity> findBinarySecurityTokenResults(
-            List<WSSecurityEngineResult> wsSecEngineResults
-        ) {
-            List<BinarySecurity> results = new ArrayList<BinarySecurity>();
-            for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt.intValue() == WSConstants.BST 
-                    && Boolean.TRUE.equals(wser.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN))) {
-                    results.add((BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN));
-                }
-            }
-            return results;
-        }
-        
-        private SecurityToken createSecurityToken(
-            SamlAssertionWrapper assertionWrapper
-        ) {
-            SecurityToken token = new SecurityToken(assertionWrapper.getId());
-
-            SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
-            if (subjectKeyInfo != null) {
-                token.setSecret(subjectKeyInfo.getSecret());
-                X509Certificate[] certs = subjectKeyInfo.getCerts();
-                if (certs != null && certs.length > 0) {
-                    token.setX509Certificate(certs[0], null);
-                }
-            }
-            if (assertionWrapper.getSaml1() != null) {
-                token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-            } else if (assertionWrapper.getSaml2() != null) {
-                token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-            }
-            token.setToken(assertionWrapper.getElement());
-
-            return token;
-        }
-    
-        private SecurityToken createSecurityToken(BinarySecurity binarySecurityToken) {
-            SecurityToken token = new SecurityToken(binarySecurityToken.getID());
-            token.setToken(binarySecurityToken.getElement());
-            token.setSecret(binarySecurityToken.getToken());
-            token.setTokenType(binarySecurityToken.getValueType());
-    
-            return token;
+            final List<Integer> actions = new ArrayList<>(1);
+            actions.add(WSConstants.SIGN);
+            List<WSSecurityEngineResult> signedResults = 
+                WSSecurityUtil.fetchAllActionResults(rResult.getResults(), actions);
+            parameters.setSignedResults(signedResults);
+            
+            final List<Integer> samlActions = new ArrayList<>(2);
+            samlActions.add(WSConstants.ST_SIGNED);
+            samlActions.add(WSConstants.ST_UNSIGNED);
+            List<WSSecurityEngineResult> samlResults = 
+                WSSecurityUtil.fetchAllActionResults(rResult.getResults(), samlActions);
+            parameters.setSamlResults(samlResults);
+            
+            SecurityPolicyValidator issuedValidator = new IssuedTokenPolicyValidator();
+            issuedValidator.validatePolicies(parameters, issuedAis);
         }
         
     }

@@ -30,7 +30,7 @@ import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 /**
  * Some abstract functionality for validating SAML Assertions
  */
-public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyValidator {
+public abstract class AbstractSamlPolicyValidator extends AbstractSecurityPolicyValidator {
     
     /**
      * Check the holder-of-key requirements against the received assertion. The subject

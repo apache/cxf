@@ -25,9 +25,9 @@ import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
- * Some abstract functionality for validating a Security Token.
+ * Some abstract functionality for validating policies
  */
-public abstract class AbstractTokenPolicyValidator {
+public abstract class AbstractSecurityPolicyValidator implements SecurityPolicyValidator {
     
     /**
      * Check to see if a token is required or not.

@@ -52,7 +52,6 @@ import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.ws.security.wss4j.policyvalidators.AbstractSamlPolicyValidator;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -68,6 +67,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
@@ -608,7 +608,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
         }
     }
 
-    private static class ProofOfPossessionValidator extends AbstractSamlPolicyValidator {
+    private static class ProofOfPossessionValidator {
         
         public boolean checkProofOfPossession(
             TokenRenewerParameters tokenParameters,
@@ -634,8 +634,8 @@ public class SAMLTokenRenewer implements TokenRenewer {
             if (tlsInfo != null) {
                 tlsCerts = tlsInfo.getPeerCertificates();
             }
-            
-            return compareCredentials(subjectKeyInfo, signedResults, tlsCerts);
+           
+            return DOMSAMLUtil.compareCredentials(subjectKeyInfo, signedResults, tlsCerts);
         }
     }
 }

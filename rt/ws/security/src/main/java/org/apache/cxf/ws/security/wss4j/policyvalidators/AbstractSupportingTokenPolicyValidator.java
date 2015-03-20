@@ -70,100 +70,35 @@ import org.apache.wss4j.policy.model.SupportingTokens;
 /**
  * A base class to use to validate various SupportingToken policies.
  */
-public abstract class AbstractSupportingTokenPolicyValidator 
-    extends AbstractTokenPolicyValidator implements SupportingTokenPolicyValidator {
+public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSecurityPolicyValidator {
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractSupportingTokenPolicyValidator.class);
     
-    private Message message;
-    private List<WSSecurityEngineResult> results;
-    private List<WSSecurityEngineResult> signedResults;
-    private List<WSSecurityEngineResult> encryptedResults;
-    private List<WSSecurityEngineResult> utResults;
-    private List<WSSecurityEngineResult> samlResults;
-    private boolean validateUsernameToken = true;
-    private Element timestamp;
-    private boolean signed;
-    private boolean encrypted;
-    private boolean derived;
-    private boolean endorsed; 
     private SignedElements signedElements;
     private EncryptedElements encryptedElements;
     private SignedParts signedParts;
     private EncryptedParts encryptedParts;
+    
+    protected abstract boolean isSigned();
+    protected abstract boolean isEncrypted();
+    protected abstract boolean isEndorsing();
 
-    /**
-     * Set the list of UsernameToken results
-     */
-    public void setUsernameTokenResults(
-        List<WSSecurityEngineResult> utResultsList,
-        boolean valUsernameToken
-    ) {
-        utResults = utResultsList;
-        validateUsernameToken = valUsernameToken;
-    }
-    
-    /**
-     * Set the list of SAMLToken results
-     */
-    public void setSAMLTokenResults(List<WSSecurityEngineResult> samlResultsList) {
-        samlResults = samlResultsList;
-    }
-    
-    /**
-     * Set the Timestamp element
-     */
-    public void setTimestampElement(Element timestampElement) {
-        timestamp = timestampElement;
-    }
-    
-    public void setMessage(Message msg) {
-        message = msg;
-    }
-    
-    public void setResults(List<WSSecurityEngineResult> results) {
-        this.results = results;
-    }
-    
-    public void setSignedResults(List<WSSecurityEngineResult> signedResults) {
-        this.signedResults = signedResults;
-    }
-    
-    public void setEncryptedResults(List<WSSecurityEngineResult> encryptedResults) {
-        this.encryptedResults = encryptedResults;
-    }
-    
-    public void setSigned(boolean signed) {
-        this.signed = signed;
-    }
-    
-    public void setEncrypted(boolean encrypted) {
-        this.encrypted = encrypted;
-    }
-    
-    public void setDerived(boolean derived) {
-        this.derived = derived;
-    }
-    
-    public void setEndorsed(boolean endorsed) {
-        this.endorsed = endorsed;
-    }
-    
     /**
      * Process UsernameTokens.
      */
-    protected boolean processUsernameTokens() {
-        if (!validateUsernameToken) {
+    protected boolean processUsernameTokens(PolicyValidatorParameters parameters, boolean derived) {
+        if (!parameters.isUtWithCallbacks()) {
             return true;
         }
         
         List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        tokenResults.addAll(utResults);
+        tokenResults.addAll(parameters.getUsernameTokenResults());
         List<WSSecurityEngineResult> dktResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : utResults) {
+        for (WSSecurityEngineResult wser : parameters.getUsernameTokenResults()) {
             if (derived) {
                 byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
+                WSSecurityEngineResult dktResult = 
+                    getMatchingDerivedKey(secret, parameters.getResults());
                 if (dktResult != null) {
                     dktResults.add(dktResult);
                 }
@@ -174,14 +109,22 @@ public abstract class AbstractSupportingTokenPolicyValidator
             return false;
         }
         
-        if (signed && !areTokensSigned(tokenResults)) {
+        if (isSigned() && !areTokensSigned(tokenResults, parameters.getSignedResults(),
+                                           parameters.getEncryptedResults(),
+                                           parameters.getMessage())) {
             return false;
         }
-        if (encrypted && !areTokensEncrypted(tokenResults)) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
+                                                 parameters.getMessage())) {
             return false;
         }
         tokenResults.addAll(dktResults);
-        if ((endorsed && !checkEndorsed(tokenResults)) || !validateSignedEncryptedPolicies(tokenResults)) {
+        if ((isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
+                                             parameters.getMessage(),
+                                             parameters.getTimestampElement())) 
+            || !validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
+                                                parameters.getEncryptedResults(),
+                                                parameters.getMessage())) {
             return false;
         }
         
@@ -192,22 +135,30 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Process SAML Tokens. Only signed results are supported.
      */
-    protected boolean processSAMLTokens() {
-        if (samlResults.isEmpty()) {
+    protected boolean processSAMLTokens(PolicyValidatorParameters parameters) {
+        if (parameters.getSamlResults().isEmpty()) {
             return false;
         }
         
-        if (signed && !areTokensSigned(samlResults)) {
+        if (isSigned() && !areTokensSigned(parameters.getSamlResults(), parameters.getSignedResults(),
+                                           parameters.getEncryptedResults(),
+                                           parameters.getMessage())) {
             return false;
         }
-        if (encrypted && !areTokensEncrypted(samlResults)) {
+        if (isEncrypted() && !areTokensEncrypted(parameters.getSamlResults(), 
+                                                 parameters.getEncryptedResults(),
+                                                 parameters.getMessage())) {
             return false;
         }
-        if (endorsed && !checkEndorsed(samlResults)) {
+        if (isEndorsing() && !checkEndorsed(parameters.getSamlResults(), parameters.getSignedResults(),
+                                            parameters.getMessage(),
+                                            parameters.getTimestampElement())) {
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(samlResults)) {
+        if (!validateSignedEncryptedPolicies(parameters.getSamlResults(), parameters.getSignedResults(),
+                                             parameters.getEncryptedResults(),
+                                             parameters.getMessage())) {
             return false;
         }
         
@@ -218,10 +169,10 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Process Kerberos Tokens.
      */
-    protected boolean processKerberosTokens() {
+    protected boolean processKerberosTokens(PolicyValidatorParameters parameters, boolean derived) {
         List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
         List<WSSecurityEngineResult> dktResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : results) {
+        for (WSSecurityEngineResult wser : parameters.getResults()) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.BST) {
                 BinarySecurity binarySecurity = 
@@ -229,7 +180,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
                 if (binarySecurity instanceof KerberosSecurity) {
                     if (derived) {
                         byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                        WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
+                        WSSecurityEngineResult dktResult = 
+                            getMatchingDerivedKey(secret, parameters.getResults());
                         if (dktResult != null) {
                             dktResults.add(dktResult);
                         }
@@ -243,18 +195,25 @@ public abstract class AbstractSupportingTokenPolicyValidator
             return false;
         }
         
-        if (signed && !areTokensSigned(tokenResults)) {
+        if (isSigned() && !areTokensSigned(tokenResults, parameters.getSignedResults(),
+                                           parameters.getEncryptedResults(),
+                                           parameters.getMessage())) {
             return false;
         }
-        if (encrypted && !areTokensEncrypted(tokenResults)) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
+                                                 parameters.getMessage())) {
             return false;
         }
         tokenResults.addAll(dktResults);
-        if (endorsed && !checkEndorsed(tokenResults)) {
+        if (isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
+                                            parameters.getMessage(),
+                                            parameters.getTimestampElement())) {
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(tokenResults)) {
+        if (!validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
+                                             parameters.getEncryptedResults(),
+                                             parameters.getMessage())) {
             return false;
         }
         
@@ -265,10 +224,10 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Process X509 Tokens.
      */
-    protected boolean processX509Tokens() {
+    protected boolean processX509Tokens(PolicyValidatorParameters parameters, boolean derived) {
         List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
         List<WSSecurityEngineResult> dktResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : results) {
+        for (WSSecurityEngineResult wser : parameters.getResults()) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.BST) {
                 BinarySecurity binarySecurity = 
@@ -276,7 +235,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
                 if (binarySecurity instanceof X509Security
                     || binarySecurity instanceof PKIPathSecurity) {
                     if (derived) {
-                        WSSecurityEngineResult resultToStore = processX509DerivedTokenResult(wser);
+                        WSSecurityEngineResult resultToStore = 
+                            processX509DerivedTokenResult(wser, parameters.getResults());
                         if (resultToStore != null) {
                             dktResults.add(resultToStore);
                         }
@@ -290,18 +250,25 @@ public abstract class AbstractSupportingTokenPolicyValidator
             return false;
         }
         
-        if (signed && !areTokensSigned(tokenResults)) {
+        if (isSigned() && !areTokensSigned(tokenResults, parameters.getSignedResults(),
+                                           parameters.getEncryptedResults(),
+                                           parameters.getMessage())) {
             return false;
         }
-        if (encrypted && !areTokensEncrypted(tokenResults)) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
+                                                 parameters.getMessage())) {
             return false;
         }
         tokenResults.addAll(dktResults);
-        if (endorsed && !checkEndorsed(tokenResults)) {
+        if (isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
+                                            parameters.getMessage(),
+                                            parameters.getTimestampElement())) {
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(tokenResults)) {
+        if (!validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
+                                             parameters.getEncryptedResults(),
+                                             parameters.getMessage())) {
             return false;
         }
         
@@ -311,9 +278,9 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Process KeyValue Tokens.
      */
-    protected boolean processKeyValueTokens() {
+    protected boolean processKeyValueTokens(PolicyValidatorParameters parameters) {
         List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : signedResults) {
+        for (WSSecurityEngineResult wser : parameters.getSignedResults()) {
             PublicKey publicKey = 
                 (PublicKey)wser.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
             if (publicKey != null) {
@@ -325,17 +292,24 @@ public abstract class AbstractSupportingTokenPolicyValidator
             return false;
         }
         
-        if (signed && !areTokensSigned(tokenResults)) {
+        if (isSigned() && !areTokensSigned(tokenResults, parameters.getSignedResults(),
+                                           parameters.getEncryptedResults(),
+                                           parameters.getMessage())) {
             return false;
         }
-        if (encrypted && !areTokensEncrypted(tokenResults)) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
+                                                 parameters.getMessage())) {
             return false;
         }
-        if (endorsed && !checkEndorsed(tokenResults)) {
+        if (isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
+                                            parameters.getMessage(),
+                                            parameters.getTimestampElement())) {
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(tokenResults)) {
+        if (!validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
+                                             parameters.getEncryptedResults(),
+                                             parameters.getMessage())) {
             return false;
         }
         
@@ -346,20 +320,24 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Validate (SignedParts|SignedElements|EncryptedParts|EncryptedElements) policies of this
      * SupportingToken.
      */
-    private boolean validateSignedEncryptedPolicies(List<WSSecurityEngineResult> tokenResults) {
-        if (!validateSignedEncryptedParts(signedParts, false, signedResults, tokenResults)) {
+    private boolean validateSignedEncryptedPolicies(List<WSSecurityEngineResult> tokenResults,
+                                                    List<WSSecurityEngineResult> signedResults,
+                                                    List<WSSecurityEngineResult> encryptedResults,
+                                                    Message message) {
+        if (!validateSignedEncryptedParts(signedParts, false, signedResults, tokenResults, message)) {
             return false;
         }
         
-        if (!validateSignedEncryptedParts(encryptedParts, true, encryptedResults, tokenResults)) {
+        if (!validateSignedEncryptedParts(encryptedParts, true, encryptedResults, tokenResults, message)) {
             return false;
         }
         
-        if (!validateSignedEncryptedElements(signedElements, false, signedResults, tokenResults)) {
+        if (!validateSignedEncryptedElements(signedElements, false, signedResults, tokenResults, message)) {
             return false;
         }
         
-        if (!validateSignedEncryptedElements(encryptedElements, false, encryptedResults, tokenResults)) {
+        if (!validateSignedEncryptedElements(encryptedElements, false, encryptedResults, tokenResults, 
+                                             message)) {
             return false;
         }
         
@@ -370,15 +348,15 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Process Security Context Tokens.
      */
-    protected boolean processSCTokens() {
+    protected boolean processSCTokens(PolicyValidatorParameters parameters, boolean derived) {
         List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
         List<WSSecurityEngineResult> dktResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : results) {
+        for (WSSecurityEngineResult wser : parameters.getResults()) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.SCT) {
                 if (derived) {
                     byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                    WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
+                    WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret, parameters.getResults());
                     if (dktResult != null) {
                         dktResults.add(dktResult);
                     }
@@ -391,18 +369,25 @@ public abstract class AbstractSupportingTokenPolicyValidator
             return false;
         }
         
-        if (signed && !areTokensSigned(tokenResults)) {
+        if (isSigned() && !areTokensSigned(tokenResults, parameters.getSignedResults(),
+                                           parameters.getEncryptedResults(),
+                                           parameters.getMessage())) {
             return false;
         }
-        if (encrypted && !areTokensEncrypted(tokenResults)) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
+                                                 parameters.getMessage())) {
             return false;
         }
         tokenResults.addAll(dktResults);
-        if (endorsed && !checkEndorsed(tokenResults)) {
+        if (isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
+                                            parameters.getMessage(),
+                                            parameters.getTimestampElement())) {
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(tokenResults)) {
+        if (!validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
+                                             parameters.getEncryptedResults(),
+                                             parameters.getMessage())) {
             return false;
         }
         
@@ -413,13 +398,14 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Find an EncryptedKey element that has a cert that matches the cert of the signature, then
      * find a DerivedKey element that matches that EncryptedKey element.
      */
-    private WSSecurityEngineResult processX509DerivedTokenResult(WSSecurityEngineResult result) {
+    private WSSecurityEngineResult processX509DerivedTokenResult(WSSecurityEngineResult result,
+                                                                 List<WSSecurityEngineResult> results) {
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        WSSecurityEngineResult encrResult = getMatchingEncryptedKey(cert);
+        WSSecurityEngineResult encrResult = getMatchingEncryptedKey(cert, results);
         if (encrResult != null) {
             byte[] secret = (byte[])encrResult.get(WSSecurityEngineResult.TAG_SECRET);
-            WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
+            WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret, results);
             if (dktResult != null) {
                 return dktResult;
             }
@@ -431,7 +417,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Get a security result representing a Derived Key that has a secret key that
      * matches the parameter.
      */
-    private WSSecurityEngineResult getMatchingDerivedKey(byte[] secret) {
+    private WSSecurityEngineResult getMatchingDerivedKey(byte[] secret,
+                                                         List<WSSecurityEngineResult> results) {
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.DKT) {
@@ -447,7 +434,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Get a security result representing an EncryptedKey that matches the parameter.
      */
-    private WSSecurityEngineResult getMatchingEncryptedKey(X509Certificate cert) {
+    private WSSecurityEngineResult getMatchingEncryptedKey(X509Certificate cert,
+                                                           List<WSSecurityEngineResult> results) {
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.ENCR) {
@@ -461,7 +449,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
         return null;
     }
     
-    private boolean isTLSInUse() {
+    private boolean isTLSInUse(Message message) {
         // See whether TLS is in use or not
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
         if (tlsInfo != null) {
@@ -475,13 +463,16 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * check that the Timestamp is signed. Otherwise, check that the signature is signed.
      * @return true if the endorsed supporting token policy is correct
      */
-    private boolean checkEndorsed(List<WSSecurityEngineResult> tokenResults) {
+    private boolean checkEndorsed(List<WSSecurityEngineResult> tokenResults,
+                                  List<WSSecurityEngineResult> signedResults,
+                                  Message message,
+                                  Element timestamp) {
         boolean endorsingSatisfied = false;
-        if (isTLSInUse()) {
-            endorsingSatisfied = checkTimestampIsSigned(tokenResults);
+        if (isTLSInUse(message)) {
+            endorsingSatisfied = checkTimestampIsSigned(tokenResults, signedResults, timestamp);
         }
         if (!endorsingSatisfied) {
-            endorsingSatisfied = checkSignatureIsSigned(tokenResults);
+            endorsingSatisfied = checkSignatureIsSigned(tokenResults, signedResults);
         }
         return endorsingSatisfied;
     }
@@ -490,11 +481,15 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Return true if a list of tokens were signed, false otherwise.
      */
-    private boolean areTokensSigned(List<WSSecurityEngineResult> tokens) {
-        if (!isTLSInUse()) {
+    private boolean areTokensSigned(List<WSSecurityEngineResult> tokens,
+                                    List<WSSecurityEngineResult> signedResults,
+                                    List<WSSecurityEngineResult> encryptedResults,
+                                    Message message) {
+        if (!isTLSInUse(message)) {
             for (WSSecurityEngineResult wser : tokens) {
                 Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-                if (tokenElement == null || !isTokenSigned(tokenElement)) {
+                if (tokenElement == null 
+                    || !isTokenSigned(tokenElement, signedResults, encryptedResults)) {
                     return false;
                 }
             }
@@ -505,11 +500,13 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Return true if a list of tokens were encrypted, false otherwise.
      */
-    private boolean areTokensEncrypted(List<WSSecurityEngineResult> tokens) {
-        if (!isTLSInUse()) {
+    private boolean areTokensEncrypted(List<WSSecurityEngineResult> tokens,
+                                       List<WSSecurityEngineResult> encryptedResults,
+                                       Message message) {
+        if (!isTLSInUse(message)) {
             for (WSSecurityEngineResult wser : tokens) {
                 Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-                if (tokenElement == null || !isTokenEncrypted(tokenElement)) {
+                if (tokenElement == null || !isTokenEncrypted(tokenElement, encryptedResults)) {
                     return false;
                 }
             }
@@ -522,7 +519,9 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * @param tokenResults A list of WSSecurityEngineResults corresponding to tokens
      * @return true if the Timestamp is signed
      */
-    private boolean checkTimestampIsSigned(List<WSSecurityEngineResult> tokenResults) {
+    private boolean checkTimestampIsSigned(List<WSSecurityEngineResult> tokenResults,
+                                           List<WSSecurityEngineResult> signedResults,
+                                           Element timestamp) {
         for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> sl =
                 CastUtils.cast((List<?>)signedResult.get(
@@ -545,7 +544,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * @param tokenResults A list of WSSecurityEngineResults corresponding to tokens
      * @return true if the Signature is itself signed
      */
-    private boolean checkSignatureIsSigned(List<WSSecurityEngineResult> tokenResults) {
+    private boolean checkSignatureIsSigned(List<WSSecurityEngineResult> tokenResults,
+                                           List<WSSecurityEngineResult> signedResults) {
         for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> sl =
                 CastUtils.cast((List<?>)signedResult.get(
@@ -636,7 +636,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
         SignedParts parts,
         boolean content,
         List<WSSecurityEngineResult> protResults,
-        List<WSSecurityEngineResult> tokenResults
+        List<WSSecurityEngineResult> tokenResults,
+        Message message
     ) {
         if (parts == null) {
             return true;
@@ -716,7 +717,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
         RequiredElements elements,
         boolean content,
         List<WSSecurityEngineResult> protResults,
-        List<WSSecurityEngineResult> tokenResults
+        List<WSSecurityEngineResult> tokenResults,
+        Message message
     ) {
         if (elements == null) {
             return true;
@@ -797,13 +799,14 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Return true if a token was signed, false otherwise.
      */
-    private boolean isTokenSigned(Element token) {
+    private boolean isTokenSigned(Element token, List<WSSecurityEngineResult> signedResults,
+                                  List<WSSecurityEngineResult> encryptedResults) {
         for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> dataRefs = 
                 CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
             for (WSDataRef dataRef : dataRefs) {
                 if (token == dataRef.getProtectedElement()
-                    || isEncryptedTokenSigned(token, dataRef)) {
+                    || isEncryptedTokenSigned(token, dataRef, encryptedResults)) {
                     return true;
                 }
             }
@@ -811,7 +814,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
         return false;
     }
     
-    private boolean isEncryptedTokenSigned(Element token, WSDataRef signedRef) {
+    private boolean isEncryptedTokenSigned(Element token, WSDataRef signedRef,
+                                           List<WSSecurityEngineResult> encryptedResults) {
         if (signedRef.getProtectedElement() != null
             && "EncryptedData".equals(signedRef.getProtectedElement().getLocalName())
             && WSConstants.ENC_NS.equals(signedRef.getProtectedElement().getNamespaceURI())) {
@@ -837,7 +841,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
     /**
      * Return true if a token was encrypted, false otherwise.
      */
-    private boolean isTokenEncrypted(Element token) {
+    private boolean isTokenEncrypted(Element token, List<WSSecurityEngineResult> encryptedResults) {
         for (WSSecurityEngineResult result : encryptedResults) {
             List<WSDataRef> dataRefs = 
                 CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
@@ -851,18 +855,6 @@ public abstract class AbstractSupportingTokenPolicyValidator
             }
         }
         return false;
-    }
-
-    public void setUtResults(List<WSSecurityEngineResult> utResults) {
-        this.utResults = utResults;
-    }
-
-    public void setValidateUsernameToken(boolean validateUsernameToken) {
-        this.validateUsernameToken = validateUsernameToken;
-    }
-
-    public void setTimestamp(Element timestamp) {
-        this.timestamp = timestamp;
     }
 
     public void setSignedElements(SignedElements signedElements) {

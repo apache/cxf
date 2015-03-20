@@ -29,7 +29,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
@@ -41,6 +40,8 @@ import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.X509Token.TokenType;
@@ -48,60 +49,57 @@ import org.apache.wss4j.policy.model.X509Token.TokenType;
 /**
  * Validate an X509 Token policy.
  */
-public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator implements TokenPolicyValidator {
+public class X509TokenPolicyValidator extends AbstractSecurityPolicyValidator {
     
     private static final Logger LOG = LogUtils.getL7dLogger(X509TokenPolicyValidator.class);
     
     private static final String X509_V3_VALUETYPE = WSConstants.X509TOKEN_NS + "#X509v3";
     private static final String PKI_VALUETYPE = WSConstants.X509TOKEN_NS + "#X509PKIPathv1";
     
-    public boolean validatePolicy(
-        AssertionInfoMap aim,
-        Message message,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
-        if (!ais.isEmpty()) {
-            parsePolicies(aim, ais, message, signedResults, results);
+    /**
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * policy defined by the AssertionInfo parameter
+     */
+    public boolean canValidatePolicy(AssertionInfo assertionInfo) {
+        if (assertionInfo.getAssertion() != null 
+            && (SP12Constants.X509_TOKEN.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.X509_TOKEN.equals(assertionInfo.getAssertion().getName()))) {
+            return true;
         }
         
-        return true;
+        return false;
     }
     
-    private void parsePolicies(
-        AssertionInfoMap aim,
-        Collection<AssertionInfo> ais, 
-        Message message,
-        List<WSSecurityEngineResult> signedResults,
-        List<WSSecurityEngineResult> results
-    ) {
+    /**
+     * Validate policies. Return true if all of the policies are valid.
+     */
+    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> bstResults = 
-            WSSecurityUtil.fetchAllActionResults(results, WSConstants.BST);
+            WSSecurityUtil.fetchAllActionResults(parameters.getResults(), WSConstants.BST);
         
         for (AssertionInfo ai : ais) {
             X509Token x509TokenPolicy = (X509Token)ai.getAssertion();
             ai.setAsserted(true);
-            assertToken(x509TokenPolicy, aim);
+            assertToken(x509TokenPolicy, parameters.getAssertionInfoMap());
             
-            if (!isTokenRequired(x509TokenPolicy, message)) {
+            if (!isTokenRequired(x509TokenPolicy, parameters.getMessage())) {
                 continue;
             }
 
-            if (bstResults.isEmpty() && signedResults.isEmpty()) {
+            if (bstResults.isEmpty() && parameters.getSignedResults().isEmpty()) {
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
                 continue;
             }
 
-            if (!checkTokenType(x509TokenPolicy.getTokenType(), bstResults, signedResults)) {
+            if (!checkTokenType(x509TokenPolicy.getTokenType(), bstResults, parameters.getSignedResults())) {
                 ai.setNotAsserted("An incorrect X.509 Token Type is detected");
                 continue;
             }
         }
+        
+        return true;
     }
     
     private void assertToken(X509Token token, AssertionInfoMap aim) {

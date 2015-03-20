@@ -25,14 +25,13 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
@@ -44,34 +43,26 @@ import org.apache.wss4j.policy.model.X509Token;
  */
 public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValidator {
     
-    public boolean validatePolicy(
-        AssertionInfoMap aim,
-        Message message,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults,
-        List<WSSecurityEngineResult> encryptedResults
-    ) {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (!ais.isEmpty()) {
-            parsePolicies(aim, ais, message, soapBody, results, signedResults, encryptedResults);
+    /**
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * policy defined by the AssertionInfo parameter
+     */
+    public boolean canValidatePolicy(AssertionInfo assertionInfo) {
+        if (assertionInfo.getAssertion() != null 
+            && (SP12Constants.ASYMMETRIC_BINDING.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.ASYMMETRIC_BINDING.equals(assertionInfo.getAssertion().getName()))) {
+            return true;
         }
         
-        return true;
+        return false;
     }
     
-    private void parsePolicies(
-        AssertionInfoMap aim,
-        Collection<AssertionInfo> ais,
-        Message message,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults,
-        List<WSSecurityEngineResult> encryptedResults
-    ) {
+    /**
+     * Validate policies. Return true if all of the policies are valid.
+     */
+    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         boolean hasDerivedKeys = false;
-        for (WSSecurityEngineResult result : results) {
+        for (WSSecurityEngineResult result : parameters.getResults()) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.DKT) {
                 hasDerivedKeys = true;
@@ -84,20 +75,24 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setAsserted(true);
 
             // Check the protection order
-            if (!checkProtectionOrder(binding, aim, ai, results)) {
+            if (!checkProtectionOrder(binding, parameters.getAssertionInfoMap(), ai, parameters.getResults())) {
                 continue;
             }
             
             // Check various properties of the binding
-            if (!checkProperties(binding, ai, aim, results, signedResults, message)) {
+            if (!checkProperties(binding, ai, parameters.getAssertionInfoMap(), parameters.getResults(), 
+                                 parameters.getSignedResults(), parameters.getMessage())) {
                 continue;
             }
             
             // Check various tokens of the binding
-            if (!checkTokens(binding, ai, aim, hasDerivedKeys, signedResults, encryptedResults)) {
+            if (!checkTokens(binding, ai, parameters.getAssertionInfoMap(), hasDerivedKeys, 
+                             parameters.getSignedResults(), parameters.getEncryptedResults())) {
                 continue;
             }
         }
+        
+        return true;
     }
     
     /**

@@ -29,7 +29,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
@@ -42,48 +41,46 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.X509Security;
-import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.Layout.LayoutType;
 
 /**
  * Validate a Layout policy.
  */
-public class LayoutPolicyValidator extends AbstractTokenPolicyValidator {
+public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
     
-    public boolean validatePolicy(
-        AssertionInfoMap aim,
-        Message message,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.LAYOUT);
-        if (!ais.isEmpty()) {
-            parsePolicies(aim, ais, message, results, signedResults);
+    /**
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * policy defined by the AssertionInfo parameter
+     */
+    public boolean canValidatePolicy(AssertionInfo assertionInfo) {
+        if (assertionInfo.getAssertion() != null 
+            && (SP12Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName()))) {
+            return true;
         }
-
-        return true;
-    }
         
-    private void parsePolicies(
-        AssertionInfoMap aim,
-        Collection<AssertionInfo> ais, 
-        Message message,  
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
+        return false;
+    }
+    
+    /**
+     * Validate policies. Return true if all of the policies are valid.
+     */
+    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             Layout layout = (Layout)ai.getAssertion();
             ai.setAsserted(true);
-            assertToken(layout, aim);
+            assertToken(layout, parameters.getAssertionInfoMap());
             
-            if (!validatePolicy(layout, results, signedResults)) {
+            if (!validatePolicy(layout, parameters.getResults(), parameters.getSignedResults())) {
                 String error = "Layout does not match the requirements";
                 ai.setNotAsserted(error);
             }
         }
+        
+        return true;
     }
     
     private void assertToken(Layout token, AssertionInfoMap aim) {

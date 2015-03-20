@@ -29,18 +29,15 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
-import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.transform.STRTransform;
-import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 
@@ -48,39 +45,36 @@ import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
  * Validate results corresponding to the processing of a Signature, EncryptedKey or
  * EncryptedData structure against an AlgorithmSuite policy.
  */
-public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator {
+public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidator {
     
-    public boolean validatePolicy(
-        AssertionInfoMap aim,
-        Message message,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
-        if (!ais.isEmpty()) {
-            parsePolicies(aim, ais, message, results);
+    /**
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * policy defined by the AssertionInfo parameter
+     */
+    public boolean canValidatePolicy(AssertionInfo assertionInfo) {
+        if (assertionInfo.getAssertion() != null 
+            && (SP12Constants.ALGORITHM_SUITE.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.ALGORITHM_SUITE.equals(assertionInfo.getAssertion().getName()))) {
+            return true;
         }
-
-        return true;
+        
+        return false;
     }
     
-    private void parsePolicies(
-        AssertionInfoMap aim,
-        Collection<AssertionInfo> ais, 
-        Message message,  
-        List<WSSecurityEngineResult> results
-    ) {
+    /**
+     * Validate policies. Return true if all of the policies are valid.
+     */
+    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
             ai.setAsserted(true);
             
-            boolean valid = validatePolicy(ai, algorithmSuite, results);
+            boolean valid = validatePolicy(ai, algorithmSuite, parameters.getResults());
             if (valid) {
                 String namespace = algorithmSuite.getAlgorithmSuiteType().getNamespace();
                 String name = algorithmSuite.getAlgorithmSuiteType().getName();
-                Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
+                Collection<AssertionInfo> algSuiteAis = 
+                    parameters.getAssertionInfoMap().get(new QName(namespace, name));
                 if (algSuiteAis != null) {
                     for (AssertionInfo algSuiteAi : algSuiteAis) {
                         algSuiteAi.setAsserted(true);
@@ -90,6 +84,8 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
                 ai.setNotAsserted("Error in validating AlgorithmSuite policy");
             }
         }
+        
+        return true;
     }
     
     public boolean validatePolicy(

@@ -58,7 +58,7 @@ import org.apache.wss4j.policy.model.X509Token;
 /**
  * Some abstract functionality for validating a security binding.
  */
-public abstract class AbstractBindingPolicyValidator implements BindingPolicyValidator {
+public abstract class AbstractBindingPolicyValidator implements SecurityPolicyValidator {
     
     private static final QName SIG_QNAME = new QName(WSConstants.SIG_NS, WSConstants.SIG_LN);
     

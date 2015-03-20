@@ -20,23 +20,19 @@
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.cert.Certificate;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.saml.DOMSAMLUtil;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
@@ -45,57 +41,40 @@ import org.opensaml.saml.common.SAMLVersion;
 /**
  * Validate a SamlToken policy.
  */
-public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implements TokenPolicyValidator {
+public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
     
-    private Element body;
-    private List<WSSecurityEngineResult> signed;
-    
-    public boolean validatePolicy(
-        AssertionInfoMap aim,
-        Message message,
-        Element soapBody,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        body = soapBody;
-        signed = signedResults;
-        
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
-        if (!ais.isEmpty()) {
-            parsePolicies(aim, ais, message, results, signedResults);
+    /**
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * policy defined by the AssertionInfo parameter
+     */
+    public boolean canValidatePolicy(AssertionInfo assertionInfo) {
+        if (assertionInfo.getAssertion() != null 
+            && (SP12Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName()))) {
+            return true;
         }
         
-        return true;
+        return false;
     }
     
-    private void parsePolicies(
-        AssertionInfoMap aim, 
-        Collection<AssertionInfo> ais, 
-        Message message,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        final List<Integer> actions = new ArrayList<Integer>(2);
-        actions.add(WSConstants.ST_SIGNED);
-        actions.add(WSConstants.ST_UNSIGNED);
-        List<WSSecurityEngineResult> samlResults = 
-            WSSecurityUtil.fetchAllActionResults(results, actions);
-        
+    /**
+     * Validate policies. Return true if all of the policies are valid.
+     */
+    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             SamlToken samlToken = (SamlToken)ai.getAssertion();
             ai.setAsserted(true);
-            assertToken(samlToken, aim);
+            assertToken(samlToken, parameters.getAssertionInfoMap());
 
-            if (!isTokenRequired(samlToken, message)) {
+            if (!isTokenRequired(samlToken, parameters.getMessage())) {
                 PolicyUtils.assertPolicy(
-                    aim, 
+                    parameters.getAssertionInfoMap(), 
                     new QName(samlToken.getVersion().getNamespace(), samlToken.getSamlTokenType().name())
                 );
                 continue;
             }
 
-            if (samlResults.isEmpty()) {
+            if (parameters.getSamlResults().isEmpty()) {
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
@@ -103,24 +82,25 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
             }
             
             // All of the received SAML Assertions must conform to the policy
-            for (WSSecurityEngineResult result : samlResults) {
+            for (WSSecurityEngineResult result : parameters.getSamlResults()) {
                 SamlAssertionWrapper assertionWrapper = 
                     (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 
-                if (!checkVersion(aim, samlToken, assertionWrapper)) {
+                if (!checkVersion(parameters.getAssertionInfoMap(), samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");
                     continue;
                 }
-                TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
+                TLSSessionInfo tlsInfo = parameters.getMessage().get(TLSSessionInfo.class);
                 Certificate[] tlsCerts = null;
                 if (tlsInfo != null) {
                     tlsCerts = tlsInfo.getPeerCertificates();
                 }
-                if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
+                if (!checkHolderOfKey(assertionWrapper, parameters.getSignedResults(), tlsCerts)) {
                     ai.setNotAsserted("Assertion fails holder-of-key requirements");
                     continue;
                 }
-                if (!DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, body, signed)) {
+                if (!DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, parameters.getSoapBody(),
+                                                    parameters.getSignedResults())) {
                     ai.setNotAsserted("Assertion fails sender-vouches requirements");
                     continue;
                 }
@@ -131,6 +111,8 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
                  */
             }
         }
+        
+        return true;
     }
     
     /**

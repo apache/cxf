@@ -20,23 +20,29 @@
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.opensaml.saml.common.SAMLVersion;
@@ -47,36 +53,77 @@ import org.opensaml.saml.common.SAMLVersion;
  */
 public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
     
-    private List<WSSecurityEngineResult> signedResults;
-    private Message message;
     private ClaimsPolicyValidator claimsValidator = new DefaultClaimsPolicyValidator();
 
-    public IssuedTokenPolicyValidator(
-        List<WSSecurityEngineResult> signedResults,
-        Message message
-    ) {
-        this.signedResults = signedResults;
-        this.message = message;
-    }
-    
-    public boolean validatePolicy(
-        Collection<AssertionInfo> ais,
-        SamlAssertionWrapper assertionWrapper
-    ) {
-        if (ais == null || ais.isEmpty()) {
+    /**
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * policy defined by the AssertionInfo parameter
+     */
+    public boolean canValidatePolicy(AssertionInfo assertionInfo) {
+        if (assertionInfo.getAssertion() != null 
+            && (SP12Constants.ISSUED_TOKEN.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.ISSUED_TOKEN.equals(assertionInfo.getAssertion().getName()))) {
             return true;
         }
         
+        return false;
+    }
+    
+    /**
+     * Validate policies. Return true if all of the policies are valid.
+     */
+    public boolean validatePolicies(PolicyValidatorParameters parameters, 
+                                    Collection<AssertionInfo> ais) {
+        List<WSSecurityEngineResult> samlResults = parameters.getSamlResults();
+        if (samlResults != null) {
+            for (WSSecurityEngineResult samlResult : samlResults) {
+                SamlAssertionWrapper samlAssertion = 
+                    (SamlAssertionWrapper)samlResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                if (validateSAMLToken(parameters, samlAssertion, ais)) {
+                    // Store token on the security context
+                    SecurityToken token = createSecurityToken(samlAssertion);
+                    parameters.getMessage().getExchange().put(SecurityConstants.TOKEN, token);
+                    return true;
+                }
+            }
+        }
+        
+        List<WSSecurityEngineResult> bstResults = 
+            WSSecurityUtil.fetchAllActionResults(parameters.getResults(), 
+                                                 Collections.singletonList(WSConstants.BST));
+            
+        if (bstResults != null) {
+            for (WSSecurityEngineResult bstResult : bstResults) {
+                BinarySecurity binarySecurity = 
+                    (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                if (Boolean.TRUE.equals(bstResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN))
+                    && validateBinarySecurityToken(parameters, binarySecurity, ais)) {
+                    // Store token on the security context
+                    SecurityToken token = createSecurityToken(binarySecurity);
+                    parameters.getMessage().getExchange().put(SecurityConstants.TOKEN, token);
+                    return true;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    private boolean validateSAMLToken(PolicyValidatorParameters parameters, 
+                                      SamlAssertionWrapper samlAssertion,
+                                      Collection<AssertionInfo> ais) {
+        boolean asserted = true;
         for (AssertionInfo ai : ais) {
             IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
             ai.setAsserted(true);
-            assertToken(issuedToken, message.get(AssertionInfoMap.class));
+            assertToken(issuedToken, parameters.getAssertionInfoMap());
 
-            if (!isTokenRequired(issuedToken, message)) {
+            if (!isTokenRequired(issuedToken, parameters.getMessage())) {
                 continue;
             }
             
-            if (assertionWrapper == null) {
+            if (samlAssertion == null) {
+                asserted = false;
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
@@ -84,7 +131,8 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             }
 
             Element template = issuedToken.getRequestSecurityTokenTemplate();
-            if (template != null && !checkIssuedTokenTemplate(template, assertionWrapper)) {
+            if (template != null && !checkIssuedTokenTemplate(template, samlAssertion)) {
+                asserted = false;
                 ai.setNotAsserted("Error in validating the IssuedToken policy");
                 continue;
             }
@@ -93,57 +141,59 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             if (claims != null) {
                 String dialect = claims.getAttributeNS(null, "Dialect");
                 if (claimsValidator.getDialect().equals(dialect)
-                    && !claimsValidator.validatePolicy(claims, assertionWrapper)) {
+                    && !claimsValidator.validatePolicy(claims, samlAssertion)) {
+                    asserted = false;
                     ai.setNotAsserted("Error in validating the Claims policy");
                     continue;
                 }
             }
 
-            TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
+            TLSSessionInfo tlsInfo = parameters.getMessage().get(TLSSessionInfo.class);
             Certificate[] tlsCerts = null;
             if (tlsInfo != null) {
                 tlsCerts = tlsInfo.getPeerCertificates();
             }
-            if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
+            if (!checkHolderOfKey(samlAssertion, parameters.getSignedResults(), tlsCerts)) {
+                asserted = false;
                 ai.setNotAsserted("Assertion fails holder-of-key requirements");
                 continue;
             }
+            
         }
         
-        return true;
+        return asserted;
     }
     
-    public boolean validatePolicy(
-        Collection<AssertionInfo> ais,
-        BinarySecurity binarySecurityToken
-    ) {
-        if (ais == null || ais.isEmpty()) {
-            return true;
-        }
-        
+    private boolean validateBinarySecurityToken(PolicyValidatorParameters parameters, 
+                                                BinarySecurity binarySecurity, 
+                                                Collection<AssertionInfo> ais) {
+        boolean asserted = true;
         for (AssertionInfo ai : ais) {
             IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
             ai.setAsserted(true);
-            assertToken(issuedToken, message.get(AssertionInfoMap.class));
+            asserted = true;
+            assertToken(issuedToken, parameters.getAssertionInfoMap());
 
-            if (!isTokenRequired(issuedToken, message)) {
+            if (!isTokenRequired(issuedToken, parameters.getMessage())) {
                 continue;
             }
-            if (binarySecurityToken == null) {
+            if (binarySecurity == null) {
+                asserted = false;
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
-                return false;
+                continue;
             }
 
             Element template = issuedToken.getRequestSecurityTokenTemplate();
-            if (template != null && !checkIssuedTokenTemplate(template, binarySecurityToken)) {
+            if (template != null && !checkIssuedTokenTemplate(template, binarySecurity)) {
+                asserted = false;
                 ai.setNotAsserted("Error in validating the IssuedToken policy");
-                return false;
+                continue;
             }
         }
         
-        return true;
+        return asserted;
     }
     
     private void assertToken(IssuedToken token, AssertionInfoMap aim) {
@@ -216,5 +266,36 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         return true;
     }
     
-   
+    private SecurityToken createSecurityToken(
+        SamlAssertionWrapper assertionWrapper
+    ) {
+        SecurityToken token = new SecurityToken(assertionWrapper.getId());
+
+        SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
+        if (subjectKeyInfo != null) {
+            token.setSecret(subjectKeyInfo.getSecret());
+            X509Certificate[] certs = subjectKeyInfo.getCerts();
+            if (certs != null && certs.length > 0) {
+                token.setX509Certificate(certs[0], null);
+            }
+        }
+        if (assertionWrapper.getSaml1() != null) {
+            token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+        } else if (assertionWrapper.getSaml2() != null) {
+            token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        }
+        token.setToken(assertionWrapper.getElement());
+
+        return token;
+    }
+
+    private SecurityToken createSecurityToken(BinarySecurity binarySecurityToken) {
+        SecurityToken token = new SecurityToken(binarySecurityToken.getID());
+        token.setToken(binarySecurityToken.getElement());
+        token.setSecret(binarySecurityToken.getToken());
+        token.setTokenType(binarySecurityToken.getValueType());
+
+        return token;
+    }
+
 }
