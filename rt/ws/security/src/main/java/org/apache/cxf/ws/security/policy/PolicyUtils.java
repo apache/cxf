@@ -28,6 +28,8 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractBinding;
 
 /**
  * Some common functionality that can be shared for working with policies
@@ -108,4 +110,28 @@ public final class PolicyUtils {
 
         return false;
     }
+    
+    public static AbstractBinding getSecurityBinding(AssertionInfoMap aim) {
+        
+        AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (transAis != null) {
+            transAis.setAsserted(true);
+            return (AbstractBinding)transAis.getAssertion();
+        }
+        
+        AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (asymAis != null) {
+            asymAis.setAsserted(true);
+            return (AbstractBinding)asymAis.getAssertion();
+        }
+
+        AssertionInfo symAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (symAis != null) {
+            symAis.setAsserted(true);
+            return (AbstractBinding)symAis.getAssertion();
+        }
+        
+        return null;
+    }
+
 }

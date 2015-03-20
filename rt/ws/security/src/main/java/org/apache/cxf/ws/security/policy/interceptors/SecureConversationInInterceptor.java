@@ -83,22 +83,6 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         addBefore(WSS4JStaxInInterceptor.class.getName());
         addBefore(HttpsTokenInInterceptor.class.getName());
     }
-    private AbstractBinding getBinding(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (!ais.isEmpty()) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (!ais.isEmpty()) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (!ais.isEmpty()) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        return null;
-    }
     
     public void handleMessage(SoapMessage message) throws Fault {
         final AssertionInfoMap aim = message.get(AssertionInfoMap.class);
@@ -205,7 +189,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 bindingPolicy.addPolicyComponent(bindingPolicyEa);
                 All bindingPolicyAll = new All();
                 
-                AbstractBinding origBinding = getBinding(aim);
+                AbstractBinding origBinding = PolicyUtils.getSecurityBinding(aim);
                 bindingPolicyAll.addPolicyComponent(origBinding.getAlgorithmSuite());
                 bindingPolicyAll.addPolicyComponent(new ProtectionToken(SPConstants.SPVersion.SP12, sctPolicy));
                 bindingPolicyAll.addAssertion(
@@ -255,14 +239,14 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     }
     
     private SignedParts getSignedParts(AssertionInfoMap aim, String addNs) {
-        Collection<AssertionInfo> signedPartsAis = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+        AssertionInfo signedPartsAi = 
+            PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_PARTS);
         SignedParts signedParts = null;
-        if (!signedPartsAis.isEmpty()) {
-            signedParts = (SignedParts)signedPartsAis.iterator().next().getAssertion();
+        if (signedPartsAi != null) {
+            signedParts = (SignedParts)signedPartsAi.getAssertion();
         }
         if (signedParts == null) {
-            List<Header> headers = new ArrayList<Header>();
+            List<Header> headers = new ArrayList<>();
             if (addNs != null) {
                 headers.add(new Header("To", addNs));
                 headers.add(new Header("From", addNs));
@@ -500,23 +484,19 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         }
         
         public void handleMessage(SoapMessage message) throws Fault {
-            // TODO Auto-generated method stub
-            
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim == null) {
                 return;
             }
-            Collection<AssertionInfo> ais = 
-                PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
-            if (ais.isEmpty()) {
+            AssertionInfo ai = 
+                PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+            if (ai == null) {
                 return;
             }
             
-            SecureConversationToken tok = (SecureConversationToken)ais.iterator()
-                .next().getAssertion();
+            SecureConversationToken tok = (SecureConversationToken)ai.getAssertion();
             doCancel(message, aim, tok);
-
         }
         
         private void doCancel(SoapMessage message, AssertionInfoMap aim, SecureConversationToken itok) {

@@ -39,7 +39,6 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
@@ -52,7 +51,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.SymmetricBinding;
@@ -130,7 +128,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             String actor = (String)message.getContextualProperty(SecurityConstants.ACTOR);
             
             // extract Assertion information
-            AbstractBinding binding = getSecurityBinding(aim);
+            AbstractBinding binding = PolicyUtils.getSecurityBinding(aim);
 
             if (binding == null && isRequestor(message)) {
                 Policy policy = new Policy();
@@ -192,29 +190,6 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             
         }
         
-        private AbstractBinding getSecurityBinding(AssertionInfoMap aim) {
-            
-            AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-            if (transAis != null) {
-                transAis.setAsserted(true);
-                return (AbstractBinding)transAis.getAssertion();
-            }
-            
-            AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-            if (asymAis != null) {
-                asymAis.setAsserted(true);
-                return (AbstractBinding)asymAis.getAssertion();
-            }
-
-            AssertionInfo symAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-            if (symAis != null) {
-                symAis.setAsserted(true);
-                return (AbstractBinding)symAis.getAssertion();
-            }
-            
-            return null;
-        }
-
         public Set<String> getAfter() {
             return Collections.emptySet();
         }

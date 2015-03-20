@@ -120,30 +120,9 @@ final class NegotiationUtils {
     }
 
     static AlgorithmSuite getAlgorithmSuite(AssertionInfoMap aim) {
-        AbstractBinding transport = null;
-        Collection<AssertionInfo> ais = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                transport = (AbstractBinding)ai.getAssertion();
-            }                    
-        } else {
-            ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-            if (!ais.isEmpty()) {
-                for (AssertionInfo ai : ais) {
-                    transport = (AbstractBinding)ai.getAssertion();
-                }                    
-            } else {
-                ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-                if (!ais.isEmpty()) {
-                    for (AssertionInfo ai : ais) {
-                        transport = (AbstractBinding)ai.getAssertion();
-                    }                    
-                }
-            }
-        }
-        if (transport != null) {
-            return transport.getAlgorithmSuite();
+        AbstractBinding binding = PolicyUtils.getSecurityBinding(aim);
+        if (binding != null) {
+            return binding.getAlgorithmSuite();
         }
         return null;
     }
@@ -202,9 +181,7 @@ final class NegotiationUtils {
 
             EndpointPolicy ep = pe.getServerEndpointPolicy(endpoint.getEndpointInfo(), destination, message);
             List<Interceptor<? extends Message>> interceptors = ep.getInterceptors(message);
-            for (Interceptor<? extends Message> i : interceptors) {
-                message.getInterceptorChain().add(i);
-            }
+            message.getInterceptorChain().add(interceptors);
 
             Collection<Assertion> assertions = ep.getVocabulary(message);
             if (null != assertions) {

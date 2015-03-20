@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.util.Collection;
 import java.util.logging.Logger;
 
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -58,7 +57,7 @@ public class SecurityVerificationOutInterceptor extends AbstractPhaseInterceptor
     public void handleMessage(SoapMessage message) throws Fault {
         if (MessageUtils.isRequestor(message)) {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-            if (aim != null && !isThereASecurityBinding(aim)) {
+            if (aim != null && PolicyUtils.getSecurityBinding(aim) == null) {
                 AssertionInfo assertion = getSecuredPart(aim);
                 if (assertion != null) {
                     String error = String
@@ -76,42 +75,35 @@ public class SecurityVerificationOutInterceptor extends AbstractPhaseInterceptor
         }
     }
     
-    private boolean isThereASecurityBinding(AssertionInfoMap aim) {
-        return 
-            PolicyUtils.isThereAnAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING)
-            || PolicyUtils.isThereAnAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING)
-            || PolicyUtils.isThereAnAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-    }
-    
     private AssertionInfo getSecuredPart(AssertionInfoMap aim) {
-        Collection<AssertionInfo> assertions = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
-        if (!assertions.isEmpty()) {
-            return assertions.iterator().next();
+        AssertionInfo assertion = 
+            PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_PARTS);
+        if (assertion != null) {
+            return assertion;
         }
         
-        assertions = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
-        if (!assertions.isEmpty()) {
-            return assertions.iterator().next();
+        assertion = 
+            PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+        if (assertion != null) {
+            return assertion;
         }
         
-        assertions = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
-        if (!assertions.isEmpty()) {
-            return assertions.iterator().next();
+        assertion = 
+            PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
+        if (assertion != null) {
+            return assertion;
         }
         
-        assertions = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
-        if (!assertions.isEmpty()) {
-            return assertions.iterator().next();
+        assertion = 
+            PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+        if (assertion != null) {
+            return assertion;
         }
         
-        assertions = 
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
-        if (!assertions.isEmpty()) {
-            return assertions.iterator().next();
+        assertion = 
+            PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+        if (assertion != null) {
+            return assertion;
         }
         
         return null;

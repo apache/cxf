@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -32,11 +31,9 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
-import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.SecurityUtils;
-import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
@@ -44,7 +41,6 @@ import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
@@ -65,8 +61,8 @@ public final class STSTokenHelper {
         if (issuedToken.getPolicy() != null) {
             params.setWspNamespace(issuedToken.getPolicy().getNamespace());
         }
-        params.setTrust10(getTrust10(aim));
-        params.setTrust13(getTrust13(aim));
+        params.setTrust10(NegotiationUtils.getTrust10(aim));
+        params.setTrust13(NegotiationUtils.getTrust13(aim));
         params.setTokenTemplate(issuedToken.getRequestSecurityTokenTemplate());
 
         return getToken(message, params);
@@ -439,24 +435,6 @@ public final class STSTokenHelper {
             client.setClaims(params.getClaims());
         }
         return client.requestSecurityToken(appliesTo);
-    }
-
-    private static Trust10 getTrust10(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais =
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
-        if (ais.isEmpty()) {
-            return null;
-        }
-        return (Trust10)ais.iterator().next().getAssertion();
-    }
-
-    private static Trust13 getTrust13(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais =
-            PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
-        if (ais.isEmpty()) {
-            return null;
-        }
-        return (Trust13)ais.iterator().next().getAssertion();
     }
 
     public static class TokenRequestParams {

@@ -89,21 +89,12 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         }
         // Assert some policies
         if (issuedToken.isRequireExternalReference()) {
-            assertPolicy(new QName(issuedToken.getName().getNamespaceURI(), 
-                                   SPConstants.REQUIRE_EXTERNAL_REFERENCE), aim);
+            PolicyUtils.assertPolicy(aim, new QName(issuedToken.getName().getNamespaceURI(), 
+                                                    SPConstants.REQUIRE_EXTERNAL_REFERENCE));
         }
         if (issuedToken.isRequireInternalReference()) {
-            assertPolicy(new QName(issuedToken.getName().getNamespaceURI(), 
-                                   SPConstants.REQUIRE_INTERNAL_REFERENCE), aim);
-        }
-    }
-    
-    protected static void assertPolicy(QName n, AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }
+            PolicyUtils.assertPolicy(aim, new QName(issuedToken.getName().getNamespaceURI(), 
+                                                    SPConstants.REQUIRE_INTERNAL_REFERENCE));
         }
     }
     

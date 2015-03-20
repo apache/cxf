@@ -113,7 +113,6 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             return tok;
         }
         
-        
         // Remove the old token
         message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN);
         message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
@@ -135,8 +134,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             try {
                 SecureConversationTokenInterceptorProvider.setupClient(client, message, aim, itok, true);
 
-                String s = message
-                    .getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
+                String s = message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
                 client.setLocation(s);
                 
                 Map<String, Object> ctx = client.getRequestContext();

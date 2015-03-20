@@ -35,7 +35,7 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
     private static final long serialVersionUID = 2092269997296804632L;
     private static final Collection<QName> ASSERTION_TYPES;
     static {
-        ASSERTION_TYPES = new ArrayList<QName>();
+        ASSERTION_TYPES = new ArrayList<>();
         ASSERTION_TYPES.add(SP12Constants.LAYOUT);
         ASSERTION_TYPES.add(SP12Constants.INCLUDE_TIMESTAMP);
         ASSERTION_TYPES.add(SP12Constants.ALGORITHM_SUITE);
