@@ -34,21 +34,23 @@ import org.apache.cxf.metrics.interceptors.MetricsMessageOutInterceptor;
  */
 @NoJSR250Annotations
 public class MetricsFeature extends AbstractFeature {
-
-    /**
-     * 
-     */
+    final MetricsProvider[] providers;
+    
     public MetricsFeature() {
+        this.providers = null;
+    }
+    public MetricsFeature(MetricsProvider ... providers) {
+        this.providers = providers.length > 0 ? providers : null;
     }
     
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor();
+        MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
         CountingOutInterceptor countingOut = new CountingOutInterceptor();
         
-        provider.getInInterceptors().add(new MetricsMessageInInterceptor());
-        provider.getInInterceptors().add(new MetricsMessageInOneWayInterceptor());
-        provider.getInInterceptors().add(new MetricsMessageInPreInvokeInterceptor());
+        provider.getInInterceptors().add(new MetricsMessageInInterceptor(providers));
+        provider.getInInterceptors().add(new MetricsMessageInOneWayInterceptor(providers));
+        provider.getInInterceptors().add(new MetricsMessageInPreInvokeInterceptor(providers));
         provider.getOutInterceptors().add(countingOut);
         provider.getOutInterceptors().add(out);
         provider.getOutFaultInterceptors().add(countingOut);

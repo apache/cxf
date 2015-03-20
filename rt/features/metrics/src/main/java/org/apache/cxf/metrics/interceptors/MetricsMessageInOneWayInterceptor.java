@@ -22,11 +22,12 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.ServiceInvokerInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.phase.Phase;
 
 public class MetricsMessageInOneWayInterceptor extends AbstractMetricsInterceptor {
-    public MetricsMessageInOneWayInterceptor() {
-        super(Phase.INVOKE);
+    public MetricsMessageInOneWayInterceptor(MetricsProvider p[]) {
+        super(Phase.INVOKE, p);
         addAfter(ServiceInvokerInterceptor.class.getName());
     }
 

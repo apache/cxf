@@ -21,8 +21,12 @@ package org.apache.cxf.metrics.interceptors;
 
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -37,9 +41,21 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 
 
 public abstract class AbstractMetricsInterceptor extends AbstractPhaseInterceptor<Message> {
-
-    public AbstractMetricsInterceptor(String phase) {
+    MetricsProvider providers[];
+    public AbstractMetricsInterceptor(String phase, MetricsProvider p[]) {
         super(phase);
+        providers = p;
+    }
+    
+    protected Collection<? extends MetricsProvider> getMetricProviders(Bus bus) {
+        if (providers != null) {
+            return Arrays.asList(providers);
+        }
+        ConfiguredBeanLocator b = bus.getExtension(ConfiguredBeanLocator.class);
+        if (b == null) {
+            return Collections.emptyList();
+        }
+        return b.getBeansOfType(MetricsProvider.class);
     }
     
     protected ExchangeMetrics getExchangeMetrics(Message m, boolean create) {
@@ -75,12 +91,8 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         final Endpoint ep = m.getExchange().getEndpoint();
         Object o = ep.get(MetricsContext.class.getName());
         if (o == null) {
-            ConfiguredBeanLocator b = m.getExchange().getBus().getExtension(ConfiguredBeanLocator.class);
-            if (b == null) {
-                return null;
-            }
             List<MetricsContext> contexts = new ArrayList<MetricsContext>();
-            for (MetricsProvider p : b.getBeansOfType(MetricsProvider.class)) {
+            for (MetricsProvider p : getMetricProviders(m.getExchange().getBus())) {
                 MetricsContext c = p.createEndpointContext(ep, MessageUtils.isRequestor(m));
                 if (c != null) {
                     contexts.add(c);
@@ -122,12 +134,8 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
     private Object createMetricsContextForOperation(Message message, BindingOperationInfo boi) {
         Object o = boi.getProperty(MetricsContext.class.getName());
         if (o == null) {
-            ConfiguredBeanLocator b = message.getExchange().getBus().getExtension(ConfiguredBeanLocator.class);
-            if (b == null) {
-                return null;
-            }
             List<MetricsContext> contexts = new ArrayList<MetricsContext>();
-            for (MetricsProvider p : b.getBeansOfType(MetricsProvider.class)) {
+            for (MetricsProvider p : getMetricProviders(message.getExchange().getBus())) {
                 MetricsContext c = p.createOperationContext(message.getExchange().getEndpoint(),
                                                             boi, MessageUtils.isRequestor(message));
                 if (c != null) {

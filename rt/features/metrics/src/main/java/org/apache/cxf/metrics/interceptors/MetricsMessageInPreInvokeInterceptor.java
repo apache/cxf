@@ -22,12 +22,13 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.ExchangeMetrics;
+import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.phase.Phase;
 
 public class MetricsMessageInPreInvokeInterceptor extends AbstractMetricsInterceptor {
 
-    public MetricsMessageInPreInvokeInterceptor() {
-        super(Phase.PRE_INVOKE);
+    public MetricsMessageInPreInvokeInterceptor(MetricsProvider p[]) {
+        super(Phase.PRE_INVOKE, p);
     }
 
     public void handleMessage(Message message) throws Fault {

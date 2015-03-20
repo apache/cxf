@@ -21,11 +21,12 @@ package org.apache.cxf.metrics.interceptors;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.MessageSenderInterceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.phase.Phase;
 
 public class MetricsMessageOutInterceptor extends AbstractMetricsInterceptor {
-    public MetricsMessageOutInterceptor() {
-        super(Phase.PREPARE_SEND_ENDING);
+    public MetricsMessageOutInterceptor(MetricsProvider p[]) {
+        super(Phase.PREPARE_SEND_ENDING, p);
         addBefore(MessageSenderInterceptor.MessageSenderEndingInterceptor.class.getName());
     }
     public void handleMessage(Message message) throws Fault {

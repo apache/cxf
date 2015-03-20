@@ -24,11 +24,12 @@ import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.ExchangeMetrics;
+import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.phase.Phase;
 
 public class MetricsMessageInInterceptor extends AbstractMetricsInterceptor {
-    public MetricsMessageInInterceptor() {
-        super(Phase.RECEIVE);
+    public MetricsMessageInInterceptor(MetricsProvider p[]) {
+        super(Phase.RECEIVE, p);
         addBefore(AttachmentInInterceptor.class.getName());
     }
     public void handleMessage(Message message) throws Fault {
