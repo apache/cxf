@@ -1,0 +1,2 @@
+org.apache.cxf.metrics.codahale.CodahaleMetricsProvider:org.apache.cxf.metrics.MetricsProvider:true:true
+

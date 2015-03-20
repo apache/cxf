@@ -28,8 +28,8 @@ import com.codahale.metrics.MetricRegistry;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.management.codahale.Metrics;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.throttling.ThrottlingInterceptor;
 import org.apache.cxf.throttling.ThrottlingManager;
@@ -47,9 +47,7 @@ public class Server {
         
         Bus b = BusFactory.getDefaultBus();
         MetricRegistry registry = new MetricRegistry();
-        b.setExtension(registry, MetricRegistry.class);
-        new Metrics(b);
-        
+        b.setExtension(registry, MetricRegistry.class);        
         
         ThrottlingManager manager = new ThrottlingManager() {
             @Override
@@ -68,7 +66,7 @@ public class Server {
         
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9001/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
+        Endpoint.publish(address, implementor, new MetricsFeature());
     }
 
     public static void main(String args[]) throws Exception {

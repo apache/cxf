@@ -16,34 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.management.codahale;
 
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+package org.apache.cxf.metrics;
 
-public final class CountingOutputStream extends FilterOutputStream {
-    private long count;
 
-    public CountingOutputStream(OutputStream out) {
-      super(out);
-    }
+import org.apache.cxf.message.Exchange;
+
+
+/**
+ * Class to hold all the various metric pieces for a given context (Endpoint, Customer, Operation, etc...)
+ */
+public interface MetricsContext {
     
-    public long getCount() {
-        return count;
-    }
-
-    public void write(byte[] b, int off, int len) throws IOException {
-        out.write(b, off, len);
-        count += len;
-    }
-
-    public void write(int b) throws IOException {
-        out.write(b);
-        count++;
-    }
-
-    public void close() throws IOException {
-        out.close();
-    }
+    /**
+     * Will be called at the start of invoke (or when added to a started MessageMetrics).  This is
+     * when the metrics should increment "inFlight" counts and other stats.   There is no need to 
+     * record a "start time" as the invoke time will be passed into the stop method.
+     */
+    void start(Exchange m);
+    
+    /**
+     * Called when the invocation is complete.
+     * 
+     * @param timeInNS
+     * @param inSize
+     * @param outSize
+     * @param fm
+     */
+    void stop(long timeInNS, long inSize, long outSize, Exchange m);
 }

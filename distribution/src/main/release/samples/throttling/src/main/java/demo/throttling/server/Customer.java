@@ -21,9 +21,9 @@ package demo.throttling.server;
 
 import com.codahale.metrics.MetricRegistry;
 
-import org.apache.cxf.management.codahale.CodahaleMetricsContext;
-import org.apache.cxf.management.codahale.MetricsContext;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.metrics.MetricsContext;
+import org.apache.cxf.metrics.codahale.CodahaleMetricsContext;
 
 /**
  * 

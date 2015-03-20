@@ -12,6 +12,9 @@
     <artifactId>cxf-rt-features-logging</artifactId>
     <packaging>bundle</packaging>
 
+    <name>Apache CXF Advanced Logging Feature</name>
+    <description>Apache CXF Advanced Logging Feature</description>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

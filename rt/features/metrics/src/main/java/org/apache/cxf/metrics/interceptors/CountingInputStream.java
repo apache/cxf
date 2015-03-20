@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.management.codahale;
+package org.apache.cxf.metrics.interceptors;
 
 import java.io.FilterInputStream;
 import java.io.IOException;

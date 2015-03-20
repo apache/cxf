@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.management.codahale;
+package org.apache.cxf.metrics.codahale;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -28,7 +28,9 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
+import org.apache.cxf.metrics.MetricsContext;
 
 /**
  * 
@@ -73,11 +75,11 @@ public class CodahaleMetricsContext implements MetricsContext, Closeable {
     }
 
     
-    public void start() {
+    public void start(Exchange ex) {
         inFlight.inc();
     }
     
-    public void stop(long timeInNS, long inSize, long outSize, FaultMode fm) {
+    public void stop(long timeInNS, long inSize, long outSize, Exchange ex) {
         totals.update(timeInNS, TimeUnit.NANOSECONDS);
 
         if (inSize != -1) {
@@ -86,6 +88,7 @@ public class CodahaleMetricsContext implements MetricsContext, Closeable {
         if (outSize != -1) {
             outgoingData.mark(outSize);
         }
+        FaultMode fm = ex.get(FaultMode.class);
         if (fm != null) {
             switch (fm) {
             case CHECKED_APPLICATION_FAULT:

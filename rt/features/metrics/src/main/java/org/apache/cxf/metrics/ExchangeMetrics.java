@@ -17,29 +17,32 @@
  * under the License.
  */
 
-package org.apache.cxf.management.codahale;
+package org.apache.cxf.metrics;
 
 import java.util.Deque;
 import java.util.LinkedList;
 
-import org.apache.cxf.message.FaultMode;
-import org.apache.cxf.message.Message;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.metrics.interceptors.CountingInputStream;
+import org.apache.cxf.metrics.interceptors.CountingOutputStream;
 
 /**
  * 
  */
-public class MessageMetrics {
+public class ExchangeMetrics {
     Deque<MetricsContext> contexts = new LinkedList<MetricsContext>();
+    Exchange exchange;
     boolean started;
     long startTime = -1;
     
-    public MessageMetrics() {
+    public ExchangeMetrics(Exchange e) {
+        exchange = e;
     }
 
-    public MessageMetrics addContext(MetricsContext ctx) {
+    public ExchangeMetrics addContext(MetricsContext ctx) {
         contexts.addLast(ctx);
         if (started) {
-            ctx.start();
+            ctx.start(exchange);
         }
         return this;
     }
@@ -48,29 +51,28 @@ public class MessageMetrics {
         started = true;
         startTime = System.nanoTime();
         for (MetricsContext ctx : contexts) {
-            ctx.start();
+            ctx.start(exchange);
         }
     }
     
-    public void stop(Message m) {
+    public void stop() {
         started = false;
         if (startTime == -1) {
             return;
         }
-        FaultMode fm = m.getExchange().get(FaultMode.class);       
-        CountingInputStream in = m.getExchange().get(CountingInputStream.class);
+        CountingInputStream in = exchange.get(CountingInputStream.class);
         long inSize = -1;
         long outSize = -1;
         if (in != null) {
             inSize = in.getCount();
         }
-        CountingOutputStream out = m.getExchange().get(CountingOutputStream.class);
+        CountingOutputStream out = exchange.get(CountingOutputStream.class);
         if (out != null) {
             outSize = out.getCount();
         }
         long l = System.nanoTime() - startTime;
         for (MetricsContext ctx : contexts) {
-            ctx.stop(l, inSize, outSize, fm);
+            ctx.stop(l, inSize, outSize, exchange);
         }
     }
     

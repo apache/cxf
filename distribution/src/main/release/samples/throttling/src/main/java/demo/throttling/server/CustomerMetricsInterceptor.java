@@ -28,8 +28,8 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.management.codahale.MessageMetrics;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.metrics.ExchangeMetrics;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
@@ -47,7 +47,7 @@ public class CustomerMetricsInterceptor extends AbstractPhaseInterceptor<Message
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        MessageMetrics m = message.getExchange().get(MessageMetrics.class);
+        ExchangeMetrics m = message.getExchange().get(ExchangeMetrics.class);
         if (m != null) {
             Map<String, List<String>> h = CastUtils.cast((Map<?,?>)message.get(Message.PROTOCOL_HEADERS));
             String auth = h.get("Authorization").toString();
