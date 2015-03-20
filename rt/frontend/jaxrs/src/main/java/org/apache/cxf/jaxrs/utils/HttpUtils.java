@@ -71,7 +71,9 @@ public final class HttpUtils {
     
     private static final String HTTP_SCHEME = "http";
     private static final String LOCAL_HOST_IP_ADDRESS = "127.0.0.1";
+    private static final String LOCAL_HOST_IP_ADDRESS_SCHEME = "://" + LOCAL_HOST_IP_ADDRESS;
     private static final String ANY_IP_ADDRESS = "0.0.0.0";
+    private static final String ANY_IP_ADDRESS_SCHEME = "://" + ANY_IP_ADDRESS;
     private static final int DEFAULT_HTTP_PORT = 80;
         
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
@@ -339,7 +341,8 @@ public final class HttpUtils {
         HttpServletRequest request = 
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
         boolean absolute = u.isAbsolute();
-        if (request != null && (!absolute || isLocalHostOrAnyIpAddress(u))) {
+        StringBuilder uriBuf = new StringBuilder(); 
+        if (request != null && (!absolute || isLocalHostOrAnyIpAddress(u, uriBuf))) {
             String serverAndPort = request.getServerName();
             boolean localAddressUsed = false;
             if (absolute) {
@@ -363,7 +366,7 @@ public final class HttpUtils {
                 u = URI.create(base + u.toString());
             } else {
                 int originalPort = u.getPort();
-                String hostValue = u.getHost().equals(ANY_IP_ADDRESS) 
+                String hostValue = uriBuf.toString().contains(ANY_IP_ADDRESS_SCHEME) 
                     ? ANY_IP_ADDRESS : LOCAL_HOST_IP_ADDRESS;
                 String replaceValue = originalPort == -1 ? hostValue : hostValue + ":" + originalPort;
                 u = URI.create(u.toString().replace(replaceValue, serverAndPort));
@@ -372,9 +375,12 @@ public final class HttpUtils {
         return u;
     }
     
-    private static boolean isLocalHostOrAnyIpAddress(URI u) {
-        String host = u.getHost();
-        return host != null && (LOCAL_HOST_IP_ADDRESS.equals(host)) || ANY_IP_ADDRESS.equals(host);
+    private static boolean isLocalHostOrAnyIpAddress(URI u, StringBuilder uriStringBuffer) {
+        String uriString = u.toString();
+        boolean result = uriString.contains(LOCAL_HOST_IP_ADDRESS_SCHEME) 
+            || uriString.contains(ANY_IP_ADDRESS_SCHEME);
+        uriStringBuffer.append(uriString);
+        return result;
     }
     
     public static void resetRequestURI(Message m, String requestURI) {
