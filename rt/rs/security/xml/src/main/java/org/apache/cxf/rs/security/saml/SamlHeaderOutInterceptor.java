@@ -72,6 +72,7 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         if (headers == null) {
             headers = new HashMap<String, List<String>>();
+            message.put(Message.PROTOCOL_HEADERS, headers);
         }
         return headers;
     }
