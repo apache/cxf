@@ -76,7 +76,7 @@ http://cxf.apache.org/schemas/core.xsd">
   </jaxrs:server>
 
   <jaxrs:server id="bookservice3"
-		        address="/thebooks3/bookstore">
+		        address="/thebooks%203/bookstore">
     <jaxrs:serviceBeans>
       <ref bean="serviceBean" />
     </jaxrs:serviceBeans>		  

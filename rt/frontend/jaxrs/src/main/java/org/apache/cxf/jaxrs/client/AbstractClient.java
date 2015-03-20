@@ -746,7 +746,7 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     protected static void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, 
-                                                      Throwable cause, Response response) {
+                                                      Throwable ex, Response response) {
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(name, 
                                                    BUNDLE,
