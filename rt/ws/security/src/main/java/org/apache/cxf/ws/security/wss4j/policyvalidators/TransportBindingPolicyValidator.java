@@ -52,9 +52,9 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             TransportBinding binding = (TransportBinding)ai.getAssertion();
             ai.setAsserted(true);
@@ -90,8 +90,6 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             PolicyUtils.assertPolicy(parameters.getAssertionInfoMap(), SP12Constants.SIGNED_PARTS);
             PolicyUtils.assertPolicy(parameters.getAssertionInfoMap(), SP11Constants.SIGNED_PARTS);
         }
-        
-        return true;
     }
     
 }

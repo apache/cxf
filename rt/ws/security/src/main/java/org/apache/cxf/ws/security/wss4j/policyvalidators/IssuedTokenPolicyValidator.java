@@ -70,9 +70,9 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, 
+    public void validatePolicies(PolicyValidatorParameters parameters, 
                                     Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> samlResults = parameters.getSamlResults();
         if (samlResults != null) {
@@ -83,7 +83,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                     // Store token on the security context
                     SecurityToken token = createSecurityToken(samlAssertion);
                     parameters.getMessage().getExchange().put(SecurityConstants.TOKEN, token);
-                    return true;
+                    return;
                 }
             }
         }
@@ -101,12 +101,10 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                     // Store token on the security context
                     SecurityToken token = createSecurityToken(binarySecurity);
                     parameters.getMessage().getExchange().put(SecurityConstants.TOKEN, token);
-                    return true;
+                    return;
                 }
             }
         }
-        
-        return true;
     }
     
     private boolean validateSAMLToken(PolicyValidatorParameters parameters, 

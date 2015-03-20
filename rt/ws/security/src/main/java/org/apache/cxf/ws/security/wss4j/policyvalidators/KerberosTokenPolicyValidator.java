@@ -65,9 +65,9 @@ public class KerberosTokenPolicyValidator extends AbstractSecurityPolicyValidato
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> kerberosResults = findKerberosResults(parameters.getResults());
         
         for (WSSecurityEngineResult kerberosResult : kerberosResults) {
@@ -106,11 +106,9 @@ public class KerberosTokenPolicyValidator extends AbstractSecurityPolicyValidato
                 token.setSecret((byte[])kerberosResult.get(WSSecurityEngineResult.TAG_SECRET));
                 SecurityUtils.getTokenStore(parameters.getMessage()).add(token);
                 parameters.getMessage().getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
-                return true;
+                return;
             }
         }
-        
-        return true;
     }
     
     private void assertToken(KerberosToken token, AssertionInfoMap aim) {

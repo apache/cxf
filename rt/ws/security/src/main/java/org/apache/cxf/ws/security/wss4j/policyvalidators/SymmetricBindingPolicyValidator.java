@@ -56,9 +56,9 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         boolean hasDerivedKeys = false;
         for (WSSecurityEngineResult result : parameters.getResults()) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
@@ -89,8 +89,6 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 continue;
             }
         }
-        
-        return true;
     }
     
     /**

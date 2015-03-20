@@ -672,17 +672,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
         parameters.setTimestampElement(timestamp);
         
-        if (!checkTokenCoverage(parameters)) {
-            LOG.fine("Incoming request failed token policy validation");
-        }
-        
-        if (!checkBindingCoverage(parameters)) {
-            LOG.fine("Incoming request failed binding policy validation");
-        }
-
-        if (!checkSupportingTokenCoverage(parameters)) {
-            LOG.fine("Incoming request failed supporting token policy validation");
-        }
+        checkTokenCoverage(parameters);
+        checkBindingCoverage(parameters);
+        checkSupportingTokenCoverage(parameters);
         
         super.doResults(msg, actor, soapHeader, soapBody, results, utWithCallbacks);
     }
@@ -704,10 +696,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         //
         boolean check = true;
         if (!isTransportBinding(aim, msg)) {
-            check &= assertTokens(
+            assertTokens(
                 aim, SPConstants.SIGNED_PARTS, signed, msg, soapHeader, soapBody, CoverageType.SIGNED
             );
-            check &= assertTokens(
+            assertTokens(
                 aim, SPConstants.ENCRYPTED_PARTS, encrypted, msg, soapHeader, soapBody, 
                 CoverageType.ENCRYPTED
             );
@@ -719,123 +711,114 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             final XPathFactory factory = XPathFactory.newInstance();
             final XPath xpath = factory.newXPath();
             
-            check &= assertXPathTokens(aim, SPConstants.SIGNED_ELEMENTS, signed, soapEnvelope,
+            assertXPathTokens(aim, SPConstants.SIGNED_ELEMENTS, signed, soapEnvelope,
                     CoverageType.SIGNED, CoverageScope.ELEMENT, xpath);
-            check &= assertXPathTokens(aim, SPConstants.ENCRYPTED_ELEMENTS, encrypted, soapEnvelope,
+            assertXPathTokens(aim, SPConstants.ENCRYPTED_ELEMENTS, encrypted, soapEnvelope,
                     CoverageType.ENCRYPTED, CoverageScope.ELEMENT, xpath);
-            check &= assertXPathTokens(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, 
+            assertXPathTokens(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, 
                     soapEnvelope, CoverageType.ENCRYPTED, CoverageScope.CONTENT, xpath);
         }
         
-        check &= assertHeadersExists(aim, msg, soapHeader);
+        assertHeadersExists(aim, msg, soapHeader);
         return check;
     }
     
     /**
      * Check the token coverage
      */
-    private boolean checkTokenCoverage(PolicyValidatorParameters parameters) {
+    private void checkTokenCoverage(PolicyValidatorParameters parameters) {
         
-        boolean check = true;
         AssertionInfoMap aim = parameters.getAssertionInfoMap();
         
         Collection<AssertionInfo> ais = 
             PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
         SecurityPolicyValidator x509Validator = new X509TokenPolicyValidator();
-        check &= x509Validator.validatePolicies(parameters, ais);
+        x509Validator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
         SecurityPolicyValidator utValidator = new UsernameTokenPolicyValidator();
-        check &= utValidator.validatePolicies(parameters, ais);
+        utValidator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
         SecurityPolicyValidator samlValidator = new SamlTokenPolicyValidator();
-        check &= samlValidator.validatePolicies(parameters, ais);
+        samlValidator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURITY_CONTEXT_TOKEN);
         SecurityPolicyValidator sctValidator = new SecurityContextTokenPolicyValidator();
-        check &= sctValidator.validatePolicies(parameters, ais);
+        sctValidator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.WSS11);
         SecurityPolicyValidator wss11Validator = new WSS11PolicyValidator();
-        check &= wss11Validator.validatePolicies(parameters, ais);
-        
-        return check;
+        wss11Validator.validatePolicies(parameters, ais);
     }
     
     /**
      * Check the binding coverage
      */
-    private boolean checkBindingCoverage(PolicyValidatorParameters parameters) {
-        boolean check = true;
+    private void checkBindingCoverage(PolicyValidatorParameters parameters) {
         AssertionInfoMap aim = parameters.getAssertionInfoMap();
         
         Collection<AssertionInfo> ais = 
             PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
         SecurityPolicyValidator transportValidator = new TransportBindingPolicyValidator();
-        check &= transportValidator.validatePolicies(parameters, ais);
+        transportValidator.validatePolicies(parameters, ais);
             
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
         SecurityPolicyValidator symmetricValidator = new SymmetricBindingPolicyValidator();
-        check &= symmetricValidator.validatePolicies(parameters, ais);
+        symmetricValidator.validatePolicies(parameters, ais);
 
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         SecurityPolicyValidator asymmetricValidator = new AsymmetricBindingPolicyValidator();
-        check &= asymmetricValidator.validatePolicies(parameters, ais);
+        asymmetricValidator.validatePolicies(parameters, ais);
         
         // Check AlgorithmSuite + Layout that might not be tied to a binding
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
         SecurityPolicyValidator algorithmSuiteValidator = new AlgorithmSuitePolicyValidator();
-        check &= algorithmSuiteValidator.validatePolicies(parameters, ais);
+        algorithmSuiteValidator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.LAYOUT);
         LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator();
-        check &= layoutValidator.validatePolicies(parameters, ais);
-        
-        return check;
+        layoutValidator.validatePolicies(parameters, ais);
     }
     
     /**
      * Check the supporting token coverage
      */
-    private boolean checkSupportingTokenCoverage(PolicyValidatorParameters parameters) {
-        boolean check = true;
+    private void checkSupportingTokenCoverage(PolicyValidatorParameters parameters) {
         AssertionInfoMap aim = parameters.getAssertionInfoMap();
         
         Collection<AssertionInfo> ais = 
             PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
         SecurityPolicyValidator validator = new ConcreteSupportingTokenPolicyValidator();
-        check &= validator.validatePolicies(parameters, ais);
+        validator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         validator = new SignedTokenPolicyValidator();
-        check &= validator.validatePolicies(parameters, ais);
+        validator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_SUPPORTING_TOKENS);
         validator = new EndorsingTokenPolicyValidator();
-        check &= validator.validatePolicies(parameters, ais);
+        validator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         validator = new SignedEndorsingTokenPolicyValidator();
-        check &= validator.validatePolicies(parameters, ais);
+        validator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         validator = new SignedEncryptedTokenPolicyValidator();
-        check &= validator.validatePolicies(parameters, ais);
+        validator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_SUPPORTING_TOKENS);
         validator = new EncryptedTokenPolicyValidator();
-        check &= validator.validatePolicies(parameters, ais);
+        validator.validatePolicies(parameters, ais);
         
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         validator = new EndorsingEncryptedTokenPolicyValidator();
-        check &= validator.validatePolicies(parameters, ais);
+        validator.validatePolicies(parameters, ais);
 
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         validator = new SignedEndorsingEncryptedTokenPolicyValidator();
-        check &= validator.validatePolicies(parameters, ais);
-        
-        return check;
+        validator.validatePolicies(parameters, ais);
     }
     
     private boolean assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, Node header) 

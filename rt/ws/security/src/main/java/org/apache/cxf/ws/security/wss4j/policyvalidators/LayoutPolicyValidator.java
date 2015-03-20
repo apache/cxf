@@ -66,9 +66,9 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             Layout layout = (Layout)ai.getAssertion();
             ai.setAsserted(true);
@@ -79,8 +79,6 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
                 ai.setNotAsserted(error);
             }
         }
-        
-        return true;
     }
     
     private void assertToken(Layout token, AssertionInfoMap aim) {

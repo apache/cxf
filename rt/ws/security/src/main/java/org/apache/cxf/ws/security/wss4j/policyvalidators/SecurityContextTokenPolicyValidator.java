@@ -52,9 +52,9 @@ public class SecurityContextTokenPolicyValidator extends AbstractSecurityPolicyV
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> sctResults = 
             WSSecurityUtil.fetchAllActionResults(parameters.getResults(), WSConstants.SCT);
 
@@ -74,8 +74,6 @@ public class SecurityContextTokenPolicyValidator extends AbstractSecurityPolicyV
                 continue;
             }
         }
-        
-        return true;
     }
     
     private void assertToken(SecurityContextToken token, AssertionInfoMap aim) {

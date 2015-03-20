@@ -58,9 +58,9 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         boolean hasDerivedKeys = false;
         for (WSSecurityEngineResult result : parameters.getResults()) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
@@ -91,8 +91,6 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
                 continue;
             }
         }
-        
-        return true;
     }
     
     /**

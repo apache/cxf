@@ -62,9 +62,9 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
             ai.setAsserted(true);
@@ -84,8 +84,6 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
                 ai.setNotAsserted("Error in validating AlgorithmSuite policy");
             }
         }
-        
-        return true;
     }
     
     private boolean validatePolicy(

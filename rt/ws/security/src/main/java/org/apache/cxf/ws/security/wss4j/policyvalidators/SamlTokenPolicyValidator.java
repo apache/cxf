@@ -58,9 +58,9 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             SamlToken samlToken = (SamlToken)ai.getAssertion();
             ai.setAsserted(true);
@@ -111,8 +111,6 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
                  */
             }
         }
-        
-        return true;
     }
     
     /**

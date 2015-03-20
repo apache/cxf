@@ -35,7 +35,7 @@ public interface SecurityPolicyValidator {
     boolean canValidatePolicy(AssertionInfo assertionInfo);
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais);
+    void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais);
 }

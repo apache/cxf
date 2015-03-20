@@ -58,9 +58,9 @@ public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidato
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies. W
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy = 
                 (org.apache.wss4j.policy.model.UsernameToken)ai.getAssertion();
@@ -82,8 +82,6 @@ public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidato
                 continue;
             }
         }
-        
-        return true;
     }
     
     private void assertToken(org.apache.wss4j.policy.model.UsernameToken token, AssertionInfoMap aim) {

@@ -55,9 +55,9 @@ public class SignedTokenPolicyValidator extends AbstractSupportingTokenPolicyVal
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
@@ -110,8 +110,6 @@ public class SignedTokenPolicyValidator extends AbstractSupportingTokenPolicyVal
                 }
             }
         }
-        
-        return true;
     }
     
     protected boolean isSigned() {

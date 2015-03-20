@@ -56,9 +56,9 @@ public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> scResults =
             WSSecurityUtil.fetchAllActionResults(parameters.getResults(), WSConstants.SC);
         
@@ -79,7 +79,6 @@ public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
                 continue;
             }
         }
-        return true;
     }
     
     private void assertToken(Wss11 token, AssertionInfoMap aim) {

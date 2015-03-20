@@ -71,9 +71,9 @@ public class X509TokenPolicyValidator extends AbstractSecurityPolicyValidator {
     }
     
     /**
-     * Validate policies. Return true if all of the policies are valid.
+     * Validate policies.
      */
-    public boolean validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> bstResults = 
             WSSecurityUtil.fetchAllActionResults(parameters.getResults(), WSConstants.BST);
         
@@ -98,8 +98,6 @@ public class X509TokenPolicyValidator extends AbstractSecurityPolicyValidator {
                 continue;
             }
         }
-        
-        return true;
     }
     
     private void assertToken(X509Token token, AssertionInfoMap aim) {
