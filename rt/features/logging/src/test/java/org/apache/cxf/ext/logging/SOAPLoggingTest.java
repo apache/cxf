@@ -48,6 +48,7 @@ public class SOAPLoggingTest {
     public void testSlf4j() throws MalformedURLException {
         TestService serviceImpl = new TestServiceImplementation();
         LoggingFeature loggingFeature = new LoggingFeature();
+        loggingFeature.setPrettyLogging(true);
         Endpoint ep = Endpoint.publish(SERVICE_URI, serviceImpl, loggingFeature);
         TestService client = createTestClient(loggingFeature);
         client.echo("test");

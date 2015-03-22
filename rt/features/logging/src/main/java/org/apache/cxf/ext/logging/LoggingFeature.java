@@ -21,6 +21,7 @@ package org.apache.cxf.ext.logging;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.ext.logging.event.LogEventSender;
+import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
 import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -45,20 +46,19 @@ public class LoggingFeature extends AbstractFeature {
     private int limit = AbstractLoggingInterceptor.DEFAULT_LIMIT;
     private long inMemThreshold;
     private LogEventSender sender;
+    private LoggingInInterceptor in;
+    private LoggingOutInterceptor out;
+    private PrettyLoggingFilter prettyFilter;
     
     public LoggingFeature() {
         this.sender = new Slf4jEventSender();
+        prettyFilter = new PrettyLoggingFilter(sender);
+        in = new LoggingInInterceptor(prettyFilter);
+        out = new LoggingOutInterceptor(prettyFilter);
     }
     
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        LoggingInInterceptor in = new LoggingInInterceptor(sender);
-        in.setLimit(limit);
-        in.setInMemThreshold(inMemThreshold);
-        LoggingOutInterceptor out = new LoggingOutInterceptor(sender);
-        out.setLimit(limit);
-        out.setInMemThreshold(inMemThreshold);
-        
         WireTapIn wireTapIn = new WireTapIn(inMemThreshold, limit);
         provider.getInInterceptors().add(wireTapIn);
         provider.getInInterceptors().add(in);
@@ -69,14 +69,20 @@ public class LoggingFeature extends AbstractFeature {
     }
 
     public void setLimit(int lim) {
-        limit = lim;
+        in.setLimit(limit);
+        out.setLimit(limit);
     }
     
     public void setInMemThreshold(long inMemThreshold) {
-        this.inMemThreshold = inMemThreshold;
+        in.setInMemThreshold(inMemThreshold);
+        out.setInMemThreshold(inMemThreshold);
     }
     
     public void setSender(LogEventSender sender) {
-        this.sender = sender;
+        this.prettyFilter.setNext(sender);
+    }
+
+    public void setPrettyLogging(boolean prettyLogging) {
+        this.prettyFilter.setPrettyLogging(prettyLogging);
     }
 }

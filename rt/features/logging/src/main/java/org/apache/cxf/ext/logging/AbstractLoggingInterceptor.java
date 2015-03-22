@@ -33,7 +33,7 @@ abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Messa
     protected long threshold = -1;
 
     protected LogEventSender sender;
-    
+
     public AbstractLoggingInterceptor(String phase, LogEventSender sender) {
         super(phase);
         this.sender = sender;
@@ -63,4 +63,5 @@ abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Messa
             exchange.put(LogEvent.KEY_EXCHANGE_ID, exchangeId);
         }
     }
+
 }

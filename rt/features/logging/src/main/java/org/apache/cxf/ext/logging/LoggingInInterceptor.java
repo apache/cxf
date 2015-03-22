@@ -84,4 +84,5 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         event.setFullContentFile(writer.getTempFile());
     }
 
+
 }
