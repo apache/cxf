@@ -76,6 +76,7 @@ import org.apache.cxf.ws.security.sts.provider.model.wstrust14.ActAsType;
 import org.apache.cxf.ws.security.sts.provider.model.xmldsig.KeyInfoType;
 import org.apache.cxf.ws.security.sts.provider.model.xmldsig.X509DataType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
@@ -85,7 +86,6 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Constants;
 
 /**
@@ -739,7 +739,7 @@ public class RequestParser {
         }
    
         // Find processed token corresponding to the URI
-        referenceURI = WSSecurityUtil.getIDFromReference(referenceURI);
+        referenceURI = XMLUtils.getIDFromReference(referenceURI);
 
         MessageContext messageContext = wsContext.getMessageContext();
         final List<WSHandlerResult> handlerResults = 

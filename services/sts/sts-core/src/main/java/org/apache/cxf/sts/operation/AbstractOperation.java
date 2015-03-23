@@ -78,13 +78,13 @@ import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -214,7 +214,7 @@ public abstract class AbstractOperation {
         }
         
         if (tokenReference.isUseKeyIdentifier()) {
-            String identifier = WSSecurityUtil.getIDFromReference(tokenReference.getIdentifier());
+            String identifier = XMLUtils.getIDFromReference(tokenReference.getIdentifier());
             
             KeyIdentifierType keyIdentifierType = 
                 QNameConstants.WSSE_FACTORY.createKeyIdentifierType();

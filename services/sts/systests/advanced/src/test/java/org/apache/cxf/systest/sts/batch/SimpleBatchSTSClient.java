@@ -42,7 +42,6 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -95,6 +94,7 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
@@ -952,11 +952,11 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         if (encryptionAlgorithm != null && encryptionAlgorithm.endsWith("spnego#GSS_Wrap")) {
             // Get the CipherValue
             Element tmpE = 
-                WSSecurityUtil.getDirectChildElement(child, "CipherData", WSConstants.ENC_NS);
+                XMLUtils.getDirectChildElement(child, "CipherData", WSConstants.ENC_NS);
             byte[] cipherValue = null;
             if (tmpE != null) {
                 tmpE = 
-                    WSSecurityUtil.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
+                    XMLUtils.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
                 if (tmpE != null) {
                     String content = DOMUtils.getContent(tmpE);
                     cipherValue = Base64.decode(content);

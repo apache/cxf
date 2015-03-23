@@ -33,7 +33,6 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
@@ -41,9 +40,9 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -311,9 +310,9 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                 // Find the Timestamp + change it.
                 
                 Element timestampElement = 
-                    WSSecurityUtil.findElement(securityHeader, "Timestamp", WSConstants.WSU_NS);
+                    XMLUtils.findElement(securityHeader, "Timestamp", WSConstants.WSU_NS);
                 Element createdValue = 
-                    WSSecurityUtil.findElement(timestampElement, "Created", WSConstants.WSU_NS);
+                    XMLUtils.findElement(timestampElement, "Created", WSConstants.WSU_NS);
                 DateFormat zulu = new XmlSchemaDateFormat();
                 
                 XMLGregorianCalendar createdCalendar = 
@@ -337,7 +336,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 Element signatureElement = 
-                    WSSecurityUtil.findElement(securityHeader, "Signature", WSConstants.SIG_NS);
+                    XMLUtils.findElement(securityHeader, "Signature", WSConstants.SIG_NS);
                 
                 Node firstChild = signatureElement.getFirstChild();
                 while (!(firstChild instanceof Element) && firstChild != null) {
@@ -358,9 +357,9 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 Element encryptedKey = 
-                    WSSecurityUtil.findElement(securityHeader, "EncryptedKey", WSConstants.ENC_NS);
+                    XMLUtils.findElement(securityHeader, "EncryptedKey", WSConstants.ENC_NS);
                 Element cipherValue = 
-                    WSSecurityUtil.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
+                    XMLUtils.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
                 String cipherText = cipherValue.getTextContent();
                 
                 StringBuilder stringBuilder = new StringBuilder(cipherText);
@@ -392,7 +391,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         public void modifySOAPBody(Element soapBody) {
             if (soapBody != null) {
                 Element cipherValue = 
-                    WSSecurityUtil.findElement(soapBody, "CipherValue", WSConstants.ENC_NS);
+                    XMLUtils.findElement(soapBody, "CipherValue", WSConstants.ENC_NS);
                 String cipherText = cipherValue.getTextContent();
                 
                 StringBuilder stringBuilder = new StringBuilder(cipherText);
