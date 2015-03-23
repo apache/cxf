@@ -19,7 +19,9 @@
 
 package demo.throttling.server;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.ws.Endpoint;
@@ -31,7 +33,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.throttling.ThrottlingInterceptor;
+import org.apache.cxf.throttling.ThrottlingFeature;
 import org.apache.cxf.throttling.ThrottlingManager;
 
 public class Server {
@@ -51,22 +53,27 @@ public class Server {
         
         ThrottlingManager manager = new ThrottlingManager() {
             @Override
-            public long getThrottleDelay(Message m) {
+            public long getThrottleDelay(String phase, Message m) {
                 if (m.get("THROTTLED") != null) {
                     return 0;
                 }
                 m.put("THROTTLED", true);
                 Customer c = m.getExchange().get(Customer.class);
                 return c.throttle(m);
-            }           
+            }
+
+            @Override
+            public List<String> getDecisionPhases() {
+                return Collections.singletonList(Phase.PRE_STREAM);
+            }
         };
         b.getInInterceptors().add(new CustomerMetricsInterceptor(registry, customers));
-        b.getInInterceptors().add(new ThrottlingInterceptor(Phase.PRE_STREAM, manager));
-        //add Throttling
         
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9001/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor, new MetricsFeature());
+        Endpoint.publish(address, implementor, 
+                         new MetricsFeature(),
+                         new ThrottlingFeature(manager));
     }
 
     public static void main(String args[]) throws Exception {
