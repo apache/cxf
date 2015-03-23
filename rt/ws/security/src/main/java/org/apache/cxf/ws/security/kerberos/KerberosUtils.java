@@ -23,8 +23,8 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**

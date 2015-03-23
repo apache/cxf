@@ -155,7 +155,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             }
             if (!foundCert && !signedResults.isEmpty()) {
                 String error = "An X.509 certificate was not used for the " + wrapper.getName();
-                notAssertPolicy(aim, wrapper.getName(), error);
+                unassertPolicy(aim, wrapper.getName(), error);
                 ai.setNotAsserted(error);
                 return false;
             }
@@ -168,6 +168,15 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         assertToken(wrapper, aim);
 
         return true;
+    }
+    
+    private void unassertPolicy(AssertionInfoMap aim, QName q, String msg) {
+        Collection<AssertionInfo> ais = aim.get(q);
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setNotAsserted(msg);
+            }    
+        }
     }
 
     private boolean checkRecipientTokens(

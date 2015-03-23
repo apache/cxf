@@ -33,9 +33,9 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -72,7 +72,7 @@ public abstract class AbstractCommonBindingHandler {
         this.message = msg;
     }
 
-    protected void policyNotAsserted(Assertion assertion, String reason) {
+    protected void unassertPolicy(Assertion assertion, String reason) {
         if (assertion == null) {
             return;
         }
@@ -91,7 +91,7 @@ public abstract class AbstractCommonBindingHandler {
         }
     }
     
-    protected void policyNotAsserted(Assertion assertion, Exception reason) {
+    protected void unassertPolicy(Assertion assertion, Exception reason) {
         if (assertion == null) {
             return;
         }
@@ -450,7 +450,7 @@ public abstract class AbstractCommonBindingHandler {
         if (st == null) {
             String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
             if (id != null) {
-                st = SecurityUtils.getTokenStore(message).getToken(id);
+                st = TokenStoreUtils.getTokenStore(message).getToken(id);
             }
         }
         return st;

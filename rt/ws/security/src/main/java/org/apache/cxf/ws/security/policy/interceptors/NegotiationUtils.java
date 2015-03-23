@@ -43,10 +43,10 @@ import org.apache.cxf.ws.policy.EndpointPolicy;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
@@ -159,7 +159,7 @@ final class NegotiationUtils {
         try {
             Endpoint endpoint = message.getExchange().getEndpoint();
 
-            TokenStore store = SecurityUtils.getTokenStore(message);
+            TokenStore store = TokenStoreUtils.getTokenStore(message);
             if (secConv) {
                 endpoint = STSUtils.createSCEndpoint(bus, 
                                                      namespace,
@@ -230,7 +230,7 @@ final class NegotiationUtils {
                         (SecurityContextToken)wser.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
                     
-                    SecurityToken token = SecurityUtils.getTokenStore(message).getToken(tok.getIdentifier());
+                    SecurityToken token = TokenStoreUtils.getTokenStore(message).getToken(tok.getIdentifier());
                     if (token == null || token.isExpired()) {
                         byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                         if (secret != null) {
@@ -238,7 +238,7 @@ final class NegotiationUtils {
                             token.setToken(tok.getElement());
                             token.setSecret(secret);
                             token.setTokenType(tok.getTokenType());
-                            SecurityUtils.getTokenStore(message).add(token);
+                            TokenStoreUtils.getTokenStore(message).add(token);
                         }
                     }
                     if (token != null) {

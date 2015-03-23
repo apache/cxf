@@ -28,7 +28,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -125,7 +124,7 @@ public final class SecurityUtils {
     }
     
     public static String getPassword(Message message, String userName, 
-                                     int type, Class<?> callingClass) {
+                                     int type, Class<?> callingClass) throws WSSecurityException {
         CallbackHandler handler = getCallbackHandler(message, callingClass);
         if (handler == null) {
             return null;
@@ -143,28 +142,18 @@ public final class SecurityUtils {
         return password == null ? "" : password;
     }
     
-    public static CallbackHandler getCallbackHandler(Message message, Class<?> callingClass) {
+    public static CallbackHandler getCallbackHandler(Message message, Class<?> callingClass) 
+        throws WSSecurityException {
         return getCallbackHandler(message, callingClass, SecurityConstants.CALLBACK_HANDLER);
     }
     
     public static CallbackHandler getCallbackHandler(Message message, 
                                                      Class<?> callingClass,
-                                                     String callbackProperty) {
+                                                     String callbackProperty) throws WSSecurityException {
         //Then try to get the password from the given callback handler
         Object o = message.getContextualProperty(callbackProperty);
     
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, callingClass).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        return handler;
+        return org.apache.cxf.rt.security.utils.SecurityUtils.getCallbackHandler(o);
     }
  
 }

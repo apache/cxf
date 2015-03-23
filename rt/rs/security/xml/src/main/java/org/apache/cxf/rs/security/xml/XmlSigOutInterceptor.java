@@ -61,7 +61,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     private static final Logger LOG = 
         LogUtils.getL7dLogger(XmlSigOutInterceptor.class);
     private static final Set<String> SUPPORTED_STYLES = 
-        new HashSet<String>(Arrays.asList(ENVELOPED_SIG, ENVELOPING_SIG, DETACHED_SIG));
+        new HashSet<>(Arrays.asList(ENVELOPED_SIG, ENVELOPING_SIG, DETACHED_SIG));
     
     private QName envelopeQName = DEFAULT_ENV_QNAME;
     private String sigStyle = ENVELOPED_SIG;

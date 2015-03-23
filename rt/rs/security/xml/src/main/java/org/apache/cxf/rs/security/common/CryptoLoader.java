@@ -19,21 +19,16 @@
 
 package org.apache.cxf.rs.security.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -42,16 +37,17 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 public class CryptoLoader {
     
     private static final String CRYPTO_CACHE = "rs-security-xml-crypto.cache";
-    
+
     public Crypto loadCrypto(String cryptoResource) throws IOException, WSSecurityException {
-        URL url = ClassLoaderUtils.getResource(cryptoResource, this.getClass());
+        URL url = 
+            org.apache.cxf.rt.security.utils.SecurityUtils.loadResource(null, cryptoResource);
         if (url != null) {
             return loadCryptoFromURL(url);
         } else {
             return null;
         }
     }
-    
+
     public Crypto getCrypto(Message message,
                             String cryptoKey, 
                             String propKey) 
@@ -74,47 +70,18 @@ public class CryptoLoader {
             return crypto;
         }
         
-        ClassLoaderHolder orig = null;
-        try {
-            URL url = ClassLoaderUtils.getResource(propResourceName, this.getClass());
-            if (url == null) {
-                ResourceManager manager = message.getExchange()
-                        .getBus().getExtension(ResourceManager.class);
-                ClassLoader loader = manager.resolveResource("", ClassLoader.class);
-                if (loader != null) {
-                    orig = ClassLoaderUtils.setThreadContextClassloader(loader);
-                }
-                url = manager.resolveResource(propResourceName, URL.class);
-            }
-            if (url == null) {
-                try {
-                    URI propResourceUri = URI.create(propResourceName);
-                    if (propResourceUri.getScheme() != null) {
-                        url = propResourceUri.toURL();
-                    } else {
-                        File f = new File(propResourceUri.toString());
-                        if (f.exists()) { 
-                            url = f.toURI().toURL();
-                        }
-                    }
-                } catch (IOException ex) {
-                    // let CryptoFactory try to load it
-                }   
-            }
-            if (url != null) {
-                crypto = loadCryptoFromURL(url);
-            } else {
-                crypto = CryptoFactory.getInstance(propResourceName, Thread.currentThread().getContextClassLoader());
-            }
-            if (cryptoCache != null) {
-                cryptoCache.put(o, crypto);
-            }
-            return crypto;
-        } finally {
-            if (orig != null) {
-                orig.reset();
-            }
+        URL url = org.apache.cxf.rt.security.utils.SecurityUtils.loadResource(message, propResourceName);
+
+        if (url != null) {
+            crypto = loadCryptoFromURL(url);
+        } else {
+            crypto = CryptoFactory.getInstance(propResourceName, Thread.currentThread().getContextClassLoader());
         }
+        if (cryptoCache != null && crypto != null) {
+            cryptoCache.put(o, crypto);
+        }
+        
+        return crypto;
     }
     
     public static Crypto loadCryptoFromURL(URL url) throws IOException, WSSecurityException {
@@ -133,7 +100,7 @@ public class CryptoLoader {
                 Map<Object, Crypto> o = 
                     CastUtils.cast((Map<?, ?>)info.getProperty(CRYPTO_CACHE));
                 if (o == null) {
-                    o = new ConcurrentHashMap<Object, Crypto>();
+                    o = new ConcurrentHashMap<>();
                     info.setProperty(CRYPTO_CACHE, o);
                 }
                 return o;

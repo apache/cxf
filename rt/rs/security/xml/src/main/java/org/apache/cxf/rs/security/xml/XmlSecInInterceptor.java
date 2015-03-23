@@ -85,7 +85,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     /**
      * a collection of compiled regular expression patterns for the subject DN
      */
-    private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
+    private Collection<Pattern> subjectDNPatterns = new ArrayList<>();
 
     public XmlSecInInterceptor() {
         super(Phase.POST_STREAM);
@@ -211,7 +211,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     protected SecurityEventListener configureSecurityEventListener(
         final Crypto sigCrypto, final Message msg, XMLSecurityProperties securityProperties
     ) {
-        final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
+        final List<SecurityEvent> incomingSecurityEventList = new LinkedList<>();
         SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
@@ -365,7 +365,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
      */
     public void setSubjectConstraints(List<String> constraints) {
         if (constraints != null) {
-            subjectDNPatterns = new ArrayList<Pattern>();
+            subjectDNPatterns = new ArrayList<>();
             for (String constraint : constraints) {
                 try {
                     subjectDNPatterns.add(Pattern.compile(constraint.trim()));

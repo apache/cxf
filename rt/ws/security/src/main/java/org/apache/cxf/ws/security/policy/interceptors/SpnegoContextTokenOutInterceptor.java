@@ -28,13 +28,14 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -62,12 +63,12 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                 SecurityToken tok = null;
                 if (tokId != null) {
-                    tok = SecurityUtils.getTokenStore(message).getToken(tokId);
+                    tok = TokenStoreUtils.getTokenStore(message).getToken(tokId);
                     
                     if (tok != null && tok.isExpired()) {
                         message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
                         message.getExchange().remove(SecurityConstants.TOKEN_ID);
-                        SecurityUtils.getTokenStore(message).remove(tokId);
+                        TokenStoreUtils.getTokenStore(message).remove(tokId);
                         tok = null;
                     }
                 }
@@ -81,7 +82,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     }
                     message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-                    SecurityUtils.getTokenStore(message).add(tok);
+                    TokenStoreUtils.getTokenStore(message).add(tok);
                 }
             } else {
                 // server side should be checked on the way in

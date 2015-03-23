@@ -37,11 +37,12 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.cache.CXFEHCacheReplayCache;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -136,7 +137,7 @@ public final class WSS4JUtils {
         if (securityToken == null) {
             return null;
         }
-        SecurityToken existingToken = SecurityUtils.getTokenStore(message).getToken(securityToken.getId());
+        SecurityToken existingToken = TokenStoreUtils.getTokenStore(message).getToken(securityToken.getId());
         if (existingToken == null || existingToken.isExpired()) {
             Date created = new Date();
             Date expires = new Date();
@@ -170,7 +171,7 @@ public final class WSS4JUtils {
                 }
             }
 
-            SecurityUtils.getTokenStore(message).add(cachedTok);
+            TokenStoreUtils.getTokenStore(message).add(cachedTok);
 
             return cachedTok.getId();
         }

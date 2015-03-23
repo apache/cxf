@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -40,15 +39,22 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.common.crypto.WSProviderConfig;
 
 
 public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
+    protected static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
+    protected static final String SIG_PREFIX = "ds";
+    protected static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
+    protected static final String ENC_PREFIX = "xenc";
+    protected static final String WSU_NS = 
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+    
     private static final Logger LOG = 
         LogUtils.getL7dLogger(AbstractXmlSecOutInterceptor.class);
     
     static {
-        WSSConfig.init();
+        WSProviderConfig.init();
     }
     
     public AbstractXmlSecOutInterceptor() {

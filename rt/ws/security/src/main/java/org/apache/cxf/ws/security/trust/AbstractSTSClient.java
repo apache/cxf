@@ -75,6 +75,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -98,7 +99,6 @@ import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.RemoteReferenceResolver;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
 import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
@@ -115,6 +115,7 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
@@ -1518,11 +1519,11 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         if (encryptionAlgorithm != null && encryptionAlgorithm.endsWith("spnego#GSS_Wrap")) {
             // Get the CipherValue
             Element tmpE = 
-                WSSecurityUtil.getDirectChildElement(child, "CipherData", WSConstants.ENC_NS);
+                XMLUtils.getDirectChildElement(child, "CipherData", WSConstants.ENC_NS);
             byte[] cipherValue = null;
             if (tmpE != null) {
                 tmpE = 
-                    WSSecurityUtil.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
+                    XMLUtils.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
                 if (tmpE != null) {
                     String content = DOMUtils.getContent(tmpE);
                     cipherValue = Base64.decode(content);

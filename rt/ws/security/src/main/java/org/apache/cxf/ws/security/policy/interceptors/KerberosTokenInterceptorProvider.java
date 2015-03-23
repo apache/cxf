@@ -40,11 +40,11 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.kerberos.KerberosClient;
 import org.apache.cxf.ws.security.kerberos.KerberosUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.wss4j.KerberosTokenInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
@@ -128,11 +128,11 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                                                                       tok.getId());
                         message.getExchange().put(SecurityConstants.TOKEN_ID, 
                                                   tok.getId());
-                        SecurityUtils.getTokenStore(message).add(tok);
+                        TokenStoreUtils.getTokenStore(message).add(tok);
                         
                         // Create another cache entry with the SHA1 Identifier as the key for easy retrieval
                         if (tok.getSHA1() != null) {
-                            SecurityUtils.getTokenStore(message).add(tok.getSHA1(), tok);
+                            TokenStoreUtils.getTokenStore(message).add(tok.getSHA1(), tok);
                         }
                     }
                 } else {
@@ -267,7 +267,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 // Just consume this for now as it isn't critical...
             }
             
-            SecurityUtils.getTokenStore(message).add(token);
+            TokenStoreUtils.getTokenStore(message).add(token);
             message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
         }
         

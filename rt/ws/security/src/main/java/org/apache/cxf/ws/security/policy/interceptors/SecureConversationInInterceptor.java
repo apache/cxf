@@ -28,6 +28,7 @@ import java.util.Properties;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -47,11 +48,11 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider.HttpsTokenInInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.DefaultSymmetricBinding;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -429,7 +430,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (st == null) {
                 String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                 if (id != null) {
-                    st = SecurityUtils.getTokenStore(message).getToken(id);
+                    st = TokenStoreUtils.getTokenStore(message).getToken(id);
                 }
             }
             if (st != null && !st.isExpired()) {
@@ -506,7 +507,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (tok == null) {
                 String tokId = (String)m2.getContextualProperty(SecurityConstants.TOKEN_ID);
                 if (tokId != null) {
-                    tok = SecurityUtils.getTokenStore(m2).getToken(tokId);
+                    tok = TokenStoreUtils.getTokenStore(m2).getToken(tokId);
                 }
             }
 
@@ -529,7 +530,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     }
                     
                     client.cancelSecurityToken(tok);
-                    SecurityUtils.getTokenStore(m2).remove(tok.getId());
+                    TokenStoreUtils.getTokenStore(m2).remove(tok.getId());
                     m2.put(SecurityConstants.TOKEN, null);
                 } catch (RuntimeException e) {
                     throw e;

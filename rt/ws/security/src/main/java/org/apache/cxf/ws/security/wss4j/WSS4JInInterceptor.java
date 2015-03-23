@@ -45,6 +45,7 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -62,12 +63,13 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.rt.security.saml.SAMLUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
@@ -677,7 +679,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
                 if (ep != null && ep.getEndpointInfo() != null) {
                     TokenStore store = 
-                        SecurityUtils.getTokenStore((SoapMessage)reqData.getMsgContext());
+                        TokenStoreUtils.getTokenStore((SoapMessage)reqData.getMsgContext());
                     return new TokenStoreCallbackHandler(null, store);
                 }                    
                 throw sec;
@@ -686,7 +688,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             
         Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
         if (ep != null && ep.getEndpointInfo() != null) {
-            TokenStore store = SecurityUtils.getTokenStore((SoapMessage)reqData.getMsgContext());
+            TokenStore store = TokenStoreUtils.getTokenStore((SoapMessage)reqData.getMsgContext());
             return new TokenStoreCallbackHandler(cbHandler, store);
         }
         return cbHandler;

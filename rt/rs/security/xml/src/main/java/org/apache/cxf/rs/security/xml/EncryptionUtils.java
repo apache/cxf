@@ -29,7 +29,7 @@ import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -51,7 +51,7 @@ public final class EncryptionUtils {
         int mode, 
         X509Certificate cert
     ) throws WSSecurityException {
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
+        Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
             OAEPParameterSpec oaepParameters = 
                 constructOAEPParameters(
@@ -81,7 +81,7 @@ public final class EncryptionUtils {
     
     public static Cipher initCipherWithKey(String keyEncAlgo, String digestAlgo, int mode, Key key)
         throws WSSecurityException {
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
+        Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
             OAEPParameterSpec oaepParameters = 
                 constructOAEPParameters(

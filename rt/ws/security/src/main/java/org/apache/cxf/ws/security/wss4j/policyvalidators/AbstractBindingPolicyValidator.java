@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -33,7 +32,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
-import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -443,26 +441,6 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
             }
         }
         return false;
-    }
-    
-    protected void notAssertPolicy(AssertionInfoMap aim, Assertion token, String msg) {
-        Collection<AssertionInfo> ais = aim.get(token.getName());
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == token) {
-                    ai.setNotAsserted(msg);
-                }
-            }    
-        }
-    }
-    
-    protected void notAssertPolicy(AssertionInfoMap aim, QName q, String msg) {
-        Collection<AssertionInfo> ais = aim.get(q);
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setNotAsserted(msg);
-            }    
-        }
     }
     
 }

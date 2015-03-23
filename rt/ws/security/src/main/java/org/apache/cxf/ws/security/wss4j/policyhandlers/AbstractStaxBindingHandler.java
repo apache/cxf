@@ -39,12 +39,13 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -208,7 +209,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
 
         final SecurityToken secToken = getSecurityToken();
         if (secToken == null) {
-            policyNotAsserted(token, "Could not find KerberosToken");
+            unassertPolicy(token, "Could not find KerberosToken");
         }
         
         // Convert to WSS4J token
@@ -287,7 +288,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         Object o = message.getContextualProperty(SecurityConstants.SAML_CALLBACK_HANDLER);
         CallbackHandler handler = SecurityUtils.getCallbackHandler(o);
         if (handler == null) {
-            policyNotAsserted(token, "No SAML CallbackHandler available");
+            unassertPolicy(token, "No SAML CallbackHandler available");
             return null;
         }
         properties.setSamlCallbackHandler(handler);

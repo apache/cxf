@@ -45,7 +45,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
@@ -113,7 +112,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
             throwFault("Crypto can not be loaded", ex);
         }
         
-        Element encKeyElement = getNode(encDataElement, WSConstants.ENC_NS, "EncryptedKey", 0);
+        Element encKeyElement = getNode(encDataElement, ENC_NS, "EncryptedKey", 0);
         if (encKeyElement == null) {
             //TODO: support EncryptedData/ds:KeyInfo - the encrypted key is passed out of band
             throwFault("EncryptedKey element is not available", null);
@@ -146,8 +145,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         }
         
         
-        Element cipherValue = getNode(encKeyElement, WSConstants.ENC_NS, 
-                                               "CipherValue", 0);
+        Element cipherValue = getNode(encKeyElement, ENC_NS, "CipherValue", 0);
         if (cipherValue == null) {
             throwFault("CipherValue element is not available", null);
         }
@@ -200,7 +198,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
     }
     
     private String getEncodingMethodAlgorithm(Element parent) {
-        Element encMethod = getNode(parent, WSConstants.ENC_NS, "EncryptionMethod", 0);
+        Element encMethod = getNode(parent, ENC_NS, "EncryptionMethod", 0);
         if (encMethod == null) {
             throwFault("EncryptionMethod element is not available", null);
         }
@@ -208,9 +206,9 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
     }
     
     private String getDigestMethodAlgorithm(Element parent) {
-        Element encMethod = getNode(parent, WSConstants.ENC_NS, "EncryptionMethod", 0);
+        Element encMethod = getNode(parent, ENC_NS, "EncryptionMethod", 0);
         if (encMethod != null) {
-            Element digestMethod = getNode(encMethod, WSConstants.SIG_NS, "DigestMethod", 0);
+            Element digestMethod = getNode(encMethod, SIG_NS, "DigestMethod", 0);
             if (digestMethod != null) {
                 return digestMethod.getAttributeNS(null, "Algorithm");
             }

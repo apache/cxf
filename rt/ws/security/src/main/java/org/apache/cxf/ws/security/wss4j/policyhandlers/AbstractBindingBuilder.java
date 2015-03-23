@@ -61,15 +61,16 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.CXFCallbackLookup;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
@@ -90,6 +91,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.util.Loader;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -300,7 +302,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected final TokenStore getTokenStore() {
-        return SecurityUtils.getTokenStore(message);
+        return TokenStoreUtils.getTokenStore(message);
     }
     
     protected WSSecTimestamp createTimestamp() {
@@ -432,13 +434,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 //ws-trust/ws-sc stuff.......
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
-                    policyNotAsserted(token, "Could not find IssuedToken");
+                    unassertPolicy(token, "Could not find IssuedToken");
                 }
                 Element clone = cloneElement(secToken.getToken());
                 secToken.setToken(clone);
                 addSupportingElement(clone);
                 
-                String id = WSSecurityUtil.getIDFromReference(secToken.getId());
+                String id = XMLUtils.getIDFromReference(secToken.getId());
 
                 if (suppTokens.isEncryptedToken()) {
                     WSEncryptionPart part = new WSEncryptionPart(id, "Element");
@@ -651,13 +653,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     part.setId(secRef.getID());
                     part.setElement(clone);
                 } else {
-                    String id = WSSecurityUtil.getIDFromReference(token.getId());
+                    String id = XMLUtils.getIDFromReference(token.getId());
 
                     part = new WSEncryptionPart(id);
                     part.setElement(token.getToken());
                 }
             } else {
-                policyNotAsserted(supportingToken.getToken(), 
+                unassertPolicy(supportingToken.getToken(), 
                                   "UnsupportedTokenInSupportingToken: " + tempTok);  
             }
             if (part != null) {
@@ -743,7 +745,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     }
                     utBuilder.setUserInfo(userName, password);
                 } else {
-                    policyNotAsserted(token, "No password available");
+                    unassertPolicy(token, "No password available");
                     return null;
                 }
             }
@@ -757,7 +759,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             
             return utBuilder;
         } else {
-            policyNotAsserted(token, "No username available");
+            unassertPolicy(token, "No username available");
             return null;
         }
     }
@@ -783,13 +785,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 utBuilder.addDerivedKey(useMac, null, 1000);
                 utBuilder.prepare(saaj.getSOAPPart());
             } else {
-                policyNotAsserted(token, "No password available");
+                unassertPolicy(token, "No password available");
                 return null;
             }
             
             return utBuilder;
         } else {
-            policyNotAsserted(token, "No username available");
+            unassertPolicy(token, "No username available");
             return null;
         }
     }
@@ -824,7 +826,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         
         CallbackHandler handler = SecurityUtils.getCallbackHandler(o);
         if (handler == null) {
-            policyNotAsserted(token, "No SAML CallbackHandler available");
+            unassertPolicy(token, "No SAML CallbackHandler available");
             return null;
         }
         
@@ -910,11 +912,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         try {
             handler = SecurityUtils.getCallbackHandler(o);
             if (handler == null) {
-                policyNotAsserted(info, "No callback handler and no password available");
+                unassertPolicy(info, "No callback handler and no password available");
                 return null;
             }
         } catch (WSSecurityException ex) {
-            policyNotAsserted(info, "No callback handler and no password available");
+            unassertPolicy(info, "No callback handler and no password available");
             return null;
         }
         
@@ -922,7 +924,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         try {
             handler.handle(cb);
         } catch (Exception e) {
-            policyNotAsserted(info, e);
+            unassertPolicy(info, e);
         }
         
         //get the password
@@ -1550,7 +1552,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
         }
         if (encrUser == null || "".equals(encrUser)) {
-            policyNotAsserted(token, "A " + (sign ? "signature" : "encryption") + " username needs to be declared.");
+            unassertPolicy(token, "A " + (sign ? "signature" : "encryption") + " username needs to be declared.");
         }
         if (WSHandlerConstants.USE_REQ_SIG_CERT.equals(encrUser)) {
             List<WSHandlerResult> results = 
@@ -1564,7 +1566,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     encrKeyBuilder.setUserInfo(getUsername(results));
                 }
             } else {
-                policyNotAsserted(token, "No security results in incoming message");
+                unassertPolicy(token, "No security results in incoming message");
             }
         } else {
             encrKeyBuilder.setUserInfo(encrUser);
@@ -1757,7 +1759,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 try {
                     user = crypto.getDefaultX509Identifier();
                     if (StringUtils.isEmpty(user)) {
-                        policyNotAsserted(token, "No configured " + type + " username detected");
+                        unassertPolicy(token, "No configured " + type + " username detected");
                         return null;
                     }
                 } catch (WSSecurityException e1) {
@@ -1765,7 +1767,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     throw new Fault(e1);
                 }
             } else {
-                policyNotAsserted(token, "Security configuration could not be detected. "
+                unassertPolicy(token, "Security configuration could not be detected. "
                     + "Potential cause: Make sure jaxws:client element with name " 
                     + "attribute value matching endpoint port is defined as well as a " 
                     + SecurityConstants.SIGNATURE_PROPERTIES + " element within it.");
@@ -1784,7 +1786,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             sig.prepare(saaj.getSOAPPart(), crypto, secHeader);
         } catch (WSSecurityException e) {
             LOG.log(Level.FINE, e.getMessage(), e);
-            policyNotAsserted(token, e);
+            unassertPolicy(token, e);
         }
         
         return sig;
@@ -1826,7 +1828,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                         encryptedTokensList.add(part);
                     }
                 } catch (WSSecurityException e) {
-                    policyNotAsserted(supportingToken.getToken(), e);
+                    unassertPolicy(supportingToken.getToken(), e);
                 }
                 
             } else if (tempTok instanceof WSSecurityTokenHolder) {
@@ -1938,7 +1940,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         dkSign.prepare(doc, secHeader);
         
         if (isTokenProtection) {
-            String sigTokId = WSSecurityUtil.getIDFromReference(tok.getId());
+            String sigTokId = XMLUtils.getIDFromReference(tok.getId());
             sigParts.add(new WSEncryptionPart(sigTokId));
         }
         
@@ -2001,7 +2003,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             sigTokId = tok.getId();
         }
                        
-        sigTokId = WSSecurityUtil.getIDFromReference(sigTokId);
+        sigTokId = XMLUtils.getIDFromReference(sigTokId);
         sig.setCustomTokenId(sigTokId);
         sig.setSecretKey(tok.getSecret());
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());

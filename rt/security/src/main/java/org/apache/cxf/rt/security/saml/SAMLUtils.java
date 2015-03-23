@@ -109,7 +109,7 @@ public final class SAMLUtils {
             roleAttributeName = SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
         }
         
-        Set<Principal> roles = new HashSet<Principal>();
+        Set<Principal> roles = new HashSet<>();
         
         for (Claim claim : claims) {
             if (claim instanceof SAMLClaim && ((SAMLClaim)claim).getName().equals(name)

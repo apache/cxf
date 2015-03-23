@@ -33,6 +33,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
@@ -201,17 +202,17 @@ public class X509TokenPolicyValidator extends AbstractSecurityPolicyValidator {
     private Element getKeyIdentifier(Element signatureElement) {
         if (signatureElement != null) {
             Element keyInfoElement = 
-                WSSecurityUtil.getDirectChildElement(
+                XMLUtils.getDirectChildElement(
                     signatureElement, "KeyInfo", WSConstants.SIG_NS
                 );
             if (keyInfoElement != null) {
                 Element strElement = 
-                    WSSecurityUtil.getDirectChildElement(
+                    XMLUtils.getDirectChildElement(
                         keyInfoElement, "SecurityTokenReference", WSConstants.WSSE_NS
                     );
                 if (strElement != null) {
                     Element kiElement = 
-                        WSSecurityUtil.getDirectChildElement(
+                        XMLUtils.getDirectChildElement(
                             strElement, "KeyIdentifier", WSConstants.WSSE_NS
                         );
                     return kiElement;

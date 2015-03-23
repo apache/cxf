@@ -28,9 +28,9 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -104,7 +104,7 @@ public class KerberosTokenPolicyValidator extends AbstractSecurityPolicyValidato
             if (asserted) {
                 SecurityToken token = createSecurityToken(kerberosToken);
                 token.setSecret((byte[])kerberosResult.get(WSSecurityEngineResult.TAG_SECRET));
-                SecurityUtils.getTokenStore(parameters.getMessage()).add(token);
+                TokenStoreUtils.getTokenStore(parameters.getMessage()).add(token);
                 parameters.getMessage().getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
                 return;
             }

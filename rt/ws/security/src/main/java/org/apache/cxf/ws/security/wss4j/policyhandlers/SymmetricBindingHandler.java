@@ -298,12 +298,12 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 }
                 assertToken(sigToken);
             } else {
-                policyNotAsserted(sbinding, "No signature token");
+                unassertPolicy(sbinding, "No signature token");
                 return;
             }
             
             if (sigTok == null && StringUtils.isEmpty(sigTokId)) {
-                policyNotAsserted(sigAbstractTokenWrapper, "No signature token id");
+                unassertPolicy(sigAbstractTokenWrapper, "No signature token id");
                 return;
             } else {
                 assertPolicy(sigAbstractTokenWrapper);
@@ -359,7 +359,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 //Use the same token
                 encrTok = sigTok;
             } else {
-                policyNotAsserted(sbinding, "Encryption token does not equal signature token");
+                unassertPolicy(sbinding, "Encryption token does not equal signature token");
                 return;
             }
             
@@ -493,7 +493,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             return dkEncr;
         } catch (Exception e) {
             LOG.log(Level.FINE, e.getMessage(), e);
-            policyNotAsserted(recToken, e);
+            unassertPolicy(recToken, e);
         }
         return null;
     }
@@ -613,7 +613,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     return encr;
                 } catch (WSSecurityException e) {
                     LOG.log(Level.FINE, e.getMessage(), e);
-                    policyNotAsserted(recToken, e);
+                    unassertPolicy(recToken, e);
                 }    
             }
         }

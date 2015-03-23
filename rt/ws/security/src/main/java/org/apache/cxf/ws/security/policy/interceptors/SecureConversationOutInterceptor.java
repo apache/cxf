@@ -36,10 +36,10 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProvider.IssuedTokenOutInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -75,7 +75,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 if (tok == null) {
                     String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                     if (tokId != null) {
-                        tok = SecurityUtils.getTokenStore(message).getToken(tokId);
+                        tok = TokenStoreUtils.getTokenStore(message).getToken(tokId);
                     }
                 }
                 if (tok == null) {
@@ -91,7 +91,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN, tok);
-                    SecurityUtils.getTokenStore(message).add(tok);
+                    TokenStoreUtils.getTokenStore(message).add(tok);
                 }
                 PolicyUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
             } else {
@@ -118,7 +118,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN);
-        SecurityUtils.getTokenStore(message).remove(tok.getId());
+        TokenStoreUtils.getTokenStore(message).remove(tok.getId());
         
         STSClient client = STSUtils.getClient(message, "sct");
         AddressingProperties maps =

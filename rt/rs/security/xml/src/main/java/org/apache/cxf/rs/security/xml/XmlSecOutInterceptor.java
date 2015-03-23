@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.xml;
 
 import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -51,9 +50,8 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.xml.security.Init;
-import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutboundXMLSec;
@@ -84,8 +82,8 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private SecretKey symmetricKey;
     private boolean signRequest;
     private boolean encryptRequest;
-    private List<QName> elementsToSign = new ArrayList<QName>();
-    private List<QName> elementsToEncrypt = new ArrayList<QName>();
+    private List<QName> elementsToSign = new ArrayList<>();
+    private List<QName> elementsToEncrypt = new ArrayList<>();
     private boolean keyInfoMustBeAvailable = true;
     
     static {
@@ -259,33 +257,10 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private SecretKey getSymmetricKey(String symEncAlgo) throws Exception {
         synchronized (this) {
             if (symmetricKey == null) {
-                KeyGenerator keyGen = getKeyGenerator(symEncAlgo);
+                KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgo);
                 symmetricKey = keyGen.generateKey();
             } 
             return symmetricKey;
-        }
-    }
-    
-    private KeyGenerator getKeyGenerator(String symEncAlgo) throws WSSecurityException {
-        try {
-            //
-            // Assume AES as default, so initialize it
-            //
-            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
-            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
-            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)
-                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_128_GCM)) {
-                keyGen.init(128);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)
-                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_192_GCM)) {
-                keyGen.init(192);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)
-                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_256_GCM)) {
-                keyGen.init(256);
-            }
-            return keyGen;
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e);
         }
     }
     

@@ -41,7 +41,7 @@ public class Claim implements Serializable, Cloneable {
 
     private URI claimType;
     private boolean optional;
-    private List<Object> values = new ArrayList<Object>(1);
+    private List<Object> values = new ArrayList<>(1);
 
     public Claim() {
     }

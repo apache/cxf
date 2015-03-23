@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.xml;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
@@ -34,7 +33,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
@@ -46,11 +44,10 @@ import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.message.token.DOMX509Data;
-import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.wss4j.common.token.DOMX509Data;
+import org.apache.wss4j.common.token.DOMX509IssuerSerial;
+import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
@@ -153,7 +150,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.ENCRYPT_MODE, symmetricKey);
         
         Document result = xmlCipher.doFinal(payloadDoc, payloadDoc.getDocumentElement(), false);
-        NodeList list = result.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherValue");
+        NodeList list = result.getElementsByTagNameNS(ENC_NS, "CipherValue");
         if (list.getLength() != 1) {
             throw new Exception("Payload CipherData is missing");
         }
@@ -169,7 +166,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     private byte[] getSymmetricKey(String symEncAlgo) throws Exception {
         synchronized (this) {
             if (symmetricKey == null) {
-                KeyGenerator keyGen = getKeyGenerator(symEncAlgo);
+                KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgo);
                 symmetricKey = keyGen.generateKey();
             } 
             return symmetricKey.getEncoded();
@@ -179,29 +176,6 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     private X509Certificate getReceiverCertificateFromCrypto(Crypto crypto, String user) throws Exception {
         X509Certificate[] certs = SecurityUtils.getCertificates(crypto, user);
         return certs[0];
-    }
-    
-    private KeyGenerator getKeyGenerator(String symEncAlgo) throws WSSecurityException {
-        try {
-            //
-            // Assume AES as default, so initialize it
-            //
-            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
-            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
-            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)
-                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_128_GCM)) {
-                keyGen.init(128);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)
-                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_192_GCM)) {
-                keyGen.init(192);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)
-                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_256_GCM)) {
-                keyGen.init(256);
-            }
-            return keyGen;
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e);
-        }
     }
     
     // Apache Security XMLCipher does not support 
@@ -265,13 +239,10 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         xencCipherValue.appendChild(doc.createTextNode(encodedKey));
         
         Element topKeyInfoElement = 
-            doc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
-            );
+            doc.createElementNS(SIG_NS, SIG_PREFIX + ":KeyInfo");
         Element retrievalMethodElement = 
-            doc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":RetrievalMethod"
-            );
+            doc.createElementNS(SIG_NS, SIG_PREFIX + ":RetrievalMethod");
+        
         retrievalMethodElement.setAttribute("Type", DEFAULT_RETRIEVAL_METHOD_TYPE);
         topKeyInfoElement.appendChild(retrievalMethodElement);
         
@@ -282,9 +253,9 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     
     protected Element createCipherValue(Document doc, Element encryptedKey) {
         Element cipherData = 
-            doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
+            doc.createElementNS(ENC_NS, ENC_PREFIX + ":CipherData");
         Element cipherValue = 
-            doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherValue");
+            doc.createElementNS(ENC_NS, ENC_PREFIX + ":CipherValue");
         cipherData.appendChild(cipherValue);
         encryptedKey.appendChild(cipherData);
         return cipherValue;
@@ -293,9 +264,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     private Element createKeyInfoElement(Document encryptedDataDoc,
                                          X509Certificate remoteCert) throws Exception {
         Element keyInfoElement = 
-            encryptedDataDoc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
-            );
+            encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":KeyInfo");
         
         String keyIdType = encProps.getEncryptionKeyIdType() == null
             ? SecurityUtils.X509_CERT : encProps.getEncryptionKeyIdType();
@@ -311,11 +280,9 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 );
             }
             Text text = encryptedDataDoc.createTextNode(Base64.encode(data));
-            Element cert = encryptedDataDoc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_CERT_LN);
+            Element cert = encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":X509Certificate");
             cert.appendChild(text);
-            Element x509Data = encryptedDataDoc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_DATA_LN);
+            Element x509Data = encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":X509Data");
             
             x509Data.appendChild(cert);
             keyIdentifierNode = x509Data;
@@ -341,16 +308,15 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                                                 String keyEncAlgo,
                                                 String digestAlgo) {
         Element encryptedKey = 
-            encryptedDataDoc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedKey");
+            encryptedDataDoc.createElementNS(ENC_NS, ENC_PREFIX + ":EncryptedKey");
 
         Element encryptionMethod = 
-            encryptedDataDoc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX 
+            encryptedDataDoc.createElementNS(ENC_NS, ENC_PREFIX 
                                              + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyEncAlgo);
         if (digestAlgo != null) {
             Element digestMethod = 
-                encryptedDataDoc.createElementNS(WSConstants.SIG_NS, WSConstants.SIG_PREFIX 
-                                                 + ":DigestMethod");
+                encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":DigestMethod");
             digestMethod.setAttributeNS(null, "Algorithm", digestAlgo);
             encryptionMethod.appendChild(digestMethod);
         }
@@ -360,13 +326,12 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     
     protected Element createEncryptedDataElement(Document encryptedDataDoc, String symEncAlgo) {
         Element encryptedData = 
-            encryptedDataDoc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedData");
+            encryptedDataDoc.createElementNS(ENC_NS, ENC_PREFIX + ":EncryptedData");
 
-        WSSecurityUtil.setNamespace(encryptedData, WSConstants.ENC_NS, WSConstants.ENC_PREFIX);
+        XMLUtils.setNamespace(encryptedData, ENC_NS, ENC_PREFIX);
         
         Element encryptionMethod = 
-            encryptedDataDoc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX 
-                                             + ":EncryptionMethod");
+            encryptedDataDoc.createElementNS(ENC_NS, ENC_PREFIX + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", symEncAlgo);
         encryptedData.appendChild(encryptionMethod);
         encryptedDataDoc.appendChild(encryptedData);

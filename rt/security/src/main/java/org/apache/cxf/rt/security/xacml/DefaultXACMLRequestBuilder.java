@@ -81,7 +81,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
     }
 
     private ResourceType createResourceType(CXFMessageParser messageParser) {
-        List<AttributeType> attributes = new ArrayList<AttributeType>();
+        List<AttributeType> attributes = new ArrayList<>();
         
         // Resource-id
         String resourceId = null;
@@ -131,23 +131,26 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
     }
 
     private EnvironmentType createEnvironmentType() {
-        List<AttributeType> attributes = new ArrayList<AttributeType>();
         if (sendDateTime) {
+            List<AttributeType> attributes = new ArrayList<>();
             AttributeType environmentAttribute = createAttribute(XACMLConstants.CURRENT_DATETIME,
                                                                  XACMLConstants.XS_DATETIME, null,
                                                                  new DateTime().toString());
             attributes.add(environmentAttribute);
+            return RequestComponentBuilder.createEnvironmentType(attributes);
         }
+        
+        List<AttributeType> attributes = Collections.emptyList();
         return RequestComponentBuilder.createEnvironmentType(attributes);
     }
 
     private SubjectType createSubjectType(Principal principal, List<String> roles, String issuer) {
-        List<AttributeType> attributes = new ArrayList<AttributeType>();
+        List<AttributeType> attributes = new ArrayList<>();
         attributes.add(createAttribute(XACMLConstants.SUBJECT_ID, XACMLConstants.XS_STRING, issuer,
                                        principal.getName()));
 
         if (roles != null) {
-            List<AttributeValueType> roleAttributes = new ArrayList<AttributeValueType>();
+            List<AttributeValueType> roleAttributes = new ArrayList<>();
             for (String role : roles) {
                 if (role != null) {
                     AttributeValueType subjectRoleAttributeValue = 

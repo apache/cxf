@@ -133,7 +133,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken secToken = getSecurityToken();
                     if (secToken == null) {
-                        policyNotAsserted(initiatorToken, "Security token is not found or expired");
+                        unassertPolicy(initiatorToken, "Security token is not found or expired");
                         return;
                     } else {
                         assertPolicy(initiatorToken);
@@ -156,7 +156,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } else if (initiatorToken instanceof SamlToken) {
                     String tokenId = getSAMLToken();
                     if (tokenId == null) {
-                        policyNotAsserted(initiatorToken, "Security token is not found or expired");
+                        unassertPolicy(initiatorToken, "Security token is not found or expired");
                         return;
                     }
                 }
@@ -272,7 +272,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             if (initiatorToken instanceof IssuedToken) {
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
-                    policyNotAsserted(initiatorToken, "Security token is not found or expired");
+                    unassertPolicy(initiatorToken, "Security token is not found or expired");
                     return;
                 } else {
                     assertPolicy(initiatorToken);
@@ -302,7 +302,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             } else if (initiatorToken instanceof SamlToken) {
                 String tokenId = getSAMLToken();
                 if (tokenId == null) {
-                    policyNotAsserted(initiatorToken, "Security token is not found or expired");
+                    unassertPolicy(initiatorToken, "Security token is not found or expired");
                     return;
                 }
             }
@@ -320,7 +320,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             addSupportingTokens(sigParts);
         } catch (WSSecurityException ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
-            policyNotAsserted(encryptionToken, ex);
+            unassertPolicy(encryptionToken, ex);
         }
         
         List<WSEncryptionPart> encrParts = null;
@@ -476,7 +476,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     return dkEncr;
                 } catch (Exception e) {
                     LOG.log(Level.FINE, e.getMessage(), e);
-                    policyNotAsserted(recToken, e);
+                    unassertPolicy(recToken, e);
                 }
             } else {
                 try {
@@ -518,7 +518,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         setEncryptionUser(encr, recToken, false, crypto);
                     }
                     if (!encr.isCertSet() && crypto == null) {
-                        policyNotAsserted(recToken, "Missing security configuration. "
+                        unassertPolicy(recToken, "Missing security configuration. "
                                 + "Make sure jaxws:client element is configured " 
                                 + "with a " + SecurityConstants.ENCRYPT_PROPERTIES + " value.");
                     }
@@ -560,7 +560,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     return encr;
                 } catch (WSSecurityException e) {
                     LOG.log(Level.FINE, e.getMessage(), e);
-                    policyNotAsserted(recToken, e);
+                    unassertPolicy(recToken, e);
                 }    
             }
         }
@@ -737,7 +737,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     createEncryptedKey(wrapper, token);
                 }
             } else {
-                policyNotAsserted(token, "No security results found");
+                unassertPolicy(token, "No security results found");
             }
         } else {
             createEncryptedKey(wrapper, token);

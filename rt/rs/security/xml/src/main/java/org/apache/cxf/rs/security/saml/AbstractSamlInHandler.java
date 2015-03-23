@@ -50,7 +50,9 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
@@ -59,7 +61,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
@@ -75,7 +76,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
         LogUtils.getL7dLogger(AbstractSamlInHandler.class);
     
     static {
-        WSSConfig.init();
+        WSProviderConfig.init();
     }
     
     private Validator samlValidator = new SamlAssertionValidator();
@@ -142,7 +143,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
                     throwFault("Crypto can not be loaded", ex);
                 }
                 data.setEnableRevocation(MessageUtils.isTrue(
-                    message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
+                    message.getContextualProperty(ConfigurationConstants.ENABLE_REVOCATION)));
                 Signature sig = assertion.getSignature();
                 WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
                 

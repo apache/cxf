@@ -138,7 +138,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     if (transportToken instanceof IssuedToken) {
                         SecurityToken secToken = getSecurityToken();
                         if (secToken == null) {
-                            policyNotAsserted(transportToken, "No transport token id");
+                            unassertPolicy(transportToken, "No transport token id");
                             return;
                         } else {
                             assertPolicy(transportToken);

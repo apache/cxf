@@ -63,9 +63,16 @@ public final class SAMLUtils {
     }
     
     public static SamlAssertionWrapper createAssertion(Message message) throws Fault {
-        CallbackHandler handler = SecurityUtils.getCallbackHandler(
-            message, SAMLUtils.class, SecurityConstants.SAML_CALLBACK_HANDLER);
-        return createAssertion(message, handler);
+        try {
+            CallbackHandler handler = SecurityUtils.getCallbackHandler(
+                message, SAMLUtils.class, SecurityConstants.SAML_CALLBACK_HANDLER);
+            return createAssertion(message, handler);
+        } catch (Exception ex) {
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            LOG.warning(sw.toString());
+            throw new Fault(new RuntimeException(ex.getMessage() + ", stacktrace: " + sw.toString()));
+        }
     }
     
     public static SamlAssertionWrapper createAssertion(Message message,

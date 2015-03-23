@@ -28,11 +28,12 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
@@ -174,7 +175,7 @@ public class STSTokenValidator implements Validator {
             return null;
         }
         
-        return SecurityUtils.getTokenStore(message);
+        return TokenStoreUtils.getTokenStore(message);
     }
     
     protected boolean isValidatedLocally(Credential credential, RequestData data) 

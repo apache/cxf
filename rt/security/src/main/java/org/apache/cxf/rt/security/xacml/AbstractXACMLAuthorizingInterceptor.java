@@ -77,7 +77,7 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
             
             LoginSecurityContext loginSecurityContext = (LoginSecurityContext)sc;
             Set<Principal> principalRoles = loginSecurityContext.getUserRoles();
-            List<String> roles = new ArrayList<String>();
+            List<String> roles = new ArrayList<>();
             if (principalRoles != null) {
                 for (Principal p : principalRoles) {
                     if (p != principal) {

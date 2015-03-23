@@ -32,8 +32,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.wss4j.TokenStoreCallbackHandler;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -135,7 +135,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     WSSSecurityProperties properties = getProperties();
                     TokenStoreCallbackHandler callbackHandler = 
                         new TokenStoreCallbackHandler(
-                            properties.getCallbackHandler(), SecurityUtils.getTokenStore(message)
+                            properties.getCallbackHandler(), TokenStoreUtils.getTokenStore(message)
                         );
                     properties.setCallbackHandler(callbackHandler);
                 } else if (initiatorToken instanceof SamlToken) {
@@ -262,7 +262,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     WSSSecurityProperties properties = getProperties();
                     TokenStoreCallbackHandler callbackHandler = 
                         new TokenStoreCallbackHandler(
-                            properties.getCallbackHandler(), SecurityUtils.getTokenStore(message)
+                            properties.getCallbackHandler(), TokenStoreUtils.getTokenStore(message)
                         );
                     properties.setCallbackHandler(callbackHandler);
                 } else if (initiatorToken instanceof SamlToken) {

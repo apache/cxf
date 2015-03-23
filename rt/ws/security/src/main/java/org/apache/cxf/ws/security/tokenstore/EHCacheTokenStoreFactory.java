@@ -22,8 +22,8 @@ package org.apache.cxf.ws.security.tokenstore;
 import java.net.URL;
 
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 
 
 /**

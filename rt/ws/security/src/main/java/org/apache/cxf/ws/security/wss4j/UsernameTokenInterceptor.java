@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
@@ -40,11 +41,11 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.rt.security.saml.SAMLUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.SecurityUtils;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSPasswordCallback;

@@ -34,9 +34,9 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.Reference;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 
@@ -161,11 +161,11 @@ public class SecurityToken implements Serializable {
     }
     
     public SecurityToken(String id) {
-        this.id = WSSecurityUtil.getIDFromReference(id);
+        this.id = XMLUtils.getIDFromReference(id);
     }
 
     public SecurityToken(String id, Date created, Date expires) {
-        this.id = WSSecurityUtil.getIDFromReference(id);
+        this.id = XMLUtils.getIDFromReference(id);
         
         if (created != null) {
             this.created = new Date(created.getTime());
@@ -179,7 +179,7 @@ public class SecurityToken implements Serializable {
                  Element tokenElem,
                  Date created,
                  Date expires) {
-        this.id = WSSecurityUtil.getIDFromReference(id);
+        this.id = XMLUtils.getIDFromReference(id);
         
         this.token = cloneElement(tokenElem);
         if (created != null) {
@@ -193,7 +193,7 @@ public class SecurityToken implements Serializable {
     public SecurityToken(String id,
                  Element tokenElem,
                  Element lifetimeElem) {
-        this.id = WSSecurityUtil.getIDFromReference(id);
+        this.id = XMLUtils.getIDFromReference(id);
         
         this.token = cloneElement(tokenElem);
         if (lifetimeElem != null) {
@@ -284,7 +284,7 @@ public class SecurityToken implements Serializable {
      * Set the id
      */
     public void setId(String id) {
-        this.id = WSSecurityUtil.getIDFromReference(id);
+        this.id = XMLUtils.getIDFromReference(id);
     }
     
     /**

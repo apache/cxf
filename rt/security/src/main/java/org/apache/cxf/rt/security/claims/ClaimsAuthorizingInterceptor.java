@@ -52,13 +52,13 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     
     private static final Set<String> SKIP_METHODS;
     static {
-        SKIP_METHODS = new HashSet<String>();
+        SKIP_METHODS = new HashSet<>();
         SKIP_METHODS.addAll(Arrays.asList(
             new String[] {"wait", "notify", "notifyAll", 
                           "equals", "toString", "hashCode"}));
     }
     
-    private Map<String, List<ClaimBean>> claims = new HashMap<String, List<ClaimBean>>();
+    private Map<String, List<ClaimBean>> claims = new HashMap<>();
     private Map<String, String> nameAliases = Collections.emptyMap();
     private Map<String, String> formatAliases = Collections.emptyMap();
     
@@ -163,7 +163,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             List<ClaimBean> methodClaims = 
                 getClaims(m.getAnnotation(Claims.class), m.getAnnotation(Claim.class));
             
-            List<ClaimBean> allClaims = new ArrayList<ClaimBean>(methodClaims);
+            List<ClaimBean> allClaims = new ArrayList<>(methodClaims);
             for (ClaimBean bean : clsClaims) {
                 if (isClaimOverridden(bean, methodClaims)) {
                     continue;
@@ -200,9 +200,9 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     
     private List<ClaimBean> getClaims(
             Claims claimsAnn, Claim claimAnn) {
-        List<ClaimBean> claimsList = new ArrayList<ClaimBean>();
+        List<ClaimBean> claimsList = new ArrayList<>();
         
-        List<Claim> annClaims = new ArrayList<Claim>();
+        List<Claim> annClaims = new ArrayList<>();
         if (claimsAnn != null) {
             annClaims.addAll(Arrays.asList(claimsAnn.value()));
         } else if (claimAnn != null) {
