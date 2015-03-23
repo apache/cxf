@@ -270,7 +270,7 @@ public final class OAuthClientUtils {
                 } catch (Exception ex) {
                     throw new ProcessingException(ex);
                 }
-                accessTokenService.header("Authorization", sb.toString());
+                accessTokenService.replaceHeader("Authorization", sb.toString());
             } else {
                 form.param(OAuthConstants.CLIENT_ID, consumer.getKey());
                 if (consumer.getSecret() != null) {

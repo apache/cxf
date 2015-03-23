@@ -96,7 +96,12 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         codeReg.setClient(client);
         codeReg.setRedirectUri(redirectUri);
         codeReg.setRequestedScope(requestedScope);
-        codeReg.setApprovedScope(approvedScope);
+        if (approvedScope != null && approvedScope.isEmpty()) {
+            // no down-scoping done by a user, all of the requested scopes have been authorized
+            codeReg.setApprovedScope(requestedScope);
+        } else {
+            codeReg.setApprovedScope(approvedScope);
+        }
         codeReg.setSubject(userSubject);
         codeReg.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
         codeReg.setClientCodeChallenge(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE));
