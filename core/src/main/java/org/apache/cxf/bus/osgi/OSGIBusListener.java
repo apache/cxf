@@ -92,9 +92,9 @@ public class OSGIBusListener implements BusLifeCycleListener {
     }
     
     public void initComplete() {
-        WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
         ManagedWorkQueueList wqList = bus.getExtension(ManagedWorkQueueList.class);
         if (wqList != null) {
+            WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
             wqList.addAllToWorkQueueManager(manager);
         }
         registerBusAsService();
