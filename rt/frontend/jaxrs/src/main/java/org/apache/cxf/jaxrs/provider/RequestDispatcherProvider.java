@@ -406,6 +406,14 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         this.includeResource = includeResource;
     }
 
+    public void setLocationPrefix(String locationPrefix) {
+        this.locationPrefix = locationPrefix;
+    }
+
+    public void setResourceExtension(String resourceExtension) {
+        this.resourceExtension = resourceExtension;
+    }
+
     protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {
         
         private Map<String, String[]> params;
