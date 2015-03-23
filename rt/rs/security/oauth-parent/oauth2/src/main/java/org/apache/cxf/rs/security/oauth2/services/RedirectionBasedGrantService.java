@@ -19,7 +19,6 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -172,7 +171,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             return createGrant(data,
                                client, 
                                requestedScope,
-                               Collections.<String>emptyList(),
+                               OAuthUtils.convertPermissionsToScopeList(preAuthorizedToken.getScopes()),
                                userSubject,
                                preAuthorizedToken);
         }

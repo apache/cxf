@@ -72,7 +72,12 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
             reg.setGrantType(OAuthConstants.IMPLICIT_GRANT);
             reg.setSubject(userSubject);
             reg.setRequestedScope(requestedScope);        
-            reg.setApprovedScope(approvedScope);
+            if (approvedScope != null && approvedScope.isEmpty()) {
+                // no down-scoping done by a user, all of the requested scopes have been authorized
+                reg.setApprovedScope(requestedScope);
+            } else {
+                reg.setApprovedScope(approvedScope);
+            }
             reg.setAudience(state.getAudience());
             token = getDataProvider().createAccessToken(reg);
         } else {
