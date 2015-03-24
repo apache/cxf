@@ -94,14 +94,13 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
-import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
 import org.apache.wss4j.dom.processor.X509Util;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -716,7 +715,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         W3CDOMStreamWriter writer
     ) throws XMLStreamException {
         writer.writeStartElement("wst", "BinaryExchange", namespace);
-        writer.writeAttribute("EncodingType", BinarySecurity.BASE64_ENCODING);
+        writer.writeAttribute("EncodingType", WSConstants.BASE64_ENCODING);
         writer.writeAttribute("ValueType", namespace + "/spnego");
         writer.writeCharacters(binaryExchange);
         writer.writeEndElement();

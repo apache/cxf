@@ -20,14 +20,13 @@
 package org.apache.cxf.sts.operation;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
 
 /**
  * A Dummy TokenProvider for use in the unit tests. It mocks up a dummy BinarySecurityToken.

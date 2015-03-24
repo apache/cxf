@@ -34,7 +34,7 @@ import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.common.token.BinarySecurity;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 

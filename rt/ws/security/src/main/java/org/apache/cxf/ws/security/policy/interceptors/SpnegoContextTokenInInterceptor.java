@@ -58,7 +58,6 @@ import org.apache.neethi.Policy;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
@@ -279,7 +278,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 throw new Exception("No BinaryExchange element received");
             }
             String encoding = binaryExchange.getAttributeNS(null, "EncodingType");
-            if (!BinarySecurity.BASE64_ENCODING.equals(encoding)) {
+            if (!WSConstants.BASE64_ENCODING.equals(encoding)) {
                 throw new Exception("Unknown encoding type: " + encoding);
             }
 

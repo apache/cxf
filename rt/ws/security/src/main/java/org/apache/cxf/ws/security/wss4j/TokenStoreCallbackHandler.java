@@ -29,7 +29,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.xml.security.utils.Base64;
 
 public class TokenStoreCallbackHandler implements CallbackHandler {
@@ -67,7 +67,7 @@ public class TokenStoreCallbackHandler implements CallbackHandler {
     
     private static String getSHA1(byte[] input) {
         try {
-            byte[] digestBytes = WSSecurityUtil.generateDigest(input);
+            byte[] digestBytes = KeyUtils.generateDigest(input);
             return Base64.encode(digestBytes);
         } catch (WSSecurityException e) {
             //REVISIT

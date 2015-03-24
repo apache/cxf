@@ -32,11 +32,11 @@ import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -166,7 +166,7 @@ public class KerberosTokenPolicyValidator extends AbstractSecurityPolicyValidato
         token.setTokenType(binarySecurityToken.getValueType());
         byte[] tokenBytes = binarySecurityToken.getToken();
         try {
-            token.setSHA1(Base64.encode(WSSecurityUtil.generateDigest(tokenBytes)));
+            token.setSHA1(Base64.encode(KeyUtils.generateDigest(tokenBytes)));
         } catch (WSSecurityException e) {
             // Just consume this for now as it isn't critical...
         }

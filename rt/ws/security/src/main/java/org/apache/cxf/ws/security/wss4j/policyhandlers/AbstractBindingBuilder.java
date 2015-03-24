@@ -77,6 +77,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -90,12 +91,14 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.Version;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.CallbackLookup;
@@ -107,9 +110,6 @@ import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecSignatureConfirmation;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
-import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
@@ -687,8 +687,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         secRefSaml.setID(secRefID);
 
         if (useDirectReferenceToAssertion) {
-            org.apache.wss4j.dom.message.token.Reference ref = 
-                new org.apache.wss4j.dom.message.token.Reference(doc);
+            org.apache.wss4j.common.token.Reference ref = 
+                new org.apache.wss4j.common.token.Reference(doc);
             ref.setURI("#" + id);
             if (saml1) {
                 ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
@@ -1371,7 +1371,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         if (alsoIncludeToken) {
             X509Certificate encCert = getEncryptCert(crypto, encrUser);
             BinarySecurity bstToken = new X509Security(saaj.getSOAPPart());
-            ((X509Security) bstToken).setX509Certificate(encCert);
+            ((X509Security)bstToken).setX509Certificate(encCert);
             bstToken.addWSUNamespace();
             bstToken.setID(wssConfig.getIdAllocator().createSecureId("X509-", encCert));
             WSSecurityUtil.prependChildElement(

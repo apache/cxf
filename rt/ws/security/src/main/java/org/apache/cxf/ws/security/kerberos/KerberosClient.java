@@ -33,9 +33,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.ietf.jgss.GSSCredential;
 
@@ -163,7 +163,7 @@ public class KerberosClient implements Configurable {
             token.setKey(secretKey);
             token.setSecret(secretKey.getEncoded());
         }
-        String sha1 = Base64.encode(WSSecurityUtil.generateDigest(bst.getToken()));
+        String sha1 = Base64.encode(KeyUtils.generateDigest(bst.getToken()));
         token.setSHA1(sha1);
         token.setTokenType(bst.getValueType());
 

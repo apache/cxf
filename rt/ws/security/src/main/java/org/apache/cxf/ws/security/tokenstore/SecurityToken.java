@@ -34,9 +34,9 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 

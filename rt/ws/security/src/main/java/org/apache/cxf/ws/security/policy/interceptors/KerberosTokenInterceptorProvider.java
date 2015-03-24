@@ -55,9 +55,9 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.KerberosTokenPolicyVali
 import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -262,7 +262,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             
             byte[] ticket = kerberosToken.getBinaryContent();
             try {
-                token.setSHA1(Base64.encode(WSSecurityUtil.generateDigest(ticket)));
+                token.setSHA1(Base64.encode(KeyUtils.generateDigest(ticket)));
             } catch (WSSecurityException e) {
                 // Just consume this for now as it isn't critical...
             }

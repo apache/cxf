@@ -26,8 +26,8 @@ import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
 
 /**
  * A TokenProvider implementation that creates a (custom) BinarySecurityToken.

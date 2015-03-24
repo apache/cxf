@@ -47,6 +47,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -58,7 +59,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
@@ -225,7 +225,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     
     protected UsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement, boolean bspCompliant) 
         throws WSSecurityException, Base64DecodingException {
-        BSPEnforcer bspEnforcer = new BSPEnforcer(!bspCompliant);
+        BSPEnforcer bspEnforcer = new org.apache.wss4j.common.bsp.BSPEnforcer(!bspCompliant);
         org.apache.wss4j.dom.message.token.UsernameToken ut = 
             new org.apache.wss4j.dom.message.token.UsernameToken(tokenElement, false, bspEnforcer);
         
