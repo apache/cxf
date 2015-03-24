@@ -167,7 +167,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
     }
     
     public List<URI> getSupportedClaimTypes() {
-        List<URI> list = new ArrayList<URI>();
+        List<URI> list = new ArrayList<>();
         try {
             list.add(new URI(this.groupURI));
         } catch (URISyntaxException e) {
@@ -228,8 +228,8 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
             LOG.finer("Retrieve groups for user " + user);
         }
         
-        List<String> groups = null;
-        groups = LdapUtils.getAttributeOfEntries(ldap, this.groupBaseDn, this.getGroupObjectClass(),
+        List<String> groups = 
+            LdapUtils.getAttributeOfEntries(ldap, this.groupBaseDn, this.getGroupObjectClass(),
                                                             this.groupMemberAttribute, user, "cn");
         
         if (groups == null || groups.size() == 0) {
@@ -265,7 +265,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
             scopePattern = Pattern.compile(regex);
         }
         
-        List<String> filteredGroups = new ArrayList<String>();
+        List<String> filteredGroups = new ArrayList<>();
         for (String group: groups) {
             if (scopePattern != null && scopePattern.matcher(group).matches()) {
                 //Group matches the scoped filter

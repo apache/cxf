@@ -65,7 +65,7 @@ public final class LdapUtils {
         AttributesMapper mapper = 
             new AttributesMapper() {
                 public Object mapFromAttributes(Attributes attrs) throws NamingException {
-                    Map<String, Attribute> map = new HashMap<String, Attribute>();
+                    Map<String, Attribute> map = new HashMap<>();
                     NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
                     while (attrEnum.hasMore()) {
                         Attribute att = attrEnum.next();

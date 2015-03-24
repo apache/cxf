@@ -191,7 +191,7 @@ public class MemoryIdentityCache implements IdentityCache, IdentityMapper, Manag
             // Identities object NOT found for key sourceUser@sourceRealm
             targetPrincipal = this.identityMapper.mapPrincipal(
                     sourceRealm, sourcePrincipal, targetRealm);
-            identities = new HashMap<String, String>();
+            identities = new HashMap<>();
             identities.put(sourceRealm, sourcePrincipal.getName());
             identities.put(targetRealm, targetPrincipal.getName());
             this.add(targetPrincipal.getName(), targetRealm, identities);

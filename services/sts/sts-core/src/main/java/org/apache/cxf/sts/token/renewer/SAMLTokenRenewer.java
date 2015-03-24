@@ -41,10 +41,10 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
-import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.cache.CacheUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
+import org.apache.cxf.sts.token.provider.AbstractSAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.ConditionsProvider;
 import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
@@ -53,7 +53,6 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -80,7 +79,7 @@ import org.opensaml.saml.saml2.core.AudienceRestriction;
 /**
  * A TokenRenewer implementation that renews a (valid or expired) SAML Token.
  */
-public class SAMLTokenRenewer implements TokenRenewer {
+public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements TokenRenewer {
     
     // The default maximum expired time a token is allowed to be is 30 minutes
     public static final long DEFAULT_MAX_EXPIRY = 60L * 30L;
@@ -88,7 +87,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
     private static final Logger LOG = LogUtils.getL7dLogger(SAMLTokenRenewer.class);
     private boolean signToken = true;
     private ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
-    private Map<String, SAMLRealm> realmMap = new HashMap<String, SAMLRealm>();
+    private Map<String, SAMLRealm> realmMap = new HashMap<>();
     private long maxExpiry = DEFAULT_MAX_EXPIRY;
     // boolean to enable/disable the check of proof of possession
     private boolean verifyProofOfPossession = true;
@@ -428,77 +427,13 @@ public class SAMLTokenRenewer implements TokenRenewer {
     ) throws Exception {
         if (signToken) {
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
-            
-            // Initialise signature objects with defaults of STSPropertiesMBean
-            Crypto signatureCrypto = stsProperties.getSignatureCrypto();
-            CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
-            SignatureProperties signatureProperties = stsProperties.getSignatureProperties();
-            String alias = stsProperties.getSignatureUsername();
-            
             String realm = tokenParameters.getRealm();
             SAMLRealm samlRealm = null;
             if (realm != null && realmMap.containsKey(realm)) {
                 samlRealm = realmMap.get(realm);
             }
-            if (samlRealm != null) {
-                // If SignatureCrypto configured in realm then
-                // callbackhandler and alias of STSPropertiesMBean is ignored
-                if (samlRealm.getSignatureCrypto() != null) {
-                    LOG.fine("SAMLRealm signature keystore used");
-                    signatureCrypto = samlRealm.getSignatureCrypto();
-                    callbackHandler = samlRealm.getCallbackHandler();
-                    alias = samlRealm.getSignatureAlias();
-                }
-                // SignatureProperties can be defined independently of SignatureCrypto
-                if (samlRealm.getSignatureProperties() != null) {
-                    signatureProperties = samlRealm.getSignatureProperties();
-                }
-            }
             
-            // Get the signature algorithm to use
-            String signatureAlgorithm = tokenParameters.getKeyRequirements().getSignatureAlgorithm();
-            if (signatureAlgorithm == null) {
-                // If none then default to what is configured
-                signatureAlgorithm = signatureProperties.getSignatureAlgorithm();
-            } else {
-                List<String> supportedAlgorithms = 
-                    signatureProperties.getAcceptedSignatureAlgorithms();
-                if (!supportedAlgorithms.contains(signatureAlgorithm)) {
-                    signatureAlgorithm = signatureProperties.getSignatureAlgorithm();
-                    LOG.fine("SignatureAlgorithm not supported, defaulting to: " + signatureAlgorithm);
-                }
-            }
-            
-            // Get the c14n algorithm to use
-            String c14nAlgorithm = tokenParameters.getKeyRequirements().getC14nAlgorithm();
-            if (c14nAlgorithm == null) {
-                // If none then default to what is configured
-                c14nAlgorithm = signatureProperties.getC14nAlgorithm();
-            } else {
-                List<String> supportedAlgorithms = 
-                    signatureProperties.getAcceptedC14nAlgorithms();
-                if (!supportedAlgorithms.contains(c14nAlgorithm)) {
-                    c14nAlgorithm = signatureProperties.getC14nAlgorithm();
-                    LOG.fine("C14nAlgorithm not supported, defaulting to: " + c14nAlgorithm);
-                }
-            }
-            
-            // If alias not defined, get the default of the SignatureCrypto
-            if ((alias == null || "".equals(alias)) && (signatureCrypto != null)) {
-                alias = signatureCrypto.getDefaultX509Identifier();
-                LOG.fine("Signature alias is null so using default alias: " + alias);
-            }
-            // Get the password
-            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
-            LOG.fine("Creating SAML Token");
-            callbackHandler.handle(cb);
-            String password = cb[0].getPassword();
-    
-            LOG.fine("Signing SAML Token");
-            boolean useKeyValue = signatureProperties.isUseKeyValue();
-            assertion.signAssertion(
-                alias, password, signatureCrypto, useKeyValue, c14nAlgorithm, signatureAlgorithm
-            );
+            signToken(assertion, samlRealm, stsProperties, tokenParameters.getKeyRequirements());
         } else {
             if (assertion.getSaml1().getSignature() != null) {
                 assertion.getSaml1().setSignature(null);
@@ -550,7 +485,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
         // Conditions on the token
         Map<String, Object> additionalProperties = renewerParameters.getAdditionalProperties();
         if (additionalProperties == null) {
-            additionalProperties = new HashMap<String, Object>();
+            additionalProperties = new HashMap<>(1);
         }
         additionalProperties.put(ReceivedToken.class.getName(), renewerParameters.getToken());
         providerParameters.setAdditionalProperties(additionalProperties);
@@ -618,11 +553,11 @@ public class SAMLTokenRenewer implements TokenRenewer {
             final List<WSHandlerResult> handlerResults = 
                 CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
 
-            List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
+            List<WSSecurityEngineResult> signedResults = new ArrayList<>();
             if (handlerResults != null && handlerResults.size() > 0) {
                 WSHandlerResult handlerResult = handlerResults.get(0);
                 List<WSSecurityEngineResult> results = handlerResult.getResults();
-                final List<Integer> signedActions = new ArrayList<Integer>(2);
+                final List<Integer> signedActions = new ArrayList<>(2);
                 signedActions.add(WSConstants.SIGN);
                 signedActions.add(WSConstants.UT_SIGN);
                 

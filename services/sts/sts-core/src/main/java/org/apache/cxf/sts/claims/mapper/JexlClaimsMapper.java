@@ -48,7 +48,7 @@ public class JexlClaimsMapper implements ClaimsMapper {
         // jexl.setLenient(false);
         jexlEngine.setSilent(false);
 
-        Map<String, Object> functions = new HashMap<String, Object>();
+        Map<String, Object> functions = new HashMap<>();
         functions.put("claims", new ClaimUtils());
         jexlEngine.setFunctions(functions);
     }

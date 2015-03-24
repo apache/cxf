@@ -96,17 +96,14 @@ public class RequestParser {
     
     private static final Logger LOG = LogUtils.getL7dLogger(RequestParser.class);
     
-    private KeyRequirements keyRequirements = new KeyRequirements();
-    private TokenRequirements tokenRequirements = new TokenRequirements();
-
-    public void parseRequest(
+    public RequestRequirements parseRequest(
         RequestSecurityTokenType request, WebServiceContext wsContext, STSPropertiesMBean stsProperties, 
         List<ClaimsParser> claimsParsers
     ) throws STSException {
         LOG.fine("Parsing RequestSecurityToken");
         
-        keyRequirements = new KeyRequirements();
-        tokenRequirements = new TokenRequirements();
+        KeyRequirements keyRequirements = new KeyRequirements();
+        TokenRequirements tokenRequirements = new TokenRequirements();
         
         for (Object requestObject : request.getAny()) {
             // JAXB types
@@ -139,7 +136,7 @@ public class RequestParser {
                 Element element = (Element)requestObject;
                 if (STSConstants.WST_NS_05_12.equals(element.getNamespaceURI())
                     && "SecondaryParameters".equals(element.getLocalName())) {
-                    parseSecondaryParameters(element, claimsParsers);
+                    parseSecondaryParameters(element, claimsParsers, tokenRequirements, keyRequirements);
                 } else if ("AppliesTo".equals(element.getLocalName())
                     && (STSConstants.WSP_NS.equals(element.getNamespaceURI())
                         || STSConstants.WSP_NS_04.equals(element.getNamespaceURI()))) {
@@ -165,14 +162,12 @@ public class RequestParser {
         String context = request.getContext();
         tokenRequirements.setContext(context);
         LOG.fine("Received Context attribute: " + context);
-    }
-    
-    public KeyRequirements getKeyRequirements() {
-        return keyRequirements;
-    }
-    
-    public TokenRequirements getTokenRequirements() {
-        return tokenRequirements;
+        
+        RequestRequirements requestRequirements = new RequestRequirements();
+        requestRequirements.setKeyRequirements(keyRequirements);
+        requestRequirements.setTokenRequirements(tokenRequirements);
+        
+        return requestRequirements;
     }
     
     /**
@@ -436,7 +431,7 @@ public class RequestParser {
         if (participantsType.getParticipant() != null 
             && !participantsType.getParticipant().isEmpty()) {
             List<Object> secondaryParticipants = 
-                new ArrayList<Object>(participantsType.getParticipant().size());
+                new ArrayList<>(participantsType.getParticipant().size());
             for (ParticipantType secondaryParticipant : participantsType.getParticipant()) {
                 secondaryParticipants.add(secondaryParticipant.getAny());
             }
@@ -469,8 +464,7 @@ public class RequestParser {
         }
 
         try {
-            KeyInfo keyInfo = 
-                keyInfoFactory.unmarshalKeyInfo(new DOMStructure(keyInfoElement));
+            KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(new DOMStructure(keyInfoElement));
             List<?> list = keyInfo.getContent();
 
             for (int i = 0; i < list.size(); i++) {
@@ -563,7 +557,8 @@ public class RequestParser {
      * direct children of the RequestSecurityToken element. 
      * @param secondaryParameters the secondaryParameters element to parse
      */
-    private void parseSecondaryParameters(Element secondaryParameters, List<ClaimsParser> claimsParsers) {
+    private void parseSecondaryParameters(Element secondaryParameters, List<ClaimsParser> claimsParsers,
+                                          TokenRequirements tokenRequirements, KeyRequirements keyRequirements) {
         LOG.fine("Found SecondaryParameters element");
         Element child = DOMUtils.getFirstElement(secondaryParameters);
         while (child != null) {

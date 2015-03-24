@@ -36,7 +36,7 @@ import org.apache.cxf.sts.event.STSRenewSuccessEvent;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
-import org.apache.cxf.sts.request.RequestParser;
+import org.apache.cxf.sts.request.RequestRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
@@ -78,10 +78,10 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         
         try {
-            RequestParser requestParser = parseRequest(request, context);
+            RequestRequirements requestRequirements = parseRequest(request, context);
     
-            KeyRequirements keyRequirements = requestParser.getKeyRequirements();
-            TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+            KeyRequirements keyRequirements = requestRequirements.getKeyRequirements();
+            TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
             
             renewerParameters.setStsProperties(stsProperties);
             renewerParameters.setPrincipal(context.getUserPrincipal());
@@ -138,7 +138,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
             // Renew the token
             //
             TokenRenewerResponse tokenRenewerResponse = null;
-            renewerParameters = createTokenRenewerParameters(requestParser, context);
+            renewerParameters = createTokenRenewerParameters(requestRequirements, context);
             Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
             if (additionalProperties != null) {
                 renewerParameters.setAdditionalProperties(additionalProperties);
@@ -288,10 +288,10 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
     }
 
     private TokenRenewerParameters createTokenRenewerParameters(
-        RequestParser requestParser, WebServiceContext context
+        RequestRequirements requestRequirements, WebServiceContext context
     ) {
         TokenProviderParameters providerParameters = 
-            createTokenProviderParameters(requestParser, context);
+            createTokenProviderParameters(requestRequirements, context);
         
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress(providerParameters.getAppliesToAddress());

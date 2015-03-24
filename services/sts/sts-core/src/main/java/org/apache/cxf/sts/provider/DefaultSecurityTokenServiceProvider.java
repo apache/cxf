@@ -123,7 +123,7 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
         TokenRenewOperation renewOperation = new TokenRenewOperation();
         populateAbstractOperation(renewOperation);
         
-        List<TokenRenewer> tokenRenewers = new ArrayList<TokenRenewer>();
+        List<TokenRenewer> tokenRenewers = new ArrayList<>();
         tokenRenewers.add(new SAMLTokenRenewer());
         renewOperation.setTokenRenewers(tokenRenewers);
         
@@ -131,10 +131,10 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
     }
     
     private void populateAbstractOperation(AbstractOperation abstractOperation) {
-        List<TokenProvider> tokenProviders = new ArrayList<TokenProvider>();
+        List<TokenProvider> tokenProviders = new ArrayList<>();
         tokenProviders.add(new SAMLTokenProvider());
         
-        List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
+        List<TokenValidator> tokenValidators = new ArrayList<>();
         tokenValidators.add(new SAMLTokenValidator());
         tokenValidators.add(new UsernameTokenValidator());
         tokenValidators.add(new X509TokenValidator());

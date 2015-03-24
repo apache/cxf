@@ -53,7 +53,7 @@ public class EventMapper implements STSEventListener {
 
     @Override
     public void handleSTSEvent(AbstractSTSEvent event) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put(KEYS.TIME.name(), new Date(event.getTimestamp()));
         map.put(KEYS.OPERATION.name(), event.getOperation());
         map.put(KEYS.DURATION.name(), String.valueOf(event.getDuration()) + "ms");
@@ -116,14 +116,14 @@ public class EventMapper implements STSEventListener {
         map.put(KEYS.APPLIESTO.name(), params.getAppliesToAddress());
 
         if (params.getRequestedPrimaryClaims() != null) {
-            List<String> claims = new ArrayList<String>();
+            List<String> claims = new ArrayList<>();
             for (Claim claim : params.getRequestedPrimaryClaims()) {
                 claims.add(claim.getClaimType().toString());
             }
             map.put(KEYS.CLAIMS_PRIMARY.name(), claims.toString());
         }
         if (params.getRequestedSecondaryClaims() != null) {
-            List<String> claims = new ArrayList<String>();
+            List<String> claims = new ArrayList<>();
             for (Claim claim : params.getRequestedSecondaryClaims()) {
                 claims.add(claim.getClaimType().toString());
             }

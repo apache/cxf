@@ -50,7 +50,7 @@ public class ClaimsManager {
 
     private List<ClaimsParser> claimParsers;
     private List<ClaimsHandler> claimHandlers;
-    private List<URI> supportedClaimTypes = new ArrayList<URI>();
+    private List<URI> supportedClaimTypes = new ArrayList<>();
     private boolean stopProcessingOnException = true;
     private IdentityMapper identityMapper;
     

@@ -43,7 +43,7 @@ public class StaticService implements ServiceMBean {
     /**
      * a collection of compiled regular expression patterns
      */
-    private final Collection<Pattern> endpointPatterns = new ArrayList<Pattern>();
+    private final Collection<Pattern> endpointPatterns = new ArrayList<>();
     
     /**
      * Return true if the supplied address corresponds to a known address for this service

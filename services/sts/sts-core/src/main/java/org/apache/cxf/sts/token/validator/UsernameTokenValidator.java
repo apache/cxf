@@ -141,7 +141,7 @@ public class UsernameTokenValidator implements TokenValidator {
         // Marshall the received JAXB object into a DOM Element
         Element usernameTokenElement = null;
         try {
-            Set<Class<?>> classes = new HashSet<Class<?>>();
+            Set<Class<?>> classes = new HashSet<>();
             classes.add(ObjectFactory.class);
             classes.add(org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory.class);
                     

@@ -32,6 +32,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.sts.token.realm.RelationshipResolver;
@@ -101,10 +102,15 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         }
         
         if (callbackHandler == null && callbackHandlerClass != null) {
-            callbackHandler = getCallbackHandler(callbackHandlerClass);
-            if (callbackHandler == null) {
-                LOG.fine("Cannot load CallbackHandler using: " + callbackHandlerClass);
-                throw new STSException("Configuration error: cannot load callback handler");
+            try {
+                callbackHandler = SecurityUtils.getCallbackHandler(callbackHandlerClass);
+                if (callbackHandler == null) {
+                    LOG.fine("Cannot load CallbackHandler using: " + callbackHandlerClass);
+                    throw new STSException("Configuration error: cannot load callback handler");
+                }
+            } catch (WSSecurityException ex) {
+                LOG.fine("Error in loading the callback handler: " + ex.getMessage());
+                throw new STSException(ex.getMessage());
             }
         }
         WSSConfig.init();
@@ -366,22 +372,6 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         return properties;
     }
     
-    private CallbackHandler getCallbackHandler(Object o) {
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = 
-                    (CallbackHandler)ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                LOG.fine(e.getMessage());
-                handler = null;
-            }
-        }
-        return handler;
-    }
-
     public void setRelationships(List<Relationship> relationships) {
         this.relationships = relationships;
         this.relationshipResolver = new RelationshipResolver(this.relationships);

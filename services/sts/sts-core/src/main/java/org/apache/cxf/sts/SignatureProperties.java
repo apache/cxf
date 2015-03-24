@@ -30,8 +30,8 @@ import org.apache.wss4j.dom.WSConstants;
 public class SignatureProperties {
     private String signatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
     private String c14nAlgorithm = WSConstants.C14N_EXCL_OMIT_COMMENTS;
-    private List<String> acceptedSignatureAlgorithms = new ArrayList<String>();
-    private List<String> acceptedC14nAlgorithms = new ArrayList<String>();
+    private List<String> acceptedSignatureAlgorithms = new ArrayList<>();
+    private List<String> acceptedC14nAlgorithms = new ArrayList<>();
     private boolean useKeyValue;
     private long keySize = 256;
     private long minimumKeySize = 128;

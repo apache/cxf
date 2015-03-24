@@ -257,7 +257,7 @@ public class SAMLTokenValidator implements TokenValidator {
             }
             
             // Add the SamlAssertionWrapper to the properties, as the claims are required to be transformed
-            Map<String, Object> addProps = new HashMap<String, Object>();
+            Map<String, Object> addProps = new HashMap<>(1);
             addProps.put(SamlAssertionWrapper.class.getName(), assertion);
             response.setAdditionalProperties(addProps);
             response.setPrincipal(principal);

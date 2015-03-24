@@ -108,7 +108,7 @@ public class SCTValidator implements TokenValidator {
                     return response;
                 }
                 byte[] secret = token.getSecret();
-                Map<String, Object> properties = new HashMap<String, Object>();
+                Map<String, Object> properties = new HashMap<>(1);
                 properties.put(SCT_VALIDATOR_SECRET, secret);
                 response.setAdditionalProperties(properties);
                 response.setPrincipal(token.getPrincipal());
