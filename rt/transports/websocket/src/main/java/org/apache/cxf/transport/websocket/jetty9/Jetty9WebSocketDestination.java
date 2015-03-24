@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
@@ -54,7 +55,6 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
-import org.eclipse.jetty.websocket.server.WebSocketServerFactory;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
@@ -77,7 +77,13 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
     public Jetty9WebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
         super(bus, registry, ei, serverEngineFactory);
-        webSocketFactory = new WebSocketServerFactory();
+        try {
+            webSocketFactory = (WebSocketServletFactory)ClassLoaderUtils
+                .loadClass("org.eclipse.jetty.websocket.server.WebSocketServerFactory",
+                           WebSocketServletFactory.class).newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         webSocketFactory.setCreator(new Creator());
         executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
