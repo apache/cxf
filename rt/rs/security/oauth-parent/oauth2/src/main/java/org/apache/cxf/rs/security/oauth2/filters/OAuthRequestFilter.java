@@ -24,8 +24,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -58,6 +60,8 @@ import org.apache.cxf.security.SecurityContext;
  */
 @Provider
 @PreMatching
+// Priorities.AUTHORIZATION also works
+@Priority(Priorities.AUTHENTICATION)
 public class OAuthRequestFilter extends AbstractAccessTokenValidator 
     implements ContainerRequestFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthRequestFilter.class);
