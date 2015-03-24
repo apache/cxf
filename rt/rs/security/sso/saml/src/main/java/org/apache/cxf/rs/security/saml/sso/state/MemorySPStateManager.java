@@ -24,11 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MemorySPStateManager implements SPStateManager {
 
-    private final Map<String, RequestState> requestStateMap = 
-        new ConcurrentHashMap<String, RequestState>(16, 0.75f, 4);
+    private final Map<String, RequestState> requestStateMap = new ConcurrentHashMap<>(16, 0.75f, 4);
     
-    private final Map<String, ResponseState> responseStateMap = 
-        new ConcurrentHashMap<String, ResponseState>(16, 0.75f, 4);
+    private final Map<String, ResponseState> responseStateMap = new ConcurrentHashMap<>(16, 0.75f, 4);
     
     public ResponseState getResponseState(String securityContextKey) {
         return responseStateMap.get(securityContextKey);

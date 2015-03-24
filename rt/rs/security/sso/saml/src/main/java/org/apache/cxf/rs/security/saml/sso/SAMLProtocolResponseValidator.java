@@ -38,13 +38,13 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.xml.EncryptionUtils;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -417,9 +417,9 @@ public class SAMLProtocolResponseValidator {
         EncryptedData encryptedData = assertion.getEncryptedData();
         Element encryptedDataDOM = encryptedData.getDOM();
                 
-        Element encKeyElement = getNode(assertion.getDOM(), WSConstants.ENC_NS, "EncryptedKey", 0);
+        Element encKeyElement = getNode(assertion.getDOM(), WSS4JConstants.ENC_NS, "EncryptedKey", 0);
         if (encKeyElement == null) {
-            encKeyElement = getNode(encryptedDataDOM, WSConstants.ENC_NS, "EncryptedKey", 0);
+            encKeyElement = getNode(encryptedDataDOM, WSS4JConstants.ENC_NS, "EncryptedKey", 0);
         }
         if (encKeyElement == null) {
             LOG.log(Level.FINE, "EncryptedKey element is not available");
@@ -436,7 +436,7 @@ public class SAMLProtocolResponseValidator {
         String keyEncAlgo = getEncodingMethodAlgorithm(encKeyElement);
         String digestAlgo = getDigestMethodAlgorithm(encKeyElement);
         
-        Element cipherValue = getNode(encKeyElement, WSConstants.ENC_NS, "CipherValue", 0);
+        Element cipherValue = getNode(encKeyElement, WSS4JConstants.ENC_NS, "CipherValue", 0);
         if (cipherValue == null) {
             LOG.fine("CipherValue element is not available");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -524,7 +524,7 @@ public class SAMLProtocolResponseValidator {
     }
     
     private String getEncodingMethodAlgorithm(Element parent) throws WSSecurityException {
-        Element encMethod = getNode(parent, WSConstants.ENC_NS, "EncryptionMethod", 0);
+        Element encMethod = getNode(parent, WSS4JConstants.ENC_NS, "EncryptionMethod", 0);
         if (encMethod == null) {
             LOG.fine("EncryptionMethod element is not available");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -533,9 +533,9 @@ public class SAMLProtocolResponseValidator {
     }
     
     private String getDigestMethodAlgorithm(Element parent) {
-        Element encMethod = getNode(parent, WSConstants.ENC_NS, "EncryptionMethod", 0);
+        Element encMethod = getNode(parent, WSS4JConstants.ENC_NS, "EncryptionMethod", 0);
         if (encMethod != null) {
-            Element digestMethod = getNode(encMethod, WSConstants.SIG_NS, "DigestMethod", 0);
+            Element digestMethod = getNode(encMethod, WSS4JConstants.SIG_NS, "DigestMethod", 0);
             if (digestMethod != null) {
                 return digestMethod.getAttributeNS(null, "Algorithm");
             }

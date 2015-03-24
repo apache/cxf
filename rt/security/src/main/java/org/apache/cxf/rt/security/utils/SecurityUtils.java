@@ -20,15 +20,20 @@ package org.apache.cxf.rt.security.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
@@ -36,6 +41,8 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * Some common functionality
  */
 public final class SecurityUtils {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(SecurityUtils.class);
     
     private SecurityUtils() {
         // complete
@@ -65,7 +72,23 @@ public final class SecurityUtils {
         return loadResource(message, o);
     }
     
+    public static URL loadResource(Object o) {
+        return loadResource((Message)null, o);
+    }
+    
     public static URL loadResource(Message message, Object o) {
+        Message msg = message;
+        if (msg == null) {
+            msg = PhaseInterceptorChain.getCurrentMessage();
+        }
+        ResourceManager manager = null;
+        if (msg != null && msg.getExchange() != null && msg.getExchange().get(Bus.class) != null) {
+            manager = msg.getExchange().get(Bus.class).getExtension(ResourceManager.class);
+        }
+        return loadResource(manager, o);
+    }
+    
+    public static URL loadResource(ResourceManager manager, Object o) {
         
         if (o instanceof String) {
             URL url = ClassLoaderUtils.getResource((String)o, SecurityUtils.class);
@@ -74,8 +97,7 @@ public final class SecurityUtils {
             }
             ClassLoaderHolder orig = null;
             try {
-                if (message != null) {
-                    ResourceManager manager = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
+                if (manager != null) {
                     ClassLoader loader = manager.resolveResource((String)o, ClassLoader.class);
                     if (loader != null) {
                         orig = ClassLoaderUtils.setThreadContextClassloader(loader);
@@ -116,4 +138,31 @@ public final class SecurityUtils {
         return null;
     }
     
+    public static Properties loadProperties(Object o) {
+        if (o instanceof Properties) {
+            return (Properties)o;
+        } 
+        
+        URL url = null;
+        if (o instanceof String) {
+            url = SecurityUtils.loadResource(o);
+        } else if (o instanceof URL) {
+            url = (URL)o;
+        }
+        
+        if (url != null) {
+            Properties properties = new Properties();
+            try {
+                InputStream ins = ((URL)o).openStream();
+                properties.load(ins);
+                ins.close();
+            } catch (IOException e) {
+                LOG.fine(e.getMessage());
+                properties = null;
+            }
+            return properties;
+        }
+        
+        return null;
+    }
 }

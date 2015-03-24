@@ -139,7 +139,7 @@ public final class SamlpRequestComponentBuilder {
         if (authnCtxClassRefList != null) {
             List<AuthnContextClassRef> classRefList = authnCtx.getAuthnContextClassRefs();
             if (classRefList == null) {
-                classRefList = new ArrayList<AuthnContextClassRef>();
+                classRefList = new ArrayList<>();
             }
             classRefList.addAll(authnCtxClassRefList);
         }
@@ -147,7 +147,7 @@ public final class SamlpRequestComponentBuilder {
         if (authnCtxDeclRefList != null) {
             List<AuthnContextDeclRef> declRefList = authnCtx.getAuthnContextDeclRefs();
             if (declRefList == null) {
-                declRefList = new ArrayList<AuthnContextDeclRef>();
+                declRefList = new ArrayList<>();
             }
             declRefList.addAll(authnCtxDeclRefList);
         }

@@ -40,7 +40,7 @@ public class CryptoLoader {
 
     public Crypto loadCrypto(String cryptoResource) throws IOException, WSSecurityException {
         URL url = 
-            org.apache.cxf.rt.security.utils.SecurityUtils.loadResource(null, cryptoResource);
+            org.apache.cxf.rt.security.utils.SecurityUtils.loadResource(cryptoResource);
         if (url != null) {
             return loadCryptoFromURL(url);
         } else {

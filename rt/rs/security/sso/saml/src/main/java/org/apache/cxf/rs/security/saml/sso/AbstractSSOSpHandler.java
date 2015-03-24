@@ -19,22 +19,18 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PreDestroy;
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -160,49 +156,9 @@ public class AbstractSSOSpHandler {
         return stateTimeToLive;
     }
     
-    protected static Properties getProps(Object o) {
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (o instanceof String) {
-            URL url = null;
-            Bus bus = PhaseInterceptorChain.getCurrentMessage().getExchange().getBus();
-            ResourceManager rm = bus.getExtension(ResourceManager.class);
-            url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, AbstractSSOSpHandler.class);
-                }
-                if (url == null) {
-                    url = new URL((String)o);
-                }
-                if (url != null) {
-                    properties = new Properties();
-                    InputStream ins = url.openStream();
-                    properties.load(ins);
-                    ins.close();
-                }
-            } catch (IOException e) {
-                LOG.fine(e.getMessage());
-                properties = null;
-            }
-        } else if (o instanceof URL) {
-            properties = new Properties();
-            try {
-                InputStream ins = ((URL)o).openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                LOG.fine(e.getMessage());
-                properties = null;
-            }            
-        }
-        return properties;
-    }
-    
     protected Crypto getSignatureCrypto() {
         if (signatureCrypto == null && signaturePropertiesFile != null) {
-            Properties sigProperties = getProps(signaturePropertiesFile);
+            Properties sigProperties = SecurityUtils.loadProperties(signaturePropertiesFile);
             if (sigProperties == null) {
                 LOG.fine("Cannot load signature properties using: " + signaturePropertiesFile);
                 return null;
@@ -219,28 +175,18 @@ public class AbstractSSOSpHandler {
     
     protected CallbackHandler getCallbackHandler() {
         if (callbackHandler == null && callbackHandlerClass != null) {
-            callbackHandler = getCallbackHandler(callbackHandlerClass);
-            if (callbackHandler == null) {
-                LOG.fine("Cannot load CallbackHandler using: " + callbackHandlerClass);
+            try {
+                callbackHandler = SecurityUtils.getCallbackHandler(callbackHandlerClass);
+                if (callbackHandler == null) {
+                    LOG.fine("Cannot load CallbackHandler using: " + callbackHandlerClass);
+                    return null;
+                }
+            } catch (WSSecurityException ex) {
+                LOG.log(Level.FINE, "Error in loading callback handler", ex);
                 return null;
             }
         }
         return callbackHandler;
     }
     
-    private CallbackHandler getCallbackHandler(Object o) {
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = 
-                    (CallbackHandler)ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                LOG.fine(e.getMessage());
-                handler = null;
-            }
-        }
-        return handler;
-    }
 }

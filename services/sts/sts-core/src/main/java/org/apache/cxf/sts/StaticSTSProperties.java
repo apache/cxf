@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.sts;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
@@ -29,7 +27,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
@@ -74,7 +71,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public void configureProperties() throws STSException {
         if (signatureCrypto == null && signatureCryptoProperties != null) {
-            Properties sigProperties = getProps(signatureCryptoProperties, bus);
+            ResourceManager resourceManager = getResourceManager();
+            URL url = SecurityUtils.loadResource(resourceManager, signatureCryptoProperties);
+            Properties sigProperties = SecurityUtils.loadProperties(url);
             if (sigProperties == null) {
                 LOG.fine("Cannot load signature properties using: " + signatureCryptoProperties);
                 throw new STSException("Configuration error: cannot load signature properties");
@@ -88,7 +87,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         }
         
         if (encryptionCrypto == null && encryptionCryptoProperties != null) {
-            Properties encrProperties = getProps(encryptionCryptoProperties, bus);
+            ResourceManager resourceManager = getResourceManager();
+            URL url = SecurityUtils.loadResource(resourceManager, encryptionCryptoProperties);
+            Properties encrProperties = SecurityUtils.loadProperties(url);
             if (encrProperties == null) {
                 LOG.fine("Cannot load encryption properties using: " + encryptionCryptoProperties);
                 throw new STSException("Configuration error: cannot load encryption properties");
@@ -114,6 +115,14 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             }
         }
         WSSConfig.init();
+    }
+    
+    private ResourceManager getResourceManager() {
+        Bus b = bus;
+        if (b == null) {
+            b = BusFactory.getThreadDefaultBus();
+        }
+        return b.getExtension(ResourceManager.class);
     }
 
     /**
@@ -327,49 +336,6 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public IdentityMapper getIdentityMapper() {
         return identityMapper;
-    }
-    
-    private static Properties getProps(Object o, Bus bus) {
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (o instanceof String) {
-            URL url = null;
-            Bus b = bus;
-            if (b == null) {
-                b = BusFactory.getThreadDefaultBus();
-            }
-            ResourceManager rm = b.getExtension(ResourceManager.class);
-            url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, StaticSTSProperties.class);
-                }
-                if (url == null) {
-                    url = new URL((String)o);
-                }
-                if (url != null) {
-                    properties = new Properties();
-                    InputStream ins = url.openStream();
-                    properties.load(ins);
-                    ins.close();
-                }
-            } catch (IOException e) {
-                LOG.fine(e.getMessage());
-                properties = null;
-            }
-        } else if (o instanceof URL) {
-            properties = new Properties();
-            try {
-                InputStream ins = ((URL)o).openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                LOG.fine(e.getMessage());
-                properties = null;
-            }            
-        }
-        return properties;
     }
     
     public void setRelationships(List<Relationship> relationships) {

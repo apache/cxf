@@ -19,22 +19,14 @@
 
 package org.apache.cxf.sts.token.realm;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.sts.SignatureProperties;
-import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -129,7 +121,7 @@ public class SAMLRealm {
      */
     public Crypto getSignatureCrypto() {
         if (signatureCrypto == null && signaturePropertiesFile != null) {
-            Properties sigProperties = getProps(signaturePropertiesFile);
+            Properties sigProperties = SecurityUtils.loadProperties(signaturePropertiesFile);
             if (sigProperties == null) {
                 LOG.fine("Cannot load signature properties using: " + signaturePropertiesFile);
                 throw new STSException("Configuration error: cannot load signature properties");
@@ -182,46 +174,6 @@ public class SAMLRealm {
             }
         }
         return callbackHandler;
-    }
-    
-    private static Properties getProps(Object o) {
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (o instanceof String) {
-            URL url = null;
-            Bus bus = PhaseInterceptorChain.getCurrentMessage().getExchange().getBus();
-            ResourceManager rm = bus.getExtension(ResourceManager.class);
-            url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, StaticSTSProperties.class);
-                }
-                if (url == null) {
-                    url = new URL((String)o);
-                }
-                if (url != null) {
-                    properties = new Properties();
-                    InputStream ins = url.openStream();
-                    properties.load(ins);
-                    ins.close();
-                }
-            } catch (IOException e) {
-                LOG.fine(e.getMessage());
-                properties = null;
-            }
-        } else if (o instanceof URL) {
-            properties = new Properties();
-            try {
-                InputStream ins = ((URL)o).openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                LOG.fine(e.getMessage());
-                properties = null;
-            }            
-        }
-        return properties;
     }
     
 }
