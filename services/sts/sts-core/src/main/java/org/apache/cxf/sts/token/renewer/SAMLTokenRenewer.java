@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -289,7 +288,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
         TokenRenewerParameters tokenParameters
     ) throws WSSecurityException {
         // Check the cached renewal properties
-        Properties props = token.getProperties();
+        Map<String, Object> props = token.getProperties();
         if (props == null) {
             LOG.log(Level.WARNING, "Error in getting properties from cached token");
             throw new STSException(

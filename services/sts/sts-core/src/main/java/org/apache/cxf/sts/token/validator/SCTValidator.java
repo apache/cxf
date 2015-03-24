@@ -20,7 +20,6 @@ package org.apache.cxf.sts.token.validator;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -113,9 +112,9 @@ public class SCTValidator implements TokenValidator {
                 response.setAdditionalProperties(properties);
                 response.setPrincipal(token.getPrincipal());
                 
-                Properties props = token.getProperties();
+                Map<String, Object> props = token.getProperties();
                 if (props != null) {
-                    String realm = props.getProperty(STSConstants.TOKEN_REALM);
+                    String realm = (String)props.get(STSConstants.TOKEN_REALM);
                     response.setTokenRealm(realm);
                 }
                 validateTarget.setState(STATE.VALID);

@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -234,9 +233,9 @@ public class SAMLTokenValidator implements TokenValidator {
                 tokenRealm = samlRealmCodec.getRealmFromToken(assertion);
                 // verify the realm against the cached token
                 if (secToken != null) {
-                    Properties props = secToken.getProperties();
+                    Map<String, Object> props = secToken.getProperties();
                     if (props != null) {
-                        String cachedRealm = props.getProperty(STSConstants.TOKEN_REALM);
+                        String cachedRealm = (String)props.get(STSConstants.TOKEN_REALM);
                         if (cachedRealm != null && !tokenRealm.equals(cachedRealm)) {
                             return response;
                         }

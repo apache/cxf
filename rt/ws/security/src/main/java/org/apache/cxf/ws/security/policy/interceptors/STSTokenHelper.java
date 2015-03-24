@@ -19,13 +19,12 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
@@ -329,9 +328,9 @@ public final class STSTokenHelper {
             String id = getIdFromToken(onBehalfOfToken);
             SecurityToken cachedToken = tokenStore.getToken(id);
             if (cachedToken != null) {
-                Properties properties = cachedToken.getProperties();
+                Map<String, Object> properties = cachedToken.getProperties();
                 if (properties != null && properties.containsKey(key)) {
-                    String associatedToken = properties.getProperty(key);
+                    String associatedToken = (String)properties.get(key);
                     SecurityToken issuedToken = tokenStore.getToken(associatedToken);
                     if (issuedToken != null) {
                         return issuedToken;
@@ -346,9 +345,9 @@ public final class STSTokenHelper {
             String id = getIdFromToken(actAsToken);
             SecurityToken cachedToken = tokenStore.getToken(id);
             if (cachedToken != null) {
-                Properties properties = cachedToken.getProperties();
+                Map<String, Object>  properties = cachedToken.getProperties();
                 if (properties != null && properties.containsKey(key)) {
-                    String associatedToken = properties.getProperty(key);
+                    String associatedToken = (String)properties.get(key);
                     SecurityToken issuedToken = tokenStore.getToken(associatedToken);
                     if (issuedToken != null) {
                         return issuedToken;
@@ -395,9 +394,9 @@ public final class STSTokenHelper {
                 cachedToken = new SecurityToken(id);
                 cachedToken.setToken(onBehalfOfToken);
             }
-            Properties properties = cachedToken.getProperties();
+            Map<String, Object> properties = cachedToken.getProperties();
             if (properties == null) {
-                properties = new Properties();
+                properties = new HashMap<>();
                 cachedToken.setProperties(properties);
             }
             properties.put(key, issuedToken.getId());
@@ -410,9 +409,9 @@ public final class STSTokenHelper {
                 cachedToken = new SecurityToken(id);
                 cachedToken.setToken(actAsToken);
             }
-            Properties properties = cachedToken.getProperties();
+            Map<String, Object>  properties = cachedToken.getProperties();
             if (properties == null) {
-                properties = new Properties();
+                properties = new HashMap<>();
                 cachedToken.setProperties(properties);
             }
             properties.put(key, issuedToken.getId());

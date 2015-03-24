@@ -22,10 +22,10 @@ package org.apache.cxf.sts.cache;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -49,10 +49,10 @@ public final class CacheUtils {
         securityToken.setToken(token);
         securityToken.setPrincipal(principal);
 
-        Properties props = new Properties();
+        Map<String, Object> props = new HashMap<>();
         securityToken.setProperties(props);
         if (realm != null) {
-            props.setProperty(STSConstants.TOKEN_REALM, realm);
+            props.put(STSConstants.TOKEN_REALM, realm);
         }
 
         // Handle Renewing logic
@@ -66,8 +66,8 @@ public final class CacheUtils {
                 String.valueOf(renewing.isAllowRenewingAfterExpiry())
             );
         } else {
-            props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW, "true");
-            props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
+            props.put(STSConstants.TOKEN_RENEWING_ALLOW, "true");
+            props.put(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
         }
         
         return securityToken;
