@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.websocket;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -30,22 +31,35 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http.HttpDestinationFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
-import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketJettyDestination;
 import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketServletDestination;
-import org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination;
-import org.apache.cxf.transport.websocket.jetty.JettyWebSocketServletDestination;
-import org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination;
+//import org.apache.cxf.transport.websocket.jetty.JettyWebSocketServletDestination;
 
 @NoJSR250Annotations()
 public class WebSocketDestinationFactory implements HttpDestinationFactory {
     private static final boolean ATMOSPHERE_AVAILABLE = probeClass("org.atmosphere.cpr.ApplicationConfig");
-    
+    private static final Constructor<?> JETTY_WEBSOCKET_DESTINATION_CTR =
+        probeConstructor("org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination");
+    private static final Constructor<?> JETTY9_WEBSOCKET_DESTINATION_CTR =
+        probeConstructor("org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination");
+    private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR =
+        probeConstructor("org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketJettyDestination");
+
     private static boolean probeClass(String name) {
         try {
             Class.forName(name, true, WebSocketDestinationFactory.class.getClassLoader());
             return true;
         } catch (Throwable t) {
             return false;
+        }
+    }
+    
+    private static Constructor<?> probeConstructor(String name) {
+        try {
+            Class<?> clz = Class.forName(name, true, WebSocketDestinationFactory.class.getClassLoader());
+            return clz.getConstructor(Bus.class, DestinationRegistry.class, 
+                                      EndpointInfo.class, JettyHTTPServerEngineFactory.class);
+        } catch (Throwable t) {
+            return null;
         }
     }
     
@@ -57,12 +71,15 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                 .getExtension(JettyHTTPServerEngineFactory.class);
             if (ATMOSPHERE_AVAILABLE) {
                 // use atmosphere if available
-                return new AtmosphereWebSocketJettyDestination(bus, registry, endpointInfo, serverEngineFactory);
+                return createJettyHTTPDestination(ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR,
+                                                  bus, registry, endpointInfo, serverEngineFactory);
             } else {
                 if (serverEngineFactory.isJetty8()) {
-                    return new JettyWebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+                    return createJettyHTTPDestination(JETTY_WEBSOCKET_DESTINATION_CTR,
+                                                      bus, registry, endpointInfo, serverEngineFactory);
                 } else {
-                    return new Jetty9WebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+                    return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
+                                                      bus, registry, endpointInfo, serverEngineFactory);
                 }
             }
         } else {
@@ -79,10 +96,11 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                     .getExtension(JettyHTTPServerEngineFactory.class);
                 // use jetty-websocket
                 if (serverEngineFactory.isJetty8()) { 
-                    return new JettyWebSocketServletDestination(bus, registry,
-                                                                endpointInfo, endpointInfo.getAddress());
-                } else { 
-                    return new Jetty9WebSocketDestination(bus, registry, endpointInfo, null);
+                    return createJettyHTTPDestination(JETTY_WEBSOCKET_DESTINATION_CTR,
+                                                      bus, registry, endpointInfo, null);
+                } else {
+                    return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
+                                                      bus, registry, endpointInfo, null);
                 }
             }
         }
@@ -103,5 +121,17 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
         return null;
     }
     
-
+    private AbstractHTTPDestination createJettyHTTPDestination(Constructor<?> ctr, Bus bus, 
+                                                               DestinationRegistry registry, EndpointInfo ei,
+                                                               JettyHTTPServerEngineFactory jhsef) throws IOException {
+        if (ctr != null) {
+            try {
+                return (AbstractHTTPDestination) ctr.newInstance(bus, registry, ei, jhsef);
+            } catch (Throwable t) {
+                // log
+                t.printStackTrace();
+            }
+        }
+        return null;
+    }
 }
