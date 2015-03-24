@@ -53,6 +53,7 @@ import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.RequestParser;
+import org.apache.cxf.sts.request.RequestRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
@@ -106,13 +107,13 @@ public abstract class AbstractOperation {
     protected STSPropertiesMBean stsProperties;
     protected boolean encryptIssuedToken;
     protected List<ServiceMBean> services;
-    protected List<TokenProvider> tokenProviders = new ArrayList<TokenProvider>();
-    protected List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
+    protected List<TokenProvider> tokenProviders = new ArrayList<>();
+    protected List<TokenValidator> tokenValidators = new ArrayList<>();
     protected boolean returnReferences = true;
     protected TokenStore tokenStore;
     protected ClaimsManager claimsManager = new ClaimsManager();
     protected STSEventListener eventPublisher;
-    protected List<TokenDelegationHandler> delegationHandlers = new ArrayList<TokenDelegationHandler>();
+    protected List<TokenDelegationHandler> delegationHandlers = new ArrayList<>();
     
     public boolean isReturnReferences() {
         return returnReferences;
@@ -177,7 +178,7 @@ public abstract class AbstractOperation {
     /**
      * Check the arguments from the STSProvider and parse the request.
      */
-    protected RequestParser parseRequest(
+    protected RequestRequirements parseRequest(
         RequestSecurityTokenType request,
         WebServiceContext context
     ) {
@@ -191,9 +192,7 @@ public abstract class AbstractOperation {
         stsProperties.configureProperties();
         
         RequestParser requestParser = new RequestParser();
-        requestParser.parseRequest(request, context, stsProperties, claimsManager.getClaimParsers());
-        
-        return requestParser;
+        return requestParser.parseRequest(request, context, stsProperties, claimsManager.getClaimParsers());
     }
     
     /**
@@ -461,7 +460,7 @@ public abstract class AbstractOperation {
      * Create a TokenProviderParameters object given a RequestParser and WebServiceContext object
      */
     protected TokenProviderParameters createTokenProviderParameters(
-        RequestParser requestParser, WebServiceContext context
+        RequestRequirements requestRequirements, WebServiceContext context
     ) {
         TokenProviderParameters providerParameters = new TokenProviderParameters();
         providerParameters.setStsProperties(stsProperties);
@@ -469,8 +468,8 @@ public abstract class AbstractOperation {
         providerParameters.setWebServiceContext(context);
         providerParameters.setTokenStore(getTokenStore());
         
-        KeyRequirements keyRequirements = requestParser.getKeyRequirements();
-        TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+        KeyRequirements keyRequirements = requestRequirements.getKeyRequirements();
+        TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
         providerParameters.setKeyRequirements(keyRequirements);
         providerParameters.setTokenRequirements(tokenRequirements);
         
@@ -630,7 +629,7 @@ public abstract class AbstractOperation {
     }
     
     protected void performDelegationHandling(
-        RequestParser requestParser, WebServiceContext context, ReceivedToken token,
+        RequestRequirements requestRequirements, WebServiceContext context, ReceivedToken token,
         Principal tokenPrincipal, Set<Principal> tokenRoles
     ) {
         TokenDelegationParameters delegationParameters = new TokenDelegationParameters();
@@ -641,8 +640,8 @@ public abstract class AbstractOperation {
         delegationParameters.setTokenPrincipal(tokenPrincipal);
         delegationParameters.setTokenRoles(tokenRoles);
         
-        KeyRequirements keyRequirements = requestParser.getKeyRequirements();
-        TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+        KeyRequirements keyRequirements = requestRequirements.getKeyRequirements();
+        TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
         delegationParameters.setKeyRequirements(keyRequirements);
         delegationParameters.setTokenRequirements(tokenRequirements);
         
@@ -676,7 +675,7 @@ public abstract class AbstractOperation {
     
     protected void checkClaimsSupport(ClaimCollection requestedClaims) {
         if (requestedClaims != null) {
-            List<URI> unhandledClaimTypes = new ArrayList<URI>();
+            List<URI> unhandledClaimTypes = new ArrayList<>();
             for (Claim requestedClaim : requestedClaims) {
                 if (!claimsManager.getSupportedClaimTypes().contains(requestedClaim.getClaimType()) 
                         && !requestedClaim.isOptional()) {

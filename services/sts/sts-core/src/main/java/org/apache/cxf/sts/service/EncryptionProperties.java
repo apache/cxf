@@ -32,8 +32,8 @@ public class EncryptionProperties {
     private String encryptionAlgorithm = WSConstants.AES_256;
     private String keyWrapAlgorithm = WSConstants.KEYTRANSPORT_RSAOEP;
     private int keyIdentifierType = WSConstants.ISSUER_SERIAL;
-    private List<String> acceptedEncryptionAlgorithms = new ArrayList<String>();
-    private List<String> acceptedKeyWrapAlgorithms = new ArrayList<String>();
+    private List<String> acceptedEncryptionAlgorithms = new ArrayList<>();
+    private List<String> acceptedKeyWrapAlgorithms = new ArrayList<>();
     private String encryptionName;
     
     public EncryptionProperties() {

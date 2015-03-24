@@ -20,7 +20,7 @@ package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
 import java.util.HashSet;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -141,7 +141,7 @@ public class UsernameTokenValidator implements TokenValidator {
         // Marshall the received JAXB object into a DOM Element
         Element usernameTokenElement = null;
         try {
-            Set<Class<?>> classes = new HashSet<Class<?>>();
+            Set<Class<?>> classes = new HashSet<>();
             classes.add(ObjectFactory.class);
             classes.add(org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory.class);
                     
@@ -215,9 +215,9 @@ public class UsernameTokenValidator implements TokenValidator {
                 tokenRealm = usernameTokenRealmCodec.getRealmFromToken(ut);
                 // verify the realm against the cached token
                 if (secToken != null) {
-                    Properties props = secToken.getProperties();
+                    Map<String, Object> props = secToken.getProperties();
                     if (props != null) {
-                        String cachedRealm = props.getProperty(STSConstants.TOKEN_REALM);
+                        String cachedRealm = (String)props.get(STSConstants.TOKEN_REALM);
                         if (!tokenRealm.equals(cachedRealm)) {
                             return response;
                         }

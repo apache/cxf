@@ -222,7 +222,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
     protected List<AudienceRestrictionBean> createAudienceRestrictions(
         TokenProviderParameters providerParameters
     ) {
-        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<AudienceRestrictionBean>();
+        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<>();
         String appliesToAddress = providerParameters.getAppliesToAddress();
         if (appliesToAddress != null) {
             AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();

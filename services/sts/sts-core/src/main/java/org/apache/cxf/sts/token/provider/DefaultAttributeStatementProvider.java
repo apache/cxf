@@ -47,7 +47,7 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
      */
     public AttributeStatementBean getStatement(TokenProviderParameters providerParameters) {
         AttributeStatementBean attrBean = new AttributeStatementBean();
-        List<AttributeBean> attributeList = new ArrayList<AttributeBean>();
+        List<AttributeBean> attributeList = new ArrayList<>();
 
         TokenRequirements tokenRequirements = providerParameters.getTokenRequirements();
         String tokenType = tokenRequirements.getTokenType();
@@ -78,13 +78,13 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
     private AttributeBean createDefaultAttribute(String tokenType) {
         AttributeBean attributeBean = new AttributeBean();
 
-        if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML2_NS.equals(tokenType)) {
-            attributeBean.setQualifiedName("token-requestor");
-            attributeBean.setNameFormat("http://cxf.apache.org/sts");
-        } else {
+        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+            || WSConstants.SAML_NS.equals(tokenType)) {
             attributeBean.setSimpleName("token-requestor");
             attributeBean.setQualifiedName("http://cxf.apache.org/sts");
+        } else {
+            attributeBean.setQualifiedName("token-requestor");
+            attributeBean.setNameFormat("http://cxf.apache.org/sts");
         }
         
         attributeBean.addAttributeValue("authenticated");
@@ -102,12 +102,12 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
         AttributeBean parameterBean = new AttributeBean();
 
         String claimType = "ActAs";
-        if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)) {
-            parameterBean.setQualifiedName(claimType);
-            parameterBean.setNameFormat("http://cxf.apache.org/sts");
-        } else {
+        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType)) {
             parameterBean.setSimpleName(claimType);
             parameterBean.setQualifiedName("http://cxf.apache.org/sts");
+        } else {
+            parameterBean.setQualifiedName(claimType);
+            parameterBean.setNameFormat("http://cxf.apache.org/sts");
         }
         if (parameter instanceof UsernameTokenType) {
             parameterBean.addAttributeValue(

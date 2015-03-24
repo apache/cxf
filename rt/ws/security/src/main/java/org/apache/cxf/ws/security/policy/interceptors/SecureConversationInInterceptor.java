@@ -22,13 +22,13 @@ package org.apache.cxf.ws.security.policy.interceptors;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -410,7 +410,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             // Get Bootstrap Token
             SecurityToken bootstrapToken = getBootstrapToken(exchange.getInMessage());
             if (bootstrapToken != null) {
-                Properties properties = new Properties();
+                Map<String, Object> properties = new HashMap<>(1);
                 properties.put(SecurityToken.BOOTSTRAP_TOKEN_ID, bootstrapToken.getId());
                 token.setProperties(properties);
             }

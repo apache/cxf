@@ -20,7 +20,8 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.util.Date;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -147,13 +148,13 @@ public class SCTProvider implements TokenProvider {
             token.setSecret(keyHandler.getSecret());
             token.setPrincipal(tokenParameters.getPrincipal());
             
-            Properties props = token.getProperties();
+            Map<String, Object> props = token.getProperties();
             if (props == null) {
-                props = new Properties();
+                props = new HashMap<>();
             }
             token.setProperties(props);
             if (tokenParameters.getRealm() != null) {
-                props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
+                props.put(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
             }
 
             // Handle Renewing logic
@@ -168,8 +169,8 @@ public class SCTProvider implements TokenProvider {
                     String.valueOf(renewing.isAllowRenewingAfterExpiry())
                 );
             } else {
-                props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW, "true");
-                props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
+                props.put(STSConstants.TOKEN_RENEWING_ALLOW, "true");
+                props.put(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
             }
             
             tokenParameters.getTokenStore().add(token);

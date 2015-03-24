@@ -222,20 +222,20 @@ public class DefaultSubjectProvider implements SubjectProvider {
      * Get the SubjectConfirmation method given a tokenType and keyType
      */
     protected String getSubjectConfirmationMethod(String tokenType, String keyType) {
-        if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML2_NS.equals(tokenType)) {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML2Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML2Constants.CONF_BEARER;
-            }
-        } else {
+        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+            || WSConstants.SAML_NS.equals(tokenType)) {
             if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
                 || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
                 return SAML1Constants.CONF_HOLDER_KEY;
             } else {
                 return SAML1Constants.CONF_BEARER;
+            }
+        } else {
+            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
+                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
+                return SAML2Constants.CONF_HOLDER_KEY;
+            } else {
+                return SAML2Constants.CONF_BEARER;
             }
         }
     }

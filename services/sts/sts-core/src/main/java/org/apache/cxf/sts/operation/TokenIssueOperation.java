@@ -40,7 +40,7 @@ import org.apache.cxf.sts.event.STSIssueSuccessEvent;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
-import org.apache.cxf.sts.request.RequestParser;
+import org.apache.cxf.sts.request.RequestRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.TokenProvider;
@@ -111,9 +111,9 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         long start = System.currentTimeMillis();
         TokenProviderParameters providerParameters = new TokenProviderParameters();
         try {
-            RequestParser requestParser = parseRequest(request, context);
+            RequestRequirements requestRequirements = parseRequest(request, context);
     
-            providerParameters = createTokenProviderParameters(requestParser, context);
+            providerParameters = createTokenProviderParameters(requestRequirements, context);
     
             // Check if the requested claims can be handled by the configured claim handlers
             ClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
@@ -124,7 +124,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             
             String realm = providerParameters.getRealm();
     
-            TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+            TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
             String tokenType = tokenRequirements.getTokenType();
     
             if (stsProperties.getSamlRealmCodec() != null) {
@@ -153,14 +153,14 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
                 ReceivedToken validateTarget = providerParameters.getTokenRequirements().getOnBehalfOf();
                 handleDelegationToken(validateTarget, providerParameters, context, 
-                                      realm, tokenRequirements, requestParser);
+                                      realm, requestRequirements);
             }
             
             // See whether ActAs is allowed or not
             if (providerParameters.getTokenRequirements().getActAs() != null) {
                 ReceivedToken validateTarget = providerParameters.getTokenRequirements().getActAs();
                 handleDelegationToken(validateTarget, providerParameters, context, 
-                                      realm, tokenRequirements, requestParser);
+                                      realm, requestRequirements);
             }
     
             // create token
@@ -194,7 +194,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             }
             // prepare response
             try {
-                KeyRequirements keyRequirements = requestParser.getKeyRequirements();
+                KeyRequirements keyRequirements = requestRequirements.getKeyRequirements();
                 EncryptionProperties encryptionProperties = providerParameters.getEncryptionProperties();
                 RequestSecurityTokenResponseType response = 
                     createResponse(
@@ -223,11 +223,10 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         TokenProviderParameters providerParameters,
         WebServiceContext context,
         String realm,
-        TokenRequirements tokenRequirements,
-        RequestParser requestParser
+        RequestRequirements requestRequirements
     ) {
         TokenValidatorResponse tokenResponse = validateReceivedToken(
-                context, realm, tokenRequirements, validateTarget);
+                context, realm, requestRequirements.getTokenRequirements(), validateTarget);
 
         if (tokenResponse == null) {
             LOG.fine("No Token Validator has been found that can handle this token");
@@ -255,7 +254,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         }
         
         // See whether OnBehalfOf/ActAs is allowed or not
-        performDelegationHandling(requestParser, context, validateTarget, tokenPrincipal, tokenRoles);
+        performDelegationHandling(requestRequirements, context, validateTarget, tokenPrincipal, tokenRoles);
     }
 
     private RequestSecurityTokenResponseType createResponse(

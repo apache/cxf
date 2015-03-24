@@ -35,7 +35,7 @@ import org.apache.cxf.sts.event.STSValidateFailureEvent;
 import org.apache.cxf.sts.event.STSValidateSuccessEvent;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
-import org.apache.cxf.sts.request.RequestParser;
+import org.apache.cxf.sts.request.RequestRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
@@ -68,9 +68,9 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
         TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
         
         try {
-            RequestParser requestParser = parseRequest(request, context);
+            RequestRequirements requestRequirements = parseRequest(request, context);
             
-            TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+            TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
             
             validatorParameters.setStsProperties(stsProperties);
             validatorParameters.setPrincipal(context.getUserPrincipal());
@@ -120,7 +120,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             if (tokenResponse.getToken().getState() == STATE.VALID 
                 && !STSConstants.STATUS.equals(tokenType)) {
                 TokenProviderParameters providerParameters = 
-                     createTokenProviderParameters(requestParser, context);
+                     createTokenProviderParameters(requestRequirements, context);
                 
                 processValidToken(providerParameters, validateTarget, tokenResponse);
                 

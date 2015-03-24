@@ -26,7 +26,7 @@ import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Properties;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
@@ -90,7 +90,7 @@ public class SecurityToken implements Serializable {
     /**
      * A bag to hold any other properties
      */
-    private Properties properties;
+    private Map<String, Object> properties;
 
     /**
      * The secret associated with the Token
@@ -239,14 +239,14 @@ public class SecurityToken implements Serializable {
     /**
      * @return Returns the properties.
      */
-    public Properties getProperties() {
+    public Map<String, Object> getProperties() {
         return properties;
     }
 
     /**
      * @param properties The properties to set.
      */
-    public void setProperties(Properties properties) {
+    public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
 

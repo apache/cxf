@@ -187,7 +187,7 @@ public class ClaimUtils {
         if (processedClaim != null) {
             resultClaim = processedClaim.clone();
             List<Object> values = resultClaim.getValues();
-            List<Object> filteredValues = new ArrayList<Object>();
+            List<Object> filteredValues = new ArrayList<>();
 
             if (values == null || filter == null) {
                 resultClaim.setValues(filteredValues);
@@ -293,7 +293,7 @@ public class ClaimUtils {
             resultClaim = processedClaim.clone();
             if (resultClaim.getValues() != null) {
                 List<Object> oldValues = resultClaim.getValues();
-                List<Object> newValues = new ArrayList<Object>();
+                List<Object> newValues = new ArrayList<>();
                 for (Object value : oldValues) {
                     newValues.add(value.toString().toUpperCase());
                 }
@@ -314,7 +314,7 @@ public class ClaimUtils {
             resultClaim = processedClaim.clone();
             if (resultClaim.getValues() != null) {
                 List<Object> oldValues = resultClaim.getValues();
-                List<Object> newValues = new ArrayList<Object>();
+                List<Object> newValues = new ArrayList<>();
                 for (Object value : oldValues) {
                     newValues.add(value.toString().toLowerCase());
                 }
@@ -343,7 +343,7 @@ public class ClaimUtils {
             resultClaim = processedClaim.clone();
             if (resultClaim.getValues() != null) {
                 List<Object> oldValues = resultClaim.getValues();
-                List<Object> newValues = new ArrayList<Object>();
+                List<Object> newValues = new ArrayList<>();
                 for (Object value : oldValues) {
                     newValues.add(prefix + value.toString() + suffix);
                 }
@@ -370,7 +370,7 @@ public class ClaimUtils {
             resultClaim = processedClaim.clone();
             if (resultClaim.getValues() != null) {
                 List<Object> oldValues = resultClaim.getValues();
-                List<Object> newValues = new ArrayList<Object>();
+                List<Object> newValues = new ArrayList<>();
                 for (Object value : oldValues) {
                     String multivalue = value.toString();
                     StringTokenizer st = new StringTokenizer(multivalue, delimiter);
@@ -430,7 +430,7 @@ public class ClaimUtils {
             resultClaim = processedClaim.clone();
             if (resultClaim.getValues() != null) {
                 List<Object> oldValues = resultClaim.getValues();
-                Set<Object> distincValues = new LinkedHashSet<Object>(oldValues);
+                Set<Object> distincValues = new LinkedHashSet<>(oldValues);
                 resultClaim.getValues().clear();
                 resultClaim.getValues().addAll(distincValues);
             }

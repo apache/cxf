@@ -174,7 +174,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
             AttributesMapper mapper = 
                 new AttributesMapper() {
                     public Object mapFromAttributes(Attributes attrs) throws NamingException {
-                        Map<String, Attribute> map = new HashMap<String, Attribute>();
+                        Map<String, Attribute> map = new HashMap<>();
                         NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
                         while (attrEnum.hasMore()) {
                             Attribute att = attrEnum.next();
@@ -187,7 +187,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
             Object result = ldap.lookup(user, mapper);
             ldapAttributes = CastUtils.cast((Map<?, ?>)result);
         } else {
-            List<String> searchAttributeList = new ArrayList<String>();
+            List<String> searchAttributeList = new ArrayList<>();
             for (Claim claim : claims) {
                 if (getClaimsLdapAttributeMapping().keySet().contains(claim.getClaimType().toString())) {
                     searchAttributeList.add(
@@ -200,8 +200,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                 }
             }
 
-            String[] searchAttributes = null;
-            searchAttributes = searchAttributeList.toArray(new String[searchAttributeList.size()]);
+            String[] searchAttributes = searchAttributeList.toArray(new String[searchAttributeList.size()]);
             
             if (this.userBaseDNs == null || this.userBaseDn != null) {
                 ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, this.userBaseDn, this.getObjectClass(), this

@@ -35,7 +35,7 @@ import org.apache.cxf.sts.event.STSCancelSuccessEvent;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
-import org.apache.cxf.sts.request.RequestParser;
+import org.apache.cxf.sts.request.RequestRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.canceller.TokenCanceller;
 import org.apache.cxf.sts.token.canceller.TokenCancellerParameters;
@@ -71,10 +71,10 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
         TokenCancellerParameters cancellerParameters = new TokenCancellerParameters();
         
         try {
-            RequestParser requestParser = parseRequest(request, context);
+            RequestRequirements requestRequirements = parseRequest(request, context);
             
-            KeyRequirements keyRequirements = requestParser.getKeyRequirements();
-            TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+            KeyRequirements keyRequirements = requestRequirements.getKeyRequirements();
+            TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
             
             cancellerParameters.setStsProperties(stsProperties);
             cancellerParameters.setPrincipal(context.getUserPrincipal());

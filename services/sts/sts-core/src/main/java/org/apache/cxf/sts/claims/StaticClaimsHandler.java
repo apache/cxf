@@ -47,7 +47,7 @@ public class StaticClaimsHandler implements ClaimsHandler {
 
     
     public List<URI> getSupportedClaimTypes() {
-        List<URI> uriList = new ArrayList<URI>();
+        List<URI> uriList = new ArrayList<>();
         for (String uri : getGlobalClaims().keySet()) {
             try {
                 uriList.add(new URI(uri));

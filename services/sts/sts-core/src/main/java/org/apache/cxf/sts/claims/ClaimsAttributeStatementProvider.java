@@ -74,7 +74,7 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
             return null;
         }
                 
-        List<AttributeBean> attributeList = new ArrayList<AttributeBean>();
+        List<AttributeBean> attributeList = new ArrayList<>();
         String tokenType = providerParameters.getTokenRequirements().getTokenType();
         
         AttributeStatementBean attrBean = new AttributeStatementBean();

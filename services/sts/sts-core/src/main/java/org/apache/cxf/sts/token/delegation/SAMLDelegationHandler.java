@@ -112,7 +112,7 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
     }
     
     protected List<String> getAudienceRestrictions(SamlAssertionWrapper assertion) {
-        List<String> addresses = new ArrayList<String>();
+        List<String> addresses = new ArrayList<>();
         if (assertion.getSaml1() != null) {
             for (AudienceRestrictionCondition restriction 
                 : assertion.getSaml1().getConditions().getAudienceRestrictionConditions()) {

@@ -147,10 +147,10 @@ public class RequestParserUnitTest extends org.junit.Assert {
         resultsList.add(new WSHandlerResult("actor", engineResultList));
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
         
-        parser.parseRequest(request, wsContext, null, null);
+        RequestRequirements requestRequirements = parser.parseRequest(request, wsContext, null, null);
         
         SCTCanceller sctCanceller = new SCTCanceller();
-        assertTrue(sctCanceller.canHandleToken(parser.getTokenRequirements().getCancelTarget()));
+        assertTrue(sctCanceller.canHandleToken(requestRequirements.getTokenRequirements().getCancelTarget()));
     }
 
     /**
@@ -178,10 +178,10 @@ public class RequestParserUnitTest extends org.junit.Assert {
         resultsList.add(new WSHandlerResult("actor", engineResultList));
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
         
-        parser.parseRequest(request, wsContext, null, null);
+        RequestRequirements requestRequirements = parser.parseRequest(request, wsContext, null, null);
         
         SCTValidator sctValidator = new SCTValidator();
-        assertTrue(sctValidator.canHandleToken(parser.getTokenRequirements().getValidateTarget()));
+        assertTrue(sctValidator.canHandleToken(requestRequirements.getTokenRequirements().getValidateTarget()));
     }
     
     /**
@@ -210,9 +210,9 @@ public class RequestParserUnitTest extends org.junit.Assert {
         resultsList.add(new WSHandlerResult("actor", engineResultList));
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
         
-        parser.parseRequest(request, wsContext, null, null);
+        RequestRequirements requestRequirements = parser.parseRequest(request, wsContext, null, null);
         
-        assertNotNull(parser.getKeyRequirements().getReceivedKey().getX509Cert());
+        assertNotNull(requestRequirements.getKeyRequirements().getReceivedKey().getX509Cert());
     }
     
     private Document parseStringToElement(String str) throws Exception {
