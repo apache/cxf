@@ -30,7 +30,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import javax.annotation.Priority;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -69,6 +71,7 @@ import org.apache.cxf.phase.Phase;
  * or unless the <tt>defaultOptionsMethodsHandlePreflight</tt> property of this class is set to <tt>true</tt>.
  */
 @PreMatching
+@Priority(Priorities.AUTHENTICATION - 1)
 public class CrossOriginResourceSharingFilter implements ContainerRequestFilter, 
     ContainerResponseFilter {
     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
@@ -97,6 +100,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     private Integer preflightFailStatus = 200;
     private boolean defaultOptionsMethodsHandlePreflight;
     private boolean findResourceMethod = true;
+    private boolean blockCorsIfUnauthorized; 
     
     private <T extends Annotation> T  getAnnotation(Method m,
                                                     Class<T> annClass) {
@@ -342,9 +346,12 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
                        ContainerResponseContext responseContext) {
         
         Message m = JAXRSUtils.getCurrentMessage();
-        
         String op = (String)m.getExchange().get(CrossOriginResourceSharingFilter.class.getName());
         if (op == null || op == PREFLIGHT_FAILED) {
+            return;
+        }
+        if (responseContext.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()
+            && blockCorsIfUnauthorized) {
             return;
         }
          
@@ -618,6 +625,10 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         this.findResourceMethod = findResourceMethod;
     }
     
+    public void setBlockCorsIfUnauthorized(boolean blockCorsIfUnauthorized) {
+        this.blockCorsIfUnauthorized = blockCorsIfUnauthorized;
+    }
+
     private class CorsInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         public CorsInInterceptor() {
