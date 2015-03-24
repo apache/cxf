@@ -31,10 +31,12 @@ import javax.xml.transform.stream.StreamSource;
 public class PrettyLoggingFilter implements LogEventSender {
     private LogEventSender next;
     private boolean prettyLogging;
+    private TransformerFactory transformerFactory;
 
     public PrettyLoggingFilter(LogEventSender next) {
         this.next = next;
         this.prettyLogging = false;
+        transformerFactory = TransformerFactory.newInstance();
     }
 
     @Override
@@ -54,7 +56,7 @@ public class PrettyLoggingFilter implements LogEventSender {
 
     public String getPrettyMessage(String message) {
         try {
-            Transformer serializer = TransformerFactory.newInstance().newTransformer();
+            Transformer serializer = transformerFactory.newTransformer();
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
             serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
