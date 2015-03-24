@@ -38,7 +38,7 @@
 -->
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            org.eclipse.jetty*;version="${cxf.jetty.osgi.version}",
+            org.eclipse.jetty*;version="${cxf.jetty.osgi.version}";resolution:=optional,
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.atmosphere*;version="${cxf.atmosphere.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
@@ -101,11 +101,13 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
             <version>${cxf.jetty.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

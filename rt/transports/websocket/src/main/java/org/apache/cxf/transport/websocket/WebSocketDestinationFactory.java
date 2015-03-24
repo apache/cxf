@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.websocket;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -30,21 +31,34 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http.HttpDestinationFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
-import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketJettyDestination;
 import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketServletDestination;
-import org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination;
 import org.apache.cxf.transport.websocket.jetty.JettyWebSocketServletDestination;
+//import org.apache.cxf.transport.websocket.jetty.JettyWebSocketServletDestination;
 
 @NoJSR250Annotations()
 public class WebSocketDestinationFactory implements HttpDestinationFactory {
     private static final boolean ATMOSPHERE_AVAILABLE = probeClass("org.atmosphere.cpr.ApplicationConfig");
-    
+    private static final Constructor<?> JETTY_WEBSOCKET_DESTINATION_CTR = 
+        probeConstructor("org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination");    
+    private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR = 
+        probeConstructor("org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketJettyDestination");    
+
     private static boolean probeClass(String name) {
         try {
             Class.forName(name, true, WebSocketDestinationFactory.class.getClassLoader());
             return true;
         } catch (Throwable t) {
             return false;
+        }
+    }
+    
+    private static Constructor<?> probeConstructor(String name) {
+        try {
+            Class<?> clz = Class.forName(name, true, WebSocketDestinationFactory.class.getClassLoader());
+            return clz.getConstructor(Bus.class, DestinationRegistry.class, 
+                                      EndpointInfo.class, JettyHTTPServerEngineFactory.class);
+        } catch (Throwable t) {
+            return null;
         }
     }
     
@@ -56,9 +70,11 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                 .getExtension(JettyHTTPServerEngineFactory.class);
             if (ATMOSPHERE_AVAILABLE) {
                 // use atmosphere if available
-                return new AtmosphereWebSocketJettyDestination(bus, registry, endpointInfo, serverEngineFactory);
+                return createJettyHTTPDestination(ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR,
+                                                  bus, registry, endpointInfo, serverEngineFactory);
             } else {
-                return new JettyWebSocketDestination(bus, registry, endpointInfo, serverEngineFactory);
+                return createJettyHTTPDestination(JETTY_WEBSOCKET_DESTINATION_CTR,
+                                                  bus, registry, endpointInfo, serverEngineFactory);
             }
         } else {
             //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
@@ -92,5 +108,17 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
         return null;
     }
     
-
+    private AbstractHTTPDestination createJettyHTTPDestination(Constructor<?> ctr, Bus bus, 
+                                                               DestinationRegistry registry, EndpointInfo ei,
+                                                               JettyHTTPServerEngineFactory jhsef) throws IOException {
+        if (ctr != null) {
+            try {
+                return (AbstractHTTPDestination) ctr.newInstance(bus, registry, ei, jhsef);
+            } catch (Throwable t) {
+                // log
+                t.printStackTrace();
+            }
+        }
+        return null;
+    }
 }
