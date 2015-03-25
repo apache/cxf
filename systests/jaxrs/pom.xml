@@ -445,6 +445,13 @@
             	</exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <!-- activate atmosphere. Its use can be disabled by setting
+                 org.apache.cxf.transport.websocket.atmosphere.disabled to "true" -->
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-runtime</artifactId>
+            <version>${cxf.atmosphere.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -496,16 +503,6 @@
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-hc</artifactId>
                     <version>${project.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>atmosphere</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.atmosphere</groupId>
-                    <artifactId>atmosphere-runtime</artifactId>
-                    <version>${cxf.atmosphere.version}</version>
                 </dependency>
             </dependencies>
         </profile>

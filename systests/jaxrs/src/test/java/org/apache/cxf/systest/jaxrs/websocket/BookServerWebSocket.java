@@ -32,10 +32,20 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServerWebSocket.class, 1);
     public static final String PORT_SPRING = allocatePort(BookServerWebSocket.class, 2);
     public static final String PORT_WAR = allocatePort(BookServerWebSocket.class, 3);
+    public static final String PORT2 = allocatePort(BookServerWebSocket.class, 4);
+    public static final String PORT2_SPRING = allocatePort(BookServerWebSocket.class, 5);
+    public static final String PORT2_WAR = allocatePort(BookServerWebSocket.class, 6);
      
     org.apache.cxf.endpoint.Server server;
     
+    private String port;
+
     public BookServerWebSocket() {
+        this(PORT);
+    }
+
+    public BookServerWebSocket(String port) {
+        this.port = port;
     }
     
     protected void run() {
@@ -47,7 +57,7 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
         sf.setProvider(new StreamingResponseProvider<Book>());
         sf.setResourceProvider(BookStoreWebSocket.class,
                                new SingletonResourceProvider(new BookStoreWebSocket(), true));
-        sf.setAddress("ws://localhost:" + PORT + "/websocket");
+        sf.setAddress("ws://localhost:" + port + "/websocket");
         server = sf.create();
 
         BusFactory.setDefaultBus(null);

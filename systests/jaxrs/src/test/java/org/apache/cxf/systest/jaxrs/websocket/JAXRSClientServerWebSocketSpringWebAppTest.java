@@ -23,11 +23,9 @@ import java.net.URISyntaxException;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.jaxrs.Book;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import org.junit.AfterClass;
@@ -43,11 +41,11 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
 
     @BeforeClass
     public static void startServers() throws Exception {
-        server = new org.eclipse.jetty.server.Server();
-
-        SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(Integer.parseInt(BookServerWebSocket.PORT_WAR));
-        server.setConnectors(new Connector[] {connector});
+        startServers(PORT);
+    }
+    
+    protected static void startServers(String port) throws Exception {
+        server = new org.eclipse.jetty.server.Server(Integer.parseInt(port));
 
         WebAppContext webappcontext = new WebAppContext();
         String contextPath = null;
@@ -64,7 +62,6 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
         server.setHandler(handlers);
         server.start();
-
     }
     
     @AfterClass

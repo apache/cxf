@@ -23,6 +23,7 @@ import java.lang.reflect.Constructor;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -42,6 +43,9 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
         probeConstructor("org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination");    
     private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR = 
         probeConstructor("org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketJettyDestination");    
+
+    private final boolean atmosphereDisabled = Boolean.valueOf(
+        SystemPropertyAction.getPropertyOrNull("org.apache.cxf.transport.websocket.atmosphere.disabled"));
 
     private static boolean probeClass(String name) {
         try {
@@ -68,7 +72,7 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
             // for the embedded mode, we stick to jetty
             JettyHTTPServerEngineFactory serverEngineFactory = bus
                 .getExtension(JettyHTTPServerEngineFactory.class);
-            if (ATMOSPHERE_AVAILABLE) {
+            if (ATMOSPHERE_AVAILABLE && !atmosphereDisabled) {
                 // use atmosphere if available
                 return createJettyHTTPDestination(ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR,
                                                   bus, registry, endpointInfo, serverEngineFactory);
@@ -81,7 +85,7 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
             registry = getDestinationRegistry(bus);
             
             // choose atmosphere if available, otherwise assume jetty is available
-            if (ATMOSPHERE_AVAILABLE) {
+            if (ATMOSPHERE_AVAILABLE && !atmosphereDisabled) {
                 // use atmosphere if available
                 return new AtmosphereWebSocketServletDestination(bus, registry,
                                                                  endpointInfo, endpointInfo.getAddress());
