@@ -120,10 +120,10 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                 }
                 try {
                     AtmosphereRequest ar = createAtmosphereRequest(request, data);
-                    ar.setAttribute(REQUEST_DISPATCHED, "true");
+                    ar.attributes().put(REQUEST_DISPATCHED, "true");
                     String refid = ar.getHeader(WebSocketConstants.DEFAULT_REQUEST_ID_KEY);
                     if (refid != null) {
-                        ar.setAttribute(WebSocketConstants.DEFAULT_REQUEST_ID_KEY, refid);
+                        ar.attributes().put(WebSocketConstants.DEFAULT_REQUEST_ID_KEY, refid);
                     }
                     // This is a new request, we must clean the Websocket AtmosphereResource.
                     request.removeAttribute(FrameworkConfig.INJECTED_ATMOSPHERE_RESOURCE);
@@ -150,8 +150,6 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                 return Action.CONTINUE;
             }           
         } else {
-            request.setAttribute(REQUEST_DISPATCHED, null);
-            request.setAttribute(RESPONSE_PARENT, null);
             request.destroyable(false);
         }
         return Action.CONTINUE;
@@ -253,8 +251,8 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                 LOG.log(Level.INFO, "transformPayload with draft={0}", new String(responseDraft));
             }
             AtmosphereRequest request = response.request();
-            if (request.getAttribute(RESPONSE_PARENT) == null) {
-                request.setAttribute(RESPONSE_PARENT, "true");
+            if (request.attributes().get(RESPONSE_PARENT) == null) {
+                request.attributes().put(RESPONSE_PARENT, "true");
                 return createResponse(response, responseDraft, true);
             } else {
                 return createResponse(response, responseDraft, false);
