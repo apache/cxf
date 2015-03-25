@@ -41,7 +41,11 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
 
     @BeforeClass
     public static void startServers() throws Exception {
-        server = new org.eclipse.jetty.server.Server(Integer.parseInt(BookServerWebSocket.PORT_WAR));
+        startServers(PORT);
+    }
+    
+    protected static void startServers(String port) throws Exception {
+        server = new org.eclipse.jetty.server.Server(Integer.parseInt(port));
 
         WebAppContext webappcontext = new WebAppContext();
         String contextPath = null;
@@ -58,7 +62,6 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
         server.setHandler(handlers);
         server.start();
-
     }
     
     @AfterClass

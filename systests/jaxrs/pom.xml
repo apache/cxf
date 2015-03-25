@@ -472,7 +472,14 @@
             <artifactId>jsonassert</artifactId>
             <version>1.2.3</version>
             <scope>test</scope>
-    </dependency>
+        </dependency>
+        <dependency>
+            <!-- activate atmosphere. Its use can be disabled by setting
+                 org.apache.cxf.transport.websocket.atmosphere.disabled to "true" -->
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-runtime</artifactId>
+            <version>${cxf.atmosphere.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -569,16 +576,6 @@
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-jaas</artifactId>
                     <version>${cxf.jetty9.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>atmosphere</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.atmosphere</groupId>
-                    <artifactId>atmosphere-runtime</artifactId>
-                    <version>${cxf.atmosphere.version}</version>
                 </dependency>
             </dependencies>
         </profile>
