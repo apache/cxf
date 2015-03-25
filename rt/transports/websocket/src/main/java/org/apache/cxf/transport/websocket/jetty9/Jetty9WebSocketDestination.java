@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.DispatcherType;
@@ -149,11 +150,10 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                     }
                     invoke(null, null, request, response);
                 } catch (InvalidPathException ex) {
-                    ex.printStackTrace();
                     reportErrorStatus(session, 400, response);
                 } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Failed to invoke service", e);
                     reportErrorStatus(session, 500, response);
-                    e.printStackTrace();
                 }
             }
 
