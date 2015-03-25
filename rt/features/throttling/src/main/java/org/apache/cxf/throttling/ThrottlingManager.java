@@ -37,10 +37,10 @@ public interface ThrottlingManager {
     List<String> getDecisionPhases();
     
     /**
-     * Returns the number of milliseconds the request should be delayed before further processing
+     * Use information in the message to determine what throttling measures should be taken
      * @param phase
      * @param m
      * @return
      */
-    long getThrottleDelay(String phase, Message m);
+    ThrottleResponse getThrottleResponse(String phase, Message m);
 }

@@ -46,10 +46,11 @@ public final class Client implements Runnable {
     @Override
     public void run() {
         long start = System.currentTimeMillis();
+        int x = 0;
+        boolean exceeded = false;
         try (Greeter port = service.getSoapPort()) {
             port.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, username);
             port.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "password");
-            int x = 0;
             do {
                 if (doStop) {
                     break;
@@ -57,12 +58,20 @@ public final class Client implements Runnable {
                 port.greetMe(username + "-" + x);
                 x++;
             } while (x < 10000);
-            long end = System.currentTimeMillis();
-            double rate = x * 1000 / (end - start);
-            System.out.println(username + " finished " + x + " invocations: " + rate + " req/sec");
+        } catch (javax.xml.ws.WebServiceException wse) {
+            if (wse.getCause().getMessage().contains("429")){
+                //exceeded are allowable number of requests
+                exceeded = true;
+            } else {
+                wse.printStackTrace();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        long end = System.currentTimeMillis();
+        double rate = x * 1000 / (end - start);
+        System.out.println(username + " finished " + x + " invocations: " + rate + " req/sec " 
+            + (exceeded ? "(exceeded max)" : ""));
     }
     public void stop() {
         doStop = true;
@@ -85,7 +94,8 @@ public final class Client implements Runnable {
         System.out.println(wsdlURL);
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         List<Client> c = new ArrayList<Client>();
-        Client client = new Client("Tom", ss);
+        Client client;
+        client = new Client("Tom", ss);
         new Thread(client).start();
         c.add(client);
         client = new Client("Rob", ss);
@@ -95,6 +105,9 @@ public final class Client implements Runnable {
         new Thread(client).start();
         c.add(client);
         client = new Client("Malcolm", ss);
+        new Thread(client).start();
+        c.add(client);
+        client = new Client("Jonas", ss);
         new Thread(client).start();
         c.add(client);
         

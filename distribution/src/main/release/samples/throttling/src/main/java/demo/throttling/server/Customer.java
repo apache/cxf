@@ -21,9 +21,9 @@ package demo.throttling.server;
 
 import com.codahale.metrics.MetricRegistry;
 
-import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.MetricsContext;
 import org.apache.cxf.metrics.codahale.CodahaleMetricsContext;
+import org.apache.cxf.throttling.ThrottleResponse;
 
 /**
  * 
@@ -43,55 +43,52 @@ public abstract class Customer {
         return metrics;
     }
 
-    public abstract long throttle(Message m);
+    public abstract void throttle(ThrottleResponse r);
     
     
     public static class PremiumCustomer extends Customer {
         public PremiumCustomer(String n) {
             super(n);
         }
-        public long throttle(Message m) {
+        public void throttle(ThrottleResponse m) {
             //Premium customers are unthrottled
-            return 0;
         }
     }
     public static class PreferredCustomer extends Customer {
         public PreferredCustomer(String n) {
             super(n);
         }
-        public long throttle(Message m) {
+        public void throttle(ThrottleResponse m) {
             //System.out.println("p  " + metrics.getTotals().getOneMinuteRate() + "  " + metrics.getTotals().getCount());
             //Preferred customers are unthrottled until they hit 100req/sec, then start delaying by .05 seconds
             //(drops to max of 50req/sec until below the 100req/sec rate)
             if (metrics.getTotals().getOneMinuteRate() > 100) {
-                return 20;
+                m.setDelay(20);
             }
-            return 0;
         }
     }
     public static class RegularCustomer extends Customer {
         public RegularCustomer(String n) {
             super(n);
         }
-        public long throttle(Message m) {
+        public void throttle(ThrottleResponse m) {
             //Regular customers are unthrottled until they hit 25req/sec, then start delaying by 0.25 seconds 
             //(drops to max of 4req/sec until below the 25req/sec rate)
             if (metrics.getTotals().getOneMinuteRate() > 25) {
-                return 250;
+                m.setDelay(250);
             }
             //They also get throttled more if they are over 10req/sec over a 5 minute period  
             //(drops to max of 2req/sec until below the 10req/sec rate)
             if (metrics.getTotals().getFiveMinuteRate() > 10) {
-                return 500;
+                m.setDelay(500);
             }
-            return 0;
         }
     }
     public static class CheapCustomer extends Customer {
         public CheapCustomer(String n) {
             super(n);
         }
-        public long throttle(Message m) {
+        public void throttle(ThrottleResponse m) {
             //System.out.println("ch  " + metrics.getTotals().getOneMinuteRate() + "  " + metrics.getTotals().getCount());
             //Cheap customers are always get a .1 sec delay
             long delay = 100;
@@ -103,7 +100,23 @@ public abstract class Customer {
             if (metrics.getTotals().getFiveMinuteRate() > 1) {
                 delay += 1000;
             }
-            return delay;
+            m.setDelay(delay);
+        }
+    }
+
+    public static class TrialCustomer extends Customer {
+        long lastTime = System.currentTimeMillis();
+        public TrialCustomer(String n) {
+            super(n);
+        }
+        public void throttle(ThrottleResponse m) {
+            //Trial customers only get 10 requests, then rejected
+            if (metrics.getTotals().getCount() >= 10) {
+                m.setResponseCode(429, "Exceeded");
+            }
+            m.addResponseHeader("X-RateLimit-Limit", "10");
+            m.addResponseHeader("X-RateLimit-Remaining", Long.toString(10 - metrics.getTotals().getCount()));
+            m.setDelay(100);
         }
     }
 

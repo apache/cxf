@@ -33,6 +33,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.throttling.ThrottleResponse;
 import org.apache.cxf.throttling.ThrottlingFeature;
 import org.apache.cxf.throttling.ThrottlingManager;
 
@@ -46,6 +47,7 @@ public class Server {
         customers.put("Rob", new Customer.PreferredCustomer("Rob"));
         customers.put("Vince", new Customer.RegularCustomer("Vince"));
         customers.put("Malcolm", new Customer.CheapCustomer("Malcolm"));
+        customers.put("Jonas", new Customer.TrialCustomer("Jonas"));
         
         Bus b = BusFactory.getDefaultBus();
         MetricRegistry registry = new MetricRegistry();
@@ -53,19 +55,22 @@ public class Server {
         
         ThrottlingManager manager = new ThrottlingManager() {
             @Override
-            public long getThrottleDelay(String phase, Message m) {
+            public ThrottleResponse getThrottleResponse(String phase, Message m) {
+                ThrottleResponse r = new ThrottleResponse();
                 if (m.get("THROTTLED") != null) {
-                    return 0;
+                    return null;
                 }
                 m.put("THROTTLED", true);
                 Customer c = m.getExchange().get(Customer.class);
-                return c.throttle(m);
+                c.throttle(r);
+                return r;
             }
 
             @Override
             public List<String> getDecisionPhases() {
                 return Collections.singletonList(Phase.PRE_STREAM);
             }
+
         };
         b.getInInterceptors().add(new CustomerMetricsInterceptor(registry, customers));
         

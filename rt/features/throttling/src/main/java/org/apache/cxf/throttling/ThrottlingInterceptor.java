@@ -42,7 +42,12 @@ public class ThrottlingInterceptor extends AbstractPhaseInterceptor<Message> {
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        long l = manager.getThrottleDelay(getPhase(), message);
+        ThrottleResponse rsp = manager.getThrottleResponse(getPhase(), message);
+        if (rsp == null) {
+            return;
+        }
+        message.getExchange().put(ThrottleResponse.class, rsp);
+        long l = rsp.getDelay();
         if (l > 0) {
             ContinuationProvider cp = message.get(ContinuationProvider.class);
             if (cp == null) {

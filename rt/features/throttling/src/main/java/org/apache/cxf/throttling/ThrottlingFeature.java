@@ -49,5 +49,7 @@ public class ThrottlingFeature extends AbstractFeature {
         for (String p : m.getDecisionPhases()) {
             provider.getInInterceptors().add(new ThrottlingInterceptor(p, m));
         }
+        provider.getOutInterceptors().add(new ThrottlingResponseInterceptor());
+        provider.getOutFaultInterceptors().add(new ThrottlingResponseInterceptor());
     }
 }

@@ -353,8 +353,11 @@ public class JettyHTTPServerEngine implements ServerEngine {
                 public void handle(String target, Request baseRequest, 
                                    HttpServletRequest request, HttpServletResponse response) 
                     throws IOException {
-                    String msg = HttpStatus.getMessage(response.getStatus());
-                    request.setAttribute(RequestDispatcher.ERROR_MESSAGE, msg);
+                    String msg = (String)request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
+                    if (StringUtils.isEmpty(msg) || msg.contains("org.apache.cxf.interceptor.Fault")) {
+                        msg = HttpStatus.getMessage(response.getStatus());
+                        request.setAttribute(RequestDispatcher.ERROR_MESSAGE, msg);
+                    }
                     if (response instanceof Response) {
                         //need to use the deprecated method to support compiling with Jetty 8
                         ((Response)response).setStatus(response.getStatus(), msg);

@@ -613,6 +613,13 @@ public abstract class AbstractHTTPDestination
         HttpServletResponse response = getHttpResponseFromMessage(outMessage);
 
         int responseCode = getReponseCodeFromMessage(outMessage);
+        if (responseCode >= 300) {
+            String ec = (String)outMessage.get(Message.ERROR_MESSAGE);
+            if (!StringUtils.isEmpty(ec)) {
+                response.sendError(responseCode, ec);
+                return null;
+            }
+        }
         response.setStatus(responseCode);
         new Headers(outMessage).copyToResponse(response);
 

@@ -101,6 +101,7 @@ public interface Message extends StringMap {
     
     String PROTOCOL_HEADERS = Message.class.getName() + ".PROTOCOL_HEADERS";
     String RESPONSE_CODE = Message.class.getName() + ".RESPONSE_CODE";
+    String ERROR_MESSAGE = Message.class.getName() + ".ERROR_MESSAGE";
     String ENDPOINT_ADDRESS = Message.class.getName() + ".ENDPOINT_ADDRESS";
     String PATH_INFO = Message.class.getName() + ".PATH_INFO";
     String QUERY_STRING = Message.class.getName() + ".QUERY_STRING";
