@@ -92,23 +92,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return true;
         }
         
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        tokenResults.addAll(parameters.getUsernameTokenResults());
-        List<WSSecurityEngineResult> dktResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : parameters.getUsernameTokenResults()) {
-            if (derived) {
-                byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                WSSecurityEngineResult dktResult = 
-                    getMatchingDerivedKey(secret, parameters.getResults());
-                if (dktResult != null) {
-                    dktResults.add(dktResult);
-                }
-            }
-        }
-        
-        if (tokenResults.isEmpty()) {
+        if (parameters.getUsernameTokenResults().isEmpty()) {
             return false;
         }
+        
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
+        tokenResults.addAll(parameters.getUsernameTokenResults());
         
         if (isSigned() && !areTokensSigned(tokenResults, parameters.getSignedResults(),
                                            parameters.getEncryptedResults(),
@@ -119,7 +108,20 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                                  parameters.getMessage())) {
             return false;
         }
-        tokenResults.addAll(dktResults);
+        
+        if (derived) {
+            for (WSSecurityEngineResult wser : parameters.getUsernameTokenResults()) {
+                byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                if (secret != null) {
+                    WSSecurityEngineResult dktResult = 
+                        getMatchingDerivedKey(secret, parameters.getResults());
+                    if (dktResult != null) {
+                        tokenResults.add(dktResult);
+                    }
+                }
+            }
+        }
+        
         if ((isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
                                              parameters.getMessage(),
                                              parameters.getTimestampElement())) 
@@ -172,21 +174,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      */
     protected boolean processKerberosTokens(PolicyValidatorParameters parameters, boolean derived) {
         List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        List<WSSecurityEngineResult> dktResults = new ArrayList<>();
         for (WSSecurityEngineResult wser : parameters.getResults()) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.BST) {
                 BinarySecurity binarySecurity = 
                     (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 if (binarySecurity instanceof KerberosSecurity) {
-                    if (derived) {
-                        byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                        WSSecurityEngineResult dktResult = 
-                            getMatchingDerivedKey(secret, parameters.getResults());
-                        if (dktResult != null) {
-                            dktResults.add(dktResult);
-                        }
-                    }
                     tokenResults.add(wser);
                 }
             }
@@ -205,7 +198,19 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                                  parameters.getMessage())) {
             return false;
         }
-        tokenResults.addAll(dktResults);
+        
+        if (derived) {
+            List<WSSecurityEngineResult> dktResults = new ArrayList<>(tokenResults.size());
+            for (WSSecurityEngineResult wser : tokenResults) {
+                byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                WSSecurityEngineResult dktResult = 
+                    getMatchingDerivedKey(secret, parameters.getResults());
+                if (dktResult != null) {
+                    dktResults.add(dktResult);
+                }
+            }
+            tokenResults.addAll(dktResults);
+        }
         if (isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
                                             parameters.getMessage(),
                                             parameters.getTimestampElement())) {
@@ -227,7 +232,6 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      */
     protected boolean processX509Tokens(PolicyValidatorParameters parameters, boolean derived) {
         List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        List<WSSecurityEngineResult> dktResults = new ArrayList<>();
         for (WSSecurityEngineResult wser : parameters.getResults()) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.BST) {
@@ -235,13 +239,6 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                     (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 if (binarySecurity instanceof X509Security
                     || binarySecurity instanceof PKIPathSecurity) {
-                    if (derived) {
-                        WSSecurityEngineResult resultToStore = 
-                            processX509DerivedTokenResult(wser, parameters.getResults());
-                        if (resultToStore != null) {
-                            dktResults.add(resultToStore);
-                        }
-                    }
                     tokenResults.add(wser);
                 }
             }
@@ -260,7 +257,19 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                                  parameters.getMessage())) {
             return false;
         }
-        tokenResults.addAll(dktResults);
+        
+        if (derived) {
+            List<WSSecurityEngineResult> dktResults = new ArrayList<>(tokenResults.size());
+            for (WSSecurityEngineResult wser : tokenResults) {
+                WSSecurityEngineResult resultToStore = 
+                    processX509DerivedTokenResult(wser, parameters.getResults());
+                if (resultToStore != null) {
+                    dktResults.add(resultToStore);
+                }
+            }
+            tokenResults.addAll(dktResults);
+        }
+        
         if (isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
                                             parameters.getMessage(),
                                             parameters.getTimestampElement())) {
@@ -351,17 +360,9 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      */
     protected boolean processSCTokens(PolicyValidatorParameters parameters, boolean derived) {
         List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        List<WSSecurityEngineResult> dktResults = new ArrayList<>();
         for (WSSecurityEngineResult wser : parameters.getResults()) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.SCT) {
-                if (derived) {
-                    byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                    WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret, parameters.getResults());
-                    if (dktResult != null) {
-                        dktResults.add(dktResult);
-                    }
-                }
                 tokenResults.add(wser);
             }
         }
@@ -379,7 +380,19 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                                  parameters.getMessage())) {
             return false;
         }
-        tokenResults.addAll(dktResults);
+        
+        if (derived) {
+            List<WSSecurityEngineResult> dktResults = new ArrayList<>(tokenResults.size());
+            for (WSSecurityEngineResult wser : tokenResults) {
+                byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret, parameters.getResults());
+                if (dktResult != null) {
+                    dktResults.add(dktResult);
+                }
+            }
+            tokenResults.addAll(dktResults);
+        }
+        
         if (isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
                                             parameters.getMessage(),
                                             parameters.getTimestampElement())) {
