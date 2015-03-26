@@ -104,7 +104,7 @@ public class X509Locator implements Locator {
     }
     
     private List<UseKeyWithType> parse(LocateRequestType request) {
-        List<UseKeyWithType> keyIDs = new ArrayList<UseKeyWithType>();
+        List<UseKeyWithType> keyIDs = new ArrayList<>();
         if (request == null) {
             return keyIDs;
         }
@@ -129,7 +129,7 @@ public class X509Locator implements Locator {
     }
 
     private List<UseKeyWithType> parse(KeyInfoType keyInfo) {
-        List<UseKeyWithType> keyIDs = new ArrayList<UseKeyWithType>();
+        List<UseKeyWithType> keyIDs = new ArrayList<>();
 
         if (keyInfo == null) {
             return keyIDs;

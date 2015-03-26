@@ -37,7 +37,7 @@ public final class XKMSClientFactory {
         factory.setServiceClass(XKMSPortType.class);
         factory.setAddress(endpointAddress);
         
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("jaxb.additionalContextClasses", 
                        new Class[] {ResultDetails.class});
         factory.setProperties(properties);

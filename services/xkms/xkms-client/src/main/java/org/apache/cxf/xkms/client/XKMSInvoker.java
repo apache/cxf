@@ -82,14 +82,14 @@ public class XKMSInvoker {
     }
     
     public X509Certificate getCertificateForIssuerSerial(String issuerDN, BigInteger serial) {
-        List<X509AppId> ids = new ArrayList<X509AppId>();
+        List<X509AppId> ids = new ArrayList<>();
         ids.add(new X509AppId(Applications.ISSUER, issuerDN));
         ids.add(new X509AppId(Applications.SERIAL, serial.toString(16)));
         return getCertificate(ids);
     }
 
     public X509Certificate getCertificateForEndpoint(String endpoint) {
-        List<X509AppId> ids = new ArrayList<X509AppId>();
+        List<X509AppId> ids = new ArrayList<>();
         ids.add(new X509AppId(Applications.SERVICE_ENDPOINT, endpoint));
         return getCertificate(ids);
     }

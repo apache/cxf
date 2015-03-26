@@ -19,21 +19,16 @@
 
 package org.apache.cxf.xkms.crypto.provider;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
 
 final class CryptoProviderUtils {
 
@@ -46,53 +41,7 @@ final class CryptoProviderUtils {
             throw new CryptoProviderException("Keystore properties path is not defined");
         }
 
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (o instanceof String) {
-            ResourceManager rm = message.getExchange().get(Bus.class)
-                .getExtension(ResourceManager.class);
-            URL url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, CryptoProviderUtils.class);
-                }
-                if (url == null) {
-                    try {
-                        url = new URL((String)o);
-                    } catch (Exception ex) {
-                        // ignore
-                    }
-                }
-                if (url != null) {
-                    InputStream ins = url.openStream();
-                    properties = new Properties();
-                    properties.load(ins);
-                    ins.close();
-                } else {
-                    throw new CryptoProviderException("Keystore properties url is not resolved: "
-                                                      + o);
-                }
-            } catch (IOException e) {
-                throw new CryptoProviderException("Cannot load keystore properties: "
-                                                  + e.getMessage(), e);
-            }
-        } else if (o instanceof URL) {
-            properties = new Properties();
-            try {
-                InputStream ins = ((URL)o).openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                throw new CryptoProviderException("Cannot load keystore properties: "
-                                                  + e.getMessage(), e);
-            }
-        }
-        if (properties == null) {
-            throw new CryptoProviderException("Cannot load keystore properties: " + o);
-        }
-
-        return properties;
+        return SecurityUtils.loadProperties(o);
     }
 
     public static String getKeystoreAlias(Properties keystoreProps) {
@@ -110,32 +59,18 @@ final class CryptoProviderUtils {
         return keystoreAlias;
     }
 
-    public static CallbackHandler getCallbackHandler(Message message) {
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, CryptoProviderUtils.class).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-
-        return handler;
-    }
-
     public static String getCallbackPwdFromMessage(Message message, String userName, int usage) {
         // Then try to get the password from the given callback handler
-        CallbackHandler handler = getCallbackHandler(message);
-        if (handler == null) {
-            throw new CryptoProviderException("No callback handler and no password available");
+        try {
+            CallbackHandler handler = SecurityUtils.getCallbackHandler(message);
+            if (handler == null) {
+                throw new CryptoProviderException("No callback handler and no password available");
+            }
+    
+            return getCallbackPwd(userName, usage, handler);
+        } catch (WSSecurityException ex) {
+            throw new CryptoProviderException("No callback handler and no password available", ex);
         }
-
-        return getCallbackPwd(userName, usage, handler);
     }
 
     public static String getCallbackPwd(String userName, int usage, CallbackHandler handler) {

@@ -120,7 +120,7 @@ public class X509Register implements Register {
     }
 
     private List<X509Certificate> getCertsFromKeyInfo(KeyInfoType keyInfo) throws CertificateException {
-        List<X509Certificate> certList = new ArrayList<X509Certificate>();
+        List<X509Certificate> certList = new ArrayList<>();
         for (Object key : keyInfo.getContent()) {
             if (key instanceof JAXBElement) {
                 Object value = ((JAXBElement<?>) key).getValue();

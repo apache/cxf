@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class HandlerContext {
     
-    private Map<Class<?>, Object> contextMap = new HashMap<Class<?>, Object>();
+    private Map<Class<?>, Object> contextMap = new HashMap<>();
 
     public HandlerContext() {
     }

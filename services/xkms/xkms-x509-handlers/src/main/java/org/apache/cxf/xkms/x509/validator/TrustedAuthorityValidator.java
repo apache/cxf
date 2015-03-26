@@ -116,7 +116,7 @@ public class TrustedAuthorityValidator implements Validator {
     }
 
     private Set<TrustAnchor> asTrustAnchors(List<X509Certificate> trustedAuthorityCerts) {
-        Set<TrustAnchor> trustAnchors = new HashSet<TrustAnchor>();
+        Set<TrustAnchor> trustAnchors = new HashSet<>();
         for (X509Certificate trustedAuthorityCert : trustedAuthorityCerts) {
             trustAnchors.add(new TrustAnchor(trustedAuthorityCert, null));
         }

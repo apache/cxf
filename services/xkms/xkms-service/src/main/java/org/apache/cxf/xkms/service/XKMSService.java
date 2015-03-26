@@ -63,9 +63,9 @@ public class XKMSService implements XKMSPortType {
     protected static final Logger LOG = LogUtils.getL7dLogger(XKMSService.class);
 
     private String serviceName = XKMSConstants.XKMS_ENDPOINT_NAME;
-    private List<Locator> locators = new ArrayList<Locator>();
-    private List<Validator> validators = new ArrayList<Validator>();
-    private List<Register> keyRegisterHandlers = new ArrayList<Register>();
+    private List<Locator> locators = new ArrayList<>();
+    private List<Validator> validators = new ArrayList<>();
+    private List<Register> keyRegisterHandlers = new ArrayList<>();
     private boolean enableXKRSS = true;
     private boolean logExceptions;
 

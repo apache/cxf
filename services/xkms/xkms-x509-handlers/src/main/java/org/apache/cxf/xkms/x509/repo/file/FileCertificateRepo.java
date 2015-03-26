@@ -156,7 +156,7 @@ public class FileCertificateRepo implements CertificateRepo {
     }
 
     private File[] getX509Files() {
-        List<File> certificateFiles = new ArrayList<File>();
+        List<File> certificateFiles = new ArrayList<>();
         try {
             certificateFiles.addAll(Arrays.asList(storageDir.listFiles()));
             certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + TRUSTED_CAS_PATH).listFiles()));
@@ -186,7 +186,7 @@ public class FileCertificateRepo implements CertificateRepo {
 
     @Override
     public List<X509Certificate> getTrustedCaCerts() {
-        List<X509Certificate> results = new ArrayList<X509Certificate>();
+        List<X509Certificate> results = new ArrayList<>();
         File[] list = getX509Files();
         for (File certFile : list) {
             try {
@@ -208,7 +208,7 @@ public class FileCertificateRepo implements CertificateRepo {
 
     @Override
     public List<X509Certificate> getCaCerts() {
-        List<X509Certificate> results = new ArrayList<X509Certificate>();
+        List<X509Certificate> results = new ArrayList<>();
         File[] list = getX509Files();
         for (File certFile : list) {
             try {
@@ -230,7 +230,7 @@ public class FileCertificateRepo implements CertificateRepo {
     
     @Override
     public List<X509CRL> getCRLs() {
-        List<X509CRL> results = new ArrayList<X509CRL>();
+        List<X509CRL> results = new ArrayList<>();
         File[] list = getX509Files();
         for (File crlFile : list) {
             try {
@@ -277,7 +277,7 @@ public class FileCertificateRepo implements CertificateRepo {
 
     @Override
     public X509Certificate findBySubjectDn(String subjectDn) {
-        List<X509Certificate> result = new ArrayList<X509Certificate>();
+        List<X509Certificate> result = new ArrayList<>();
         File[] list = getX509Files();
         for (File certFile : list) {
             try {
@@ -305,7 +305,7 @@ public class FileCertificateRepo implements CertificateRepo {
 
     @Override
     public X509Certificate findByIssuerSerial(String issuer, String serial) {
-        List<X509Certificate> result = new ArrayList<X509Certificate>();
+        List<X509Certificate> result = new ArrayList<>();
         File[] list = getX509Files();
         for (File certFile : list) {
             try {

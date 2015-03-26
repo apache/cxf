@@ -96,7 +96,7 @@ public class LdapCertificateRepo implements CertificateRepo {
 
     private List<X509Certificate> getCertificatesFromLdap(String tmpRootDN, String tmpFilter, String tmpAttrName) {
         try {
-            List<X509Certificate> certificates = new ArrayList<X509Certificate>();
+            List<X509Certificate> certificates = new ArrayList<>();
             NamingEnumeration<SearchResult> answer = ldapSearch.searchSubTree(tmpRootDN, tmpFilter);
             while (answer.hasMore()) {
                 SearchResult sr = answer.next();
@@ -119,7 +119,7 @@ public class LdapCertificateRepo implements CertificateRepo {
     
     private List<X509CRL> getCRLsFromLdap(String tmpRootDN, String tmpFilter, String tmpAttrName) {
         try {
-            List<X509CRL> crls = new ArrayList<X509CRL>();
+            List<X509CRL> crls = new ArrayList<>();
             NamingEnumeration<SearchResult> answer = ldapSearch.searchSubTree(tmpRootDN, tmpFilter);
             while (answer.hasMore()) {
                 SearchResult sr = answer.next();
