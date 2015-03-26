@@ -334,7 +334,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             serv = getServer(addr);
             if (addr != null) {            
                 EndpointInfo endpointInfo = serv.getEndpoint().getEndpointInfo();
-                if (!endpointInfo.getAddress().contains(addr)) {
+                if (endpointInfo.getAddress() == null || !endpointInfo.getAddress().contains(addr)) {
                     endpointInfo.setAddress(addr);
                 }
                 if (publishedEndpointUrl != null) {
