@@ -18,11 +18,15 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwsSignatureProvider.class);
     private SignatureAlgorithm algorithm;
     
     protected AbstractJwsSignatureProvider(SignatureAlgorithm algo) {
@@ -60,8 +64,10 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     protected abstract JwsSignature doCreateJwsSignature(JoseHeaders headers);
     
     protected void checkAlgorithm(String algo) {
+        String error = "Invalid signature algorithm";
         if (algo == null) {
-            throw new SecurityException();
+            LOG.warning(error + ":" + algo);
+            throw new JwsException(error);
         }
     }
 
