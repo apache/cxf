@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import javax.xml.transform.Source;
+import javax.xml.ws.Binding;
+import javax.xml.ws.Endpoint;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.Bus;
@@ -40,6 +42,7 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.HelloImpl;
 import org.apache.hello_world_soap_http.HelloWrongAnnotation;
+
 import org.junit.Test;
 
 public class EndpointImplTest extends AbstractJaxWsTest {
@@ -246,6 +249,17 @@ public class EndpointImplTest extends AbstractJaxWsTest {
  
         assertEquals(1, serviceFactory.getFeatures().size());
         assertTrue(serviceFactory.getFeatures().get(0) instanceof WSAddressingFeature);
+    }
+
+    @Test
+    public void testEndpointPublishAfterGetBinding() throws Exception {
+        Endpoint endpoint = Endpoint.create(new GreeterImpl());
+
+        Binding binding = endpoint.getBinding();
+        assertNotNull(binding);
+        
+        // CXF-6257
+        endpoint.publish("http://localhost:8080/test");
     }
 
     static class EchoObserver implements MessageObserver {
