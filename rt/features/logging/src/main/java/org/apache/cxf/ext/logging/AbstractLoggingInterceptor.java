@@ -40,15 +40,15 @@ abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Messa
     }
     
     public void setLimit(int lim) {
-        limit = lim;
+        this.limit = lim;
     }
 
     public int getLimit() {
-        return limit;
+        return this.limit;
     }
 
     public void setInMemThreshold(long t) {
-        threshold = t;
+        this.threshold = t;
     }
 
     public long getInMemThreshold() {

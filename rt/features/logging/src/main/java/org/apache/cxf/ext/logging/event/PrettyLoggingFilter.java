@@ -18,54 +18,72 @@
  */
 package org.apache.cxf.ext.logging.event;
 
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PrettyLoggingFilter implements LogEventSender {
+    private static final Logger LOG = LoggerFactory.getLogger(PrettyLoggingFilter.class);
     private LogEventSender next;
     private boolean prettyLogging;
-    private TransformerFactory transformerFactory;
 
     public PrettyLoggingFilter(LogEventSender next) {
         this.next = next;
         this.prettyLogging = false;
-        transformerFactory = TransformerFactory.newInstance();
     }
 
     @Override
     public void send(LogEvent event) {
         if (shouldPrettyPrint(event)) {
-            event.setPayload(getPrettyMessage(event.getPayload()));
+            event.setPayload(getPrettyMessage(event.getPayload(), event.getEncoding()));
         }
         next.send(event);
     }
 
     private boolean shouldPrettyPrint(LogEvent event) {
+        String contentType = event.getContentType(); 
         return prettyLogging 
-            && event.getContentType() != null 
-            && event.getContentType().indexOf("xml") >= 0 
+            && contentType != null 
+            && contentType.indexOf("xml") >= 0
+            && contentType.toLowerCase().indexOf("multipart/related") < 0
             && event.getPayload().length() > 0;
     }
 
-    public String getPrettyMessage(String message) {
+    public String getPrettyMessage(String message, String encoding) {
+        StringWriter swriter = new StringWriter();
         try {
-            Transformer serializer = transformerFactory.newTransformer();
-            serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-            serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
-            StringWriter swriter = new StringWriter();
-            serializer.transform(new StreamSource(new StringReader(message)), new StreamResult(swriter));
-            return swriter.toString();
-        } catch (TransformerException e) {
-            return message;
+            // Using XMLStreamWriter instead of Transformer as it works with non well formed xml
+            // that can occur when we set a limit and cur the rest off
+            XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
+            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
+            InputStream in = new ByteArrayInputStream(message.getBytes(encoding));
+            try {
+                StaxUtils.copy(new StreamSource(in), xwriter);
+            } catch (XMLStreamException xse) {
+                //ignore
+            } finally {
+                try {
+                    xwriter.flush();
+                    xwriter.close();
+                } catch (XMLStreamException xse2) {
+                    //ignore
+                }
+                in.close();
+            }
+        } catch (IOException e) {
+            LOG.debug("Error while pretty printing cxf message, returning what we got till now.", e);
         }
+        return swriter.toString();
     }
 
     public void setNext(LogEventSender next) {
