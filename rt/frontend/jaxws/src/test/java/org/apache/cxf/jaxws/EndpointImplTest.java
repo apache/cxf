@@ -253,7 +253,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
 
     @Test
     public void testEndpointPublishAfterGetBinding() throws Exception {
-        Endpoint endpoint = Endpoint.create(new GreeterImpl());
+        Endpoint endpoint = Endpoint.create(new Hello());
 
         Binding binding = endpoint.getBinding();
         assertNotNull(binding);
