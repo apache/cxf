@@ -25,11 +25,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
@@ -184,6 +187,16 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             Document node = (Document) message.getContent(Node.class);
             if (node != part && node != null) {
                 StaxUtils.copy(node, new SAAJStreamWriter(part));
+            } else {
+                SOAPBody body = soapMessage.getSOAPBody();
+                @SuppressWarnings("unchecked")
+                Map<String, String> additionalNsMap = (Map<String, String>)message
+                    .get(ReadHeadersInterceptor.ADDITIONAL_ENVELOPE_BODY_NS);
+                if (additionalNsMap != null) {
+                    for (Entry<String, String> e : additionalNsMap.entrySet()) {
+                        body.addNamespaceDeclaration(e.getKey(), e.getValue());
+                    }
+                }
             }
             message.setContent(Node.class, soapMessage.getSOAPPart());
 

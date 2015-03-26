@@ -21,7 +21,10 @@ package org.apache.cxf.binding.soap.interceptor;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -29,6 +32,7 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.XMLEvent;
 
 import org.w3c.dom.Attr;
@@ -63,6 +67,8 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 
 public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
+    
+    public static final String ADDITIONAL_ENVELOPE_BODY_NS = "additional.env.body.ns";
     /**
      * 
      */
@@ -186,6 +192,8 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     doc = processor.process(filteredReader);
                     if (doc != null) {
                         message.setContent(Node.class, doc);
+                    } else {
+                        message.put(ADDITIONAL_ENVELOPE_BODY_NS, processor.getEnvelopeAndBodyNamespaces());
                     }
                 }
 
@@ -273,14 +281,22 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
      */
     private static class HeadersProcessor {
         private static final XMLEventFactory FACTORY = XMLEventFactory.newInstance();
-        private final QName soapVersionHeader;
+        private final String ns;
+        private final String header;
+        private final String body;
+        private final String envelope;
         private final List<XMLEvent> events = new ArrayList<XMLEvent>(8);
+        private Map<String, String> namespaces;
         private StreamToDOMContext context;
         private Document doc;
         private Node parent;
+        private QName lastStartElementQName;
 
         public HeadersProcessor(SoapVersion version) {
-            this.soapVersionHeader = version.getHeader();
+            this.header = version.getHeader().getLocalPart();
+            this.ns = version.getEnvelope().getNamespaceURI();
+            this.envelope = version.getEnvelope().getLocalPart();
+            this.body = version.getBody().getLocalPart();
         }
 
         public Document process(XMLStreamReader reader) throws XMLStreamException {
@@ -343,9 +359,9 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
 
         private void addEvent(XMLEvent event) {
             if (event.isStartElement()) {
-                QName qName = event.asStartElement().getName();
-                if (soapVersionHeader.getLocalPart().equals(qName.getLocalPart())
-                    && soapVersionHeader.getNamespaceURI().equals(qName.getNamespaceURI())) {
+                lastStartElementQName = event.asStartElement().getName();
+                if (header.equals(lastStartElementQName.getLocalPart())
+                    && ns.equals(lastStartElementQName.getNamespaceURI())) {
                     // process all events recorded so far
                     context = new StreamToDOMContext(true, false, false);
                     doc = DOMUtils.createDocument();
@@ -361,7 +377,28 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     events.add(event);
                 }
             } else {
+                if (event.isNamespace()) {
+                    final String lastEl = lastStartElementQName.getLocalPart();
+                    if ((body.equals(lastEl) || envelope.equals(lastEl))
+                        && ns.equals(lastStartElementQName.getNamespaceURI())) {
+                        if (namespaces == null) {
+                            namespaces = new HashMap<String, String>();
+                        }
+                        Namespace nsEvent = (Namespace)event;
+                        //just put in the map, in case of duplicates in env and body,
+                        //body one will always come afterwards, so we're fine
+                        namespaces.put(nsEvent.getPrefix(), nsEvent.getNamespaceURI());
+                    }
+                }
                 events.add(event);
+            }
+        }
+        
+        public Map<String, String> getEnvelopeAndBodyNamespaces() {
+            if (namespaces == null) {
+                return Collections.emptyMap();
+            } else {
+                return Collections.unmodifiableMap(namespaces);
             }
         }
     }
