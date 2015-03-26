@@ -49,6 +49,8 @@ public class SOAPLoggingTest {
         TestService serviceImpl = new TestServiceImplementation();
         LoggingFeature loggingFeature = new LoggingFeature();
         loggingFeature.setPrettyLogging(true);
+        // Setting the limit should omit parts of the body but the result should still be well formed xml
+        loggingFeature.setLimit(140);
         Endpoint ep = Endpoint.publish(SERVICE_URI, serviceImpl, loggingFeature);
         TestService client = createTestClient(loggingFeature);
         client.echo("test");
