@@ -89,7 +89,7 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
     }    
     
     public String getAddress() {
-        return (null != address) ? address.getAddress().getValue() : null;
+        return (null != address && null != address.getAddress()) ? address.getAddress().getValue() : null;
     }
     
     public void setAddress(String addr) {
