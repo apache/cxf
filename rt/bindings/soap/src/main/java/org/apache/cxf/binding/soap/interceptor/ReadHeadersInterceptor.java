@@ -22,9 +22,7 @@ package org.apache.cxf.binding.soap.interceptor;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -32,7 +30,6 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.XMLEvent;
 
 import org.w3c.dom.Attr;
@@ -68,7 +65,8 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
     
-    public static final String ADDITIONAL_ENVELOPE_BODY_NS = "additional.env.body.ns";
+    public static final String ENVELOPE_EVENTS = "envelope.events";
+    public static final String BODY_EVENTS = "body.events";
     /**
      * 
      */
@@ -193,7 +191,8 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     if (doc != null) {
                         message.setContent(Node.class, doc);
                     } else {
-                        message.put(ADDITIONAL_ENVELOPE_BODY_NS, processor.getEnvelopeAndBodyNamespaces());
+                        message.put(ENVELOPE_EVENTS, processor.getEnvAttributeAndNamespaceEvents());
+                        message.put(BODY_EVENTS, processor.getBodyAttributeAndNamespaceEvents());
                     }
                 }
 
@@ -292,7 +291,8 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         private final String body;
         private final String envelope;
         private final List<XMLEvent> events = new ArrayList<XMLEvent>(8);
-        private Map<String, String> namespaces;
+        private List<XMLEvent> envEvents;
+        private List<XMLEvent> bodyEvents;
         private StreamToDOMContext context;
         private Document doc;
         private Node parent;
@@ -383,28 +383,37 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     events.add(event);
                 }
             } else {
-                if (event.isNamespace()) {
+                if (event.isNamespace() || event.isAttribute()) {
                     final String lastEl = lastStartElementQName.getLocalPart();
-                    if ((body.equals(lastEl) || envelope.equals(lastEl))
-                        && ns.equals(lastStartElementQName.getNamespaceURI())) {
-                        if (namespaces == null) {
-                            namespaces = new HashMap<String, String>();
+                    if (body.equals(lastEl) && ns.equals(lastStartElementQName.getNamespaceURI())) {
+                        if (bodyEvents == null) {
+                            bodyEvents = new ArrayList<XMLEvent>();
                         }
-                        Namespace nsEvent = (Namespace)event;
-                        //just put in the map, in case of duplicates in env and body,
-                        //body one will always come afterwards, so we're fine
-                        namespaces.put(nsEvent.getPrefix(), nsEvent.getNamespaceURI());
+                        bodyEvents.add(event);
+                    } else if (envelope.equals(lastEl) && ns.equals(lastStartElementQName.getNamespaceURI())) {
+                        if (envEvents == null) {
+                            envEvents = new ArrayList<XMLEvent>();
+                        }
+                        envEvents.add(event);
                     }
                 }
                 events.add(event);
             }
         }
         
-        public Map<String, String> getEnvelopeAndBodyNamespaces() {
-            if (namespaces == null) {
-                return Collections.emptyMap();
+        public List<XMLEvent> getBodyAttributeAndNamespaceEvents() {
+            if (bodyEvents == null) {
+                return Collections.emptyList();
             } else {
-                return Collections.unmodifiableMap(namespaces);
+                return Collections.unmodifiableList(bodyEvents);
+            }
+        }
+        
+        public List<XMLEvent> getEnvAttributeAndNamespaceEvents() {
+            if (envEvents == null) {
+                return Collections.emptyList();
+            } else {
+                return Collections.unmodifiableList(envEvents);
             }
         }
     }
