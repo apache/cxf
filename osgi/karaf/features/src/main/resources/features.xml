@@ -242,6 +242,19 @@
         <feature version="${project.version}">cxf-core</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-features-clustering/${project.version}</bundle>
     </feature>
+    <feature name="cxf-features-logging" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-core</feature>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-features-logging/${project.version}</bundle>
+    </feature>
+    <feature name="cxf-features-throttling" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-core</feature>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-features-throttling/${project.version}</bundle>
+    </feature>
+    <feature name="cxf-features-metrics" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-core</feature>
+        <bundle start-level="40" dependency='true'>mvn:io.dropwizard.metrics/metrics-core/${cxf.dropwizard.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-features-metrics/${project.version}</bundle>
+    </feature>
     <feature name="cxf-bindings-corba" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-wsdl</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-bindings-corba/${project.version}</bundle>
@@ -342,8 +355,10 @@
         <feature version="${project.version}">cxf-javascript</feature>
         <feature version="${project.version}">cxf-frontend-javascript</feature>
         <feature version="${project.version}">cxf-features-clustering</feature>
-        <!-- Compatibility bundle for the Require-Bundle use cases -->
-        <!--bundle start-level='50'>mvn:org.apache.cxf/cxf-bundle-compatible/${project.version}</bundle-->
+        <feature version="${project.version}">cxf-features-metrics</feature>
+        <feature version="${project.version}">cxf-features-throttling</feature>
+        <feature version="${project.version}">cxf-features-logging</feature>
+
         <!-- tools really aren't needed in OSGi by default
         <feature version="${project.version}">cxf-tools</feature>
         -->

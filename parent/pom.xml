@@ -79,6 +79,7 @@
         <cxf.commons-collections.version>3.2.1</cxf.commons-collections.version>
         <cxf.commons-lang.version>2.6</cxf.commons-lang.version>
         <cxf.derby.version>10.2.2.0</cxf.derby.version>
+        <cxf.dropwizard.version>3.1.0</cxf.dropwizard.version>
         <cxf.ehcache.version>2.9.0</cxf.ehcache.version>
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.guava.version>18.0</cxf.guava.version>
@@ -1774,7 +1775,7 @@
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
-                <version>3.1.0</version>
+                <version>${cxf.dropwizard.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
