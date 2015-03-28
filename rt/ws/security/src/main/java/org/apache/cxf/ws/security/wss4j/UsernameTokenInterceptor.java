@@ -22,13 +22,13 @@ package org.apache.cxf.ws.security.wss4j;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.Subject;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
@@ -181,7 +181,9 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             results = new ArrayList<>();
             message.put(WSHandlerConstants.RECV_RESULTS, results);
         }
-        WSHandlerResult rResult = new WSHandlerResult(null, v);
+        
+        WSHandlerResult rResult = 
+            new WSHandlerResult(null, v, Collections.singletonMap(action, v));
         results.add(0, rResult);
 
         assertTokens(message, principal, false);

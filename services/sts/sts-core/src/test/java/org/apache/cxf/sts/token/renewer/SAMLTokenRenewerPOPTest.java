@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.token.renewer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -28,7 +29,6 @@ import javax.xml.ws.WebServiceContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -139,8 +139,10 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         );
         signedResults.add(signedResult);
         
-        List<WSHandlerResult> handlerResults = new ArrayList<WSHandlerResult>();
-        WSHandlerResult handlerResult = new WSHandlerResult(null, signedResults);
+        List<WSHandlerResult> handlerResults = new ArrayList<>();
+        WSHandlerResult handlerResult = 
+            new WSHandlerResult(null, signedResults,
+                                Collections.singletonMap(WSConstants.SIGN, signedResults));
         handlerResults.add(handlerResult);
         
         WebServiceContext context = validatorParameters.getWebServiceContext();
@@ -214,8 +216,10 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         );
         signedResults.add(signedResult);
         
-        List<WSHandlerResult> handlerResults = new ArrayList<WSHandlerResult>();
-        WSHandlerResult handlerResult = new WSHandlerResult(null, signedResults);
+        List<WSHandlerResult> handlerResults = new ArrayList<>();
+        WSHandlerResult handlerResult = 
+            new WSHandlerResult(null, signedResults,
+                                Collections.singletonMap(WSConstants.SIGN, signedResults));
         handlerResults.add(handlerResult);
         
         WebServiceContext context = validatorParameters.getWebServiceContext();

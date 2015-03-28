@@ -24,6 +24,7 @@ import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,7 +32,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -99,8 +99,6 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                             results = new ArrayList<>();
                             message.put(WSHandlerConstants.RECV_RESULTS, results);
                         }
-                        WSHandlerResult rResult = new WSHandlerResult(null, samlResults);
-                        results.add(0, rResult);
 
                         boolean signed = false;
                         for (WSSecurityEngineResult result : samlResults) {
@@ -112,6 +110,15 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                             }
                         }
                         assertTokens(message, SPConstants.SAML_TOKEN, signed);
+                        
+                        Integer key = WSConstants.ST_UNSIGNED;
+                        if (signed) {
+                            key = WSConstants.ST_SIGNED;
+                        }
+                        WSHandlerResult rResult = 
+                            new WSHandlerResult(null, samlResults,
+                                                Collections.singletonMap(key, samlResults));
+                        results.add(0, rResult);
                         
                         // Check version against policy
                         AssertionInfoMap aim = message.get(AssertionInfoMap.class);

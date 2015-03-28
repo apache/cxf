@@ -244,6 +244,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (actor == null) {
                 actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
             }
+            reqData.setActor(actor);
 
             // Configure replay caching
             configureReplayCaches(reqData, actions, msg);
@@ -276,16 +277,15 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             Element elem = 
                 WSSecurityUtil.getSecurityHeader(doc.getSOAPHeader(), actor, version.getVersion() != 1.1);
 
-            List<WSSecurityEngineResult> wsResult = engine.processSecurityHeader(
-                elem, reqData
-            );
+            WSHandlerResult wsResult = engine.processSecurityHeader(elem, reqData);
             
-            if (!wsResult.isEmpty()) { // security header found
+            if (!(wsResult.getResults() == null || wsResult.getResults().isEmpty())) { 
+                // security header found
                 if (reqData.getWssConfig().isEnableSignatureConfirmation()) {
-                    checkSignatureConfirmation(reqData, wsResult);
+                    checkSignatureConfirmation(reqData, wsResult.getResults());
                 }
 
-                checkActions(msg, reqData, wsResult, actions, SAAJUtils.getBody(doc));
+                checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));
                 doResults(
                     msg, actor, 
                     SAAJUtils.getHeader(doc),
@@ -310,7 +310,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                               SAAJUtils.getBody(doc),
                               wsResult);
                 } else {
-                    checkActions(msg, reqData, wsResult, actions, SAAJUtils.getBody(doc));
+                    checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));
                     doResults(msg, actor,
                               SAAJUtils.getHeader(doc),
                               SAAJUtils.getBody(doc),
@@ -490,7 +490,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         String actor, 
         Element soapHeader,
         Element soapBody,
-        List<WSSecurityEngineResult> wsResult
+        WSHandlerResult wsResult
     ) throws SOAPException, XMLStreamException, WSSecurityException {
         doResults(msg, actor, soapHeader, soapBody, wsResult, false);
     }
@@ -500,7 +500,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         String actor,
         Element soapHeader,
         Element soapBody,
-        List<WSSecurityEngineResult> wsResult, 
+        WSHandlerResult wsResult, 
         boolean utWithCallbacks
     ) throws SOAPException, XMLStreamException, WSSecurityException {
         /*
@@ -512,15 +512,14 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             results = new LinkedList<>();
             msg.put(WSHandlerConstants.RECV_RESULTS, results);
         }
-        WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
-        results.add(0, rResult);
+        results.add(0, wsResult);
         
         Boolean allowUnsignedSamlPrincipals = 
                 MessageUtils.getContextualBoolean(msg, 
                         SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, false);
         
-        for (int i = wsResult.size() - 1; i >= 0; i--) {
-            WSSecurityEngineResult o = wsResult.get(i);
+        for (int i = wsResult.getResults().size() - 1; i >= 0; i--) {
+            WSSecurityEngineResult o = wsResult.getResults().get(i);
             
             Integer action = (Integer)o.get(WSSecurityEngineResult.TAG_ACTION);
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);

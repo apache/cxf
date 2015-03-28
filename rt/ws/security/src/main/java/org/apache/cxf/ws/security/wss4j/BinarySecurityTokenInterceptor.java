@@ -21,10 +21,10 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
@@ -76,7 +76,9 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
                             results = new ArrayList<>();
                             message.put(WSHandlerConstants.RECV_RESULTS, results);
                         }
-                        WSHandlerResult rResult = new WSHandlerResult(null, bstResults);
+                        WSHandlerResult rResult = 
+                            new WSHandlerResult(null, bstResults,
+                                                Collections.singletonMap(WSConstants.BST, bstResults));
                         results.add(0, rResult);
 
                         assertTokens(message);

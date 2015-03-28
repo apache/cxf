@@ -44,7 +44,6 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
@@ -141,10 +140,10 @@ public class RequestParserUnitTest extends org.junit.Assert {
         RequestData reqData = new RequestData();
         reqData.setCallbackHandler(new PasswordCallbackHandler());
         
-        List<WSSecurityEngineResult> engineResultList = 
+        WSHandlerResult results = 
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
-        List<WSHandlerResult> resultsList = new ArrayList<WSHandlerResult>();
-        resultsList.add(new WSHandlerResult("actor", engineResultList));
+        List<WSHandlerResult> resultsList = new ArrayList<>();
+        resultsList.add(results);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
         
         RequestRequirements requestRequirements = parser.parseRequest(request, wsContext, null, null);
@@ -172,10 +171,10 @@ public class RequestParserUnitTest extends org.junit.Assert {
         RequestData reqData = new RequestData();
         reqData.setCallbackHandler(new PasswordCallbackHandler());
         
-        List<WSSecurityEngineResult> engineResultList = 
+        WSHandlerResult results = 
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
-        List<WSHandlerResult> resultsList = new ArrayList<WSHandlerResult>();
-        resultsList.add(new WSHandlerResult("actor", engineResultList));
+        List<WSHandlerResult> resultsList = new ArrayList<>();
+        resultsList.add(results);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
         
         RequestRequirements requestRequirements = parser.parseRequest(request, wsContext, null, null);
@@ -204,10 +203,10 @@ public class RequestParserUnitTest extends org.junit.Assert {
         reqData.setSigVerCrypto(getCrypto());
         reqData.setCallbackHandler(new PasswordCallbackHandler());
         
-        List<WSSecurityEngineResult> engineResultList = 
+        WSHandlerResult results = 
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
-        List<WSHandlerResult> resultsList = new ArrayList<WSHandlerResult>();
-        resultsList.add(new WSHandlerResult("actor", engineResultList));
+        List<WSHandlerResult> resultsList = new ArrayList<>();
+        resultsList.add(results);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
         
         RequestRequirements requestRequirements = parser.parseRequest(request, wsContext, null, null);
