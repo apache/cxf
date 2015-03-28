@@ -1,0 +1,11 @@
+language: java
+jdk:
+  - openjdk7
+env:
+  - TEST_SUITE=unit
+  - TEST_SUITE=integration
+
+install:
+  - mvn -B -q dependency:resolve dependency:resolve-plugins -DexcludeReactor=true -DexcludeGroupIds=org.apache.cxf
+
+script: mvn -B -q -P${TEST_SUITE}-testsuite test -Djava.net.preferIPv4Stack=true
