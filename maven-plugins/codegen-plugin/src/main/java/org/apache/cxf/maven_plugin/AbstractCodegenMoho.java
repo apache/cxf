@@ -230,8 +230,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     private ArtifactRepositoryFactory artifactRepositoryFactory;
     /**
      * The toolchain manager.
+     * @component
      */
-    @Component
     private ToolchainManager toolchainManager;
 
     /**
