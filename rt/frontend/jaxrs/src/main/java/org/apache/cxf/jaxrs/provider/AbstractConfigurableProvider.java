@@ -20,16 +20,23 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.util.List;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NoContentException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 
 public abstract class AbstractConfigurableProvider {
-
+    protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
+    
     private List<String> consumeMediaTypes;
     private List<String> produceMediaTypes;
     private boolean enableBuffering;
@@ -169,5 +176,10 @@ public abstract class AbstractConfigurableProvider {
         }
         
         return false;
+    }
+    protected void reportEmptyContentLength() throws NoContentException {
+        String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
+        LOG.warning(message);
+        throw new NoContentException(message);
     }
 }

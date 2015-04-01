@@ -35,23 +35,27 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
-public class PrimitiveTextProvider<T> 
+public class PrimitiveTextProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
     private int bufferSize = IOUtils.DEFAULT_BUFFER_SIZE;
     
-    private static boolean isSupported(Class<?> type) { 
-        return InjectionUtils.isPrimitive(type);
+    private static boolean isSupported(Class<?> type, MediaType mt) { 
+        boolean isSupported = InjectionUtils.isPrimitive(type);
+        return isSupported && (String.class == type || mt.isCompatible(MediaType.TEXT_PLAIN_TYPE));
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return isSupported(type);
+        return isSupported(type, mt);
     }
 
     public T readFrom(Class<T> type, Type genType, Annotation[] anns, MediaType mt, 
                       MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         String string = IOUtils.toString(is, HttpUtils.getEncoding(mt, "UTF-8"));
+        if (String.class != type && StringUtils.isEmpty(string)) {
+            reportEmptyContentLength();
+        }
         if (type == Character.class) {
-            char character = StringUtils.isEmpty(string) ? ' ' : string.charAt(0);
+            char character = string.charAt(0);
             return type.cast(Character.valueOf(character));
         }
         return InjectionUtils.handleParameter(
@@ -69,7 +73,7 @@ public class PrimitiveTextProvider<T>
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return isSupported(type);
+        return isSupported(type, mt);
     }
 
     public void writeTo(T obj, Class<?> type, Type genType, Annotation[] anns, 
