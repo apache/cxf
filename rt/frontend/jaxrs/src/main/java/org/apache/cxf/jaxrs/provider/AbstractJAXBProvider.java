@@ -33,14 +33,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.NoContentException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -67,9 +64,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.helpers.DefaultHandler;
 
 import org.apache.cxf.annotations.SchemaValidation;
-import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -90,9 +85,6 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
     
-    protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
-
-    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
     protected static final String NS_MAPPER_PROPERTY_RI = "com.sun.xml.bind.namespacePrefixMapper";
     protected static final String NS_MAPPER_PROPERTY_RI_INT = "com.sun.xml.internal.bind.namespacePrefixMapper";
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
@@ -267,12 +259,6 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     
     public void setJaxbElementClassMap(Map<String, String> map) {
         jaxbElementClassMap = map;
-    }
-    
-    protected void reportEmptyContentLength() throws NoContentException {
-        String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
-        LOG.warning(message);
-        throw new NoContentException(message);
     }
     
     protected <X> X getStreamHandlerFromCurrentMessage(Class<X> staxCls) {

@@ -1256,8 +1256,8 @@ public final class InjectionUtils {
     public static boolean isPrimitive(Class<?> type) {
         return type.isPrimitive() 
             || Number.class.isAssignableFrom(type)
-            || Boolean.class.isAssignableFrom(type)
-            || Character.class.isAssignableFrom(type)
+            || Boolean.class == type
+            || Character.class == type
             || String.class == type;
     }
     
