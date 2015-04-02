@@ -1635,8 +1635,7 @@ public final class JAXRSUtils {
     public static boolean runContainerRequestFilters(ServerProviderFactory pf, 
                                                      Message m, 
                                                      boolean preMatch, 
-                                                     Set<String> names,
-                                                     boolean sub) {
+                                                     Set<String> names) {
         List<ProviderInfo<ContainerRequestFilter>> containerFilters = preMatch 
             ? pf.getPreMatchContainerRequestFilters() : pf.getPostMatchContainerRequestFilters(names);
         if (!containerFilters.isEmpty()) {
