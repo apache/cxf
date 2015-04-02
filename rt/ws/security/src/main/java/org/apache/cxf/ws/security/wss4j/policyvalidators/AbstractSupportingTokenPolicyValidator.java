@@ -39,7 +39,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -57,6 +56,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
@@ -109,12 +109,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (derived) {
+        if (derived && parameters.getResults().getActionResults().containsKey(WSConstants.DKT)) {
             for (WSSecurityEngineResult wser : parameters.getUsernameTokenResults()) {
                 byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                 if (secret != null) {
                     WSSecurityEngineResult dktResult = 
-                        getMatchingDerivedKey(secret, parameters.getResults().getResults());
+                        getMatchingDerivedKey(secret, parameters.getResults());
                     if (dktResult != null) {
                         tokenResults.add(dktResult);
                     }
@@ -173,10 +173,11 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      * Process Kerberos Tokens.
      */
     protected boolean processKerberosTokens(PolicyValidatorParameters parameters, boolean derived) {
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : parameters.getResults().getResults()) {
-            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.BST) {
+        List<WSSecurityEngineResult> tokenResults = null;
+        if (parameters.getResults().getActionResults().containsKey(WSConstants.BST)) {
+            tokenResults = new ArrayList<>();
+            for (WSSecurityEngineResult wser
+                : parameters.getResults().getActionResults().get(WSConstants.BST)) {
                 BinarySecurity binarySecurity = 
                     (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 if (binarySecurity instanceof KerberosSecurity) {
@@ -185,7 +186,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             }
         }
         
-        if (tokenResults.isEmpty()) {
+        if (tokenResults == null || tokenResults.isEmpty()) {
             return false;
         }
         
@@ -199,12 +200,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (derived) {
+        if (derived && parameters.getResults().getActionResults().containsKey(WSConstants.DKT)) {
             List<WSSecurityEngineResult> dktResults = new ArrayList<>(tokenResults.size());
             for (WSSecurityEngineResult wser : tokenResults) {
                 byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                 WSSecurityEngineResult dktResult = 
-                    getMatchingDerivedKey(secret, parameters.getResults().getResults());
+                    getMatchingDerivedKey(secret, parameters.getResults());
                 if (dktResult != null) {
                     dktResults.add(dktResult);
                 }
@@ -231,10 +232,11 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      * Process X509 Tokens.
      */
     protected boolean processX509Tokens(PolicyValidatorParameters parameters, boolean derived) {
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : parameters.getResults().getResults()) {
-            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.BST) {
+        List<WSSecurityEngineResult> tokenResults = null;
+        if (parameters.getResults().getActionResults().containsKey(WSConstants.BST)) {
+            tokenResults = new ArrayList<>();
+            for (WSSecurityEngineResult wser 
+                : parameters.getResults().getActionResults().get(WSConstants.BST)) {
                 BinarySecurity binarySecurity = 
                     (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 if (binarySecurity instanceof X509Security
@@ -244,7 +246,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             }
         }
         
-        if (tokenResults.isEmpty()) {
+        if (tokenResults == null || tokenResults.isEmpty()) {
             return false;
         }
         
@@ -258,11 +260,11 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (derived) {
+        if (derived && parameters.getResults().getActionResults().containsKey(WSConstants.DKT)) {
             List<WSSecurityEngineResult> dktResults = new ArrayList<>(tokenResults.size());
             for (WSSecurityEngineResult wser : tokenResults) {
                 WSSecurityEngineResult resultToStore = 
-                    processX509DerivedTokenResult(wser, parameters.getResults().getResults());
+                    processX509DerivedTokenResult(wser, parameters.getResults());
                 if (resultToStore != null) {
                     dktResults.add(resultToStore);
                 }
@@ -289,16 +291,19 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      * Process KeyValue Tokens.
      */
     protected boolean processKeyValueTokens(PolicyValidatorParameters parameters) {
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : parameters.getSignedResults()) {
-            PublicKey publicKey = 
-                (PublicKey)wser.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
-            if (publicKey != null) {
-                tokenResults.add(wser);
+        List<WSSecurityEngineResult> tokenResults = null;
+        if (parameters.getSignedResults() != null && !parameters.getSignedResults().isEmpty()) {
+            tokenResults = new ArrayList<>();
+            for (WSSecurityEngineResult wser : parameters.getSignedResults()) {
+                PublicKey publicKey = 
+                    (PublicKey)wser.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+                if (publicKey != null) {
+                    tokenResults.add(wser);
+                }
             }
         }
         
-        if (tokenResults.isEmpty()) {
+        if (tokenResults == null || tokenResults.isEmpty()) {
             return false;
         }
         
@@ -359,17 +364,11 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      * Process Security Context Tokens.
      */
     protected boolean processSCTokens(PolicyValidatorParameters parameters, boolean derived) {
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
-        for (WSSecurityEngineResult wser : parameters.getResults().getResults()) {
-            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.SCT) {
-                tokenResults.add(wser);
-            }
-        }
-        
-        if (tokenResults.isEmpty()) {
+        if (!parameters.getResults().getActionResults().containsKey(WSConstants.SCT)) {
             return false;
         }
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
+        tokenResults.addAll(parameters.getResults().getActionResults().get(WSConstants.SCT));
         
         if (isSigned() && !areTokensSigned(tokenResults, parameters.getSignedResults(),
                                            parameters.getEncryptedResults(),
@@ -381,12 +380,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (derived) {
+        if (derived && parameters.getResults().getActionResults().containsKey(WSConstants.DKT)) {
             List<WSSecurityEngineResult> dktResults = new ArrayList<>(tokenResults.size());
             for (WSSecurityEngineResult wser : tokenResults) {
                 byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                 WSSecurityEngineResult dktResult = 
-                    getMatchingDerivedKey(secret, parameters.getResults().getResults());
+                    getMatchingDerivedKey(secret, parameters.getResults());
                 if (dktResult != null) {
                     dktResults.add(dktResult);
                 }
@@ -414,7 +413,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      * find a DerivedKey element that matches that EncryptedKey element.
      */
     private WSSecurityEngineResult processX509DerivedTokenResult(WSSecurityEngineResult result,
-                                                                 List<WSSecurityEngineResult> results) {
+                                                                 WSHandlerResult results) {
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         WSSecurityEngineResult encrResult = getMatchingEncryptedKey(cert, results);
@@ -433,14 +432,11 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      * matches the parameter.
      */
     private WSSecurityEngineResult getMatchingDerivedKey(byte[] secret,
-                                                         List<WSSecurityEngineResult> results) {
-        for (WSSecurityEngineResult wser : results) {
-            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.DKT) {
-                byte[] dktSecret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                if (Arrays.equals(secret, dktSecret)) {
-                    return wser;
-                }
+                                                         WSHandlerResult results) {
+        for (WSSecurityEngineResult wser : results.getActionResults().get(WSConstants.DKT)) {
+            byte[] dktSecret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+            if (Arrays.equals(secret, dktSecret)) {
+                return wser;
             }
         }
         return null;
@@ -450,10 +446,9 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      * Get a security result representing an EncryptedKey that matches the parameter.
      */
     private WSSecurityEngineResult getMatchingEncryptedKey(X509Certificate cert,
-                                                           List<WSSecurityEngineResult> results) {
-        for (WSSecurityEngineResult wser : results) {
-            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.ENCR) {
+                                                           WSHandlerResult results) {
+        if (results.getActionResults().containsKey(WSConstants.ENCR)) {
+            for (WSSecurityEngineResult wser : results.getActionResults().get(WSConstants.ENCR)) {
                 X509Certificate encrCert = 
                     (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
                 if (cert.equals(encrCert)) {

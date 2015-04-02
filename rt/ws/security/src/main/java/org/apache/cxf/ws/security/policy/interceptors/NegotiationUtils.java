@@ -221,33 +221,31 @@ final class NegotiationUtils {
         }
         
         for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
+            List<WSSecurityEngineResult> sctResults = 
+                rResult.getActionResults().get(WSConstants.SCT);
 
-            for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt.intValue() == WSConstants.SCT) {
-                    SecurityContextToken tok = 
-                        (SecurityContextToken)wser.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
-                    message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
-                    
-                    SecurityToken token = TokenStoreUtils.getTokenStore(message).getToken(tok.getIdentifier());
-                    if (token == null || token.isExpired()) {
-                        byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                        if (secret != null) {
-                            token = new SecurityToken(tok.getIdentifier());
-                            token.setToken(tok.getElement());
-                            token.setSecret(secret);
-                            token.setTokenType(tok.getTokenType());
-                            TokenStoreUtils.getTokenStore(message).add(token);
-                        }
+            for (WSSecurityEngineResult wser : sctResults) {
+                SecurityContextToken tok = 
+                    (SecurityContextToken)wser.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
+                message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
+
+                SecurityToken token = TokenStoreUtils.getTokenStore(message).getToken(tok.getIdentifier());
+                if (token == null || token.isExpired()) {
+                    byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                    if (secret != null) {
+                        token = new SecurityToken(tok.getIdentifier());
+                        token.setToken(tok.getElement());
+                        token.setSecret(secret);
+                        token.setTokenType(tok.getTokenType());
+                        TokenStoreUtils.getTokenStore(message).add(token);
                     }
-                    if (token != null) {
-                        final SecurityContext sc = token.getSecurityContext();
-                        if (sc != null) {
-                            message.put(SecurityContext.class, sc);
-                        }
-                        return true;
+                }
+                if (token != null) {
+                    final SecurityContext sc = token.getSecurityContext();
+                    if (sc != null) {
+                        message.put(SecurityContext.class, sc);
                     }
+                    return true;
                 }
             }
         }

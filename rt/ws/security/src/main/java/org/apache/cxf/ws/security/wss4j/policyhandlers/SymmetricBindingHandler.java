@@ -950,12 +950,12 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             .get(WSHandlerConstants.RECV_RESULTS));
         
         for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
+            List<WSSecurityEngineResult> wsSecEngineResults = 
+                rResult.getActionResults().get(WSConstants.UT_NOPASSWORD);
             
-            for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                String utID = (String)wser.get(WSSecurityEngineResult.TAG_ID);
-                if (actInt.intValue() == WSConstants.UT_NOPASSWORD) {
+            if (wsSecEngineResults != null) {
+                for (WSSecurityEngineResult wser : wsSecEngineResults) {
+                    String utID = (String)wser.get(WSSecurityEngineResult.TAG_ID);
                     if (utID == null || utID.length() == 0) {
                         utID = wssConfig.getIdAllocator().createId("UsernameToken-", null);
                     }
@@ -963,7 +963,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     Date expires = new Date();
                     expires.setTime(created.getTime() + 300000);
                     SecurityToken tempTok = new SecurityToken(utID, created, expires);
-                    
+
                     byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                     tempTok.setSecret(secret);
                     tokenStore.add(tempTok);

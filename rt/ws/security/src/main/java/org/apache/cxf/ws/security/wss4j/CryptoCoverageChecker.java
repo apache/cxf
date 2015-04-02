@@ -139,11 +139,11 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         
         // Get all encrypted and signed references
         for (WSHandlerResult wshr : results) {
-            for (WSSecurityEngineResult result : wshr.getResults()) {
-                Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt == WSConstants.SIGN) {
+            List<WSSecurityEngineResult> signedResults = wshr.getActionResults().get(WSConstants.SIGN);
+            if (signedResults != null) {
+                for (WSSecurityEngineResult signedResult : signedResults) {
                     List<WSDataRef> sl = 
-                        CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                        CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                     if (sl != null) {
                         if (sl.size() == 1
                             && sl.get(0).getName().equals(new QName(WSConstants.SIG_NS, WSConstants.SIG_LN))) {
@@ -153,9 +153,14 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
                         
                         signed.addAll(sl);
                     }
-                } else if (actInt == WSConstants.ENCR) {
+                }
+            }
+            
+            List<WSSecurityEngineResult> encryptedResults = wshr.getActionResults().get(WSConstants.ENCR);
+            if (encryptedResults != null) {
+                for (WSSecurityEngineResult encryptedResult : encryptedResults) {
                     List<WSDataRef> el = 
-                        CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                        CastUtils.cast((List<?>)encryptedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                     if (el != null) {
                         encrypted.addAll(el);
                     }

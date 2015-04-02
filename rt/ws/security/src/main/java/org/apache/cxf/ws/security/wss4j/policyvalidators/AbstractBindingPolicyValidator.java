@@ -310,12 +310,10 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        for (int i = 0; i < signedResults.size(); i++) {
-            WSSecurityEngineResult result = signedResults.get(i);
+        for (WSSecurityEngineResult result : signedResults) {
             
             // Get the Token result that was used for the signature
-            WSSecurityEngineResult tokenResult = 
-                findCorrespondingToken(result, results);
+            WSSecurityEngineResult tokenResult = findCorrespondingToken(result, results);
             if (tokenResult == null) {
                 return false;
             }

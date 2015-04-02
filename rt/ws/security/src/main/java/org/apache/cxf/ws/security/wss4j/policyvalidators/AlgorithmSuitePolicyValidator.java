@@ -35,7 +35,6 @@ import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -70,7 +69,8 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
             ai.setAsserted(true);
             
-            boolean valid = validatePolicy(ai, algorithmSuite, parameters.getResults());
+            boolean valid = validatePolicy(ai, algorithmSuite, parameters.getSignedResults(),
+                                           parameters.getEncryptedResults());
             if (valid) {
                 String namespace = algorithmSuite.getAlgorithmSuiteType().getNamespace();
                 String name = algorithmSuite.getAlgorithmSuiteType().getName();
@@ -88,20 +88,23 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
     }
     
     private boolean validatePolicy(
-        AssertionInfo ai, AlgorithmSuite algorithmPolicy, WSHandlerResult results
+        AssertionInfo ai, AlgorithmSuite algorithmPolicy, 
+        List<WSSecurityEngineResult> signedResults, List<WSSecurityEngineResult> encryptedResults
     ) {
-        boolean success = true;
-        for (WSSecurityEngineResult result : results.getResults()) {
-            Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            if (WSConstants.SIGN == actInt 
-                && !checkSignatureAlgorithms(result, algorithmPolicy, ai)) {
-                success = false;
-            } else if (WSConstants.ENCR == actInt
-                && !checkEncryptionAlgorithms(result, algorithmPolicy, ai)) {
-                success = false;
+        for (WSSecurityEngineResult signedResult : signedResults) {
+            if (!checkSignatureAlgorithms(signedResult, algorithmPolicy, ai)) {
+                return false;
             }
         }
-        return success;
+        if (encryptedResults != null) {
+            for (WSSecurityEngineResult encryptedResult : encryptedResults) {
+                if (!checkEncryptionAlgorithms(encryptedResult, algorithmPolicy, ai)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     }
     
     /**

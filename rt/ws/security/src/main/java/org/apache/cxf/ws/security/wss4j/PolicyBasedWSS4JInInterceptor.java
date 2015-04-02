@@ -429,7 +429,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     
     private boolean assertTokens(AssertionInfoMap aim, 
                               String name, 
-                              Collection<WSDataRef> signed,
+                              Collection<WSDataRef> dataRefs,
                               SoapMessage msg,
                               Element soapHeader,
                               Element soapBody,
@@ -444,11 +444,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     try {
                         if (CoverageType.SIGNED.equals(type)) {
                             CryptoCoverageUtil.checkBodyCoverage(
-                                soapBody, signed, type, CoverageScope.ELEMENT
+                                soapBody, dataRefs, type, CoverageScope.ELEMENT
                             );
                         } else {
                             CryptoCoverageUtil.checkBodyCoverage(
-                                soapBody, signed, type, CoverageScope.CONTENT
+                                soapBody, dataRefs, type, CoverageScope.CONTENT
                             );
                         }
                     } catch (WSSecurityException e) {
@@ -459,7 +459,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 
                 for (Header h : p.getHeaders()) {
                     try {
-                        CryptoCoverageUtil.checkHeaderCoverage(soapHeader, signed, h
+                        CryptoCoverageUtil.checkHeaderCoverage(soapHeader, dataRefs, h
                                 .getNamespace(), h.getName(), type,
                                 CoverageScope.ELEMENT);
                     } catch (WSSecurityException e) {
@@ -474,7 +474,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                         if (attachments.isContentSignatureTransform()) {
                             scope = CoverageScope.CONTENT;
                         }
-                        CryptoCoverageUtil.checkAttachmentsCoverage(msg.getAttachments(), signed, 
+                        CryptoCoverageUtil.checkAttachmentsCoverage(msg.getAttachments(), dataRefs, 
                                                                 type, scope);
                     } catch (WSSecurityException e) {
                         ai.setNotAsserted("An attachment was not signed/encrypted");

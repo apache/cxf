@@ -179,9 +179,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             parameters.setMessage(message);
             parameters.setResults(rResult);
             
-            List<WSSecurityEngineResult> signedResults = 
-                rResult.getActionResults().get(WSConstants.SIGN);
-            parameters.setSignedResults(signedResults);
+            parameters.setSignedResults(rResult.getActionResults().get(WSConstants.SIGN));
             
             List<WSSecurityEngineResult> samlResults = new ArrayList<>();
             if (rResult.getActionResults().containsKey(WSConstants.ST_SIGNED)) {

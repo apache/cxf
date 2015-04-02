@@ -1581,16 +1581,19 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         * receiving Actor and the sending Actor match.
         */
         for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
-            /*
-            * Scan the results for the first Signature action. Use the
-            * certificate of this Signature to set the certificate for the
-            * encryption action :-).
-            */
-            for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt.intValue() == WSConstants.SIGN) {
-                    return (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+            List<WSSecurityEngineResult> signedResults = 
+                rResult.getActionResults().get(WSConstants.SIGN);
+            if (signedResults != null) {
+                /*
+                 * Scan the results for the first Signature action. Use the
+                 * certificate of this Signature to set the certificate for the
+                 * encryption action :-).
+                 */
+                for (WSSecurityEngineResult signedResult : signedResults) {
+                    if (signedResult.containsKey(WSSecurityEngineResult.TAG_X509_CERTIFICATE)) {
+                        return (X509Certificate)signedResult.get(
+                            WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                    }
                 }
             }
         }
@@ -1634,15 +1637,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             .get(WSHandlerConstants.RECV_RESULTS));
         
         for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
-            
-            for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                String encryptedKeyID = (String)wser.get(WSSecurityEngineResult.TAG_ID);
-                if (actInt.intValue() == WSConstants.ENCR
-                    && encryptedKeyID != null
-                    && encryptedKeyID.length() != 0) {
-                    return wser;
+            List<WSSecurityEngineResult> encryptedResults = rResult.getResults();
+            if (encryptedResults != null) {
+                for (WSSecurityEngineResult wser : encryptedResults) {
+                    String encryptedKeyID = (String)wser.get(WSSecurityEngineResult.TAG_ID);
+                    if (encryptedKeyID != null && encryptedKeyID.length() != 0) {
+                        return wser;
+                    }
                 }
             }
         }
