@@ -82,7 +82,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
@@ -603,12 +602,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         //
         // Pre-fetch various results
         //
-        final List<Integer> actions = new ArrayList<>(3);
-        actions.add(WSConstants.SIGN);
-        actions.add(WSConstants.UT_SIGN);
-        actions.add(WSConstants.ST_SIGNED);
-        List<WSSecurityEngineResult> signedResults = 
-            WSSecurityUtil.fetchAllActionResults(results.getResults(), actions);
+        List<WSSecurityEngineResult> signedResults = new ArrayList<>();
+        if (results.getActionResults().containsKey(WSConstants.SIGN)) {
+            signedResults.addAll(results.getActionResults().get(WSConstants.SIGN));
+        }
+        if (results.getActionResults().containsKey(WSConstants.UT_SIGN)) {
+            signedResults.addAll(results.getActionResults().get(WSConstants.UT_SIGN));
+        }
+        if (results.getActionResults().containsKey(WSConstants.ST_SIGNED)) {
+            signedResults.addAll(results.getActionResults().get(WSConstants.ST_SIGNED));
+        }
         Collection<WSDataRef> signed = new HashSet<>();
         for (WSSecurityEngineResult result : signedResults) {
             List<WSDataRef> sl = 
@@ -620,15 +623,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
         }
         
-        List<WSSecurityEngineResult> encryptResults = 
-            WSSecurityUtil.fetchAllActionResults(results.getResults(), WSConstants.ENCR);
+        List<WSSecurityEngineResult> encryptResults = results.getActionResults().get(WSConstants.ENCR);
         Collection<WSDataRef> encrypted = new HashSet<>();
-        for (WSSecurityEngineResult result : encryptResults) {
-            List<WSDataRef> sl = 
-                CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
-            if (sl != null) {
-                for (WSDataRef r : sl) {
-                    encrypted.add(r);
+        if (encryptResults != null) {
+            for (WSSecurityEngineResult result : encryptResults) {
+                List<WSDataRef> sl = 
+                    CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                if (sl != null) {
+                    for (WSDataRef r : sl) {
+                        encrypted.add(r);
+                    }
                 }
             }
         }
@@ -645,28 +649,34 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         parameters.setAssertionInfoMap(aim);
         parameters.setMessage(msg);
         parameters.setSoapBody(soapBody);
-        parameters.setResults(results.getResults());
+        parameters.setResults(results);
         parameters.setSignedResults(signedResults);
         parameters.setEncryptedResults(encryptResults);
         parameters.setUtWithCallbacks(utWithCallbacks);
         
-        final List<Integer> utActions = new ArrayList<>(2);
-        utActions.add(WSConstants.UT);
-        utActions.add(WSConstants.UT_NOPASSWORD);
-        List<WSSecurityEngineResult> utResults = 
-            WSSecurityUtil.fetchAllActionResults(results.getResults(), utActions);
+        List<WSSecurityEngineResult> utResults = new ArrayList<>();
+        if (results.getActionResults().containsKey(WSConstants.UT)) {
+            utResults.addAll(results.getActionResults().get(WSConstants.UT));
+        }
+        if (results.getActionResults().containsKey(WSConstants.UT_NOPASSWORD)) {
+            utResults.addAll(results.getActionResults().get(WSConstants.UT_NOPASSWORD));
+        }
         parameters.setUsernameTokenResults(utResults);
         
-        final List<Integer> samlActions = new ArrayList<>(2);
-        samlActions.add(WSConstants.ST_SIGNED);
-        samlActions.add(WSConstants.ST_UNSIGNED);
-        List<WSSecurityEngineResult> samlResults = 
-            WSSecurityUtil.fetchAllActionResults(results.getResults(), samlActions);
+        List<WSSecurityEngineResult> samlResults = new ArrayList<>();
+        if (results.getActionResults().containsKey(WSConstants.ST_SIGNED)) {
+            samlResults.addAll(results.getActionResults().get(WSConstants.ST_SIGNED));
+        }
+        if (results.getActionResults().containsKey(WSConstants.ST_UNSIGNED)) {
+            samlResults.addAll(results.getActionResults().get(WSConstants.ST_UNSIGNED));
+        }
         parameters.setSamlResults(samlResults);
         
         // Store the timestamp element
-        WSSecurityEngineResult tsResult = 
-            WSSecurityUtil.fetchActionResult(results.getResults(), WSConstants.TS);
+        WSSecurityEngineResult tsResult = null;
+        if (results.getActionResults().containsKey(WSConstants.TS)) {
+            tsResult = results.getActionResults().get(WSConstants.TS).get(0);
+        }
         Element timestamp = null;
         if (tsResult != null) {
             Timestamp ts = (Timestamp)tsResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);

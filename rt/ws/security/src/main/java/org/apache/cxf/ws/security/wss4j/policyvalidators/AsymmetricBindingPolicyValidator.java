@@ -61,21 +61,16 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
      * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
-        boolean hasDerivedKeys = false;
-        for (WSSecurityEngineResult result : parameters.getResults()) {
-            Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.DKT) {
-                hasDerivedKeys = true;
-                break;
-            }
-        }
+        boolean hasDerivedKeys = 
+            parameters.getResults().getActionResults().containsKey(WSConstants.DKT);
         
         for (AssertionInfo ai : ais) {
             AsymmetricBinding binding = (AsymmetricBinding)ai.getAssertion();
             ai.setAsserted(true);
 
             // Check the protection order
-            if (!checkProtectionOrder(binding, parameters.getAssertionInfoMap(), ai, parameters.getResults())) {
+            if (!checkProtectionOrder(binding, parameters.getAssertionInfoMap(), ai, 
+                                      parameters.getResults().getResults())) {
                 continue;
             }
             

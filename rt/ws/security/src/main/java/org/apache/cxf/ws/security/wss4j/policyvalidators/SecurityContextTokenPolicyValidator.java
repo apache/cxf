@@ -27,7 +27,6 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.SecurityContextToken;
@@ -56,7 +55,7 @@ public class SecurityContextTokenPolicyValidator extends AbstractSecurityPolicyV
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> sctResults = 
-            WSSecurityUtil.fetchAllActionResults(parameters.getResults(), WSConstants.SCT);
+            parameters.getResults().getActionResults().get(WSConstants.SCT);
 
         for (AssertionInfo ai : ais) {
             SecurityContextToken sctPolicy = (SecurityContextToken)ai.getAssertion();
@@ -67,7 +66,7 @@ public class SecurityContextTokenPolicyValidator extends AbstractSecurityPolicyV
                 continue;
             }
 
-            if (sctResults.isEmpty()) {
+            if (sctResults == null || sctResults.isEmpty()) {
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );

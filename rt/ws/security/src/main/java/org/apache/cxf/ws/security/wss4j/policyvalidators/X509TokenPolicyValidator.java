@@ -41,7 +41,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.str.STRParser;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -77,7 +76,7 @@ public class X509TokenPolicyValidator extends AbstractSecurityPolicyValidator {
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> bstResults = 
-            WSSecurityUtil.fetchAllActionResults(parameters.getResults(), WSConstants.BST);
+            parameters.getResults().getActionResults().get(WSConstants.BST);
         
         for (AssertionInfo ai : ais) {
             X509Token x509TokenPolicy = (X509Token)ai.getAssertion();
@@ -88,7 +87,7 @@ public class X509TokenPolicyValidator extends AbstractSecurityPolicyValidator {
                 continue;
             }
 
-            if (bstResults.isEmpty() && parameters.getSignedResults().isEmpty()) {
+            if ((bstResults == null || bstResults.isEmpty()) && parameters.getSignedResults().isEmpty()) {
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
@@ -134,7 +133,7 @@ public class X509TokenPolicyValidator extends AbstractSecurityPolicyValidator {
         List<WSSecurityEngineResult> bstResults,
         List<WSSecurityEngineResult> signedResults
     ) {
-        if (bstResults.isEmpty() && signedResults.isEmpty()) {
+        if ((bstResults == null || bstResults.isEmpty()) && signedResults.isEmpty()) {
             return false;
         }
 
@@ -148,16 +147,15 @@ public class X509TokenPolicyValidator extends AbstractSecurityPolicyValidator {
             v3certRequired = true;
         }
 
-        for (WSSecurityEngineResult result : bstResults) {
-            BinarySecurity binarySecurityToken = 
-                (BinarySecurity)result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            if (binarySecurityToken != null) {
-                String type = binarySecurityToken.getValueType();
-                if (requiredType.equals(type)) {
+        if (bstResults != null) {
+            for (WSSecurityEngineResult result : bstResults) {
+                BinarySecurity binarySecurityToken = 
+                    (BinarySecurity)result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                if (binarySecurityToken != null && requiredType.equals(binarySecurityToken.getValueType())) {
                     if (v3certRequired && binarySecurityToken instanceof X509Security) {
                         try {
                             X509Certificate cert = 
-                                 ((X509Security)binarySecurityToken).getX509Certificate(null);
+                                ((X509Security)binarySecurityToken).getX509Certificate(null);
                             if (cert != null && cert.getVersion() == 3) {
                                 return true;
                             }

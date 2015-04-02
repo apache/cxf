@@ -2093,13 +2093,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
          * signature results in the signatureActions list
          */
         List<WSSecurityEngineResult> signatureActions = new ArrayList<>();
-        final List<Integer> signedActions = new ArrayList<>(2);
-        signedActions.add(WSConstants.SIGN);
-        signedActions.add(WSConstants.UT_SIGN);
         for (WSHandlerResult wshResult : results) {
-            signatureActions.addAll(
-                WSSecurityUtil.fetchAllActionResults(wshResult.getResults(), signedActions)
-            );
+            if (wshResult.getActionResults().containsKey(WSConstants.SIGN)) {
+                signatureActions.addAll(wshResult.getActionResults().get(WSConstants.SIGN));
+            }
+            if (wshResult.getActionResults().containsKey(WSConstants.UT_SIGN)) {
+                signatureActions.addAll(wshResult.getActionResults().get(WSConstants.UT_SIGN));
+            }
         }
         
         sigConfList = new ArrayList<>();

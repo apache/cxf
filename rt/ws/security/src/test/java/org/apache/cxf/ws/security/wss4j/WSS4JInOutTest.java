@@ -61,7 +61,6 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 
 
@@ -109,7 +108,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         List<WSHandlerResult> handlerResults = 
             getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
+            handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
          
         X509Certificate certificate = 
             (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
@@ -137,7 +136,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         List<WSHandlerResult> handlerResults = 
             getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
+            handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
          
         X509Certificate certificate = 
             (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
@@ -342,8 +341,8 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         List<WSHandlerResult> results = getResults(inmsg);
         assertTrue(results != null && results.size() == 1);
         List<WSSecurityEngineResult> signatureResults = 
-            WSSecurityUtil.fetchAllActionResults(results.get(0).getResults(), WSConstants.SIGN);
-        assertTrue(signatureResults.size() == 0);
+            results.get(0).getActionResults().get(WSConstants.SIGN);
+        assertTrue(signatureResults == null || signatureResults.size() == 0);
     }
     
     @Test
@@ -416,7 +415,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         List<WSHandlerResult> results = getResults(inmsg);
         assertTrue(results != null && results.size() == 1);
         List<WSSecurityEngineResult> signatureResults = 
-            WSSecurityUtil.fetchAllActionResults(results.get(0).getResults(), WSConstants.SIGN);
+            results.get(0).getActionResults().get(WSConstants.SIGN);
         assertTrue(signatureResults.size() == 1);
         
         Object obj = signatureResults.get(0).get("foo");
@@ -447,7 +446,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         List<WSHandlerResult> handlerResults = 
             getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
+            handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
          
         X509Certificate[] certificates = 
             (X509Certificate[]) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);

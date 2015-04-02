@@ -196,7 +196,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             PolicyValidatorParameters parameters = new PolicyValidatorParameters();
             parameters.setAssertionInfoMap(message.get(AssertionInfoMap.class));
             parameters.setMessage(message);
-            parameters.setResults(rResult.getResults());
+            parameters.setResults(rResult);
             
             SecurityPolicyValidator kerberosValidator = new KerberosTokenPolicyValidator();
             kerberosValidator.validatePolicies(parameters, ais);

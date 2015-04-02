@@ -75,7 +75,8 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
             ai.setAsserted(true);
             assertToken(layout, parameters.getAssertionInfoMap());
             
-            if (!validatePolicy(layout, parameters.getResults(), parameters.getSignedResults())) {
+            if (!validatePolicy(layout, parameters.getResults().getResults(), 
+                                parameters.getSignedResults())) {
                 String error = "Layout does not match the requirements";
                 ai.setNotAsserted(error);
             }
@@ -119,7 +120,7 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
             }
         } else if (strict && (!validateStrictSignaturePlacement(results, signedResults) 
             || !validateStrictSignatureTokenPlacement(results)
-            || !checkSignatureIsSignedPlacement(signedResults))) {
+            || !checkSignatureIsSignedPlacement(results, signedResults))) {
             return false;
         }
         
@@ -184,9 +185,11 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
         return true;
     }
     
-    private boolean checkSignatureIsSignedPlacement(List<WSSecurityEngineResult> signedResults) {
-        for (int i = 0; i < signedResults.size(); i++) {
-            WSSecurityEngineResult signedResult = signedResults.get(i);
+    private boolean checkSignatureIsSignedPlacement(
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
+        for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> sl =
                 CastUtils.cast((List<?>)signedResult.get(
                     WSSecurityEngineResult.TAG_DATA_REF_URIS
@@ -196,23 +199,35 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
                     QName signedQName = dataRef.getName();
                     if (WSSecurityEngine.SIGNATURE.equals(signedQName)) {
                         Element protectedElement = dataRef.getProtectedElement();
-                        boolean endorsingSigFound = false;
-                        // Results are stored in reverse order
-                        for (WSSecurityEngineResult result : signedResults) {
-                            if (result == signedResult) {
-                                endorsingSigFound = true;
-                            }
-                            Element resultElement = 
-                                (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-                            if (resultElement == protectedElement) {
-                                if (endorsingSigFound) {
-                                    break;
-                                } else {
-                                    return false;
-                                }
-                            }
+                        if (!isEndorsingSignatureInCorrectPlace(results, signedResult,
+                                                                protectedElement)) {
+                            return false;
                         }
                     }
+                }
+            }
+        }
+        return true;
+    }
+    
+    private boolean isEndorsingSignatureInCorrectPlace(List<WSSecurityEngineResult> results,
+                                              WSSecurityEngineResult signedResult,
+                                              Element protectedElement) {
+        boolean endorsingSigFound = false;
+        // Results are stored in reverse order
+        for (WSSecurityEngineResult result : results) {
+            Integer action = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+            if (WSConstants.SIGN == action || WSConstants.ST_SIGNED == action
+                || WSConstants.UT_SIGN == action) {
+                if (result == signedResult) {
+                    endorsingSigFound = true;
+                }
+                Element resultElement = 
+                    (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                if (endorsingSigFound && resultElement == protectedElement) {
+                    return true;
+                } else if (resultElement == protectedElement) {
+                    return false;
                 }
             }
         }

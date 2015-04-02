@@ -26,7 +26,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
@@ -41,8 +40,8 @@ import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding.ProtectionOrder;
@@ -72,18 +71,18 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
     protected boolean validateTimestamp(
         boolean includeTimestamp,
         boolean transportBinding,
-        List<WSSecurityEngineResult> results,
+        WSHandlerResult results,
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
         List<WSSecurityEngineResult> timestampResults = 
-            WSSecurityUtil.fetchAllActionResults(results, WSConstants.TS);
+            results.getActionResults().get(WSConstants.TS);
         
         // Check whether we received a timestamp and compare it to the policy
-        if (includeTimestamp && timestampResults.size() != 1) {
+        if (includeTimestamp && (timestampResults == null || timestampResults.size() != 1)) {
             return false;
         } else if (!includeTimestamp) {
-            if (timestampResults.isEmpty()) {
+            if (timestampResults == null || timestampResults.isEmpty()) {
                 return true;
             }
             return false;
@@ -154,7 +153,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         AbstractSymmetricAsymmetricBinding binding, 
         AssertionInfo ai,
         AssertionInfoMap aim,
-        List<WSSecurityEngineResult> results,
+        WSHandlerResult results,
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
@@ -177,7 +176,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
         
         // Check whether the signatures were encrypted or not
-        if (binding.isEncryptSignature() && !isSignatureEncrypted(results)) {
+        if (binding.isEncryptSignature() && !isSignatureEncrypted(results.getResults())) {
             ai.setNotAsserted("The signature is not protected");
             return false;
         }

@@ -22,10 +22,10 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.List;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 /**
  * Holds various parameters to the policy validators
@@ -34,7 +34,7 @@ public class PolicyValidatorParameters {
     private AssertionInfoMap assertionInfoMap;
     private Message message;
     private Element soapBody;
-    private List<WSSecurityEngineResult> results;
+    private WSHandlerResult results;
     private List<WSSecurityEngineResult> signedResults;
     private List<WSSecurityEngineResult> encryptedResults;
     private List<WSSecurityEngineResult> usernameTokenResults;
@@ -58,11 +58,11 @@ public class PolicyValidatorParameters {
         this.soapBody = soapBody;
     }
     
-    public List<WSSecurityEngineResult> getResults() {
+    public WSHandlerResult getResults() {
         return results;
     }
     
-    public void setResults(List<WSSecurityEngineResult> results) {
+    public void setResults(WSHandlerResult results) {
         this.results = results;
     }
     

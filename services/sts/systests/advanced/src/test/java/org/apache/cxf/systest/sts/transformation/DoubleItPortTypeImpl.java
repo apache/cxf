@@ -32,7 +32,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.Assert;
 
@@ -53,7 +52,7 @@ public class DoubleItPortTypeImpl implements DoubleItPortType {
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>)context.get(WSHandlerConstants.RECV_RESULTS));
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.UT);
+            handlerResults.get(0).getActionResults().get(WSConstants.UT).get(0);
         SamlAssertionWrapper assertion = 
             (SamlAssertionWrapper)actionResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
         Assert.assertTrue(assertion != null && "DoubleItSTSIssuer".equals(assertion.getIssuerString()));

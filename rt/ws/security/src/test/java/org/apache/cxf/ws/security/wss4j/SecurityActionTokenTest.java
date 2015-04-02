@@ -53,7 +53,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 
 
@@ -70,11 +69,11 @@ public class SecurityActionTokenTest extends AbstractSecurityTest {
         List<HandlerAction> actions = 
             Collections.singletonList(new HandlerAction(WSConstants.SIGN, actionToken));
         
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.HANDLER_ACTIONS, actions);
         outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         
-        Map<String, String> inProperties = new HashMap<String, String>();
+        Map<String, String> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
@@ -85,7 +84,7 @@ public class SecurityActionTokenTest extends AbstractSecurityTest {
         List<WSHandlerResult> handlerResults = 
             getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
+            handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
          
         X509Certificate certificate = 
             (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);

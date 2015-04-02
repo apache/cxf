@@ -282,7 +282,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (!(wsResult.getResults() == null || wsResult.getResults().isEmpty())) { 
                 // security header found
                 if (reqData.getWssConfig().isEnableSignatureConfirmation()) {
-                    checkSignatureConfirmation(reqData, wsResult.getResults());
+                    checkSignatureConfirmation(reqData, wsResult);
                 }
 
                 checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));

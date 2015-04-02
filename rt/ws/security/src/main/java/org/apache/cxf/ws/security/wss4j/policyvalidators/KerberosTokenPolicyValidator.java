@@ -68,7 +68,8 @@ public class KerberosTokenPolicyValidator extends AbstractSecurityPolicyValidato
      * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
-        List<WSSecurityEngineResult> kerberosResults = findKerberosResults(parameters.getResults());
+        List<WSSecurityEngineResult> kerberosResults = 
+            findKerberosResults(parameters.getResults().getResults());
         
         for (WSSecurityEngineResult kerberosResult : kerberosResults) {
             KerberosSecurity kerberosToken = 

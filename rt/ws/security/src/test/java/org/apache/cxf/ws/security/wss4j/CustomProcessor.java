@@ -39,6 +39,7 @@ public class CustomProcessor implements Processor {
         final WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.SIGN);
         result.put("foo", this);
+        wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }
     

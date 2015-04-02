@@ -49,7 +49,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -178,19 +177,19 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             PolicyValidatorParameters parameters = new PolicyValidatorParameters();
             parameters.setAssertionInfoMap(message.get(AssertionInfoMap.class));
             parameters.setMessage(message);
-            parameters.setResults(rResult.getResults());
+            parameters.setResults(rResult);
             
-            final List<Integer> actions = new ArrayList<>(1);
-            actions.add(WSConstants.SIGN);
             List<WSSecurityEngineResult> signedResults = 
-                WSSecurityUtil.fetchAllActionResults(rResult.getResults(), actions);
+                rResult.getActionResults().get(WSConstants.SIGN);
             parameters.setSignedResults(signedResults);
             
-            final List<Integer> samlActions = new ArrayList<>(2);
-            samlActions.add(WSConstants.ST_SIGNED);
-            samlActions.add(WSConstants.ST_UNSIGNED);
-            List<WSSecurityEngineResult> samlResults = 
-                WSSecurityUtil.fetchAllActionResults(rResult.getResults(), samlActions);
+            List<WSSecurityEngineResult> samlResults = new ArrayList<>();
+            if (rResult.getActionResults().containsKey(WSConstants.ST_SIGNED)) {
+                samlResults.addAll(rResult.getActionResults().get(WSConstants.ST_SIGNED));
+            }
+            if (rResult.getActionResults().containsKey(WSConstants.ST_UNSIGNED)) {
+                samlResults.addAll(rResult.getActionResults().get(WSConstants.ST_UNSIGNED));
+            }
             parameters.setSamlResults(samlResults);
             
             SecurityPolicyValidator issuedValidator = new IssuedTokenPolicyValidator();

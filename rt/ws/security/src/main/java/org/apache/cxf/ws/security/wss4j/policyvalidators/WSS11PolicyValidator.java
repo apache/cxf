@@ -30,7 +30,6 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -60,7 +59,7 @@ public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> scResults =
-            WSSecurityUtil.fetchAllActionResults(parameters.getResults(), WSConstants.SC);
+            parameters.getResults().getActionResults().get(WSConstants.SC);
         
         for (AssertionInfo ai : ais) {
             Wss11 wss11 = (Wss11)ai.getAssertion();
@@ -71,8 +70,8 @@ public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
                 continue;
             }
             
-            if ((wss11.isRequireSignatureConfirmation() && scResults.isEmpty())
-                || (!wss11.isRequireSignatureConfirmation() && !scResults.isEmpty())) {
+            if ((wss11.isRequireSignatureConfirmation() && (scResults == null || scResults.isEmpty()))
+                || (!wss11.isRequireSignatureConfirmation() && !(scResults == null || scResults.isEmpty()))) {
                 ai.setNotAsserted(
                     "Signature Confirmation policy validation failed"
                 );

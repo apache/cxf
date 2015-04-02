@@ -35,6 +35,7 @@ import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -87,10 +88,10 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
     }
     
     private boolean validatePolicy(
-        AssertionInfo ai, AlgorithmSuite algorithmPolicy, List<WSSecurityEngineResult> results
+        AssertionInfo ai, AlgorithmSuite algorithmPolicy, WSHandlerResult results
     ) {
         boolean success = true;
-        for (WSSecurityEngineResult result : results) {
+        for (WSSecurityEngineResult result : results.getResults()) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
             if (WSConstants.SIGN == actInt 
                 && !checkSignatureAlgorithms(result, algorithmPolicy, ai)) {

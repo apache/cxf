@@ -67,7 +67,6 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
@@ -555,12 +554,13 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             List<WSSecurityEngineResult> signedResults = new ArrayList<>();
             if (handlerResults != null && handlerResults.size() > 0) {
                 WSHandlerResult handlerResult = handlerResults.get(0);
-                List<WSSecurityEngineResult> results = handlerResult.getResults();
-                final List<Integer> signedActions = new ArrayList<>(2);
-                signedActions.add(WSConstants.SIGN);
-                signedActions.add(WSConstants.UT_SIGN);
                 
-                signedResults.addAll(WSSecurityUtil.fetchAllActionResults(results, signedActions));
+                if (handlerResult.getActionResults().containsKey(WSConstants.SIGN)) {
+                    signedResults.addAll(handlerResult.getActionResults().get(WSConstants.SIGN));
+                }
+                if (handlerResult.getActionResults().containsKey(WSConstants.UT_SIGN)) {
+                    signedResults.addAll(handlerResult.getActionResults().get(WSConstants.UT_SIGN));
+                }
             }
             
             TLSSessionInfo tlsInfo = (TLSSessionInfo)messageContext.get(TLSSessionInfo.class.getName());

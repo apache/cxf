@@ -62,7 +62,6 @@ import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 
 /**
@@ -119,7 +118,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+            handlerResults.get(0).getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedAssertion = 
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
@@ -164,7 +163,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+            handlerResults.get(0).getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedAssertion = 
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
@@ -204,7 +203,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+            handlerResults.get(0).getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedAssertion = 
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
@@ -249,7 +248,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+            handlerResults.get(0).getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedAssertion = 
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
@@ -305,14 +304,13 @@ public class SamlTokenTest extends AbstractSecurityTest {
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
+            handlerResults.get(0).getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion = 
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
         assert receivedAssertion.isSigned();
         
-        actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
+        actionResult = handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
     }
     
@@ -372,14 +370,13 @@ public class SamlTokenTest extends AbstractSecurityTest {
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
+            handlerResults.get(0).getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion = 
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
         assert receivedAssertion.isSigned();
         
-        actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
+        actionResult = handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
     }
     
@@ -436,7 +433,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assertTrue(sc.isUserInRole("admin"));
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
+            handlerResults.get(0).getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion = 
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
@@ -496,7 +493,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assertTrue(sc.isUserInRole("admin"));
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
+            handlerResults.get(0).getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion = 
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
@@ -555,7 +552,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assertTrue(sc.isUserInRole("admin"));
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
+            handlerResults.get(0).getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion = 
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);

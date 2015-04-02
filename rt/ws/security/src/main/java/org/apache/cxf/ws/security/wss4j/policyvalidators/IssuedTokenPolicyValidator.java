@@ -22,7 +22,6 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -41,7 +40,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -90,8 +88,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         }
         
         List<WSSecurityEngineResult> bstResults = 
-            WSSecurityUtil.fetchAllActionResults(parameters.getResults(), 
-                                                 Collections.singletonList(WSConstants.BST));
+            parameters.getResults().getActionResults().get(WSConstants.BST);
             
         if (bstResults != null) {
             for (WSSecurityEngineResult bstResult : bstResults) {

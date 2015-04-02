@@ -73,7 +73,6 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 
@@ -437,8 +436,8 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         assertTrue(results != null && results.size() == 1);
         
         List<WSSecurityEngineResult> signatureResults = 
-            WSSecurityUtil.fetchAllActionResults(results.get(0).getResults(), WSConstants.SIGN);
-        assertTrue(!signatureResults.isEmpty());
+            results.get(0).getActionResults().get(WSConstants.SIGN);
+        assertTrue(!(signatureResults == null || signatureResults.isEmpty()));
     }
     
     protected void verifyWss4jEncResults(SoapMessage inmsg) {
@@ -451,16 +450,22 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         assertSame(handlerResults.size(), 1);
 
         final List<WSSecurityEngineResult> protectionResults = 
-            WSSecurityUtil.fetchAllActionResults(handlerResults.get(0).getResults(), WSConstants.ENCR);
+            handlerResults.get(0).getActionResults().get(WSConstants.ENCR);
         assertNotNull(protectionResults);
         
         //
         // This result should contain a reference to the decrypted element
         //
-        final Map<String, Object> result = protectionResults.get(0);
-        final List<WSDataRef> protectedElements = 
-            CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
-        assertNotNull(protectedElements);
+        boolean foundReferenceList = false;
+        for (Map<String, Object> result : protectionResults) {
+            final List<WSDataRef> protectedElements = 
+                CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+            if (protectedElements != null) {
+                foundReferenceList = true;
+                break;
+            }
+        }
+        assertTrue(foundReferenceList);
     }
     
     // TODO: This method can be removed when runOutInterceptorAndValidateAsymmetricBinding

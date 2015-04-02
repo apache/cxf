@@ -156,17 +156,17 @@ public class SCTCanceller implements TokenCanceller {
 
         if (handlerResults != null && handlerResults.size() > 0) {
             WSHandlerResult handlerResult = handlerResults.get(0);
-            List<WSSecurityEngineResult> engineResults = handlerResult.getResults();
+            List<WSSecurityEngineResult> signedResults = 
+                handlerResult.getActionResults().get(WSConstants.SIGN);
 
-            for (WSSecurityEngineResult engineResult : engineResults) {
-                Integer action = (Integer)engineResult.get(WSSecurityEngineResult.TAG_ACTION);
-                if (action.equals(WSConstants.SIGN)) {
+            if (signedResults != null) {
+                for (WSSecurityEngineResult engineResult : signedResults) {
                     byte[] receivedKey = (byte[])engineResult.get(WSSecurityEngineResult.TAG_SECRET);
                     if (Arrays.equals(secretToMatch, receivedKey)) {
                         LOG.log(
-                            Level.FINE, 
-                            "Verification of the proof of possession of the key associated with "
-                            + "the security context successful."
+                                Level.FINE, 
+                                "Verification of the proof of possession of the key associated with "
+                                + "the security context successful."
                         );
                         return true;
                     }
