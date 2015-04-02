@@ -48,6 +48,13 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
     
     private String annotationClassName = DEFAULT_ANNOTATION_CLASS_NAME;
     
+    public SecureAnnotationsInterceptor() {
+        this(true);
+    }
+    public SecureAnnotationsInterceptor(boolean uniqueId) {
+        super(uniqueId);
+    }
+    
     public void setAnnotationClassName(String name) {
         try {
             ClassLoaderUtils.loadClass(name, SecureAnnotationsInterceptor.class);

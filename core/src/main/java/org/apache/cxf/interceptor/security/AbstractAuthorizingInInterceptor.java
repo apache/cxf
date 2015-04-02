@@ -41,9 +41,11 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
     private boolean allowAnonymousUsers = true;
     
     public AbstractAuthorizingInInterceptor() {
-        super(Phase.PRE_INVOKE);
+        this(true);
     }
-    
+    public AbstractAuthorizingInInterceptor(boolean uniqueId) {
+        super(null, Phase.PRE_INVOKE, uniqueId);
+    }
     public void handleMessage(Message message) throws Fault {
         Method method = getTargetMethod(message);
         SecurityContext sc = message.get(SecurityContext.class);

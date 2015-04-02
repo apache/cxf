@@ -36,6 +36,13 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
     protected List<String> globalRoles = Collections.emptyList();
     private boolean checkConfiguredRolesOnly;
     
+    public SimpleAuthorizingInterceptor() {
+        this(true);
+    }
+    public SimpleAuthorizingInterceptor(boolean uniqueId) {
+        super(uniqueId);
+    }
+    
     @Override 
     protected boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
         if (!checkConfiguredRolesOnly && !super.isUserInRole(sc, roles, deny)) {
