@@ -254,9 +254,11 @@ public class JAXRSInvoker extends AbstractInvoker {
                 exchange.put(OperationResourceInfo.class, subOri);
                 inMessage.put(URITemplate.TEMPLATE_PARAMETERS, values);
             
-                if (JAXRSUtils.runContainerRequestFilters(providerFactory,
-                                                      inMessage,
-                                                      false, subOri.getNameBindings())) {
+                if (!subOri.isSubResourceLocator()
+                    && JAXRSUtils.runContainerRequestFilters(providerFactory,
+                                                             inMessage,
+                                                             false, 
+                                                             subOri.getNameBindings())) {
                     return new MessageContentsList(exchange.get(Response.class));
                 }
                 

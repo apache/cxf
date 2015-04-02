@@ -239,10 +239,11 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         setExchangeProperties(message, ori, values, resources.size());
         
         // Global and name-bound post-match request filters
-        if (JAXRSUtils.runContainerRequestFilters(providerFactory,
-                                                  message,
-                                                  false, 
-                                                  ori.getNameBindings())) {
+        if (!ori.isSubResourceLocator()
+            && JAXRSUtils.runContainerRequestFilters(providerFactory,
+                                                      message,
+                                                      false, 
+                                                      ori.getNameBindings())) {
             return;
         }
         
