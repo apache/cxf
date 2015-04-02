@@ -103,7 +103,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         
         // Global pre-match request filters
-        if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, true, null, false)) {
+        if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, true, null)) {
             return;
         }
         // HTTP method
@@ -198,11 +198,11 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         
         // Global and name-bound post-match request filters
-        if (JAXRSUtils.runContainerRequestFilters(providerFactory,
-                                                  message,
-                                                  false, 
-                                                  ori.getNameBindings(),
-                                                  false)) {
+        if (!ori.isSubResourceLocator()
+            && JAXRSUtils.runContainerRequestFilters(providerFactory,
+                                                      message,
+                                                      false, 
+                                                      ori.getNameBindings())) {
             return;
         }
         
