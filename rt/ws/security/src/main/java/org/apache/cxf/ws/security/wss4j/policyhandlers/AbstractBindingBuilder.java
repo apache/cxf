@@ -1637,7 +1637,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             .get(WSHandlerConstants.RECV_RESULTS));
         
         for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> encryptedResults = rResult.getResults();
+            List<WSSecurityEngineResult> encryptedResults = rResult.getActionResults().get(WSConstants.ENCR);
             if (encryptedResults != null) {
                 for (WSSecurityEngineResult wser : encryptedResults) {
                     String encryptedKeyID = (String)wser.get(WSSecurityEngineResult.TAG_ID);

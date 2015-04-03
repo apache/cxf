@@ -69,8 +69,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
             ai.setAsserted(true);
             
-            boolean valid = validatePolicy(ai, algorithmSuite, parameters.getSignedResults(),
-                                           parameters.getEncryptedResults());
+            boolean valid = validatePolicy(ai, algorithmSuite, parameters.getResults().getResults());
             if (valid) {
                 String namespace = algorithmSuite.getAlgorithmSuiteType().getNamespace();
                 String name = algorithmSuite.getAlgorithmSuiteType().getName();
@@ -88,19 +87,17 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
     }
     
     private boolean validatePolicy(
-        AssertionInfo ai, AlgorithmSuite algorithmPolicy, 
-        List<WSSecurityEngineResult> signedResults, List<WSSecurityEngineResult> encryptedResults
+        AssertionInfo ai, AlgorithmSuite algorithmPolicy, List<WSSecurityEngineResult> results
     ) {
-        for (WSSecurityEngineResult signedResult : signedResults) {
-            if (!checkSignatureAlgorithms(signedResult, algorithmPolicy, ai)) {
+        
+        for (WSSecurityEngineResult result : results) {
+            Integer action = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+            if (WSConstants.SIGN == action 
+                && !checkSignatureAlgorithms(result, algorithmPolicy, ai)) {
                 return false;
-            }
-        }
-        if (encryptedResults != null) {
-            for (WSSecurityEngineResult encryptedResult : encryptedResults) {
-                if (!checkEncryptionAlgorithms(encryptedResult, algorithmPolicy, ai)) {
-                    return false;
-                }
+            } else if (WSConstants.ENCR == action
+                && !checkEncryptionAlgorithms(result, algorithmPolicy, ai)) {
+                return false;
             }
         }
         
