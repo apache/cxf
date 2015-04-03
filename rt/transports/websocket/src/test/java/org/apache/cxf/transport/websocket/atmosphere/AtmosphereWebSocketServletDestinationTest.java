@@ -85,6 +85,29 @@ public class AtmosphereWebSocketServletDestinationTest extends Assert {
     }
 
     @Test
+    public void testUseCustomAtmoosphereInterceptor() throws Exception {
+        Bus bus = new ExtensionManagerBus();
+        bus.setProperty("atmosphere.interceptors", new CustomInterceptor1());
+        DestinationRegistry registry = new HTTPTransportFactory().getRegistry();
+        EndpointInfo endpoint = new EndpointInfo();
+        endpoint.setAddress(ENDPOINT_ADDRESS);
+        endpoint.setName(ENDPOINT_NAME);
+
+        AtmosphereWebSocketServletDestination dest = 
+            new AtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
+
+        List<AtmosphereInterceptor> ais = dest.getAtmosphereFramework().interceptors();
+        int added = 0;
+        for (AtmosphereInterceptor a : ais) {
+            if (CustomInterceptor1.class.equals(a.getClass())) {
+                added++;
+                break;
+            } 
+        }
+        assertEquals(1, added);
+    }
+
+    @Test
     public void testUseCustomAtmoosphereInterceptors() throws Exception {
         Bus bus = new ExtensionManagerBus();
         bus.setProperty("atmosphere.interceptors", Arrays.asList(new CustomInterceptor1(), new CustomInterceptor2()));
