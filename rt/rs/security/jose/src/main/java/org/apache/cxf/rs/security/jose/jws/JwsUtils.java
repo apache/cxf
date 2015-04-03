@@ -25,9 +25,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -43,6 +45,7 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public final class JwsUtils {
+    private static final Logger LOG = LogUtils.getL7dLogger(JwsUtils.class);
     private static final String JSON_WEB_SIGNATURE_ALGO_PROP = "rs.security.jws.content.signature.algorithm";
     private static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
     private static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
@@ -168,7 +171,7 @@ public final class JwsUtils {
         return loadSignatureVerifier(m, props, headers, false);
     }
     public static List<JwsSignatureProvider> loadSignatureProviders(String propLoc, Message m) {
-        Properties props = loadProperties(m, propLoc);
+        Properties props = loadJwsProperties(m, propLoc);
         JwsSignatureProvider theSigProvider = loadSignatureProvider(m, props, null, true);
         if (theSigProvider != null) {
             return Collections.singletonList(theSigProvider);
@@ -184,13 +187,14 @@ public final class JwsUtils {
             }
         }
         if (theSigProviders == null) {
-            throw new SecurityException();
+            LOG.warning("Providers are not available");
+            throw new JwsException(JwsException.Error.NO_PROVIDER);
         }
         return theSigProviders;
     }
     
     public static List<JwsSignatureVerifier> loadSignatureVerifiers(String propLoc, Message m) {
-        Properties props = loadProperties(m, propLoc);
+        Properties props = loadJwsProperties(m, propLoc);
         JwsSignatureVerifier theVerifier = loadSignatureVerifier(m, props, null, true);
         if (theVerifier != null) {
             return Collections.singletonList(theVerifier);
@@ -206,7 +210,8 @@ public final class JwsUtils {
             }
         }
         if (theVerifiers == null) {
-            throw new SecurityException();
+            LOG.warning("Verifiers are not available");
+            throw new JwsException(JwsException.Error.NO_VERIFIER);
         }
         return theVerifiers;
     }
@@ -243,7 +248,8 @@ public final class JwsUtils {
             }
         }
         if (theSigProvider == null && !ignoreNullProvider) {
-            throw new SecurityException();
+            LOG.warning("Provider is not available");
+            throw new JwsException(JwsException.Error.NO_PROVIDER);
         }
         return theSigProvider;
     }
@@ -279,15 +285,17 @@ public final class JwsUtils {
                               (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props), rsaSignatureAlgo);
         }
         if (theVerifier == null && !ignoreNullVerifier) {
-            throw new SecurityException();
+            LOG.warning("Verifier is not available");
+            throw new JwsException(JwsException.Error.NO_VERIFIER);
         }
         return theVerifier;
     }
-    private static Properties loadProperties(Message m, String propLoc) {
+    private static Properties loadJwsProperties(Message m, String propLoc) {
         try {
             return ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("JWS init properties are not available");
+            throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
         }
     }
     private static String getSignatureAlgo(Message m, Properties props, String algo, String defaultAlgo) {
@@ -311,7 +319,7 @@ public final class JwsUtils {
     private static JwsCompactConsumer verify(JwsSignatureVerifier v, String content) {
         JwsCompactConsumer jws = new JwsCompactConsumer(content);
         if (!jws.verifySignatureWith(v)) {
-            throw new SecurityException();
+            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }
         return jws;
     }

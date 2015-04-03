@@ -29,6 +29,7 @@ import javax.ws.rs.client.ClientResponseFilter;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
+import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 
 @Priority(Priorities.JWS_CLIENT_READ_PRIORITY)
@@ -38,7 +39,7 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJoseHeaders());
         if (!p.verifySignatureWith(theSigVerifier)) {
-            throw new SecurityException();
+            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));

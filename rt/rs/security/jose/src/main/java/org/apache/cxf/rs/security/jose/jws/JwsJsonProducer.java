@@ -22,9 +22,11 @@ import java.security.interfaces.RSAPrivateKey;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
@@ -32,6 +34,7 @@ import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 public class JwsJsonProducer {
+    protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonProducer.class);
     private boolean supportFlattened;
     private String plainPayload;
     private String encodedPayload;
@@ -57,7 +60,8 @@ public class JwsJsonProducer {
     }
     public String getJwsJsonSignedDocument(boolean detached) {
         if (signatures.isEmpty()) { 
-            throw new SecurityException("Signature is not available");
+            LOG.warning("Signature is not available");
+            throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
         StringBuilder sb = new StringBuilder();
         sb.append("{");
@@ -124,12 +128,14 @@ public class JwsJsonProducer {
             checkCriticalHeaders(unprotectedHeader);
             if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
                                      unprotectedHeader.asMap().keySet())) {
-                throw new SecurityException("Protected and unprotected headers have duplicate values");
+                LOG.warning("Protected and unprotected headers have duplicate values");
+                throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
             }
             unionHeaders.asMap().putAll(unprotectedHeader.asMap());
         }
         if (unionHeaders.getAlgorithm() == null) {
-            throw new SecurityException("Algorithm header is not set");
+            LOG.warning("Algorithm header is not set");
+            throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
         String sequenceToBeSigned;
         if (protectedHeader != null) {
@@ -163,7 +169,8 @@ public class JwsJsonProducer {
     }
     private static void checkCriticalHeaders(JoseHeaders unprotected) {
         if (unprotected.asMap().containsKey(JoseConstants.HEADER_CRITICAL)) {
-            throw new SecurityException();
+            LOG.warning("Unprotected headers contain critical headers");
+            throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
     }
 }

@@ -22,16 +22,12 @@ public class JoseException extends RuntimeException {
 
     private static final long serialVersionUID = 4118589816228511524L;
     public JoseException() {
-        
+
     }
-    public JoseException(String text) {
-        super(text);
+    public JoseException(String error) {
+        super(error);
     }
     public JoseException(Throwable cause) {
         super(cause);
     }
-    public JoseException(String text, Throwable cause) {
-        super(text, cause);
-    }
-    //Jose Error enum can be introduced too
 }

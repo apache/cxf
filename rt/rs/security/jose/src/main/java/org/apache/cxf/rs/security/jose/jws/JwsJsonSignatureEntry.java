@@ -19,7 +19,9 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.util.Collections;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
@@ -30,6 +32,7 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 
 public class JwsJsonSignatureEntry {
+    protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonSignatureEntry.class);
     private String encodedJwsPayload;
     private String encodedProtectedHeader;
     private String encodedSignature;
@@ -43,7 +46,8 @@ public class JwsJsonSignatureEntry {
                                  String encodedSignature,
                                  JoseHeaders unprotectedHeader) {
         if (encodedProtectedHeader == null && unprotectedHeader == null || encodedSignature == null) {
-            throw new SecurityException("Invalid security entry");
+            LOG.warning("Invalid Signature entry");
+            throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
         
         this.encodedJwsPayload = encodedJwsPayload;
@@ -64,7 +68,8 @@ public class JwsJsonSignatureEntry {
         if (unprotectedHeader != null) {
             if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
                                      unprotectedHeader.asMap().keySet())) {
-                throw new SecurityException("Protected and unprotected headers have duplicate values");
+                LOG.warning("Protected and unprotected headers have duplicate values");
+                throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
             }
             unionHeaders.asMap().putAll(unprotectedHeader.asMap());
         }
@@ -108,12 +113,15 @@ public class JwsJsonSignatureEntry {
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         try {
-            return validator.verify(getUnionHeader(),
-                                    getUnsignedEncodedSequence(),
-                                    getDecodedSignature());
-        } catch (SecurityException ex) {
+            if (validator.verify(getUnionHeader(),
+                                 getUnsignedEncodedSequence(),
+                                 getDecodedSignature())) {
+                return true;
+            }
+        } catch (JwsException ex) {
             // ignore
         }
+        LOG.warning("Invalid Signature Entry");
         return false;
     }
     public boolean verifySignatureWith(JsonWebKey key) {

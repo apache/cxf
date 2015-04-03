@@ -64,11 +64,14 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     protected abstract JwsSignature doCreateJwsSignature(JoseHeaders headers);
     
     protected void checkAlgorithm(String algo) {
-        String error = "Invalid signature algorithm";
         if (algo == null) {
-            LOG.warning(error + ":" + algo);
-            throw new JwsException(error);
+            LOG.warning("Signature algorithm is not set");
+            throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
+        }
+        if (!isValidAlgorithmFamily(algo)) {
+            LOG.warning("Invalid signature algorithm: " + algo);
+            throw new JwsException(JwsException.Error.INVALID_ALGORITHM);
         }
     }
-
+    protected abstract boolean isValidAlgorithmFamily(String algo);
 }

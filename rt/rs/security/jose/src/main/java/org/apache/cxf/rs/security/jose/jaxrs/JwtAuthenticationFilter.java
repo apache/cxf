@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -27,9 +28,11 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.HttpHeaders;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -38,7 +41,7 @@ import org.apache.cxf.security.SecurityContext;
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
 public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements ContainerRequestFilter {
-
+    protected static final Logger LOG = LogUtils.getL7dLogger(JwtAuthenticationFilter.class);
     private boolean jweOnly;
     
     @Override
@@ -46,7 +49,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
         String auth = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         String[] parts = auth == null ? null : auth.split(" ");
         if (parts == null || !"JWT".equals(parts[0]) || parts.length != 2) {
-            throw new SecurityException();
+            throw new JoseException("JWT scheme is expected");
         }
         JwtToken jwt = super.getJwtToken(parts[1], jweOnly);
         JoseUtils.setMessageContextProperty(jwt.getHeaders());

@@ -22,15 +22,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public class AbstractJwsJsonReaderProvider {
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwsJsonReaderProvider.class);
     private static final String RSSEC_SIGNATURE_IN_LIST_PROPS = "rs.security.signature.in.list.properties";
     private static final String RSSEC_SIGNATURE_LIST_PROPS = "rs.security.signature.list.properties";
     
@@ -53,7 +57,8 @@ public class AbstractJwsJsonReaderProvider {
         Object propLocsProp = 
             MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_IN_LIST_PROPS, RSSEC_SIGNATURE_LIST_PROPS);
         if (propLocsProp == null) {
-            throw new SecurityException();
+            LOG.warning("JWS JSON init properties resource is not identified");
+            throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
         }
         List<String> propLocs = null;
         if (propLocsProp instanceof String) { 

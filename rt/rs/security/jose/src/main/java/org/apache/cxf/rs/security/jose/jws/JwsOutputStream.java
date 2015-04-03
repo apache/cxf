@@ -41,11 +41,7 @@ public class JwsOutputStream extends FilterOutputStream {
     
     @Override
     public void write(byte b[], int off, int len) throws IOException {
-        try {
-            signature.update(b, off, len);
-        } catch (Throwable ex) {
-            throw new SecurityException();
-        }
+        signature.update(b, off, len);
         out.write(b, off, len);
         out.flush();
     }
@@ -54,13 +50,9 @@ public class JwsOutputStream extends FilterOutputStream {
         if (flushed) {
             return;
         }
-        try {
-            byte[] finalBytes = signature.sign();
-            out.write(new byte[]{'.'});
-            Base64UrlUtility.encodeAndStream(finalBytes, 0, finalBytes.length, out);
-        } catch (Exception ex) {
-            throw new SecurityException();
-        }
+        byte[] finalBytes = signature.sign();
+        out.write(new byte[]{'.'});
+        Base64UrlUtility.encodeAndStream(finalBytes, 0, finalBytes.length, out);
         flushed = true;
     }
     

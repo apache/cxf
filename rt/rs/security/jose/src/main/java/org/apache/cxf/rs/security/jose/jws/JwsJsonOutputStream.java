@@ -59,11 +59,7 @@ public class JwsJsonOutputStream extends FilterOutputStream {
         executor.execute(new Runnable() {
             public void run() {
                 for (JwsSignature signature : signatures) {
-                    try {
-                        signature.update(b, off, len);
-                    } catch (Throwable ex) {
-                        throw new SecurityException();
-                    }
+                    signature.update(b, off, len);
                 }
             }
         });
@@ -76,29 +72,29 @@ public class JwsJsonOutputStream extends FilterOutputStream {
             return;
         }
         out.write(StringUtils.toBytesUTF8("\",\"signatures\":["));
-        try {
-            shutdownExecutor();
-            for (int i = 0; i < signatures.size(); i++) {
-                if (i > 0) {
-                    out.write(new byte[]{','});
-                }
-                out.write(StringUtils.toBytesUTF8("{\"protected\":\"" 
-                                                 + protectedHeaders.get(i) 
-                                                 + "\",\"signature\":\""));
-                byte[] sign = signatures.get(i).sign();
-                Base64UrlUtility.encodeAndStream(sign, 0, sign.length, out);
-                out.write(StringUtils.toBytesUTF8("\"}"));
+        shutdownExecutor();
+        for (int i = 0; i < signatures.size(); i++) {
+            if (i > 0) {
+                out.write(new byte[]{','});
             }
-        } catch (Exception ex) {
-            throw new SecurityException();
+            out.write(StringUtils.toBytesUTF8("{\"protected\":\"" 
+                                             + protectedHeaders.get(i) 
+                                             + "\",\"signature\":\""));
+            byte[] sign = signatures.get(i).sign();
+            Base64UrlUtility.encodeAndStream(sign, 0, sign.length, out);
+            out.write(StringUtils.toBytesUTF8("\"}"));
         }
         out.write(StringUtils.toBytesUTF8("]}"));
         flushed = true;
     }
-    private void shutdownExecutor() throws Exception {
+    private void shutdownExecutor() {
         executor.shutdown();
         while (!executor.isTerminated()) {
-            executor.awaitTermination(1, TimeUnit.MILLISECONDS);
+            try {
+                executor.awaitTermination(1, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }

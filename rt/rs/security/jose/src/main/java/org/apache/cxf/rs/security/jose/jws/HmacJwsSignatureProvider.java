@@ -46,7 +46,8 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
         try {
             this.key = Base64UrlUtility.decode(encodedKey);
         } catch (Base64Exception ex) {
-            throw new SecurityException();
+            LOG.warning("Hmac key can not be decoded");
+            throw new JwsException(JwsException.Error.INVALID_KEY, ex);
         }
     }
     
@@ -68,10 +69,7 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
         };
     }
     @Override
-    protected void checkAlgorithm(String algo) {
-        super.checkAlgorithm(algo);
-        if (!AlgorithmUtils.isHmacSign(algo)) {
-            throw new SecurityException();
-        }
+    protected boolean isValidAlgorithmFamily(String algo) {
+        return AlgorithmUtils.isHmacSign(algo);
     }
 }

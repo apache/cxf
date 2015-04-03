@@ -20,7 +20,9 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
@@ -28,6 +30,7 @@ import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactConsumer {
+    protected static final Logger LOG = LogUtils.getL7dLogger(JwsCompactConsumer.class);
     private JoseHeadersReaderWriter reader = new JoseHeadersReaderWriter();
     private String encodedSequence;
     private String encodedSignature;
@@ -51,7 +54,8 @@ public class JwsCompactConsumer {
             if (parts.length == 2 && encodedJws.endsWith(".")) {
                 encodedSignature = "";
             } else {
-                throw new SecurityException("Invalid JWS Compact sequence");
+                LOG.warning("Compact JWS does not have 3 parts");
+                throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
             }
         } else {
             encodedSignature = parts[2];
@@ -59,7 +63,8 @@ public class JwsCompactConsumer {
         String encodedJwsPayload = parts[1];
         if (encodedDetachedPayload != null) {
             if (!StringUtils.isEmpty(encodedJwsPayload)) {
-                throw new SecurityException("Invalid JWS Compact sequence");
+                LOG.warning("Compact JWS includes a payload expected to be detached");
+                throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
             }
             encodedJwsPayload = encodedDetachedPayload;
         }
@@ -87,8 +92,9 @@ public class JwsCompactConsumer {
     }
     public JoseHeaders getJoseHeaders() {
         JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
-        if (joseHeaders.getUpdateCount() != null) { 
-            throw new SecurityException("Duplicate headers have been detected");
+        if (joseHeaders.getUpdateCount() != null) {
+            LOG.warning("Duplicate headers have been detected");
+            throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
         }
         return joseHeaders;
     }
@@ -97,9 +103,10 @@ public class JwsCompactConsumer {
             if (validator.verify(getJoseHeaders(), getUnsignedEncodedSequence(), getDecodedSignature())) {
                 return true;
             }
-        } catch (SecurityException ex) {
+        } catch (JwsException ex) {
             // ignore
         }
+        LOG.warning("Invalid Signature");
         return false;
     }
     public boolean verifySignatureWith(JsonWebKey key) {
