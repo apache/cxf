@@ -19,7 +19,10 @@
 
 package org.apache.cxf.transport.websocket.atmosphere;
 
+import java.util.List;
+
 import org.apache.cxf.Bus;
+import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereInterceptor;
 
 /**
@@ -30,12 +33,14 @@ public final class AtmosphereUtils {
     private AtmosphereUtils() {
     }
 
-    public static AtmosphereInterceptor getInterceptor(Bus bus) {
-        AtmosphereInterceptor ai = (AtmosphereInterceptor)bus.getProperty("atmosphere.interceptor");
-        if (ai == null) {
-            ai = new DefaultProtocolInterceptor(); 
+    public static void addInterceptors(AtmosphereFramework framework, Bus bus) {
+        List<AtmosphereInterceptor> ais = (List<AtmosphereInterceptor>)bus.getProperty("atmosphere.interceptors");
+        if (ais == null) {
+            framework.interceptor(new DefaultProtocolInterceptor());
+            return;
+        } 
+        for (AtmosphereInterceptor i : ais) {
+            framework.interceptor(i);
         }
-        return ai;
     }
-
 }

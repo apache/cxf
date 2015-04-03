@@ -19,7 +19,6 @@
 
 package org.apache.cxf.transport.websocket.atmosphere;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,30 +37,10 @@ import org.junit.Test;
 /**
  * 
  */
-public class AtmosphereWebSocketServletDestinationTest extends Assert {
-    private static final String ENDPOINT_ADDRESS = "/websocket/nada";
+public class AtmosphereWebSocketJettyDestinationTest extends Assert {
+    private static final String ENDPOINT_ADDRESS = "ws://localhost:8080/websocket/nada";
     private static final QName ENDPOINT_NAME = new QName("urn:websocket:probe", "nada");
 
-    @Test
-    public void testRegisteration() throws Exception {
-        Bus bus = new ExtensionManagerBus();        
-        DestinationRegistry registry = new HTTPTransportFactory().getRegistry();
-        EndpointInfo endpoint = new EndpointInfo();
-        endpoint.setAddress(ENDPOINT_ADDRESS);
-        endpoint.setName(ENDPOINT_NAME);
-
-        TestAtmosphereWebSocketServletDestination dest = 
-            new TestAtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
-
-        dest.activate();
-        
-        assertNotNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
-        
-        dest.deactivate();
-
-        assertNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
-    }
-    
     @Test
     public void testUseCXFDefaultAtmoosphereInterceptor() throws Exception {
         Bus bus = new ExtensionManagerBus();        
@@ -94,25 +73,6 @@ public class AtmosphereWebSocketServletDestinationTest extends Assert {
         assertEquals(2, ais.size());
         assertEquals(CustomInterceptor1.class, ais.get(0).getClass());
         assertEquals(CustomInterceptor2.class, ais.get(1).getClass());
-    }
-    
-    private static class TestAtmosphereWebSocketServletDestination extends AtmosphereWebSocketServletDestination {
-
-
-        public TestAtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry,
-                                                         EndpointInfo ei, String path) throws IOException {
-            super(bus, registry, ei, path);
-        }
-
-        @Override
-        public void activate() {
-            super.activate();
-        }
-
-        @Override
-        public void deactivate() {
-            super.deactivate();
-        }
     }
     
     private static class CustomInterceptor1 extends DefaultProtocolInterceptor {

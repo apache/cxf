@@ -69,7 +69,7 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.PROPERTY_SESSION_SUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
-        framework.interceptor(AtmosphereUtils.getInterceptor(bus));
+        AtmosphereUtils.addInterceptors(framework, bus);
         framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();
 
@@ -169,5 +169,10 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
                 + "  Users can specify a larger executor queue to avoid this.");
             r.run();
         }
+    }
+
+    // used for internal tests
+    AtmosphereFramework getAtmosphereFramework() {
+        return framework;
     }
 }
