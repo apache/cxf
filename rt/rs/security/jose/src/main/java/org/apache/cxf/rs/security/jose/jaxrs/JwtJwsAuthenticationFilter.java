@@ -28,6 +28,7 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
@@ -44,7 +45,7 @@ public class JwtJwsAuthenticationFilter extends AbstractJwsReaderProvider implem
         String authHeader = context.getHeaderString(HttpHeaders.AUTHORIZATION);
         String[] schemeData = authHeader.split(" ");
         if (schemeData.length != 2 || !JWT_SCHEME_PROPERTY.equals(schemeData[0])) {
-            throw new SecurityException();
+            throw new JoseException("JWT scheme is expected");
         }
         
         JwsJwtCompactConsumer p = new JwsJwtCompactConsumer(schemeData[1]);

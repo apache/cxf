@@ -43,8 +43,11 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     }
     @Override
     public boolean verify(JoseHeaders headers, String unsignedText, byte[] signature) {
-        if (SIGNATURE_LENGTH_MAP.get(super.getAlgorithm().getJwaName()) != signature.length) {
-            throw new SecurityException();
+        final String algoName = super.getAlgorithm().getJwaName();
+        if (SIGNATURE_LENGTH_MAP.get(algoName) != signature.length) {
+            LOG.warning("Algorithm " + algoName + " signature length is " + SIGNATURE_LENGTH_MAP.get(algoName) 
+                        + ", actual length is " + signature.length);
+            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }
         byte[] der = signatureToDer(signature);
         return super.verify(headers, unsignedText, der);

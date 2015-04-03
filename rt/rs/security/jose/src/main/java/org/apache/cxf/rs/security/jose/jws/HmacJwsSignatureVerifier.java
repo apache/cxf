@@ -20,7 +20,9 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
@@ -28,6 +30,7 @@ import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
+    protected static final Logger LOG = LogUtils.getL7dLogger(HmacJwsSignatureVerifier.class);
     private byte[] key;
     private AlgorithmParameterSpec hmacSpec;
     private SignatureAlgorithm supportedAlgo;
@@ -62,10 +65,14 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     }
     
     protected String checkAlgorithm(String algo) {
-        if (algo == null 
-            || !AlgorithmUtils.isHmacSign(algo)
+        if (algo == null) {
+            LOG.warning("Signature algorithm is not set");
+            throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
+        }
+        if (!AlgorithmUtils.isHmacSign(algo)
             || !algo.equals(supportedAlgo.getJwaName())) {
-            throw new SecurityException();
+            LOG.warning("Invalid signature algorithm: " + algo);
+            throw new JwsException(JwsException.Error.INVALID_ALGORITHM);
         }
         return algo;
     }

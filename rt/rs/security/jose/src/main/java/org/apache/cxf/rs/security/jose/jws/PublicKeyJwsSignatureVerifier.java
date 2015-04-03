@@ -20,7 +20,9 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
@@ -28,6 +30,7 @@ import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
+    protected static final Logger LOG = LogUtils.getL7dLogger(PublicKeyJwsSignatureVerifier.class);
     private PublicKey key;
     private AlgorithmParameterSpec signatureSpec;
     private SignatureAlgorithm supportedAlgo;
@@ -49,14 +52,19 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
                                                AlgorithmUtils.toJavaName(checkAlgorithm(headers.getAlgorithm())),
                                                signatureSpec);
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("Invalid signature");
+            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }
     }
     protected String checkAlgorithm(String algo) {
-        if (algo == null 
-            || !isValidAlgorithmFamily(algo)
+        if (algo == null) {
+            LOG.warning("Signature algorithm is not set");
+            throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
+        }
+        if (!isValidAlgorithmFamily(algo)
             || !algo.equals(supportedAlgo.getJwaName())) {
-            throw new SecurityException();
+            LOG.warning("Invalid signature algorithm: " + algo);
+            throw new JwsException(JwsException.Error.INVALID_ALGORITHM);
         }
         return algo;
     }

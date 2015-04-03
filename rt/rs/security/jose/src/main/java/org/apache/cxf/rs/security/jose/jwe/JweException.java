@@ -23,17 +23,31 @@ import org.apache.cxf.rs.security.jose.JoseException;
 public class JweException extends JoseException {
 
     private static final long serialVersionUID = 4118589816228511524L;
-    public JweException() {
-        
+    private Error status;
+    public JweException(Error status) {
+        this(status, null);
     }
-    public JweException(String text) {
-        super(text);
-    }
-    public JweException(Throwable cause) {
+    public JweException(Error status, Throwable cause) {
         super(cause);
+        this.status = status;
     }
-    public JweException(String text, Throwable cause) {
-        super(text, cause);
+    public Error getError() {
+        return status;
     }
-    // Jwe Error enum can be introduced too
+    public static enum Error {
+        NO_ENCRYPTOR,
+        NO_DECRYPTOR,
+        NO_INIT_PROPERTIES,
+        KEY_ALGORITHM_NOT_SET,
+        CONTENT_ALGORITHM_NOT_SET,
+        INVALID_KEY_ALGORITHM,
+        INVALID_CONTENT_ALGORITHM,
+        INVALID_CONTENT_KEY,
+        KEY_ENCRYPTION_FAILURE,
+        CONTENT_ENCRYPTION_FAILURE,
+        KEY_DECRYPTION_FAILURE,
+        CONTENT_DECRYPTION_FAILURE,
+        INVALID_COMPACT_JWE,
+        INVALID_JSON_JWE
+    }
 }

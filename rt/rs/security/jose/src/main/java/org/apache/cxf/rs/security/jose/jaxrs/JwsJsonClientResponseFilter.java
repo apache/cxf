@@ -29,6 +29,7 @@ import javax.ws.rs.client.ClientResponseFilter;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonSignatureEntry;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
@@ -41,7 +42,7 @@ public class JwsJsonClientResponseFilter extends AbstractJwsJsonReaderProvider i
         JwsJsonConsumer p = new JwsJsonConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
         if (isStrictVerification() && p.getSignatureEntries().size() != theSigVerifiers.size()
             || !p.verifySignatureWith(theSigVerifiers)) {
-            throw new SecurityException();
+            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));

@@ -23,17 +23,27 @@ import org.apache.cxf.rs.security.jose.JoseException;
 public class JwsException extends JoseException {
 
     private static final long serialVersionUID = 4118589816228511524L;
-    public JwsException() {
-        
+    private Error status;
+    public JwsException(Error status) {
+        this(status, null);
     }
-    public JwsException(String text) {
-        super(text);
-    }
-    public JwsException(Throwable cause) {
+    public JwsException(Error status, Throwable cause) {
         super(cause);
+        this.status = status;
     }
-    public JwsException(String text, Throwable cause) {
-        super(text, cause);
+    public Error getError() {
+        return status;
     }
-    // Jws Error enum can be introduced too
+    public static enum Error {
+        NO_PROVIDER,
+        NO_VERIFIER,
+        NO_INIT_PROPERTIES,
+        ALGORITHM_NOT_SET,
+        INVALID_ALGORITHM,
+        INVALID_KEY,
+        SIGNATURE_FAILURE,
+        INVALID_SIGNATURE,
+        INVALID_COMPACT_JWS,
+        INVALID_JSON_JWS
+    }
 }

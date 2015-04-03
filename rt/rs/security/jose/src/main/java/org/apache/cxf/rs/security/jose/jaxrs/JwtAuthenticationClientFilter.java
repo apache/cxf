@@ -31,6 +31,7 @@ import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
@@ -58,7 +59,7 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
             }
         }
         if (jwt == null) {
-            throw new SecurityException();
+            throw new JoseException("JWT token is not available");
         }
         JoseUtils.setJoseMessageContextProperty(jwt.getHeaders(),
                                                 getContextPropertyValue());

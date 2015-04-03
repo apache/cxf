@@ -22,12 +22,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public final class JoseUtils {
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(JoseUtils.class);
     private JoseUtils() {
         
     }
@@ -57,7 +59,8 @@ public final class JoseUtils {
         if (requestContext == null && headerContext != null
             || requestContext != null && headerContext == null
             || !requestContext.equals(headerContext)) {
-            throw new SecurityException();
+            LOG.warning("Invalid JOSE context property");
+            throw new JoseException();
         }
     }
     
@@ -86,7 +89,7 @@ public final class JoseUtils {
         try {
             return new String(decode(encoded), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            throw new SecurityException(ex);
+            throw new JoseException(ex);
         }
         
     }

@@ -23,9 +23,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
@@ -35,7 +37,7 @@ import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsJsonConsumer {
-
+    protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonConsumer.class);
     private String jwsSignedDocument;
     private String encodedJwsPayload;
     private List<JwsJsonSignatureEntry> signatureEntries = new LinkedList<JwsJsonSignatureEntry>();
@@ -60,15 +62,20 @@ public class JwsJsonConsumer {
         encodedJwsPayload = (String)jsonObjectMap.get("payload");
         if (encodedJwsPayload == null) {
             encodedJwsPayload = encodedDetachedPayload;
+        } else if (encodedDetachedPayload != null) {
+            LOG.warning("JSON JWS includes a payload expected to be detached");
+            throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
         if (encodedJwsPayload == null) {
-            throw new SecurityException("Invalid JWS JSON sequence: no payload is available");
+            LOG.warning("JSON JWS has no payload");
+            throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
         
         List<Map<String, Object>> signatureArray = CastUtils.cast((List<?>)jsonObjectMap.get("signatures"));
         if (signatureArray != null) {
             if (jsonObjectMap.containsKey("signature")) {
-                throw new SecurityException("Invalid JWS JSON sequence");
+                LOG.warning("JSON JWS has a flattened 'signature' element and a 'signatures' object");
+                throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
             }
             for (Map<String, Object> signatureEntry : signatureArray) {
                 this.signatureEntries.add(getSignatureObject(signatureEntry));
@@ -77,7 +84,8 @@ public class JwsJsonConsumer {
             this.signatureEntries.add(getSignatureObject(jsonObjectMap));
         }
         if (signatureEntries.isEmpty()) {
-            throw new SecurityException("Invalid JWS JSON sequence: no signatures are available");
+            LOG.warning("JSON JWS has no signatures");
+            throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
     }
     protected JwsJsonSignatureEntry getSignatureObject(Map<String, Object> signatureEntry) {
@@ -128,37 +136,29 @@ public class JwsJsonConsumer {
     }
     public boolean verifySignatureWith(List<JwsSignatureVerifier> validators) {
         try {
-            verifyAndGetNonValidated(validators);
-            return true;
-        } catch (SecurityException ex) {
-            return false;
+            if (verifyAndGetNonValidated(validators).isEmpty()) {
+                return true;
+            }
+        } catch (JwsException ex) {
+            // ignore
         }
+        LOG.warning("One of JSON JWS signatures is invalid");
+        return false;
     }
     public List<JwsJsonSignatureEntry> verifyAndGetNonValidated(List<JwsSignatureVerifier> validators) {
-        if (validators.size() > signatureEntries.size()) {
-            throw new SecurityException("Too many signature validators");
-        }
         // TODO: more effective approach is needed
         List<JwsJsonSignatureEntry> validatedSignatures = new LinkedList<JwsJsonSignatureEntry>();
         for (JwsSignatureVerifier validator : validators) {
-            boolean validated = false;
             List<JwsJsonSignatureEntry> theSignatureEntries = 
                 getSignatureEntryMap().get(validator.getAlgorithm().getJwaName());
             if (theSignatureEntries != null) {
                 for (JwsJsonSignatureEntry sigEntry : theSignatureEntries) {
                     if (sigEntry.verifySignatureWith(validator)) {     
                         validatedSignatures.add(sigEntry);
-                        validated = true;
                         break;
                     }
                 }
             }
-            if (!validated) {
-                throw new SecurityException();
-            }
-        }
-        if (validatedSignatures.isEmpty()) {
-            throw new SecurityException();
         }
         List<JwsJsonSignatureEntry> nonValidatedSignatures = new LinkedList<JwsJsonSignatureEntry>();
         for (JwsJsonSignatureEntry sigEntry : signatureEntries) {

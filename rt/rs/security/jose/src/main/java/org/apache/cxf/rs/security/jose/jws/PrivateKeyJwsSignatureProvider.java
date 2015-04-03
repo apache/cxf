@@ -57,15 +57,8 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
     protected JwsSignature doCreateJwsSignature(Signature s) {
         return new PrivateKeyJwsSignature(s);
     }
-    @Override
-    protected void checkAlgorithm(String algo) {
-        super.checkAlgorithm(algo);
-        if (!isValidAlgorithmFamily(algo)) {
-            throw new SecurityException();
-        }
-        //TODO: validate "A key of size 2048 bits or larger MUST be used" for PS-SHA algorithms 
-    }
     
+    @Override
     protected boolean isValidAlgorithmFamily(String algo) {
         return AlgorithmUtils.isRsaSign(algo);
     }
@@ -80,7 +73,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
             try {
                 s.update(src, off, len);
             } catch (SignatureException ex) {
-                throw new SecurityException();
+                throw new JwsException(JwsException.Error.SIGNATURE_FAILURE, ex);
             }
         }
 
@@ -89,9 +82,10 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
             try {
                 return s.sign();
             } catch (SignatureException ex) {
-                throw new SecurityException();
+                throw new JwsException(JwsException.Error.SIGNATURE_FAILURE, ex);
             }
         }
         
     }
+    
 }
