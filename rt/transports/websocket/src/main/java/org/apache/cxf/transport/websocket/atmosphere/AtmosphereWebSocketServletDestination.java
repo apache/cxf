@@ -64,7 +64,7 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
         framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.PROPERTY_SESSION_SUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
-        framework.interceptor(AtmosphereUtils.getInterceptor(bus));
+        AtmosphereUtils.addInterceptors(framework, bus);
         framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();
 
@@ -137,5 +137,10 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
                 + "  Users can specify a larger executor queue to avoid this.");
             r.run();
         }
+    }
+
+    // used for internal tests
+    AtmosphereFramework getAtmosphereFramework() {
+        return framework;
     }
 }
