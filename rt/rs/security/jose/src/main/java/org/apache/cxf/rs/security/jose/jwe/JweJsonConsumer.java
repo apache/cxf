@@ -24,12 +24,16 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 
 public class JweJsonConsumer {
+    protected static final Logger LOG = LogUtils.getL7dLogger(JweJsonConsumer.class);
     private String protectedHeaderJson;
     private JweHeaders protectedHeaderJwe;
     private JweHeaders sharedUnprotectedHeader;
@@ -58,12 +62,14 @@ public class JweJsonConsumer {
     }
     
     private JweDecryptionInput getJweDecryptionInput(JweDecryptionProvider jwe, JweJsonEncryptionEntry entry) {
-        if (jwe == null || entry == null) {
-            throw new SecurityException();
+        if (entry == null) {
+            LOG.warning("JWE JSON Entry is not available");
+            throw new JweException(JweException.Error.INVALID_JSON_JWE);
         }
         JweHeaders unionHeaders = recipientsMap.get(entry);
         if (unionHeaders == null) {
-            throw new SecurityException();
+            LOG.warning("JWE JSON Entry union headers are not available");
+            throw new JweException(JweException.Error.INVALID_JSON_JWE);
         }
         JweDecryptionInput input = new JweDecryptionInput(entry.getEncryptedKey(),
                                                           iv,
@@ -99,7 +105,8 @@ public class JweJsonConsumer {
         List<Map<String, Object>> encryptionArray = CastUtils.cast((List<?>)jsonObjectMap.get("recipients"));
         if (encryptionArray != null) {
             if (jsonObjectMap.containsKey("encryption_key")) {
-                throw new SecurityException("Invalid JWE JSON sequence");
+                LOG.warning("JWE JSON encryption_key is missing");
+                throw new JweException(JweException.Error.INVALID_JSON_JWE);
             }
             for (Map<String, Object> encryptionEntry : encryptionArray) {
                 this.recipients.add(getEncryptionObject(encryptionEntry));
@@ -126,14 +133,16 @@ public class JweJsonConsumer {
         if (sharedUnprotectedHeader != null) {
             if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
                                       sharedUnprotectedHeader.asMap().keySet())) {
-                throw new SecurityException("Protected and unprotected headers have duplicate values");
+                LOG.warning("Protected and unprotected headers have duplicate values");
+                throw new JweException(JweException.Error.INVALID_JSON_JWE);
             }
             unionHeaders.asMap().putAll(sharedUnprotectedHeader.asMap());
         }
         if (recipientUnprotected != null) {
             if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
                                       recipientUnprotected.asMap().keySet())) {
-                throw new SecurityException("Protected and unprotected headers have duplicate values");
+                LOG.warning("Union and recipient unprotected headers have duplicate values");
+                throw new JweException(JweException.Error.INVALID_JSON_JWE);
             }
             unionHeaders.asMap().putAll(recipientUnprotected.asMap());
         }
@@ -168,7 +177,7 @@ public class JweJsonConsumer {
         try {
             return new String(aad, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            throw new SecurityException(ex);
+            throw new JoseException(ex);
         }
     }
     public List<JweJsonEncryptionEntry> getRecipients() {

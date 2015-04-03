@@ -20,14 +20,18 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 
 public class JweCompactConsumer {
+    protected static final Logger LOG = LogUtils.getL7dLogger(JweCompactConsumer.class);
     private JweDecryptionInput jweDecryptionInput;
     public JweCompactConsumer(String jweContent) {
         if (jweContent.startsWith("\"") && jweContent.endsWith("\"")) {
@@ -35,7 +39,8 @@ public class JweCompactConsumer {
         }
         String[] parts = jweContent.split("\\.");
         if (parts.length != 5) {
-            throw new SecurityException("5 JWE parts are expected");
+            LOG.warning("5 JWE parts are expected");
+            throw new JweException(JweException.Error.INVALID_COMPACT_JWE);
         }
         try {
             String headersJson = new String(Base64UrlUtility.decode(parts[0]));
@@ -46,7 +51,8 @@ public class JweCompactConsumer {
             JoseHeadersReaderWriter reader = new JoseHeadersReaderWriter();
             JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
             if (joseHeaders.getUpdateCount() != null) { 
-                throw new SecurityException("Duplicate headers have been detected");
+                LOG.warning("Duplicate headers have been detected");
+                throw new JweException(JweException.Error.INVALID_COMPACT_JWE);
             }
             JweHeaders jweHeaders = new JweHeaders(joseHeaders);
             jweDecryptionInput = new JweDecryptionInput(encryptedCEK,
@@ -58,7 +64,8 @@ public class JweCompactConsumer {
                                                         jweHeaders);
             
         } catch (Base64Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("Incorrect Base64 URL encoding");
+            throw new JweException(JweException.Error.INVALID_COMPACT_JWE);
         }
     }
     
@@ -111,7 +118,7 @@ public class JweCompactConsumer {
         try {
             return new String(getDecryptedContent(decryption), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            throw new SecurityException(ex);
+            throw new JoseException(ex);
         }
     }
     public boolean validateCriticalHeaders() {

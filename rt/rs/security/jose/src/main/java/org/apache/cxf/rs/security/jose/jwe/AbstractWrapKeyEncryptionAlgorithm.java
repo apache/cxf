@@ -21,13 +21,16 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Set;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractWrapKeyEncryptionAlgorithm.class);
     private Key keyEncryptionKey;
     private boolean wrap;
     private KeyAlgorithm algorithm;
@@ -80,21 +83,22 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
     }
     protected String checkAlgorithm(String algo) {
         if (algo != null && !supportedAlgorithms.contains(algo)) {
-            throw new SecurityException();
+            LOG.warning("Invalid key encryption algorithm: " + algo);
+            throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
         return algo;
     }
     protected void checkAlgorithms(JweHeaders headers) {
         String providedAlgo = headers.getKeyEncryptionAlgorithm();
-        if ((providedAlgo == null && algorithm == null)
-            || (providedAlgo != null && algorithm != null && !providedAlgo.equals(algorithm.getJwaName()))) {
-            throw new SecurityException();
+        if (providedAlgo != null && !providedAlgo.equals(algorithm.getJwaName())) {
+            LOG.warning("Invalid key encryption algorithm: " + providedAlgo);
+            throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
         if (providedAlgo != null) {
             checkAlgorithm(providedAlgo);
-        } else if (algorithm != null) {
-            headers.setKeyEncryptionAlgorithm(algorithm.getJwaName());
+        } else {
             checkAlgorithm(algorithm.getJwaName());
+            headers.setKeyEncryptionAlgorithm(algorithm.getJwaName());
         }
     }
     

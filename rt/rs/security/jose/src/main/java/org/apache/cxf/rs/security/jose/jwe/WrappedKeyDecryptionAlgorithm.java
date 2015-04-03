@@ -20,13 +20,16 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
+    protected static final Logger LOG = LogUtils.getL7dLogger(WrappedKeyDecryptionAlgorithm.class);
     private Key cekDecryptionKey;
     private boolean unwrap;
     private KeyAlgorithm supportedAlgo;
@@ -68,9 +71,14 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
         return AlgorithmUtils.toJavaName(keyAlgo);
     }
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
-        if (keyAlgo == null || supportedAlgo != null && !supportedAlgo.getJwaName().equals(keyAlgo)) {
-            throw new SecurityException();
+        if (keyAlgo == null 
+            || !supportedAlgo.getJwaName().equals(keyAlgo)) {
+            reportInvalidKeyAlgorithm(keyAlgo);
         }
+    }
+    protected void reportInvalidKeyAlgorithm(String keyAlgo) {
+        LOG.warning("Invalid key encryption algorithm: " + keyAlgo);
+        throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
     }
     protected String getContentEncryptionAlgorithm(JweDecryptionInput jweDecryptionInput) {
         return AlgorithmUtils.toJavaName(jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm());

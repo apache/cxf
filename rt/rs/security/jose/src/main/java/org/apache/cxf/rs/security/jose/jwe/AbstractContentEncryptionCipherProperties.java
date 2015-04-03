@@ -19,12 +19,16 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 
 
 public abstract class AbstractContentEncryptionCipherProperties implements ContentEncryptionCipherProperties {
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractContentEncryptionCipherProperties.class);
+    
     private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private int authTagLen = DEFAULT_AUTH_TAG_LENGTH;
     private ContentAlgorithm algo;

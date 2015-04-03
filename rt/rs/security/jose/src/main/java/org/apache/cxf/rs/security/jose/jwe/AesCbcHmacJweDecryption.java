@@ -57,7 +57,8 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
         macState.mac.update(jweDecryptionInput.getEncryptedContent());
         byte[] expectedAuthTag = AesCbcHmacJweEncryption.signAndGetTag(macState);
         if (!Arrays.equals(actualAuthTag, expectedAuthTag)) {
-            throw new SecurityException();
+            LOG.warning("Invalid authentication tag");
+            throw new JweException(JweException.Error.CONTENT_DECRYPTION_FAILURE);
         }
         
     }
@@ -82,7 +83,8 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
     private String validateCekAlgorithm(String cekAlgo) {
         if (!AlgorithmUtils.isAesCbcHmac(cekAlgo) 
             || supportedAlgo != null && !supportedAlgo.equals(cekAlgo)) {
-            throw new SecurityException();
+            LOG.warning("Invalid content encryption algorithm");
+            throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
         }
         return cekAlgo;
     }

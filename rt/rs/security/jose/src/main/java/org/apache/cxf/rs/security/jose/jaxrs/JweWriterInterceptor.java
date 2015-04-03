@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 
 import javax.annotation.Priority;
@@ -29,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -38,12 +40,14 @@ import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionInput;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
+import org.apache.cxf.rs.security.jose.jwe.JweException;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweOutputStream;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 
 @Priority(Priorities.JWE_WRITE_PRIORITY)
 public class JweWriterInterceptor implements WriterInterceptor {
+    protected static final Logger LOG = LogUtils.getL7dLogger(JweWriterInterceptor.class);
     private JweEncryptionProvider encryptionProvider;
     private boolean contentTypeRequired = true;
     private boolean useJweOutputStream;
@@ -79,7 +83,8 @@ public class JweWriterInterceptor implements WriterInterceptor {
                                                    encryption.getContentEncryptionKey(), 
                                                    encryption.getIv());
             } catch (IOException ex) {
-                throw new SecurityException(ex);
+                LOG.warning("JWE encryption error");
+                throw new JweException(JweException.Error.CONTENT_ENCRYPTION_FAILURE, ex);
             }
             OutputStream wrappedStream = null;
             JweOutputStream jweOutputStream = new JweOutputStream(actualOs, encryption.getCipher(), 

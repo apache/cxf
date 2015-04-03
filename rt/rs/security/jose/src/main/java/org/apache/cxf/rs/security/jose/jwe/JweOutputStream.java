@@ -22,12 +22,15 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 
 public class JweOutputStream extends FilterOutputStream {
+    protected static final Logger LOG = LogUtils.getL7dLogger(JweOutputStream.class);
     private Cipher encryptingCipher;
     private int blockSize;
     private AuthenticationTagProducer authTagProducer;
@@ -126,7 +129,8 @@ public class JweOutputStream extends FilterOutputStream {
                 encodeAndWrite(authTag, 0, authTagLengthBits / 8, true);
             }
         } catch (Exception ex) {
-            throw new SecurityException();
+            LOG.warning("Content encryption failure");
+            throw new JweException(JweException.Error.CONTENT_ENCRYPTION_FAILURE, ex);
         }
         flushed = true;
     }

@@ -25,7 +25,7 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {    
-        this(privateKey, null);
+        this(privateKey, KeyAlgorithm.RSA_OAEP);
     }
     public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo) {    
         this(privateKey, supportedAlgo, true);
@@ -40,7 +40,7 @@ public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
         super.validateKeyEncryptionAlgorithm(keyAlgo);
         if (!AlgorithmUtils.isRsaKeyWrap(keyAlgo)) {
-            throw new SecurityException();
+            reportInvalidKeyAlgorithm(keyAlgo);
         }
     }
 }

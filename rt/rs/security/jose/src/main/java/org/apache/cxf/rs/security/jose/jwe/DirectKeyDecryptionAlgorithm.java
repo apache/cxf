@@ -19,10 +19,13 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.Key;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class DirectKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
+    private static final Logger LOG = LogUtils.getL7dLogger(DirectKeyDecryptionAlgorithm.class);
     private byte[] contentDecryptionKey;
     public DirectKeyDecryptionAlgorithm(Key contentDecryptionKey) {    
         this(contentDecryptionKey.getEncoded());
@@ -42,7 +45,8 @@ public class DirectKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     protected void validateKeyEncryptionKey(JweDecryptionInput jweDecryptionInput) {
         byte[] encryptedCEK = jweDecryptionInput.getEncryptedCEK();
         if (encryptedCEK != null && encryptedCEK.length > 0) {
-            throw new SecurityException();
+            LOG.warning("Unexpected content encryption key");
+            throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
     }
 }

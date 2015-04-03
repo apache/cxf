@@ -26,13 +26,13 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class AesWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public AesWrapKeyDecryptionAlgorithm(String encodedKey) {    
-        this(encodedKey, null);
+        this(encodedKey, KeyAlgorithm.A128KW);
     }
     public AesWrapKeyDecryptionAlgorithm(String encodedKey, KeyAlgorithm supportedAlgo) {    
         this(CryptoUtils.decodeSequence(encodedKey), supportedAlgo);
     }
     public AesWrapKeyDecryptionAlgorithm(byte[] secretKey) {    
-        this(secretKey, null);
+        this(secretKey, KeyAlgorithm.A128KW);
     }
     public AesWrapKeyDecryptionAlgorithm(byte[] secretKey, KeyAlgorithm supportedAlgo) {    
         this(CryptoUtils.createSecretKeySpec(secretKey, AlgorithmUtils.AES_WRAP_ALGO_JAVA), 
@@ -48,7 +48,7 @@ public class AesWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
         super.validateKeyEncryptionAlgorithm(keyAlgo);
         if (!isValidAlgorithmFamily(keyAlgo)) {
-            throw new SecurityException();
+            reportInvalidKeyAlgorithm(keyAlgo);
         }
     }
     

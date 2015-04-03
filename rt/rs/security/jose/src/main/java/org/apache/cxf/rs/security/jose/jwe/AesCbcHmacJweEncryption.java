@@ -167,7 +167,8 @@ public class AesCbcHmacJweEncryption extends JweEncryption {
     
     private static ContentAlgorithm validateCekAlgorithm(ContentAlgorithm cekAlgo) {
         if (!AlgorithmUtils.isAesCbcHmac(cekAlgo.getJwaName())) {
-            throw new SecurityException();
+            LOG.warning("Invalid content encryption algorithm");
+            throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
         }
         return cekAlgo;
     }

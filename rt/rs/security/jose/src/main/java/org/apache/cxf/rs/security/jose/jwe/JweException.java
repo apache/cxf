@@ -39,7 +39,7 @@ public class JweException extends JoseException {
         NO_DECRYPTOR,
         NO_INIT_PROPERTIES,
         KEY_ALGORITHM_NOT_SET,
-        CONTENT_ALGORITHM_NOT_SET,
+        CUSTOM_IV_REUSED,
         INVALID_KEY_ALGORITHM,
         INVALID_CONTENT_ALGORITHM,
         INVALID_CONTENT_KEY,

@@ -20,10 +20,12 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.JoseConstants;
@@ -33,6 +35,7 @@ import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public abstract class AbstractJweEncryption implements JweEncryptionProvider {
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJweEncryption.class);
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private ContentEncryptionProvider contentEncryptionAlgo;
     private KeyEncryptionProvider keyEncryptionAlgo;
@@ -165,10 +168,14 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         if (jweInHeaders != null) {
             if (jweInHeaders.getKeyEncryptionAlgorithm() != null 
                 && (getKeyAlgorithm() == null 
-                    || !getKeyAlgorithm().getJwaName().equals(jweInHeaders.getKeyEncryptionAlgorithm()))
-                || jweInHeaders.getContentEncryptionAlgorithm() != null 
-                    && !getContentEncryptionAlgoJwt().equals(jweInHeaders.getContentEncryptionAlgorithm())) {
-                throw new SecurityException();
+                    || !getKeyAlgorithm().getJwaName().equals(jweInHeaders.getKeyEncryptionAlgorithm()))) {
+                LOG.warning("Invalid key encryption algorithm");
+                throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
+            }
+            if (jweInHeaders.getContentEncryptionAlgorithm() != null 
+                && !getContentEncryptionAlgoJwt().equals(jweInHeaders.getContentEncryptionAlgorithm())) {
+                LOG.warning("Invalid content encryption algorithm");
+                throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
             }
             theHeaders.asMap().putAll(jweInHeaders.asMap());
             protectedHeaders = jweInHeaders.getProtectedHeaders() != null 
