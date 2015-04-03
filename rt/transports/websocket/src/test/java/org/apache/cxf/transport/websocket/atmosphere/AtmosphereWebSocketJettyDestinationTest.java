@@ -53,8 +53,14 @@ public class AtmosphereWebSocketJettyDestinationTest extends Assert {
             new AtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
 
         List<AtmosphereInterceptor> ais = dest.getAtmosphereFramework().interceptors();
-        assertEquals(1, ais.size());
-        assertEquals(DefaultProtocolInterceptor.class, ais.get(0).getClass());
+        int added = 0;
+        for (AtmosphereInterceptor a : ais) {
+            if (DefaultProtocolInterceptor.class.equals(a.getClass())) {
+                added++;
+                break;
+            }
+        }
+        assertEquals(1, added);
     }
 
     @Test
@@ -70,9 +76,16 @@ public class AtmosphereWebSocketJettyDestinationTest extends Assert {
             new AtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
 
         List<AtmosphereInterceptor> ais = dest.getAtmosphereFramework().interceptors();
-        assertEquals(2, ais.size());
-        assertEquals(CustomInterceptor1.class, ais.get(0).getClass());
-        assertEquals(CustomInterceptor2.class, ais.get(1).getClass());
+        int added = 0;
+        for (AtmosphereInterceptor a : ais) {
+            if (CustomInterceptor1.class.equals(a.getClass())) {
+                added++;
+            } else if (CustomInterceptor2.class.equals(a.getClass())) {
+                added++;
+                break;
+            } 
+        }
+        assertEquals(2, added);
     }
     
     private static class CustomInterceptor1 extends DefaultProtocolInterceptor {
