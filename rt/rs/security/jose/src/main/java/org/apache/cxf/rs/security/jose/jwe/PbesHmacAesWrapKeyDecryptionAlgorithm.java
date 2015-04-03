@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
@@ -54,7 +55,7 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgor
         int keySize = PbesHmacAesWrapKeyEncryptionAlgorithm.getKeySize(keyAlgoJwt);
         byte[] derivedKey = PbesHmacAesWrapKeyEncryptionAlgorithm
             .createDerivedKey(keyAlgoJwt, keySize, password, saltInput, pbesCount);
-        KeyDecryptionAlgorithm aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey) {
+        KeyDecryptionAlgorithm aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey, algo) {
             protected boolean isValidAlgorithmFamily(String wrapAlgo) {
                 return AlgorithmUtils.isPbesHsWrap(wrapAlgo);
             }    
@@ -65,7 +66,7 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgor
         try {
             return Base64UrlUtility.decode(p2sHeader.toString());
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            throw new JoseException(ex);
         }
     }
     @Override

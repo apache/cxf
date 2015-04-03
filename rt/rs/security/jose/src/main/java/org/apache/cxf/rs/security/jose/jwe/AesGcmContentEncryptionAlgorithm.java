@@ -46,6 +46,7 @@ public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionA
         if (AlgorithmUtils.isAesGcm(algo.getJwaName())) {       
             return algo;
         }
-        throw new SecurityException();
+        LOG.warning("Invalid content encryption algorithm");
+        throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
     }
 }

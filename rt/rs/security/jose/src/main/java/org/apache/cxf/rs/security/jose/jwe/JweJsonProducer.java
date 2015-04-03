@@ -25,12 +25,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 public class JweJsonProducer {
+    protected static final Logger LOG = LogUtils.getL7dLogger(JweJsonProducer.class);
     private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
     private JweHeaders protectedHeader;
     private JweHeaders unprotectedHeader;
@@ -81,7 +84,8 @@ public class JweJsonProducer {
         if (unprotectedHeader != null) {
             if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
                                      unprotectedHeader.asMap().keySet())) {
-                throw new SecurityException("Protected and unprotected headers have duplicate values");
+                LOG.warning("Protected and unprotected headers have duplicate values");
+                throw new JweException(JweException.Error.INVALID_JSON_JWE);
             }
             checkCriticalHeaders(unprotectedHeader);
             unionHeaders.asMap().putAll(unprotectedHeader.asMap());
@@ -101,7 +105,8 @@ public class JweJsonProducer {
                 checkCriticalHeaders(perRecipientUnprotected);
                 if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
                                           perRecipientUnprotected.asMap().keySet())) {
-                    throw new SecurityException("Protected and unprotected headers have duplicate values");
+                    LOG.warning("union and recipient unprotected headers have duplicate values");
+                    throw new JweException(JweException.Error.INVALID_JSON_JWE);
                 }
                 jsonHeaders = new JweHeaders(unionHeaders.asMap());
                 jsonHeaders.asMap().putAll(perRecipientUnprotected.asMap());
@@ -130,8 +135,8 @@ public class JweJsonProducer {
             
             byte[] encryptedCek = state.getContentEncryptionKey(); 
             if (encryptedCek.length == 0 && encryptor.getKeyAlgorithm() != null) {
-                // can be null only if it is the direct key encryption
-                throw new SecurityException();
+                LOG.warning("Unexpected key encryption algorithm");
+                throw new JweException(JweException.Error.INVALID_JSON_JWE);
             }
             String encodedCek = encryptedCek.length == 0 ? null : Base64UrlUtility.encode(encryptedCek);    
             entries.add(new JweJsonEncryptionEntry(perRecipientUnprotected, encodedCek));
@@ -173,13 +178,15 @@ public class JweJsonProducer {
             set.add(encryptor.getContentAlgorithm().getJwaName());
         }
         if (set.size() != 1) {
-            throw new SecurityException("Invalid content encryption algorithm");
+            LOG.warning("Invalid content encryption algorithm");
+            throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
         }
         return set.iterator().next();
     }
     private static void checkCriticalHeaders(JweHeaders unprotected) {
         if (unprotected.asMap().containsKey(JoseConstants.HEADER_CRITICAL)) {
-            throw new SecurityException();
+            LOG.warning("Unprotected headers contain critical headers");
+            throw new JweException(JweException.Error.INVALID_JSON_JWE);
         }
     }
 }

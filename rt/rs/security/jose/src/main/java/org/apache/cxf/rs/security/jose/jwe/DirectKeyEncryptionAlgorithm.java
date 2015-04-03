@@ -18,18 +18,21 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class DirectKeyEncryptionAlgorithm implements KeyEncryptionProvider {
+    private static final Logger LOG = LogUtils.getL7dLogger(DirectKeyEncryptionAlgorithm.class);
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] theCek) {
-        if (headers.getKeyEncryptionAlgorithm() != null) {
-            throw new SecurityException();
-        }
+        checkKeyEncryptionAlgorithm(headers);
         return new byte[0];
     }
     protected void checkKeyEncryptionAlgorithm(JweHeaders headers) {
         if (headers.getKeyEncryptionAlgorithm() != null) {
-            throw new SecurityException();
+            LOG.warning("Key encryption algorithm header is set");
+            throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
     }
     @Override

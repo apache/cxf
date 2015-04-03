@@ -40,14 +40,17 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.security.SecurityContext;
 
@@ -68,6 +71,7 @@ public final class KeyManagementUtils {
     public static final String RSSEC_DECRYPT_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
     public static final String RSSEC_DEFAULT_ALGORITHMS = "rs.security.default.algorithms";
     public static final String RSSEC_REPORT_KEY_PROP = "rs.security.report.public.key";
+    private static final Logger LOG = LogUtils.getL7dLogger(KeyManagementUtils.class);
     
     private KeyManagementUtils() {
     }
@@ -89,7 +93,8 @@ public final class KeyManagementUtils {
                 return new X509Certificate[]{(X509Certificate)CryptoUtils.loadCertificate(keyStore, alias)};
             }
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("X509 Certificates can not be created");
+            throw new JoseException(ex);
         }    
     }
     
@@ -107,7 +112,8 @@ public final class KeyManagementUtils {
             Properties props = ResourceUtils.loadProperties(keyStoreLoc, bus);
             return KeyManagementUtils.loadPublicKey(m, props);
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("Public key can not be loaded");
+            throw new JoseException(ex);
         }
     }
     private static String getMessageProperty(Message m, String keyStoreLocPropPreferred, 
@@ -115,7 +121,8 @@ public final class KeyManagementUtils {
         String propLoc = 
             (String)MessageUtils.getContextualProperty(m, keyStoreLocPropPreferred, keyStoreLocPropDefault);
         if (propLoc == null) {
-            throw new SecurityException();
+            LOG.warning("Properties resource is not identified");
+            throw new JoseException();
         }
         return propLoc;
     }
@@ -219,7 +226,8 @@ public final class KeyManagementUtils {
             InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
             return CryptoUtils.loadKeyStore(is, keyStorePswd.toCharArray(), keyStoreType);
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("Key store can not be loaded");
+            throw new JoseException(ex);
         }
     }
     public static List<String> encodeX509CertificateChain(X509Certificate[] chain) {
@@ -231,7 +239,8 @@ public final class KeyManagementUtils {
             try {
                 encodedChain.add(CryptoUtils.encodeCertificate(cert));
             } catch (Exception ex) {
-                throw new SecurityException(ex);
+                LOG.warning("X509 Certificate can not be encoded");
+                throw new JoseException(ex);
             }    
         }
         return encodedChain;
@@ -243,7 +252,8 @@ public final class KeyManagementUtils {
                 try {
                     certs.add((X509Certificate)CryptoUtils.decodeCertificate(encodedCert));
                 } catch (Exception ex) {
-                    throw new SecurityException(ex);
+                    LOG.warning("X509 Certificate can not be decoded");
+                    throw new JoseException(ex);
                 }
             }
             return certs;
@@ -269,7 +279,8 @@ public final class KeyManagementUtils {
             CertPath certPath = buildResult.getCertPath();
             CertPathValidator.getInstance("PKIX").validate(certPath, pbParams);
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("Certificate path validation error");
+            throw new JoseException(ex);
         }
     }
     public static X509Certificate[] toX509CertificateChainArray(List<String> base64EncodedChain) {
@@ -288,7 +299,7 @@ public final class KeyManagementUtils {
                                                  String storeProp1, String storeProp2) {
         if (m == null) {
             if (required) {
-                throw new SecurityException();
+                throw new JoseException();
             }
             return null;
         }
@@ -299,7 +310,8 @@ public final class KeyManagementUtils {
             try {
                 props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
             } catch (Exception ex) {
-                throw new SecurityException(ex);
+                LOG.warning("Properties resource is not identified");
+                throw new JoseException(ex);
             }
         } else {
             String keyFile = (String)m.getContextualProperty(RSSEC_KEY_STORE_FILE);
@@ -314,7 +326,8 @@ public final class KeyManagementUtils {
             }
         }
         if (props == null && required) { 
-            throw new SecurityException();
+            LOG.warning("Properties resource is not identified");
+            throw new JoseException();
         }
         return props; 
     }
@@ -337,7 +350,8 @@ public final class KeyManagementUtils {
             return loadPrivateKey(ks, m, props, keyOper, alias);
             
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("Private key can not be loaded");
+            throw new JoseException(ex);
         }
     }
 }

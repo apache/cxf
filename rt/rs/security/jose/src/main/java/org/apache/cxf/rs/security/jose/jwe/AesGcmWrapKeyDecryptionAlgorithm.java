@@ -19,15 +19,19 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
+    protected static final Logger LOG = LogUtils.getL7dLogger(AesGcmWrapKeyDecryptionAlgorithm.class);
     public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey) {    
         this(encodedKey, null);
     }
@@ -35,7 +39,7 @@ public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgori
         this(CryptoUtils.decodeSequence(encodedKey), supportedAlgo);
     }
     public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey) {    
-        this(secretKey, null);
+        this(secretKey, KeyAlgorithm.A128GCMKW);
     }
     public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey, KeyAlgorithm supportedAlgo) {    
         this(CryptoUtils.createSecretKeySpec(secretKey, AlgorithmUtils.AES), supportedAlgo);
@@ -61,13 +65,14 @@ public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgori
             Object ivHeader = jweDecryptionInput.getJweHeaders().getHeader(headerName);
             return Base64UrlUtility.decode(ivHeader.toString());
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            throw new JoseException(ex);
         }
     }
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
         super.validateKeyEncryptionAlgorithm(keyAlgo);
         if (!AlgorithmUtils.isAesGcmKeyWrap(keyAlgo)) {
-            throw new SecurityException();
+            LOG.warning("Invalid key encryption algorithm");
+            throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
     }
 }

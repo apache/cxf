@@ -28,10 +28,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -48,6 +50,7 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public final class JweUtils {
+    private static final Logger LOG = LogUtils.getL7dLogger(JweUtils.class);
     private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_KEY_ALGO_PROP = "rs.security.jwe.key.encryption.algorithm";
     private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
@@ -462,7 +465,8 @@ public final class JweUtils {
         final byte[] emptyPartyInfo = new byte[4];
        
         if (apuBytes != null && apvBytes != null && Arrays.equals(apuBytes, apvBytes)) {
-            throw new SecurityException();
+            LOG.warning("Derived key calculation problem: apu equals to apv");
+            throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE);
         }
         byte[] algorithmId = concatenateDatalenAndData(StringUtils.toBytesASCII(algoName));
         byte[] partyUInfo = apuBytes == null ? emptyPartyInfo : concatenateDatalenAndData(apuBytes);
@@ -488,7 +492,8 @@ public final class JweUtils {
             byte[] round1Hash = MessageDigestUtils.createDigest(concatKDF, MessageDigestUtils.ALGO_SHA_256);
             return Arrays.copyOf(round1Hash, algoKeyBitLen / 8);
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("Derived key calculation problem: round hash1 error");
+            throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE);
         }
     }
     private static byte[] generateKeyZ(ECPrivateKey privateKey, ECPublicKey publicKey) {
@@ -498,7 +503,8 @@ public final class JweUtils {
             ka.doPhase(publicKey, true);
             return ka.generateSecret();
         } catch (Exception ex) {
-            throw new SecurityException(ex);
+            LOG.warning("Derived key calculation problem");
+            throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE);
         }
     }
     private static byte[] concatenateDatalenAndData(byte[] bytesASCII) {
@@ -530,7 +536,8 @@ public final class JweUtils {
                                                                      String contentEncryptionAlgo,
                                                                      String compression) {
         if (keyEncryptionProvider == null && ctEncryptionProvider == null) {
-            throw new SecurityException();
+            LOG.warning("Key or content encryptor is not available");
+            throw new JweException(JweException.Error.NO_ENCRYPTOR);
         }
         JweHeaders headers = 
             prepareJweHeaders(keyEncryptionProvider != null ? keyEncryptionProvider.getAlgorithm().getJwaName() : null,
@@ -545,7 +552,8 @@ public final class JweUtils {
                                                                     SecretKey ctDecryptionKey,
                                                                     String contentDecryptionAlgo) {
         if (keyDecryptionProvider == null && ctDecryptionKey == null) {
-            throw new SecurityException();
+            LOG.warning("Key or content encryptor is not available");
+            throw new JweException(JweException.Error.NO_ENCRYPTOR);
         }
         if (keyDecryptionProvider != null) {
             return createJweDecryptionProvider(keyDecryptionProvider, contentDecryptionAlgo);

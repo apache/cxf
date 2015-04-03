@@ -48,7 +48,8 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
         if (iv == null) {
             return CryptoUtils.generateSecureRandomBytes(getIvSize() / 8);
         } else if (iv.length > 0 && providedIvUsageCount.addAndGet(1) > 1) {
-            throw new SecurityException();
+            LOG.warning("Custom IV is recommeded to be used once");
+            throw new JweException(JweException.Error.CUSTOM_IV_REUSED);
         } else {
             return iv;
         }

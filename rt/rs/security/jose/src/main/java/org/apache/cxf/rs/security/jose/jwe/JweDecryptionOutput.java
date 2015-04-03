@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.io.UnsupportedEncodingException;
 
+import org.apache.cxf.rs.security.jose.JoseException;
+
 public class JweDecryptionOutput {
     private JweHeaders headers;
     private byte[] content;
@@ -37,7 +39,7 @@ public class JweDecryptionOutput {
         try {
             return new String(getContent(), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            throw new SecurityException(ex);
+            throw new JoseException(ex);
         }
     }
 }

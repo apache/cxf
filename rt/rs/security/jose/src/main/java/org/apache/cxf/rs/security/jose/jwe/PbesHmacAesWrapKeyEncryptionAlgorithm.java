@@ -23,7 +23,9 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
@@ -38,6 +40,7 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
+    protected static final Logger LOG = LogUtils.getL7dLogger(PbesHmacAesWrapKeyEncryptionAlgorithm.class);
     private static final Map<String, Integer> PBES_HMAC_MAP;
     private static final Map<String, String> PBES_AES_MAP;
     private static final Map<String, Integer> DERIVED_KEY_SIZE_MAP;
@@ -92,13 +95,15 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvi
     static byte[] validatePassword(byte[] p, String keyAlgoJwt, boolean hashLargePasswords) {
         int minLen = DERIVED_KEY_SIZE_MAP.get(keyAlgoJwt);
         if (p.length < minLen || p.length > 128) {
-            throw new SecurityException();
+            LOG.warning("Invalid password length: " + p.length);
+            throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE);
         }
         if (p.length > minLen && hashLargePasswords) {
             try {
                 return MessageDigestUtils.createDigest(p, MessageDigestUtils.ALGO_SHA_256);
             } catch (Exception ex) {
-                throw new SecurityException(ex);
+                LOG.warning("Password hash calculation error");
+                throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE, ex);
             }
         } else {
             return p;
@@ -157,13 +162,15 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvi
     }
     static KeyAlgorithm validateKeyAlgorithm(KeyAlgorithm algo) {
         if (!AlgorithmUtils.isPbesHsWrap(algo.getJwaName())) {
-            throw new SecurityException();
+            LOG.warning("Invalid key encryption algorithm");
+            throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
         return algo;
     }
     static int validatePbesCount(int count) {
         if (count < 1000) {
-            throw new SecurityException();
+            LOG.warning("Iteration count is too low");
+            throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE);
         }
         return count;
     }    
