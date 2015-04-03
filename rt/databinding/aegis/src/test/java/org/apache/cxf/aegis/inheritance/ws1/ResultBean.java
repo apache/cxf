@@ -53,11 +53,7 @@ public class ResultBean {
         if (!Arrays.equals(result1, that.result1)) {
             return false;
         }
-        if (!Arrays.equals(result2, that.result2)) {
-            return false;
-        }
-
-        return true;
+        return Arrays.equals(result2, that.result2);
     }
 
     public int hashCode() {

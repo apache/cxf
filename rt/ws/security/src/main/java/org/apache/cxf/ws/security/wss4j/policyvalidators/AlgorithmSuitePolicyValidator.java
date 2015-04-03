@@ -52,13 +52,9 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        if (assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null 
             && (SP12Constants.ALGORITHM_SUITE.equals(assertionInfo.getAssertion().getName())
-                || SP11Constants.ALGORITHM_SUITE.equals(assertionInfo.getAssertion().getName()))) {
-            return true;
-        }
-        
-        return false;
+                || SP11Constants.ALGORITHM_SUITE.equals(assertionInfo.getAssertion().getName()));
     }
     
     /**
@@ -136,11 +132,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             return false;
         }
         
-        if (!checkKeyLengths(result, algorithmPolicy, ai, true)) {
-            return false;
-        }
-        
-        return true;
+        return checkKeyLengths(result, algorithmPolicy, ai, true);
     }
     
     /**
@@ -214,11 +206,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             }
         }
         
-        if (!checkKeyLengths(result, algorithmPolicy, ai, false)) {
-            return false;
-        }
-        
-        return true;
+        return checkKeyLengths(result, algorithmPolicy, ai, false);
     }
     
     /**

@@ -45,12 +45,8 @@ public class EncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicy
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        if (assertionInfo.getAssertion() != null 
-            && SP12Constants.ENCRYPTED_SUPPORTING_TOKENS.equals(assertionInfo.getAssertion().getName())) {
-            return true;
-        }
-        
-        return false;
+        return assertionInfo.getAssertion() != null 
+            && SP12Constants.ENCRYPTED_SUPPORTING_TOKENS.equals(assertionInfo.getAssertion().getName());
     }
     
     /**

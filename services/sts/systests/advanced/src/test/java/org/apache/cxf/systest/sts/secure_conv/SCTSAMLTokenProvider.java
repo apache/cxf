@@ -75,11 +75,8 @@ public class SCTSAMLTokenProvider implements TokenProvider {
      * that corresponds to the given TokenType.
      */
     public boolean canHandleToken(String tokenType) {
-        if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)
-            || WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType)) {
-            return true;
-        }
-        return false;
+        return WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)
+            || WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType);
     }
 
     public boolean canHandleToken(String tokenType, String realm) {

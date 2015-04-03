@@ -39,10 +39,7 @@ public class JaxwsServerGenerator extends AbstractJaxwsGenerator {
     }
 
     public boolean passthrough() {
-        if (env.optionSet(ToolConstants.CFG_SERVER)) {
-            return false;
-        }
-        return true;
+        return !env.optionSet(ToolConstants.CFG_SERVER);
     }
 
     public void generate(ToolContext penv) throws ToolException {

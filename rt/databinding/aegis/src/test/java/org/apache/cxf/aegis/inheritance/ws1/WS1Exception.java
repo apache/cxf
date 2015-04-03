@@ -79,11 +79,7 @@ public class WS1Exception extends Exception {
             return false;
         }
 
-        if (errorCode != that.errorCode) {
-            return false;
-        }
-
-        return true;
+        return errorCode == that.errorCode;
     }
 
     public int hashCode() {

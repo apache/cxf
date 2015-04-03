@@ -976,12 +976,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     }
     
     private boolean hasSignedPartsOrElements() {
-        if (PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_PARTS) != null
-            || PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_ELEMENTS) != null) {
-            return true;
-        }
-        
-        return false;
+        return PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_PARTS) != null
+            || PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_ELEMENTS) != null;
     }
 
 }

@@ -927,11 +927,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
         
         ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
-        if (ai != null) {
-            return true;
-        }
-        
-        return false;
+        return ai != null;
     }
 
 }

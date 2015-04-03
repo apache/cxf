@@ -157,11 +157,7 @@ public final class STSUtils {
     }
 
     public static boolean configureViaEPR(STSClient client, EndpointReferenceType epr) {
-        if (epr != null && client.getLocation() == null && client.getWsdlLocation() == null) {
-            return true;
-        }
-            
-        return false;
+        return epr != null && client.getLocation() == null && client.getWsdlLocation() == null;
     }
     
     private static STSClient createSTSClient(Message message, String type) {

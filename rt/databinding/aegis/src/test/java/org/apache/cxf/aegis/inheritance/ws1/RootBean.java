@@ -55,11 +55,7 @@ public class RootBean {
         if (child != null ? !child.equals(rootBean.child) : rootBean.child != null) {
             return false;
         }
-        if (id != null ? !id.equals(rootBean.id) : rootBean.id != null) {
-            return false;
-        }
-
-        return true;
+        return !(id != null ? !id.equals(rootBean.id) : rootBean.id != null);
     }
 
     public int hashCode() {

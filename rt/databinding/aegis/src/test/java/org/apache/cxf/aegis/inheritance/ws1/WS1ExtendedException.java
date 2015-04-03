@@ -65,11 +65,7 @@ public class WS1ExtendedException extends WS1Exception {
 
         final WS1ExtendedException that = (WS1ExtendedException)o;
 
-        if (extendedCode != that.extendedCode) {
-            return false;
-        }
-
-        return true;
+        return extendedCode == that.extendedCode;
     }
 
     public int hashCode() {

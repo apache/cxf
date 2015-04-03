@@ -60,12 +60,9 @@ public abstract class AbstractTypeTestClient
     }
 
     public boolean shouldRunTest(String name) {
-        if (System.getProperty("java.vendor").contains("IBM")
-            && "GMonth".equals(name)) {
-            //the validator in ibm doesn't like this type.
-            return false;
-        }
-        return true;
+        //the validator in ibm doesn't like this type.
+        return !(System.getProperty("java.vendor").contains("IBM")
+            && "GMonth".equals(name));
     }
     
     public static void initClient(Class<?> clz, QName serviceName, 

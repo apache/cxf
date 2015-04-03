@@ -60,10 +60,7 @@ public class PortTypeVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_interface) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_interface;
     }
     
     public void visit(AST node) {

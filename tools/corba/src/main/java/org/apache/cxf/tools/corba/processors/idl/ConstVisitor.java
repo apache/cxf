@@ -39,10 +39,7 @@ public class ConstVisitor extends VisitorBase {
     }
     
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_const) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_const;
     }
     
     public void visit(AST constNode) {

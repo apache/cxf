@@ -85,11 +85,8 @@ public class AttributeVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_readonly
-            || node.getType() == IDLTokenTypes.LITERAL_attribute) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_readonly
+            || node.getType() == IDLTokenTypes.LITERAL_attribute;
     }
 
     public void visit(AST attributeNode) {

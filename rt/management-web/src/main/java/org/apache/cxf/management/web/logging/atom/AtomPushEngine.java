@@ -118,11 +118,7 @@ final class AtomPushEngine {
             //System.err.println("converter is not set");
             return false;
         }
-        if (executor.isShutdown()) {
-            //System.err.println("engine shutdown");
-            return false;
-        }
-        return true;
+        return !executor.isShutdown();
     }
 
     private void publishBatch(final List<LogRecord> batch,

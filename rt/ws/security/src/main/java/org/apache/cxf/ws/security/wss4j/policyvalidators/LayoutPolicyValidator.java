@@ -57,13 +57,9 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        if (assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null 
             && (SP12Constants.LAYOUT.equals(assertionInfo.getAssertion().getName())
-                || SP11Constants.LAYOUT.equals(assertionInfo.getAssertion().getName()))) {
-            return true;
-        }
-        
-        return false;
+                || SP11Constants.LAYOUT.equals(assertionInfo.getAssertion().getName()));
     }
     
     /**

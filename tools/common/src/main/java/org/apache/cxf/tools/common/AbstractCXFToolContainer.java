@@ -62,10 +62,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         if (commandDocument == null) {
             return false;
         }
-        if ((commandDocument.hasParameter("help")) || (commandDocument.hasParameter("version"))) {
-            return true;
-        }
-        return false;
+        return commandDocument.hasParameter("help") || commandDocument.hasParameter("version");
     }
 
     public void execute(boolean exitOnFinish) throws ToolException {

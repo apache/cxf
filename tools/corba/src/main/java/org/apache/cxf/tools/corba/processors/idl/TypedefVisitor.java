@@ -41,10 +41,7 @@ public class TypedefVisitor extends VisitorBase {
     }
     
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_typedef) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_typedef;
     }
     
     public void visit(AST typedefNode) {

@@ -132,10 +132,6 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     private boolean isRecognizedQuery(Map<String, String> map) {
-
-        if (map.containsKey("wsdl") || map.containsKey("xsd")) {
-            return true;
-        }
-        return false;
+        return map.containsKey("wsdl") || map.containsKey("xsd");
     }
 }

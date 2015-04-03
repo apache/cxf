@@ -358,11 +358,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy
     ) {
         AbstractSecurityAssertion supportingToken = usernameTokenPolicy.getParentAssertion();
-        if (supportingToken instanceof SupportingTokens
-            && ((SupportingTokens)supportingToken).isEndorsing()) {
-            return false;
-        }
-        return true;
+        return !(supportingToken instanceof SupportingTokens
+            && ((SupportingTokens)supportingToken).isEndorsing());
     }
 
     protected void addToken(SoapMessage message) {

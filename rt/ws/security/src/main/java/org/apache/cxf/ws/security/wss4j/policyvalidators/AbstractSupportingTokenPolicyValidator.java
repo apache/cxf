@@ -122,16 +122,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             }
         }
         
-        if ((isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
+        return !((isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
                                              parameters.getMessage(),
                                              parameters.getTimestampElement())) 
             || !validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
                                                 parameters.getEncryptedResults(),
-                                                parameters.getMessage())) {
-            return false;
-        }
-        
-        return true;
+                                                parameters.getMessage()));
     }
     
     
@@ -159,13 +155,9 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(parameters.getSamlResults(), parameters.getSignedResults(),
+        return validateSignedEncryptedPolicies(parameters.getSamlResults(), parameters.getSignedResults(),
                                              parameters.getEncryptedResults(),
-                                             parameters.getMessage())) {
-            return false;
-        }
-        
-        return true;
+                                             parameters.getMessage());
     }
     
     
@@ -218,13 +210,9 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
+        return validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
                                              parameters.getEncryptedResults(),
-                                             parameters.getMessage())) {
-            return false;
-        }
-        
-        return true;
+                                             parameters.getMessage());
     }
     
     
@@ -278,13 +266,9 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
+        return validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
                                              parameters.getEncryptedResults(),
-                                             parameters.getMessage())) {
-            return false;
-        }
-        
-        return true;
+                                             parameters.getMessage());
     }
     
     /**
@@ -322,13 +306,9 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
+        return validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
                                              parameters.getEncryptedResults(),
-                                             parameters.getMessage())) {
-            return false;
-        }
-        
-        return true;
+                                             parameters.getMessage());
     }
     
     /**
@@ -351,12 +331,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (!validateSignedEncryptedElements(encryptedElements, false, encryptedResults, tokenResults, 
-                                             message)) {
-            return false;
-        }
-        
-        return true;
+        return validateSignedEncryptedElements(encryptedElements, false, encryptedResults, tokenResults, message);
     }
     
     
@@ -399,13 +374,9 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         
-        if (!validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
+        return validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
                                              parameters.getEncryptedResults(),
-                                             parameters.getMessage())) {
-            return false;
-        }
-        
-        return true;
+                                             parameters.getMessage());
     }
     
     /**
@@ -462,10 +433,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
     private boolean isTLSInUse(Message message) {
         // See whether TLS is in use or not
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
-        if (tlsInfo != null) {
-            return true;
-        }
-        return false;
+        return tlsInfo != null;
     }
     
     /**

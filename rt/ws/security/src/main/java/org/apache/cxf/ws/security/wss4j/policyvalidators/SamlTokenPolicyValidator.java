@@ -48,13 +48,9 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        if (assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null 
             && (SP12Constants.SAML_TOKEN.equals(assertionInfo.getAssertion().getName())
-                || SP11Constants.SAML_TOKEN.equals(assertionInfo.getAssertion().getName()))) {
-            return true;
-        }
-        
-        return false;
+                || SP11Constants.SAML_TOKEN.equals(assertionInfo.getAssertion().getName()));
     }
     
     /**

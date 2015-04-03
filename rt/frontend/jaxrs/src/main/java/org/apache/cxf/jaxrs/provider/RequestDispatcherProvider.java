@@ -144,10 +144,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 }
             }
         }
-        if (mc != null && mc.get(MESSAGE_RESOURCE_PATH_PROPERTY) != null) {
-            return true;
-        }
-        return false;
+        return mc != null && mc.get(MESSAGE_RESOURCE_PATH_PROPERTY) != null;
     }
 
     private boolean classResourceSupported(Class<?> type) {

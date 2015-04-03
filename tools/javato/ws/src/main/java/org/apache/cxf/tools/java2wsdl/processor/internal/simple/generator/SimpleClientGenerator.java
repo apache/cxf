@@ -35,10 +35,7 @@ public class SimpleClientGenerator extends AbstractSimpleGenerator {
     }
 
     public boolean passthrough() {
-        if (env.optionSet(ToolConstants.CFG_CLIENT)) {
-            return false;
-        }
-        return true;
+        return !env.optionSet(ToolConstants.CFG_CLIENT);
     }
 
 

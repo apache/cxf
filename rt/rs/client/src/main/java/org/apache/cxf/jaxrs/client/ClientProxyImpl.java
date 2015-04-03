@@ -270,11 +270,8 @@ public class ClientProxyImpl extends AbstractClient implements
         if (p.getType() == ParameterType.CONTEXT) {
             return true;
         }
-        if (p.getType() == ParameterType.REQUEST_BODY 
-            && m.getParameterTypes()[p.getIndex()] == AsyncResponse.class) {
-            return true;
-        }
-        return false;
+        return p.getType() == ParameterType.REQUEST_BODY 
+            && m.getParameterTypes()[p.getIndex()] == AsyncResponse.class;
     }
     
     private static int getBodyIndex(MultivaluedMap<ParameterType, Parameter> map, 

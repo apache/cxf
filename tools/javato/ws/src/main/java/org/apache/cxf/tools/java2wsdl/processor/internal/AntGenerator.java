@@ -41,10 +41,7 @@ public class AntGenerator extends AbstractGenerator {
     }
 
     public boolean passthrough() {
-        if (env.optionSet(ToolConstants.CFG_ANT)) {
-            return false;
-        }
-        return true;
+        return !env.optionSet(ToolConstants.CFG_ANT);
     }
 
     public void generate(ToolContext penv) throws ToolException {

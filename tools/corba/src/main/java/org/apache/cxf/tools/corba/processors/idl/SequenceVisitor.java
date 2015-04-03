@@ -51,10 +51,7 @@ public class SequenceVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_sequence) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_sequence;
     }
 
     public void visit(AST seq) {

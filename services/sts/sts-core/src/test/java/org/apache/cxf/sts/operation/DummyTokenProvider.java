@@ -39,10 +39,7 @@ public class DummyTokenProvider implements TokenProvider {
         WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     
     public boolean canHandleToken(String tokenType) {
-        if (TOKEN_TYPE.equals(tokenType)) {
-            return true;
-        }
-        return false;
+        return TOKEN_TYPE.equals(tokenType);
     }
     
     public boolean canHandleToken(String tokenType, String realm) {

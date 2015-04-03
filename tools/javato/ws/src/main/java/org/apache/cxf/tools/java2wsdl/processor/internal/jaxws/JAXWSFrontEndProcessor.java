@@ -182,10 +182,7 @@ public class JAXWSFrontEndProcessor implements Processor {
                 getInfClass(returnClass);
             }
         }
-        if (infList.contains("java.rmi.Remote")) {
-            return true;
-        }
-        return false;
+        return infList.contains("java.rmi.Remote");
     }
     
     

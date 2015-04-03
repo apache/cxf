@@ -157,11 +157,7 @@ public class Client {
         if (!consumerKey.equals(that.consumerKey)) {
             return false;
         }
-        if (!secretKey.equals(that.secretKey)) {
-            return false;
-        }
-
-        return true;
+        return secretKey.equals(that.secretKey);
     }
 
     @Override

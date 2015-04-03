@@ -562,13 +562,10 @@ public class ScopedNameVisitor extends VisitorBase {
     }     
     
     protected static boolean isFullyScopedName(AST node) {
-        if (node.getType() == IDLTokenTypes.IDENT
+        return node.getType() == IDLTokenTypes.IDENT
             && node.getFirstChild() != null
             && ((node.getFirstChild().getType() == IDLTokenTypes.SCOPEOP)
-                || (node.getFirstChild().getType() == IDLTokenTypes.IDENT))) {
-            return true;
-        }
-        return false;
+                || (node.getFirstChild().getType() == IDLTokenTypes.IDENT));
     }
     
     protected static Scope getFullyScopedName(Scope currentScope, AST node) {

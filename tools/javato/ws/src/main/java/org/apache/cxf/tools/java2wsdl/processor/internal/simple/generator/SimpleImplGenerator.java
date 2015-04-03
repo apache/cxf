@@ -36,13 +36,8 @@ public class SimpleImplGenerator extends AbstractSimpleGenerator {
 
     public boolean passthrough() {
         Boolean genFromSei = (Boolean)env.get(ToolConstants.GEN_FROM_SEI);
-        if (genFromSei && env.optionSet(ToolConstants.CFG_SERVER) 
-            && (!env.optionSet(ToolConstants.IMPL_CLASS))) {
-            return false;
-        }
-
-        return true;
-
+        return !(genFromSei && env.optionSet(ToolConstants.CFG_SERVER) 
+            && (!env.optionSet(ToolConstants.IMPL_CLASS)));
     }
 
 

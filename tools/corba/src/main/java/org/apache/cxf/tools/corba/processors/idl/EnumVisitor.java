@@ -42,10 +42,7 @@ public class EnumVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_enum) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_enum;
     }
 
     public void visit(AST enumNode) {

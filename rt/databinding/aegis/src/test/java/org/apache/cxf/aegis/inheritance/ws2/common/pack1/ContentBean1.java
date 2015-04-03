@@ -50,11 +50,7 @@ public class ContentBean1 {
 
         final ContentBean1 that = (ContentBean1)o;
 
-        if (data1 != null ? !data1.equals(that.data1) : that.data1 != null) {
-            return false;
-        }
-
-        return true;
+        return !(data1 != null ? !data1.equals(that.data1) : that.data1 != null);
     }
 
     public int hashCode() {

@@ -321,90 +321,62 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
     }
     
     private boolean isEnvelope(QName qname) {
-        if ("Envelope".equals(qname.getLocalPart())
+        return "Envelope".equals(qname.getLocalPart())
             && (SOAP_NS.equals(qname.getNamespaceURI()) 
-                || SOAP12_NS.equals(qname.getNamespaceURI()))) {
-            return true;
-        }
-        return false;
+                || SOAP12_NS.equals(qname.getNamespaceURI()));
     }
     
     private boolean isSoapHeader(QName qname) {
-        if ("Header".equals(qname.getLocalPart())
+        return "Header".equals(qname.getLocalPart())
             && (SOAP_NS.equals(qname.getNamespaceURI()) 
-                || SOAP12_NS.equals(qname.getNamespaceURI()))) {
-            return true;
-        }
-        return false;
+                || SOAP12_NS.equals(qname.getNamespaceURI()));
     }
     
     private boolean isSecurityHeader(QName qname) {
-        if ("Security".equals(qname.getLocalPart()) && WSSE_NS.equals(qname.getNamespaceURI())) {
-            return true;
-        }
-        return false;
+        return "Security".equals(qname.getLocalPart()) && WSSE_NS.equals(qname.getNamespaceURI());
     }
     
     private boolean isTimestamp(List<QName> qnames) {
-        if (qnames != null && qnames.size() == 4
+        return qnames != null 
+            && qnames.size() == 4
             && isEnvelope(qnames.get(0))
             && isSoapHeader(qnames.get(1))
             && isSecurityHeader(qnames.get(2))
             && "Timestamp".equals(qnames.get(3).getLocalPart())
-            && WSU_NS.equals(qnames.get(3).getNamespaceURI())) {
-            return true;
-        }
-        
-        return false;
+            && WSU_NS.equals(qnames.get(3).getNamespaceURI());
     }
     
     private boolean isReplyTo(List<QName> qnames) {
-        if (qnames != null && qnames.size() == 3
+        return qnames != null && qnames.size() == 3
             && isEnvelope(qnames.get(0))
             && isSoapHeader(qnames.get(1))
             && "ReplyTo".equals(qnames.get(2).getLocalPart())
-            && WSA_NS.equals(qnames.get(2).getNamespaceURI())) {
-            return true;
-        }
-        
-        return false;
+            && WSA_NS.equals(qnames.get(2).getNamespaceURI());
     }
     
     private boolean isFaultTo(List<QName> qnames) {
-        if (qnames != null && qnames.size() == 3
+        return qnames != null && qnames.size() == 3
             && isEnvelope(qnames.get(0))
             && isSoapHeader(qnames.get(1))
             && "FaultTo".equals(qnames.get(2).getLocalPart())
-            && WSA_NS.equals(qnames.get(2).getNamespaceURI())) {
-            return true;
-        }
-        
-        return false;
+            && WSA_NS.equals(qnames.get(2).getNamespaceURI());
     }
     
     private boolean isBody(List<QName> qnames) {
-        if (qnames != null && qnames.size() == 2
+        return qnames != null && qnames.size() == 2
             && isEnvelope(qnames.get(0))
             && "Body".equals(qnames.get(1).getLocalPart())
             && (SOAP_NS.equals(qnames.get(1).getNamespaceURI()) 
-                || SOAP12_NS.equals(qnames.get(1).getNamespaceURI()))) {
-            return true;
-        }
-
-        return false;
+                || SOAP12_NS.equals(qnames.get(1).getNamespaceURI()));
     }
     
     private boolean isUsernameToken(List<QName> qnames) {
-        if (qnames != null && qnames.size() == 4
+        return qnames != null && qnames.size() == 4
             && isEnvelope(qnames.get(0))
             && isSoapHeader(qnames.get(1))
             && isSecurityHeader(qnames.get(2))
             && "UsernameToken".equals(qnames.get(3).getLocalPart())
-            && WSSE_NS.equals(qnames.get(3).getNamespaceURI())) {
-            return true;
-        }
-        
-        return false;
+            && WSSE_NS.equals(qnames.get(3).getNamespaceURI());
     }
     
     public boolean isSignBody() {

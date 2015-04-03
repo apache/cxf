@@ -564,10 +564,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     }
     
     protected boolean isFeedRequested(MediaType mt) {
-        if ("entry".equalsIgnoreCase(mt.getParameters().get("type"))) {
-            return false;
-        }
-        return true;
+        return !"entry".equalsIgnoreCase(mt.getParameters().get("type"));
     }
 
     public void setAtomWriters(Map<String, AtomElementWriter<?, ?>> writers) {

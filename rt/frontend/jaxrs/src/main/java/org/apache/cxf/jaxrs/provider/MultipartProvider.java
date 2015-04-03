@@ -125,15 +125,12 @@ public class MultipartProvider extends AbstractConfigurableProvider
     
     private boolean isSupported(Class<?> type, Type genericType, Annotation[] anns, 
                                 MediaType mt) {
-        if (mediaTypeSupported(mt) 
+        return mediaTypeSupported(mt) 
             && (WELL_KNOWN_MULTIPART_CLASSES.contains(type)
                 || Collection.class.isAssignableFrom(type)
                 || Map.class.isAssignableFrom(type) && type != MultivaluedMap.class
                 || AnnotationUtils.getAnnotation(anns, Multipart.class) != null
-                || MessageUtils.isTrue(mc.getContextualProperty(SUPPORT_TYPE_AS_MULTIPART)))) {
-            return true;
-        }
-        return false;
+                || MessageUtils.isTrue(mc.getContextualProperty(SUPPORT_TYPE_AS_MULTIPART)));
     }
 
     protected void checkContentLength() {

@@ -345,16 +345,13 @@ public final class StaxUtils {
     private static boolean setRestrictionProperties(XMLInputFactory factory) {
         //For now, we can only support Woodstox 4.2.x and newer as none of the other
         //stax parsers support these settings
-        if (setProperty(factory, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount)
+        return setProperty(factory, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount)
             && setProperty(factory, "com.ctc.wstx.maxAttributeSize", maxAttributeSize)
             && setProperty(factory, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold)
             && setProperty(factory, "com.ctc.wstx.maxElementCount", maxElementCount)
             && setProperty(factory, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold)
             && setProperty(factory, "com.ctc.wstx.maxCharacters", maxXMLCharacters)
-            && setProperty(factory, "com.ctc.wstx.maxTextLength", maxTextLength)) {
-            return true;
-        }
-        return false;
+            && setProperty(factory, "com.ctc.wstx.maxTextLength", maxTextLength);
     }
 
     private static boolean setProperty(XMLInputFactory f, String p, Object o) {

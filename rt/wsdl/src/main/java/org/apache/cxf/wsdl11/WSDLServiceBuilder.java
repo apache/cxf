@@ -784,10 +784,7 @@ public class WSDLServiceBuilder {
     private static boolean hasAttributes(XmlSchemaComplexType complexType) {
         // Now lets see if we have any attributes...
         // This should probably look at the restricted and substitute types too.
-        if (complexType.getAnyAttribute() != null || !complexType.getAttributes().isEmpty()) {
-            return true;
-        }
-        return false;
+        return complexType.getAnyAttribute() != null || !complexType.getAttributes().isEmpty();
     }
 
     private static boolean isWrappableSequence(XmlSchemaComplexType type, String namespaceURI,

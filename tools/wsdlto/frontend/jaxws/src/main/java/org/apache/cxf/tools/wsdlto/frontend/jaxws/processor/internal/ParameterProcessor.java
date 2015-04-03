@@ -522,10 +522,7 @@ public class ParameterProcessor extends AbstractProcessor {
             return false;
         }
 
-        if (!in.getNamespaceURI().equals(out.getNamespaceURI())) {
-            return false;
-        }
-        return true;
+        return in.getNamespaceURI().equals(out.getNamespaceURI());
     }
 
     private JavaParameter getParameterFromQName(QName wrapperElement, QName item, JavaType.Style style,

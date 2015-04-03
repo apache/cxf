@@ -154,10 +154,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         ObjectName serviceCounterName = getServiceCounterName(ex);
         Counter serviceCounter = counterRepo.getCounter(serviceCounterName);
         //If serviceCounter is null, we need to wait ResponseTimeOutInterceptor to create it , hence set to true
-        if (serviceCounter == null || serviceCounter.isEnabled()) {
-            return true;
-        }
-        return false;   
+        return serviceCounter == null || serviceCounter.isEnabled();
     }
     
     protected ObjectName getOperationCounterName(Exchange ex, ObjectName sericeCounterName) {

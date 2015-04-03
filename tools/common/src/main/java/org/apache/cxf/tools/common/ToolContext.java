@@ -174,20 +174,14 @@ public class ToolContext {
         if (s instanceof String && ((String)s).length() > 0 && ((String)s).charAt(0) == '=') {
             s = ((String)s).substring(1);
         }
-        if (s == null || "none".equals(s) || "false".equals(s) || "basic".equals(s)) {
-            return false;
-        }
-        return true;
+        return !(s == null || "none".equals(s) || "false".equals(s) || "basic".equals(s));
     }
     public boolean basicValidateWSDL() {
         Object s = get(ToolConstants.CFG_VALIDATE_WSDL);
         if (s instanceof String && ((String)s).length() > 0 && ((String)s).charAt(0) == '=') {
             s = ((String)s).substring(1);
         }
-        if ("none".equals(s) || "false".equals(s)) {
-            return false;
-        }
-        return true;
+        return !("none".equals(s) || "false".equals(s));
     }
 
     public void addNamespacePackageMap(String namespace, String pn) {

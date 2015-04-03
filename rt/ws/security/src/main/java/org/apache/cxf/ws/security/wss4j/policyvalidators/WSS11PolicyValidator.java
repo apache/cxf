@@ -45,13 +45,9 @@ public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        if (assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null 
             && (SP12Constants.WSS11.equals(assertionInfo.getAssertion().getName())
-                || SP11Constants.WSS11.equals(assertionInfo.getAssertion().getName()))) {
-            return true;
-        }
-        
-        return false;
+                || SP11Constants.WSS11.equals(assertionInfo.getAssertion().getName()));
     }
     
     /**

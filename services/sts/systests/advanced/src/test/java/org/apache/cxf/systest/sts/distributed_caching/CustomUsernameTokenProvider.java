@@ -39,10 +39,7 @@ public class CustomUsernameTokenProvider implements TokenProvider {
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#UsernameToken";
     
     public boolean canHandleToken(String tokenType) {
-        if (TOKEN_TYPE.equals(tokenType)) {
-            return true;
-        }
-        return false;
+        return TOKEN_TYPE.equals(tokenType);
     }
     
     public boolean canHandleToken(String tokenType, String realm) {

@@ -36,12 +36,8 @@ public class SimpleSEIGenerator extends AbstractSimpleGenerator {
 
     public boolean passthrough() {
         Boolean genFromSei = (Boolean)env.get(ToolConstants.GEN_FROM_SEI);
-        if (!genFromSei && env.optionSet(ToolConstants.CFG_CLIENT)
-            && (!env.optionSet(ToolConstants.SEI_CLASS))) {
-            return false;
-        }
-        return true;
-
+        return !(!genFromSei && env.optionSet(ToolConstants.CFG_CLIENT)
+            && (!env.optionSet(ToolConstants.SEI_CLASS)));
     }
 
 

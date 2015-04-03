@@ -1594,11 +1594,7 @@ public class WSDLToCorbaHelper {
     }
 
     private boolean isIDLObjectType(QName typeName) {
-        if (typeName.equals(ReferenceConstants.WSADDRESSING_TYPE)) {
-            return true;
-        }
-
-        return false;
+        return typeName.equals(ReferenceConstants.WSADDRESSING_TYPE);
     }
 
     private boolean isAddressingNamespace(QName typeName) {

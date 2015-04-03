@@ -47,10 +47,7 @@ public class StructVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_struct) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_struct;
     }
 
     public void visit(AST node) {

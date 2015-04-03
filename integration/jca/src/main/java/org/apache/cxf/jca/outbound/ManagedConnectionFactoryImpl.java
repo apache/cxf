@@ -121,11 +121,7 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         
         ManagedConnectionFactoryImpl that = (ManagedConnectionFactoryImpl)o;
        
-        if (!ObjectUtils.equals(that.getBusConfigURL(), busConfigURL)) {
-            return false;
-        }
-        
-        return true;
+        return ObjectUtils.equals(that.getBusConfigURL(), busConfigURL);
     }
     
     public PrintWriter getLogWriter() throws ResourceException {

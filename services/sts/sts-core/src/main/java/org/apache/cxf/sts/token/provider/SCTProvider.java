@@ -78,11 +78,8 @@ public class SCTProvider implements TokenProvider {
      * token provider.
      */
     public boolean canHandleToken(String tokenType, String realm) {
-        if (STSUtils.TOKEN_TYPE_SCT_05_02.equals(tokenType) 
-            || STSUtils.TOKEN_TYPE_SCT_05_12.equals(tokenType)) {
-            return true;
-        }
-        return false;
+        return STSUtils.TOKEN_TYPE_SCT_05_02.equals(tokenType) 
+            || STSUtils.TOKEN_TYPE_SCT_05_12.equals(tokenType);
     }
         
     /**

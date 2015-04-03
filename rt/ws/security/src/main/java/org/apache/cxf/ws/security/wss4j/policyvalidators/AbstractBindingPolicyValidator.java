@@ -82,10 +82,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         if (includeTimestamp && (timestampResults == null || timestampResults.size() != 1)) {
             return false;
         } else if (!includeTimestamp) {
-            if (timestampResults == null || timestampResults.isEmpty()) {
-                return true;
-            }
-            return false;
+            return timestampResults == null || timestampResults.isEmpty();
         }
         
         // At this point we received a (required) Timestamp. Now check that it is integrity protected.
@@ -239,10 +236,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
                 signed = true;
             }
             if (actInt.intValue() == WSConstants.ENCR && el != null) {
-                if (signed) {
-                    return true;
-                }
-                return false;
+                return signed;
             }
         }
         return false;
@@ -265,10 +259,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
             // Don't count an endorsing signature
             if (actInt.intValue() == WSConstants.SIGN && el != null
                 && !(el.size() == 1 && el.get(0).getName().equals(SIG_QNAME))) {
-                if (encrypted) {
-                    return true;
-                }
-                return false;
+                return encrypted;
             }
         }
         return false;

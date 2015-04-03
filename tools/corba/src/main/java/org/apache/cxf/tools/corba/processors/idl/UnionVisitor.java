@@ -48,10 +48,7 @@ public class UnionVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_union) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_union;
     }
 
     public void visit(AST unionNode) {

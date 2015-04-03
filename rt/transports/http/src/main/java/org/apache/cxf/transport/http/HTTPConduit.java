@@ -1552,10 +1552,7 @@ public abstract class HTTPConduit
                 return true;
             }
             // 2. Robust OneWays could have a fault
-            if (responseCode == 500 && MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false)) {
-                return true;
-            }
-            return false;
+            return responseCode == 500 && MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
         }
 
         protected void handleResponseInternal() throws IOException {

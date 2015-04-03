@@ -56,11 +56,7 @@ public class BeanC extends BeanB {
 
         final BeanC beanC = (BeanC)o;
 
-        if ((propC != null) ? (!propC.equals(beanC.propC)) : (beanC.propC != null)) {
-            return false;
-        }
-
-        return true;
+        return !((propC != null) ? (!propC.equals(beanC.propC)) : (beanC.propC != null));
     }
 
     public int hashCode() {

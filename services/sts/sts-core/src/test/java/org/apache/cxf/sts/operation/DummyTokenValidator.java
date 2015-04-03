@@ -37,11 +37,8 @@ public class DummyTokenValidator implements TokenValidator {
     
     public boolean canHandleToken(ReceivedToken validateTarget) {
         Object token = validateTarget.getToken();
-        if ((token instanceof BinarySecurityTokenType)
-            && TOKEN_TYPE.equals(((BinarySecurityTokenType)token).getValueType())) {
-            return true;
-        }
-        return false;
+        return (token instanceof BinarySecurityTokenType)
+            && TOKEN_TYPE.equals(((BinarySecurityTokenType)token).getValueType());
     }
     
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {

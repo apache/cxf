@@ -47,11 +47,7 @@ public class BeanB extends BeanA {
 
         final BeanB beanB = (BeanB)o;
 
-        if ((propB != null) ? (!propB.equals(beanB.propB)) : (beanB.propB != null)) {
-            return false;
-        }
-
-        return true;
+        return !((propB != null) ? (!propB.equals(beanB.propB)) : (beanB.propB != null));
     }
 
     public int hashCode() {

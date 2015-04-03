@@ -70,10 +70,7 @@ public final class FrontendFactory {
                 return true;
             }
         }
-        if (isJAXWSAnnotationExists()) {
-            return true;
-        }
-        return false;
+        return isJAXWSAnnotationExists();
     }
 
     private boolean isJAXWSAnnotationExists() {
@@ -108,10 +105,7 @@ public final class FrontendFactory {
 
     private boolean isExcluced(Method method) {
         WebMethod webMethod = AnnotationUtil.getPrivMethodAnnotation(method, WebMethod.class);
-        if (webMethod != null && webMethod.exclude()) {
-            return true;
-        }
-        return false;
+        return webMethod != null && webMethod.exclude();
     }
 
     public Style discoverStyle() {

@@ -142,11 +142,8 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean nameSpaceCheck() {
-        if (WSDLConstants.RPC.equalsIgnoreCase((String)env.get(ToolConstants.CFG_STYLE))
-            && !env.optionSet(ToolConstants.CFG_NAMESPACE)) {
-            return false;
-        }
-        return true;
+        return !(WSDLConstants.RPC.equalsIgnoreCase((String)env.get(ToolConstants.CFG_STYLE))
+            && !env.optionSet(ToolConstants.CFG_NAMESPACE));
     }
 
     protected void init() throws ToolException {

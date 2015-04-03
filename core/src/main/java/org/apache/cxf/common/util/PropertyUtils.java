@@ -65,11 +65,7 @@ public final class PropertyUtils {
             return false;
         }
 
-        if (Boolean.TRUE.equals(property) || "true".equalsIgnoreCase(property.toString())) {
-            return true;
-        }
-        
-        return false;
+        return Boolean.TRUE.equals(property) || "true".equalsIgnoreCase(property.toString());
     }
     
     /**
@@ -85,11 +81,7 @@ public final class PropertyUtils {
             return false;
         }
 
-        if (Boolean.FALSE.equals(property) || "false".equalsIgnoreCase(property.toString())) {
-            return true;
-        }
-        
-        return false;
+        return Boolean.FALSE.equals(property) || "false".equalsIgnoreCase(property.toString());
     }
     
     public static Long getLong(Message message, String key) {

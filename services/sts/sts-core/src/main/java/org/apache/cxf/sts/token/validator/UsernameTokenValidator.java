@@ -102,10 +102,7 @@ public class UsernameTokenValidator implements TokenValidator {
      * ReceivedToken argument. The realm is ignored in this token Validator.
      */
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
-        if (validateTarget.getToken() instanceof UsernameTokenType) {
-            return true;
-        }
-        return false;
+        return validateTarget.getToken() instanceof UsernameTokenType;
     }
     
     /**

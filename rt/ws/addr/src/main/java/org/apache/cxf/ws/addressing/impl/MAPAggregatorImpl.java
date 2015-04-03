@@ -243,12 +243,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         if (null == aim) {
             return false;            
         }
-        if (null == aim.get(MetadataConstants.ADDRESSING_ASSERTION_QNAME)) {
-            return false;
-        }
-        // no need to analyse the content of the Addressing assertion here
-        
-        return true;
+        return null != aim.get(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
     }
     
     /**
@@ -271,10 +266,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         if (null != aim.get(MetadataConstants.USING_ADDRESSING_2005_QNAME)) {
             return true;
         }
-        if (null != aim.get(MetadataConstants.USING_ADDRESSING_2006_QNAME)) {
-            return true;
-        } 
-        return false;
+        return null != aim.get(MetadataConstants.USING_ADDRESSING_2006_QNAME);
     }
 
    

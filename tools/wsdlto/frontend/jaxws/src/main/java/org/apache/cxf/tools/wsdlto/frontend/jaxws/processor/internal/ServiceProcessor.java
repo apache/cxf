@@ -537,11 +537,8 @@ public class ServiceProcessor extends AbstractProcessor {
 
     private boolean isOutOfBandHeader(BindingMessageInfo bmi, ExtensibilityElement ext) {
         SoapHeader soapHeader = SOAPBindingUtil.getSoapHeader(ext);
-        if (soapHeader.getMessage() != null
-            && !bmi.getMessageInfo().getName().equals(soapHeader.getMessage())) {
-            return true;
-        }
-        return false;
+        return soapHeader.getMessage() != null
+            && !bmi.getMessageInfo().getName().equals(soapHeader.getMessage());
     }
 
     private void processSoapHeader(JavaMethod jm, BindingOperationInfo operation, ExtensibilityElement ext) {

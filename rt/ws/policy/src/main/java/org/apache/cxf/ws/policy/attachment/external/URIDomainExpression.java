@@ -50,12 +50,9 @@ public class URIDomainExpression implements DomainExpression {
             && wsdl11XPointer.matchesService(si.getTargetNamespace(), si.getName().getLocalPart())) {
             return true;
         }
-        if ((si.getInterface() != null) && (si.getInterface().getName() != null)
+        return (si.getInterface() != null) && (si.getInterface().getName() != null)
             && wsdl11XPointer.matchesPortType(si.getTargetNamespace(),
-                                              si.getInterface().getName().getLocalPart())) {
-            return true;
-        }
-        return false;
+                                              si.getInterface().getName().getLocalPart());
     }
 
     @Override
@@ -63,13 +60,10 @@ public class URIDomainExpression implements DomainExpression {
         if (ei == null) {
             return false;
         }
-        if ((ei.getService() != null) && (ei.getService().getName() != null) && (ei.getName() != null)
+        return (ei.getService() != null) && (ei.getService().getName() != null) && (ei.getName() != null)
             && wsdl11XPointer.matchesPort(ei.getService().getTargetNamespace(),
                                           ei.getService().getName().getLocalPart(),
-                                          ei.getName().getLocalPart())) {
-            return true;
-        }
-        return false;
+                                          ei.getName().getLocalPart());
     }
     
     @Override
@@ -90,15 +84,12 @@ public class URIDomainExpression implements DomainExpression {
                         boi.getName().getLocalPart())) {
             return true;
         }
-        if ((boi.getOperationInfo() != null) && (boi.getOperationInfo().getInterface() != null) 
+        return (boi.getOperationInfo() != null) && (boi.getOperationInfo().getInterface() != null) 
             && (boi.getOperationInfo().getInterface().getName() != null) && (boi.getOperationInfo().getName() != null)
             && wsdl11XPointer.matchesPortTypeOperation(
                         boi.getOperationInfo().getInterface().getName().getNamespaceURI(), 
                         boi.getOperationInfo().getInterface().getName().getLocalPart(), 
-                        boi.getOperationInfo().getName().getLocalPart())) {
-            return true;
-        }
-        return false;
+                        boi.getOperationInfo().getName().getLocalPart());
     }
 
     @Override
@@ -117,10 +108,7 @@ public class URIDomainExpression implements DomainExpression {
             return true;
         }
                 
-        if (checkPortTypeOperationInOut(bmi)) {
-            return true;
-        }
-        return false;
+        return checkPortTypeOperationInOut(bmi);
     }
 
 
@@ -134,10 +122,7 @@ public class URIDomainExpression implements DomainExpression {
             return true;
         }
         
-        if (checkPortTypeOperationFault(bfi)) {
-            return true;
-        }        
-        return false;
+        return checkPortTypeOperationFault(bfi);
     }
 
     private boolean checkBindingOperationInOut(BindingMessageInfo bmi) {
@@ -196,21 +181,18 @@ public class URIDomainExpression implements DomainExpression {
             ini = bfi.getBindingOperation().getOperationInfo().getInterface();
         }
 
-        if ((ini != null) && (ini.getName() != null)
+        return (ini != null) && (ini.getName() != null)
             && (bfi.getBindingOperation().getName() != null)
             && (bfi.getFaultInfo().getFaultName() != null)
             && wsdl11XPointer.matchesPortTypeOperationFault(
                       ini.getName().getNamespaceURI(),
                       ini.getName().getLocalPart(),
                       bfi.getBindingOperation().getName().getLocalPart(),
-                      bfi.getFaultInfo().getFaultName().getLocalPart())) {
-            return true;
-        }
-        return false;
+                      bfi.getFaultInfo().getFaultName().getLocalPart());
     }
 
     private boolean checkBindingOperationFault(BindingFaultInfo bfi) {
-        if ((bfi.getFaultInfo() != null) && (bfi.getFaultInfo().getFaultName() != null)
+        return (bfi.getFaultInfo() != null) && (bfi.getFaultInfo().getFaultName() != null)
             &&  (bfi.getBindingOperation().getName() != null)
             && (bfi.getBindingOperation().getBinding() != null) 
             && (bfi.getBindingOperation().getBinding().getName() != null)
@@ -218,10 +200,7 @@ public class URIDomainExpression implements DomainExpression {
                       bfi.getFaultInfo().getFaultName().getNamespaceURI(),
                       bfi.getBindingOperation().getBinding().getName().getLocalPart(),
                       bfi.getBindingOperation().getName().getLocalPart(),
-                      bfi.getFaultInfo().getFaultName().getLocalPart())) {
-            return true;
-        }
-        return false;
+                      bfi.getFaultInfo().getFaultName().getLocalPart());
     }
 
     public static class Wsdl11XPointer {

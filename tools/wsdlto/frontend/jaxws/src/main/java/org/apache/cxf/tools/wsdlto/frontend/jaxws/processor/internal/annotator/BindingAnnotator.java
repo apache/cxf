@@ -132,12 +132,9 @@ public final class BindingAnnotator implements Annotator {
             intf.setSOAPUse(SOAPBinding.Use.ENCODED);
         }
 
-        if (intf.getSOAPStyle() == SOAPBinding.Style.DOCUMENT
+        return !(intf.getSOAPStyle() == SOAPBinding.Style.DOCUMENT
             && intf.getSOAPUse() == SOAPBinding.Use.LITERAL
-            && intf.getSOAPParameterStyle() == SOAPBinding.ParameterStyle.WRAPPED) {
-            return false;
-        }
-        return true;
+            && intf.getSOAPParameterStyle() == SOAPBinding.ParameterStyle.WRAPPED);
     }
 }
 

@@ -49,11 +49,7 @@ public class NotFoundException extends Exception {
             return false;
         }
 
-        if (id != null ? !id.equals(that.id) : that.id != null) {
-            return false;
-        }
-
-        return true;
+        return !(id != null ? !id.equals(that.id) : that.id != null);
     }
 
     public int hashCode() {

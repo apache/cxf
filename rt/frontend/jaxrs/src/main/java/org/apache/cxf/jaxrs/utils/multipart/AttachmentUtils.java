@@ -188,10 +188,7 @@ public final class AttachmentUtils {
             return true;
         }
         ContentDisposition cd = at.getContentDisposition();
-        if (cd != null && value.equals(cd.getParameter("name"))) {
-            return true;
-        }
-        return false;
+        return cd != null && value.equals(cd.getParameter("name"));
     }
 
     public static MultivaluedMap<String, String> populateFormMap(MessageContext mc, 

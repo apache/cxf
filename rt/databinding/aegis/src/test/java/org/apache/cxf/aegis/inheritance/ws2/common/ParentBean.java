@@ -66,11 +66,7 @@ public class ParentBean {
         if (content != null ? !content.equals(that.content) : that.content != null) {
             return false;
         }
-        if (id != null ? !id.equals(that.id) : that.id != null) {
-            return false;
-        }
-
-        return true;
+        return !(id != null ? !id.equals(that.id) : that.id != null);
     }
 
     public int hashCode() {

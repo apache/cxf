@@ -46,10 +46,7 @@ public class FixedVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_fixed) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_fixed;
     }
 
     public void visit(AST fixedNode) {

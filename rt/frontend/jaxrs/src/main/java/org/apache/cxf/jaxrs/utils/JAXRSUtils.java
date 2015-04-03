@@ -622,12 +622,9 @@ public final class JAXRSUtils {
     }
     
     private static boolean matchHttpMethod(String expectedMethod, String httpMethod) {
-        if (expectedMethod.equalsIgnoreCase(httpMethod) 
+        return expectedMethod.equalsIgnoreCase(httpMethod) 
             || headMethodPossible(expectedMethod, httpMethod)
-            || expectedMethod.equals(DefaultMethod.class.getSimpleName())) {
-            return true;
-        }
-        return false;
+            || expectedMethod.equals(DefaultMethod.class.getSimpleName());
     }
     
     public static boolean headMethodPossible(String expectedMethod, String httpMethod) {
@@ -1400,11 +1397,8 @@ public final class JAXRSUtils {
                                          MediaType acceptContentType, 
                                          OperationResourceInfo ori) {
         
-        if (intersectMimeTypes(ori.getConsumeTypes(), requestContentType).size() != 0
-            && intersectMimeTypes(ori.getProduceTypes(), acceptContentType).size() != 0) {
-            return true;
-        }
-        return false;
+        return intersectMimeTypes(ori.getConsumeTypes(), requestContentType).size() != 0
+            && intersectMimeTypes(ori.getProduceTypes(), acceptContentType).size() != 0;
     }
 
     public static List<MediaType> parseMediaTypes(String types) {

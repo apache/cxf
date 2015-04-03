@@ -48,13 +48,9 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        if (assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null 
             && (SP12Constants.ASYMMETRIC_BINDING.equals(assertionInfo.getAssertion().getName())
-                || SP11Constants.ASYMMETRIC_BINDING.equals(assertionInfo.getAssertion().getName()))) {
-            return true;
-        }
-        
-        return false;
+                || SP11Constants.ASYMMETRIC_BINDING.equals(assertionInfo.getAssertion().getName()));
     }
     
     /**

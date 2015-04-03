@@ -483,10 +483,7 @@ public final class CorbaUtils {
     }
 
     public static boolean isIOR(String location) {
-        if ((location.startsWith("ior:")) || (location.startsWith("IOR:"))) {
-            return true;
-        }
-        return false;
+        return location.startsWith("ior:") || location.startsWith("IOR:");
     }
 
 

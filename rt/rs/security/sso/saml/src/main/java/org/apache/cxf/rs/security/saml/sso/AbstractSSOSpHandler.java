@@ -133,11 +133,7 @@ public class AbstractSSOSpHandler {
             return true;
         }
         
-        if (expiresAt > 0 && currentTime.after(new Date(expiresAt))) {
-            return true;
-        }
-        
-        return false;
+        return expiresAt > 0 && currentTime.after(new Date(expiresAt));
     }
     
     public void setStateProvider(SPStateManager stateProvider) {

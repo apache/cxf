@@ -144,11 +144,7 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
             return false;
         }
         
-        if (!ObjectUtils.equals(that.getAddress(), address)) {
-            return false;
-        }
- 
-        return true;
+        return ObjectUtils.equals(that.getAddress(), address);
     }
 
     // Required by JCA Spec

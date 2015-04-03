@@ -47,10 +47,7 @@ public class ExceptionVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if (node.getType() == IDLTokenTypes.LITERAL_exception) {
-            return true;
-        }
-        return false;
+        return node.getType() == IDLTokenTypes.LITERAL_exception;
     }
 
     public void visit(AST node) {

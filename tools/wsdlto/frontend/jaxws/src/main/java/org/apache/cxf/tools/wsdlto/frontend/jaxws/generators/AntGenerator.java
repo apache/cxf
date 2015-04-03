@@ -46,12 +46,9 @@ public class AntGenerator extends AbstractJAXWSGenerator {
     }
 
     public boolean passthrough() {
-        if (env.optionSet(ToolConstants.CFG_ANT)
+        return !(env.optionSet(ToolConstants.CFG_ANT)
                 || env.optionSet(ToolConstants.CFG_ALL)
-                || env.optionSet(ToolConstants.CFG_GEN_ANT)) {
-            return false;
-        }
-        return true;
+                || env.optionSet(ToolConstants.CFG_GEN_ANT));
     }
 
     public void generate(ToolContext penv) throws ToolException {       

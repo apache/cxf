@@ -83,11 +83,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         if (realm != null && !realmMap.containsKey(realm)) {
             return false;
         }
-        if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)
-            || WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType)) {
-            return true;
-        }
-        return false;
+        return WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)
+            || WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType);
     }
     
     /**

@@ -44,11 +44,7 @@ public class BeanA implements java.io.Serializable {
 
         final BeanA beanA = (BeanA)o;
 
-        if ((propA != null) ? (!propA.equals(beanA.propA)) : (beanA.propA != null)) {
-            return false;
-        }
-
-        return true;
+        return !((propA != null) ? (!propA.equals(beanA.propA)) : (beanA.propA != null));
     }
 
     public int hashCode() {

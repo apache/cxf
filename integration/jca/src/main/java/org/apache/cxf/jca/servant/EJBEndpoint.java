@@ -150,10 +150,7 @@ public class EJBEndpoint {
         if (cls == null) {
             return false;
         }
-        if (null != cls.getAnnotation(WebService.class)) {
-            return true;
-        }
-        return false;
+        return null != cls.getAnnotation(WebService.class);
     }
 
     public String getEjbServantBaseURL() {
@@ -165,10 +162,7 @@ public class EJBEndpoint {
     }
     
     private static boolean isNotNull(String value) {
-        if (value != null && !"".equals(value.trim())) {
-            return true;
-        }
-        return false;
+        return value != null && !"".equals(value.trim());
     }
 
     public WorkManager getWorkManager() {

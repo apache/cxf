@@ -711,10 +711,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             || context.optionSet(ToolConstants.CFG_GEN_FAULT)) {
             return true;
         }
-        if (context.optionSet(ToolConstants.CFG_NO_TYPES)) {
-            return true;
-        }
-        return false;
+        return context.optionSet(ToolConstants.CFG_NO_TYPES);
     }
 
     public void generateTypes() throws ToolException {

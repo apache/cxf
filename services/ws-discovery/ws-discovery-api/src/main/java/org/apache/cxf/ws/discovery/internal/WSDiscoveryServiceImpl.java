@@ -594,10 +594,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                 return false;
             }
             if (addr.equals(addc)) {
-                if (snr != null && !snr.equals(snc)) {
-                    return false;
-                }
-                return true;
+                return !(snr != null && !snr.equals(snc));
             }
             return false;
         }

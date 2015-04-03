@@ -97,10 +97,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
         if (uri == null) {
             return false;
         }
-        if (map.containsKey(CODE_QUERY_KEY)) {
-            return true;
-        }
-        return false;
+        return map.containsKey(CODE_QUERY_KEY);
     }
     
     public static void writeUtilsToResponseStream(Class<?> referenceClass, OutputStream outputStream) {

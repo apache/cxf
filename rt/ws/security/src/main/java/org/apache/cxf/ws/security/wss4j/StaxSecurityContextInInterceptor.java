@@ -191,12 +191,8 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
         }
         
         // Now check that a PublicKey/X509Certificate was used
-        if (token.getPublicKey() != null 
-            || (token.getX509Certificates() != null && token.getX509Certificates().length > 0)) {
-            return true;
-        }
-        
-        return false;
+        return token.getPublicKey() != null 
+            || (token.getX509Certificates() != null && token.getX509Certificates().length > 0);
     }
     
     private boolean isSamlEventSigned(SamlTokenSecurityEvent event) {
@@ -204,13 +200,9 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
             return false;
         }
         
-        if (event.getSecurityToken() != null 
+        return event.getSecurityToken() != null 
             && event.getSecurityToken().getSamlAssertionWrapper() != null
-            && event.getSecurityToken().getSamlAssertionWrapper().isSigned()) {
-            return true;
-        }
-        
-        return false;
+            && event.getSecurityToken().getSamlAssertionWrapper().isSigned();
     }
     
     private SecurityContext createSecurityContext(final Principal p) {

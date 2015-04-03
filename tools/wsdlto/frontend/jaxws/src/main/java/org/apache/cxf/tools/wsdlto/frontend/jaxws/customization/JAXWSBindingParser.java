@@ -163,12 +163,8 @@ public class JAXWSBindingParser {
 
 
     private boolean isPackageElement(Node node) {
-        if (ToolConstants.NS_JAXWS_BINDINGS.equals(node.getNamespaceURI())
-            && "package".equals(node.getLocalName())) {
-            return true;
-        }
-        return false;
-
+        return ToolConstants.NS_JAXWS_BINDINGS.equals(node.getNamespaceURI())
+            && "package".equals(node.getLocalName());
     }
 
     private boolean isJAXWSParameterElement(Node node) {

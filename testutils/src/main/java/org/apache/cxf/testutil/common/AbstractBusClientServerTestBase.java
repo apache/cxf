@@ -114,9 +114,6 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
         tpe.execute(client);
         tpe.shutdown();
         tpe.awaitTermination(timeOut, timeUnit);
-        if (!client.isDone()) {
-            return false;
-        }
-        return true;
+        return client.isDone();
     }
 }

@@ -49,12 +49,8 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
         QName sp12QName = SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS;
-        if (assertionInfo.getAssertion() != null 
-            && sp12QName.equals(assertionInfo.getAssertion().getName())) {
-            return true;
-        }
-        
-        return false;
+        return assertionInfo.getAssertion() != null 
+            && sp12QName.equals(assertionInfo.getAssertion().getName());
     }
     
     /**

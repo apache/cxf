@@ -94,9 +94,6 @@ public class DecoupledFaultHandler extends AbstractSoapInterceptor {
     }
     
     private boolean isWSAHeader(Header header) {
-        if (header.getName().getNamespaceURI().startsWith(Names.WSA_NAMESPACE_NAME)) {
-            return true;
-        }
-        return false;
+        return header.getName().getNamespaceURI().startsWith(Names.WSA_NAMESPACE_NAME);
     }
 }

@@ -1580,12 +1580,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     protected boolean equals(ChoiceWithGroups x, ChoiceWithGroups y) {
         if (x.getVarInt() != null && x.getVarString() != null
             && x.getVarFloat() != null) {
-            if (x.getVarInt().compareTo(y.getVarInt()) == 0 
+            return x.getVarInt().compareTo(y.getVarInt()) == 0 
                 && x.getVarString().equals(y.getVarString())
-                && x.getVarFloat().compareTo(y.getVarFloat()) == 0) {
-                return true;
-            }
-            return false;
+                && x.getVarFloat().compareTo(y.getVarFloat()) == 0;
         } else {
             if (x.getVarOtherFloat() != null && y.getVarOtherFloat() != null) {
                 return x.getVarOtherFloat().compareTo(y.getVarOtherFloat()) == 0;
@@ -2193,10 +2190,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         if (x.getVarString() != null && !x.getVarString().equals(y.getVarString())) {
             return false;
         }
-        if (x.getVarInt() != null && x.getVarInt() != y.getVarInt()) {
-            return false;
-        }
-        return true;
+        return !(x.getVarInt() != null && x.getVarInt() != y.getVarInt());
     }
 
     @Test

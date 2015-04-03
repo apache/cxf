@@ -164,10 +164,7 @@ public class ManagedConnectionImpl
         if (cls == null) {
             return false;
         }
-        if (null != cls.getAnnotation(WebService.class)) {
-            return true;
-        }
-        return false;
+        return null != cls.getAnnotation(WebService.class);
     }
     
     public boolean isBound() {

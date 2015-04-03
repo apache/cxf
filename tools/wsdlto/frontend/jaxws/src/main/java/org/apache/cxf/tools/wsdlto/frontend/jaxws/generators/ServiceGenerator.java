@@ -51,16 +51,13 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
             || env.optionSet(ToolConstants.CFG_ALL)) {
             return false;
         } 
-        if (env.optionSet(ToolConstants.CFG_GEN_ANT)
+        return env.optionSet(ToolConstants.CFG_GEN_ANT)
             || env.optionSet(ToolConstants.CFG_GEN_TYPES)
             || env.optionSet(ToolConstants.CFG_GEN_CLIENT)
             || env.optionSet(ToolConstants.CFG_GEN_IMPL)
             || env.optionSet(ToolConstants.CFG_GEN_SEI)
             || env.optionSet(ToolConstants.CFG_GEN_SERVER)
-            || env.optionSet(ToolConstants.CFG_GEN_FAULT)) {
-            return true;
-        }
-        return false;
+            || env.optionSet(ToolConstants.CFG_GEN_FAULT);
     }
 
     public void generate(ToolContext penv) throws ToolException {

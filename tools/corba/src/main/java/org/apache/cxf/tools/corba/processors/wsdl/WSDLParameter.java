@@ -614,10 +614,7 @@ public final class WSDLParameter {
     private boolean hasAttributes(XmlSchemaComplexType complexType) {
         // Now lets see if we have any attributes...
         // This should probably look at the restricted and substitute types too.
-        if (complexType.getAnyAttribute() != null || complexType.getAttributes().size() > 0) {
-            return true;
-        }
-        return false;
+        return complexType.getAnyAttribute() != null || complexType.getAttributes().size() > 0;
     }
 
     private boolean isWrappableSequence(XmlSchemaComplexType type) {

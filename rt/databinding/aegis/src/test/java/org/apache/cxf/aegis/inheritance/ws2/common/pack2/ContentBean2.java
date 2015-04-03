@@ -56,11 +56,7 @@ public class ContentBean2 extends ContentBean1 {
 
         final ContentBean2 that = (ContentBean2)o;
 
-        if (content2 != null ? !content2.equals(that.content2) : that.content2 != null) {
-            return false;
-        }
-
-        return true;
+        return !(content2 != null ? !content2.equals(that.content2) : that.content2 != null);
     }
 
     public int hashCode() {

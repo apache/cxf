@@ -786,10 +786,7 @@ public final class JAXBEncoderDecoder {
     }
 
     private static boolean isList(Type cls) {
-        if (cls instanceof ParameterizedType) {
-            return true;
-        }
-        return false;
+        return cls instanceof ParameterizedType;
     }
     private static boolean isList(MessagePartInfo part) {
         if (part.getTypeClass().isArray() && !part.getTypeClass().getComponentType().isPrimitive()) {

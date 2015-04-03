@@ -56,18 +56,12 @@ public class StringVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if ((node.getType() == IDLTokenTypes.LITERAL_string)
-            || (node.getType() == IDLTokenTypes.LITERAL_wstring)) {
-            return true;
-        }
-        return false;
+        return (node.getType() == IDLTokenTypes.LITERAL_string)
+            || (node.getType() == IDLTokenTypes.LITERAL_wstring);
     }
 
     public static boolean isBounded(AST node) {
-        if (node.getFirstChild() == null) {
-            return false;
-        }
-        return true;
+        return node.getFirstChild() != null;
     }
 
     public void visit(AST node) {

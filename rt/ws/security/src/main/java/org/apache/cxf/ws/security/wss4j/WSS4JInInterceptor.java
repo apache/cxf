@@ -451,30 +451,21 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * Is a Nonce Cache required, i.e. are we expecting a UsernameToken 
      */
     protected boolean isNonceCacheRequired(List<Integer> actions, SoapMessage msg) {
-        if (actions.contains(WSConstants.UT) || actions.contains(WSConstants.UT_NOPASSWORD)) {
-            return true;
-        }
-        return false;
+        return actions.contains(WSConstants.UT) || actions.contains(WSConstants.UT_NOPASSWORD);
     }
     
     /**
      * Is a Timestamp cache required, i.e. are we expecting a Timestamp 
      */
     protected boolean isTimestampCacheRequired(List<Integer> actions, SoapMessage msg) {
-        if (actions.contains(WSConstants.TS)) {
-            return true;
-        }
-        return false;
+        return actions.contains(WSConstants.TS);
     }
     
     /**
      * Is a SAML Cache required, i.e. are we expecting a SAML Token 
      */
     protected boolean isSamlCacheRequired(List<Integer> actions, SoapMessage msg) {
-        if (actions.contains(WSConstants.ST_UNSIGNED) || actions.contains(WSConstants.ST_SIGNED)) {
-            return true;
-        }
-        return false;
+        return actions.contains(WSConstants.ST_UNSIGNED) || actions.contains(WSConstants.ST_SIGNED);
     }
     
     /**

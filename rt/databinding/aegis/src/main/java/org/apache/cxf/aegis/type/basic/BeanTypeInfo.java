@@ -120,11 +120,7 @@ public class BeanTypeInfo {
     }
 
     public boolean isMapped(PropertyDescriptor pd) {
-        if (pd.getReadMethod() == null) {
-            return false;
-        }
-
-        return true;
+        return pd.getReadMethod() != null;
     }
 
     protected void mapProperty(PropertyDescriptor pd) {

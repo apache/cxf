@@ -57,11 +57,7 @@ public final class ExceptionUtils {
             return true;
         }
 
-        if (Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(value.toString())) {
-            return true;
-        }
-        
-        return false;
+        return Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(value.toString());
     }
     
     

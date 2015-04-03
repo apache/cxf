@@ -124,10 +124,7 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
         if (assertionMap == null) {
             return false;
         }
-        if (!RMPolicyUtilities.collectRMAssertions(assertionMap).isEmpty()) {
-            return true;
-        }
-        return false;
+        return !RMPolicyUtilities.collectRMAssertions(assertionMap).isEmpty();
     }
 
 }

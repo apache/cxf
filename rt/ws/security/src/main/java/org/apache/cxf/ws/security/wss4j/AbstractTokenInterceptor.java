@@ -137,10 +137,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     protected boolean isTLSInUse(SoapMessage message) {
         // See whether TLS is in use or not
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
-        if (tlsInfo != null) {
-            return true;
-        }
-        return false;
+        return tlsInfo != null;
     }
     
     protected TokenStore getTokenStore(SoapMessage message) {

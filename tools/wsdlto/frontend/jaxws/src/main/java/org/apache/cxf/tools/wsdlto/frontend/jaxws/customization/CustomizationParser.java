@@ -598,26 +598,12 @@ public final class CustomizationParser {
     }
 
     private boolean isValidJaxbBindingFile(XMLStreamReader reader) {
-        if (ToolConstants.JAXB_BINDINGS.equals(reader.getName())
-            || ToolConstants.SCHEMA.equals(reader.getName())) {
-            return true;
-        }
-        return false;
+        return ToolConstants.JAXB_BINDINGS.equals(reader.getName())
+            || ToolConstants.SCHEMA.equals(reader.getName());
     }
 
     private boolean isValidJaxwsBindingFile(String bindingLocation, XMLStreamReader reader) {
-        if (ToolConstants.JAXWS_BINDINGS.equals(reader.getName())) {
-            // Comment this check , by default wsdlLocation value will be the
-            // user input wsdl url
-            /*
-             * String wsdlLocation = reader.getAttributeValue(null,
-             * "wsdlLocation"); if (!StringUtils.isEmpty(wsdlLocation)) { return
-             * true; }
-             */
-            return true;
-        }
-        return false;
-
+        return ToolConstants.JAXWS_BINDINGS.equals(reader.getName());
     }
 
     protected void setWSDLNode(final Element node) {

@@ -60,7 +60,7 @@ public final class PartialWSDLProcessor  {
     }
 
     
-    public static  boolean isPortTypeExisted(Definition wsdlDefinition, QName name) {
+    public static boolean isPortTypeExisted(Definition wsdlDefinition, QName name) {
         Map<QName, PortType>  portTypes = CastUtils.cast(wsdlDefinition.getAllPortTypes());
         if (portTypes == null || portTypes.isEmpty()) {
             return false;
@@ -78,10 +78,7 @@ public final class PartialWSDLProcessor  {
         } catch (Exception e) {
             portType = null;
         }
-        if (portType == null) {
-            return false;
-        }    
-        return true;
+        return portType != null;
     }
 
     public static boolean isBindingExisted(Definition wsdlDefinition, QName name) {
@@ -100,21 +97,11 @@ public final class PartialWSDLProcessor  {
         } catch (Exception e) {
             binding = null;
         }
-        if (binding == null) {
-            return false;
-        }    
-        return true;
+        return binding != null;
     }
     public static boolean isServiceExisted(Definition wsdlDefinition, QName name) {
-        if (wsdlDefinition.getService(name) == null) {
-            return false;
-        }
-        return true;
+        return wsdlDefinition.getService(name) != null;
     }
-
-
-
-
 
     public static Binding doAppendBinding(Definition wsdlDefinition, String name, PortType portType, 
                                              ExtensionRegistry extReg) throws Exception {
