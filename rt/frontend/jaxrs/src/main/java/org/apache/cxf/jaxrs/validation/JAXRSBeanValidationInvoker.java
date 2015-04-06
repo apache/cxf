@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -40,29 +41,34 @@ public class JAXRSBeanValidationInvoker extends JAXRSInvoker {
         Message message = JAXRSUtils.getCurrentMessage();
         
         BeanValidationProvider theProvider = getProvider(message);
-        
-        if (isValidateServiceObject()) {
-            theProvider.validateBean(serviceObject);
-        }
-        
-        theProvider.validateParameters(serviceObject, m, params.toArray());
-        
-        Object response = super.invoke(exchange, serviceObject, m, params);
-        
-        if (response instanceof MessageContentsList) {
-            MessageContentsList list = (MessageContentsList)response;
-            if (list.size() == 1) {
-                Object entity = ((MessageContentsList)list).get(0);
-                
-                if (entity instanceof Response) {
-                    theProvider.validateReturnValue(serviceObject, m, ((Response)entity).getEntity());    
-                } else {                
-                    theProvider.validateReturnValue(serviceObject, m, entity);
+        try {
+            if (isValidateServiceObject()) {
+                theProvider.validateBean(serviceObject);
+            }
+            
+            theProvider.validateParameters(serviceObject, m, params.toArray());
+            
+            Object response = super.invoke(exchange, serviceObject, m, params);
+            
+            if (response instanceof MessageContentsList) {
+                MessageContentsList list = (MessageContentsList)response;
+                if (list.size() == 1) {
+                    Object entity = ((MessageContentsList)list).get(0);
+                    
+                    if (entity instanceof Response) {
+                        theProvider.validateReturnValue(serviceObject, m, ((Response)entity).getEntity());    
+                    } else {                
+                        theProvider.validateReturnValue(serviceObject, m, entity);
+                    }
                 }
             }
+            return response;
+        } catch (Fault ex) {
+            throw ex;
+        } catch (Throwable ex) {
+            throw new Fault(ex);
         }
         
-        return response;
     }
     
     protected BeanValidationProvider getProvider(Message message) {
