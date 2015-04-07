@@ -258,7 +258,9 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // TODO Unignore when we pick up WSS4J 2.0.4
     @org.junit.Test
+    @org.junit.Ignore
     public void testInclusiveC14NPolicy() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
