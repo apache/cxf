@@ -625,8 +625,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             dkSign.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
 
             // Set the algo info
-            dkSign.setSignatureAlgorithm(abinding.getAlgorithmSuite()
-                    .getSymmetricSignature());
+            dkSign.setSignatureAlgorithm(abinding.getAlgorithmSuite().getSymmetricSignature());
+            dkSign.setSigCanonicalization(abinding.getAlgorithmSuite().getC14n().getValue());
             AlgorithmSuiteType algType = abinding.getAlgorithmSuite().getAlgorithmSuiteType();
             dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
             dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"

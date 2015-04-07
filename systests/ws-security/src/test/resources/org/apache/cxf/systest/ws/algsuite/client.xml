@@ -63,6 +63,34 @@
             </p:policies>
         </jaxws:features>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetric128InclusivePort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="Alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#DoubleItSymmetric128InclusivePolicy"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetric128InclusivePort2" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="Alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#DoubleItSymmetric128Policy"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricCombinedPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
@@ -256,6 +284,45 @@
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
                                 <sp:Basic256/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:SymmetricBinding>
+                <sp:EncryptedParts>
+                    <sp:Body/>
+                </sp:EncryptedParts>
+                <sp:SignedParts>
+                    <sp:Body/>
+                </sp:SignedParts>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="DoubleItSymmetric128InclusivePolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                    <wsp:Policy>
+                        <sp:ProtectionToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:WssX509V3Token10/>
+                                        <sp:RequireKeyIdentifierReference/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:ProtectionToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128/>
+                                <sp:InclusiveC14N/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>

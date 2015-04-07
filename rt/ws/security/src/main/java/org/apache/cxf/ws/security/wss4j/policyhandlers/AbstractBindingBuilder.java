@@ -1928,6 +1928,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
         //Set the algo info
         dkSign.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+        dkSign.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
         dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
         if (tok.getSHA1() != null) {
@@ -2007,8 +2008,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         sigTokId = XMLUtils.getIDFromReference(sigTokId);
         sig.setCustomTokenId(sigTokId);
         sig.setSecretKey(tok.getSecret());
-        sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+        sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
         sig.prepare(doc, getSignatureCrypto(null), secHeader);
 
         sig.getParts().addAll(sigParts);

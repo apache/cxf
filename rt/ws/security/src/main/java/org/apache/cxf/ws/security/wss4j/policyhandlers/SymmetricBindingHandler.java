@@ -680,6 +680,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
 
         //Set the algo info
         dkSign.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getSymmetricSignature());
+        dkSign.setSigCanonicalization(sbinding.getAlgorithmSuite().getC14n().getValue());
         AlgorithmSuiteType algType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
         dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
         if (tok.getSHA1() != null) {
@@ -837,6 +838,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             sig.setCustomTokenId(sigTokId);
             sig.setSecretKey(tok.getSecret());
             sig.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getSymmetricSignature());
+            sig.setSigCanonicalization(sbinding.getAlgorithmSuite().getC14n().getValue());
             Crypto crypto = null;
             if (sbinding.getProtectionToken() != null) {
                 crypto = getEncryptionCrypto(sbinding.getProtectionToken());
