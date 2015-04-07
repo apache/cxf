@@ -409,8 +409,11 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     }
 
     private static boolean getBusProperty(Bus b, String key, boolean dflt) {
-        String v = (String)b.getProperty(key);
-        return v != null ? Boolean.valueOf(v) : dflt;
+        Object v = b.getProperty(key);
+        if (v instanceof Boolean) {
+            return (Boolean)v;
+        }
+        return v != null ? Boolean.valueOf(v.toString()) : dflt;       
     }
 }
 
