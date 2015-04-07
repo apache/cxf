@@ -61,7 +61,7 @@ public class CodahaleMetricsProvider implements MetricsProvider {
 
     }
     
-    protected final void setupJMXReporter(Bus b, MetricRegistry reg) {
+    public static void setupJMXReporter(Bus b, MetricRegistry reg) {
         InstrumentationManager im = b.getExtension(InstrumentationManager.class);
         if (im != null) {
             JmxReporter reporter = JmxReporter.forRegistry(reg).registerWith(im.getMBeanServer())
