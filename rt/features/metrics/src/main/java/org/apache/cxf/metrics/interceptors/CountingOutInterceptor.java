@@ -32,16 +32,11 @@ public class CountingOutInterceptor extends AbstractPhaseInterceptor<Message> {
         addBefore(AttachmentOutInterceptor.class.getName());
     }
     public void handleMessage(Message message) throws Fault {
-        if (isRequestor(message)) {
-            //
-        } else {
-            OutputStream out = message.getContent(OutputStream.class);
-            if (out != null) {
-                CountingOutputStream newOut = new CountingOutputStream(out);
-                message.setContent(OutputStream.class, newOut);
-                message.getExchange().put(CountingOutputStream.class, newOut);
-            }
-           
+        OutputStream out = message.getContent(OutputStream.class);
+        if (out != null) {
+            CountingOutputStream newOut = new CountingOutputStream(out);
+            message.setContent(OutputStream.class, newOut);
+            message.getExchange().put(CountingOutputStream.class, newOut);
         }
     }    
 }

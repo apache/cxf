@@ -26,9 +26,10 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  * 
  */
 public interface MetricsProvider {
+    String CLIENT_ID = "MetricsProvider.CLIENT_ID";
 
-    MetricsContext createEndpointContext(Endpoint endpoint, boolean asClient);
+    MetricsContext createEndpointContext(Endpoint endpoint, boolean asClient, String cid);
 
-    MetricsContext createOperationContext(Endpoint endpoint, BindingOperationInfo boi, boolean asClient);
+    MetricsContext createOperationContext(Endpoint endpoint, BindingOperationInfo boi, boolean asClient, String cid);
 
 }

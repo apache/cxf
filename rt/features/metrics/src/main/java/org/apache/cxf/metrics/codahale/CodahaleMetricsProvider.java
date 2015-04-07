@@ -40,7 +40,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  * 
  */
 @NoJSR250Annotations
-public class CodahaleMetricsProvider implements MetricsProvider {
+public class CodahaleMetricsProvider implements MetricsProvider {    
     private static final String QUESTION_MARK = "?";
     private static final String ESCAPED_QUESTION_MARK = "\\?";
 
@@ -88,7 +88,7 @@ public class CodahaleMetricsProvider implements MetricsProvider {
         return value;
     }
 
-    StringBuilder getBaseServiceName(Endpoint endpoint, boolean asClient) {
+    StringBuilder getBaseServiceName(Endpoint endpoint, boolean isClient, String clientId) {
         StringBuilder buffer = new StringBuilder();
         if (endpoint.get("org.apache.cxf.management.service.counter.name") != null) {
             buffer.append((String)endpoint.get("org.apache.cxf.management.service.counter.name"));
@@ -101,14 +101,16 @@ public class CodahaleMetricsProvider implements MetricsProvider {
             buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
             buffer.append(ManagementConstants.BUS_ID_PROP + "=" + bus.getId() + ",");
             buffer.append(ManagementConstants.TYPE_PROP).append("=Metrics");
-            if (asClient) {
+            if (isClient) {
                 buffer.append(".Client,");
             } else {
                 buffer.append(".Server,");
             }
             buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
-
             buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + portName + ",");
+            if (clientId != null) {
+                buffer.append("Client=" + clientId + ",");
+            }
         }
         return buffer;
     }
@@ -116,16 +118,17 @@ public class CodahaleMetricsProvider implements MetricsProvider {
     
     /** {@inheritDoc}*/
     @Override
-    public MetricsContext createEndpointContext(final Endpoint endpoint, boolean asClient) {
-        StringBuilder buffer = getBaseServiceName(endpoint, asClient);
+    public MetricsContext createEndpointContext(final Endpoint endpoint, boolean isClient, String clientId) {
+        StringBuilder buffer = getBaseServiceName(endpoint, isClient, clientId);
         final String baseName = buffer.toString();
         return new CodahaleMetricsContext(baseName, registry);
     }
 
     /** {@inheritDoc}*/
     @Override
-    public MetricsContext createOperationContext(Endpoint endpoint, BindingOperationInfo boi, boolean asClient) {
-        StringBuilder buffer = getBaseServiceName(endpoint, asClient);
+    public MetricsContext createOperationContext(Endpoint endpoint, BindingOperationInfo boi,
+                                                 boolean asClient, String clientId) {
+        StringBuilder buffer = getBaseServiceName(endpoint, asClient, clientId);
         buffer.append("Operation=").append(boi.getName().getLocalPart()).append(',');
         return new CodahaleMetricsContext(buffer.toString(), registry);
     }

@@ -93,7 +93,8 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         if (o == null) {
             List<MetricsContext> contexts = new ArrayList<MetricsContext>();
             for (MetricsProvider p : getMetricProviders(m.getExchange().getBus())) {
-                MetricsContext c = p.createEndpointContext(ep, MessageUtils.isRequestor(m));
+                MetricsContext c = p.createEndpointContext(ep, MessageUtils.isRequestor(m),
+                                                           (String)m.getContextualProperty(MetricsProvider.CLIENT_ID));
                 if (c != null) {
                     contexts.add(c);
                 }
@@ -137,7 +138,8 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
             List<MetricsContext> contexts = new ArrayList<MetricsContext>();
             for (MetricsProvider p : getMetricProviders(message.getExchange().getBus())) {
                 MetricsContext c = p.createOperationContext(message.getExchange().getEndpoint(),
-                                                            boi, MessageUtils.isRequestor(message));
+                                         boi, MessageUtils.isRequestor(message),
+                                         (String)message.getContextualProperty(MetricsProvider.CLIENT_ID));
                 if (c != null) {
                     contexts.add(c);
                 }

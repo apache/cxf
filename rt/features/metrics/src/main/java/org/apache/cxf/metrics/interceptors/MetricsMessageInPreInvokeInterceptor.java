@@ -32,12 +32,14 @@ public class MetricsMessageInPreInvokeInterceptor extends AbstractMetricsInterce
     }
 
     public void handleMessage(Message message) throws Fault {
-        Exchange ex = message.getExchange();
-        if (ex.getBindingOperationInfo() != null) {
-            //we now know the operation, start metrics for it
-            ExchangeMetrics ctx = getExchangeMetrics(message, false);
-            if (ctx != null) {
-                addOperationMetrics(ctx, message, ex.getBindingOperationInfo());
+        if (!isRequestor(message)) {
+            Exchange ex = message.getExchange();
+            if (ex.getBindingOperationInfo() != null) {
+                //we now know the operation, start metrics for it
+                ExchangeMetrics ctx = getExchangeMetrics(message, false);
+                if (ctx != null) {
+                    addOperationMetrics(ctx, message, ex.getBindingOperationInfo());
+                }
             }
         }
     }               

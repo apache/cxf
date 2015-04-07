@@ -20,20 +20,20 @@ package org.apache.cxf.metrics.interceptors;
 
 import java.io.InputStream;
 
-import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.ExchangeMetrics;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.phase.Phase;
 
-public class MetricsMessageInInterceptor extends AbstractMetricsInterceptor {
-    public MetricsMessageInInterceptor(MetricsProvider p[]) {
-        super(Phase.RECEIVE, p);
-        addBefore(AttachmentInInterceptor.class.getName());
+public class MetricsMessageClientOutInterceptor extends AbstractMetricsInterceptor {
+    public MetricsMessageClientOutInterceptor(MetricsProvider p[]) {
+        super(Phase.SETUP, p);
+        addBefore("*");
     }
     public void handleMessage(Message message) throws Fault {
-        if (!isRequestor(message)) {
+        if (isRequestor(message)) {
             ExchangeMetrics ctx = getExchangeMetrics(message, true);
             InputStream in = message.getContent(InputStream.class);
             if (in != null) {
@@ -41,15 +41,24 @@ public class MetricsMessageInInterceptor extends AbstractMetricsInterceptor {
                 message.setContent(InputStream.class, newIn);
                 message.getExchange().put(CountingInputStream.class, newIn);
             }
+            if (message.getExchange().getBindingOperationInfo() != null) {
+                //we now know the operation, start metrics for it
+                addOperationMetrics(ctx, message, message.getExchange().getBindingOperationInfo());
+            }
             ctx.start();
         }
     }
     public void handleFault(Message message) {
         if (isRequestor(message)) {
-            //fault on the incoming chains for the client.  It will be thrown back to client so stop
-            stop(message);
-        } else if (message.getExchange().isOneWay()) {
-            stop(message);
+            Exception ex = message.getContent(Exception.class);
+            if (ex != null) {
+                FaultMode fm = message.getExchange().get(FaultMode.class);
+                message.getExchange().put(FaultMode.class, FaultMode.RUNTIME_FAULT);
+                stop(message);
+                message.getExchange().put(FaultMode.class, fm);
+            } else {
+                stop(message);
+            }
         }
     }
 }

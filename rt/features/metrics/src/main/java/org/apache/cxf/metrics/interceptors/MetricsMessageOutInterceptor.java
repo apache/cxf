@@ -30,9 +30,10 @@ public class MetricsMessageOutInterceptor extends AbstractMetricsInterceptor {
         addBefore(MessageSenderInterceptor.MessageSenderEndingInterceptor.class.getName());
     }
     public void handleMessage(Message message) throws Fault {
-        if (isRequestor(message)) {
-            //
-        } else {
+        if (!isRequestor(message)) {
+            stop(message);
+        } else if (message.getExchange().isOneWay()) {
+            //one way on the client, it's sent, now stop
             stop(message);
         }
     }    

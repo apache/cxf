@@ -18,38 +18,20 @@
  */
 package org.apache.cxf.metrics.interceptors;
 
-import java.io.InputStream;
-
-import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.metrics.ExchangeMetrics;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.phase.Phase;
 
-public class MetricsMessageInInterceptor extends AbstractMetricsInterceptor {
-    public MetricsMessageInInterceptor(MetricsProvider p[]) {
-        super(Phase.RECEIVE, p);
-        addBefore(AttachmentInInterceptor.class.getName());
+public class MetricsMessageInPostInvokeInterceptor extends AbstractMetricsInterceptor {
+
+    public MetricsMessageInPostInvokeInterceptor(MetricsProvider p[]) {
+        super(Phase.POST_INVOKE, p);
     }
+
     public void handleMessage(Message message) throws Fault {
-        if (!isRequestor(message)) {
-            ExchangeMetrics ctx = getExchangeMetrics(message, true);
-            InputStream in = message.getContent(InputStream.class);
-            if (in != null) {
-                CountingInputStream newIn = new CountingInputStream(in);
-                message.setContent(InputStream.class, newIn);
-                message.getExchange().put(CountingInputStream.class, newIn);
-            }
-            ctx.start();
-        }
-    }
-    public void handleFault(Message message) {
         if (isRequestor(message)) {
-            //fault on the incoming chains for the client.  It will be thrown back to client so stop
-            stop(message);
-        } else if (message.getExchange().isOneWay()) {
             stop(message);
         }
-    }
+    }               
 }
