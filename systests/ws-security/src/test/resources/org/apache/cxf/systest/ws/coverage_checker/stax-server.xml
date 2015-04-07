@@ -30,7 +30,8 @@
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
                 <constructor-arg>
                     <map>
-                        <entry key="action" value="Signature Timestamp"/>
+                        <entry key="#{T(org.apache.wss4j.common.ConfigurationConstants).ACTION}" 
+                               value="Signature Timestamp"/>
                         <entry key="signaturePropFile" value="alice.properties"/>
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
                     </map>
