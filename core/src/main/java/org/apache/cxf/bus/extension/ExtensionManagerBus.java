@@ -20,7 +20,6 @@ package org.apache.cxf.bus.extension;
 
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -96,7 +95,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
     
     private final ExtensionManagerImpl extensionManager;
     
-    public ExtensionManagerBus(Map<Class<?>, Object> extensions, Map<String, Object> properties,
+    public ExtensionManagerBus(Map<Class<?>, Object> extensions, Map<String, Object> props,
           ClassLoader extensionClassLoader) {
         if (extensions == null) {
             extensions = new ConcurrentHashMap<Class<?>, Object>(16, 0.75f, 4);
@@ -115,8 +114,8 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
             feature.setPrettyLogging(FORCE_PRETTY);
             features.add(feature);
         }        
-        if (null == properties) {
-            properties = new HashMap<String, Object>();
+        if (null != props) {
+            properties.putAll(props);
         }
         
         Configurer configurer = (Configurer)extensions.get(Configurer.class);

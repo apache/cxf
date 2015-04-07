@@ -35,6 +35,9 @@ public class PropertiesResolver implements ResourceResolver {
     }
 
     public <T> T resolve(String resourceName, Class<T> resourceType) {
+        if (resourceName == null) {
+            return null;
+        }
         Object obj = properties.get(resourceName);
         if (null != obj) {
             return resourceType.cast(properties.get(resourceName));
