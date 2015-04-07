@@ -39,6 +39,15 @@ import org.apache.wss4j.common.crypto.WSProviderConfig;
 
 
 public abstract class AbstractXmlSecInHandler {
+    /**
+     * A key used to reference the cert that was used to verify the signed request
+     */
+    public static final String SIGNING_CERT = "xml.security.signing.cert";
+    /**
+     * A key used to reference the public key that was used to verify the signed request
+     */
+    public static final String SIGNING_PUBLIC_KEY = "xml.security.signing.public.key";
+    
     protected static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     protected static final String SIG_PREFIX = "ds";
     protected static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";

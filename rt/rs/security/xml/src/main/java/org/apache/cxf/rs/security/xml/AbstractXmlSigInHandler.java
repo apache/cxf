@@ -60,7 +60,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
     /**
      * a collection of compiled regular expression patterns for the subject DN
      */
-    private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
+    private Collection<Pattern> subjectDNPatterns = new ArrayList<>();
     
     public void setRemoveSignature(boolean remove) {
         this.removeSignature = remove;
@@ -153,7 +153,12 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             // validate trust 
             new TrustValidator().validateTrust(crypto, cert, publicKey, subjectDNPatterns);
             if (valid && persistSignature) {
-                message.setContent(XMLSignature.class, signature);
+                if (signature.getKeyInfo() != null) {
+                    message.put(SIGNING_CERT, signature.getKeyInfo().getX509Certificate());
+                }
+                if (signature.getKeyInfo() != null) {
+                    message.put(SIGNING_PUBLIC_KEY, signature.getKeyInfo().getPublicKey());
+                }
                 message.setContent(Element.class, signedElement);
             }
         } catch (Exception ex) {

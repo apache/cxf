@@ -49,7 +49,6 @@ import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.EncryptionConstants;
@@ -115,10 +114,9 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             String userName = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
             if (SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
                 && !MessageUtils.isRequestor(message)) {
-                XMLSignature sig = message.getExchange().getInMessage().getContent(XMLSignature.class);
-                if (sig != null) {
-                    receiverCert = sig.getKeyInfo().getX509Certificate(); 
-                }
+                receiverCert = 
+                    (X509Certificate)message.getExchange().getInMessage().get(
+                        AbstractXmlSecInHandler.SIGNING_CERT);
             } else {
                 CryptoLoader loader = new CryptoLoader();
                 Crypto crypto = loader.getCrypto(message, 

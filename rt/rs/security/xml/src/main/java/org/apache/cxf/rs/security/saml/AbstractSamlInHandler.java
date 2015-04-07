@@ -46,6 +46,7 @@ import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProvider;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
+import org.apache.cxf.rs.security.xml.AbstractXmlSecInHandler;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -65,7 +66,6 @@ import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.wss4j.dom.validate.Validator;
-import org.apache.xml.security.signature.XMLSignature;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
 
@@ -275,12 +275,8 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
                 if (assertionParent != signedElement) {
                     // if not then try to compare if the same cert/key was used to sign SAML token
                     // and the payload
-                    XMLSignature signature = message.getContent(XMLSignature.class);
-                    if (signature == null) {
-                        return false;
-                    }
                     SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSignatureKeyInfo();
-                    if (!compareCredentials(subjectKeyInfo, signature, tlsCerts)) {
+                    if (!compareCredentials(subjectKeyInfo, message, tlsCerts)) {
                         return false;
                     }
                 }
@@ -297,9 +293,8 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
         for (String confirmationMethod : confirmationMethods) {
             if (OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
-                XMLSignature sig = message.getContent(XMLSignature.class);
                 SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
-                if (!compareCredentials(subjectKeyInfo, sig, tlsCerts)) {
+                if (!compareCredentials(subjectKeyInfo, message, tlsCerts)) {
                     return false;
                 }
             }
@@ -317,7 +312,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
      */
     private boolean compareCredentials(
         SAMLKeyInfo subjectKeyInfo,
-        XMLSignature sig,
+        Message message,
         Certificate[] tlsCerts
     ) {
         X509Certificate[] subjectCerts = subjectKeyInfo.getCerts();
@@ -334,22 +329,23 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
             return true;
         }
         
-        if (sig == null) {
-            return false;
-        }
-        
         //
         // Now try the message-level signatures
         //
         try {
-            X509Certificate[] certs =
-                new X509Certificate[] {sig.getKeyInfo().getX509Certificate()};
-            PublicKey publicKey = sig.getKeyInfo().getPublicKey();
-            if (certs != null && certs.length > 0 && subjectCerts != null
-                && subjectCerts.length > 0 && certs[0].equals(subjectCerts[0])) {
+            X509Certificate signingCert = 
+                (X509Certificate)message.getExchange().getInMessage().get(
+                    AbstractXmlSecInHandler.SIGNING_CERT);
+            
+            if (subjectCerts != null && subjectCerts.length > 0 
+                && signingCert != null && signingCert.equals(subjectCerts[0])) {
                 return true;
             }
-            if (publicKey != null && publicKey.equals(subjectPublicKey)) {
+            
+            PublicKey signingKey = 
+                (PublicKey)message.getExchange().getInMessage().get(
+                    AbstractXmlSecInHandler.SIGNING_PUBLIC_KEY);
+            if (signingKey != null && signingKey.equals(subjectPublicKey)) {
                 return true;
             }
         } catch (Exception ex) {
