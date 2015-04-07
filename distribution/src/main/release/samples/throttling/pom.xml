@@ -101,11 +101,14 @@
                             <execution>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>java</goal>
+                                    <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>demo.throttling.client.Client</mainClass>
+                                    <executable>java</executable>
                                     <arguments>
+                                        <argument>-classpath</argument>
+                                        <classpath />
+                                        <argument>demo.throttling.client.Client</argument>
                                         <argument>${wsdl.location}</argument>
                                     </arguments>
                                 </configuration>

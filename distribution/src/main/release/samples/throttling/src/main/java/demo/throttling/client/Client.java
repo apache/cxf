@@ -22,11 +22,20 @@ package demo.throttling.client;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
+import com.codahale.metrics.MetricRegistry;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.metrics.MetricsFeature;
+import org.apache.cxf.metrics.MetricsProvider;
+import org.apache.cxf.metrics.codahale.CodahaleMetricsProvider;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 
@@ -48,30 +57,40 @@ public final class Client implements Runnable {
         long start = System.currentTimeMillis();
         int x = 0;
         boolean exceeded = false;
-        try (Greeter port = service.getSoapPort()) {
+        try (Greeter port = service.getSoapPort(new MetricsFeature())) {
+            port.getRequestContext().put(MetricsProvider.CLIENT_ID, username);
             port.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, username);
             port.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "password");
-            do {
-                if (doStop) {
-                    break;
+            try {
+                do {
+                    if (doStop) {
+                        break;
+                    }
+                    port.greetMe(username + "-" + x);
+                    x++;
+                } while (x < 10000);
+            } catch (javax.xml.ws.WebServiceException wse) {
+                if (wse.getCause().getMessage().contains("429")){
+                    //exceeded are allowable number of requests
+                    exceeded = true;
+                } else {
+                    wse.printStackTrace();
                 }
-                port.greetMe(username + "-" + x);
-                x++;
-            } while (x < 10000);
-        } catch (javax.xml.ws.WebServiceException wse) {
-            if (wse.getCause().getMessage().contains("429")){
-                //exceeded are allowable number of requests
-                exceeded = true;
-            } else {
-                wse.printStackTrace();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            long end = System.currentTimeMillis();
+            double rate = x * 1000 / (end - start);
+            System.out.println(username + " finished " + x + " invocations: " + rate + " req/sec " 
+                + (exceeded ? "(exceeded max)" : ""));
+            try {
+                //sleep for a few seconds before the client is closed so things can be seen in JMX 
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                //ignore
+            } 
+            
+        } catch (Exception e1) {
+            e1.printStackTrace();
         }
-        long end = System.currentTimeMillis();
-        double rate = x * 1000 / (end - start);
-        System.out.println(username + " finished " + x + " invocations: " + rate + " req/sec " 
-            + (exceeded ? "(exceeded max)" : ""));
     }
     public void stop() {
         doStop = true;
@@ -79,8 +98,7 @@ public final class Client implements Runnable {
     
     public static void main(String args[]) throws Exception {
         if (args.length == 0) {
-            System.out.println("please specify wsdl");
-            System.exit(1);
+            args = new String[] {SOAPService.WSDL_LOCATION.toExternalForm()};
         }
 
         URL wsdlURL;
@@ -90,8 +108,16 @@ public final class Client implements Runnable {
         } else {
             wsdlURL = new URL(args[0]);
         }
+        
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("bus.jmx.usePlatformMBeanServer", Boolean.TRUE);
+        properties.put("bus.jmx.enabled", Boolean.TRUE);
+        properties.put("bus.jmx.createMBServerConnectorFactory", Boolean.FALSE);
+        Bus b = new CXFBusFactory().createBus(null, properties);
+        MetricRegistry registry = new MetricRegistry();
+        CodahaleMetricsProvider.setupJMXReporter(b, registry);
+        b.setExtension(registry, MetricRegistry.class);        
 
-        System.out.println(wsdlURL);
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         List<Client> c = new ArrayList<Client>();
         Client client;
@@ -118,7 +144,8 @@ public final class Client implements Runnable {
         }
         Thread.sleep(2000);
 
-        System.exit(0);
+        Thread.sleep(1000000);
+        //System.exit(0);
     }
 
     
