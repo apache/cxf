@@ -265,6 +265,9 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP13Constants.SCOPE_POLICY_15,
             SP13Constants.MUST_SUPPORT_INTERACTIVE_CHALLENGE,
             
+            // AlgorithmSuite misc
+            new QName(SP11Constants.SP_NS, SPConstants.INCLUSIVE_C14N),
+            new QName(SP12Constants.SP_NS, SPConstants.INCLUSIVE_C14N),
         });
         final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
         for (QName q : others) {

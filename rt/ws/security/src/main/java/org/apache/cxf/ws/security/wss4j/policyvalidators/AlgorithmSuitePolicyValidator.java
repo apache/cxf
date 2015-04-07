@@ -34,7 +34,11 @@ import org.w3c.dom.Element;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
+<<<<<<< HEAD
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+=======
+import org.apache.cxf.ws.security.policy.PolicyUtils;
+>>>>>>> dbc4a26... [CXF-6333] - Support Inclusive C14N via security policy
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
@@ -85,6 +89,10 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
                         algSuiteAi.setAsserted(true);
                     }
                 }
+                
+                PolicyUtils.assertPolicy(parameters.getAssertionInfoMap(), 
+                                         new QName(algorithmSuite.getName().getNamespaceURI(), 
+                                                   algorithmSuite.getC14n().name()));
             } else if (!valid && ai.isAsserted()) {
                 ai.setNotAsserted("Error in validating AlgorithmSuite policy");
             }
@@ -173,6 +181,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
             }
             for (String transformAlgorithm : transformAlgorithms) {
                 if (!(algorithmPolicy.getC14n().getValue().equals(transformAlgorithm)
+                    || WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithm)
                     || STRTransform.TRANSFORM_URI.equals(transformAlgorithm)
                     || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transformAlgorithm)
                     || WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transformAlgorithm))) {

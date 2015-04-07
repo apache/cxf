@@ -258,4 +258,56 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testInclusiveC14NPolicy() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = AlgorithmSuiteTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = AlgorithmSuiteTest.class.getResource("DoubleItAlgSuite.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetric128InclusivePort");
+        
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // This should succeed as the client + server policies match
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(25);
+        
+        portQName = new QName(NAMESPACE, "DoubleItSymmetric128InclusivePort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // This should fail as the client uses Exclusive C14N for the signature c14n method
+        // + the server uses Inclusive C14n
+        try {
+            // DOM
+            port.doubleIt(25);
+            fail("Failure expected on Exclusive C14n");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        try {
+            // Streaming
+            SecurityTestUtil.enableStreaming(port);
+            port.doubleIt(25);
+            fail("Failure expected on Exclusive C14n");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        bus.shutdown(true);
+    }
+    
 }

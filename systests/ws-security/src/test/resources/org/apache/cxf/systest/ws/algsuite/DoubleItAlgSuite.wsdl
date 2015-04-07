@@ -44,6 +44,12 @@
         <wsdl:port name="DoubleItSymmetric128Port3" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="http://localhost:9010/DoubleItSymmetric128no3"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSymmetric128InclusivePort" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="http://localhost:9010/DoubleItSymmetric128Inclusive"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItSymmetric128InclusivePort2" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="http://localhost:9010/DoubleItSymmetric128Inclusive2"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItSymmetricCombinedPort" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="http://localhost:9010/DoubleItSymmetricCombined"/>
         </wsdl:port>

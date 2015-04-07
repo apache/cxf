@@ -326,6 +326,8 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             properties.setIncludeSignatureToken(true);
             properties.setSignatureAlgorithm(
                 tbinding.getAlgorithmSuite().getSymmetricSignature());
+            properties.setSignatureCanonicalizationAlgorithm(
+                tbinding.getAlgorithmSuite().getC14n().getValue());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
             properties.setSignatureDigestAlgorithm(algType.getDigest());
         } else if (token instanceof X509Token || token instanceof KeyValueToken) {
@@ -337,6 +339,8 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             WSSSecurityProperties properties = getProperties();
             properties.setSignatureAlgorithm(
                        tbinding.getAlgorithmSuite().getAsymmetricSignature());
+            properties.setSignatureCanonicalizationAlgorithm(
+                       tbinding.getAlgorithmSuite().getC14n().getValue());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
             properties.setSignatureDigestAlgorithm(algType.getDigest());
         } else if (token instanceof UsernameToken) {
@@ -351,6 +355,8 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             
             properties.setSignatureAlgorithm(
                        tbinding.getAlgorithmSuite().getSymmetricSignature());
+            properties.setSignatureCanonicalizationAlgorithm(
+                       tbinding.getAlgorithmSuite().getC14n().getValue());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
             properties.setSignatureDigestAlgorithm(algType.getDigest());
         }

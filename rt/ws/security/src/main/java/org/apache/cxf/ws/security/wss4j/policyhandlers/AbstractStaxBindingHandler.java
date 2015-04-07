@@ -545,6 +545,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             properties.setSignatureAlgorithm(
                        binding.getAlgorithmSuite().getAsymmetricSignature());
         }
+        properties.setSignatureCanonicalizationAlgorithm(
+                       binding.getAlgorithmSuite().getC14n().getValue());
         String sigUser = (String)message.getContextualProperty(userNameKey);
         if (sigUser == null) {
             sigUser = (String)message.getContextualProperty(SecurityConstants.USERNAME);
