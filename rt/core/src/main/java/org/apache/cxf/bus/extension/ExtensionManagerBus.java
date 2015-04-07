@@ -56,9 +56,10 @@ public class ExtensionManagerBus extends CXFBusImpl {
     public ExtensionManagerBus(Map<Class<?>, Object> e, Map<String, Object> properties,
           ClassLoader extensionClassLoader) {
         super(e);
-
         if (null == properties) {
             properties = new HashMap<String, Object>();
+        } else {
+            setProperties(properties);
         }
         
         Configurer configurer = (Configurer)extensions.get(Configurer.class);
