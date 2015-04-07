@@ -29,9 +29,10 @@ import javax.xml.ws.Endpoint;
 import com.codahale.metrics.MetricRegistry;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.metrics.MetricsFeature;
+import org.apache.cxf.metrics.codahale.CodahaleMetricsProvider;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.throttling.ThrottleResponse;
 import org.apache.cxf.throttling.ThrottlingFeature;
@@ -49,8 +50,12 @@ public class Server {
         customers.put("Malcolm", new Customer.CheapCustomer("Malcolm"));
         customers.put("Jonas", new Customer.TrialCustomer("Jonas"));
         
-        Bus b = BusFactory.getDefaultBus();
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("bus.jmx.usePlatformMBeanServer", Boolean.TRUE);
+        properties.put("bus.jmx.enabled", Boolean.TRUE);
+        Bus b = new CXFBusFactory().createBus(null, properties);
         MetricRegistry registry = new MetricRegistry();
+        CodahaleMetricsProvider.setupJMXReporter(b, registry);
         b.setExtension(registry, MetricRegistry.class);        
         
         ThrottlingManager manager = new ThrottlingManager() {

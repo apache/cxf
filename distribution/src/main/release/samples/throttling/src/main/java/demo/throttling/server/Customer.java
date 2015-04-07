@@ -38,7 +38,7 @@ public abstract class Customer {
     
     MetricsContext getMetricsContext(MetricRegistry registry) {
         if (metrics == null) {
-            metrics = new CodahaleMetricsContext("Customer-" + name, registry);
+            metrics = new CodahaleMetricsContext("demo.server:customer=" + name +",type=Customer,", registry);
         }
         return metrics;
     }
