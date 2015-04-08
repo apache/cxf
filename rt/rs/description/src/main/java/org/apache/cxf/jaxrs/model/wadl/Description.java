@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * 
  * See <a href="http://www.w3.org/Submission/wadl/#x3-80002.3">WADL Documentation</a>.
  */
-@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER })
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Description {
     /**
