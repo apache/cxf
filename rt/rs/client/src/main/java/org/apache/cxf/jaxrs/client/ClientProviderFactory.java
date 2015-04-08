@@ -59,10 +59,6 @@ public final class ClientProviderFactory extends ProviderFactory {
         return factory;
     }
     
-    public static ClientProviderFactory getInstance(Bus bus) {
-        return (ClientProviderFactory)bus.getProperty(CLIENT_FACTORY_NAME);
-    }
-    
     public static ClientProviderFactory getInstance(Message m) {
         Endpoint e = m.getExchange().get(Endpoint.class);
         return (ClientProviderFactory)e.get(CLIENT_FACTORY_NAME);
