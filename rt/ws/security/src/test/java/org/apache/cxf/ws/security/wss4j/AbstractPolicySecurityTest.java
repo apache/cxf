@@ -226,7 +226,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         }
     }
     
-    private void checkAssertion(AssertionInfoMap aim, 
+    protected void checkAssertion(AssertionInfoMap aim, 
                                 QName name,
                                 AssertionInfo inf,
                                 boolean asserted) {

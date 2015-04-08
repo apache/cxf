@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -42,7 +43,6 @@ import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
-import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.wss4j.dom.WSConstants;
@@ -190,8 +190,12 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
             parameters.setSamlResults(samlResults);
             
-            SecurityPolicyValidator issuedValidator = new IssuedTokenPolicyValidator();
-            issuedValidator.validatePolicies(parameters, issuedAis);
+            QName qName = issuedAis.iterator().next().getAssertion().getName();
+            Map<QName, SecurityPolicyValidator> validators = 
+                PolicyUtils.getSecurityPolicyValidators(message);
+            if (validators.containsKey(qName)) {
+                validators.get(qName).validatePolicies(parameters, issuedAis);
+            }
         }
         
     }

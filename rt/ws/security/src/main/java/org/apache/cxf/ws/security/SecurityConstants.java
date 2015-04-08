@@ -434,6 +434,14 @@ public final class SecurityConstants {
      */
     public static final String SCT_TOKEN_VALIDATOR = "ws-security.sct.validator";
     
+    /**
+     * This refers to a Map of QName, SecurityPolicyValidator, which retrieves a SecurityPolicyValidator
+     * implementation to validate a particular security policy, based on the QName of the policy. Any
+     * SecurityPolicyValidator implementation defined in this map will override the default value
+     * used internally for the corresponding QName.
+     */
+    public static final String POLICY_VALIDATOR_MAP = "ws-security.policy.validator.map";
+    
     //
     // STS Client Configuration tags
     //
@@ -651,7 +659,7 @@ public final class SecurityConstants {
             DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
             KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE,
             KERBEROS_REQUEST_CREDENTIAL_DELEGATION, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL,
-            AUDIENCE_RESTRICTION_VALIDATION
+            AUDIENCE_RESTRICTION_VALIDATION, POLICY_VALIDATOR_MAP
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
