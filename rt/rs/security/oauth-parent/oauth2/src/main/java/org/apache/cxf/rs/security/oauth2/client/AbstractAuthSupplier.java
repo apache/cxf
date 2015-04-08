@@ -22,7 +22,7 @@ package org.apache.cxf.rs.security.oauth2.client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 
 public abstract class AbstractAuthSupplier {
-    protected ClientAccessToken clientAccessToken = new ClientAccessToken();
+    private ClientAccessToken clientAccessToken = new ClientAccessToken();
     protected AbstractAuthSupplier(String type) {
         clientAccessToken = new ClientAccessToken();
         clientAccessToken.setTokenType(type);
@@ -32,6 +32,12 @@ public abstract class AbstractAuthSupplier {
     }
     protected String createAuthorizationHeader() {
         return clientAccessToken.getTokenType() + " " + clientAccessToken.getTokenKey();
+    }
+    protected ClientAccessToken getClientAccessToken() {
+        return clientAccessToken;
+    }
+    protected void setClientAccessToken(ClientAccessToken clientAccessToken) {
+        this.clientAccessToken = clientAccessToken;
     }
 
 }

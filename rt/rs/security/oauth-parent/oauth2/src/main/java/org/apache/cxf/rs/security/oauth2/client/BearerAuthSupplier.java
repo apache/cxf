@@ -25,6 +25,7 @@ import java.util.Collections;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
@@ -46,7 +47,7 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
                                    URI currentURI,
                                    Message message,
                                    String fullHeader) {
-        if (clientAccessToken.getTokenKey() == null) {
+        if (getClientAccessToken().getTokenKey() == null) {
             return null;
         }
         
@@ -67,9 +68,10 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         }
     }
     private void refreshAccessTokenIfExpired(AuthorizationPolicy authPolicy) {
-        if (clientAccessToken.getExpiresIn() != -1 
-            && OAuthUtils.isExpired(clientAccessToken.getIssuedAt(), 
-                                    clientAccessToken.getExpiresIn())) {
+        ClientAccessToken at = getClientAccessToken();
+        if (at.getExpiresIn() != -1 
+            && OAuthUtils.isExpired(at.getIssuedAt(), 
+                                    at.getExpiresIn())) {
             refreshAccessToken(authPolicy);
         }
         
@@ -77,7 +79,8 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
 
 
     private boolean refreshAccessToken(AuthorizationPolicy authPolicy) {
-        if (clientAccessToken.getRefreshToken() == null) {
+        ClientAccessToken at = getClientAccessToken();
+        if (at.getRefreshToken() == null) {
             return false;
         }
         // Client id and secret are needed to refresh the tokens
@@ -100,16 +103,16 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         // not be done on every request the current approach is quite reasonable 
         
         WebClient accessTokenService = createAccessTokenServiceClient();
-        clientAccessToken = OAuthClientUtils.refreshAccessToken(accessTokenService, theConsumer, clientAccessToken);
+        setClientAccessToken(OAuthClientUtils.refreshAccessToken(accessTokenService, theConsumer, at));
         return true;
     }
 
-    private WebClient createAccessTokenServiceClient() {
+    WebClient createAccessTokenServiceClient() {
         return WebClient.create(accessTokenServiceUri, Collections.singletonList(new OAuthJSONProvider()));
     }
 
     public void setRefreshToken(String refreshToken) {
-        clientAccessToken.setRefreshToken(refreshToken);
+        getClientAccessToken().setRefreshToken(refreshToken);
     }
 
     public void setAccessTokenServiceUri(String uri) {
