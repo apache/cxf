@@ -119,10 +119,12 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         this.accessTokenServiceUri = uri;
     }
 
-    public void setConsumer(OAuthClientUtils.Consumer consumer) {
-        this.consumer = consumer;
+    public void setConsumer(OAuthClientUtils.Consumer c) {
+        this.consumer = c;
     }
-
+    public OAuthClientUtils.Consumer getConsumer() {
+        return consumer;
+    }
     public void setRefreshEarly(boolean refreshEarly) {
         this.refreshEarly = refreshEarly;
     }

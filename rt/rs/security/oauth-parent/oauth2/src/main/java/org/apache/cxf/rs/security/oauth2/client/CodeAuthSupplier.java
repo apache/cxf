@@ -66,7 +66,7 @@ public class CodeAuthSupplier implements HttpAuthSupplier {
     public void setAccessTokenServiceUri(String uri) {
         tokenSupplier.setAccessTokenServiceUri(uri);
     }
-    public void setConsumer(Consumer consumer) {
+    public void setConsumer(OAuthClientUtils.Consumer consumer) {
         tokenSupplier.setConsumer(consumer);
     }
 }
