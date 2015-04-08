@@ -398,9 +398,6 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             
             });
         }
-        getBus().setProperty(ClientProviderFactory.class.getName(), factory);
-        
-
     }
     
     protected void applyFeatures(AbstractClient client) {

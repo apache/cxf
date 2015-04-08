@@ -722,7 +722,7 @@ public abstract class AbstractClient implements Client {
         if (pValue == null) {
             return null;
         }
-        ProviderFactory pf = ClientProviderFactory.getInstance(cfg.getBus());
+        ProviderFactory pf = ClientProviderFactory.getInstance(cfg.getEndpoint());
         if (pf != null) {
             Class<?> pClass = pValue.getClass();
             
