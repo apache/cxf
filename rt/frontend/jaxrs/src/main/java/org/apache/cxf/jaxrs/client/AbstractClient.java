@@ -733,7 +733,7 @@ public abstract class AbstractClient implements Client, Retryable {
         if (pValue == null) {
             return null;
         }
-        ProviderFactory pf = ProviderFactory.getInstance(cfg.getBus());
+        ProviderFactory pf = ProviderFactory.getInstance(cfg.getEndpoint());
         if (pf != null) {
             Class<?> pClass = pValue.getClass();
             @SuppressWarnings("unchecked")

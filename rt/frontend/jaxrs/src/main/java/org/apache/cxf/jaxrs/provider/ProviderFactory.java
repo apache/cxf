@@ -242,12 +242,12 @@ public final class ProviderFactory {
         return new ProviderFactory(bus);
     }
     
-    public static ProviderFactory getInstance(Bus bus) {
-        return (ProviderFactory)bus.getProperty(ProviderFactory.class.getName());
-    }
-    
     public static ProviderFactory getInstance(Message m) {
         Endpoint e = m.getExchange().get(Endpoint.class);
+        return getInstance(e);
+    }
+    
+    public static ProviderFactory getInstance(Endpoint e) {
         return (ProviderFactory)e.get(ProviderFactory.class.getName());
     }
     
