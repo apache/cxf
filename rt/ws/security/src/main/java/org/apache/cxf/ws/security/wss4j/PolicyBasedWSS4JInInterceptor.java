@@ -20,39 +20,25 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
-import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
-import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -65,16 +51,10 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
-import org.apache.wss4j.policy.model.Attachments;
-import org.apache.wss4j.policy.model.Header;
-import org.apache.wss4j.policy.model.RequiredElements;
-import org.apache.wss4j.policy.model.RequiredParts;
-import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.UsernameToken.PasswordType;
 import org.apache.wss4j.policy.model.Wss11;
@@ -85,7 +65,6 @@ import org.apache.wss4j.policy.model.Wss11;
 public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     public static final PolicyBasedWSS4JInInterceptor INSTANCE 
         = new PolicyBasedWSS4JInInterceptor();
-    private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JInInterceptor.class);
 
     /**
      * 
@@ -368,107 +347,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return WSS4JUtils.getSignatureCrypto(s, message, passwordEncryptor);
     }
     
-    private boolean assertXPathTokens(AssertionInfoMap aim, 
-                                   String name, 
-                                   Collection<WSDataRef> refs,
-                                   Element soapEnvelope,
-                                   CoverageType type,
-                                   CoverageScope scope,
-                                   final XPath xpath) throws SOAPException {
-        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, name);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-                
-                RequiredElements elements = (RequiredElements)ai.getAssertion();
-                
-                if (elements != null && elements.getXPaths() != null && !elements.getXPaths().isEmpty()) {
-                    List<String> expressions = new ArrayList<>();
-                    MapNamespaceContext namespaceContext = new MapNamespaceContext();
-                    
-                    for (org.apache.wss4j.policy.model.XPath xPath : elements.getXPaths()) {
-                        expressions.add(xPath.getXPath());
-                        Map<String, String> namespaceMap = xPath.getPrefixNamespaceMap();
-                        if (namespaceMap != null) {
-                            namespaceContext.addNamespaces(namespaceMap);
-                        }
-                    }
-
-                    xpath.setNamespaceContext(namespaceContext);
-                    try {
-                        CryptoCoverageUtil.checkCoverage(soapEnvelope, refs,
-                                                         xpath, expressions, type, scope);
-                    } catch (WSSecurityException e) {
-                        ai.setNotAsserted("No " + type 
-                                          + " element found matching one of the XPaths " 
-                                          + Arrays.toString(expressions.toArray()));
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    
-    private boolean assertTokens(AssertionInfoMap aim, 
-                              String name, 
-                              Collection<WSDataRef> dataRefs,
-                              SoapMessage msg,
-                              Element soapHeader,
-                              Element soapBody,
-                              CoverageType type) throws SOAPException {
-        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, name);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-                SignedParts p = (SignedParts)ai.getAssertion();
-                
-                if (p.isBody()) {
-                    try {
-                        if (CoverageType.SIGNED.equals(type)) {
-                            CryptoCoverageUtil.checkBodyCoverage(
-                                soapBody, dataRefs, type, CoverageScope.ELEMENT
-                            );
-                        } else {
-                            CryptoCoverageUtil.checkBodyCoverage(
-                                soapBody, dataRefs, type, CoverageScope.CONTENT
-                            );
-                        }
-                    } catch (WSSecurityException e) {
-                        ai.setNotAsserted(msg.getVersion().getBody() + " not " + type);
-                        continue;
-                    }
-                }
-                
-                for (Header h : p.getHeaders()) {
-                    try {
-                        CryptoCoverageUtil.checkHeaderCoverage(soapHeader, dataRefs, h
-                                .getNamespace(), h.getName(), type,
-                                CoverageScope.ELEMENT);
-                    } catch (WSSecurityException e) {
-                        ai.setNotAsserted(h.getNamespace() + ":" + h.getName() + " not + " + type);
-                    }
-                }
-                
-                Attachments attachments = p.getAttachments();
-                if (attachments != null) {
-                    try {
-                        CoverageScope scope = CoverageScope.ELEMENT;
-                        if (attachments.isContentSignatureTransform()) {
-                            scope = CoverageScope.CONTENT;
-                        }
-                        CryptoCoverageUtil.checkAttachmentsCoverage(msg.getAttachments(), dataRefs, 
-                                                                type, scope);
-                    } catch (WSSecurityException e) {
-                        ai.setNotAsserted("An attachment was not signed/encrypted");
-                    }
-                }
-            }
-        }
-        return true;
-    }
-    
-    
     /**
      * Set a WSS4J AlgorithmSuite object on the RequestData context, to restrict the
      * algorithms that are allowed for encryption, signature, etc.
@@ -620,22 +498,23 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
         }
         
+        CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
+        
         //
         // Check policies
         //
-        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
-        if (!checkSignedEncryptedCoverage(aim, msg, soapHeader, soapBody, signed, encrypted)) {
-            LOG.fine("Incoming request failed signed-encrypted policy validation");
-        }
-        
         PolicyValidatorParameters parameters = new PolicyValidatorParameters();
+        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         parameters.setAssertionInfoMap(aim);
         parameters.setMessage(msg);
         parameters.setSoapBody(soapBody);
+        parameters.setSoapHeader(soapHeader);
         parameters.setResults(results);
         parameters.setSignedResults(signedResults);
         parameters.setEncryptedResults(encryptResults);
         parameters.setUtWithCallbacks(utWithCallbacks);
+        parameters.setSigned(signed);
+        parameters.setEncrypted(encrypted);
         
         List<WSSecurityEngineResult> utResults = new ArrayList<>();
         if (results.getActionResults().containsKey(WSConstants.UT)) {
@@ -679,145 +558,4 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         super.doResults(msg, actor, soapHeader, soapBody, results, utWithCallbacks);
     }
     
-    /**
-     * Check SignedParts, EncryptedParts, SignedElements, EncryptedElements, RequiredParts, etc.
-     */
-    private boolean checkSignedEncryptedCoverage(
-        AssertionInfoMap aim,
-        SoapMessage msg,
-        Element soapHeader,
-        Element soapBody,
-        Collection<WSDataRef> signed, 
-        Collection<WSDataRef> encrypted
-    ) throws SOAPException {
-        CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
-        //
-        // SIGNED_PARTS and ENCRYPTED_PARTS only apply to non-Transport bindings
-        //
-        boolean check = true;
-        if (!isTransportBinding(aim, msg)) {
-            assertTokens(
-                aim, SPConstants.SIGNED_PARTS, signed, msg, soapHeader, soapBody, CoverageType.SIGNED
-            );
-            assertTokens(
-                aim, SPConstants.ENCRYPTED_PARTS, encrypted, msg, soapHeader, soapBody, 
-                CoverageType.ENCRYPTED
-            );
-        }
-        Element soapEnvelope = soapHeader.getOwnerDocument().getDocumentElement();
-        if (containsXPathPolicy(aim)) {
-            // XPathFactory and XPath are not thread-safe so we must recreate them
-            // each request.
-            final XPathFactory factory = XPathFactory.newInstance();
-            final XPath xpath = factory.newXPath();
-            
-            assertXPathTokens(aim, SPConstants.SIGNED_ELEMENTS, signed, soapEnvelope,
-                    CoverageType.SIGNED, CoverageScope.ELEMENT, xpath);
-            assertXPathTokens(aim, SPConstants.ENCRYPTED_ELEMENTS, encrypted, soapEnvelope,
-                    CoverageType.ENCRYPTED, CoverageScope.ELEMENT, xpath);
-            assertXPathTokens(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, 
-                    soapEnvelope, CoverageType.ENCRYPTED, CoverageScope.CONTENT, xpath);
-        }
-        
-        assertHeadersExists(aim, msg, soapHeader);
-        return check;
-    }
-    
-    private boolean assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, Node header) 
-        throws SOAPException {
-        
-        Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.REQUIRED_PARTS);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                RequiredParts rp = (RequiredParts)ai.getAssertion();
-                ai.setAsserted(true);
-                for (Header h : rp.getHeaders()) {
-                    QName qName = new QName(h.getNamespace(), h.getName());
-                    if (header == null || DOMUtils.getFirstChildWithName((Element)header, qName) == null) {
-                        ai.setNotAsserted("No header element of name " + qName + " found.");
-                    }
-                }
-            }
-        }
-        
-        ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.REQUIRED_ELEMENTS);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                RequiredElements rp = (RequiredElements)ai.getAssertion();
-                ai.setAsserted(true);
-                
-                if (rp != null && rp.getXPaths() != null && !rp.getXPaths().isEmpty()) {
-                    XPathFactory factory = XPathFactory.newInstance();
-                    for (org.apache.wss4j.policy.model.XPath xPath : rp.getXPaths()) {
-                        Map<String, String> namespaces = xPath.getPrefixNamespaceMap();
-                        String expression = xPath.getXPath();
-    
-                        XPath xpath = factory.newXPath();
-                        if (namespaces != null) {
-                            xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
-                        }
-                        NodeList list;
-                        try {
-                            list = (NodeList)xpath.evaluate(expression, 
-                                                                     header,
-                                                                     XPathConstants.NODESET);
-                            if (list.getLength() == 0) {
-                                ai.setNotAsserted("No header element matching XPath " + expression + " found.");
-                            }
-                        } catch (XPathExpressionException e) {
-                            ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
-                        }
-                    }
-                }
-            }
-        }
-        
-        return true;
-    }
-
-    private boolean isTransportBinding(AssertionInfoMap aim, SoapMessage message) {
-        AssertionInfo symAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (symAis != null) {
-            return false;
-        }
-        
-        AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (asymAis != null) {
-            return false;
-        }
-        
-        AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (transAis != null) {
-            return true;
-        }
-        
-        // No bindings, check if we are using TLS
-        TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
-        if (tlsInfo != null) {
-            // We don't need to check these policies for TLS
-            PolicyUtils.assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
-            PolicyUtils.assertPolicy(aim, SP11Constants.ENCRYPTED_PARTS);
-            PolicyUtils.assertPolicy(aim, SP12Constants.SIGNED_PARTS);
-            PolicyUtils.assertPolicy(aim, SP11Constants.SIGNED_PARTS);
-            return true;
-        }
-        
-        return false;
-    }
-    
-    private boolean containsXPathPolicy(AssertionInfoMap aim) {
-        AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
-        if (ai != null) {
-            return true;
-        }
-        
-        ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
-        if (ai != null) {
-            return true;
-        }
-        
-        ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
-        return ai != null;
-    }
-
 }

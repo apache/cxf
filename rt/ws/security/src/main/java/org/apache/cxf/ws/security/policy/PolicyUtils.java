@@ -31,6 +31,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
+import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AlgorithmSuitePolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AsymmetricBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.ConcreteSupportingTokenPolicyValidator;
@@ -40,7 +42,11 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyVal
 import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.KerberosTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.LayoutPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.RequiredElementsPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.RequiredPartsPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.SecuredElementsPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.SecuredPartsPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityContextTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEncryptedTokenPolicyValidator;
@@ -67,7 +73,17 @@ public final class PolicyUtils {
         new HashMap<>();
     
     static {
-        // Tokens
+        configureTokenValidators();
+        configureBindingValidators();
+        configureSupportingTokenValidators();
+        configurePartsValidators();
+    }
+    
+    private PolicyUtils() {
+        // complete
+    }
+    
+    private static void configureTokenValidators() {
         SecurityPolicyValidator validator = new X509TokenPolicyValidator();
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.X509_TOKEN, validator);
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.X509_TOKEN, validator);
@@ -89,9 +105,10 @@ public final class PolicyUtils {
         validator = new KerberosTokenPolicyValidator();
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.KERBEROS_TOKEN, validator);
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.KERBEROS_TOKEN, validator);
-        
-        // Bindings
-        validator = new TransportBindingPolicyValidator();
+    }
+    
+    private static void configureBindingValidators() {
+        SecurityPolicyValidator validator = new TransportBindingPolicyValidator();
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.TRANSPORT_BINDING, validator);
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.TRANSPORT_BINDING, validator);
         validator = new SymmetricBindingPolicyValidator();
@@ -106,9 +123,10 @@ public final class PolicyUtils {
         validator = new LayoutPolicyValidator();
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.LAYOUT, validator);
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.LAYOUT, validator);
-        
-        // Supporting Tokens
-        validator = new ConcreteSupportingTokenPolicyValidator();
+    }
+    
+    private static void configureSupportingTokenValidators() {
+        SecurityPolicyValidator validator = new ConcreteSupportingTokenPolicyValidator();
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.SUPPORTING_TOKENS, validator);
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.SUPPORTING_TOKENS, validator);
         validator = new SignedTokenPolicyValidator();
@@ -130,10 +148,37 @@ public final class PolicyUtils {
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS, validator);
     }
     
-    private PolicyUtils() {
-        // complete
+    private static void configurePartsValidators() {
+        SecurityPolicyValidator validator = new SecuredPartsPolicyValidator();
+        ((SecuredPartsPolicyValidator)validator).setCoverageType(CoverageType.SIGNED);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.SIGNED_PARTS, validator);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.SIGNED_PARTS, validator);
+        validator = new SecuredPartsPolicyValidator();
+        ((SecuredPartsPolicyValidator)validator).setCoverageType(CoverageType.ENCRYPTED);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.ENCRYPTED_PARTS, validator);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.ENCRYPTED_PARTS, validator);
+        validator = new SecuredElementsPolicyValidator();
+        ((SecuredElementsPolicyValidator)validator).setCoverageType(CoverageType.SIGNED);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.SIGNED_ELEMENTS, validator);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.SIGNED_ELEMENTS, validator);
+        validator = new SecuredElementsPolicyValidator();
+        ((SecuredElementsPolicyValidator)validator).setCoverageType(CoverageType.ENCRYPTED);
+        ((SecuredElementsPolicyValidator)validator).setCoverageScope(CoverageScope.ELEMENT);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.ENCRYPTED_ELEMENTS, validator);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.ENCRYPTED_ELEMENTS, validator);
+        validator = new SecuredElementsPolicyValidator();
+        ((SecuredElementsPolicyValidator)validator).setCoverageType(CoverageType.ENCRYPTED);
+        ((SecuredElementsPolicyValidator)validator).setCoverageScope(CoverageScope.CONTENT);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, validator);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.CONTENT_ENCRYPTED_ELEMENTS, validator);
+        validator = new RequiredPartsPolicyValidator();
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.REQUIRED_PARTS, validator);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.REQUIRED_PARTS, validator);
+        validator = new RequiredElementsPolicyValidator();
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.REQUIRED_ELEMENTS, validator);
+        DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.REQUIRED_ELEMENTS, validator);
     }
-
+    
     public static Collection<AssertionInfo> getAllAssertionsByLocalname(
         AssertionInfoMap aim, String localname
     ) {
