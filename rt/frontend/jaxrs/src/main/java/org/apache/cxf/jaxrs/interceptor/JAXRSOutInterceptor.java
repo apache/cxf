@@ -426,8 +426,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         return Boolean.TRUE.equals(m.getExchange().get(AbstractHTTPDestination.RESPONSE_COMMITED));
     }
 
-    private boolean isResponseRedirected(Message outMessage) {
-        return Boolean.TRUE.equals(outMessage.get(AbstractHTTPDestination.REQUEST_REDIRECTED));
+    private boolean isResponseRedirected(Message m) {
+        return Boolean.TRUE.equals(m.getExchange().get(AbstractHTTPDestination.REQUEST_REDIRECTED));
     }
     
     private void writeResponseToStream(OutputStream os, Object responseObj) {

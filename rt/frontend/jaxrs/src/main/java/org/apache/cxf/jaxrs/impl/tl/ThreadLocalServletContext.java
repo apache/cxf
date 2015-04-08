@@ -79,7 +79,11 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {
-        return get().getNamedDispatcher(name);
+        return getDispatcher(get().getNamedDispatcher(name));
+    }
+
+    private RequestDispatcher getDispatcher(RequestDispatcher rd) {
+        return rd == null ? null : new RequestDispatcherImpl(rd);
     }
 
     public String getRealPath(String path) {
@@ -87,7 +91,7 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
     }
 
     public RequestDispatcher getRequestDispatcher(String path) {
-        return get().getRequestDispatcher(path);
+        return getDispatcher(get().getRequestDispatcher(path));
     }
 
     public URL getResource(String path) throws MalformedURLException {

@@ -685,7 +685,7 @@ public abstract class AbstractHTTPDestination
     }
 
     private boolean isResponseRedirected(Message outMessage) {
-        return Boolean.TRUE.equals(outMessage.get(REQUEST_REDIRECTED));
+        return Boolean.TRUE.equals(outMessage.getExchange().get(REQUEST_REDIRECTED));
     }
 
     /**
