@@ -51,6 +51,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.EndpointUtils;
@@ -104,7 +105,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                                  @SuppressWarnings("rawtypes") Class serviceClass,
                                                  WebServiceFeature ... features) {
         for (WebServiceFeature f : features) {
-            if (!f.getClass().getName().startsWith("javax.xml.ws")) {
+            if (!f.getClass().getName().startsWith("javax.xml.ws")
+                && !(f instanceof Feature)) {
                 throw new WebServiceException("Unknown feature error: " + f.getClass().getName());
             }
         }
