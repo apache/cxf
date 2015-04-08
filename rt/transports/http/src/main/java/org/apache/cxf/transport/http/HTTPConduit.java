@@ -71,6 +71,7 @@ import org.apache.cxf.policy.PolicyDataEngine;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.Assertor;
+import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.auth.DefaultBasicAuthSupplier;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
@@ -1588,6 +1589,7 @@ public abstract class HTTPConduit
             inMessage.setExchange(exchange);
             updateResponseHeaders(inMessage);
             inMessage.put(Message.RESPONSE_CODE, responseCode);
+            propagateConduit(exchange, inMessage);
 
             if (!doProcessResponse(outMessage, responseCode)
                 || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
@@ -1645,7 +1647,15 @@ public abstract class HTTPConduit
             
         }
 
-        
+        protected void propagateConduit(Exchange exchange, Message in) {
+            if (exchange != null) {
+                Message out = exchange.getOutMessage();
+                if (out != null) {
+                    in.put(Conduit.class, out.get(Conduit.class));
+                }
+            }
+        }
+
         protected void handleHttpRetryException(HttpRetryException e) throws IOException {
             String msg = "HTTP response '" + e.responseCode() + ": "
                 + getResponseMessage() + "' invoking " + url;
