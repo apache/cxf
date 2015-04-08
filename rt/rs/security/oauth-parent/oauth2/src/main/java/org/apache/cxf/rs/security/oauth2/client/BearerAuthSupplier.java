@@ -31,7 +31,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 
 public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuthSupplier {
-    private Consumer consumer; 
+    private OAuthClientUtils.Consumer consumer; 
     private String accessTokenServiceUri;
     private boolean refreshEarly; 
     public BearerAuthSupplier() {
@@ -85,10 +85,10 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         // and checked if the policy is null. 
         // Client TLS authentication is also fine as an alternative authentication mechanism,
         // how can we check here that a 2-way TLS has been set up ?
-        Consumer theConsumer = consumer;
+        OAuthClientUtils.Consumer theConsumer = consumer;
         if (theConsumer == null 
             && authPolicy != null && authPolicy.getUserName() != null && authPolicy.getPassword() != null) {
-            theConsumer = new Consumer(authPolicy.getUserName(), authPolicy.getPassword());
+            theConsumer = new OAuthClientUtils.Consumer(authPolicy.getUserName(), authPolicy.getPassword());
             return false;
         }
         if (theConsumer == null) {
@@ -116,10 +116,7 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         this.accessTokenServiceUri = uri;
     }
 
-    public Consumer getConsumer() {
-        return consumer;
-    }
-    public void setConsumer(Consumer consumer) {
+    public void setConsumer(OAuthClientUtils.Consumer consumer) {
         this.consumer = consumer;
     }
 
