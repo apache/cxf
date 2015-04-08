@@ -29,29 +29,14 @@ import org.w3c.dom.NamedNodeMap;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
-    private static final Class<?> EP_CLASS;
-    static {
-        Class<?> cls = EndpointImpl.class;
-        try {
-            if (ProviderImpl.isJaxWs22()) {
-                cls = ClassLoaderUtils
-                    .loadClass("org.apache.cxf.jaxws22.JAXWS22EndpointImpl", 
-                           EndpointDefinitionParser.class);
-            }
-        } catch (Throwable t) {
-            cls = EndpointImpl.class;
-        }
-        EP_CLASS = cls;
-    }
+    private static final Class<?> EP_CLASS = EndpointImpl.class;
     public static String getIdOrName(Element elem) {
         String id = elem.getAttribute("id");
 
