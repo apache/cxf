@@ -186,6 +186,7 @@ public class X509TokenValidator implements TokenValidator {
             }
             response.setPrincipal(principal);
             validateTarget.setState(STATE.VALID);
+            LOG.fine("X.509 Token successfully validated");
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }

@@ -184,6 +184,7 @@ public class SCTProvider implements TokenProvider {
             unAttachedReference.setWsseValueType(tokenRequirements.getTokenType());
             response.setUnattachedReference(unAttachedReference);
             
+            LOG.fine("SecurityContextToken successfully created");
             return response;
         } catch (Exception e) {
             LOG.log(Level.WARNING, "", e);
