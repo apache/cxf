@@ -72,7 +72,6 @@ public class AttachmentSerializer {
         bodyBoundary = AttachmentUtil.getUniqueBoundaryValue();
 
         String bodyCt = (String) message.get(Message.CONTENT_TYPE);
-        bodyCt = bodyCt.replaceAll("\"", "\\\"");
         
         // The bodyCt string is used enclosed within "", so if it contains the character ", it
         // should be adjusted, like in the following case:
@@ -107,17 +106,15 @@ public class AttachmentSerializer {
         // type is a required parameter for multipart/related only
         if (xopOrMultipartRelated
             && requestMimeType.indexOf("type=") == -1) {
-            ct.append("; ");
             if (xop) {
-                ct.append("type=\"application/xop+xml\"");
+                ct.append("; type=\"application/xop+xml\"");
             } else {
-                ct.append("type=\"").append(bodyCt).append("\"");
+                ct.append("; type=\"").append(bodyCt).append("\"");
             }    
         }
         
         // boundary
-        ct.append("; ")
-            .append("boundary=\"")
+        ct.append("; boundary=\"")
             .append(bodyBoundary)
             .append("\"");
             
@@ -127,8 +124,7 @@ public class AttachmentSerializer {
         // for simpler multipart/related payloads but is not needed for
         // multipart/mixed, multipart/form-data
         if (xopOrMultipartRelated) {
-            ct.append("; ")
-                .append("start=\"<")
+            ct.append("; start=\"<")
                 .append(checkAngleBrackets(rootContentId))
                 .append(">\"");
         }
@@ -136,8 +132,7 @@ public class AttachmentSerializer {
         // start-info is a required parameter for XOP/MTOM, may be needed for
         // other WS cases but is redundant in simpler multipart/related cases
         if (writeOptionalTypeParameters || xop) {
-            ct.append("; ")
-                .append("start-info=\"")
+            ct.append("; start-info=\"")
                 .append(bodyCt)
                 .append("\"");
         }
@@ -159,7 +154,7 @@ public class AttachmentSerializer {
         StringBuilder mimeBodyCt = new StringBuilder();
         String bodyType = getHeaderValue("Content-Type", null);
         if (bodyType == null) {
-            mimeBodyCt.append((xop ? "application/xop+xml" : "text/xml") + "; charset=")
+            mimeBodyCt.append(xop ? "application/xop+xml; charset=" : "text/xml; charset=")
                 .append(encoding)
                 .append("; type=\"")
                 .append(bodyCt)
@@ -189,12 +184,9 @@ public class AttachmentSerializer {
     
     private static void writeHeaders(String contentType, String attachmentId, 
                                      Map<String, List<String>> headers, Writer writer) throws IOException {
-        writer.write("\r\n");
-        writer.write("Content-Type: ");
+        writer.write("\r\nContent-Type: ");
         writer.write(contentType);
-        writer.write("\r\n");
-
-        writer.write("Content-Transfer-Encoding: binary\r\n");
+        writer.write("\r\nContent-Transfer-Encoding: binary\r\n");
 
         if (attachmentId != null) {
             attachmentId = checkAngleBrackets(attachmentId);
@@ -209,7 +201,8 @@ public class AttachmentSerializer {
                 || "Content-Transfer-Encoding".equalsIgnoreCase(name)) {
                 continue;
             }
-            writer.write(name + ": ");
+            writer.write(name);
+            writer.write(": ");
             List<String> values = entry.getValue();
             for (int i = 0; i < values.size(); i++) {
                 writer.write(values.get(i));
@@ -238,8 +231,7 @@ public class AttachmentSerializer {
         if (message.getAttachments() != null) {
             for (Attachment a : message.getAttachments()) {
                 StringWriter writer = new StringWriter();                
-                writer.write("\r\n");
-                writer.write("--");
+                writer.write("\r\n--");
                 writer.write(bodyBoundary);
                 
                 Map<String, List<String>> headers = null;
@@ -265,8 +257,7 @@ public class AttachmentSerializer {
             }
         }
         StringWriter writer = new StringWriter();                
-        writer.write("\r\n");
-        writer.write("--");
+        writer.write("\r\n--");
         writer.write(bodyBoundary);
         writer.write("--");
         out.write(writer.getBuffer().toString().getBytes(encoding));
