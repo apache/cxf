@@ -85,6 +85,9 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         if (isCancelledOrNotSuspended()) {
             return false;
         }
+        return doResumeFinal(response);
+    }
+    private synchronized boolean doResumeFinal(Object response) {
         inMessage.getExchange().put(AsyncResponse.class, this);
         cont.setObject(response);
         resumedByApplication = true;
@@ -112,6 +115,9 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
     
     private synchronized boolean doCancel(String retryAfterHeader) {
+        if (cancelled) {
+            return true;
+        }
         if (!isSuspended()) {
             return false;
         }
@@ -119,8 +125,8 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         if (retryAfterHeader != null) {
             rb.header(HttpHeaders.RETRY_AFTER, retryAfterHeader);
         }
-        doResume(rb.build());
         cancelled = true;
+        doResumeFinal(rb.build());
         return cancelled;
     }
 

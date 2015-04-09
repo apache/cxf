@@ -228,8 +228,8 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             response.setCreated(validFrom.toDate());
             response.setExpires(validTill.toDate());
 
+            LOG.fine("SAML Token successfully renewed");
             return response;
-            
         } catch (Exception ex) {
             LOG.log(Level.WARNING, "", ex);
             throw new STSException("Can't renew SAML assertion", ex, STSException.REQUEST_FAILED);

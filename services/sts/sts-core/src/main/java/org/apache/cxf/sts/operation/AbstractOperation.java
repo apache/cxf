@@ -601,6 +601,10 @@ public abstract class AbstractOperation {
         validatorParameters.setTokenRequirements(validateRequirements);
         validatorParameters.setToken(token);
 
+        if (tokenValidators.isEmpty()) {
+            LOG.fine("No token validators have been configured to validate the received token");
+        }
+        
         TokenValidatorResponse tokenResponse = null;
         for (TokenValidator tokenValidator : tokenValidators) {
             boolean canHandle = false;
@@ -623,6 +627,10 @@ public abstract class AbstractOperation {
                 }
                 break;
             }
+        }
+        
+        if (tokenResponse == null) {
+            LOG.fine("No token validator has been configured to validate the received token");
         }
         return tokenResponse;
     }

@@ -115,6 +115,7 @@ public class SCTCanceller implements TokenCanceller {
                 }
                 tokenParameters.getTokenStore().remove(token.getId());
                 cancelTarget.setState(STATE.CANCELLED);
+                LOG.fine("SecurityContextToken successfully cancelled");
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
             }
