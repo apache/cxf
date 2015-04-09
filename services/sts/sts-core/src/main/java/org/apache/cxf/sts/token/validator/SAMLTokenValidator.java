@@ -262,6 +262,7 @@ public class SAMLTokenValidator implements TokenValidator {
             response.setPrincipal(principal);
             
             validateTarget.setState(STATE.VALID);
+            LOG.fine("SAML Token successfully validated");
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }

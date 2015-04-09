@@ -235,6 +235,7 @@ public class UsernameTokenValidator implements TokenValidator {
             response.setPrincipal(principal);
             response.setTokenRealm(tokenRealm);
             validateTarget.setState(STATE.VALID);
+            LOG.fine("Username Token successfully validated");
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         } catch (Base64DecodingException ex) {

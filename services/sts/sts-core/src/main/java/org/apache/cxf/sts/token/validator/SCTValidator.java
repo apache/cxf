@@ -118,6 +118,7 @@ public class SCTValidator implements TokenValidator {
                     response.setTokenRealm(realm);
                 }
                 validateTarget.setState(STATE.VALID);
+                LOG.fine("SecurityContextToken successfully validated");
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
             }

@@ -67,11 +67,15 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
         response.setToken(delegateTarget);
         
         if (delegateTarget.getState() != STATE.VALID || !delegateTarget.isDOMElement()) {
+            LOG.fine("Delegation token is not valid");
             return response;
         }
         
         if (isDelegationAllowed(delegateTarget, tokenParameters.getAppliesToAddress())) {
+            LOG.fine("Delegation is allowed for principal " + tokenParameters.getPrincipal());
             response.setDelegationAllowed(true);
+        } else {
+            LOG.fine("Delegation is not allowed for principal " + tokenParameters.getPrincipal());
         }
         
         return response;

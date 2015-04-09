@@ -161,6 +161,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             }
             response.setComputedKey(computedKey);
             
+            LOG.fine("SAML Token successfully created");
             return response;
         } catch (Exception e) {
             LOG.log(Level.WARNING, "", e);
