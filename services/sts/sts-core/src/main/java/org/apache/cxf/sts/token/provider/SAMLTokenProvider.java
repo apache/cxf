@@ -169,6 +169,7 @@ public class SAMLTokenProvider implements TokenProvider {
             }
             response.setComputedKey(computedKey);
             
+            LOG.fine("SAML Token successfully created");
             return response;
         } catch (Exception e) {
             LOG.log(Level.WARNING, "", e);
