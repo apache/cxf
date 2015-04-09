@@ -57,12 +57,12 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
         try {
             JwsJwtCompactConsumer jwsReader = getJwsReader(assertion);
             JwtToken jwtToken = jwsReader.getJwtToken();
-            super.validateSignature(jwtToken.getHeaders(),
+            validateSignature(jwtToken.getHeaders(),
                                     jwsReader.getUnsignedEncodedSequence(), 
                                     jwsReader.getDecodedSignature());
             
                    
-            super.validateClaims(client, jwtToken.getClaims());
+            validateClaims(client, jwtToken.getClaims());
             UserSubject grantSubject = new UserSubject(jwtToken.getClaims().getSubject());
             
             return doCreateAccessToken(client, 
