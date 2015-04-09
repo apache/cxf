@@ -45,7 +45,7 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     
     protected void validateSignature(JoseHeaders headers, String unsignedText, byte[] signature) {
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
-        if (theSigVerifier.verify(headers, unsignedText, signature)) {    
+        if (!theSigVerifier.verify(headers, unsignedText, signature)) {    
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
     }

@@ -1,0 +1,64 @@
+package org.apache.cxf.rs.security.oauth2.grants.jwt;
+
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.Arrays;
+
+import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.easymock.EasyMockRule;
+import org.easymock.Mock;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.fail;
+
+public class AbstractJwtHandlerTest {
+    private static final String UNSIGNED_TEXT = "myUnsignedText";
+    private static final byte[] SIGNATURE = "mySignature".getBytes();
+
+    @Rule
+    public EasyMockRule rule = new EasyMockRule(this);
+    private AbstractJwtHandler handler;
+    @Mock
+    private JwsSignatureVerifier signatureVerifier;
+    @Mock
+    private JoseHeaders headers;
+
+    @Before
+    public void setUp() {
+        handler = new AbstractJwtHandler(Arrays.asList("someGrantType")) {
+            @Override
+            public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params) throws OAuthServiceException {
+                throw new UnsupportedOperationException("not implemented");
+            }
+        };
+        handler.setJwsVerifier(signatureVerifier);
+    }
+
+    @Test
+    public void testValidateSignatureWithValidSignature() {
+        expect(signatureVerifier.verify(headers, UNSIGNED_TEXT, SIGNATURE)).andReturn(true);
+        replay(signatureVerifier);
+        handler.validateSignature(headers, UNSIGNED_TEXT, SIGNATURE);
+        verify(signatureVerifier);
+    }
+
+    @Test
+    public void testValidateSignatureWithInvalidSignature() {
+        expect(signatureVerifier.verify(headers, UNSIGNED_TEXT, SIGNATURE)).andReturn(false);
+        replay(signatureVerifier);
+        try {
+            handler.validateSignature(headers, UNSIGNED_TEXT, SIGNATURE);
+            fail("OAuthServiceException expected");
+        } catch (OAuthServiceException expected) {
+        }
+        verify(signatureVerifier);
+    }
+}
