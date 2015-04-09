@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxws.support;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -49,7 +48,6 @@ import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.binding.xml.XMLBinding;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
@@ -467,17 +465,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 addAddressingFeature(feature);
             }
             feature.setAddressingRequired(addressing.isRequired());
-            if (ProviderImpl.isJaxWs22()) {
-                try {
-                    Class<?> addrClass = ClassLoaderUtils.loadClass("javax.xml.ws.soap.AddressingFeature",
-                                                                    ProviderImpl.class);
-                    Method responsesMethod = addrClass.getMethod("getResponses", new Class[] {});
-                    Object responses = responsesMethod.invoke(addressing, new Object[] {});
-                    feature.setResponses(responses.toString());
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
+            feature.setResponses(addressing.getResponses().toString());
         } else {
             removeAddressingFeature();
             getEndpointInfo().setProperty("org.apache.cxf.ws.addressing.MAPAggregator.addressingDisabled",
