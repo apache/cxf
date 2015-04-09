@@ -320,7 +320,7 @@ public class AttachmentDeserializer {
 
     private Map<String, List<String>> loadPartHeaders(InputStream in) throws IOException {
         List<String> headerLines = new ArrayList<String>(10);
-        StringBuffer buffer = new StringBuffer(128);
+        StringBuilder buffer = new StringBuilder(128);
         String line;
         // loop until we hit the end or a null line
         while ((line = readLine(in)) != null) {
@@ -384,7 +384,7 @@ public class AttachmentDeserializer {
     }
 
     private String readLine(InputStream in) throws IOException {
-        StringBuffer buffer = new StringBuffer(128);
+        StringBuilder buffer = new StringBuilder(128);
 
         int c;
 
