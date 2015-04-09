@@ -199,11 +199,30 @@ public class ${service.Name} extends ${serviceSuperclass} {
     }    
 #end
 
+#if ($frontend == "cxf")
+#foreach ($portClassName in $cxfPortClassnames)
+    /**
+     * Proxy interface the extends ${portClassName} to also provide useful methods
+     * without having to cast to the appropriate interface. 
+     */
+#if ($mark-generated == "true")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+#end
+    public interface ${portClassName}Proxy extends ${portClassName}, AutoCloseable, BindingProvider, Client {
+    }
+#end
+#end
+
 #foreach ($port in $service.Ports)
 #set($portClassName = ${port.InterfaceClass})
 #if ($portClassName == ${service.Name}) 
 #set($portClassName = ${port.fullClassName})
 #end
+
+#if ($frontend == "cxf")
+#set($portClassName = "${portClassName}Proxy")
+#end
+
     /**
 #if ($port.javaDoc != "")
 $port.javaDoc

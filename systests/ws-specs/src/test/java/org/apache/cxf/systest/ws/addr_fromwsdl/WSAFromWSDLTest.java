@@ -31,6 +31,7 @@ import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersFault_Exception;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersService;
+import org.apache.cxf.systest.ws.addr_feature.AddNumbersService.AddNumbersPortTypeProxy;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -137,67 +138,70 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
         ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
 
-        AddNumbersPortType port = getPort();
+        try (AddNumbersPortTypeProxy port = getPort()) {
 
-        try {
-            port.addNumbers3(-1, 2);
-        } catch (AddNumbersFault_Exception ex) {
-            assert true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            assert false;
+            try {
+                port.addNumbers3(-1, 2);
+            } catch (AddNumbersFault_Exception ex) {
+                assert true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                assert false;
+            }
+    
+            String expectedOut = "3in";
+            String expectedIn = "3fault";
+    
+            assertTrue(output.toString().indexOf(expectedOut) != -1);
+            assertTrue(input.toString().indexOf(expectedIn) != -1);
         }
-
-        String expectedOut = "3in";
-        String expectedIn = "3fault";
-
-        assertTrue(output.toString().indexOf(expectedOut) != -1);
-        assertTrue(input.toString().indexOf(expectedIn) != -1);
     }
     
     @Test
     public void testAnonToNonAnon() throws Exception {
-        AddNumbersPortType port = getPort();
-        ((BindingProvider)port).getRequestContext()
-            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                 "http://localhost:" + PORT + "/jaxws/addNonAnon");
-        try {
-            port.addNumbers3(-1, 2);
-        } catch (SOAPFaultException e) {
-            assertTrue(e.getFault().getFaultCode().contains("OnlyNonAnonymousAddressSupported"));
+        try (AddNumbersPortTypeProxy port = getPort()) {
+            port.getRequestContext()
+                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                     "http://localhost:" + PORT + "/jaxws/addNonAnon");
+            try {
+                port.addNumbers3(-1, 2);
+            } catch (SOAPFaultException e) {
+                assertTrue(e.getFault().getFaultCode().contains("OnlyNonAnonymousAddressSupported"));
+            }
         }
     } 
     @Test
     public void testNonAnonToAnon() throws Exception {
-        AddNumbersPortType port = getPort();
-        ((BindingProvider)port).getRequestContext()
-            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                 "http://localhost:" + PORT + "/jaxws/addAnon");
-        
-        AddressingProperties maps = new AddressingProperties();
-        EndpointReferenceType ref = new EndpointReferenceType();
-        AttributedURIType add = new AttributedURIType();
-        add.setValue("http://localhost:" + INVALID_PORT + "/not/a/real/url");
-        ref.setAddress(add);
-        maps.setReplyTo(ref);
-        maps.setFaultTo(ref);
-
-        ((BindingProvider)port).getRequestContext()
-            .put("javax.xml.ws.addressing.context", maps);
-
-        try {
-            port.addNumbers3(-1, 2);
-        } catch (SOAPFaultException e) {
-            assertTrue(e.getFault().getFaultCode().contains("OnlyAnonymousAddressSupported"));
+        try (AddNumbersPortTypeProxy port = getPort()) {
+            port.getRequestContext()
+                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                     "http://localhost:" + PORT + "/jaxws/addAnon");
+            
+            AddressingProperties maps = new AddressingProperties();
+            EndpointReferenceType ref = new EndpointReferenceType();
+            AttributedURIType add = new AttributedURIType();
+            add.setValue("http://localhost:" + INVALID_PORT + "/not/a/real/url");
+            ref.setAddress(add);
+            maps.setReplyTo(ref);
+            maps.setFaultTo(ref);
+    
+            port.getRequestContext()
+                .put("javax.xml.ws.addressing.context", maps);
+    
+            try {
+                port.addNumbers3(-1, 2);
+            } catch (SOAPFaultException e) {
+                assertTrue(e.getFault().getFaultCode().contains("OnlyAnonymousAddressSupported"));
+            }
         }
     }
-    private AddNumbersPortType getPort()throws Exception {
+    private AddNumbersPortTypeProxy getPort()throws Exception {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         AddNumbersService service = new AddNumbersService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
-        AddNumbersPortType port = service.getAddNumbersPort(new AddressingFeature());
+        AddNumbersPortTypeProxy port = service.getAddNumbersPort(new AddressingFeature());
         updateAddressPort(port, PORT);
         return port;
     }

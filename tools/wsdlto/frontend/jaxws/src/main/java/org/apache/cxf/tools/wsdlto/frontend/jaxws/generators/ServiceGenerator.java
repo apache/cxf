@@ -21,12 +21,16 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -106,11 +110,17 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                     
                 }
     
+                Set<String> portNames = new HashSet<>();
                 for (JavaPort port : js.getPorts()) {
                     if (!port.getPackageName().equals(js.getPackageName())
                         && !port.getInterfaceClass().equals(js.getName())) {
                         js.addImport(port.getFullClassName());
                     }
+                    portNames.add(port.getInterfaceClass());
+                }
+                if ("cxf".equals(env.get(ToolConstants.CFG_FRONTEND))) {
+                    js.addImport(BindingProvider.class.getName());
+                    js.addImport(Client.class.getName());
                 }
     
                 String url = (String)env.get(ToolConstants.CFG_WSDLURL);
@@ -136,7 +146,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                     useGetResource = true;
                 }
                 
-                
+                setAttributes("cxfPortClassnames", portNames.toArray(new String[portNames.size()]));
                 setAttributes("service", js);
                 setAttributes("wsdlLocation", location);
                 setAttributes("useGetResource", useGetResource);
