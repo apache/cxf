@@ -90,11 +90,16 @@ public class JexlClaimsMapper implements ClaimsMapper {
 
     public void setScript(String scriptLocation) throws IOException {
         URL resource = ClassLoaderUtils.getResource(scriptLocation, this.getClass());
-        if (resource == null) {
+        if (resource != null) {
+            scriptLocation = resource.getPath();
+            LOG.fine("Script found within Classpath: " + scriptLocation);
+        }
+        File scriptFile = new File(scriptLocation);
+        if (scriptFile.exists()) {
+            this.script = jexlEngine.createScript(scriptFile);
+        } else {
             throw new IllegalArgumentException("Script resource not found!");
         }
-        
-        this.script = jexlEngine.createScript(new File(resource.getPath()));
     }
 
     public JexlEngine getJexlEngine() {
