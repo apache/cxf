@@ -70,6 +70,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     static {
         HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
         HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
+        HEADERS.add(new QName(WSConstants.WSSE11_NS, "EncryptedHeader"));
     }
     
     private final Map<String, Object> properties;
