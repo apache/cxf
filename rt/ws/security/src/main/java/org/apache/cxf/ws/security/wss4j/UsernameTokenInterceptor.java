@@ -209,9 +209,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             );
         data.setNonceReplayCache(nonceCache);
 
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setAllowUsernameTokenNoPassword(allowNoPassword);
-        data.setWssConfig(config);
+        data.setAllowUsernameTokenNoPassword(allowNoPassword);
+        data.setWssConfig(WSSConfig.getNewInstance());
         if (!bspCompliant) {
             data.setDisableBSPEnforcement(true);
         }
@@ -395,7 +394,9 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         if (!StringUtils.isEmpty(userName)) {
             // If NoPassword property is set we don't need to set the password
             if (token.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
+                WSSecUsernameToken utBuilder = new WSSecUsernameToken();
+                utBuilder.setIdAllocator(wssConfig.getIdAllocator());
+                utBuilder.setWsTimeSource(wssConfig.getCurrentTime());
                 utBuilder.setUserInfo(userName, null);
                 utBuilder.setPasswordType(null);
                 return utBuilder;
@@ -408,7 +409,9 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             
             if (!StringUtils.isEmpty(password)) {
                 //If the password is available then build the token
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
+                WSSecUsernameToken utBuilder = new WSSecUsernameToken();
+                utBuilder.setIdAllocator(wssConfig.getIdAllocator());
+                utBuilder.setWsTimeSource(wssConfig.getCurrentTime());
                 if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {
                     utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);  
                 } else {

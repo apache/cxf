@@ -358,7 +358,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
             encrKey.appendToHeader(secHeader);
             
-            WSSecDKSign dkSig = new WSSecDKSign(wssConfig);
+            WSSecDKSign dkSig = new WSSecDKSign();
+            dkSig.setIdAllocator(wssConfig.getIdAllocator());
             dkSig.setCallbackLookup(callbackLookup);
             if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkSig.setWscVersion(ConversationConstants.VERSION_05_02);
@@ -447,7 +448,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         List<WSEncryptionPart> sigParts
     ) throws Exception {
         //Do Signature with derived keys
-        WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+        WSSecDKSign dkSign = new WSSecDKSign();
+        dkSign.setIdAllocator(wssConfig.getIdAllocator());
         dkSign.setCallbackLookup(callbackLookup);
         AlgorithmSuite algorithmSuite = tbinding.getAlgorithmSuite();
 
@@ -497,7 +499,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         SupportingTokens wrapper,
         List<WSEncryptionPart> sigParts
     ) throws Exception {
-        WSSecSignature sig = new WSSecSignature(wssConfig);
+        WSSecSignature sig = new WSSecSignature();
+        sig.setIdAllocator(wssConfig.getIdAllocator());
         sig.setCallbackLookup(callbackLookup);
         
         //Setting the AttachedReference or the UnattachedReference according to the flag

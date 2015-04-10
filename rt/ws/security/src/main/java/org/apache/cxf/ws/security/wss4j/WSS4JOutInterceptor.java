@@ -282,7 +282,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 throw new SoapFault(new Message("SECURITY_FAILED", LOG), e, version
                         .getSender());
             } finally {
-                reqData.clear();
                 reqData = null;
             }
         }

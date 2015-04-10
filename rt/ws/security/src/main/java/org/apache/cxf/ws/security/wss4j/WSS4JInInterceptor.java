@@ -281,7 +281,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             
             if (!(wsResult.getResults() == null || wsResult.getResults().isEmpty())) { 
                 // security header found
-                if (reqData.getWssConfig().isEnableSignatureConfirmation()) {
+                if (reqData.isEnableSignatureConfirmation()) {
                     checkSignatureConfirmation(reqData, wsResult);
                 }
 
@@ -332,7 +332,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         } catch (SOAPException e) {
             throw new SoapFault(new Message("SAAJ_EX", LOG), e, version.getSender());
         } finally {
-            reqData.clear();
             reqData = null;
         }
     }

@@ -400,7 +400,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                           List<WSEncryptionPart> encrParts,
                                           boolean atEnd) {
         try {
-            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
+            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
+            dkEncr.setIdAllocator(wssConfig.getIdAllocator());
             dkEncr.setCallbackLookup(callbackLookup);
             if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
@@ -514,7 +515,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                            attached, encrParts, atEnd);
             } else {
                 try {
-                    WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
+                    WSSecEncrypt encr = new WSSecEncrypt();
+                    encr.setIdAllocator(wssConfig.getIdAllocator());
                     encr.setCallbackLookup(callbackLookup);
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
                     String encrTokId = encrTok.getId();
@@ -626,7 +628,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                SecurityToken tok,
                                boolean included) throws WSSecurityException {
         Document doc = saaj.getSOAPPart();
-        WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+        WSSecDKSign dkSign = new WSSecDKSign();
+        dkSign.setIdAllocator(wssConfig.getIdAllocator());
         dkSign.setCallbackLookup(callbackLookup);
         if (policyAbstractTokenWrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
             dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
@@ -753,7 +756,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         if (policyToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             return doSignatureDK(sigs, policyAbstractTokenWrapper, policyToken, tok, included);
         } else {
-            WSSecSignature sig = new WSSecSignature(wssConfig);
+            WSSecSignature sig = new WSSecSignature();
+            sig.setIdAllocator(wssConfig.getIdAllocator());
             sig.setCallbackLookup(callbackLookup);
             sig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
             // If a EncryptedKeyToken is used, set the correct value type to
