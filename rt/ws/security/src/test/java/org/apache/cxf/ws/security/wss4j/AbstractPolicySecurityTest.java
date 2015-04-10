@@ -137,9 +137,9 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         //DOMUtils.writeXml(inDoc, System.out);
         
         // Use this snippet if you need intermediate output for debugging.
-
-        dumpDocument(inDoc);
-
+        /*
+         * dumpDocument(inDoc);
+         */
 
         /* This verifies of the header elements have been
          * wrapped in an EncryptedHeader
@@ -578,7 +578,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
                 0, strDataNodes.getLength());
     }
 
-    private void dumpDocument(Document document) throws Exception {
+    private void dumpDocument(Document document) throws Exception { //NOPMD
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer t = tf.newTransformer();
         t.setOutputProperty(OutputKeys.INDENT, "yes");
