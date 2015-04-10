@@ -41,7 +41,9 @@ import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.interceptors.STSTokenHelper;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 
 /**
@@ -96,7 +98,8 @@ public class STSTokenHelperTest extends AbstractBusClientServerTestBase {
         exchange.put(Endpoint.class, ep);
         
         STSTokenHelper.TokenRequestParams params = new STSTokenHelper.TokenRequestParams();
-        STSTokenHelper.getToken(message, params);
+        SecurityToken token = STSTokenHelper.getToken(message, params);
+        Assert.assertNotNull(token);
     }
 
     private STSClient initStsClient(Bus bus) {
