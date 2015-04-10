@@ -51,6 +51,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
         HEADERS.add(new QName(WSConstants.WSSE11_NS, "Security"));
         HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
+        HEADERS.add(new QName(WSConstants.WSSE11_NS, "EncryptedHeader"));
     }
 
     private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();

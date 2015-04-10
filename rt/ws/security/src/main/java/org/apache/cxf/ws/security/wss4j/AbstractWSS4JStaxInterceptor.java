@@ -75,6 +75,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         HEADERS.add(new QName(WSSConstants.NS_WSSE10, "Security"));
         HEADERS.add(new QName(WSSConstants.NS_WSSE11, "Security"));
         HEADERS.add(new QName(WSSConstants.NS_XMLENC, "EncryptedData"));
+        HEADERS.add(new QName(WSSConstants.NS_WSSE11, "EncryptedHeader"));
     }
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractWSS4JStaxInterceptor.class);
