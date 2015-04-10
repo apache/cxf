@@ -20,7 +20,6 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -47,8 +46,12 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor, 
     PhaseInterceptor<SoapMessage> {
 
-    private static final Set<QName> HEADERS = 
-        Collections.singleton(new QName(WSConstants.WSSE_NS, "Security"));
+    private static final Set<QName> HEADERS = new HashSet<>();
+    
+    static {
+        HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
+        HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
+    }
 
     private Map<String, Object> properties = new ConcurrentHashMap<>();
     private final Set<String> before = new HashSet<>();

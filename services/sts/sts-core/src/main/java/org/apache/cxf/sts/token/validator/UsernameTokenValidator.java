@@ -165,7 +165,7 @@ public class UsernameTokenValidator implements TokenValidator {
         //
         try {
             boolean allowNamespaceQualifiedPasswordTypes = 
-                wssConfig.getAllowNamespaceQualifiedPasswordTypes();
+                requestData.isAllowNamespaceQualifiedPasswordTypes();
             UsernameToken ut = 
                 new UsernameToken(usernameTokenElement, allowNamespaceQualifiedPasswordTypes, 
                                   new BSPEnforcer());

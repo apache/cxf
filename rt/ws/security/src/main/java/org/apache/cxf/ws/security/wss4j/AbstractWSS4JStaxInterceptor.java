@@ -64,11 +64,14 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor, 
     PhaseInterceptor<SoapMessage> {
 
-    private static final Set<QName> HEADERS = 
-        Collections.singleton(new QName(WSConstants.WSSE_NS, "Security"));
-    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractWSS4JStaxInterceptor.class);
-
+    private static final Set<QName> HEADERS = new HashSet<>();
+    
+    static {
+        HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
+        HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
+    }
+    
     private final Map<String, Object> properties;
     private final WSSSecurityProperties userSecurityProperties;
     private Map<String, Crypto> cryptos = new ConcurrentHashMap<>();
