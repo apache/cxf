@@ -186,6 +186,16 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                        new XPathExpression(
                                "//ser:Header", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
                true);
+
+        this.runInterceptorAndValidate(
+                "wss-242-with-encryptedheader.xml",
+                this.getPrefixes(),
+                Arrays.asList(
+                        new XPathExpression(
+                                "//ser:Header", CoverageType.SIGNED, CoverageScope.ELEMENT),
+                        new XPathExpression(
+                                "//ser:Header", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
+                true);
     }
     
     private Map<String, String> getPrefixes() {
