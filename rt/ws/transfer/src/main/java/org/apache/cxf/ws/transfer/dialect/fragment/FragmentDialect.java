@@ -588,7 +588,8 @@ public class FragmentDialect implements Dialect {
                 if (
                         FragmentDialectConstants.FRAGMENT_2011_03_IRI.equals(node.getNamespaceURI())
                                 && FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME.equals(node.getLocalName())) {
-                    String attrName = ((Element)node).getAttribute(
+                    String attrName = ((Element)node).getAttributeNS(
+                            FragmentDialectConstants.FRAGMENT_2011_03_IRI,
                             FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR);
                     String attrValue = node.getTextContent();
                     if (attrName == null) {

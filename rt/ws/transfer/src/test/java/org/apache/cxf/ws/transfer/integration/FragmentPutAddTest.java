@@ -145,7 +145,8 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
                 FragmentDialectConstants.FRAGMENT_2011_03_IRI,
                 FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME
         );
-        addedAttr.setAttribute(
+        addedAttr.setAttributeNS(
+                FragmentDialectConstants.FRAGMENT_2011_03_IRI,
                 FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME_ATTR,
                 "foo"
         );
