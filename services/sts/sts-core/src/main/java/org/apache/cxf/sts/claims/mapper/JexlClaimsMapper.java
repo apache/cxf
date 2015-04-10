@@ -50,6 +50,7 @@ public class JexlClaimsMapper implements ClaimsMapper {
 
         Map<String, Object> functions = new HashMap<>();
         functions.put("claims", new ClaimUtils());
+        functions.put("LOG", LOG);
         jexlEngine.setFunctions(functions);
     }
 
