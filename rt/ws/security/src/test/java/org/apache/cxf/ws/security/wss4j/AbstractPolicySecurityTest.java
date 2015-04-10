@@ -32,6 +32,11 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.Node;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -131,14 +136,16 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         //DOMUtils.writeXml(inDoc, System.out);
         
         // Use this snippet if you need intermediate output for debugging.
-        /*
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer t = tf.newTransformer();
-        t.setOutputProperty(OutputKeys.INDENT, "no");
-        t.transform(new DOMSource(inDoc), new StreamResult(System.out));
-        */
-        
-        
+
+        dumpDocument(inDoc);
+
+
+        /* This verifies of the header elements have been
+         * wrapped in an EncryptedHeader
+         * See SOAP Message Security 1.1, chapter 9.3
+         */
+        verifyEncryptedHeader(originalDoc, inDoc);
+
         this.runInInterceptorAndValidate(inDoc,
                 inPolicy, inAssertions.getAssertedAssertions(),
                 inAssertions.getNotAssertedAssertions(), types);
@@ -544,8 +551,8 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         assertNotNull("SecurityTokenReference for " + assertionId + " not found in security header.", strId);
         
         // Verify STR is included in the signature references
-        final XPathExpression sigRefExpr = xpath.compile(
-            "/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo/ds:Reference");
+        final XPathExpression sigRefExpr =
+                xpath.compile("/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo/ds:Reference");
         
         final NodeList sigReferenceNodes = 
             (NodeList) sigRefExpr.evaluate(signedDoc, XPathConstants.NODESET);
@@ -559,10 +566,34 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
                 break;
             }
         }
-        
+
         assertTrue("SecurityTokenReference for " + assertionId + " is not signed.", foundStrReference);
     }
-    
+
+    protected void verifyEncryptedHeader(Document originalDoc, Document processedDoc) throws Exception {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xpath = factory.newXPath();
+        final NamespaceContext nsContext = this.getNamespaceContext();
+        xpath.setNamespaceContext(nsContext);
+
+        // Find EncryptedData in the message, should not be there
+        final XPathExpression strData = xpath.compile(
+                "/s:Envelope/s:Header/xenc:EncryptedData");
+
+        final NodeList strDataNodes =
+                (NodeList) strData.evaluate(processedDoc, XPathConstants.NODESET);
+
+        assertEquals("EncryptedData found without in header without being wrapped in an EncryptedHeader.",
+                0, strDataNodes.getLength());
+    }
+
+    private void dumpDocument(Document document) throws Exception {
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer t = tf.newTransformer();
+        t.setOutputProperty(OutputKeys.INDENT, "yes");
+        t.transform(new DOMSource(document), new StreamResult(System.out));
+    }
+
     protected static final class MockEndpoint extends 
         AbstractAttributedInterceptorProvider implements Endpoint {
 
