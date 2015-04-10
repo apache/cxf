@@ -26,6 +26,8 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 
 
@@ -67,19 +69,33 @@ public class JweHeaders extends JoseHeaders {
     public void setKeyEncryptionAlgorithm(String type) {
         super.setAlgorithm(type);
     }
+    public void setKeyEncryptionAlgorithm(KeyAlgorithm algo) {
+        this.setKeyEncryptionAlgorithm(algo.getJwaName());
+    }
     
     public String getKeyEncryptionAlgorithm() {
         return super.getAlgorithm();
+    }
+    public KeyAlgorithm getKeyEncryptionAlgorithmEnum() {
+        String algo = getKeyEncryptionAlgorithm();
+        return algo == null ? null : KeyAlgorithm.getAlgorithm(algo);
     }
     
     public void setContentEncryptionAlgorithm(String type) {
         setHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM, type);
     }
     
+    public void setContentEncryptionAlgorithm(ContentAlgorithm algo) {
+        this.setContentEncryptionAlgorithm(algo.getJwaName());
+    }
+    
     public String getContentEncryptionAlgorithm() {
         return (String)getHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM);
     }
-    
+    public ContentAlgorithm getContentEncryptionAlgorithmEnum() {
+        String algo = getContentEncryptionAlgorithm();
+        return algo == null ? null : ContentAlgorithm.getAlgorithm(algo);
+    }
     public void setZipAlgorithm(String type) {
         setHeader(JoseConstants.JWE_HEADER_ZIP_ALGORITHM, type);
     }
