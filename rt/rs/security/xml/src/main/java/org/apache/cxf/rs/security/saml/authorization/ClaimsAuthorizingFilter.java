@@ -28,8 +28,8 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.rt.security.claims.ClaimBean;
-import org.apache.cxf.rt.security.claims.ClaimsAuthorizingInterceptor;
+import org.apache.cxf.rt.security.saml.claims.ClaimBean;
+import org.apache.cxf.rt.security.saml.interceptor.ClaimsAuthorizingInterceptor;
 
 public class ClaimsAuthorizingFilter implements ContainerRequestFilter {
 

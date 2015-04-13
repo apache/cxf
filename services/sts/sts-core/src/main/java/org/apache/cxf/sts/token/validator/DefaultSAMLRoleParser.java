@@ -24,8 +24,8 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.apache.cxf.rt.security.claims.ClaimCollection;
-import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
-import org.apache.cxf.rt.security.saml.SAMLUtils;
+import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
+import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 /**

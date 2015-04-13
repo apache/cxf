@@ -119,13 +119,17 @@
         <feature version="${project.version}">cxf-ws-addr</feature>
         <bundle start-level="40" dependency="true">mvn:net.sf.ehcache/ehcache/${cxf.ehcache.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-ws-security/${project.version}</bundle>
-        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-security/${project.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-security-saml/${project.version}</bundle>
     </feature>
     <feature name="cxf-rt-security" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-wsdl</feature>
-        <feature version="${cxf.wss4j.version}">wss4j</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-security/${project.version}</bundle>
+    </feature>
+    <feature name="cxf-rt-security-saml" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-rt-security</feature>
+        <feature version="${cxf.wss4j.version}">wss4j</feature>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-security-saml/${project.version}</bundle>
     </feature>
     <feature name="cxf-http" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-core</feature>
@@ -189,7 +193,7 @@
     </feature>
     <feature name="cxf-rs-security-xml" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-jaxrs</feature>
-        <feature version="${project.version}">cxf-rt-security</feature>
+        <feature version="${project.version}">cxf-rt-security-saml</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-xml/${project.version}</bundle>
     </feature>
     <feature name="cxf-rs-security-sso-saml" version="${project.version}" resolver="(obr)">

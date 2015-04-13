@@ -40,7 +40,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
-
 import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -54,7 +53,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
-import org.apache.cxf.rt.security.saml.SAMLUtils;
+import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.EHCacheTokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;

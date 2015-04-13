@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.saml;
+package org.apache.cxf.rt.security.saml.xacml;
 
 import java.util.List;
 
@@ -31,7 +31,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
 import org.apache.cxf.rt.security.saml.xacml.pdp.api.PolicyDecisionPoint;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
@@ -40,6 +39,7 @@ import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.xacml.XACMLObjectBuilder;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.DecisionType;
+import org.opensaml.xacml.ctx.DecisionType.DECISION;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResponseType;
 import org.opensaml.xacml.ctx.ResultType;
@@ -48,69 +48,17 @@ import org.opensaml.xacml.ctx.StatusType;
 import org.opensaml.xacml.ctx.SubjectType;
 
 /**
- * A test implementation of PolicyDecisionPoint. It just mocks up a Response
+ * A test implementation of AbstractXACMLAuthorizingInterceptor. It just mocks up a Response
  * object based on the role of the Subject. If the role is "manager" then it permits the
  * request, otherwise it denies it.
  */
-public class PolicyDecisionPointMockImpl implements PolicyDecisionPoint {
-    
-    public PolicyDecisionPointMockImpl() {
-        org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
-    }
-    
-    @Override
-    public Source evaluate(Source request) {
-        RequestType requestType = requestSourceToRequestType(request);
-        
-        XMLObjectBuilderFactory builderFactory = 
-            XMLObjectProviderRegistrySupport.getBuilderFactory();
-        
-        @SuppressWarnings("unchecked")
-        XACMLObjectBuilder<ResponseType> responseTypeBuilder = 
-            (XACMLObjectBuilder<ResponseType>)
-            builderFactory.getBuilder(ResponseType.DEFAULT_ELEMENT_NAME);
-        
-        @SuppressWarnings("unchecked")
-        XACMLObjectBuilder<ResultType> resultTypeBuilder = 
-            (XACMLObjectBuilder<ResultType>)
-            builderFactory.getBuilder(ResultType.DEFAULT_ELEMENT_NAME);
-        
-        @SuppressWarnings("unchecked")
-        XACMLObjectBuilder<DecisionType> decisionTypeBuilder =
-            (XACMLObjectBuilder<DecisionType>)
-            builderFactory.getBuilder(DecisionType.DEFAULT_ELEMENT_NAME);
-        
-        @SuppressWarnings("unchecked")
-        XACMLObjectBuilder<StatusType> statusTypeBuilder = 
-            (XACMLObjectBuilder<StatusType>)
-            builderFactory.getBuilder(StatusType.DEFAULT_ELEMENT_NAME);
-        
-        @SuppressWarnings("unchecked")
-        XACMLObjectBuilder<StatusCodeType> statusCodeTypeBuilder =
-            (XACMLObjectBuilder<StatusCodeType>)
-            builderFactory.getBuilder(StatusCodeType.DEFAULT_ELEMENT_NAME);
-            
-        DecisionType decisionType = decisionTypeBuilder.buildObject();
-        
-        String role = getSubjectRole(requestType);
-        if ("manager".equals(role)) {
-            decisionType.setDecision(DecisionType.DECISION.Permit); 
-        } else {
-            decisionType.setDecision(DecisionType.DECISION.Deny);
-        }
-        
-        ResultType result = resultTypeBuilder.buildObject();
-        result.setDecision(decisionType);
-        
-        StatusType status = statusTypeBuilder.buildObject();
-        StatusCodeType statusCode = statusCodeTypeBuilder.buildObject();
-        statusCode.setValue("urn:oasis:names:tc:xacml:1.0:status:ok");
-        status.setStatusCode(statusCode);
-        result.setStatus(status);
-        
-        ResponseType response = responseTypeBuilder.buildObject();
-        response.getResults().add(result);
-        
+public class DummyPDP implements PolicyDecisionPoint {
+
+    public Source evaluate(Source requestSource) {
+        RequestType request = requestSourceToRequestType(requestSource); 
+        String role = getSubjectRole(request);
+        DECISION decision = "manager".equals(role) ? DecisionType.DECISION.Permit : DecisionType.DECISION.Deny;        
+        ResponseType response = createResponse(decision);
         return responseType2Source(response);
     }
     
@@ -139,7 +87,52 @@ public class PolicyDecisionPointMockImpl implements PolicyDecisionPoint {
         }
         return new DOMSource(responseElement);
     }
-    
+
+    private ResponseType createResponse(DECISION decision) {
+        XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+        
+        @SuppressWarnings("unchecked")
+        XACMLObjectBuilder<ResponseType> responseTypeBuilder = 
+            (XACMLObjectBuilder<ResponseType>)
+            builderFactory.getBuilder(ResponseType.DEFAULT_ELEMENT_NAME);
+        
+        @SuppressWarnings("unchecked")
+        XACMLObjectBuilder<ResultType> resultTypeBuilder = 
+            (XACMLObjectBuilder<ResultType>)
+            builderFactory.getBuilder(ResultType.DEFAULT_ELEMENT_NAME);
+        
+        @SuppressWarnings("unchecked")
+        XACMLObjectBuilder<DecisionType> decisionTypeBuilder =
+            (XACMLObjectBuilder<DecisionType>)
+            builderFactory.getBuilder(DecisionType.DEFAULT_ELEMENT_NAME);
+        
+        @SuppressWarnings("unchecked")
+        XACMLObjectBuilder<StatusType> statusTypeBuilder = 
+            (XACMLObjectBuilder<StatusType>)
+            builderFactory.getBuilder(StatusType.DEFAULT_ELEMENT_NAME);
+        
+        @SuppressWarnings("unchecked")
+        XACMLObjectBuilder<StatusCodeType> statusCodeTypeBuilder =
+            (XACMLObjectBuilder<StatusCodeType>)
+            builderFactory.getBuilder(StatusCodeType.DEFAULT_ELEMENT_NAME);
+            
+        ResultType result = resultTypeBuilder.buildObject();
+
+        DecisionType decisionType = decisionTypeBuilder.buildObject();
+        decisionType.setDecision(decision);
+        result.setDecision(decisionType);
+        
+        StatusType status = statusTypeBuilder.buildObject();
+        StatusCodeType statusCode = statusCodeTypeBuilder.buildObject();
+        statusCode.setValue("urn:oasis:names:tc:xacml:1.0:status:ok");
+        status.setStatusCode(statusCode);
+        result.setStatus(status);
+        
+        ResponseType response = responseTypeBuilder.buildObject();
+        response.getResults().add(result);
+        return response;
+    }
+
     private String getSubjectRole(RequestType request) {
         List<SubjectType> subjects = request.getSubjects();
         if (subjects != null) {
@@ -157,5 +150,4 @@ public class PolicyDecisionPointMockImpl implements PolicyDecisionPoint {
         return null;
     }
 
-    
 }

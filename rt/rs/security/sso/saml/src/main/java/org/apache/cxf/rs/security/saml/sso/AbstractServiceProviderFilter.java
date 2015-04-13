@@ -55,7 +55,7 @@ import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
-import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
+import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -193,16 +193,16 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                 roleAttributeName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
             }
             ClaimCollection claims = 
-                org.apache.cxf.rt.security.saml.SAMLUtils.getClaims(assertionWrapper);
+                org.apache.cxf.rt.security.saml.utils.SAMLUtils.getClaims(assertionWrapper);
             Set<Principal> roles = 
-                org.apache.cxf.rt.security.saml.SAMLUtils.parseRolesFromClaims(
+                org.apache.cxf.rt.security.saml.utils.SAMLUtils.parseRolesFromClaims(
                     claims, roleAttributeName, null);
 
             SAMLSecurityContext context = 
                 new SAMLSecurityContext(new SimplePrincipal(name), roles, claims);
-            context.setIssuer(org.apache.cxf.rt.security.saml.SAMLUtils.getIssuer(assertionWrapper));
+            context.setIssuer(org.apache.cxf.rt.security.saml.utils.SAMLUtils.getIssuer(assertionWrapper));
             context.setAssertionElement(
-                org.apache.cxf.rt.security.saml.SAMLUtils.getAssertionElement(assertionWrapper));
+                org.apache.cxf.rt.security.saml.utils.SAMLUtils.getAssertionElement(assertionWrapper));
             m.put(SecurityContext.class, context);
         }
     }

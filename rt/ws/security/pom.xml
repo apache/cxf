@@ -49,7 +49,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-security</artifactId>
+            <artifactId>cxf-rt-security-saml</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

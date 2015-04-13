@@ -31,7 +31,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.rt.security.claims.SAMLClaim;
+import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;

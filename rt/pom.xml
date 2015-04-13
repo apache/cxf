@@ -75,5 +75,6 @@
         <module>management-web</module>
         <module>javascript</module>
         <module>security</module>
+        <module>security-saml</module>
     </modules>
 </project>

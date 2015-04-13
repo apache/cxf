@@ -19,10 +19,10 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-rt-security</artifactId>
+    <artifactId>cxf-rt-security-saml</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache CXF Runtime Security functionality</name>
-    <description>Apache CXF Runtime Security functionality</description>
+    <name>Apache CXF Runtime SAML Security functionality</name>
+    <description>Apache CXF Runtime SAML Security functionality</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
@@ -30,11 +30,21 @@
         <version>3.1.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.osgi.import>
+            org.opensaml*,
+        </cxf.osgi.import>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-core</artifactId>
+            <artifactId>cxf-rt-security</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-ws-security-common</artifactId>
+            <version>${cxf.wss4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
