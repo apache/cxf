@@ -168,7 +168,7 @@ public class SAMLRealm {
                     LOG.fine("Cannot load CallbackHandler using: " + callbackHandlerClass);
                     throw new STSException("Configuration error: cannot load callback handler");
                 }
-            } catch (WSSecurityException ex) {
+            } catch (Exception ex) {
                 LOG.fine("Error in loading the callback handler object: " + ex.getMessage());
                 throw new STSException(ex.getMessage());
             }

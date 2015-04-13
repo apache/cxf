@@ -659,7 +659,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     protected CallbackHandler getCallback(RequestData reqData) throws WSSecurityException {
         Object o = ((SoapMessage)reqData.getMsgContext())
             .getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-        CallbackHandler cbHandler = SecurityUtils.getCallbackHandler(o);
+        CallbackHandler cbHandler = null;
+        try {
+            cbHandler = SecurityUtils.getCallbackHandler(o);
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
         
         if (cbHandler == null) {
             try {

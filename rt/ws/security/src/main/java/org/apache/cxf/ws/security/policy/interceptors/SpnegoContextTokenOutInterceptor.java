@@ -38,7 +38,6 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.spnego.SpnegoClientAction;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
 import org.apache.wss4j.policy.SPConstants;
@@ -117,7 +116,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 );
             
             spnegoToken.retrieveServiceTicket(jaasContext, callbackHandler, kerberosSpn);
-        } catch (WSSecurityException e) {
+        } catch (Exception e) {
             throw new Fault(e);
         }
         

@@ -832,12 +832,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
         }
         
-        CallbackHandler handler = SecurityUtils.getCallbackHandler(o);
-        if (handler == null) {
-            unassertPolicy(token, "No SAML CallbackHandler available");
-            return null;
-        }
-        
         SAMLCallback samlCallback = new SAMLCallback();
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
@@ -845,7 +839,16 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
             samlCallback.setSamlVersion(Version.SAML_20);
         }
-        SAMLUtil.doSAMLCallback(handler, samlCallback);
+        try {
+            CallbackHandler handler = SecurityUtils.getCallbackHandler(o);
+            if (handler == null) {
+                unassertPolicy(token, "No SAML CallbackHandler available");
+                return null;
+            }
+            SAMLUtil.doSAMLCallback(handler, samlCallback);
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         
         if (samlCallback.isSignAssertion()) {
@@ -923,7 +926,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 unassertPolicy(info, "No callback handler and no password available");
                 return null;
             }
-        } catch (WSSecurityException ex) {
+        } catch (Exception ex) {
             unassertPolicy(info, "No callback handler and no password available");
             return null;
         }
@@ -1486,7 +1489,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             if (callbackHandler != null) {
                 return new JasyptPasswordEncryptor(callbackHandler);
             }
-        } catch (WSSecurityException ex) {
+        } catch (Exception ex) {
             return null;
         }
         

@@ -35,7 +35,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
-import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
  * Some common functionality
@@ -48,17 +47,14 @@ public final class SecurityUtils {
         // complete
     }
 
-    public static CallbackHandler getCallbackHandler(Object o) throws WSSecurityException {
+    public static CallbackHandler getCallbackHandler(Object o) throws InstantiationException, 
+    IllegalAccessException, ClassNotFoundException {
         CallbackHandler handler = null;
         if (o instanceof CallbackHandler) {
             handler = (CallbackHandler)o;
         } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils.loadClass((String)o, 
-                                                                      SecurityUtils.class).newInstance();
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-            }
+            handler = (CallbackHandler)ClassLoaderUtils.loadClass((String)o, 
+                                                                  SecurityUtils.class).newInstance();
         }
         return handler;
     }

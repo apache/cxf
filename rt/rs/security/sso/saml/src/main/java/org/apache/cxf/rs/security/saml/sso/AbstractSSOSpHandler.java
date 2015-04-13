@@ -177,7 +177,7 @@ public class AbstractSSOSpHandler {
                     LOG.fine("Cannot load CallbackHandler using: " + callbackHandlerClass);
                     return null;
                 }
-            } catch (WSSecurityException ex) {
+            } catch (Exception ex) {
                 LOG.log(Level.FINE, "Error in loading callback handler", ex);
                 return null;
             }

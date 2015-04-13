@@ -51,7 +51,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -184,7 +183,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
                 policyNotAsserted(info, "No callback handler and no password available", message);
                 return null;
             }
-        } catch (WSSecurityException ex) {
+        } catch (Exception ex) {
             policyNotAsserted(info, "No callback handler and no password available", message);
             return null;
         }

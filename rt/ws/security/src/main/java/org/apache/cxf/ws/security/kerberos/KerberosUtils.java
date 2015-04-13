@@ -46,10 +46,15 @@ public final class KerberosUtils {
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_JAAS_CONTEXT_NAME);
             String kerberosSpn = 
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_SPN);
-            CallbackHandler callbackHandler = 
-                SecurityUtils.getCallbackHandler(
-                    message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER)
-                );
+            try {
+                CallbackHandler callbackHandler = 
+                    SecurityUtils.getCallbackHandler(
+                        message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER)
+                    );
+                client.setCallbackHandler(callbackHandler);
+            } catch (Exception ex) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+            }
             boolean useCredentialDelegation = 
                 MessageUtils.getContextualBoolean(message, 
                                               SecurityConstants.KERBEROS_USE_CREDENTIAL_DELEGATION, 
@@ -67,7 +72,6 @@ public final class KerberosUtils {
             
             client.setContextName(jaasContext);
             client.setServiceName(kerberosSpn);
-            client.setCallbackHandler(callbackHandler);
             client.setUseDelegatedCredential(useCredentialDelegation);
             client.setUsernameServiceNameForm(isInServiceNameForm);
             client.setRequestCredentialDelegation(requestCredentialDelegation);

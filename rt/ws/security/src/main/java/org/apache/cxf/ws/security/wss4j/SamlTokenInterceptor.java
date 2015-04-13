@@ -173,7 +173,11 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         
         RequestData data = new CXFRequestData();
         Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-        data.setCallbackHandler(SecurityUtils.getCallbackHandler(o));
+        try {
+            data.setCallbackHandler(SecurityUtils.getCallbackHandler(o));
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
         data.setMsgContext(message);
         data.setWssConfig(WSSConfig.getNewInstance());
         

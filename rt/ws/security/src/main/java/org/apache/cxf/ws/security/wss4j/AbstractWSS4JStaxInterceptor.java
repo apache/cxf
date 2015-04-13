@@ -193,7 +193,12 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         SoapMessage soapMessage, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Object o = soapMessage.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-        CallbackHandler callbackHandler = SecurityUtils.getCallbackHandler(o);
+        CallbackHandler callbackHandler = null;
+        try {
+            callbackHandler = SecurityUtils.getCallbackHandler(o);
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
             
         if (callbackHandler != null) {
             EndpointInfo info = soapMessage.getExchange().get(Endpoint.class).getEndpointInfo();

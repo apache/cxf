@@ -153,7 +153,11 @@ public final class SecurityUtils {
         //Then try to get the password from the given callback handler
         Object o = message.getContextualProperty(callbackProperty);
     
-        return org.apache.cxf.rt.security.utils.SecurityUtils.getCallbackHandler(o);
+        try {
+            return org.apache.cxf.rt.security.utils.SecurityUtils.getCallbackHandler(o);
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
     }
  
 }

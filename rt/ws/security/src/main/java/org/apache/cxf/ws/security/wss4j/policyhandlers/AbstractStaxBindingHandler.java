@@ -286,12 +286,16 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         // Get the SAML CallbackHandler
         //
         Object o = message.getContextualProperty(SecurityConstants.SAML_CALLBACK_HANDLER);
-        CallbackHandler handler = SecurityUtils.getCallbackHandler(o);
-        if (handler == null) {
-            unassertPolicy(token, "No SAML CallbackHandler available");
-            return null;
+        try {
+            CallbackHandler handler = SecurityUtils.getCallbackHandler(o);
+            if (handler == null) {
+                unassertPolicy(token, "No SAML CallbackHandler available");
+                return null;
+            }
+            properties.setSamlCallbackHandler(handler);
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
-        properties.setSamlCallbackHandler(handler);
         
         // Action
         WSSConstants.Action actionToPerform = WSSConstants.SAML_TOKEN_UNSIGNED;
