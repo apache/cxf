@@ -19,6 +19,7 @@
 
 package org.apache.cxf.message;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.Bus;
@@ -88,6 +89,15 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
     
     public <T> T get(Class<T> key) {
         return key.cast(get(key.getName()));
+    }
+
+    public void putAll(Map<? extends String, ?> m) {
+        for (Map.Entry<? extends String, ?> e : m.entrySet()) {
+            // just skip the null value to void the NPE in JDK1.8
+            if (e.getValue() != null) {
+                super.put(e.getKey(), e.getValue());
+            }
+        }
     }
 
     public <T> void put(Class<T> key, T value) {
