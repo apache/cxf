@@ -79,7 +79,6 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     private String assertionConsumerServiceAddress;
     private AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
     private boolean signRequest;
-    private String signatureUsername;
     
     private String webAppDomain;
     private boolean addWebAppContext = true;
@@ -116,23 +115,6 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
 
     public String getIdpServiceAddress() {
         return idpServiceAddress;
-    }
-    
-    /**
-     * Set the username/alias to use to sign any request
-     * @param signatureUsername the username/alias to use to sign any request
-     */
-    public void setSignatureUsername(String signatureUsername) {
-        this.signatureUsername = signatureUsername;
-        LOG.fine("Setting signatureUsername: " + signatureUsername);
-    }
-    
-    /**
-     * Get the username/alias to use to sign any request
-     * @return the username/alias to use to sign any request
-     */
-    public String getSignatureUsername() {
-        return signatureUsername;
     }
     
     @PreDestroy

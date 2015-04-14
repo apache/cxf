@@ -35,6 +35,12 @@ public final class SSOConstants {
     public static final String SECURITY_CONTEXT_TOKEN = "org.apache.cxf.websso.context";
     public static final String RACS_IS_COLLOCATED = "org.apache.cxf.racs.is.collocated";
     
+    public static final String SAML2_METADATA_NS = "urn:oasis:names:tc:SAML:2.0:metadata";
+    
+    public static final String WS_ADDRESSING_NS = "http://www.w3.org/2005/08/addressing";
+    
+    public static final String SCHEMA_INSTANCE_NS = "http://www.w3.org/2001/XMLSchema-instance";
+    
     private SSOConstants() {
     }
 }
