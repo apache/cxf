@@ -31,7 +31,7 @@ public abstract class AbstractAuthSupplier {
         clientAccessToken.setTokenKey(accessToken);
     }
     protected String createAuthorizationHeader() {
-        return clientAccessToken.getTokenType() + " " + clientAccessToken.getTokenKey();
+        return OAuthClientUtils.createAuthorizationHeader(clientAccessToken);
     }
     protected ClientAccessToken getClientAccessToken() {
         return clientAccessToken;
