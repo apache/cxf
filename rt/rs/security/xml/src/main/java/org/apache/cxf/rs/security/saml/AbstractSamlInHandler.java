@@ -41,17 +41,15 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProvider;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
 import org.apache.cxf.rs.security.xml.AbstractXmlSecInHandler;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -142,8 +140,16 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
                 } catch (IOException ex) {
                     throwFault("Crypto can not be loaded", ex);
                 }
-                data.setEnableRevocation(MessageUtils.isTrue(
-                    message.getContextualProperty(ConfigurationConstants.ENABLE_REVOCATION)));
+                
+                boolean enableRevocation = false;
+                String enableRevocationStr = 
+                    (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
+                        SecurityConstants.ENABLE_REVOCATION, message);
+                if (enableRevocationStr != null) {
+                    enableRevocation = Boolean.parseBoolean(enableRevocationStr);
+                }
+                data.setEnableRevocation(enableRevocation);
+                
                 Signature sig = assertion.getSignature();
                 WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
                 
@@ -184,12 +190,16 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     
     protected void configureAudienceRestriction(Message msg, RequestData reqData) {
         // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction = 
-            MessageUtils.getContextualBoolean(msg, 
-                                              SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
-                                              false);
+        boolean enableAudienceRestriction = false;
+        String audRestrStr = 
+            (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
+                SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg);
+        if (audRestrStr != null) {
+            enableAudienceRestriction = Boolean.parseBoolean(audRestrStr);
+        }
+        
         if (enableAudienceRestriction) {
-            List<String> audiences = new ArrayList<String>();
+            List<String> audiences = new ArrayList<>();
             if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
                 audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
             }

@@ -31,9 +31,9 @@ import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -566,7 +566,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             String uname = crypto.getX509Identifier(secTok.getX509Certificate());
             if (uname == null) {
                 String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
-                uname = (String)message.getContextualProperty(userNameKey);
+                uname = (String)SecurityUtils.getSecurityPropertyValue(userNameKey, message);
             }
             String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
             if (password == null) {

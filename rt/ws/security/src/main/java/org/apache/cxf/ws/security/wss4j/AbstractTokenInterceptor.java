@@ -177,7 +177,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         //Then try to get the password from the given callback handler
         CallbackHandler handler = null;
         try {
-            Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+            Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
             handler = SecurityUtils.getCallbackHandler(o);
             if (handler == null) {
                 policyNotAsserted(info, "No callback handler and no password available", message);

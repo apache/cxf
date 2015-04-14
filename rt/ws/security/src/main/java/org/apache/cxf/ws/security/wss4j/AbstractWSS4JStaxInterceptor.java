@@ -146,14 +146,15 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         }
         
         String certConstraints = 
-            (String)msg.getContextualProperty(SecurityConstants.SUBJECT_CERT_CONSTRAINTS);
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
         if (certConstraints != null && !"".equals(certConstraints)) {
             securityProperties.setSubjectCertConstraints(convertCertConstraints(certConstraints));
         }
         
         // Now set SAML SenderVouches + Holder Of Key requirements
         String validateSAMLSubjectConf = 
-            (String)msg.getContextualProperty(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION);
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION,
+                                                           msg);
         if (validateSAMLSubjectConf != null) {
             securityProperties.setValidateSamlSubjectConfirmation(Boolean.valueOf(validateSAMLSubjectConf));
         }
@@ -192,7 +193,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     protected void configureCallbackHandler(
         SoapMessage soapMessage, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        Object o = soapMessage.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, soapMessage);
         CallbackHandler callbackHandler = null;
         try {
             callbackHandler = SecurityUtils.getCallbackHandler(o);
@@ -266,7 +267,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     }
 
     public Object getProperty(Object msgContext, String key) {
-        Object obj = ((Message)msgContext).getContextualProperty(key);
+        Object obj = SecurityUtils.getSecurityPropertyValue(key, (Message)msgContext);
         if (obj == null) {
             obj = getOption(key);
         }

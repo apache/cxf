@@ -104,7 +104,7 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
         throws WSSecurityException {
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         RequestData data = new CXFRequestData();
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
         try {
             data.setCallbackHandler(SecurityUtils.getCallbackHandler(o));
         } catch (Exception ex) {

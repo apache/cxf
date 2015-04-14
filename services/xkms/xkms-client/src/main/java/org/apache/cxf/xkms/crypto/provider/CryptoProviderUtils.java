@@ -35,7 +35,7 @@ final class CryptoProviderUtils {
     }
 
     public static Properties loadKeystoreProperties(Message message, String propKey) {
-        Object o = message.getContextualProperty(propKey);
+        Object o = SecurityUtils.getSecurityPropertyValue(propKey, message);
         if (o == null) {
             throw new CryptoProviderException("Keystore properties path is not defined");
         }

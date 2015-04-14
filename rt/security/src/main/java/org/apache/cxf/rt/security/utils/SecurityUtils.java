@@ -161,4 +161,16 @@ public final class SecurityUtils {
         
         return null;
     }
+    
+    /**
+     * Get the security property value for the given property. It also checks for the older "ws-"* property
+     * values.
+     */
+    public static Object getSecurityPropertyValue(String property, Message message) {
+        Object value = message.getContextualProperty(property);
+        if (value != null) {
+            return value;
+        }
+        return message.getContextualProperty("ws-" + property);
+    }
 }

@@ -52,12 +52,13 @@ public class CryptoLoader {
                             String cryptoKey, 
                             String propKey) 
         throws IOException, WSSecurityException {
-        Crypto crypto = (Crypto)message.getContextualProperty(cryptoKey);
+        Crypto crypto = 
+            (Crypto)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(cryptoKey, message);
         if (crypto != null) {
             return crypto;
         }
         
-        Object o = message.getContextualProperty(propKey);
+        Object o = org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(propKey, message);
         if (o == null) {
             return null;
         }

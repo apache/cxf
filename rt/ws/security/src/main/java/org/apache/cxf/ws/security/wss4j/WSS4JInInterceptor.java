@@ -265,7 +265,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
              *isn't available
              */
             boolean enableRevocation = reqData.isRevocationEnabled() 
-                || MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
+                || MessageUtils.isTrue(SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION,
+                                       msg));
             reqData.setEnableRevocation(enableRevocation);
             
             Element soapBody = SAAJUtils.getBody(doc);
@@ -337,10 +338,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     
     private void configureAudienceRestriction(SoapMessage msg, RequestData reqData) {
         // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction = 
-            MessageUtils.getContextualBoolean(msg, 
-                                              SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
-                                              true);
+        boolean enableAudienceRestriction = true;
+        String audRestrValStr = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg);
+        if (audRestrValStr != null) {
+            enableAudienceRestriction = Boolean.parseBoolean(audRestrValStr);
+        }
         if (enableAudienceRestriction) {
             List<String> audiences = new ArrayList<>();
             if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
@@ -395,11 +398,13 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         // Try to get Crypto Provider from message context properties. 
         // It gives a possibility to use external Crypto Provider 
         //
-        Crypto encCrypto = (Crypto)msg.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        Crypto encCrypto = 
+            (Crypto)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_CRYPTO, msg);
         if (encCrypto != null) {
             reqData.setDecCrypto(encCrypto);
         }
-        Crypto sigCrypto = (Crypto)msg.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        Crypto sigCrypto = 
+            (Crypto)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, msg);
         if (sigCrypto != null) {
             reqData.setSigVerCrypto(sigCrypto);
         }
@@ -503,9 +508,17 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         results.add(0, wsResult);
         
-        Boolean allowUnsignedSamlPrincipals = 
-                MessageUtils.getContextualBoolean(msg, 
-                        SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, false);
+        String allowUnsigned = 
+            (String)SecurityUtils.getSecurityPropertyValue(
+                SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, msg
+            );
+        boolean allowUnsignedSamlPrincipals = Boolean.parseBoolean(allowUnsigned);
+        boolean useJAASSubject = true; 
+        String useJAASSubjectStr = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SC_FROM_JAAS_SUBJECT, msg);
+        if (useJAASSubjectStr != null) {
+            useJAASSubject = Boolean.parseBoolean(useJAASSubjectStr);
+        }
         
         for (int i = wsResult.getResults().size() - 1; i >= 0; i--) {
             WSSecurityEngineResult o = wsResult.getResults().get(i);
@@ -513,8 +526,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             Integer action = (Integer)o.get(WSSecurityEngineResult.TAG_ACTION);
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             final Subject subject = (Subject)o.get(WSSecurityEngineResult.TAG_SUBJECT);
-            final boolean useJAASSubject = MessageUtils
-                .getContextualBoolean(msg, SecurityConstants.SC_FROM_JAAS_SUBJECT, true);
             final Object binarySecurity = o.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
             
             final boolean isValidSamlToken = action == WSConstants.ST_SIGNED 
@@ -577,8 +588,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
             
             if (receivedAssertion instanceof SamlAssertionWrapper) {
-                String roleAttributeName = (String)msg.getContextualProperty(
-                        SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+                String roleAttributeName = (String)SecurityUtils.getSecurityPropertyValue(
+                        SecurityConstants.SAML_ROLE_ATTRIBUTENAME, msg);
                 if (roleAttributeName == null || roleAttributeName.length() == 0) {
                     roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                 }
@@ -656,8 +667,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
     
     protected CallbackHandler getCallback(RequestData reqData) throws WSSecurityException {
-        Object o = ((SoapMessage)reqData.getMsgContext())
-            .getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        Object o = 
+            SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, 
+                                                   (SoapMessage)reqData.getMsgContext());
         CallbackHandler cbHandler = null;
         try {
             cbHandler = SecurityUtils.getCallbackHandler(o);

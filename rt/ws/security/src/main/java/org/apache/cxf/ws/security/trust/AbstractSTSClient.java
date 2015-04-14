@@ -1554,6 +1554,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
     protected CallbackHandler createHandler() {
         Object o = getProperty(SecurityConstants.CALLBACK_HANDLER);
+        if (o == null) {
+            o = getProperty("ws-" + SecurityConstants.CALLBACK_HANDLER);
+        }
         try {
             return SecurityUtils.getCallbackHandler(o);
         } catch (Exception e) {

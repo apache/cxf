@@ -41,7 +41,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
-import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.DOMX509Data;
@@ -111,7 +111,9 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         if (encryptSymmetricKey) {
             X509Certificate receiverCert = null;
             
-            String userName = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
+            String userName = 
+                (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
+                    SecurityConstants.ENCRYPT_USERNAME, message);
             if (SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
                 && !MessageUtils.isRequestor(message)) {
                 receiverCert = 

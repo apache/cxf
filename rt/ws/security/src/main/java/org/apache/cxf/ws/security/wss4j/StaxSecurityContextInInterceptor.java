@@ -35,6 +35,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -118,8 +119,8 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                     Object receivedAssertion = null;
                     
                     if (event.getSecurityEventType() == WSSecurityEventConstants.SamlToken) {
-                        String roleAttributeName = (String)msg.getContextualProperty(
-                                SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+                        String roleAttributeName = (String)SecurityUtils.getSecurityPropertyValue(
+                                SecurityConstants.SAML_ROLE_ATTRIBUTENAME, msg);
                         if (roleAttributeName == null || roleAttributeName.length() == 0) {
                             roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                         }

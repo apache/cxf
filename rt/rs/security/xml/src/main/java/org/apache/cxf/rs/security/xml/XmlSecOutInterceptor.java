@@ -46,7 +46,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
-import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -159,7 +159,8 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (encryptSymmetricKey) {
             X509Certificate sendingCert = null;
             String userName = 
-                (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
+                (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
+                    SecurityConstants.ENCRYPT_USERNAME, message);
             if (SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
                 && !MessageUtils.isRequestor(message)) {
                 sendingCert = 

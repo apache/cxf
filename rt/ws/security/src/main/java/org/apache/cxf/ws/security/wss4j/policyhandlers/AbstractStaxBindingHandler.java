@@ -162,10 +162,11 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         
         // Check if a CallbackHandler was specified
         if (properties.getCallbackHandler() == null) {
-            String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
+            String password = 
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.PASSWORD, message);
             if (password != null) {
                 String username = 
-                    (String)message.getContextualProperty(SecurityConstants.USERNAME);
+                    (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, message);
                 UTCallbackHandler callbackHandler = new UTCallbackHandler(username, password);
                 properties.setCallbackHandler(callbackHandler);
             }
@@ -285,7 +286,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         //
         // Get the SAML CallbackHandler
         //
-        Object o = message.getContextualProperty(SecurityConstants.SAML_CALLBACK_HANDLER);
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_CALLBACK_HANDLER, message);
         try {
             CallbackHandler handler = SecurityUtils.getCallbackHandler(o);
             if (handler == null) {
@@ -536,9 +537,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
         properties.setSignatureCanonicalizationAlgorithm(
                        binding.getAlgorithmSuite().getC14n().getValue());
-        String sigUser = (String)message.getContextualProperty(userNameKey);
+        String sigUser = (String)SecurityUtils.getSecurityPropertyValue(userNameKey, message);
         if (sigUser == null) {
-            sigUser = (String)message.getContextualProperty(SecurityConstants.USERNAME);
+            sigUser = (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, message);
         }
         if (sigUser != null && properties.getSignatureUser() == null) {
             properties.setSignatureUser(sigUser);

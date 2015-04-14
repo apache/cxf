@@ -39,6 +39,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
@@ -245,7 +246,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
         
         boolean enableRevocation = 
-            MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
+            MessageUtils.isTrue(SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, msg));
         securityProperties.setEnableRevocation(enableRevocation);
         
         // Crypto loading only applies for Map
@@ -293,10 +294,12 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     
     private void configureAudienceRestriction(SoapMessage msg, WSSSecurityProperties securityProperties) {
         // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction = 
-            MessageUtils.getContextualBoolean(msg, 
-                                              SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
-                                              true);
+        boolean enableAudienceRestriction = true;
+        String audRestrStr = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg);
+        if (audRestrStr != null) {
+            enableAudienceRestriction = Boolean.parseBoolean(audRestrStr);
+        }
         if (enableAudienceRestriction) {
             List<String> audiences = new ArrayList<String>();
             if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {

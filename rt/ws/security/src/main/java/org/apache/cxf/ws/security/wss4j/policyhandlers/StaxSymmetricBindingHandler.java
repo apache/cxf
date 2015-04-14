@@ -32,6 +32,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -470,9 +471,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             properties.setEncryptionSymAlgorithm(
                        algorithmSuite.getAlgorithmSuiteType().getEncryption());
 
-            String encUser = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
+            String encUser = 
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_USERNAME, message);
             if (encUser == null) {
-                encUser = (String)message.getContextualProperty(SecurityConstants.USERNAME);
+                encUser = (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, message);
             }
             if (encUser != null && properties.getEncryptionUser() == null) {
                 properties.setEncryptionUser(encUser);

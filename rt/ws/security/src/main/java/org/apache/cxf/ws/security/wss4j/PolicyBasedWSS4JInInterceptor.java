@@ -30,11 +30,11 @@ import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -119,13 +119,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
-        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        Object s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
         if (s == null) {
-            s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+            s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PROPERTIES, message);
         }
-        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        Object e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_CRYPTO, message);
         if (e == null) {
-            e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+            e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, message);
         }
         
         Crypto encrCrypto = getEncryptionCrypto(e, message, data);
@@ -157,13 +157,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     ) throws WSSecurityException {
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
-        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        Object s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
         if (s == null) {
-            s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+            s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PROPERTIES, message);
         }
-        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        Object e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_CRYPTO, message);
         if (e == null) {
-            e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+            e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, message);
         }
         
         Crypto encrCrypto = getEncryptionCrypto(e, message, data);
@@ -264,13 +264,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
-        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        Object s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
         if (s == null) {
-            s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+            s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PROPERTIES, message);
         }
-        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        Object e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_CRYPTO, message);
         if (e == null) {
-            e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+            e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, message);
         }
         
         Crypto encrCrypto = getEncryptionCrypto(e, message, data);

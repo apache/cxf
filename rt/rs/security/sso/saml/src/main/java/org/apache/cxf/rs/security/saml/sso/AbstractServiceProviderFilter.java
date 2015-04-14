@@ -54,11 +54,12 @@ import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.saml.saml2.core.AuthnRequest;
@@ -188,7 +189,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         
         if (name != null) {
             String roleAttributeName = 
-                (String)m.getContextualProperty(SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_ROLE_ATTRIBUTENAME, m);
             if (roleAttributeName == null || roleAttributeName.length() == 0) {
                 roleAttributeName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
             }

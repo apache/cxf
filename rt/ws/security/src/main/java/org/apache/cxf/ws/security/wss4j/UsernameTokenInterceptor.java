@@ -151,7 +151,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     private SecurityContext createSecurityContext(Message msg,
                                                   SamlAssertionWrapper samlAssertion) {
         String roleAttributeName = 
-            (String)msg.getContextualProperty(SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_ROLE_ATTRIBUTENAME, msg);
         if (roleAttributeName == null || roleAttributeName.length() == 0) {
             roleAttributeName = WSS4JInInterceptor.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
         }
@@ -198,7 +198,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         
         RequestData data = new CXFRequestData();
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
         try {
             data.setCallbackHandler(SecurityUtils.getCallbackHandler(o));
         } catch (Exception ex) {
@@ -389,7 +389,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
 
 
     protected WSSecUsernameToken addUsernameToken(SoapMessage message, UsernameToken token) {
-        String userName = (String)message.getContextualProperty(SecurityConstants.USERNAME);
+        String userName = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, message);
         WSSConfig wssConfig = (WSSConfig)message.getContextualProperty(WSSConfig.class.getName());
         if (wssConfig == null) {
             wssConfig = WSSConfig.getNewInstance();
@@ -406,7 +407,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                 return utBuilder;
             }
             
-            String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
+            String password = 
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.PASSWORD, message);
             if (StringUtils.isEmpty(password)) {
                 password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN, message);
             }

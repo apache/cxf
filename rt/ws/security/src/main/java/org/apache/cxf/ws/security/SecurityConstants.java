@@ -28,114 +28,17 @@ import java.util.Set;
  * Configuration tags used to configure the WS-SecurityPolicy layer. Some of them are also 
  * used by the non WS-SecurityPolicy approach in the WSS4J(Out|In)Interceptors.
  */
-public final class SecurityConstants {
+public final class SecurityConstants extends org.apache.cxf.rt.security.SecurityConstants {
     
     //
     // User properties
     //
     
     /**
-     * The user's name. It is used differently by each of the WS-Security functions:
-     * a) It is used as the name in the UsernameToken
-     * b) It is used as the alias name in the keystore to get the user's cert and private key for signature
-     *    if {@link SIGNATURE_USERNAME} is not set.
-     * c) It is used as the alias name in the keystore to get the user's public key for encryption if 
-     *    {@link ENCRYPT_USERNAME} is not set.
-     */
-    public static final String USERNAME = "ws-security.username";
-    
-    /**
-     * The user's password when a {@link CALLBACK_HANDLER} is not defined. It is currently only used for 
-     * the case of adding a password to a UsernameToken.
-     */
-    public static final String PASSWORD = "ws-security.password";
-    
-    /**
-     * The user's name for signature. It is used as the alias name in the keystore to get the user's cert 
-     * and private key for signature. If this is not defined, then {@link USERNAME} is used instead. If 
-     * that is also not specified, it uses the the default alias set in the properties file referenced by
-     * {@link SIGNATURE_PROPERTIES}. If that's also not set, and the keystore only contains a single key, 
-     * that key will be used. 
-     */
-    public static final String SIGNATURE_USERNAME = "ws-security.signature.username";
-    
-    /**
-     * The user's name for encryption. It is used as the alias name in the keystore to get the user's public 
-     * key for encryption. If this is not defined, then {@link USERNAME} is used instead. If 
-     * that is also not specified, it uses the the default alias set in the properties file referenced by
-     * {@link ENCRYPT_PROPERTIES}. If that's also not set, and the keystore only contains a single key, 
-     * that key will be used.
-     * 
-     * For the web service provider, the "useReqSigCert" keyword can be used to accept (encrypt to) any 
-     * client whose public key is in the service's truststore (defined in {@link ENCRYPT_PROPERTIES}).
-     */
-    public static final String ENCRYPT_USERNAME = "ws-security.encryption.username";
-    
-    /**
      * The actor or role name of the wsse:Security header. If this parameter 
      * is omitted, the actor name is not set.
      */
     public static final String ACTOR = "ws-security.actor";
-    
-    //
-    // Callback class and Crypto properties
-    //
-    
-    /**
-     * The CallbackHandler implementation class used to obtain passwords, for both outbound and inbound 
-     * requests. The value of this tag must be either:
-     * a) The class name of a {@link javax.security.auth.callback.CallbackHandler} instance, which must
-     * be accessible via the classpath.
-     * b) A {@link javax.security.auth.callback.CallbackHandler} instance.
-     */
-    public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
-    
-    /**
-     * The SAML CallbackHandler implementation class used to construct SAML Assertions. The value of this 
-     * tag must be either:
-     * a) The class name of a {@link javax.security.auth.callback.CallbackHandler} instance, which must
-     * be accessible via the classpath.
-     * b) A {@link javax.security.auth.callback.CallbackHandler} instance.
-     */
-    public static final String SAML_CALLBACK_HANDLER = "ws-security.saml-callback-handler";
-    
-    /**
-     * The Crypto property configuration to use for signature, if {@link SIGNATURE_CRYPTO} is not set instead.
-     * The value of this tag must be either:
-     * a) A Java Properties object that contains the Crypto configuration.
-     * b) The path of the Crypto property file that contains the Crypto configuration.
-     * c) A URL that points to the Crypto property file that contains the Crypto configuration.
-     */
-    public static final String SIGNATURE_PROPERTIES = "ws-security.signature.properties";
-    
-    /**
-     * The Crypto property configuration to use for encryption, if {@link ENCRYPT_CRYPTO} is not set instead.
-     * The value of this tag must be either:
-     * a) A Java Properties object that contains the Crypto configuration.
-     * b) The path of the Crypto property file that contains the Crypto configuration.
-     * c) A URL that points to the Crypto property file that contains the Crypto configuration.
-     */
-    public static final String ENCRYPT_PROPERTIES = "ws-security.encryption.properties";
-    
-    /**
-     * A Crypto object to be used for signature. If this is not defined then the 
-     * {@link SIGNATURE_PROPERTIES} is used instead.
-     */
-    public static final String SIGNATURE_CRYPTO = "ws-security.signature.crypto";
-    
-    /**
-     * A Crypto object to be used for encryption. If this is not defined then the 
-     * {@link ENCRYPT_PROPERTIES} is used instead.
-     */
-    public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
-    
-    /**
-     * A message property for prepared X509 certificate to be used for encryption. 
-     * If this is not defined, then the certificate will be either loaded from the 
-     * keystore {@link ENCRYPT_PROPERTIES} or extracted from request 
-     * (if {@link ENCRYPT_USERNAME} has value "useReqSigCert").
-     */
-    public static final String ENCRYPT_CERT = "ws-security.encryption.certificate";
     
     //
     // Boolean WS-Security configuration tags, e.g. the value should be "true" or "false".
@@ -145,12 +48,6 @@ public final class SecurityConstants {
      * Whether to validate the password of a received UsernameToken or not. The default is true.
      */
     public static final String VALIDATE_TOKEN = "ws-security.validate.token";
-    
-    /**
-     * Whether to enable Certificate Revocation List (CRL) checking or not when verifying trust 
-     * in a certificate. The default value is "false".
-     */
-    public static final String ENABLE_REVOCATION = "ws-security.enableRevocation";
     
     // WebLogic and WCF always encrypt UsernameTokens whenever possible
     //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
@@ -170,12 +67,6 @@ public final class SecurityConstants {
     public static final String IS_BSP_COMPLIANT = "ws-security.is-bsp-compliant";
     
     /**
-     * Whether to allow unsigned saml assertions as SecurityContext Principals. The default is false.
-     */
-    public static final String ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL = 
-            "ws-security.enable.unsigned-saml-assertion.principal";
-    
-    /**
      * Whether to cache UsernameToken nonces. The default value is "true" for message recipients, and 
      * "false" for message initiators. Set it to true to cache for both cases. Set this to "false" to
      * not cache UsernameToken nonces. Note that caching only applies when either a UsernameToken
@@ -192,22 +83,6 @@ public final class SecurityConstants {
      * else that a Timestamp action has been configured for the non-security-policy case.
      */
     public static final String ENABLE_TIMESTAMP_CACHE = "ws-security.enable.timestamp.cache";
-    
-    /**
-     * Whether to cache SAML2 Token Identifiers, if the token contains a "OneTimeUse" Condition.
-     * The default value is "true" for message recipients, and "false" for message initiators.
-     * Set it to true to cache for both cases. Set this to "false" to not cache SAML2 Token Identifiers.
-     * Note that caching only applies when either a "SamlToken" policy is in effect, or
-     * else that a SAML action has been configured for the non-security-policy case.
-     */
-    public static final String ENABLE_SAML_ONE_TIME_USE_CACHE = "ws-security.enable.saml.cache";
-    
-    /**
-     * Whether to validate the SubjectConfirmation requirements of a received SAML Token
-     * (sender-vouches or holder-of-key). The default is true.
-     */
-    public static final String VALIDATE_SAML_SUBJECT_CONFIRMATION = 
-        "ws-security.validate.saml.subject.conf";
     
     /**
      * Whether to enable streaming WS-Security. If set to false (the default), the old DOM
@@ -231,21 +106,16 @@ public final class SecurityConstants {
      * The default value is "true" which included the SOAP mustUnderstand header.
      */
     public static final String MUST_UNDERSTAND = "ws-security.must-understand";
+    
+    /**
+     * Whether to cache SAML2 Token Identifiers, if the token contains a "OneTimeUse" Condition.
+     * The default value is "true" for message recipients, and "false" for message initiators.
+     * Set it to true to cache for both cases. Set this to "false" to not cache SAML2 Token Identifiers.
+     * Note that caching only applies when either a "SamlToken" policy is in effect, or
+     * else that a SAML action has been configured for the non-security-policy case.
+     */
+    public static final String ENABLE_SAML_ONE_TIME_USE_CACHE = "ws-security.enable.saml.cache";
 
-    /**
-     * Set this to "false" if security context must not be created from JAAS Subject.
-     *
-     * The default value is "true".
-     */
-    public static final String SC_FROM_JAAS_SUBJECT = "ws-security.sc.jaas-subject";
-    
-    /**
-     * Enable SAML AudienceRestriction validation. If this is set to "true", then IF the
-     * SAML Token contains Audience Restriction URIs, one of them must match either the
-     * request URL or the Service QName. The default is "true".
-     */
-    public static final String AUDIENCE_RESTRICTION_VALIDATION = "ws-security.validate.audience-restriction";
-    
     //
     // Non-boolean WS-Security Configuration parameters
     //
@@ -277,12 +147,6 @@ public final class SecurityConstants {
     public static final String USERNAMETOKEN_FUTURE_TTL = "ws-security.usernametoken.futureTimeToLive";
     
     /**
-     * The attribute URI of the SAML AttributeStatement where the role information is stored.
-     * The default is "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role".
-     */
-    public static final String SAML_ROLE_ATTRIBUTENAME = "ws-security.saml-role-attributename";
-    
-    /**
      * The SpnegoClientAction implementation to use for SPNEGO. This allows the user to plug in
      * a different implementation to obtain a service ticket.
      */
@@ -306,8 +170,7 @@ public final class SecurityConstants {
      * This holds a reference to a ReplayCache instance used to cache SAML2 Token Identifiers, when
      * the token has a "OneTimeUse" Condition. The default instance that is used is the EHCacheReplayCache.
      */
-    public static final String SAML_ONE_TIME_USE_CACHE_INSTANCE = 
-        "ws-security.saml.cache.instance";
+    public static final String SAML_ONE_TIME_USE_CACHE_INSTANCE = "ws-security.saml.cache.instance";
     
     /**
      * Set this property to point to a configuration file for the underlying caching implementation.
@@ -335,13 +198,6 @@ public final class SecurityConstants {
      */
     public static final String CACHE_IDENTIFIER = "ws-security.cache.identifier";
 
-    /**
-     * A comma separated String of regular expressions which will be applied to the subject DN of 
-     * the certificate used for signature validation, after trust verification of the certificate 
-     * chain associated with the  certificate.
-     */
-    public static final String SUBJECT_CERT_CONSTRAINTS = "ws-security.subject.cert.constraints";
-    
     /**
      * The Subject Role Classifier to use. If one of the WSS4J Validators returns a JAAS Subject
      * from Validation, then the WSS4JInInterceptor will attempt to create a SecurityContext
@@ -661,6 +517,10 @@ public final class SecurityConstants {
             KERBEROS_REQUEST_CREDENTIAL_DELEGATION, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL,
             AUDIENCE_RESTRICTION_VALIDATION, POLICY_VALIDATOR_MAP
         }));
+        for (String commonProperty : COMMON_PROPERTIES) {
+            s.add(commonProperty);
+            s.add("ws-" + commonProperty);
+        }
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
     

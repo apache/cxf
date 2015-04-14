@@ -33,6 +33,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -98,7 +99,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     }
 
     public Object getProperty(Object msgContext, String key) {
-        Object obj = ((Message)msgContext).getContextualProperty(key);
+        Object obj = SecurityUtils.getSecurityPropertyValue(key, (Message)msgContext);
         if (obj == null) {
             obj = getOption(key);
         }
@@ -173,16 +174,19 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         }
         
         String certConstraints = 
-            (String)msg.getContextualProperty(SecurityConstants.SUBJECT_CERT_CONSTRAINTS);
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
         if (certConstraints != null) {
             msg.put(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
         }
         
         // Now set SAML SenderVouches + Holder Of Key requirements
-        boolean validateSAMLSubjectConf = 
-            MessageUtils.getContextualBoolean(
-                msg, SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true
-            );
+        String valSAMLSubjectConf = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION,
+                                                           msg);
+        boolean validateSAMLSubjectConf = true;
+        if (valSAMLSubjectConf != null) {
+            validateSAMLSubjectConf = Boolean.parseBoolean(valSAMLSubjectConf);
+        }
         msg.put(
             WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, 
             Boolean.toString(validateSAMLSubjectConf)

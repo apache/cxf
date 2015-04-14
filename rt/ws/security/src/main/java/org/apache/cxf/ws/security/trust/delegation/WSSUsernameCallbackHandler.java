@@ -27,9 +27,9 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 
@@ -48,7 +48,7 @@ public class WSSUsernameCallbackHandler implements CallbackHandler {
                 Message message = callback.getCurrentMessage();
                 
                 String username = 
-                    (String)message.getContextualProperty(SecurityConstants.USERNAME);
+                    (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, message);
                 if (username != null) {
                     Node contentNode = message.getContent(Node.class);
                     Document doc = null;

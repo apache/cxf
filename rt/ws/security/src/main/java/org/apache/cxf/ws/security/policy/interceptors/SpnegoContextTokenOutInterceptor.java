@@ -112,7 +112,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         try {
             CallbackHandler callbackHandler = 
                 SecurityUtils.getCallbackHandler(
-                    message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER)
+                    SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message)
                 );
             
             spnegoToken.retrieveServiceTicket(jaasContext, callbackHandler, kerberosSpn);

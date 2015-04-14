@@ -172,7 +172,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         
         RequestData data = new CXFRequestData();
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
         try {
             data.setCallbackHandler(SecurityUtils.getCallbackHandler(o));
         } catch (Exception ex) {
@@ -228,7 +228,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         //
         // Get the SAML CallbackHandler
         //
-        Object o = message.getContextualProperty(SecurityConstants.SAML_CALLBACK_HANDLER);
+        Object o = 
+            SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_CALLBACK_HANDLER, message);
 
         CallbackHandler handler = null;
         if (o instanceof CallbackHandler) {
@@ -265,11 +266,12 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             String issuerName = samlCallback.getIssuerKeyName();
             if (issuerName == null) {
                 String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
-                issuerName = (String)message.getContextualProperty(userNameKey);
+                issuerName = (String)SecurityUtils.getSecurityPropertyValue(userNameKey, message);
             }
             String password = samlCallback.getIssuerKeyPassword();
             if (password == null) {
-                password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
+                password = 
+                    (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.PASSWORD, message);
                 if (StringUtils.isEmpty(password)) {
                     password = 
                         getPassword(issuerName, token, WSPasswordCallback.SIGNATURE, message);
@@ -301,12 +303,12 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         String propKey,
         SoapMessage message
     ) throws WSSecurityException {
-        Crypto crypto = (Crypto)message.getContextualProperty(cryptoKey);
+        Crypto crypto = (Crypto)SecurityUtils.getSecurityPropertyValue(cryptoKey, message);
         if (crypto != null) {
             return crypto;
         }
 
-        Object o = message.getContextualProperty(propKey);
+        Object o = SecurityUtils.getSecurityPropertyValue(propKey, message);
         if (o == null) {
             return null;
         }

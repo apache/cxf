@@ -39,6 +39,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSSPolicyException;
@@ -210,15 +211,17 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         SoapMessage msg, OutboundSecurityContext outboundSecurityContext,
         WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
-        String user = (String)msg.getContextualProperty(SecurityConstants.USERNAME);
+        String user = (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, msg);
         if (user != null) {
             securityProperties.setTokenUser(user);
         }
-        String sigUser = (String)msg.getContextualProperty(SecurityConstants.SIGNATURE_USERNAME);
+        String sigUser = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_USERNAME, msg);
         if (sigUser != null) {
             securityProperties.setSignatureUser(sigUser);
         }
-        String encUser = (String)msg.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
+        String encUser = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_USERNAME, msg);
         if (encUser != null) {
             securityProperties.setEncryptionUser(encUser);
         }

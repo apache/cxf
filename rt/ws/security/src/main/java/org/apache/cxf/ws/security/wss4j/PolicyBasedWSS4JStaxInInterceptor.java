@@ -36,6 +36,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -92,13 +93,13 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             return;
         }
         
-        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        Object s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
         if (s == null) {
-            s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+            s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PROPERTIES, message);
         }
-        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        Object e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_CRYPTO, message);
         if (e == null) {
-            e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+            e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, message);
         }
         
         Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
@@ -149,13 +150,13 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             securityEvents.add(httpsTokenSecurityEvent);
         }
         
-        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        Object s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
         if (s == null) {
-            s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+            s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PROPERTIES, message);
         }
-        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        Object e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_CRYPTO, message);
         if (e == null) {
-            e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+            e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, message);
         }
 
         Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
@@ -197,13 +198,13 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             return;
         }
         
-        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        Object s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
         if (s == null) {
-            s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+            s = SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PROPERTIES, message);
         }
-        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        Object e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_CRYPTO, message);
         if (e == null) {
-            e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+            e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, message);
         }
         
         Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);

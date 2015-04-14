@@ -296,7 +296,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_SPN);
             CallbackHandler callbackHandler = 
                 SecurityUtils.getCallbackHandler(
-                    message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER)
+                    SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message)
                 );
 
             SpnegoTokenContext spnegoToken = new SpnegoTokenContext();
