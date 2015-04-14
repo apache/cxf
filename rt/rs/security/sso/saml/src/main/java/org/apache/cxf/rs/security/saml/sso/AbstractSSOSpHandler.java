@@ -50,6 +50,7 @@ public class AbstractSSOSpHandler {
     private String signaturePropertiesFile;
     private CallbackHandler callbackHandler;
     private String callbackHandlerClass;
+    private String signatureUsername;
     
     static {
         OpenSAMLUtil.initSamlEngine();
@@ -243,4 +244,22 @@ public class AbstractSSOSpHandler {
         }
         return handler;
     }
+
+    /**
+     * Set the username/alias to use to sign any request
+     * @param signatureUsername the username/alias to use to sign any request
+     */
+    public void setSignatureUsername(String signatureUsername) {
+        this.signatureUsername = signatureUsername;
+        LOG.fine("Setting signatureUsername: " + signatureUsername);
+    }
+     
+    /**
+     * Get the username/alias to use to sign any request
+     * @return the username/alias to use to sign any request
+     */
+    public String getSignatureUsername() {
+        return signatureUsername;
+    }
+
 }
