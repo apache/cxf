@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.security.SecurityContext;
@@ -85,7 +85,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         
         String cryptoKey = null; 
         String propKey = null;
-        if (SecurityUtils.isSignedAndEncryptedTwoWay(message)) {
+        if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
             propKey = SecurityConstants.ENCRYPT_PROPERTIES;
         } else {
@@ -145,7 +145,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
                 } 
             } else if (!keyInfoMustBeAvailable) {
                 String user = getUserName(crypto, message);
-                cert = SecurityUtils.getCertificates(crypto, user)[0];
+                cert = RSSecurityUtils.getCertificates(crypto, user)[0];
                 publicKey = cert.getPublicKey();
                 valid = signature.checkSignatureValue(cert);
             }
@@ -190,7 +190,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         if (sc != null && sc.getUserPrincipal() != null) {
             return sc.getUserPrincipal().getName();
         } else {
-            return SecurityUtils.getUserName(crypto, null);
+            return RSSecurityUtils.getUserName(crypto, null);
         }
         
     }

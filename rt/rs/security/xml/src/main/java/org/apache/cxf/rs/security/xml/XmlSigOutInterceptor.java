@@ -35,7 +35,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -109,16 +109,16 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         Crypto crypto = loader.getCrypto(message, 
                                          SecurityConstants.SIGNATURE_CRYPTO,
                                          SecurityConstants.SIGNATURE_PROPERTIES);
-        String user = SecurityUtils.getUserName(message, crypto, userNameKey);
+        String user = RSSecurityUtils.getUserName(message, crypto, userNameKey);
          
-        if (StringUtils.isEmpty(user) || SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(user)) {
+        if (StringUtils.isEmpty(user) || RSSecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(user)) {
             throw new Exception("User name is not available");
         }
 
         String password = 
-            SecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, this.getClass());
+            RSSecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, this.getClass());
     
-        X509Certificate[] issuerCerts = SecurityUtils.getCertificates(crypto, user);
+        X509Certificate[] issuerCerts = RSSecurityUtils.getCertificates(crypto, user);
         
         String sigAlgo = sigProps.getSignatureAlgo() == null 
             ? SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1 : sigProps.getSignatureAlgo();

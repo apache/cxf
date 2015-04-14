@@ -35,7 +35,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.xml.EncryptionUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.wss4j.common.WSS4JConstants;
@@ -299,7 +299,7 @@ public class SAMLProtocolResponseValidator {
     
     protected SAMLKeyInfo createKeyInfoFromDefaultAlias(Crypto sigCrypto) throws WSSecurityException {
         try {
-            X509Certificate[] certs = SecurityUtils.getCertificates(sigCrypto, 
+            X509Certificate[] certs = RSSecurityUtils.getCertificates(sigCrypto, 
                                                                     sigCrypto.getDefaultX509Identifier());
             SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(new X509Certificate[]{certs[0]});
             samlKeyInfo.setPublicKey(certs[0].getPublicKey());
@@ -503,7 +503,7 @@ public class SAMLProtocolResponseValidator {
             getNode(encKeyElement, Constants.SignatureSpecNS, "X509Certificate", 0);
         if (certNode != null) {
             try {
-                return SecurityUtils.loadX509Certificate(crypto, certNode);
+                return RSSecurityUtils.loadX509Certificate(crypto, certNode);
             } catch (Exception ex) {
                 LOG.log(Level.FINE, "X509Certificate can not be created", ex);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -513,7 +513,7 @@ public class SAMLProtocolResponseValidator {
         certNode = getNode(encKeyElement, Constants.SignatureSpecNS, "X509IssuerSerial", 0);
         if (certNode != null) {
             try {
-                return SecurityUtils.loadX509IssuerSerial(crypto, certNode);
+                return RSSecurityUtils.loadX509IssuerSerial(crypto, certNode);
             } catch (Exception ex) {
                 LOG.log(Level.FINE, "X509Certificate can not be created", ex);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");

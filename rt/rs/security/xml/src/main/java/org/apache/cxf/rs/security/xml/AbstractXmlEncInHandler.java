@@ -36,7 +36,7 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -96,7 +96,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         
         String cryptoKey = null; 
         String propKey = null;
-        if (SecurityUtils.isSignedAndEncryptedTwoWay(message)) {
+        if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
             propKey = SecurityConstants.SIGNATURE_PROPERTIES;
         } else {
@@ -170,23 +170,23 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
          */
         
         String keyIdentifierType = encProps != null ? encProps.getEncryptionKeyIdType() : null;
-        if (keyIdentifierType == null || keyIdentifierType.equals(SecurityUtils.X509_CERT)) {
+        if (keyIdentifierType == null || keyIdentifierType.equals(RSSecurityUtils.X509_CERT)) {
             Element certNode = getNode(encKeyElement, 
                                        Constants.SignatureSpecNS, "X509Certificate", 0);
             if (certNode != null) {
                 try {
-                    return SecurityUtils.loadX509Certificate(crypto, certNode);
+                    return RSSecurityUtils.loadX509Certificate(crypto, certNode);
                 } catch (Exception ex) {
                     throwFault("X509Certificate can not be created", ex);
                 }
             }
         }
-        if (keyIdentifierType == null || keyIdentifierType.equals(SecurityUtils.X509_ISSUER_SERIAL)) {
+        if (keyIdentifierType == null || keyIdentifierType.equals(RSSecurityUtils.X509_ISSUER_SERIAL)) {
             Element certNode = getNode(encKeyElement, 
                     Constants.SignatureSpecNS, "X509IssuerSerial", 0);
             if (certNode != null) {
                 try {
-                    return SecurityUtils.loadX509IssuerSerial(crypto, certNode);
+                    return RSSecurityUtils.loadX509IssuerSerial(crypto, certNode);
                 } catch (Exception ex) {
                     throwFault("X509Certificate can not be created", ex);
                 }
@@ -231,7 +231,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
                                          String keyEncAlgo,
                                          String digestAlgo,
                                          Message message) throws WSSecurityException {
-        CallbackHandler callback = SecurityUtils.getCallbackHandler(message, this.getClass());
+        CallbackHandler callback = RSSecurityUtils.getCallbackHandler(message, this.getClass());
         PrivateKey key = null;
         try {
             key = crypto.getPrivateKey(cert, callback);

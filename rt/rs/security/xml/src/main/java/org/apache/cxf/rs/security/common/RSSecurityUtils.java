@@ -34,6 +34,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -41,13 +42,13 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.utils.Constants;
 
-public final class SecurityUtils {
+public final class RSSecurityUtils {
     
     public static final String X509_CERT = "X509Certificate";
     public static final String X509_ISSUER_SERIAL = "X509IssuerSerial";
     public static final String USE_REQUEST_SIGNATURE_CERT = "useReqSigCert";
     
-    private SecurityUtils() {
+    private RSSecurityUtils() {
         
     }
     
@@ -58,11 +59,9 @@ public final class SecurityUtils {
             ? outMessage : m;
         
         Object encryptionProperties = 
-            org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
-            SecurityConstants.ENCRYPT_PROPERTIES, m);
+            SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, m);
         Object signatureProperties = 
-            org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
-            SecurityConstants.SIGNATURE_PROPERTIES, m);
+            SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PROPERTIES, m);
         
         return "POST".equals((String)requestMessage.get(Message.HTTP_REQUEST_METHOD))
             && encryptionProperties != null && signatureProperties != null;
@@ -115,8 +114,7 @@ public final class SecurityUtils {
     }
     
     public static String getUserName(Message message, Crypto crypto, String userNameKey) {
-        String user = 
-            (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(userNameKey, message);
+        String user = (String)SecurityUtils.getSecurityPropertyValue(userNameKey, message);
         return getUserName(crypto, user);
     }
     
@@ -159,11 +157,10 @@ public final class SecurityUtils {
                                                      Class<?> callingClass,
                                                      String callbackProperty) throws WSSecurityException {
         //Then try to get the password from the given callback handler
-        Object o = 
-            org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(callbackProperty, message);
+        Object o = SecurityUtils.getSecurityPropertyValue(callbackProperty, message);
     
         try {
-            return org.apache.cxf.rt.security.utils.SecurityUtils.getCallbackHandler(o);
+            return SecurityUtils.getCallbackHandler(o);
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }

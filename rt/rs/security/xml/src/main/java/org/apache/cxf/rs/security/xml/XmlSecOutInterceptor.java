@@ -45,7 +45,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -161,7 +161,7 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
             String userName = 
                 (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
                     SecurityConstants.ENCRYPT_USERNAME, message);
-            if (SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
+            if (RSSecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
                 && !MessageUtils.isRequestor(message)) {
                 sendingCert = 
                     message.getExchange().getInMessage().getContent(X509Certificate.class);
@@ -177,7 +177,7 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
                                           SecurityConstants.ENCRYPT_CRYPTO,
                                           SecurityConstants.ENCRYPT_PROPERTIES);
                 
-                userName = SecurityUtils.getUserName(crypto, userName);
+                userName = RSSecurityUtils.getUserName(crypto, userName);
                 if (StringUtils.isEmpty(userName)) {
                     throw new Exception("User name is not available");
                 }
@@ -251,7 +251,7 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     private X509Certificate getCertificateFromCrypto(Crypto crypto, String user) throws Exception {
-        X509Certificate[] certs = SecurityUtils.getCertificates(crypto, user);
+        X509Certificate[] certs = RSSecurityUtils.getCertificates(crypto, user);
         return certs[0];
     }
     
@@ -274,16 +274,16 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
         Crypto crypto = loader.getCrypto(message, 
                                          SecurityConstants.SIGNATURE_CRYPTO,
                                          SecurityConstants.SIGNATURE_PROPERTIES);
-        String user = SecurityUtils.getUserName(message, crypto, userNameKey);
+        String user = RSSecurityUtils.getUserName(message, crypto, userNameKey);
          
-        if (StringUtils.isEmpty(user) || SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(user)) {
+        if (StringUtils.isEmpty(user) || RSSecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(user)) {
             throw new Exception("User name is not available");
         }
 
         String password = 
-            SecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, this.getClass());
+            RSSecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, this.getClass());
     
-        X509Certificate[] issuerCerts = SecurityUtils.getCertificates(crypto, user);
+        X509Certificate[] issuerCerts = RSSecurityUtils.getCertificates(crypto, user);
         properties.setSignatureCerts(issuerCerts);
         
         String sigAlgo = sigProps.getSignatureAlgo() == null 

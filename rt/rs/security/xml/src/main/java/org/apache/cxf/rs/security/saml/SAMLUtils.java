@@ -29,7 +29,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -64,7 +64,7 @@ public final class SAMLUtils {
     
     public static SamlAssertionWrapper createAssertion(Message message) throws Fault {
         try {
-            CallbackHandler handler = SecurityUtils.getCallbackHandler(
+            CallbackHandler handler = RSSecurityUtils.getCallbackHandler(
                 message, SAMLUtils.class, SecurityConstants.SAML_CALLBACK_HANDLER);
             return createAssertion(message, handler);
         } catch (Exception ex) {
@@ -90,13 +90,13 @@ public final class SAMLUtils {
                                           SecurityConstants.SIGNATURE_PROPERTIES);
                 
                 String user = 
-                    SecurityUtils.getUserName(message, crypto, SecurityConstants.SIGNATURE_USERNAME);
+                    RSSecurityUtils.getUserName(message, crypto, SecurityConstants.SIGNATURE_USERNAME);
                 if (StringUtils.isEmpty(user)) {
                     return assertion;
                 }
         
                 String password = 
-                    SecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, 
+                    RSSecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, 
                             SAMLUtils.class);
                 
                 assertion.signAssertion(user, password, crypto, false);

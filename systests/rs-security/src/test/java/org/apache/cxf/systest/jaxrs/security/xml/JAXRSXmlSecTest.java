@@ -33,7 +33,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.xml.EncryptionProperties;
 import org.apache.cxf.rs.security.xml.XmlEncInInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
@@ -315,7 +315,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         String aes128GCM = "http://www.w3.org/2009/xmlenc11#aes128-gcm";
         encryptionProperties.setEncryptionSymmetricKeyAlgo(aes128GCM);
-        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_CERT);
+        encryptionProperties.setEncryptionKeyIdType(RSSecurityUtils.X509_CERT);
         
         doTestPostEncryptedBook(address, false, properties, encryptionProperties, false, test.streaming);
     }
@@ -332,7 +332,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_128);
-        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_CERT);
+        encryptionProperties.setEncryptionKeyIdType(RSSecurityUtils.X509_CERT);
         encryptionProperties.setEncryptionDigestAlgo(XMLCipher.SHA256);
         
         doTestPostEncryptedBook(
@@ -352,7 +352,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_128);
-        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_ISSUER_SERIAL);
+        encryptionProperties.setEncryptionKeyIdType(RSSecurityUtils.X509_ISSUER_SERIAL);
         
         doTestPostEncryptedBook(
             address, false, properties, encryptionProperties, false, test.streaming
@@ -391,7 +391,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionSymmetricKeyAlgo(
             "http://www.w3.org/2009/xmlenc11#aes128-gcm");
-        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_CERT);
+        encryptionProperties.setEncryptionKeyIdType(RSSecurityUtils.X509_CERT);
         
         try {
             doTestPostEncryptedBook(address, true, properties, encryptionProperties, true, test.streaming);
@@ -421,7 +421,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         throws Exception {
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_128);
-        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_CERT);
+        encryptionProperties.setEncryptionKeyIdType(RSSecurityUtils.X509_CERT);
         doTestPostEncryptedBook(
             address, sign, properties, encryptionProperties, false, test.streaming
         );
@@ -548,7 +548,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         bean.setProperties(properties);
         
         XmlEncOutInterceptor encInterceptor = new XmlEncOutInterceptor();
-        encInterceptor.setKeyIdentifierType(SecurityUtils.X509_CERT);
+        encInterceptor.setKeyIdentifierType(RSSecurityUtils.X509_CERT);
         encInterceptor.setSymmetricEncAlgorithm(XMLCipher.AES_128);
         bean.getOutInterceptors().add(encInterceptor);
         bean.getInInterceptors().add(new XmlEncInInterceptor());

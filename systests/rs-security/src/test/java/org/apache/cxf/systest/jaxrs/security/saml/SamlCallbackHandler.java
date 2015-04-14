@@ -33,7 +33,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -105,8 +105,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                                                          SecurityConstants.SIGNATURE_CRYPTO,
                                                          SecurityConstants.SIGNATURE_PROPERTIES);
                         X509Certificate cert = 
-                            SecurityUtils.getCertificates(crypto, 
-                                SecurityUtils.getUserName(m, crypto, "ws-security.signature.username"))[0];
+                            RSSecurityUtils.getCertificates(crypto, 
+                                RSSecurityUtils.getUserName(m, crypto, "ws-security.signature.username"))[0];
                         
                         KeyInfoBean keyInfo = new KeyInfoBean();
                         keyInfo.setCertificate(cert);

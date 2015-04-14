@@ -40,7 +40,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -177,7 +177,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
             if (assertion.isSigned()) {
                 WSSConfig cfg = WSSConfig.getNewInstance(); 
                 data.setWssConfig(cfg);
-                data.setCallbackHandler(SecurityUtils.getCallbackHandler(message, this.getClass()));
+                data.setCallbackHandler(RSSecurityUtils.getCallbackHandler(message, this.getClass()));
                 try {
                     data.setSigVerCrypto(new CryptoLoader().getCrypto(message,
                                                 SecurityConstants.SIGNATURE_CRYPTO,

@@ -47,7 +47,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -142,7 +142,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
         UnsupportedCallbackException, WSSecurityException {
         String cryptoKey = null; 
         String propKey = null;
-        if (SecurityUtils.isSignedAndEncryptedTwoWay(message)) {
+        if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
             propKey = SecurityConstants.SIGNATURE_PROPERTIES;
         } else {
@@ -163,7 +163,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
                 alias = crypto.getDefaultX509Identifier();
             }
             if (alias != null) {
-                CallbackHandler callback = SecurityUtils.getCallbackHandler(message, this.getClass());
+                CallbackHandler callback = RSSecurityUtils.getCallbackHandler(message, this.getClass());
                 WSPasswordCallback passwordCallback = 
                     new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
                 callback.handle(new Callback[] {passwordCallback});
@@ -177,7 +177,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     private Crypto getSignatureCrypto(Message message) {
         String cryptoKey = null; 
         String propKey = null;
-        if (SecurityUtils.isSignedAndEncryptedTwoWay(message)) {
+        if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
             propKey = SecurityConstants.ENCRYPT_PROPERTIES;
         } else {

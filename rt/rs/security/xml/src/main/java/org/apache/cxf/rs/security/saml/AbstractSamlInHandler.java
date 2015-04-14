@@ -42,7 +42,7 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProvider;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
 import org.apache.cxf.rs.security.xml.AbstractXmlSecInHandler;
@@ -132,7 +132,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
             if (assertion.isSigned()) {
                 WSSConfig cfg = WSSConfig.getNewInstance(); 
                 data.setWssConfig(cfg);
-                data.setCallbackHandler(SecurityUtils.getCallbackHandler(message, this.getClass()));
+                data.setCallbackHandler(RSSecurityUtils.getCallbackHandler(message, this.getClass()));
                 try {
                     data.setSigVerCrypto(new CryptoLoader().getCrypto(message,
                                                 SecurityConstants.SIGNATURE_CRYPTO,
@@ -209,7 +209,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     
     protected SAMLKeyInfo createKeyInfoFromDefaultAlias(Crypto sigCrypto) throws WSSecurityException {
         try {
-            X509Certificate[] certs = SecurityUtils.getCertificates(sigCrypto, 
+            X509Certificate[] certs = RSSecurityUtils.getCertificates(sigCrypto, 
                                                                     sigCrypto.getDefaultX509Identifier());
             SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(new X509Certificate[]{certs[0]});
             samlKeyInfo.setPublicKey(certs[0].getPublicKey());

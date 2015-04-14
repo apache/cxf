@@ -40,8 +40,9 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
-import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.DOMX509Data;
@@ -112,9 +113,8 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             X509Certificate receiverCert = null;
             
             String userName = 
-                (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
-                    SecurityConstants.ENCRYPT_USERNAME, message);
-            if (SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_USERNAME, message);
+            if (RSSecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
                 && !MessageUtils.isRequestor(message)) {
                 receiverCert = 
                     (X509Certificate)message.getExchange().getInMessage().get(
@@ -125,7 +125,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                                           SecurityConstants.ENCRYPT_CRYPTO,
                                           SecurityConstants.ENCRYPT_PROPERTIES);
                 
-                userName = SecurityUtils.getUserName(crypto, userName);
+                userName = RSSecurityUtils.getUserName(crypto, userName);
                 if (StringUtils.isEmpty(userName)) {
                     throw new Exception("User name is not available");
                 }
@@ -174,7 +174,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     }
     
     private X509Certificate getReceiverCertificateFromCrypto(Crypto crypto, String user) throws Exception {
-        X509Certificate[] certs = SecurityUtils.getCertificates(crypto, user);
+        X509Certificate[] certs = RSSecurityUtils.getCertificates(crypto, user);
         return certs[0];
     }
     
@@ -267,10 +267,10 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":KeyInfo");
         
         String keyIdType = encProps.getEncryptionKeyIdType() == null
-            ? SecurityUtils.X509_CERT : encProps.getEncryptionKeyIdType();
+            ? RSSecurityUtils.X509_CERT : encProps.getEncryptionKeyIdType();
         
         Node keyIdentifierNode = null; 
-        if (keyIdType.equals(SecurityUtils.X509_CERT)) {
+        if (keyIdType.equals(RSSecurityUtils.X509_CERT)) {
             byte data[] = null;
             try {
                 data = remoteCert.getEncoded();
@@ -286,7 +286,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             
             x509Data.appendChild(cert);
             keyIdentifierNode = x509Data;
-        } else if (keyIdType.equals(SecurityUtils.X509_ISSUER_SERIAL)) {
+        } else if (keyIdType.equals(RSSecurityUtils.X509_ISSUER_SERIAL)) {
             String issuer = remoteCert.getIssuerDN().getName();
             java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
             DOMX509IssuerSerial domIssuerSerial = 
