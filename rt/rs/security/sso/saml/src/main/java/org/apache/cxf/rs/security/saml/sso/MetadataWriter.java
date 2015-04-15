@@ -148,6 +148,13 @@ public class MetadataWriter {
         writer.writeAttribute("Binding", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST");
         writer.writeEndElement(); // AssertionConsumerService
         
+        writer.writeStartElement("md", "AssertionConsumerService", SSOConstants.SAML2_METADATA_NS);
+        writer.writeAttribute("Location", serviceURL);
+        writer.writeAttribute("index", "0");
+        writer.writeAttribute("isDefault", "true");
+        writer.writeAttribute("Binding", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-REDIRECT");
+        writer.writeEndElement(); // AssertionConsumerService
+        
         /*
         if (protocol.getClaimTypesRequested() != null && !protocol.getClaimTypesRequested().isEmpty()) {
             writer.writeStartElement("md", "AttributeConsumingService", SSOConstants.SAML2_METADATA_NS);
