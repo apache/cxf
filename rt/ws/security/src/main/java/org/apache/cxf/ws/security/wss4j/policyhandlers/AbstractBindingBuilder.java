@@ -118,7 +118,6 @@ import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
-import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.Attachments;
@@ -500,7 +499,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
             } else if (token instanceof X509Token) {
                 //We have to use a cert. Prepare X509 signature
-                WSSecSignature sig = getSignatureBuilder(suppTokens, token, endorse);
+                WSSecSignature sig = getSignatureBuilder(token, false, endorse);
+                assertPolicy(suppTokens);
                 Element bstElem = sig.getBinarySecurityTokenElement();
                 if (bstElem != null) {
                     if (lastEncryptedKeyElement != null) {
@@ -521,7 +521,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 }
                 ret.add(new SupportingToken(token, sig, getSignedParts(suppTokens)));
             } else if (token instanceof KeyValueToken) {
-                WSSecSignature sig = getSignatureBuilder(suppTokens, token, endorse);
+                WSSecSignature sig = getSignatureBuilder(token, false, endorse);
+                assertPolicy(suppTokens);
                 if (suppTokens.isEncryptedToken()) {
                     WSEncryptionPart part = new WSEncryptionPart(sig.getBSTTokenId(), "Element");
                     encryptedTokensList.add(part);
@@ -865,7 +866,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
             Crypto crypto = samlCallback.getIssuerCrypto();
             if (crypto == null) {
-                crypto = getSignatureCrypto(null);
+                crypto = getSignatureCrypto();
             }
             
             assertion.signAssertion(
@@ -1358,14 +1359,14 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
     
-    protected WSSecEncryptedKey getEncryptedKeyBuilder(AbstractTokenWrapper wrapper, 
-                                                       AbstractToken token) throws WSSecurityException {
+    protected WSSecEncryptedKey getEncryptedKeyBuilder(AbstractToken token) throws WSSecurityException {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setIdAllocator(wssConfig.getIdAllocator());
         encrKey.setCallbackLookup(callbackLookup);
-        Crypto crypto = getEncryptionCrypto(wrapper);
+        Crypto crypto = getEncryptionCrypto();
         message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
-        setKeyIdentifierType(encrKey, wrapper, token);
+        setKeyIdentifierType(encrKey, token);
+        
         boolean alsoIncludeToken = false;
         // Find out do we also need to include the token as per the Inclusion requirement
         if (token instanceof X509Token 
@@ -1374,7 +1375,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             alsoIncludeToken = true;
         }
         
-        String encrUser = setEncryptionUser(encrKey, wrapper, false, crypto);
+        String encrUser = setEncryptionUser(encrKey, token, false, crypto);
         
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
         encrKey.setSymmetricEncAlgorithm(algType.getEncryption());
@@ -1414,15 +1415,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
     
-    public Crypto getSignatureCrypto(AbstractTokenWrapper wrapper) throws WSSecurityException {
-        return getCrypto(wrapper, SecurityConstants.SIGNATURE_CRYPTO,
-                         SecurityConstants.SIGNATURE_PROPERTIES);
+    public Crypto getSignatureCrypto() throws WSSecurityException {
+        return getCrypto(SecurityConstants.SIGNATURE_CRYPTO, SecurityConstants.SIGNATURE_PROPERTIES);
     }
 
-
-    public Crypto getEncryptionCrypto(AbstractTokenWrapper wrapper) throws WSSecurityException {
-        Crypto crypto = getCrypto(wrapper, SecurityConstants.ENCRYPT_CRYPTO,
-                                  SecurityConstants.ENCRYPT_PROPERTIES);
+    public Crypto getEncryptionCrypto() throws WSSecurityException {
+        Crypto crypto = 
+            getCrypto(SecurityConstants.ENCRYPT_CRYPTO, SecurityConstants.ENCRYPT_PROPERTIES);
         boolean enableRevocation = false;
         String enableRevStr = 
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, message);
@@ -1450,8 +1449,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
     }
     
-    public Crypto getCrypto(
-        AbstractTokenWrapper wrapper, 
+    protected Crypto getCrypto(
         String cryptoKey, 
         String propKey
     ) throws WSSecurityException {
@@ -1504,7 +1502,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
     
-    public void setKeyIdentifierType(WSSecBase secBase, AbstractTokenWrapper wrapper, AbstractToken token) {
+    public void setKeyIdentifierType(WSSecBase secBase, AbstractToken token) {
         boolean tokenTypeSet = false;
         
         if (token instanceof X509Token) {
@@ -1525,7 +1523,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         }
         
         assertPolicy(token);
-        assertPolicy(wrapper);
         
         if (!tokenTypeSet) {
             boolean requestor = isRequestor();
@@ -1552,7 +1549,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         }
     }
     
-    public String setEncryptionUser(WSSecEncryptedKey encrKeyBuilder, AbstractTokenWrapper token,
+    public String setEncryptionUser(WSSecEncryptedKey encrKeyBuilder, AbstractToken token,
                                   boolean sign, Crypto crypto) {
         // Check for prepared certificate property
         X509Certificate encrCert = 
@@ -1683,13 +1680,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected WSSecSignature getSignatureBuilder(
-        AbstractTokenWrapper wrapper, AbstractToken token, boolean endorse
-    ) throws WSSecurityException {
-        return getSignatureBuilder(wrapper, token, false, endorse);
-    }
-    
-    protected WSSecSignature getSignatureBuilder(
-        AbstractTokenWrapper wrapper, AbstractToken token, boolean attached, boolean endorse
+        AbstractToken token, boolean attached, boolean endorse
     ) throws WSSecurityException {
         WSSecSignature sig = new WSSecSignature();
         sig.setIdAllocator(wssConfig.getIdAllocator());
@@ -1698,7 +1689,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         checkForX509PkiPath(sig, token);
         if (token instanceof IssuedToken || token instanceof SamlToken) {
             assertPolicy(token);
-            assertPolicy(wrapper);
             SecurityToken securityToken = getSecurityToken();
             String tokenType = securityToken.getTokenType();
             
@@ -1746,7 +1736,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             
             sig.setCustomTokenId(sigTokId);
         } else {
-            setKeyIdentifierType(sig, wrapper, token);
+            setKeyIdentifierType(sig, token);
             // Find out do we also need to include the token as per the Inclusion requirement
             if (token instanceof X509Token 
                 && token.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER
@@ -1764,13 +1754,12 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;
         }
 
-        Crypto crypto = encryptCrypto ? getEncryptionCrypto(wrapper) 
-            : getSignatureCrypto(wrapper);
+        Crypto crypto = encryptCrypto ? getEncryptionCrypto() : getSignatureCrypto();
         
         if (endorse && crypto == null && binding instanceof SymmetricBinding) {
             type = "encryption";
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;
-            crypto = getEncryptionCrypto(wrapper);
+            crypto = getEncryptionCrypto();
         }
         
         if (!endorse) {
@@ -2033,7 +2022,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         sig.setSecretKey(tok.getSecret());
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
-        sig.prepare(doc, getSignatureCrypto(null), secHeader);
+        sig.prepare(doc, getSignatureCrypto(), secHeader);
 
         sig.getParts().addAll(sigParts);
         List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
