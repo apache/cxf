@@ -151,7 +151,6 @@ public class MetadataWriter {
         writer.writeStartElement("md", "AssertionConsumerService", SSOConstants.SAML2_METADATA_NS);
         writer.writeAttribute("Location", serviceURL);
         writer.writeAttribute("index", "1");
-        writer.writeAttribute("isDefault", "true");
         writer.writeAttribute("Binding", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-REDIRECT");
         writer.writeEndElement(); // AssertionConsumerService
         
