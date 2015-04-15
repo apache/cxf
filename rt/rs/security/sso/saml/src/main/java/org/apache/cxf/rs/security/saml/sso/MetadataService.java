@@ -100,5 +100,21 @@ public class MetadataService extends AbstractSSOSpHandler {
         LOG.warning(errorMsg.toString());
     }
 
+    public String getServiceAddress() {
+        return serviceAddress;
+    }
+
+    public void setServiceAddress(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
+    }
+
+    public String getLogoutServiceAddress() {
+        return logoutServiceAddress;
+    }
+
+    public void setLogoutServiceAddress(String logoutServiceAddress) {
+        this.logoutServiceAddress = logoutServiceAddress;
+    }
+
 
 }
