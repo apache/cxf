@@ -227,94 +227,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-<<<<<<< HEAD
-=======
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
-       
-        Dispatch<DOMSource> dispatch = 
-            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
-        updateAddressPort(dispatch, test.getPort());
-        
-        // Setup STSClient
-        STSClient stsClient = createDispatchSTSClient(bus);
-        String wsdlLocation = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
-        stsClient.setWsdlLocation(wsdlLocation);
-        
-        // Creating a DOMSource Object for the request
-        DOMSource request = createDOMRequest();
-        
-        // Make a successful request
-        Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
-        client.getRequestContext().put("ws-security.username", "alice");
-        client.getRequestContext().put("ws-security.sts.client", stsClient);
-        
-        if (test.isStreaming()) {
-            client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
-            client.getResponseContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
-        }
-        
-        DOMSource response = dispatch.invoke(request);
-        assertNotNull(response);
-        
-        bus.shutdown(true);
-    }
-    
     @org.junit.Test
-    public void testSAML2DispatchLocation() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
-       
-        Dispatch<DOMSource> dispatch = 
-            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
-        updateAddressPort(dispatch, test.getPort());
-        
-        // Setup STSClient
-        STSClient stsClient = createDispatchSTSClient(bus);
-        String location = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport";
-        stsClient.setLocation(location);
-        stsClient.setPolicy("classpath:/org/apache/cxf/systest/sts/issuer/sts-transport-policy.xml");
-        
-        // Creating a DOMSource Object for the request
-        DOMSource request = createDOMRequest();
-        
-        // Make a successful request
-        Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
-        client.getRequestContext().put("ws-security.username", "alice");
-        client.getRequestContext().put("ws-security.sts.client", stsClient);
-        
-        if (test.isStreaming()) {
-            client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
-            client.getResponseContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
-        }
-        
-        DOMSource response = dispatch.invoke(request);
-        assertNotNull(response);
-        
-        bus.shutdown(true);
-    }
-    
-    // TODO Not supported for now
-    @org.junit.Test
-    @org.junit.Ignore
-    public void testSAML2EndorsingX509() throws Exception {
+    public void testSAML2X509Endorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
@@ -326,54 +240,17 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2X509EndorsingPort");
-        DoubleItPortType transportSaml1Port = 
-            service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportSaml1Port, test.getPort());
-
-        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(transportSaml1Port);
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)port, STSPORT);
         }
         
-        doubleIt(transportSaml1Port, 25);
+        doubleIt(port, 40);
         
-        ((java.io.Closeable)transportSaml1Port).close();
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
-    private DOMSource createDOMRequest() throws ParserConfigurationException {
-        // Creating a DOMSource Object for the request
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document requestDoc = db.newDocument();
-        Element root = requestDoc.createElementNS("http://www.example.org/schema/DoubleIt", "ns2:DoubleIt");
-        root.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ns2", "http://www.example.org/schema/DoubleIt");
-        Element number = requestDoc.createElementNS(null, "numberToDouble");
-        number.setTextContent("25");
-        root.appendChild(number);
-        requestDoc.appendChild(root);
-        return new DOMSource(requestDoc);
-    }
-    
-    private STSClient createDispatchSTSClient(Bus bus) {
-        STSClient stsClient = new STSClient(bus);
-        stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
-        stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
-        properties.put("ws-security.callback-handler",
-                       "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
-        properties.put("ws-security.sts.token.username", "myclientkey");
-        properties.put("ws-security.sts.token.properties", "clientKeystore.properties");
-        properties.put("ws-security.sts.token.usecert", "true");
-        stsClient.setProperties(properties);
-        
-        return stsClient;
-    }
-    
->>>>>>> 6a41413... [CXF-6327] - Adding @Ignore'd test
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
