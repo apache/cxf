@@ -230,9 +230,7 @@ public final class EndpointReferenceUtils {
             LSInputImpl impl = new LSInputImpl();
             impl.setSystemId(newId);
             impl.setBaseURI(newId);
-            impl.setCharacterStream(
-                new InputStreamReader(
-                    new ByteArrayInputStream(value)));
+			impl.setByteStream(new ByteArrayInputStream(value));
             return impl;
         }
     }
