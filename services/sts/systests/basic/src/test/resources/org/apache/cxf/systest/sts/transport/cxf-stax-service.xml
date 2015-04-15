@@ -48,6 +48,14 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml2x509endorsing" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSAML2X509EndorsingPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.StaxServer}/doubleit/services/doubleittransportsaml2x509endorsing" wsdlLocation="org/apache/cxf/systest/sts/transport/DoubleIt.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.StaxServer}">
             <httpj:tlsServerParameters>

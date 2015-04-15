@@ -64,6 +64,21 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItTransportSAML2X509EndorsingBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItBindingTransportSAML2X509EndorsingPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItTransportSAML1Port" binding="tns:DoubleItTransportSAML1Binding">
             <soap:address location="https://localhost:8081/doubleit/services/doubleittransportsaml1"/>
@@ -73,6 +88,10 @@
         </wsdl:port>
         <wsdl:port name="DoubleItTransportSAML1EndorsingPort" binding="tns:DoubleItTransportSAML1EndorsingBinding">
             <soap:address location="https://localhost:8081/doubleit/services/doubleittransportsaml1endorsing"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItTransportSAML2X509EndorsingPort"
+                   binding="tns:DoubleItTransportSAML2X509EndorsingBinding">
+            <soap:address location="https://localhost:8081/doubleit/services/doubleittransportsaml2x509endorsing"/>
         </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItBindingTransportSAML1Policy">
@@ -258,6 +277,84 @@
                                 </wsaw:Metadata>
                             </sp:Issuer>
                         </sp:IssuedToken>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
+                <sp:Wss11>
+                    <wsp:Policy>
+                        <sp:MustSupportRefIssuerSerial/>
+                        <sp:MustSupportRefThumbprint/>
+                        <sp:MustSupportRefEncryptedKey/>
+                    </wsp:Policy>
+                </sp:Wss11>
+                <sp:Trust13>
+                    <wsp:Policy>
+                        <sp:MustSupportIssuedTokens/>
+                        <sp:RequireClientEntropy/>
+                        <sp:RequireServerEntropy/>
+                    </wsp:Policy>
+                </sp:Trust13>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItBindingTransportSAML2X509EndorsingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <wsam:Addressing wsp:Optional="false">
+                    <wsp:Policy/>
+                </wsam:Addressing>
+                <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:TripleDes/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:EndorsingSupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:IssuedToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <sp:RequestSecurityTokenTemplate>
+                                <t:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0</t:TokenType>
+                                <t:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey</t:KeyType>
+                            </sp:RequestSecurityTokenTemplate>
+                            <wsp:Policy>
+                                <sp:RequireInternalReference/>
+                            </wsp:Policy>
+                            <sp:Issuer>
+                                <wsaw:Address>http://localhost:8080/STS/STSUT
+                                                                </wsaw:Address>
+                                <wsaw:Metadata>
+                                    <wsx:Metadata>
+                                        <wsx:MetadataSection>
+                                            <wsx:MetadataReference>
+                                                <wsaw:Address>http://localhost:8080/SecurityTokenService/UT/mex
+                                                                                                </wsaw:Address>
+                                            </wsx:MetadataReference>
+                                        </wsx:MetadataSection>
+                                    </wsx:Metadata>
+                                </wsaw:Metadata>
+                            </sp:Issuer>
+                        </sp:IssuedToken>
+                        <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                            <wsp:Policy>
+                                <sp:WssX509V3Token10/>
+                                <sp:RequireIssuerSerialReference/>
+                            </wsp:Policy>
+                        </sp:X509Token>
                     </wsp:Policy>
                 </sp:EndorsingSupportingTokens>
                 <sp:Wss11>
