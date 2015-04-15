@@ -483,7 +483,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
                     
                     encr.setDocument(saaj.getSOAPPart());
-                    Crypto crypto = getEncryptionCrypto(recToken);
+                    Crypto crypto = getEncryptionCrypto();
                     
                     SecurityToken securityToken = getSecurityToken();
                     if (!isRequestor() && securityToken != null 
@@ -500,10 +500,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                             encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                             encr.setCustomEKTokenId(securityToken.getId());
                         } else {
-                            setKeyIdentifierType(encr, recToken, encrToken);
+                            setKeyIdentifierType(encr, encrToken);
                         }
                     } else {
-                        setKeyIdentifierType(encr, recToken, encrToken);
+                        setKeyIdentifierType(encr, encrToken);
                     }
                     //
                     // Using a stored cert is only suitable for the Issued Token case, where
@@ -513,7 +513,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         && securityToken.getX509Certificate() != null) {
                         encr.setUseThisCert(securityToken.getX509Certificate());
                     } else {
-                        setEncryptionUser(encr, recToken, false, crypto);
+                        setEncryptionUser(encr, encrToken, false, crypto);
                     }
                     if (!encr.isCertSet() && crypto == null) {
                         policyNotAsserted(recToken, "Missing security configuration. "
@@ -605,7 +605,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         if (sigParts.isEmpty()) {
             // Add the BST to the security header if required
             if (!attached && isTokenRequired(sigToken.getIncludeTokenType())) {
-                WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, attached, false);
+                WSSecSignature sig = getSignatureBuilder(sigToken, attached, false);
                 sig.appendBSTElementToHeader(secHeader);
             } 
             return;
@@ -670,7 +670,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 throw new Fault(ex);
             }
         } else {
-            WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, attached, false);
+            WSSecSignature sig = getSignatureBuilder(sigToken, attached, false);
                       
             // This action must occur before sig.prependBSTElementToHeader
             if (abinding.isProtectTokens()) {
@@ -784,7 +784,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     private void createEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken token)
         throws WSSecurityException {
         //Set up the encrypted key to use
-        encrKey = this.getEncryptedKeyBuilder(wrapper, token);
+        encrKey = this.getEncryptedKeyBuilder(token);
+        assertPolicy(wrapper);
         Element bstElem = encrKey.getBinarySecurityTokenElement();
         if (bstElem != null) {
             // If a BST is available then use it

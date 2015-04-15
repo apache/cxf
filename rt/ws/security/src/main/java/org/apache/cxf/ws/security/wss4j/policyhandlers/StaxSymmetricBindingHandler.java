@@ -423,7 +423,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             properties.addAction(actionToPerform);
 
             if (isRequestor()) {
-                properties.setEncryptionKeyIdentifier(getKeyIdentifierType(recToken, encrToken));
+                properties.setEncryptionKeyIdentifier(getKeyIdentifierType(encrToken));
                 properties.setDerivedKeyKeyIdentifier(
                     WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             } else if (recToken.getToken() instanceof KerberosToken && !isRequestor()) {
@@ -538,7 +538,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             properties.addSignaturePart(securePart);
         }
         
-        configureSignature(wrapper, sigToken, false);
+        configureSignature(sigToken, false);
         
         if (policyToken instanceof X509Token) {
             properties.setIncludeSignatureToken(false);

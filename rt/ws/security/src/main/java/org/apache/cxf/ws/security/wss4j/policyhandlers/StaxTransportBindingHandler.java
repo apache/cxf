@@ -348,7 +348,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         } else if (token instanceof KerberosToken) {
             WSSSecurityProperties properties = getProperties();
             properties.addAction(WSSConstants.SIGNATURE);
-            configureSignature(wrapper, token, false);
+            configureSignature(token, false);
             
             addKerberosToken((KerberosToken)token, false, true, false);
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
@@ -375,7 +375,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         }
         properties.addAction(actionToPerform);
         
-        configureSignature(wrapper, token, false);
+        configureSignature(token, false);
         if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             properties.setSignatureAlgorithm(
                    tbinding.getAlgorithmSuite().getSymmetricSignature());

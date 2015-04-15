@@ -356,7 +356,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             properties.addAction(actionToPerform);
             
             properties.getEncryptionSecureParts().addAll(encrParts);
-            properties.setEncryptionKeyIdentifier(getKeyIdentifierType(recToken, encrToken));
+            properties.setEncryptionKeyIdentifier(getKeyIdentifierType(encrToken));
             
             // Find out do we also need to include the token as per the Inclusion requirement
             WSSecurityTokenConstants.KeyIdentifier keyIdentifier = properties.getEncryptionKeyIdentifier();
@@ -424,7 +424,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         properties.getSignatureSecureParts().addAll(sigParts);
         
         AbstractToken sigToken = wrapper.getToken();
-        configureSignature(wrapper, sigToken, false);
+        configureSignature(sigToken, false);
         
         if (abinding.isProtectTokens() && (sigToken instanceof X509Token)
             && sigToken.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER) {

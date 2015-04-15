@@ -355,7 +355,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
         
         if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-            WSSecEncryptedKey encrKey = getEncryptedKeyBuilder(wrapper, token);
+            WSSecEncryptedKey encrKey = getEncryptedKeyBuilder(token);
+            assertPolicy(wrapper);
             
             Element bstElem = encrKey.getBinarySecurityTokenElement();
             if (bstElem != null) {
@@ -363,8 +364,15 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
             encrKey.appendToHeader(secHeader);
             
+<<<<<<< HEAD
             WSSecDKSign dkSig = new WSSecDKSign(wssConfig);
             if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
+=======
+            WSSecDKSign dkSig = new WSSecDKSign();
+            dkSig.setIdAllocator(wssConfig.getIdAllocator());
+            dkSig.setCallbackLookup(callbackLookup);
+            if (token.getVersion() == SPConstants.SPVersion.SP11) {
+>>>>>>> aaad96f... [CXF-6327] - Invalid Policy exception for EndorsingSupportingTokens with more than one token assertions
                 dkSig.setWscVersion(ConversationConstants.VERSION_05_02);
             }
             
@@ -386,7 +394,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             return dkSig.getSignatureValue();
         } else {
-            WSSecSignature sig = getSignatureBuilder(wrapper, token, false);
+            WSSecSignature sig = getSignatureBuilder(token, false, false);
+            assertPolicy(wrapper);
             if (sig != null) {
                 sig.prependBSTElementToHeader(secHeader);
             
@@ -552,7 +561,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
             crypto = secTok.getCrypto();
             if (crypto == null) {
-                crypto = getSignatureCrypto(wrapper);
+                crypto = getSignatureCrypto();
             }
             if (crypto == null) {
                 LOG.fine("No signature Crypto properties are available");
@@ -574,7 +583,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             sig.setUserInfo(uname, password);
             sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         } else {
-            crypto = getSignatureCrypto(wrapper);
+            crypto = getSignatureCrypto();
             sig.setSecretKey(secTok.getSecret());
             sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
         }

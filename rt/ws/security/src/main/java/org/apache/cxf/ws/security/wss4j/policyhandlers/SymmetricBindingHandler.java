@@ -534,10 +534,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     encr.setEncKeyId(encrTokId);
                     encr.setEphemeralKey(encrTok.getSecret());
-                    Crypto crypto = getEncryptionCrypto(recToken);
+                    Crypto crypto = getEncryptionCrypto();
                     if (crypto != null) {
                         this.message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
-                        setEncryptionUser(encr, recToken, false, crypto);
+                        setEncryptionUser(encr, encrToken, false, crypto);
                     }
                     
                     encr.setDocument(saaj.getSOAPPart());
@@ -834,9 +834,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             sig.setSigCanonicalization(sbinding.getAlgorithmSuite().getC14n().getValue());
             Crypto crypto = null;
             if (sbinding.getProtectionToken() != null) {
-                crypto = getEncryptionCrypto(sbinding.getProtectionToken());
+                crypto = getEncryptionCrypto();
             } else {
-                crypto = getSignatureCrypto(policyAbstractTokenWrapper);
+                crypto = getSignatureCrypto();
             }
             this.message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
             sig.prepare(saaj.getSOAPPart(), crypto, secHeader);
@@ -857,7 +857,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     }
 
     private String setupEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken sigToken) throws WSSecurityException {
-        WSSecEncryptedKey encrKey = this.getEncryptedKeyBuilder(wrapper, sigToken);
+        WSSecEncryptedKey encrKey = this.getEncryptedKeyBuilder(sigToken);
+        assertPolicy(wrapper);
         String id = encrKey.getId();
         byte[] secret = encrKey.getEphemeralKey();
 

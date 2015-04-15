@@ -57,7 +57,6 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
-import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.Attachments;
 import org.apache.wss4j.policy.model.ContentEncryptedElements;
@@ -509,7 +508,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     }
 
     protected void configureSignature(
-        AbstractTokenWrapper wrapper, AbstractToken token, boolean attached
+        AbstractToken token, boolean attached
     ) throws WSSecurityException {
         
         if (token instanceof X509Token) {
@@ -521,7 +520,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             }
         }
         
-        properties.setSignatureKeyIdentifier(getKeyIdentifierType(wrapper, token));
+        properties.setSignatureKeyIdentifier(getKeyIdentifierType(token));
 
         // Find out do we also need to include the token as per the Inclusion requirement
         WSSecurityTokenConstants.KeyIdentifier keyIdentifier = properties.getSignatureKeyIdentifier();
@@ -562,7 +561,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     }
     
     protected WSSecurityTokenConstants.KeyIdentifier getKeyIdentifierType(
-        AbstractTokenWrapper wrapper, AbstractToken token
+        AbstractToken token
     ) {
         WSSecurityTokenConstants.KeyIdentifier identifier = null;
         if (token instanceof X509Token) {
@@ -679,7 +678,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 }
             } else if (token instanceof X509Token || token instanceof KeyValueToken) {
                 assertToken(token);
-                configureSignature(suppTokens, token, false);
+                configureSignature(token, false);
                 if (suppTokens.isEncryptedToken()) {
                     SecurePart part = 
                         new SecurePart(WSSConstants.TAG_wsse_BinarySecurityToken, Modifier.Element);

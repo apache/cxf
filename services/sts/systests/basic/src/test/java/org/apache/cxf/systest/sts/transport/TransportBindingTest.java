@@ -378,10 +378,13 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO Not supported for now
     @org.junit.Test
-    @org.junit.Ignore
     public void testSAML2EndorsingX509() throws Exception {
+        
+        // Only works for DOM (clients)
+        if (test.isStreaming()) {
+            return;
+        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
