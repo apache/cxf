@@ -364,15 +364,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
             encrKey.appendToHeader(secHeader);
             
-<<<<<<< HEAD
             WSSecDKSign dkSig = new WSSecDKSign(wssConfig);
-            if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
-=======
-            WSSecDKSign dkSig = new WSSecDKSign();
-            dkSig.setIdAllocator(wssConfig.getIdAllocator());
-            dkSig.setCallbackLookup(callbackLookup);
             if (token.getVersion() == SPConstants.SPVersion.SP11) {
->>>>>>> aaad96f... [CXF-6327] - Invalid Policy exception for EndorsingSupportingTokens with more than one token assertions
                 dkSig.setWscVersion(ConversationConstants.VERSION_05_02);
             }
             

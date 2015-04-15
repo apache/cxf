@@ -82,6 +82,7 @@ public class AbstractJwtHandlerTest {
             handler.validateSignature(headers, UNSIGNED_TEXT, SIGNATURE);
             fail("OAuthServiceException expected");
         } catch (OAuthServiceException expected) {
+            // expected
         }
         verify(signatureVerifier);
     }

@@ -1373,18 +1373,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
     
-<<<<<<< HEAD
-    protected WSSecEncryptedKey getEncryptedKeyBuilder(AbstractTokenWrapper wrapper, 
-                                                       AbstractToken token) throws WSSecurityException {
-        WSSecEncryptedKey encrKey = new WSSecEncryptedKey(wssConfig);
-        Crypto crypto = getEncryptionCrypto(wrapper);
-=======
     protected WSSecEncryptedKey getEncryptedKeyBuilder(AbstractToken token) throws WSSecurityException {
-        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
-        encrKey.setIdAllocator(wssConfig.getIdAllocator());
-        encrKey.setCallbackLookup(callbackLookup);
+        WSSecEncryptedKey encrKey = new WSSecEncryptedKey(wssConfig);
         Crypto crypto = getEncryptionCrypto();
->>>>>>> aaad96f... [CXF-6327] - Invalid Policy exception for EndorsingSupportingTokens with more than one token assertions
         message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
         setKeyIdentifierType(encrKey, token);
         
@@ -1435,24 +1426,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return getCrypto(SecurityConstants.SIGNATURE_CRYPTO, SecurityConstants.SIGNATURE_PROPERTIES);
     }
 
-<<<<<<< HEAD
-
-    public Crypto getEncryptionCrypto(AbstractTokenWrapper wrapper) throws WSSecurityException {
-        Crypto crypto = getCrypto(wrapper, SecurityConstants.ENCRYPT_CRYPTO,
-                                  SecurityConstants.ENCRYPT_PROPERTIES);
-        boolean enableRevocation = MessageUtils.isTrue(
-                                       message.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
-=======
     public Crypto getEncryptionCrypto() throws WSSecurityException {
         Crypto crypto = 
             getCrypto(SecurityConstants.ENCRYPT_CRYPTO, SecurityConstants.ENCRYPT_PROPERTIES);
-        boolean enableRevocation = false;
-        String enableRevStr = 
-            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, message);
-        if (enableRevStr != null) {
-            enableRevocation = Boolean.parseBoolean(enableRevStr);
-        }
->>>>>>> aaad96f... [CXF-6327] - Invalid Policy exception for EndorsingSupportingTokens with more than one token assertions
+        boolean enableRevocation = MessageUtils.isTrue(
+                                       message.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
         if (enableRevocation && crypto != null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             String encrUser = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
