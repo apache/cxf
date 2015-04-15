@@ -171,7 +171,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
             controller.invoke(request, response);
         } finally {
             if (origBus != bus) {
-                BusFactory.setThreadDefaultBus(null);
+                BusFactory.setThreadDefaultBus(origBus);
             }
             if (origLoader != null) {
                 origLoader.reset();
