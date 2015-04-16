@@ -1055,13 +1055,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             for (Header head : parts.getHeaders()) {
                 WSEncryptionPart wep = new WSEncryptionPart(head.getName(),
                                                             head.getNamespace(),
-<<<<<<< HEAD
-                                                            "Element");
-                signedParts.add(wep);
-=======
                                                             "Header");
-                securedParts.add(wep);
->>>>>>> 5b20a3c... [CXF-6343] - EncryptedHeader not properly processed or generated. This closes #66
+                signedParts.add(wep);
             }
             
             Attachments attachments = parts.getAttachments();

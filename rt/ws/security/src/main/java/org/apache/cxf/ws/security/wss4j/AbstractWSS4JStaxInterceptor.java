@@ -72,15 +72,9 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
 
     private static final Set<QName> HEADERS = new HashSet<QName>();
     static {
-<<<<<<< HEAD
         HEADERS.add(new QName(WSSConstants.NS_WSSE10, "Security"));
-        HEADERS.add(new QName(WSSConstants.NS_WSSE11, "Security"));
         HEADERS.add(new QName(WSSConstants.NS_XMLENC, "EncryptedData"));
-=======
-        HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
-        HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
-        HEADERS.add(new QName(WSConstants.WSSE11_NS, "EncryptedHeader"));
->>>>>>> 5b20a3c... [CXF-6343] - EncryptedHeader not properly processed or generated. This closes #66
+        HEADERS.add(new QName(WSSConstants.NS_WSSE11, "EncryptedHeader"));
     }
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractWSS4JStaxInterceptor.class);
