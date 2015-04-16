@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.net.URI;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ResourceBundle;
@@ -30,10 +31,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -45,6 +47,7 @@ public class MetadataService extends AbstractSSOSpHandler {
     
     private String serviceAddress;
     private String logoutServiceAddress;
+    private boolean addEndpointAddressToContext;
     
     @GET
     @Produces("text/xml")
@@ -85,8 +88,18 @@ public class MetadataService extends AbstractSSOSpHandler {
             // Get the private key
             PrivateKey privateKey = crypto.getPrivateKey(signatureUser, password);
             
-            return metadataWriter.getMetaData(serviceAddress, logoutServiceAddress, privateKey, issuerCerts[0], 
+            if (addEndpointAddressToContext) {
+                Message message = JAXRSUtils.getCurrentMessage();
+                String httpBasePath = (String)message.get("http.base.path");
+                String rawPath = URI.create(httpBasePath).getRawPath();
+                return metadataWriter.getMetaData(rawPath + serviceAddress, 
+                                                  rawPath + logoutServiceAddress, 
+                                                  privateKey, issuerCerts[0], 
+                                                  true);
+            } else {
+                return metadataWriter.getMetaData(serviceAddress, logoutServiceAddress, privateKey, issuerCerts[0], 
                                               true);
+            }
         } catch (Exception ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
@@ -116,5 +129,7 @@ public class MetadataService extends AbstractSSOSpHandler {
         this.logoutServiceAddress = logoutServiceAddress;
     }
 
-
+    public void setAddEndpointAddressToContext(boolean add) {
+        addEndpointAddressToContext = add;
+    }
 }
