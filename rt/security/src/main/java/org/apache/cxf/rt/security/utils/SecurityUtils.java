@@ -149,7 +149,7 @@ public final class SecurityUtils {
         if (url != null) {
             Properties properties = new Properties();
             try {
-                InputStream ins = ((URL)o).openStream();
+                InputStream ins = url.openStream();
                 properties.load(ins);
                 ins.close();
             } catch (IOException e) {
