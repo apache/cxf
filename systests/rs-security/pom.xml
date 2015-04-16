@@ -77,6 +77,19 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+<<<<<<< HEAD
+=======
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-security-sso-saml</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-security-oauth2-jose</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+>>>>>>> da35252... Adding a SAML SSO Metadata test
          <groupId>org.bouncycastle</groupId>
          <artifactId>bcprov-ext-jdk15on</artifactId>
          <version>${cxf.bcprov.version}</version>
