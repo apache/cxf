@@ -41,6 +41,8 @@ under the License.
     <bean id="metadataBean" class="org.apache.cxf.rs.security.saml.sso.MetadataService">
        <property name="serviceAddress" 
                  value="https://localhost:${testutil.ports.jaxrs-saml}/saml-roles"/>
+       <property name="assertionConsumerServiceAddress" 
+                 value="https://localhost:${testutil.ports.jaxrs-saml}/saml-roles"/>
        <property name="logoutServiceAddress" 
                  value="https://localhost:${testutil.ports.jaxrs-saml}/sso/logout"/>
        <property name="signatureUsername" value="alice"/>

@@ -73,6 +73,7 @@ public class MetadataWriter {
     //CHECKSTYLE:OFF
     public Document getMetaData(
         String serviceURL,
+        String assertionConsumerServiceURL,
         String logoutURL,
         Key signingKey,
         X509Certificate signingCert,
@@ -95,7 +96,7 @@ public class MetadataWriter {
         writer.writeNamespace("wsa", SSOConstants.WS_ADDRESSING_NS);
         writer.writeNamespace("xsi", SSOConstants.SCHEMA_INSTANCE_NS);
 
-        writeSAMLMetadata(writer, serviceURL, logoutURL, signingCert, wantRequestsSigned);
+        writeSAMLMetadata(writer, assertionConsumerServiceURL, logoutURL, signingCert, wantRequestsSigned);
 
         writer.writeEndElement(); // EntityDescriptor
 
@@ -121,7 +122,7 @@ public class MetadataWriter {
     
     private void writeSAMLMetadata(
         XMLStreamWriter writer, 
-        String serviceURL,
+        String assertionConsumerServiceURL,
         String logoutURL,
         X509Certificate signingCert,
         boolean wantRequestsSigned
@@ -142,14 +143,14 @@ public class MetadataWriter {
         }
         
         writer.writeStartElement("md", "AssertionConsumerService", SSOConstants.SAML2_METADATA_NS);
-        writer.writeAttribute("Location", serviceURL);
+        writer.writeAttribute("Location", assertionConsumerServiceURL);
         writer.writeAttribute("index", "0");
         writer.writeAttribute("isDefault", "true");
         writer.writeAttribute("Binding", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST");
         writer.writeEndElement(); // AssertionConsumerService
         
         writer.writeStartElement("md", "AssertionConsumerService", SSOConstants.SAML2_METADATA_NS);
-        writer.writeAttribute("Location", serviceURL);
+        writer.writeAttribute("Location", assertionConsumerServiceURL);
         writer.writeAttribute("index", "1");
         writer.writeAttribute("Binding", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-REDIRECT");
         writer.writeEndElement(); // AssertionConsumerService

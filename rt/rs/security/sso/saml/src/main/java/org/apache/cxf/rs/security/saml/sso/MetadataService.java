@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
-import java.net.URI;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ResourceBundle;
@@ -46,6 +45,7 @@ public class MetadataService extends AbstractSSOSpHandler {
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(MetadataService.class);
     
     private String serviceAddress;
+    private String assertionConsumerServiceAddress;
     private String logoutServiceAddress;
     private boolean addEndpointAddressToContext;
     
@@ -90,15 +90,17 @@ public class MetadataService extends AbstractSSOSpHandler {
             
             if (addEndpointAddressToContext) {
                 Message message = JAXRSUtils.getCurrentMessage();
-                String httpBasePath = (String)message.get("http.base.path");
-                String rawPath = URI.create(httpBasePath).getRawPath();
+                String rawPath = (String)message.get("http.base.path");
                 return metadataWriter.getMetaData(rawPath + serviceAddress, 
+                                                  rawPath + assertionConsumerServiceAddress, 
                                                   rawPath + logoutServiceAddress, 
                                                   privateKey, issuerCerts[0], 
                                                   true);
             } else {
-                return metadataWriter.getMetaData(serviceAddress, logoutServiceAddress, privateKey, issuerCerts[0], 
-                                              true);
+                return metadataWriter.getMetaData(serviceAddress, assertionConsumerServiceAddress,
+                                                  logoutServiceAddress, 
+                                                  privateKey, issuerCerts[0], 
+                                                  true);
             }
         } catch (Exception ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
@@ -131,5 +133,15 @@ public class MetadataService extends AbstractSSOSpHandler {
 
     public void setAddEndpointAddressToContext(boolean add) {
         addEndpointAddressToContext = add;
+    }
+
+
+    public String getAssertionConsumerServiceAddress() {
+        return assertionConsumerServiceAddress;
+    }
+
+
+    public void setAssertionConsumerServiceAddress(String assertionConsumerServiceAddress) {
+        this.assertionConsumerServiceAddress = assertionConsumerServiceAddress;
     }
 }
