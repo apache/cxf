@@ -57,8 +57,8 @@ import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.stax.ConfigurationConverter;
+import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 
 public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor, 
@@ -68,9 +68,9 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     private static final Set<QName> HEADERS = new HashSet<>();
     
     static {
-        HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
-        HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
-        HEADERS.add(new QName(WSConstants.WSSE11_NS, "EncryptedHeader"));
+        HEADERS.add(new QName(WSSConstants.NS_WSSE10, "Security"));
+        HEADERS.add(new QName(WSSConstants.NS_XMLENC, "EncryptedData"));
+        HEADERS.add(new QName(WSSConstants.NS_WSSE11, "EncryptedHeader"));
     }
     
     private final Map<String, Object> properties;
