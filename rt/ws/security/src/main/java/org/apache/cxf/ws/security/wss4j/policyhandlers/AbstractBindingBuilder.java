@@ -1055,8 +1055,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             for (Header head : parts.getHeaders()) {
                 WSEncryptionPart wep = new WSEncryptionPart(head.getName(),
                                                             head.getNamespace(),
+<<<<<<< HEAD
                                                             "Element");
                 signedParts.add(wep);
+=======
+                                                            "Header");
+                securedParts.add(wep);
+>>>>>>> 5b20a3c... [CXF-6343] - EncryptedHeader not properly processed or generated. This closes #66
             }
             
             Attachments attachments = parts.getAttachments();
@@ -1129,7 +1134,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             for (Header head : parts.getHeaders()) {
                 WSEncryptionPart wep = new WSEncryptionPart(head.getName(),
                                                             head.getNamespace(),
-                                                            "Element");
+                                                            "Header");
                 signedParts.add(wep);
             }
             Attachments attachments = parts.getAttachments();
@@ -1194,7 +1199,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         result.addAll(this.getParts(sign, includeBody, parts, found));
         
         // Handle sign/enc elements
-        result.addAll(this.getElements("Element", xpaths, found, sign));
+        result.addAll(this.getElements("Header", xpaths, found, sign));
         
         if (!sign) {
             // Handle content encrypted elements
@@ -2161,7 +2166,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 if (signedPart.getId() == null && !"Token".equals(signedPart.getName())) {
                     throw new IllegalArgumentException(
                             "WSEncryptionPart must be ID based but no id was found.");
-                } else if (encryptedPart.getEncModifier().equals("Element")
+                } else if (encryptedPart.getEncModifier().equals("Header")
                         && signedPart.getId().equals(encryptedPart.getId())) {
                     // We are to sign something that has already been encrypted.
                     // We need to preserve the original aspects of signedPart but

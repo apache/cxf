@@ -420,7 +420,15 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                         SP12Constants.SIGNED_PARTS),
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
-        
+
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content_signed_with_encrypted_header.xml",
+                "encrypted_parts_policy_header_and_body_signed.xml",
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS,
+                        SP12Constants.SIGNED_PARTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_parts_policy_header_and_body_signed.xml",
@@ -543,5 +551,5 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
         
         // TODO: Tests for derived keys.
     }
-  
+
 }
