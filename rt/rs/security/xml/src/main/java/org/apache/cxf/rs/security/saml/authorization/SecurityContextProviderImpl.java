@@ -24,10 +24,12 @@ import java.util.Set;
 import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
 import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
@@ -39,6 +41,17 @@ public class SecurityContextProviderImpl implements SecurityContextProvider {
     
     public SecurityContext getSecurityContext(Message message,
             SamlAssertionWrapper wrapper) {
+        // First check to see if we are allowed to set up a security context
+        // The SAML Assertion must be signed, or we must explicitly allow unsigned
+        String allowUnsigned = 
+            (String)SecurityUtils.getSecurityPropertyValue(
+                SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, message
+            );
+        boolean allowUnsignedSamlPrincipals = Boolean.parseBoolean(allowUnsigned);
+        if (!(wrapper.isSigned() || allowUnsignedSamlPrincipals)) {
+            return null;
+        }
+        
         ClaimCollection claims = getClaims(wrapper);
         Subject subject = getSubject(message, wrapper, claims);
         SecurityContext securityContext = doGetSecurityContext(message, subject, claims);
@@ -61,6 +74,10 @@ public class SecurityContextProviderImpl implements SecurityContextProvider {
         Message message, Subject subject, ClaimCollection claims
     ) {
         String defaultRoleName = (String)message.getContextualProperty(ROLE_QUALIFIER_PROPERTY);
+        if (defaultRoleName == null) {
+            defaultRoleName = 
+                (String)message.getContextualProperty(SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+        }
         String defaultNameFormat = (String)message.getContextualProperty(ROLE_NAMEFORMAT_PROPERTY);
         
         String subjectPrincipalName = getSubjectPrincipalName(subject, claims);

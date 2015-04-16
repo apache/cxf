@@ -47,6 +47,7 @@ import org.apache.cxf.rs.security.saml.authorization.SecurityContextProvider;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
 import org.apache.cxf.rs.security.xml.AbstractXmlSecInHandler;
 import org.apache.cxf.rt.security.SecurityConstants;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -221,15 +222,25 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     }
     
     protected void checkSubjectConfirmationData(Message message, SamlAssertionWrapper assertion) {
-        Certificate[] tlsCerts = getTLSCertificates(message);
-        if (!checkHolderOfKey(message, assertion, tlsCerts)) {
-            throwFault("Holder Of Key claim fails", null);
+        String valSAMLSubjectConf = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION,
+                                                           message);
+        boolean validateSAMLSubjectConf = true;
+        if (valSAMLSubjectConf != null) {
+            validateSAMLSubjectConf = Boolean.parseBoolean(valSAMLSubjectConf);
         }
-        if (!checkSenderVouches(message, assertion, tlsCerts)) {
-            throwFault("Sender vouchers claim fails", null);
-        }
-        if (!checkBearer(assertion, tlsCerts)) {
-            throwFault("Bearer claim fails", null);
+        
+        if (validateSAMLSubjectConf) {
+            Certificate[] tlsCerts = getTLSCertificates(message);
+            if (!checkHolderOfKey(message, assertion, tlsCerts)) {
+                throwFault("Holder Of Key claim fails", null);
+            }
+            if (!checkSenderVouches(message, assertion, tlsCerts)) {
+                throwFault("Sender vouchers claim fails", null);
+            }
+            if (!checkBearer(assertion, tlsCerts)) {
+                throwFault("Bearer claim fails", null);
+            }
         }
     }
     

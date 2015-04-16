@@ -50,6 +50,7 @@ import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
 import org.apache.cxf.rt.security.SecurityConstants;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -297,7 +298,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             
             // validate trust 
             try {
-                new TrustValidator().validateTrust(sigCrypto, cert, publicKey, subjectDNPatterns);
+                new TrustValidator().validateTrust(sigCrypto, cert, publicKey, 
+                                                   getSubjectContraints(msg));
             } catch (WSSecurityException e) {
                 throw new XMLSecurityException("empty", "Error during Signature Trust "
                                                + "validation: " + e.getMessage());
@@ -374,6 +376,23 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
                 }
             }
         }
+    }
+    
+    private Collection<Pattern> getSubjectContraints(Message msg) throws PatternSyntaxException {
+        String certConstraints = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
+        // Check the message property first. If this is not null then use it. Otherwise pick up
+        // the constraints set as a property
+        if (certConstraints != null) {
+            String[] certConstraintsList = certConstraints.split(",");
+            if (certConstraintsList != null) {
+                subjectDNPatterns.clear();
+                for (String certConstraint : certConstraintsList) {
+                    subjectDNPatterns.add(Pattern.compile(certConstraint.trim()));
+                }
+            }
+        }
+        return subjectDNPatterns;
     }
     
     /**

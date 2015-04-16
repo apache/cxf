@@ -188,7 +188,7 @@ public class SecurityConstants {
     /**
      * A comma separated String of regular expressions which will be applied to the subject DN of 
      * the certificate used for signature validation, after trust verification of the certificate 
-     * chain associated with the  certificate.
+     * chain associated with the certificate.
      */
     public static final String SUBJECT_CERT_CONSTRAINTS = "security.subject.cert.constraints";
     
@@ -198,9 +198,10 @@ public class SecurityConstants {
         Set<String> s = new HashSet<>(Arrays.asList(new String[] {
             USERNAME, PASSWORD, SIGNATURE_USERNAME, ENCRYPT_USERNAME,
             CALLBACK_HANDLER, SAML_CALLBACK_HANDLER, SIGNATURE_PROPERTIES, 
-            SIGNATURE_CRYPTO, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
+            SIGNATURE_CRYPTO, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO, ENCRYPT_CERT,
             ENABLE_REVOCATION, SUBJECT_CERT_CONSTRAINTS, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL,
-            AUDIENCE_RESTRICTION_VALIDATION
+            AUDIENCE_RESTRICTION_VALIDATION, SAML_ROLE_ATTRIBUTENAME, 
+            ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, SC_FROM_JAAS_SUBJECT
         }));
         COMMON_PROPERTIES = Collections.unmodifiableSet(s);
     }

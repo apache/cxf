@@ -119,6 +119,11 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 receiverCert = 
                     (X509Certificate)message.getExchange().getInMessage().get(
                         AbstractXmlSecInHandler.SIGNING_CERT);
+                if (receiverCert == null) {
+                    receiverCert = 
+                        (X509Certificate)message.getExchange().getInMessage().get(
+                            SecurityConstants.ENCRYPT_CERT);
+                }
             } else {
                 CryptoLoader loader = new CryptoLoader();
                 Crypto crypto = loader.getCrypto(message, 

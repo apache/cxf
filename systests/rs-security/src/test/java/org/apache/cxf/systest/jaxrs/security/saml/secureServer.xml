@@ -57,6 +57,9 @@ under the License.
             <ref bean="samlEnvHandler"/>
             <ref bean="rolesHandler"/>
         </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="security.enable.unsigned-saml-assertion.principal" value="true"/>
+        </jaxrs:properties>
         <!-- If default role qualifier and format are not supported: 
        
        <jaxrs:properties>
@@ -91,6 +94,9 @@ under the License.
             <ref bean="samlEnvHandlerWithCustomProvider"/>
             <ref bean="rolesHandlerWithUserMap"/>
         </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="security.enable.unsigned-saml-assertion.principal" value="true"/>
+        </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-saml}/saml-claims">
         <jaxrs:serviceBeans>
@@ -100,5 +106,8 @@ under the License.
             <ref bean="samlEnvHandler"/>
             <ref bean="claimsHandler"/>
         </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="security.enable.unsigned-saml-assertion.principal" value="true"/>
+        </jaxrs:properties>
     </jaxrs:server>
 </beans>

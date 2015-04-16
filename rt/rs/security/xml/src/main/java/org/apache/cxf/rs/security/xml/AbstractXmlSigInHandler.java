@@ -38,6 +38,7 @@ import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
 import org.apache.cxf.rt.security.SecurityConstants;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -60,7 +61,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
     /**
      * a collection of compiled regular expression patterns for the subject DN
      */
-    private Collection<Pattern> subjectDNPatterns = new ArrayList<>();
+    private final Collection<Pattern> subjectDNPatterns = new ArrayList<>();
     
     public void setRemoveSignature(boolean remove) {
         this.removeSignature = remove;
@@ -151,7 +152,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             }
             
             // validate trust 
-            new TrustValidator().validateTrust(crypto, cert, publicKey, subjectDNPatterns);
+            new TrustValidator().validateTrust(crypto, cert, publicKey, getSubjectContraints(message));
             if (valid && persistSignature) {
                 if (signature.getKeyInfo() != null) {
                     message.put(SIGNING_CERT, signature.getKeyInfo().getX509Certificate());
@@ -315,7 +316,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
      */
     public void setSubjectConstraints(List<String> constraints) {
         if (constraints != null) {
-            subjectDNPatterns = new ArrayList<>();
+            subjectDNPatterns.clear();
             for (String constraint : constraints) {
                 try {
                     subjectDNPatterns.add(Pattern.compile(constraint.trim()));
@@ -324,6 +325,23 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
                 }
             }
         }
+    }
+    
+    private Collection<Pattern> getSubjectContraints(Message msg) throws PatternSyntaxException {
+        String certConstraints = 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
+        // Check the message property first. If this is not null then use it. Otherwise pick up
+        // the constraints set as a property
+        if (certConstraints != null) {
+            String[] certConstraintsList = certConstraints.split(",");
+            if (certConstraintsList != null) {
+                subjectDNPatterns.clear();
+                for (String certConstraint : certConstraintsList) {
+                    subjectDNPatterns.add(Pattern.compile(certConstraint.trim()));
+                }
+            }
+        }
+        return subjectDNPatterns;
     }
     
 }
