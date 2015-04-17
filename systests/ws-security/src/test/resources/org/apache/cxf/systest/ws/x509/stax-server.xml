@@ -172,7 +172,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -181,7 +181,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -190,7 +190,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -199,7 +199,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -208,7 +208,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -216,7 +216,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -224,7 +224,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -250,7 +250,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -259,7 +259,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -268,7 +268,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -289,49 +289,49 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportEndorsing" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportEndorsingSP11" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportEndorsingSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportEndorsingSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportSignedEndorsing" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportSignedEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportEndorsingEncrypted" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportEndorsingEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportEndorsingEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportSignedEndorsingEncrypted" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportSignedEndorsingEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportSignedEndorsingEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportSupportingSigned" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportSupportingSigned" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportSupportingSignedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportSupportingSignedCertConstraints" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportSupportingSignedCertConstraints" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportSupportingSignedCertConstraintsPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="cxfca.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*CN=alice.*"/>
+            <entry key="security.subject.cert.constraints" value=".*CN=alice.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -345,7 +345,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportSupportingToken" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportSupportingToken" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportSupportingTokenPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
         <jaxws:features>
@@ -357,7 +357,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportSupportingToken2" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportSupportingToken2" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportSupportingTokenPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
         <jaxws:features>
@@ -369,7 +369,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportPKISupportingToken" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportPKISupportingToken" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportPKISupportingTokenPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
         <jaxws:features>
@@ -381,7 +381,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportEndorsingNegativeTest" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportNegativeEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportNegativeEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
         <jaxws:features>
@@ -393,7 +393,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportEndorsingNegativeTest2" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportNegativeEndorsing2" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportNegativeEndorsingPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
         <jaxws:features>
@@ -406,7 +406,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>

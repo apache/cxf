@@ -42,7 +42,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TLSHOKSignedEndorsing" address="https://localhost:${testutil.ports.Server.2}/DoubleItSamlTLSHOKSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItTLSHOKSignedEndorsingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSigned" address="http://localhost:${testutil.ports.Server}/DoubleItSamlAsymmetricSigned" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSignedPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
@@ -50,7 +50,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricInitiator" address="http://localhost:${testutil.ports.Server}/DoubleItSamlAsymmetricInitiator" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricInitiatorPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
@@ -58,7 +58,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSaml2Bearer" address="http://localhost:${testutil.ports.Server}/DoubleItSamlAsymmetricSaml2Bearer" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSaml2BearerPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
@@ -66,7 +66,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.saml2.validator" value-ref="allowUnsignedBearerAssertions"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -77,7 +77,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TLSHOKSignedEndorsingSaml2" address="https://localhost:${testutil.ports.Server.2}/DoubleItSamlTLSHOKSignedEndorsingSaml2" serviceName="s:DoubleItService" endpointName="s:DoubleItTLSHOKSignedEndorsingSaml2Port" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSV" address="http://localhost:${testutil.ports.Server}/DoubleItSamlSymmetricSV" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSVPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
@@ -88,7 +88,7 @@
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.encryption.username" value="alice"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricIssuedToken" address="http://localhost:${testutil.ports.Server}/DoubleItSamlSymmetricIssuedToken" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricIssuedTokenPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
@@ -96,7 +96,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.username" value="bob"/>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <!-- -->

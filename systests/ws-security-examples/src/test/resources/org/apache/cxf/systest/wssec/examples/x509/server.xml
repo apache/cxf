@@ -30,7 +30,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricProtectTokens" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricProtectTokens" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricProtectTokensPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
@@ -38,7 +38,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignEncrypt" address="http://localhost:${testutil.ports.Server}/DoubleItX509SymmetricSignEncrypt" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSignEncryptPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
@@ -46,7 +46,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.username" value="bob"/>
             <entry key="security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricEndorsing" address="http://localhost:${testutil.ports.Server}/DoubleItX509SymmetricEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricEndorsingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
@@ -57,7 +57,7 @@
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.encryption.username" value="alice"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>
