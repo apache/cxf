@@ -154,7 +154,7 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         bean.setBus(springBus);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.saml-callback-handler", 
+        properties.put("security.saml-callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.SamlCallbackHandler");
         if (extraProperties != null) {
             properties.putAll(extraProperties);

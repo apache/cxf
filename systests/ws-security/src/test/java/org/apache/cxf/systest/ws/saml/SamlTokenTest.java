@@ -137,7 +137,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            "security.saml-callback-handler", new SamlCallbackHandler()
         );
         try {
             saml1Port.doubleIt(25);
@@ -148,7 +148,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
 
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+            "security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
@@ -159,7 +159,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(saml1Port, PORT2);
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+            "security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         
         try {
@@ -202,7 +202,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(false, true);
         samlCallbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", samlCallbackHandler
+            "security.saml-callback-handler", samlCallbackHandler
         );
         
         int result = saml1Port.doubleIt(25);
@@ -241,7 +241,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(false, true);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
         
         ((BindingProvider)saml1Port).getRequestContext().put(
@@ -295,7 +295,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlElementCallbackHandler(false)
+            "security.saml-callback-handler", new SamlElementCallbackHandler(false)
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
@@ -333,7 +333,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+            "security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         try {
             saml2Port.doubleIt(25);
@@ -346,7 +346,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler();
         samlCallbackHandler.setSignAssertion(true);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", samlCallbackHandler
+            "security.saml-callback-handler", samlCallbackHandler
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
@@ -380,7 +380,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
 
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            "security.saml-callback-handler", new SamlCallbackHandler()
         );
         
         try {
@@ -424,7 +424,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+            "security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         try {
             saml2Port.doubleIt(25);
@@ -435,7 +435,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            "security.saml-callback-handler", new SamlCallbackHandler()
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
@@ -446,7 +446,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(saml2Port, PORT);
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            "security.saml-callback-handler", new SamlCallbackHandler()
         );
         
         try {
@@ -487,7 +487,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler(false, true)
+            "security.saml-callback-handler", new SamlCallbackHandler(false, true)
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
@@ -522,7 +522,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler(false, true)
+            "security.saml-callback-handler", new SamlCallbackHandler(false, true)
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
@@ -555,7 +555,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
@@ -589,7 +589,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         if (!test.isStreaming() && PORT.equals(test.getPort())) {
             SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler();
             ((BindingProvider)saml2Port).getRequestContext().put(
-                "ws-security.saml-callback-handler", samlCallbackHandler
+                "security.saml-callback-handler", samlCallbackHandler
             );
             int result = saml2Port.doubleIt(25);
             assertTrue(result == 50);
@@ -627,7 +627,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
 
         int result = saml2Port.doubleIt(25);
@@ -666,7 +666,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setKeyInfoIdentifier(CERT_IDENTIFIER.KEY_VALUE);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
 
         int result = saml2Port.doubleIt(25);
@@ -704,7 +704,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
 
         int result = saml2Port.doubleIt(25);
@@ -736,7 +736,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            "security.saml-callback-handler", new SamlCallbackHandler()
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
@@ -770,7 +770,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         // TODO Only working for DOM client + server atm
         if (!test.isStreaming() && PORT.equals(test.getPort())) {
             ((BindingProvider)saml2Port).getRequestContext().put(
-                "ws-security.saml-callback-handler", new SamlCallbackHandler()
+                "security.saml-callback-handler", new SamlCallbackHandler()
             );
             int result = saml2Port.doubleIt(25);
             assertTrue(result == 50);
@@ -804,7 +804,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
@@ -841,7 +841,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
 
         int result = saml2Port.doubleIt(25);
@@ -920,7 +920,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         roleCallbackHandler.setSignAssertion(true);
         roleCallbackHandler.setRoleName("manager");
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", roleCallbackHandler
+            "security.saml-callback-handler", roleCallbackHandler
         );
         
         int result = saml2Port.doubleIt(25);
@@ -962,7 +962,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
         // Create a SAML Token with no "OneTimeUse" Condition
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            "security.saml-callback-handler", new SamlCallbackHandler()
         );
         
         Client cxfClient = ClientProxy.getClient(saml2Port);
@@ -983,7 +983,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConditions(conditions);
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
         
         cxfClient.getOutInterceptors().remove(cacheInterceptor);
@@ -1037,7 +1037,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
         callbackHandler.setConditions(conditions);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
         
         saml2Port.doubleIt(25);
@@ -1092,7 +1092,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
         callbackHandler.setConditions(conditions);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
         
         saml2Port.doubleIt(25);
@@ -1131,7 +1131,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
         callbackHandler.setConditions(conditions);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
         
         // It should fail with validation enabled
@@ -1148,7 +1148,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(saml2Port, portNumber);
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
         saml2Port.doubleIt(25);
     }

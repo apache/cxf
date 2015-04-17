@@ -26,17 +26,17 @@
     </cxf:bus>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItBearerPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.saml-callback-handler" value="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler"/>
+            <entry key="security.saml-callback-handler" value="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSSenderVouchesPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
+            <entry key="security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSHOKSignedEndorsingPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.saml-callback-handler" value-ref="saml1HOKHandler"/>
+            <entry key="security.saml-callback-handler" value-ref="saml1HOKHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
@@ -44,7 +44,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSignedPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
+            <entry key="security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
@@ -54,7 +54,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricInitiatorPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.saml-callback-handler" value-ref="saml1HOKHandler"/>
+            <entry key="security.saml-callback-handler" value-ref="saml1HOKHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
@@ -64,7 +64,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSaml2BearerPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.saml-callback-handler" value-ref="saml2BearerHandler"/>
+            <entry key="security.saml-callback-handler" value-ref="saml2BearerHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
@@ -74,12 +74,12 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSSenderVouchesSaml2Port" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.saml-callback-handler" value-ref="saml2SenderVouchesHandler"/>
+            <entry key="security.saml-callback-handler" value-ref="saml2SenderVouchesHandler"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSHOKSignedEndorsingSaml2Port" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.saml-callback-handler" value-ref="saml2HOKHandler"/>
+            <entry key="security.saml-callback-handler" value-ref="saml2HOKHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
@@ -87,7 +87,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSVPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
+            <entry key="security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>

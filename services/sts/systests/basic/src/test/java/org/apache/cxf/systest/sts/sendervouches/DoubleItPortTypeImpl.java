@@ -63,7 +63,7 @@ public class DoubleItPortTypeImpl extends AbstractBusClientServerTestBase implem
         //
         Saml2CallbackHandler callbackHandler = new Saml2CallbackHandler(wsc.getUserPrincipal());
         ((BindingProvider)transportSAML2SupportingPort).getRequestContext().put(
-            "ws-security.saml-callback-handler", callbackHandler
+            "security.saml-callback-handler", callbackHandler
         );
         
         return transportSAML2SupportingPort.doubleIt(numberToDouble);

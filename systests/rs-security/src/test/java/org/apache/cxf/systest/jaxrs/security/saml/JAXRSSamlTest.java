@@ -218,7 +218,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.saml-callback-handler", 
+        properties.put("security.saml-callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.SamlCallbackHandler");
         properties.put("security.signature.username", "alice");
         properties.put("ws-security.signature.properties", 
