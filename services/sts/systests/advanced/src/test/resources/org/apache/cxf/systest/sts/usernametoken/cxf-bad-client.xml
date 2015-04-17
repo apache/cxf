@@ -26,13 +26,13 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportUTPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
-            <entry key="ws-security.password" value="trombone"/>
+            <entry key="security.password" value="trombone"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportUTAuthorizationPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
-            <entry key="ws-security.password" value="trombone"/>
+            <entry key="security.password" value="trombone"/>
         </jaxws:properties>
     </jaxws:client>
     <http:conduit name="https://localhost.*">

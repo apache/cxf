@@ -91,7 +91,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
-        ((BindingProvider)utPort).getRequestContext().put("ws-security.password", "password");
+        ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
         try {
             utPort.doubleIt(25);
             fail("Expected failure on bob");
@@ -124,7 +124,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
-        ((BindingProvider)utPort).getRequestContext().put("ws-security.password", "password");
+        ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
         try {
             utPort.doubleIt(25);
             fail("Expected failure on bob");
@@ -179,7 +179,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         
         // Now make an invocation using another username
         client.getRequestContext().put("security.username", "bob");
-        client.getRequestContext().put("ws-security.password", "password");
+        client.getRequestContext().put("security.password", "password");
         try {
             dispatch.invoke(request);
             fail("Expected failure on bob");

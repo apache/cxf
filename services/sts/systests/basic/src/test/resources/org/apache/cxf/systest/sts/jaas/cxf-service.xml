@@ -31,7 +31,7 @@
         <property name="properties">
             <map>
                 <entry key="security.username" value="bob"/>
-                <entry key="ws-security.password" value="trombone"/>
+                <entry key="security.password" value="trombone"/>
             </map>
         </property>
         <property name="claimsCallbackHandler" ref="roleClaimsCallbackHandler"/>
