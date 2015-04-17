@@ -50,6 +50,8 @@ import org.apache.cxf.transport.https.SSLUtils;
 public class ClientImpl implements Client {
     private static final String HTTP_CONNECTION_TIMEOUT_PROP = "http.connection.timeout";
     private static final String HTTP_RECEIVE_TIMEOUT_PROP = "http.receive.timeout";
+    private static final String HTTP_PROXY_SERVER_PROP = "http.proxy.server.uri";
+    private static final String HTTP_PROXY_SERVER_PORT_PROP = "http.proxy.server.port";
     
     private Configurable<Client> configImpl;
     private TLSConfiguration secConfig;
@@ -271,6 +273,13 @@ public class ClientImpl implements Client {
                 || tlsParams.getTrustManagers() != null) {
                 clientCfg.getHttpConduit().setTlsClientParameters(tlsParams);
             }
+            
+            setConnectionProperties(configProps, clientCfg);
+            
+            // start building the invocation
+            return new InvocationBuilderImpl(WebClient.fromClient(targetClient));
+        }
+        private void setConnectionProperties(Map<String, Object> configProps, ClientConfiguration clientCfg) {
             Long connTimeOutValue = getLongValue(configProps.get(HTTP_CONNECTION_TIMEOUT_PROP));
             if (connTimeOutValue != null) {
                 clientCfg.getHttpConduit().getClient().setConnectionTimeout(connTimeOutValue);
@@ -279,13 +288,16 @@ public class ClientImpl implements Client {
             if (recTimeOutValue != null) {
                 clientCfg.getHttpConduit().getClient().setReceiveTimeout(recTimeOutValue);
             }
-            
-            // start building the invocation
-            return new InvocationBuilderImpl(WebClient.fromClient(targetClient));
+            Object proxyServerValue = configProps.get(HTTP_PROXY_SERVER_PROP);
+            if (proxyServerValue != null) {
+                clientCfg.getHttpConduit().getClient().setProxyServer((String)proxyServerValue);
+            }
+            Integer proxyServerPortValue = getIntValue(configProps.get(HTTP_PROXY_SERVER_PORT_PROP));
+            if (proxyServerPortValue != null) {
+                clientCfg.getHttpConduit().getClient().setProxyServerPort(proxyServerPortValue);
+            }
         }
-        private Long getLongValue(Object o) {
-            return o instanceof Long ? (Long)o : o instanceof String ? Long.valueOf(o.toString()) : null;
-        }
+
         private void initTargetClientIfNeeded() {
             URI uri = uriBuilder.build();
             if (targetClient == null) {
@@ -482,5 +494,11 @@ public class ClientImpl implements Client {
             checkNull(templatesMap.keySet().toArray());
             checkNull(templatesMap.values().toArray());
         }
+    }
+    private static Long getLongValue(Object o) {
+        return o instanceof Long ? (Long)o : o instanceof String ? Long.valueOf(o.toString()) : null;
+    }
+    private static Integer getIntValue(Object o) {
+        return o instanceof Integer ? (Integer)o : o instanceof String ? Integer.valueOf(o.toString()) : null;
     }
 }
