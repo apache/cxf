@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -269,10 +269,10 @@ public final class ResponseImpl extends Response {
     }
     
     public Link getLink(String relation) {
-        Set<Map.Entry<String, Link>> entries = getAllLinks().entrySet();
-        for (Map.Entry<String, Link> entry : entries) {
-            if (entry.getKey().contains(relation)) {
-                return entry.getValue();
+        Set<Link> links = getAllLinks();
+        for (Link link : links) {
+            if (link.getRel() != null && link.getRel().equals(relation)) {
+                return link;
             }
         }
         return null;
@@ -284,22 +284,22 @@ public final class ResponseImpl extends Response {
     }
 
     public Set<Link> getLinks() {
-        return new HashSet<Link>(getAllLinks().values());
+        return new HashSet<Link>(getAllLinks());
     }
 
-    private Map<String, Link> getAllLinks() {
+    private Set<Link> getAllLinks() {
         List<Object> linkValues = metadata.get(HttpHeaders.LINK);
         if (linkValues == null) {
-            return Collections.emptyMap();
+            return Collections.emptySet();
         } else {
-            Map<String, Link> links = new LinkedHashMap<String, Link>();
+            Set<Link> links = new LinkedHashSet<Link>();
             for (Object o : linkValues) {
                 Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
                 if (!link.getUri().isAbsolute()) {
                     URI requestURI = URI.create((String)outMessage.get(Message.REQUEST_URI));
                     link = Link.fromLink(link).baseUri(requestURI).build();
                 }
-                links.put(link.getRel(), link);
+                links.add(link);
             }
             return links;
         }
