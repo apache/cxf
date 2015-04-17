@@ -106,7 +106,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                                                          SecurityConstants.SIGNATURE_PROPERTIES);
                         X509Certificate cert = 
                             RSSecurityUtils.getCertificates(crypto, 
-                                RSSecurityUtils.getUserName(m, crypto, "ws-security.signature.username"))[0];
+                                RSSecurityUtils.getUserName(m, crypto, "security.signature.username"))[0];
                         
                         KeyInfoBean keyInfo = new KeyInfoBean();
                         keyInfo.setCertificate(cert);

@@ -30,7 +30,7 @@
             <entry key="ws-security.bst.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>
-            <entry key="ws-security.signature.username" value="myservicekey"/>
+            <entry key="security.signature.username" value="myservicekey"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.encryption.username" value="useReqSigCert"/>

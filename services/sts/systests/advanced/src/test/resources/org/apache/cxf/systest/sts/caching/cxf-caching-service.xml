@@ -62,7 +62,7 @@
             <entry key="ws-security.bst.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>
-            <entry key="ws-security.signature.username" value="myservicekey"/>
+            <entry key="security.signature.username" value="myservicekey"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.encryption.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.encryption.username" value="useReqSigCert"/>

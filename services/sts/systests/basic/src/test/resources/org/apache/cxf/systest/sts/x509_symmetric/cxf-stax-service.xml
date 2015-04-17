@@ -33,7 +33,7 @@
         <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port"/>
         <property name="properties">
             <map>
-                <entry key="ws-security.signature.username" value="myservicekey"/>
+                <entry key="security.signature.username" value="myservicekey"/>
                 <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                 <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
                 <entry key="ws-security.encryption.properties" value="serviceKeystore.properties"/>

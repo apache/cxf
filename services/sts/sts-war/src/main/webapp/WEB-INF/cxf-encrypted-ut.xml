@@ -52,7 +52,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.sts.war.PasswordCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="mystskey"/>
+            <entry key="security.signature.username" value="mystskey"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>

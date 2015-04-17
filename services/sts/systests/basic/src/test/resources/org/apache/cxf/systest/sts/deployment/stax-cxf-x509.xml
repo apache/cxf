@@ -69,7 +69,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="mystskey"/>
+            <entry key="security.signature.username" value="mystskey"/>
             <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>

@@ -27,7 +27,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSAML2BearerPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="myclientkey"/>
+            <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.encryption.username" value="myservicekey"/>
@@ -40,7 +40,7 @@
                     <property name="actAs" ref="delegationCallbackHandler"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.signature.username" value="myclientkey"/>
+                            <entry key="security.signature.username" value="myclientkey"/>
                             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
                             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
@@ -56,7 +56,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSAML2BearerPort2" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="myclientkey"/>
+            <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.encryption.username" value="myservicekey"/>
@@ -69,7 +69,7 @@
                     <property name="actAs" ref="delegationCallbackHandler"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.signature.username" value="myclientkey"/>
+                            <entry key="security.signature.username" value="myclientkey"/>
                             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
                             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
@@ -85,7 +85,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSAML2BearerPort3" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="myclientkey"/>
+            <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.encryption.username" value="myservicekey"/>
@@ -98,7 +98,7 @@
                     <property name="actAs" ref="delegationCallbackHandler"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.signature.username" value="myclientkey"/>
+                            <entry key="security.signature.username" value="myclientkey"/>
                             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
                             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
@@ -114,7 +114,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSAML2BearerPort4" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="myclientkey"/>
+            <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.encryption.username" value="myservicekey"/>
@@ -127,7 +127,7 @@
                     <property name="actAs" ref="delegationCallbackHandler"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.signature.username" value="myclientkey"/>
+                            <entry key="security.signature.username" value="myclientkey"/>
                             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
                             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
@@ -143,7 +143,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSAML2BearerPort5" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="myclientkey"/>
+            <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.encryption.username" value="myservicekey"/>
@@ -156,7 +156,7 @@
                     <property name="actAs" ref="delegationCallbackHandler"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.signature.username" value="myclientkey"/>
+                            <entry key="security.signature.username" value="myclientkey"/>
                             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
                             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>

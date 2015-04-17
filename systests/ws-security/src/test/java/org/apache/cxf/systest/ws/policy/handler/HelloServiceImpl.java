@@ -32,7 +32,7 @@ import org.apache.cxf.annotations.EndpointProperty;
         value = "org.apache.cxf.systest.ws.policy.handler.CommonPasswordCallback"),
         @EndpointProperty(key = "ws-security.is-bsp-compliant", value = "false"),
         @EndpointProperty(key = "ws-security.signature.properties", value = "alice.properties"),
-        @EndpointProperty(key = "ws-security.signature.username", value = "alice")
+        @EndpointProperty(key = "security.signature.username", value = "alice")
         })
 @HandlerChain(file = "handlers.xml")
 public class HelloServiceImpl implements HelloService {

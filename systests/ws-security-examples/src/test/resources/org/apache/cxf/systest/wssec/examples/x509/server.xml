@@ -44,7 +44,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignEncrypt" address="http://localhost:${testutil.ports.Server}/DoubleItX509SymmetricSignEncrypt" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSignEncryptPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.username" value="bob"/>
+            <entry key="security.signature.username" value="bob"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -53,7 +53,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <!-- TODO Fix the way these properties are inverted -->
-            <entry key="ws-security.signature.username" value="bob"/>
+            <entry key="security.signature.username" value="bob"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="ws-security.encryption.username" value="alice"/>
