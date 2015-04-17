@@ -105,7 +105,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -127,7 +127,7 @@
                     <property name="callbackHandler" ref="kerberosCallbackHandler"/>
                 </bean>
             </entry>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
         </jaxws:properties>
@@ -137,7 +137,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -182,7 +182,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -199,7 +199,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="ws-security.kerberos.client">
                 <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">

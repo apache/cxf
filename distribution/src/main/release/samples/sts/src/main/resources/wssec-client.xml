@@ -25,7 +25,7 @@
     </cxf:bus>
     <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+            <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="security.callback-handler" value="demo.wssec.client.ClientCallbackHandler"/>
             <entry key="security.encryption.properties" value="clientKeystore.properties"/>

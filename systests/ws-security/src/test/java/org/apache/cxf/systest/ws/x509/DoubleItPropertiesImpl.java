@@ -35,7 +35,7 @@ import org.example.contract.doubleit.DoubleItPortType;
 @EndpointProperties({
     @EndpointProperty(key = "security.encryption.username", value = "alice"),
     @EndpointProperty(key = "security.encryption.properties", value = "alice.properties"),
-    @EndpointProperty(key = "ws-security.signature.properties", value = "bob.properties"),
+    @EndpointProperty(key = "security.signature.properties", value = "bob.properties"),
     @EndpointProperty(key = "security.callback-handler", 
                       value = "org.apache.cxf.systest.ws.common.KeystorePasswordCallback")
 })

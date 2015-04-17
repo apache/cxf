@@ -51,7 +51,7 @@
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="EncryptedUTSTS" implementor="#encryptedUtSTSProviderBean" address="/UTEncrypted" wsdlLocation="/WEB-INF/wsdl/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:UTEncrypted_Port">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.sts.war.PasswordCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
+            <entry key="security.signature.properties" value="stsKeystore.properties"/>
             <entry key="security.signature.username" value="mystskey"/>
         </jaxws:properties>
     </jaxws:endpoint>

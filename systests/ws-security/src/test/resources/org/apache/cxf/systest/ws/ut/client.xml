@@ -66,7 +66,7 @@
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.username" value="alice"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSignedEncryptedPort" createdFromAPI="true">
@@ -74,7 +74,7 @@
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.username" value="alice"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItEncryptedPort" createdFromAPI="true">

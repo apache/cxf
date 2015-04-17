@@ -28,7 +28,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSignEncrypt" address="http://localhost:${testutil.ports.StaxServer}/DoubleItX509AsymmetricSignEncrypt" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSignEncryptPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
@@ -37,7 +37,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricProtectTokens" address="http://localhost:${testutil.ports.StaxServer}/DoubleItX509AsymmetricProtectTokens" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricProtectTokensPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
@@ -47,7 +47,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.username" value="bob"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -58,7 +58,7 @@
             <!-- TODO Fix the way these properties are inverted -->
             <entry key="security.signature.username" value="bob"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.encryption.username" value="alice"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>

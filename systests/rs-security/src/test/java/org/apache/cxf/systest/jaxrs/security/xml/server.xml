@@ -92,7 +92,7 @@ under the License.
         </jaxrs:outInterceptors>
         <jaxrs:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     
@@ -108,7 +108,7 @@ under the License.
         </jaxrs:outInterceptors>
         <jaxrs:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     
@@ -124,7 +124,7 @@ under the License.
         </jaxrs:outInterceptors>
         <jaxrs:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     
@@ -158,7 +158,7 @@ under the License.
         <jaxrs:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
             <entry key="security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsec-validate">
@@ -176,7 +176,7 @@ under the License.
         <jaxrs:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
             <entry key="security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsec-useReqSigCert">
@@ -193,7 +193,7 @@ under the License.
         </jaxrs:outInterceptors>
         <jaxrs:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
             <entry key="security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
         </jaxrs:properties>

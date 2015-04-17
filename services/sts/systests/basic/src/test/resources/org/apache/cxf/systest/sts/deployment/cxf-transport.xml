@@ -143,7 +143,7 @@
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS-realmB" implementor="#transportSTSProviderBean2" address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/b-issuer/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_SAML_Port" depends-on="ClientAuthHttpsSettings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
+            <entry key="security.signature.properties" value="stsKeystore.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <!--
@@ -156,7 +156,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler"
                 value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
-            <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
+            <entry key="security.signature.properties" value="stsKeystore.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
     -->

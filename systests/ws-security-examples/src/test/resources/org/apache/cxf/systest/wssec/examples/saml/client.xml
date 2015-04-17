@@ -38,7 +38,7 @@
         <jaxws:properties>
             <entry key="security.saml-callback-handler" value-ref="saml1HOKHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
         </jaxws:properties>
     </jaxws:client>
@@ -46,7 +46,7 @@
         <jaxws:properties>
             <entry key="security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
@@ -56,7 +56,7 @@
         <jaxws:properties>
             <entry key="security.saml-callback-handler" value-ref="saml1HOKHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
@@ -66,7 +66,7 @@
         <jaxws:properties>
             <entry key="security.saml-callback-handler" value-ref="saml2BearerHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
@@ -81,7 +81,7 @@
         <jaxws:properties>
             <entry key="security.saml-callback-handler" value-ref="saml2HOKHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
         </jaxws:properties>
     </jaxws:client>
@@ -89,7 +89,7 @@
         <jaxws:properties>
             <entry key="security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
@@ -98,7 +98,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricIssuedTokenPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>

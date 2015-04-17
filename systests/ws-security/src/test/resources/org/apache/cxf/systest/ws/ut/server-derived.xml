@@ -48,21 +48,21 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignedEndorsing" address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSignedEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricEndorsingEncrypted" address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricEndorsingEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricEndorsingEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignedEndorsingEncrypted" address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricSignedEndorsingEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSignedEndorsingEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>

@@ -161,7 +161,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         properties.put("security.saml-callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.oauth2.SamlCallbackHandler2");
         properties.put("security.signature.username", "alice");
-        properties.put("ws-security.signature.properties", CRYPTO_RESOURCE_PROPERTIES);
+        properties.put("security.signature.properties", CRYPTO_RESOURCE_PROPERTIES);
         bean.setProperties(properties);
         
         bean.getOutInterceptors().add(new Saml2BearerAuthOutInterceptor());

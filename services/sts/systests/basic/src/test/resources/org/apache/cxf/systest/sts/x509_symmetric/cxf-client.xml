@@ -32,7 +32,7 @@
             <map>
                 <entry key="security.signature.username" value="myclientkey"/>
                 <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+                <entry key="security.signature.properties" value="clientKeystore.properties"/>
                 <entry key="security.encryption.properties" value="clientKeystore.properties"/>
                 <entry key="security.encryption.username" value="mystskey"/>
             </map>

@@ -23,7 +23,7 @@
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+            <entry key="security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">
                 <bean class="org.apache.cxf.systest.sts.username_actas.ActAsValidator"/>
@@ -35,7 +35,7 @@
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+            <entry key="security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">
                 <bean class="org.apache.cxf.systest.sts.username_actas.ActAsValidator"/>
@@ -47,7 +47,7 @@
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+            <entry key="security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">
                 <bean class="org.apache.cxf.systest.sts.username_actas.ActAsValidator"/>
@@ -59,7 +59,7 @@
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+            <entry key="security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">
                 <bean class="org.apache.cxf.systest.sts.username_actas.ActAsValidator"/>
@@ -71,7 +71,7 @@
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+            <entry key="security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">
                 <bean class="org.apache.cxf.systest.sts.username_actas.ActAsValidator"/>

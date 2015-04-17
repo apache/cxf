@@ -33,7 +33,7 @@
     <jaxws:client name="{http://WSSec/wssc}SecureConversation_MutualCertificate10SignEncrypt_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties.sct" value="alice.properties"/>
+            <entry key="security.signature.properties.sct" value="alice.properties"/>
             <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
@@ -119,7 +119,7 @@
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties.sct" value="alice.properties"/>
+            <entry key="security.signature.properties.sct" value="alice.properties"/>
             <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>

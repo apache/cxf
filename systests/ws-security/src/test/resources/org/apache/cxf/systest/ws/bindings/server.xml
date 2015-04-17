@@ -28,7 +28,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="OnlySignEntireHeadersAndBodyEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItOnlySign" serviceName="s:DoubleItService" endpointName="s:DoubleItOnlySignPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -41,7 +41,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="NotOnlySignEntireHeadersAndBodyEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItNotOnlySign" serviceName="s:DoubleItService" endpointName="s:DoubleItNotOnlySignPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -54,7 +54,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptSignatureEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItEncryptSignature" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptSignaturePort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -67,7 +67,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptSignatureEndpoint2" address="http://localhost:${testutil.ports.Server}/DoubleItEncryptSignature2" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptSignaturePort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -80,7 +80,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="IncludeTimestampEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItIncludeTimestamp" serviceName="s:DoubleItService" endpointName="s:DoubleItIncludeTimestampPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -93,7 +93,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="IncludeTimestampEndpoint2" address="http://localhost:${testutil.ports.Server}/DoubleItIncludeTimestamp2" serviceName="s:DoubleItService" endpointName="s:DoubleItIncludeTimestampPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -106,7 +106,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptBeforeSigningEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItEncryptBeforeSigning" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptBeforeSigningPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -119,7 +119,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptBeforeSigningEndpoint2" address="http://localhost:${testutil.ports.Server}/DoubleItEncryptBeforeSigning2" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptBeforeSigningPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -132,7 +132,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignBeforeEncryptingEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItSignBeforeEncrypting" serviceName="s:DoubleItService" endpointName="s:DoubleItSignBeforeEncryptingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -145,7 +145,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignBeforeEncryptingEndpoint2" address="http://localhost:${testutil.ports.Server}/DoubleItSignBeforeEncrypting2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignBeforeEncryptingPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -158,7 +158,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TimestampFirstEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItTimestampFirst" serviceName="s:DoubleItService" endpointName="s:DoubleItTimestampFirstPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -171,7 +171,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TimestampFirstEndpoint2" address="http://localhost:${testutil.ports.Server}/DoubleItTimestampFirst2" serviceName="s:DoubleItService" endpointName="s:DoubleItTimestampFirstPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -184,7 +184,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TimestampLastEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItTimestampLast" serviceName="s:DoubleItService" endpointName="s:DoubleItTimestampLastPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -197,7 +197,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TimestampLastEndpoint2" address="http://localhost:${testutil.ports.Server}/DoubleItTimestampLast2" serviceName="s:DoubleItService" endpointName="s:DoubleItTimestampLastPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -210,7 +210,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="StrictEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItStrict" serviceName="s:DoubleItService" endpointName="s:DoubleItStrictPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -223,7 +223,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="StrictEndpoint2" address="http://localhost:${testutil.ports.Server}/DoubleItStrict2" serviceName="s:DoubleItService" endpointName="s:DoubleItStrictPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -236,7 +236,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TokenProtectionEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItTokenProtection" serviceName="s:DoubleItService" endpointName="s:DoubleItTokenProtectionPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -249,7 +249,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TokenProtectionEndpoint2" address="http://localhost:${testutil.ports.Server}/DoubleItTokenProtection2" serviceName="s:DoubleItService" endpointName="s:DoubleItTokenProtectionPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -262,7 +262,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureConfirmationEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItSignatureConfirmation" serviceName="s:DoubleItService" endpointName="s:DoubleItSignatureConfirmationPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -275,7 +275,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureConfirmationEndpoint2" address="http://localhost:${testutil.ports.Server}/DoubleItSignatureConfirmation2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignatureConfirmationPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
@@ -289,7 +289,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureConfirmationEncBeforeSigningEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItSignatureConfirmationEncBeforeSigning" serviceName="s:DoubleItService" endpointName="s:DoubleItSignatureConfirmationEncBeforeSigningPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/bindings/DoubleItBindings.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>

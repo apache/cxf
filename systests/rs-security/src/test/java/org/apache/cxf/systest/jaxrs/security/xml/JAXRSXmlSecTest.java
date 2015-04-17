@@ -112,7 +112,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         newProperties.put("security.signature.username", "bob");
 
         String cryptoUrl = "org/apache/cxf/systest/jaxrs/security/bob.properties";
-        newProperties.put("ws-security.signature.properties", cryptoUrl);
+        newProperties.put("security.signature.properties", cryptoUrl);
         doTestSignatureProxy(address, false, null, test.streaming, newProperties);
         
         // Constraint validation fails with "alice"
@@ -122,7 +122,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         newProperties.put("security.signature.username", "alice");
 
         cryptoUrl = "org/apache/cxf/systest/jaxrs/security/alice.properties";
-        newProperties.put("ws-security.signature.properties", cryptoUrl);
+        newProperties.put("security.signature.properties", cryptoUrl);
         try {
             doTestSignatureProxy(address, false, null, test.streaming, newProperties);
             fail("Failure expected on a failing cert constraint");
@@ -158,7 +158,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             if (cryptoUrlPrefix != null) {
                 cryptoUrl = cryptoUrlPrefix + this.getClass().getResource("/" + cryptoUrl).toURI().getPath();
             }
-            newProperties.put("ws-security.signature.properties", cryptoUrl);
+            newProperties.put("security.signature.properties", cryptoUrl);
         }
         bean.setProperties(newProperties);
         
@@ -229,7 +229,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.signature.username", "alice");
-        properties.put("ws-security.signature.properties", 
+        properties.put("security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         if (streaming) {
@@ -369,7 +369,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("security.signature.username", "alice");
-        properties.put("ws-security.signature.properties", 
+        properties.put("security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         doTestPostEncryptedBook(address, true, properties, test.streaming);
         
@@ -385,7 +385,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("security.signature.username", "alice");
-        properties.put("ws-security.signature.properties", 
+        properties.put("security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
@@ -411,7 +411,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("security.signature.username", "alice");
-        properties.put("ws-security.signature.properties", 
+        properties.put("security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         doTestPostEncryptedBook(address, true, properties, test.streaming);
     }
@@ -543,7 +543,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.encryption.username", "bob");
         properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
-        properties.put("ws-security.signature.properties", 
+        properties.put("security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         
@@ -587,7 +587,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.encryption.username", "bob");
         properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
-        properties.put("ws-security.signature.properties", 
+        properties.put("security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         

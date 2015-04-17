@@ -22,7 +22,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportbst" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportCustomBSTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server}/doubleit/services/doubleittransportcustombst" wsdlLocation="org/apache/cxf/systest/sts/custom_onbehalfof/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+            <entry key="security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.bst.validator">
                 <bean class="org.apache.cxf.systest.sts.custom_onbehalfof.CustomBSTTokenValidator"/>
             </entry>

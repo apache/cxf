@@ -209,7 +209,7 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         properties.put("security.encryption.username", "bob");
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
         properties.put("security.callback-handler", callbackHandler);
-        properties.put("ws-security.signature.properties", "alice.properties");
+        properties.put("security.signature.properties", "alice.properties");
         properties.put("security.encryption.properties", "bob.properties");
         stsClient.setProperties(properties);
         
@@ -244,7 +244,7 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         properties.put("security.encryption.username", "bob");
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
         properties.put("security.callback-handler", callbackHandler);
-        properties.put("ws-security.signature.properties", "alice.properties");
+        properties.put("security.signature.properties", "alice.properties");
         properties.put("security.encryption.properties", "bob.properties");
         stsClient.setProperties(properties);
         

@@ -27,7 +27,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSecureConversationPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="ws-security.signature.properties.sct" value="alice.properties"/>
+            <entry key="security.signature.properties.sct" value="alice.properties"/>
             <entry key="security.signature.username.sct" value="alice"/>
             <entry key="security.encryption.properties.sct" value="bob.properties"/>
             <entry key="security.encryption.username.sct" value="bob"/>

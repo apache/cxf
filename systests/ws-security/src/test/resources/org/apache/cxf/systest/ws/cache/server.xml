@@ -29,14 +29,14 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CacheSymmetric" address="http://localhost:${testutil.ports.Server}/DoubleItCacheSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItCacheSymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/cache/DoubleItCache.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.crypto" value="bob.properties"/>
+            <entry key="security.signature.crypto" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CachePerProxySymmetric" address="http://localhost:${testutil.ports.Server}/DoubleItCachePerProxySymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItCacheSymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/cache/DoubleItCache.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.crypto" value="bob.properties"/>
+            <entry key="security.signature.crypto" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
 

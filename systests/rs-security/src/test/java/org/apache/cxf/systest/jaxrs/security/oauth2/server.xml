@@ -81,7 +81,7 @@ under the License.
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:properties>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2}/oauth2-auth">
@@ -92,7 +92,7 @@ under the License.
             <ref bean="samlAuthHandler"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
 </beans>

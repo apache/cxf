@@ -28,7 +28,7 @@
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+            <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
@@ -90,7 +90,7 @@
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+            <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.sts.client" value-ref="saml2STSClient" />
         </jaxws:properties>
@@ -117,7 +117,7 @@
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+            <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.sts.client" value-ref="saml2STSNoRenewClient" />
         </jaxws:properties>

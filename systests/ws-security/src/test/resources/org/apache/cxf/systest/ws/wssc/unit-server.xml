@@ -48,8 +48,8 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric" address="http://localhost:${testutil.ports.UnitServer.2}/DoubleItSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/wssc/DoubleItWSSC.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.signature.properties.sct" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>

@@ -22,13 +22,13 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.performance.complex_type.common.KeystorePasswordCallback"/>
             <entry key="security.encryption.properties" value="etc/clientKeystore.properties"/>
-            <entry key="ws-security.signature.properties" value="etc/serviceKeystore.properties"/>
+            <entry key="security.signature.properties" value="etc/serviceKeystore.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:client name="{http://cxf.apache.org/cxf/performance}SoapHttpDocLitPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.performance.complex_type.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="etc/clientKeystore.properties"/>
+            <entry key="security.signature.properties" value="etc/clientKeystore.properties"/>
             <entry key="security.encryption.properties" value="etc/serviceKeystore.properties"/>
         </jaxws:properties>
     </jaxws:client>

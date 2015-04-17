@@ -28,19 +28,19 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11" address="http://localhost:${testutil.ports.Server}/DoubleItSoap11" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11Port" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap12" address="http://localhost:${testutil.ports.Server}/DoubleItSoap12" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap12Port" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap12Dispatch" address="http://localhost:${testutil.ports.Server}/DoubleItSoap12Dispatch" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap12DispatchPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>

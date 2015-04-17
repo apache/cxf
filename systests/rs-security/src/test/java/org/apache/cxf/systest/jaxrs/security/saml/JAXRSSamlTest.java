@@ -221,7 +221,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         properties.put("security.saml-callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.SamlCallbackHandler");
         properties.put("security.signature.username", "alice");
-        properties.put("ws-security.signature.properties", 
+        properties.put("security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         if (selfSign) {
             properties.put("ws-security.self-sign-saml-assertion", "true");

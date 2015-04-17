@@ -79,7 +79,7 @@
             <entry key="security.encryption.username" value="CN=bob, OU=eng, O=apache.org"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.username" value="alice"/>
-            <entry key="ws-security.signature.crypto" value-ref="xkmsAsymmetricCrypto"/>
+            <entry key="security.signature.crypto" value-ref="xkmsAsymmetricCrypto"/>
         </jaxws:properties>
     </jaxws:client>
     <!-- End Asymmetric -->

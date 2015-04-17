@@ -50,7 +50,7 @@ under the License.
             <ref bean="samlHeaderHandler"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-saml}/samlform">
@@ -61,7 +61,7 @@ under the License.
             <ref bean="samlFormHandler"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-saml}/samlxml">
@@ -73,7 +73,7 @@ under the License.
             <ref bean="samlEnvHandler"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
 </beans>

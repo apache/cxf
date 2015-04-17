@@ -47,7 +47,7 @@ under the License.
       <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.rm.sec.UTPasswordCallback"/>
       <entry key="security.encryption.properties" value="bob.properties"/>
       <entry key="security.encryption.username" value="bob"/>
-      <entry key="ws-security.signature.properties" value="alice.properties"/>
+      <entry key="security.signature.properties" value="alice.properties"/>
       <entry key="security.signature.username" value="alice"/>
     </jaxws:properties>
     <jaxws:features>
