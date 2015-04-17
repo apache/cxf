@@ -49,7 +49,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>

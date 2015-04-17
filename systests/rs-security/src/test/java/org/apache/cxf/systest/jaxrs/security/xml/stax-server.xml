@@ -209,7 +209,7 @@ under the License.
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
             <entry key="ws-security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
         </jaxrs:properties>
     </jaxrs:server>
 

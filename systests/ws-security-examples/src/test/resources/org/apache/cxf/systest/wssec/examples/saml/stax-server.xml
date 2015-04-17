@@ -52,7 +52,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -61,7 +61,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -70,7 +70,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
             <entry key="ws-security.saml2.validator" value-ref="allowUnsignedBearerAssertions"/>
@@ -95,7 +95,7 @@
             <entry key="security.signature.username" value="bob"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
-            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="security.encryption.username" value="alice"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>

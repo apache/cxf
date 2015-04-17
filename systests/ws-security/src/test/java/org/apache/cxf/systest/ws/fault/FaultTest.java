@@ -168,7 +168,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
             "ws-security.encryption.properties", 
             "bob.properties"
         );
-        client.getRequestContext().put("ws-security.encryption.username", "bob");
+        client.getRequestContext().put("security.encryption.username", "bob");
 
         updateAddressPort(dispatch, PORT);
         

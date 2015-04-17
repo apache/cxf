@@ -30,7 +30,7 @@
             <entry key="ws-security.signature.properties.sct" value="alice.properties"/>
             <entry key="security.signature.username.sct" value="alice"/>
             <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
-            <entry key="ws-security.encryption.username.sct" value="bob"/>
+            <entry key="security.encryption.username.sct" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>

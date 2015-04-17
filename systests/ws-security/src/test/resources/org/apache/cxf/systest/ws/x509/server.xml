@@ -116,7 +116,7 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>
-            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="security.encryption.username" value="alice"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricNoInitiatorReference" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricNoInitiatorReference" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricNoInitiatorReferencePort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
@@ -124,7 +124,7 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>
-            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="security.encryption.username" value="alice"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSP11" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
@@ -132,7 +132,7 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>
-            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="security.encryption.username" value="alice"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricEncryptedPassword" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricEncryptedPassword" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricEncryptedPasswordPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
@@ -140,7 +140,7 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob-enc.properties"/>
             <entry key="ws-security.encryption.properties" value="alice-enc.properties"/>
-            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="security.encryption.username" value="alice"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSHA256" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricSHA256" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSHA256Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
@@ -148,7 +148,7 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>
-            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="security.encryption.username" value="alice"/>
             <entry key="ws-security.asymmetric.signature.algorithm" value="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -156,7 +156,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -164,7 +164,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -172,7 +172,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -180,7 +180,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -188,7 +188,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -211,21 +211,21 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>
-            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="security.encryption.username" value="alice"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSignatureEncryption" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricSignatureEncryption" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSignatureEncryptionPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509Signature.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricProtectTokens" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricProtect" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricProtectTokensPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -233,7 +233,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -241,7 +241,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>

@@ -284,7 +284,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.encryption.username", "bob");
+        properties.put("security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         doTestPostEncryptedBook(address, false, properties, test.streaming);
@@ -308,7 +308,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.encryption.username", "bob");
+        properties.put("security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         
@@ -326,7 +326,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.encryption.username", "bob");
+        properties.put("security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         
@@ -346,7 +346,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.encryption.username", "bob");
+        properties.put("security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         
@@ -365,7 +365,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.encryption.username", "bob");
+        properties.put("security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("security.signature.username", "alice");
@@ -381,7 +381,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.encryption.username", "bob");
+        properties.put("security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("security.signature.username", "alice");
@@ -407,7 +407,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.encryption.username", "bob");
+        properties.put("security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("security.signature.username", "alice");
@@ -540,7 +540,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.encryption.username", "bob");
+        properties.put("security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("ws-security.signature.properties", 
@@ -584,7 +584,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.encryption.username", "bob");
+        properties.put("security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("ws-security.signature.properties", 

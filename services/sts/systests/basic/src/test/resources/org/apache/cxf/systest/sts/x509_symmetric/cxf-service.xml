@@ -37,7 +37,7 @@
                 <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                 <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
                 <entry key="ws-security.encryption.properties" value="serviceKeystore.properties"/>
-                <entry key="ws-security.encryption.username" value="mystskey"/>
+                <entry key="security.encryption.username" value="mystskey"/>
             </map>
         </property>
     </bean>

@@ -353,7 +353,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         properties.put("security.username", "alice");
         properties.put("ws-security.callback-handler",
                        "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
-        properties.put("ws-security.encryption.username", "mystskey");
+        properties.put("security.encryption.username", "mystskey");
         properties.put("ws-security.encryption.properties", "clientKeystore.properties");
         properties.put("ws-security.is-bsp-compliant", "false");
         stsClient.setProperties(properties);

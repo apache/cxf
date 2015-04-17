@@ -28,14 +28,14 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItCacheSymmetricPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItCachePerProxySymmetricPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
 

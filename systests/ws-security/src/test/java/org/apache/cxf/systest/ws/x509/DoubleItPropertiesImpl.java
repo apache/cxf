@@ -33,7 +33,7 @@ import org.example.contract.doubleit.DoubleItPortType;
 @Features(features = "org.apache.cxf.feature.LoggingFeature")    
 
 @EndpointProperties({
-    @EndpointProperty(key = "ws-security.encryption.username", value = "alice"),
+    @EndpointProperty(key = "security.encryption.username", value = "alice"),
     @EndpointProperty(key = "ws-security.encryption.properties", value = "alice.properties"),
     @EndpointProperty(key = "ws-security.signature.properties", value = "bob.properties"),
     @EndpointProperty(key = "ws-security.callback-handler", 

@@ -29,7 +29,7 @@
             <entry key="security.signature.username" value="eve"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
-            <entry key="ws-security.encryption.username" value="myservicekey"/>
+            <entry key="security.encryption.username" value="myservicekey"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>

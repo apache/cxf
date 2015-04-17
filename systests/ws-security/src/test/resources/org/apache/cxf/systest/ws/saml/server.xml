@@ -75,7 +75,7 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -85,7 +85,7 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
         <jaxws:features>
@@ -127,7 +127,7 @@
             <entry key="security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
@@ -144,7 +144,7 @@
             <entry key="security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
@@ -154,7 +154,7 @@
             <entry key="security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
@@ -164,7 +164,7 @@
             <entry key="security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>

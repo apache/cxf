@@ -70,7 +70,7 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
             <entry key="security.signature.username" value="mystskey"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>
