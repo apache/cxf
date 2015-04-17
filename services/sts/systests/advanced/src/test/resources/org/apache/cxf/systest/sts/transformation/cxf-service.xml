@@ -26,7 +26,7 @@
     </cxf:bus>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportut" implementor="org.apache.cxf.systest.sts.transformation.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportUTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server}/doubleit/services/doubleittransportut" wsdlLocation="org/apache/cxf/systest/sts/transformation/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.ut.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>
@@ -54,7 +54,7 @@
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportutclaims" implementor="org.apache.cxf.systest.sts.transformation.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportUTClaimsPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server}/doubleit/services/doubleittransportutclaims" wsdlLocation="org/apache/cxf/systest/sts/transformation/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.ut.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>

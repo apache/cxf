@@ -81,7 +81,7 @@
     </bean>
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="RealmBSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/realmB" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">

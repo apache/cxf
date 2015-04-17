@@ -26,7 +26,7 @@
     </cxf:bus>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml1endorsing" implementor="org.apache.cxf.systest.sts.intermediary_transformation.IntermediaryCachingPortTypeImpl" endpointName="s:DoubleItTransportSAML1EndorsingPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Intermediary}/doubleit/services/doubleittransportsaml1endorsing" wsdlLocation="org/apache/cxf/systest/sts/intermediary_transformation/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.is-bsp-compliant" value="false"/>
         </jaxws:properties>
@@ -55,7 +55,7 @@
                     <property name="properties">
                         <map>
                             <entry key="security.username" value="bob"/>
-                            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                             <entry key="ws-security.sts.token.username" value="myclientkey"/>
                             <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
                             <entry key="ws-security.sts.token.usecert" value="true"/>

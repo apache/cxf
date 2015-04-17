@@ -63,7 +63,7 @@
     </bean>
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="BSTS" implementor="#transportSTSProviderBean" address="https://localhost:30102/SecurityTokenService/b" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/cross_domain/sts-b.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_STSB_Port">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>

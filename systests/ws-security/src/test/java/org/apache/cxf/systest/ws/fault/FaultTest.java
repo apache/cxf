@@ -161,7 +161,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         // Add WS-Security configuration
         Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
         client.getRequestContext().put(
-            "ws-security.callback-handler",
+            "security.callback-handler",
             "org.apache.cxf.systest.ws.common.KeystorePasswordCallback"
         );
         client.getRequestContext().put(

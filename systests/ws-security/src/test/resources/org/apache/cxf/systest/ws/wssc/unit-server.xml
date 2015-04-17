@@ -37,17 +37,17 @@
     </httpj:engine-factory>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Transport" address="https://localhost:${testutil.ports.UnitServer}/DoubleItTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/wssc/DoubleItWSSC.wsdl" depends-on="tls-settings">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportSP12" address="https://localhost:${testutil.ports.UnitServer}/DoubleItTransportSP12" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportSP12Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/wssc/DoubleItWSSC.wsdl" depends-on="tls-settings">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric" address="http://localhost:${testutil.ports.UnitServer.2}/DoubleItSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/wssc/DoubleItWSSC.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.signature.properties.sct" value="bob.properties"/>
         </jaxws:properties>

@@ -29,7 +29,7 @@
     <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="demo.wssec.client.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="demo.wssec.client.UTPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/Client_Encrypt.properties"/>
             <entry key="security.encryption.username" value="serverx509v1"/>
             <entry key="ws-security.enable.streaming" value="true"/>

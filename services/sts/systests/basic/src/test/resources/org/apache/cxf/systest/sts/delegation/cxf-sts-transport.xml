@@ -117,12 +117,12 @@
     </bean>
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/delegation/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port" depends-on="ClientAuthHttpsSettings">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTSUT" implementor="#transportUTSTSProviderBean" address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportUT" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/delegation/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_UT_Port" depends-on="ClientAuthHttpsSettings">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     

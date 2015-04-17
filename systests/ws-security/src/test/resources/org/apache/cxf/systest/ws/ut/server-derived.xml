@@ -27,41 +27,41 @@
     </cxf:bus>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignature" address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricProtectionSig" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricProtectionSigPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignatureDK" address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricProtectionSigDK" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricProtectionSigDKPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricEncryption" address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricProtectionEnc" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricProtectionEncPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportEndorsing" address="https://localhost:${testutil.ports.ServerDerived.2}/DoubleItUTDerivedTransportEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" depends-on="tls-settings" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignedEndorsing" address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSignedEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricEndorsingEncrypted" address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricEndorsingEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricEndorsingEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSignedEndorsingEncrypted" address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricSignedEndorsingEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSignedEndorsingEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>

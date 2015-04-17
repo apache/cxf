@@ -27,7 +27,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItPlaintextPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItPlaintextNoPasswordPort" createdFromAPI="true">
@@ -38,19 +38,19 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItDigestPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSSupportingPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSESupportingPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
@@ -60,7 +60,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncrSupportingPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
@@ -68,7 +68,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSESupportingPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>

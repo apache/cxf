@@ -118,13 +118,13 @@
     </bean>
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port" depends-on="ClientAuthHttpsSettings">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS-realmB" implementor="#transportSTSProviderBean2" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/b-issuer/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_SAML_Port" depends-on="ClientAuthHttpsSettings">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -137,7 +137,7 @@
         serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port"
                 depends-on="ClientAuthHttpsSettings">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler"
+            <entry key="security.callback-handler"
                 value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
             <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
             <entry key="ws-security.enable.streaming" value="true"/>

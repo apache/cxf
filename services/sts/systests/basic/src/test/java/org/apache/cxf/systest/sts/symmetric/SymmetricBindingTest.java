@@ -351,7 +351,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security.username", "alice");
-        properties.put("ws-security.callback-handler",
+        properties.put("security.callback-handler",
                        "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         properties.put("security.encryption.username", "mystskey");
         properties.put("ws-security.encryption.properties", "clientKeystore.properties");

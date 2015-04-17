@@ -21,7 +21,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml1PublicKey" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSAML1PublicKeyPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.StaxServer}/doubleit/services/doubleittransportsaml1publickey" wsdlLocation="org/apache/cxf/systest/sts/template/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.is-bsp-compliant" value="false"/>
             <entry key="ws-security.enable.streaming" value="true"/>
@@ -29,7 +29,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml2PublicKey" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSAML2PublicKeyPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.StaxServer}/doubleit/services/doubleittransportsaml2publickey" wsdlLocation="org/apache/cxf/systest/sts/template/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.is-bsp-compliant" value="false"/>
             <entry key="ws-security.enable.streaming" value="true"/>

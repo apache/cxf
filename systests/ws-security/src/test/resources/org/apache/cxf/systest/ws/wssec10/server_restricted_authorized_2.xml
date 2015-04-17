@@ -58,7 +58,7 @@
     <jaxws:endpoint id="UserNameOverTransport" address="https://localhost:${testutil.ports.AuthorizedServer2.1}/UserNameOverTransport" serviceName="interop:PingService" endpointName="interop:UserNameOverTransport_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <!-- new property -->
             <entry key="ws-security.validate.token" value="false"/>
         </jaxws:properties>

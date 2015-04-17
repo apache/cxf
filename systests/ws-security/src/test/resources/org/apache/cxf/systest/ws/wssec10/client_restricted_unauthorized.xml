@@ -27,13 +27,13 @@
     <jaxws:client name="{http://WSSec/wssec10}UserName_IPingService_hashed" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Frank"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec10}UserNameOverTransport_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Frank"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
     <http:conduit name="https://.*/UserNameOverTransport.*">

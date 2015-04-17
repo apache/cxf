@@ -30,7 +30,7 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItGCM192Port" createdFromAPI="true">
@@ -39,7 +39,7 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.is-bsp-compliant" value="false"/>
         </jaxws:properties>
     </jaxws:client>
@@ -49,7 +49,7 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>

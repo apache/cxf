@@ -26,7 +26,7 @@
     <jaxws:endpoint xmlns:s="http://apache.org/hello_world_soap_http" id="server" implementor="demo.wssec.server.GreeterImpl" endpointName="s:SoapPort" serviceName="s:SOAPService" address="http://localhost:9001/SoapContext/SoapPort" wsdlLocation="wsdl/hello_world.wsdl">
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
-            <entry key="ws-security.callback-handler" value="demo.wssec.server.ServerCallbackHandler"/>
+            <entry key="security.callback-handler" value="demo.wssec.server.ServerCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.encryption.properties" value="serviceKeystore.properties"/>
         </jaxws:properties>

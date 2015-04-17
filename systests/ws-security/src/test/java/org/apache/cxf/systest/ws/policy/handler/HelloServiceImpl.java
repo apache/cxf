@@ -28,7 +28,7 @@ import org.apache.cxf.annotations.EndpointProperty;
 
 @WebService(name = "HelloPolicyService", serviceName = "HelloPolicyService")
 @EndpointProperties(value = {
-        @EndpointProperty(key = "ws-security.callback-handler", 
+        @EndpointProperty(key = "security.callback-handler", 
         value = "org.apache.cxf.systest.ws.policy.handler.CommonPasswordCallback"),
         @EndpointProperty(key = "ws-security.is-bsp-compliant", value = "false"),
         @EndpointProperty(key = "ws-security.signature.properties", value = "alice.properties"),

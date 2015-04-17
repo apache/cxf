@@ -27,7 +27,7 @@
     </cxf:bus>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SecureConversation" address="http://localhost:${testutil.ports.StaxServer}/DoubleItSecureConversation" serviceName="s:DoubleItService" endpointName="s:DoubleItSecureConversationPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/secconv/DoubleItSecConv.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler.sct" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="ws-security.signature.properties.sct" value="bob.properties"/>
             <entry key="security.encryption.username.sct" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints.sct" value=".*O=apache.org.*"/>

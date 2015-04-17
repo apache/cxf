@@ -22,7 +22,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricsaml2bearer" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricSAML2BearerPort" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.Server2}/doubleit/services/doubleitasymmetricsaml2bearer" wsdlLocation="org/apache/cxf/systest/sts/username_actas/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">
@@ -34,7 +34,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricsaml2bearer2" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricSAML2BearerPort2" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.Server2}/doubleit/services/doubleitasymmetricsaml2bearer2" wsdlLocation="org/apache/cxf/systest/sts/username_actas/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">
@@ -46,7 +46,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricsaml2bearer3" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricSAML2BearerPort3" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.Server2}/doubleit/services/doubleitasymmetricsaml2bearer3" wsdlLocation="org/apache/cxf/systest/sts/username_actas/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">
@@ -58,7 +58,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricsaml2bearer4" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricSAML2BearerPort4" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.Server2}/doubleit/services/doubleitasymmetricsaml2bearer4" wsdlLocation="org/apache/cxf/systest/sts/username_actas/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">
@@ -70,7 +70,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricsaml2bearer5" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricSAML2BearerPort5" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.Server2}/doubleit/services/doubleitasymmetricsaml2bearer5" wsdlLocation="org/apache/cxf/systest/sts/username_actas/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.signature.username" value="myservicekey"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.saml2.validator">

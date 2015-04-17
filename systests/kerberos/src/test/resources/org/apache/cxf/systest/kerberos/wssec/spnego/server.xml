@@ -50,43 +50,43 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SpnegoOverSymmetric" address="http://localhost:${testutil.ports.Server}/DoubleItSpnegoSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSpnegoSymmetricPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/spnego/DoubleItSpnego.wsdl">
         <jaxws:properties>
             <entry key="ws-security.kerberos.jaas.context" value="bob"/>
-            <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
+            <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SpnegoOverSymmetricDerived" address="http://localhost:${testutil.ports.Server}/DoubleItSpnegoSymmetricDerived" serviceName="s:DoubleItService" endpointName="s:DoubleItSpnegoSymmetricDerivedPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/spnego/DoubleItSpnego.wsdl">
         <jaxws:properties>
             <entry key="ws-security.kerberos.jaas.context" value="bob"/>
-            <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
+            <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SpnegoOverSymmetricEncryptBeforeSigning" address="http://localhost:${testutil.ports.Server}/DoubleItSpnegoSymmetricEncryptBeforeSigning" serviceName="s:DoubleItService" endpointName="s:DoubleItSpnegoSymmetricEncryptBeforeSigningPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/spnego/DoubleItSpnego.wsdl">
         <jaxws:properties>
             <entry key="ws-security.kerberos.jaas.context" value="bob"/>
-            <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
+            <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SpnegoOverTransport" address="https://localhost:${testutil.ports.Server.2}/DoubleItSpnegoTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItSpnegoTransportPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/spnego/DoubleItSpnego.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.kerberos.jaas.context" value="bob"/>
-            <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
+            <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SpnegoOverTransportEndorsing" address="https://localhost:${testutil.ports.Server.2}/DoubleItSpnegoTransportEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItSpnegoTransportEndorsingPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/spnego/DoubleItSpnego.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.kerberos.jaas.context" value="bob"/>
-            <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
+            <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SpnegoOverTransportEndorsingSP11" address="https://localhost:${testutil.ports.Server.2}/DoubleItSpnegoTransportEndorsingSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItSpnegoTransportEndorsingSP11Port" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/spnego/DoubleItSpnego.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.kerberos.jaas.context" value="bob"/>
-            <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
+            <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SpnegoOverSymmetricSecureConversation" address="http://localhost:${testutil.ports.Server}/DoubleItSpnegoSymmetricSecureConversation" serviceName="s:DoubleItService" endpointName="s:DoubleItSpnegoSymmetricSecureConversationPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/spnego/DoubleItSpnego.wsdl">
         <jaxws:properties>
             <entry key="ws-security.kerberos.jaas.context" value="bob"/>
-            <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
+            <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>

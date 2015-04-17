@@ -31,7 +31,7 @@
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.signature.properties" value="morpit.properties"/>
             <entry key="security.signature.username" value="morpit"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>

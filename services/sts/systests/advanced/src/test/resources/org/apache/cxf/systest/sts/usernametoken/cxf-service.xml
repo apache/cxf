@@ -26,7 +26,7 @@
     </cxf:bus>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportut" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportUTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server}/doubleit/services/doubleittransportut" wsdlLocation="org/apache/cxf/systest/sts/usernametoken/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.ut.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>
@@ -39,7 +39,7 @@
                     <property name="properties">
                         <map>
                             <entry key="security.username" value="bob"/>
-                            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                         </map>
                     </property>
                 </bean>
@@ -61,7 +61,7 @@
           
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportutauthorization" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportUTAuthorizationPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server}/doubleit/services/doubleittransportutauthorization" wsdlLocation="org/apache/cxf/systest/sts/usernametoken/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.ut.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator">
                     <property name="useIssueBinding" value="true"/>
@@ -76,7 +76,7 @@
                     <property name="properties">
                         <map>
                             <entry key="security.username" value="bob"/>
-                            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                         </map>
                     </property>
                     <property name="claimsCallbackHandler" ref="claimsCallbackHandlerImpl"/>

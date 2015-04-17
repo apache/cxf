@@ -97,7 +97,7 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            "ws-security.callback-handler", 
+            "security.callback-handler", 
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put("ws-security.sts.token.properties", "serviceKeystore.properties");

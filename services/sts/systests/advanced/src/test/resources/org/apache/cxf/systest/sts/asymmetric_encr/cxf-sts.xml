@@ -56,7 +56,7 @@
     </bean>
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="X509STS" implementor="#x509STSProviderBean" address="http://localhost:${testutil.ports.STSServer}/SecurityTokenService/X509" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/asymmetric_encr/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:X509_Port">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
             <entry key="security.signature.username" value="mystskey"/>
         </jaxws:properties>

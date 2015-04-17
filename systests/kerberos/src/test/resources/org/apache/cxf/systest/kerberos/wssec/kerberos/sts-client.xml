@@ -37,7 +37,7 @@
         <jaxws:properties>
             <entry key="security.username" value="myclientkey"/>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
             <entry key="ws-security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
@@ -47,7 +47,7 @@
                     <property name="properties">
                         <map>
                             <entry key="security.username" value="alice"/>
-                            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
+                            <entry key="security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
                             <entry key="ws-security.sts.token.username" value="myclientkey"/>
                             <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
                             <entry key="ws-security.sts.token.usecert" value="true"/>

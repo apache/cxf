@@ -21,7 +21,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml1alternative" implementor="org.apache.cxf.systest.sts.caching.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSAML1AlternativePort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.CachingServer}/doubleit/services/doubleittransportsaml1alternative" wsdlLocation="org/apache/cxf/systest/sts/caching/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="ws-security.saml1.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator">
@@ -41,7 +41,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportut" implementor="org.apache.cxf.systest.sts.caching.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportUTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.CachingServer}/doubleit/services/doubleittransportut" wsdlLocation="org/apache/cxf/systest/sts/caching/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.ut.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>
@@ -58,7 +58,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricbst" implementor="org.apache.cxf.systest.sts.caching.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricBSTPort" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.CachingServer.2}/doubleit/services/doubleitasymmetricbst" wsdlLocation="org/apache/cxf/systest/sts/caching/DoubleIt.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.bst.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>

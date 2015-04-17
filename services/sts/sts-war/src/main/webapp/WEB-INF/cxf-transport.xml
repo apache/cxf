@@ -49,7 +49,7 @@
     </bean>
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS" implementor="#transportSTSProviderBean" address="/Transport" wsdlLocation="/WEB-INF/wsdl/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.sts.war.PasswordCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.sts.war.PasswordCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>

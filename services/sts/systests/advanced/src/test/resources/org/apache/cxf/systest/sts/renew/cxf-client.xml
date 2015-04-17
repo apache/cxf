@@ -27,7 +27,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSaml1Port" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.sts.client">
@@ -53,7 +53,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSaml1BearerPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
@@ -89,7 +89,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSaml2Port" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.sts.client" value-ref="saml2STSClient" />
@@ -116,7 +116,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSaml2NoRenewPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="ws-security.sts.client" value-ref="saml2STSNoRenewClient" />

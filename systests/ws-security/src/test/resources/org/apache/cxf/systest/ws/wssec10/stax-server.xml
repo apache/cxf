@@ -50,14 +50,14 @@
     <jaxws:endpoint id="UserNameOverTransport" address="https://localhost:${testutil.ports.StaxServer.1}/UserNameOverTransport" serviceName="interop:PingService" endpointName="interop:UserNameOverTransport_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransport" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint id="UserName" address="http://localhost:${testutil.ports.StaxServer}/UserName" serviceName="interop:PingService" endpointName="interop:UserName_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransport">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -70,7 +70,7 @@
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
@@ -83,7 +83,7 @@
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>

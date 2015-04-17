@@ -50,12 +50,12 @@
     <bean id="org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentService" class="org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentServiceImpl"/>
     <jaxws:endpoint id="JavaFirstPolicyService" address="http://localhost:${testutil.ports.JavaFirstPolicyServer}/JavaFirstPolicyService" implementor="#org.apache.cxf.systest.ws.policy.JavaFirstPolicyService">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint id="JavaFirstAttachmentPolicyService" address="http://localhost:${testutil.ports.JavaFirstPolicyServer}/JavaFirstAttachmentPolicyService" implementor="#org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService2">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
         <jaxws:features>
             <p:policies/>
@@ -63,7 +63,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint id="JavaFirstAttachmentPolicyService2" address="http://localhost:${testutil.ports.JavaFirstPolicyServer}/JavaFirstAttachmentPolicyService2" implementor="#org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
         <jaxws:features>
             <p:policies/>
@@ -71,7 +71,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint id="SslUsernamePasswordAttachmentService" address="https://localhost:${testutil.ports.JavaFirstPolicyServer.2}/SslUsernamePasswordAttachmentService" implementor="#org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentService">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
         <jaxws:features>
             <p:policies/>
@@ -80,19 +80,19 @@
     <bean id="org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService" class="org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleServiceImpl"/>
     <jaxws:endpoint id="BindingSimpleServiceEndpoint" implementor="#org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService" address="https://localhost:${testutil.ports.JavaFirstPolicyServer.3}/BindingSimpleService">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <bean id="org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleService" class="org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleServiceImpl"/>
     <jaxws:endpoint id="OperationSimpleServiceEndpoint" implementor="#org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleService" address="https://localhost:${testutil.ports.JavaFirstPolicyServer.3}/OperationSimpleService">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <bean id="org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleService" class="org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleServiceImpl"/>
     <jaxws:endpoint id="NoAlternativesOperationSimpleServiceEndpoint" implementor="#org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleService" address="https://localhost:${testutil.ports.JavaFirstPolicyServer.3}/NoAlternativesOperationSimpleService">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:wsp="http://www.w3.org/ns/ws-policy" wsu:Id="InternalTransportAndUsernamePolicy">
