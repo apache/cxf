@@ -86,11 +86,11 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         
         // Make a successful invocation
-        ((BindingProvider)utPort).getRequestContext().put("ws-security.username", "alice");
+        ((BindingProvider)utPort).getRequestContext().put("security.username", "alice");
         utPort.doubleIt(25);
         
         // Now make an invocation using another username
-        ((BindingProvider)utPort).getRequestContext().put("ws-security.username", "bob");
+        ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
         ((BindingProvider)utPort).getRequestContext().put("ws-security.password", "password");
         try {
             utPort.doubleIt(25);
@@ -119,11 +119,11 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         
         // Make a successful invocation
-        ((BindingProvider)utPort).getRequestContext().put("ws-security.username", "alice");
+        ((BindingProvider)utPort).getRequestContext().put("security.username", "alice");
         utPort.doubleIt(25);
         
         // Now make an invocation using another username
-        ((BindingProvider)utPort).getRequestContext().put("ws-security.username", "bob");
+        ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
         ((BindingProvider)utPort).getRequestContext().put("ws-security.password", "password");
         try {
             utPort.doubleIt(25);
@@ -173,12 +173,12 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         updateAddressPort(dispatch, PORT);
         
         // Make a successful request
-        client.getRequestContext().put("ws-security.username", "alice");
+        client.getRequestContext().put("security.username", "alice");
         DOMSource response = dispatch.invoke(request);
         assertNotNull(response);
         
         // Now make an invocation using another username
-        client.getRequestContext().put("ws-security.username", "bob");
+        client.getRequestContext().put("security.username", "bob");
         client.getRequestContext().put("ws-security.password", "password");
         try {
             dispatch.invoke(request);

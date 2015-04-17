@@ -38,7 +38,7 @@
     </http:conduit>
     <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="demo.wssec.client.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>

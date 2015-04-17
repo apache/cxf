@@ -321,7 +321,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         
         // Make a successful request
         Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
-        client.getRequestContext().put("ws-security.username", "alice");
+        client.getRequestContext().put("security.username", "alice");
         client.getRequestContext().put("ws-security.sts.client", stsClient);
         
         if (test.isStreaming()) {
@@ -364,7 +364,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         
         // Make a successful request
         Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
-        client.getRequestContext().put("ws-security.username", "alice");
+        client.getRequestContext().put("security.username", "alice");
         client.getRequestContext().put("ws-security.sts.client", stsClient);
         
         if (test.isStreaming()) {
@@ -432,7 +432,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
         
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
+        properties.put("security.username", "alice");
         properties.put("ws-security.callback-handler",
                        "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         properties.put("ws-security.sts.token.username", "myclientkey");

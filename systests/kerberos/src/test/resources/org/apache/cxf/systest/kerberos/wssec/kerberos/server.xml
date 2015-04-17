@@ -88,7 +88,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverAsymmetric" address="http://localhost:${testutil.ports.Server}/DoubleItKerberosAsymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosAsymmetricPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.username" value="bob"/>
+            <entry key="security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>
@@ -106,7 +106,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverAsymmetricEndorsing" address="http://localhost:${testutil.ports.Server}/DoubleItKerberosAsymmetricEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosAsymmetricEndorsingPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.username" value="bob"/>
+            <entry key="security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>
@@ -131,7 +131,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverAsymmetricSignedEndorsing" address="http://localhost:${testutil.ports.Server}/DoubleItKerberosAsymmetricSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosAsymmetricSignedEndorsingPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.username" value="bob"/>
+            <entry key="security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>
@@ -142,7 +142,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverAsymmetricSignedEncrypted" address="http://localhost:${testutil.ports.Server}/DoubleItKerberosAsymmetricSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosAsymmetricSignedEncryptedPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.username" value="bob"/>
+            <entry key="security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value-ref="kerberosCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>

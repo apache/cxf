@@ -35,7 +35,7 @@ import org.junit.BeforeClass;
 /**
  * In this test case, a CXF client requests a Security Token from an STS, passing a username that
  * it has obtained from an unknown client as an "OnBehalfOf" element. This username is obtained
- * by parsing the "ws-security.username" property. The client then invokes on the service 
+ * by parsing the "security.username" property. The client then invokes on the service 
  * provider using the returned (custom BinarySecurityToken) token from the STS. The service
  * provider dispatches the received BinarySecurityToken to the STS for validation, and receives
  * a transformed SAML Token in response.
@@ -89,7 +89,7 @@ public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
 
         // Transport port
         ((BindingProvider)transportPort).getRequestContext().put(
-            "ws-security.username", "alice"
+            "security.username", "alice"
         );
         doubleIt(transportPort, 25);
         

@@ -26,7 +26,7 @@
     </cxf:bus>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetric128Port" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.username" value="bob"/>
@@ -39,7 +39,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetric128Port2" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.username" value="bob"/>
@@ -52,7 +52,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetric128Port3" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.username" value="bob"/>
@@ -65,7 +65,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetric128InclusivePort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.username" value="bob"/>
@@ -79,7 +79,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetric128InclusivePort2" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.username" value="bob"/>
@@ -93,7 +93,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricCombinedPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.username" value="bob"/>

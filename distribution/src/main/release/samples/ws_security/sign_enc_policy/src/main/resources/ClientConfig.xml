@@ -28,7 +28,7 @@
     </cxf:bus>
     <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="demo.wssec.client.UTPasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/Client_Encrypt.properties"/>
             <entry key="ws-security.encryption.username" value="serverx509v1"/>

@@ -59,91 +59,91 @@
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}UX_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="abcd"/>
+            <entry key="security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}UX-NoTimestamp_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="abcd"/>
+            <entry key="security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}UXD_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="abcd"/>
+            <entry key="security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}UX-SEES_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="abcd"/>
+            <entry key="security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}UXD-SEES_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="abcd"/>
+            <entry key="security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}X_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}X-NoTimestamp_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}X-AES128_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}X-AES256_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}X-TripleDES_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}XD_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}XD-ES_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec11}XD-SEES_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>

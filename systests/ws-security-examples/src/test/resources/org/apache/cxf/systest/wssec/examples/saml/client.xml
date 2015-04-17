@@ -110,7 +110,7 @@
                     <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Symmetric_Port"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.username" value="alice"/>
+                            <entry key="security.username" value="alice"/>
                             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
                             <entry key="ws-security.encryption.properties" value="alice.properties"/>
                             <entry key="ws-security.encryption.username" value="cxfca"/>

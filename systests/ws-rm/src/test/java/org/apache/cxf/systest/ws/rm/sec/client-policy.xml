@@ -43,7 +43,7 @@ under the License.
   <!--jaxws:client id="GreeterAsymmetricClient" name="{http://cxf.apache.org/greeter_control}GreeterAsymmetricPort"-->
   <jaxws:client id="GreeterCombinedClient" address="http://localhost:${testutil.ports.Server}/RMGreeterAsymmetric" serviceClass="org.apache.cxf.greeter_control.Greeter">
       <jaxws:properties>
-      <entry key="ws-security.username" value="Alice"/>
+      <entry key="security.username" value="Alice"/>
       <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.rm.sec.UTPasswordCallback"/>
       <entry key="ws-security.encryption.properties" value="bob.properties"/>
       <entry key="ws-security.encryption.username" value="bob"/>

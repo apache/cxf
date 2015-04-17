@@ -33,7 +33,7 @@
                     <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.username" value="alice"/>
+                            <entry key="security.username" value="alice"/>
                             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                             <entry key="ws-security.sts.token.username" value="eve"/>
                             <entry key="ws-security.sts.token.properties" value="eveKeystore.properties"/>
@@ -46,7 +46,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML1EndorsingPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="myclientkey"/>
+            <entry key="security.username" value="myclientkey"/>
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.sts.client">
@@ -58,7 +58,7 @@
                     <property name="enableAppliesTo" value="false"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.username" value="alice"/>
+                            <entry key="security.username" value="alice"/>
                             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                             <entry key="ws-security.sts.token.username" value="myclientkey"/>
                             <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>

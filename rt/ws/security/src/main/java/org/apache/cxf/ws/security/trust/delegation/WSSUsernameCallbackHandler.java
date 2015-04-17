@@ -35,7 +35,7 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
  * This CallbackHandler implementation obtains a username via the jaxws property 
- * "ws-security.username", as defined in SecurityConstants, and creates a wss UsernameToken 
+ * "security.username", as defined in SecurityConstants, and creates a wss UsernameToken 
  * (with no password) to be used as the delegation token.
  */
 public class WSSUsernameCallbackHandler implements CallbackHandler {

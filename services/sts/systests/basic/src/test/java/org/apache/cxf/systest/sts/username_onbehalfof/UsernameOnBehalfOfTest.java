@@ -42,7 +42,7 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * In this test case, a CXF client requests a Security Token from an STS, passing a username that
  * it has obtained from an unknown client as an "OnBehalfOf" element. This username is obtained
- * by parsing the "ws-security.username" property. The client then invokes on the service 
+ * by parsing the "security.username" property. The client then invokes on the service 
  * provider using the returned token from the STS. 
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
@@ -129,7 +129,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
 
         // Transport port
         ((BindingProvider)port).getRequestContext().put(
-            "ws-security.username", "alice"
+            "security.username", "alice"
         );
         doubleIt(port, 25);
         
@@ -147,7 +147,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)port2).getRequestContext().put(
-            "ws-security.username", "eve"
+            "security.username", "eve"
         );
         // This time we expect a failure as the server validator doesn't accept "eve".
         try {

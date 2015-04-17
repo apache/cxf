@@ -29,13 +29,13 @@
     <!-- -->
     <jaxws:client name="{http://WSSec/wssec10}UserNameOverTransport_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssec10}UserName_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
@@ -54,7 +54,7 @@
     <!-- -->
     <jaxws:client name="{http://WSSec/wssec10}MutualCertificate10SignEncrypt_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
@@ -65,7 +65,7 @@
     <!-- -->
     <jaxws:client name="{http://WSSec/wssec10}MutualCertificate10SignEncryptRsa15TripleDes_IPingService" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.username" value="Alice"/>
+            <entry key="security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>

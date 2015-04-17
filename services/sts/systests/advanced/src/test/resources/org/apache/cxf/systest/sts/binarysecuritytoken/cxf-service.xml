@@ -42,7 +42,7 @@
                     <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.username" value="bob"/>
+                            <entry key="security.username" value="bob"/>
                             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                         </map>
                     </property>
