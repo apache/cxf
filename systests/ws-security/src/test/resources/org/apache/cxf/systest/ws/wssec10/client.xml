@@ -57,7 +57,7 @@
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <!-- -->
@@ -68,7 +68,7 @@
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>

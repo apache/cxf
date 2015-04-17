@@ -34,85 +34,85 @@
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties.sct" value="alice.properties"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}AC_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}ADC_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}ADC-ES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_A_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_AD_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_AD-ES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}XC_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}XDC_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}XDC_IPingService1" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}XDC-ES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}XDC-SEES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_X_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_X10_IPingService" createdFromAPI="true">
@@ -120,70 +120,70 @@
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties.sct" value="alice.properties"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_XD_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_XD-SEES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_XD-ES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}UXC_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}UXDC_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}UXDC-SEES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_UX_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_UXD_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://WSSec/wssc}_UXD-SEES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username.sct" value="abcd"/>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="bob.properties"/>
+            <entry key="security.encryption.properties.sct" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
     <http:conduit name="http://localhost/.*">

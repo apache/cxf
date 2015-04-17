@@ -156,7 +156,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="alice"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -171,7 +171,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="alice"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -186,7 +186,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="alice"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -201,7 +201,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="alice"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -216,7 +216,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="alice"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -231,7 +231,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="alice"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -246,7 +246,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="alice"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>

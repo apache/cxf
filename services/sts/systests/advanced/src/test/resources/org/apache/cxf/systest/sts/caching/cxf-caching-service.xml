@@ -64,7 +64,7 @@
             </entry>
             <entry key="security.signature.username" value="myservicekey"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
-            <entry key="ws-security.encryption.properties" value="serviceKeystore.properties"/>
+            <entry key="security.encryption.properties" value="serviceKeystore.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">

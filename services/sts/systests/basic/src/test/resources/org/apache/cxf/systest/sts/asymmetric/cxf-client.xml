@@ -33,7 +33,7 @@
                 <entry key="security.username" value="alice"/>
                 <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                 <entry key="security.encryption.username" value="mystskey"/>
-                <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
+                <entry key="security.encryption.properties" value="clientKeystore.properties"/>
                 <entry key="ws-security.sts.token.username" value="myclientkey"/>
                 <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
                 <entry key="ws-security.sts.token.usecert" value="true"/>
@@ -46,7 +46,7 @@
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
+            <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="security.encryption.username" value="myservicekey"/>
             <entry key="ws-security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
@@ -56,7 +56,7 @@
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
+            <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="security.encryption.username" value="myservicekey"/>
             <entry key="ws-security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
@@ -66,7 +66,7 @@
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
+            <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="security.encryption.username" value="myservicekey"/>
             <entry key="ws-security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
@@ -78,7 +78,7 @@
                         <map>
                             <entry key="security.username" value="alice"/>
                             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                            <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
+                            <entry key="security.encryption.properties" value="clientKeystore.properties"/>
                             <entry key="security.encryption.username" value="mystskey"/>
                             <entry key="ws-security.sts.token.usecert" value="true"/>
                             <entry key="ws-security.is-bsp-compliant" value="false"/>

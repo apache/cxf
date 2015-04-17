@@ -21,13 +21,13 @@
     <jaxws:endpoint createdFromAPI="true" name="{http://cxf.apache.org/cxf/performance}SoapHttpDocLitPort">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.performance.complex_type.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="etc/serviceKeystore.properties"/>
+            <entry key="security.encryption.properties.sct" value="etc/serviceKeystore.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:client name="{http://cxf.apache.org/cxf/performance}SoapHttpDocLitPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.performance.complex_type.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties.sct" value="etc/serviceKeystore.properties"/>
+            <entry key="security.encryption.properties.sct" value="etc/serviceKeystore.properties"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>

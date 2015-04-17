@@ -27,35 +27,35 @@
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSWASignatureContentPolicyPort" createdFromAPI="true">
          <jaxws:properties>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSWASignatureCompletePolicyPort" createdFromAPI="true">
          <jaxws:properties>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSWAEncryptionPolicyPort" createdFromAPI="true">
          <jaxws:properties>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSWACombinedPolicyPort" createdFromAPI="true">
          <jaxws:properties>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSWACombinedAsymmetricPolicyPort" createdFromAPI="true">
          <jaxws:properties>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.signature.properties" value="alice.properties"/>
             <entry key="security.signature.username" value="alice"/>

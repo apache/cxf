@@ -126,7 +126,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="security.encryption.username" value="alice"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -135,7 +135,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="security.encryption.username" value="alice"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -144,7 +144,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="security.encryption.username" value="alice"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -153,7 +153,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob-enc.properties"/>
-            <entry key="ws-security.encryption.properties" value="alice-enc.properties"/>
+            <entry key="security.encryption.properties" value="alice-enc.properties"/>
             <entry key="security.encryption.username" value="alice"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -162,7 +162,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="security.encryption.username" value="alice"/>
             <entry key="ws-security.asymmetric.signature.algorithm" value="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
         </jaxws:properties>
@@ -232,7 +232,7 @@
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="security.encryption.username" value="alice"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -337,7 +337,7 @@
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportKVT" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItX509TransportKVT" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportKVTPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
-            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
             <entry key="ws-security.is-bsp-compliant" value="false"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>

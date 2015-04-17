@@ -54,7 +54,7 @@
     </bean>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.encryption.crypto" value-ref="xkmsCrypto"/>
+            <entry key="security.encryption.crypto" value-ref="xkmsCrypto"/>
             <entry key="security.encryption.username" value="CN=bob, OU=eng, O=apache.org"/>
         </jaxws:properties>
     </jaxws:client>
@@ -75,7 +75,7 @@
     </bean>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.encryption.crypto" value-ref="xkmsAsymmetricCrypto"/>
+            <entry key="security.encryption.crypto" value-ref="xkmsAsymmetricCrypto"/>
             <entry key="security.encryption.username" value="CN=bob, OU=eng, O=apache.org"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.username" value="alice"/>

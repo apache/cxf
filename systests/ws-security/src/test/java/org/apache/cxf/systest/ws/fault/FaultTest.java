@@ -165,7 +165,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
             "org.apache.cxf.systest.ws.common.KeystorePasswordCallback"
         );
         client.getRequestContext().put(
-            "ws-security.encryption.properties", 
+            "security.encryption.properties", 
             "bob.properties"
         );
         client.getRequestContext().put("security.encryption.username", "bob");

@@ -28,7 +28,7 @@
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
         <jaxws:features>
@@ -41,7 +41,7 @@
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
         <jaxws:features>
@@ -54,7 +54,7 @@
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
         <jaxws:features>
@@ -67,7 +67,7 @@
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.is-bsp-compliant" value="false"/>
         </jaxws:properties>
@@ -81,7 +81,7 @@
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
             <entry key="ws-security.is-bsp-compliant" value="false"/>
         </jaxws:properties>
@@ -95,7 +95,7 @@
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
         <jaxws:features>

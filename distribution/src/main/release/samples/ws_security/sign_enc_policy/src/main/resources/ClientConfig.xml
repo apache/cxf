@@ -30,7 +30,7 @@
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="demo.wssec.client.UTPasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="etc/Client_Encrypt.properties"/>
+            <entry key="security.encryption.properties" value="etc/Client_Encrypt.properties"/>
             <entry key="security.encryption.username" value="serverx509v1"/>
         </jaxws:properties>
     </jaxws:client>

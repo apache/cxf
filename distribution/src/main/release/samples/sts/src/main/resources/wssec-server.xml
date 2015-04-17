@@ -28,7 +28,7 @@
             <entry key="security.signature.username" value="myservicekey"/>
             <entry key="security.callback-handler" value="demo.wssec.server.ServerCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
-            <entry key="ws-security.encryption.properties" value="serviceKeystore.properties"/>
+            <entry key="security.encryption.properties" value="serviceKeystore.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>

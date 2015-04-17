@@ -28,7 +28,7 @@
             <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
             <entry key="security.callback-handler" value="demo.wssec.client.ClientCallbackHandler"/>
-            <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
+            <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="security.encryption.username" value="myservicekey"/>
             <entry key="ws-security.enable.streaming" value="true"/>
             <entry key="ws-security.sts.client">
@@ -41,7 +41,7 @@
                         <map>
                             <entry key="security.username" value="alice"/>
                             <entry key="security.callback-handler" value="demo.wssec.client.ClientCallbackHandler"/>
-                            <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
+                            <entry key="security.encryption.properties" value="clientKeystore.properties"/>
                             <entry key="security.encryption.username" value="mystskey"/>
                             <!-- Because of the PublicKey requirement in the InitiatorToken element
                                 in the WSP WSDL, the client needs to have the STS add its public

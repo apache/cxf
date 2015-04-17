@@ -285,7 +285,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.encryption.username", "bob");
-        properties.put("ws-security.encryption.properties", 
+        properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         doTestPostEncryptedBook(address, false, properties, test.streaming);
     }
@@ -309,7 +309,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.encryption.username", "bob");
-        properties.put("ws-security.encryption.properties", 
+        properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
@@ -327,7 +327,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.encryption.username", "bob");
-        properties.put("ws-security.encryption.properties", 
+        properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
@@ -347,7 +347,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.encryption.username", "bob");
-        properties.put("ws-security.encryption.properties", 
+        properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
@@ -366,7 +366,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.encryption.username", "bob");
-        properties.put("ws-security.encryption.properties", 
+        properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("security.signature.username", "alice");
         properties.put("ws-security.signature.properties", 
@@ -382,7 +382,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.encryption.username", "bob");
-        properties.put("ws-security.encryption.properties", 
+        properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("security.signature.username", "alice");
         properties.put("ws-security.signature.properties", 
@@ -408,7 +408,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.encryption.username", "bob");
-        properties.put("ws-security.encryption.properties", 
+        properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("security.signature.username", "alice");
         properties.put("ws-security.signature.properties", 
@@ -541,7 +541,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.encryption.username", "bob");
-        properties.put("ws-security.encryption.properties", 
+        properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
@@ -585,7 +585,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("security.encryption.username", "bob");
-        properties.put("ws-security.encryption.properties", 
+        properties.put("security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
