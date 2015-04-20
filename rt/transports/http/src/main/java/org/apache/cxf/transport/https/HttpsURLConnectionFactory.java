@@ -163,12 +163,21 @@ public class HttpsURLConnectionFactory {
                 .getInstance(protocol, provider);
             ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
             KeyManager[] keyManagers = tlsClientParameters.getKeyManagers();
+<<<<<<< HEAD
             if (tlsClientParameters.getCertAlias() != null) {
                 getKeyManagersWithCertAlias(tlsClientParameters, keyManagers);
             }
             if (keyManagers == null) {
                 keyManagers = SSLUtils.getDefaultKeyStoreManagers(LOG);
             }
+=======
+            if (keyManagers == null) {
+                keyManagers = SSLUtils.getDefaultKeyStoreManagers(LOG);
+            }
+            if (tlsClientParameters.getCertAlias() != null) {
+                getKeyManagersWithCertAlias(tlsClientParameters, keyManagers);
+            }
+>>>>>>> d657398... [CXF-6359] - NullPointerException when certAlias specified but no keyManagers are configured. Thanks to Tom Pasierb for the patch
             ctx.init(keyManagers, tlsClientParameters.getTrustManagers(),
                      tlsClientParameters.getSecureRandom());
 
@@ -266,7 +275,7 @@ public class HttpsURLConnectionFactory {
     
     protected void getKeyManagersWithCertAlias(TLSClientParameters tlsClientParameters,
                                                KeyManager[] keyManagers) throws GeneralSecurityException {
-        if (tlsClientParameters.getCertAlias() != null) {
+        if (tlsClientParameters.getCertAlias() != null && keyManagers != null) {
             for (int idx = 0; idx < keyManagers.length; idx++) {
                 if (keyManagers[idx] instanceof X509KeyManager
                     && !(keyManagers[idx] instanceof AliasedX509ExtendedKeyManager)) {
