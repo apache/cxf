@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +52,7 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
         headerProviders.put(Cookie.class, new CookieHeaderProvider());
         headerProviders.put(NewCookie.class, new NewCookieHeaderProvider());
         headerProviders.put(Link.class, new LinkHeaderProvider());
+        headerProviders.put(Date.class, new DateHeaderProvider());
     }
     
     
