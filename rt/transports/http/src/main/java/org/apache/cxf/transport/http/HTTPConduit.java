@@ -1851,11 +1851,11 @@ public abstract class HTTPConduit
             // See if we are being redirected in a loop as best we can,
             // using string equality on URL.
             boolean invalidLoopDetected = newURL.equals(lastURL); 
-            if (!invalidLoopDetected) {
+            if (invalidLoopDetected) {
                 // this URI was used sometime earlier
                 Integer maxSameURICount = PropertyUtils.getInteger(message, AUTO_REDIRECT_MAX_SAME_URI_COUNT);
-                if (maxSameURICount == null || newURLCount > maxSameURICount) {
-                    invalidLoopDetected = true;
+                if (maxSameURICount != null && newURLCount <= maxSameURICount) {
+                    invalidLoopDetected = false;
                 }
             }
             if (invalidLoopDetected) {
