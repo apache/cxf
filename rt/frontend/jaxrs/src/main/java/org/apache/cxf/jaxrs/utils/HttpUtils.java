@@ -200,7 +200,7 @@ public final class HttpUtils {
     }
     
     public static HeaderDelegate<Object> getHeaderDelegate(Object o) {
-        return getHeaderDelegate(getOtherRuntimeDelegate(), o);
+        return getHeaderDelegate(RuntimeDelegate.getInstance(), o);
     }
     
     @SuppressWarnings("unchecked")
