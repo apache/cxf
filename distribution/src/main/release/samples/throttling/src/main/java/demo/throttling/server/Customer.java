@@ -38,7 +38,7 @@ public abstract class Customer {
     
     MetricsContext getMetricsContext(MetricRegistry registry) {
         if (metrics == null) {
-            metrics = new CodahaleMetricsContext("demo.server:customer=" + name +",type=Customer,", registry);
+            metrics = new CodahaleMetricsContext("demo.server:customer=" + name + ",type=Customer,", registry);
         }
         return metrics;
     }
@@ -59,7 +59,8 @@ public abstract class Customer {
             super(n);
         }
         public void throttle(ThrottleResponse m) {
-            //System.out.println("p  " + metrics.getTotals().getOneMinuteRate() + "  " + metrics.getTotals().getCount());
+            //System.out.println("p  " + metrics.getTotals().getOneMinuteRate()
+            // + "  " + metrics.getTotals().getCount());
             //Preferred customers are unthrottled until they hit 100req/sec, then start delaying by .05 seconds
             //(drops to max of 50req/sec until below the 100req/sec rate)
             if (metrics.getTotals().getOneMinuteRate() > 100) {
@@ -89,7 +90,8 @@ public abstract class Customer {
             super(n);
         }
         public void throttle(ThrottleResponse m) {
-            //System.out.println("ch  " + metrics.getTotals().getOneMinuteRate() + "  " + metrics.getTotals().getCount());
+            //System.out.println("ch  " + metrics.getTotals().getOneMinuteRate()
+            // + "  " + metrics.getTotals().getCount());
             //Cheap customers are always get a .1 sec delay
             long delay = 100;
             //Then they get futher throttled dependending on rates

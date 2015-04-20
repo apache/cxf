@@ -70,7 +70,7 @@ public final class Client implements Runnable {
                     x++;
                 } while (x < 10000);
             } catch (javax.xml.ws.WebServiceException wse) {
-                if (wse.getCause().getMessage().contains("429")){
+                if (wse.getCause().getMessage().contains("429")) {
                     //exceeded are allowable number of requests
                     exceeded = true;
                 } else {

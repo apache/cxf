@@ -49,7 +49,7 @@ public class CustomerMetricsInterceptor extends AbstractPhaseInterceptor<Message
     public void handleMessage(Message message) throws Fault {
         ExchangeMetrics m = message.getExchange().get(ExchangeMetrics.class);
         if (m != null) {
-            Map<String, List<String>> h = CastUtils.cast((Map<?,?>)message.get(Message.PROTOCOL_HEADERS));
+            Map<String, List<String>> h = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             String auth = h.get("Authorization").toString();
             auth = auth.substring(auth.indexOf(' ') + 1);
             try {

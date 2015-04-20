@@ -44,15 +44,8 @@ public class Storage {
     }
     
     public void addDocument(final String name, final byte[] content) throws IOException {
-        InputStream in = null;
-        
-        try {
-            in = new ByteArrayInputStream(content);
+        try (InputStream in = new ByteArrayInputStream(content)) {
             addDocument(name, in);
-        } finally {
-            if (in != null) {
-                try { in.close(); } catch (IOException ex) { /* do nothing */ }
-            }
         }
     }
     
@@ -63,16 +56,10 @@ public class Storage {
             throw new IOException("Unable to delete FS file:" + f.getAbsolutePath());
         } 
         
-        OutputStream out = null;
-        try {            
-            out = new BufferedOutputStream(new FileOutputStream(f));
+        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(f))) {
             out.write(IOUtils.readBytesFromStream(in));
             
             f.deleteOnExit();
-        } finally {
-            if (out != null) {
-                try { out.close(); } catch (IOException ex) { /* do nothing */ }
-            }
         }
     }
     

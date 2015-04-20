@@ -233,18 +233,11 @@ public class Catalog {
         return new StreamingOutput() {            
             @Override
             public void write(final OutputStream out) throws IOException, WebApplicationException {
-                InputStream in = null;
-                
-                try {
-                    in = storage.getDocument(source);
+                try (InputStream in = storage.getDocument(source)) {
                     out.write(IOUtils.readBytesFromStream(in));
                 } catch (final FileNotFoundException ex) {
                     throw new NotFoundException("Document does not exist: " + source);
-                } finally {
-                    if (in != null) { 
-                        try { in.close(); } catch (IOException ex) { /* do nothing */ }
-                    }    
-                }                
+                }
             }
         };
     }
@@ -304,9 +297,7 @@ public class Catalog {
     private void storeAndIndex(final LuceneDocumentMetadata metadata, final byte[] content)
         throws IOException {
         
-        BufferedInputStream in = null;        
-        try {
-            in = new BufferedInputStream(new ByteArrayInputStream(content));
+        try (BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(content))) {
             
             final Document document = extractor.extract(in, metadata);
             if (document != null) {                    
@@ -319,10 +310,6 @@ public class Catalog {
                 } finally {
                     writer.close();
                 }
-            }
-        } finally {
-            if (in != null) { 
-                try { in.close(); } catch (IOException ex) { /* do nothing */ }
             }
         }
     }
