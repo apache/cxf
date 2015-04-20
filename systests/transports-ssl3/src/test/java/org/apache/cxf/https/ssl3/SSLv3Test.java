@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.ssl;
+package org.apache.cxf.https.ssl3;
 
 import java.io.IOException;
 import java.net.URL;
@@ -27,31 +27,26 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
-import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.SSLUtils;
-import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.ws.security.SecurityConstants;
-import org.example.contract.doubleit.DoubleItPortType;
+import org.apache.hello_world.Greeter;
+import org.apache.hello_world.services.SOAPService;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
- * A set of tests SSL protocol support.
+ * A set of tests SSL v3 protocol support. It should be disallowed by default on both the
+ * (Jetty) server and CXF client side.
  */
-public class SSLTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String PORT2 = allocatePort(Server.class, 2);
-    static final String PORT3 = allocatePort(Server.class, 3);
-    
-    private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
-    private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
+public class SSLv3Test extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(SSLv3Server.class);
+    static final String PORT2 = allocatePort(SSLv3Server.class, 2);
+    static final String PORT3 = allocatePort(SSLv3Server.class, 3);
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -59,20 +54,20 @@ public class SSLTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(SSLv3Server.class, true)
         );
     }
     
+    @AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 
     @org.junit.Test
-    public void testSSLv3NotAllowed() throws Exception {
+    public void testSSLv3ServerNotAllowedByDefault() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SSLTest.class.getResource("client.xml");
+        URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -86,10 +81,10 @@ public class SSLTest extends AbstractBusClientServerTestBase {
         connection.setHostnameVerifier(new DisableCNCheckVerifier());
         
         SSLContext sslContext = SSLContext.getInstance("SSL");
-        URL keystore = SSLTest.class.getResource("../security/Truststore.jks");
+        URL keystore = SSLv3Test.class.getResource("../../../../../keys/Truststore.jks");
         TrustManager[] trustManagers = 
             SSLUtils.getTrustStoreManagers(false, "jks", keystore.getPath(), 
-                                           "PKIX", LogUtils.getL7dLogger(SSLTest.class));
+                                           "PKIX", LogUtils.getL7dLogger(SSLv3Test.class));
         sslContext.init(null, trustManagers, new java.security.SecureRandom());
         
         connection.setSSLSocketFactory(sslContext.getSocketFactory());
@@ -107,10 +102,10 @@ public class SSLTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    public void testSSLv3Allowed() throws Exception {
+    public void testSSLv3ServerAllowed() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SSLTest.class.getResource("client.xml");
+        URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -124,10 +119,10 @@ public class SSLTest extends AbstractBusClientServerTestBase {
         connection.setHostnameVerifier(new DisableCNCheckVerifier());
         
         SSLContext sslContext = SSLContext.getInstance("SSL");
-        URL keystore = SSLTest.class.getResource("../security/Truststore.jks");
+        URL keystore = SSLv3Test.class.getResource("../../../../../keys/Truststore.jks");
         TrustManager[] trustManagers = 
             SSLUtils.getTrustStoreManagers(false, "jks", keystore.getPath(), 
-                                           "PKIX", LogUtils.getL7dLogger(SSLTest.class));
+                                           "PKIX", LogUtils.getL7dLogger(SSLv3Test.class));
         sslContext.init(null, trustManagers, new java.security.SecureRandom());
         
         connection.setSSLSocketFactory(sslContext.getSocketFactory());
@@ -144,57 +139,108 @@ public class SSLTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testClientSSL3NotAllowed() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SSLTest.class.getResource("client.xml");
+        URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        URL wsdl = SSLTest.class.getResource("DoubleItSSL.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort3");
-        DoubleItPortType utPort = 
-                service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT3);
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
         
-        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
-        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER,
-                                                          new UTPasswordCallback());
+        updateAddressPort(port, PORT3);
         
         try {
-            utPort.doubleIt(25);
+            port.greetMe("Kitty");
             fail("Failure expected on the client not supporting SSLv3 by default");
         } catch (Exception ex) {
             // expected
         }
         
-        ((java.io.Closeable)utPort).close();
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testAsyncClientSSL3NotAllowed() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        
+        updateAddressPort(port, PORT3);
+        
+        try {
+            port.greetMe("Kitty");
+            fail("Failure expected on the client not supporting SSLv3 by default");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testClientSSL3Allowed() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SSLTest.class.getResource("client-ssl3.xml");
+        URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        URL wsdl = SSLTest.class.getResource("DoubleItSSL.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort3");
-        DoubleItPortType utPort = 
-                service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT3);
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
         
-        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
-        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER,
-                                                          new UTPasswordCallback());
+        updateAddressPort(port, PORT3);
         
-        utPort.doubleIt(25);
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
         
-        ((java.io.Closeable)utPort).close();
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testAsyncClientSSL3Allowed() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        
+        updateAddressPort(port, PORT3);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     

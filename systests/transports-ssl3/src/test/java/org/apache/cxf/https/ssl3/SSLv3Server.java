@@ -17,29 +17,31 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.ssl;
+package org.apache.cxf.https.ssl3;
 
 import java.net.URL;
+import java.security.Security;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-public class Server extends AbstractBusTestServerBase {
+public class SSLv3Server extends AbstractBusTestServerBase {
 
-    public Server() {
-
+    public SSLv3Server() {
+        // Remove "SSLv3" from the default disabled algorithm list for the purposes of this test
+        Security.setProperty("jdk.tls.disabledAlgorithms", "MD5");
     }
 
     protected void run()  {
-        URL busFile = Server.class.getResource("server.xml");
+        URL busFile = SSLv3Server.class.getResource("sslv3-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);
 
         try {
-            new Server();
+            new SSLv3Server();
         } catch (Exception e) {
             e.printStackTrace();
         }

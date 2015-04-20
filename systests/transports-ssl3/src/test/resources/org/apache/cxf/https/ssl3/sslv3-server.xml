@@ -21,59 +21,62 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
    
     <httpj:engine-factory id="default-tls-settings">
-        <httpj:engine port="${testutil.ports.Server}">
+        <httpj:engine port="${testutil.ports.SSLv3Server}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="false"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext" address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ssl/DoubleItSSL.wsdl" depends-on="default-tls-settings">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-        </jaxws:properties>
-    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="SSLv3NotAllowedByDefaultEndpoint" 
+                     implementor="org.apache.cxf.https.ssl3.GreeterImpl" 
+                     address="https://localhost:${testutil.ports.SSLv3Server}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="default-tls-settings"/>
     
     <httpj:engine-factory id="allow-sslv3-settings">
-        <httpj:engine port="${testutil.ports.Server.2}">
+        <httpj:engine port="${testutil.ports.SSLv3Server.2}">
             <httpj:tlsServerParameters secureSocketProtocol="SSLv3" >
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="false"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext2" address="https://localhost:${testutil.ports.Server.2}/DoubleItUTPlaintext2" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ssl/DoubleItSSL.wsdl" depends-on="allow-sslv3-settings">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-        </jaxws:properties>
-    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="SSLv3AllowedByDefaultEndpoint" 
+                     implementor="org.apache.cxf.https.ssl3.GreeterImpl" 
+                     address="https://localhost:${testutil.ports.SSLv3Server.2}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="allow-sslv3-settings"/>
     
     <httpj:engine-factory id="disallow-tls-via-configuration">
-        <httpj:engine port="${testutil.ports.Server.3}">
-            <httpj:tlsServerParameters>
+        <httpj:engine port="${testutil.ports.SSLv3Server.3}">
+            <httpj:tlsServerParameters secureSocketProtocol="SSLv3">
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="false"/>
                 <sec:excludeProtocols>
@@ -86,10 +89,12 @@
         </httpj:engine>
     </httpj:engine-factory>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext3" address="https://localhost:${testutil.ports.Server.3}/DoubleItUTPlaintext3" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort3" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ssl/DoubleItSSL.wsdl" depends-on="disallow-tls-via-configuration">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
-        </jaxws:properties>
-    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="TLSNotAllowedByEndpoint" 
+                     implementor="org.apache.cxf.https.ssl3.GreeterImpl" 
+                     address="https://localhost:${testutil.ports.SSLv3Server.3}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="disallow-tls-via-configuration"/>
     
 </beans>
