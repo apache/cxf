@@ -75,7 +75,6 @@ public final class ServiceUtils {
      * Does not modify the Message context (other than what is done in the getContextualProperty itself)
      * 
      * @param message
-     * @param type
      */
     public static SchemaValidationType getSchemaValidationType(Message message) {
         SchemaValidationType validationType = getOverrideSchemaValidationType(message);

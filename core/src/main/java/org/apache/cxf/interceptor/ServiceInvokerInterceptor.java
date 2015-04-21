@@ -158,7 +158,6 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
     /**
      * Get the Executor for this invocation.
      * @param endpoint
-     * @return
      */
     private Executor getExecutor(final Endpoint endpoint) {
         return endpoint.getService().getExecutor();

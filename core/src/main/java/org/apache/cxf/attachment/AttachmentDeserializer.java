@@ -260,7 +260,6 @@ public class AttachmentDeserializer {
      * Create an Attachment from the MIME stream. If there is a previous attachment
      * that is not read, cache that attachment.
      *
-     * @return
      * @throws IOException
      */
     private Attachment createAttachment(Map<String, List<String>> headers) throws IOException {

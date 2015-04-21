@@ -63,7 +63,6 @@ public class CallbackHandlerTlsCert implements CallbackHandlerProvider {
      * Extracts certificate from message, expecting to find TLSSessionInfo inside.
      *
      * @param message
-     * @return
      */
     private Certificate getCertificate(Message message) {
         TLSSessionInfo tlsSessionInfo = message.get(TLSSessionInfo.class);

@@ -262,7 +262,6 @@ public final class StaxUtils {
     
     /**
      * Return a cached, namespace-aware, factory.
-     * @return
      */
     private static XMLInputFactory getXMLInputFactory() {
         if (SAFE_INPUT_FACTORY != null) {
@@ -1186,7 +1185,6 @@ public final class StaxUtils {
 
     /**
      * @param parent
-     * @return
      */
     private static Document getDocument(Node parent) {
         return (parent instanceof Document) ? (Document)parent : parent.getOwnerDocument();

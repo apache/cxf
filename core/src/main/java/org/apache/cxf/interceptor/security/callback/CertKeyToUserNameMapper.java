@@ -31,7 +31,7 @@ public class CertKeyToUserNameMapper implements CertificateToNameMapper {
     /**
      * Returns Subject DN from X509Certificate
      *
-     * @param certificate
+     * @param cert
      * @return Subject DN as a user name
      */
     @Override
