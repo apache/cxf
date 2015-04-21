@@ -226,6 +226,10 @@ public final class KeyManagementUtils {
         String keyStoreType = props.getProperty(RSSEC_KEY_STORE_TYPE);
         String keyStoreLoc = props.getProperty(RSSEC_KEY_STORE_FILE);
         String keyStorePswd = props.getProperty(RSSEC_KEY_STORE_PSWD);
+        
+        if (keyStorePswd == null) {
+            throw new JoseException("No keystore password was defined");
+        }
         try {
             InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
             return CryptoUtils.loadKeyStore(is, keyStorePswd.toCharArray(), keyStoreType);
