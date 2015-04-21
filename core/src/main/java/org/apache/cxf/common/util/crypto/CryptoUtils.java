@@ -653,6 +653,9 @@ public final class CryptoUtils {
     }
     public static Certificate loadCertificate(KeyStore keyStore, String alias) {
         try {
+            if (!keyStore.containsAlias(alias)) {
+                throw new SecurityException("No alias exists in the keystore for the given alias: " + alias);
+            }
             return keyStore.getCertificate(alias);
         } catch (Exception ex) { 
             throw new SecurityException(ex);
