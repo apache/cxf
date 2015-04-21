@@ -18,14 +18,26 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
-import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import java.util.Map;
 
+import org.apache.cxf.rs.security.jose.JoseHeaders;
 
-public interface JwsSignatureProvider {
-    SignatureAlgorithm getAlgorithm();
-    byte[] sign(JwsHeaders headers, byte[] content);
-    /**
-     * Create a signature handler capable of updating the signature input (optional operation)
-     */
-    JwsSignature createJwsSignature(JwsHeaders headers);
+public class JwsHeaders extends JoseHeaders {
+    public JwsHeaders() {
+    }
+    
+    public JwsHeaders(JoseHeaders headers) {
+        super(headers.asMap());
+    }
+    
+    public JwsHeaders(Map<String, Object> values) {
+        super(values);
+    }
+    public JwsHeaders(String sigAlgo) {
+        init(sigAlgo);
+    }
+    private void init(String sigAlgo) {
+        setAlgorithm(sigAlgo);
+    }
+
 }

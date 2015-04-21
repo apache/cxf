@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class NoneJwsSignatureProvider implements JwsSignatureProvider {
@@ -29,12 +28,12 @@ public class NoneJwsSignatureProvider implements JwsSignatureProvider {
     }
 
     @Override
-    public JwsSignature createJwsSignature(JoseHeaders headers) {
+    public JwsSignature createJwsSignature(JwsHeaders headers) {
         return new NoneJwsSignature();
     }
 
     @Override
-    public byte[] sign(JoseHeaders headers, byte[] content) {
+    public byte[] sign(JwsHeaders headers, byte[] content) {
         JwsSignature sig = createJwsSignature(headers);
         sig.update(content, 0, content.length);
         return sig.sign();

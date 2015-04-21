@@ -22,32 +22,31 @@ import java.security.interfaces.RSAPrivateKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactProducer {
     private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
-    private JoseHeaders headers;
+    private JwsHeaders headers;
     private String plainJwsPayload;
     private String signature;
     public JwsCompactProducer(String plainJwsPayload) {
         this(null, null, plainJwsPayload);
     }
-    public JwsCompactProducer(JoseHeaders headers, String plainJwsPayload) {
+    public JwsCompactProducer(JwsHeaders headers, String plainJwsPayload) {
         this(headers, null, plainJwsPayload);
     }
-    protected JwsCompactProducer(JoseHeaders headers, JoseHeadersReaderWriter w, String plainJwsPayload) {
+    protected JwsCompactProducer(JwsHeaders headers, JoseHeadersReaderWriter w, String plainJwsPayload) {
         this.headers = headers;
         if (w != null) {
             this.writer = w;
         }
         this.plainJwsPayload = plainJwsPayload;
     }
-    public JoseHeaders getJoseHeaders() {
+    public JwsHeaders getJoseHeaders() {
         if (headers == null) {
-            headers = new JoseHeaders();
+            headers = new JwsHeaders();
         }
         return headers;
     }

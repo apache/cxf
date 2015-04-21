@@ -38,7 +38,7 @@ public class JwsJsonSignatureEntry {
     private String encodedSignature;
     private JoseHeaders protectedHeader;
     private JoseHeaders unprotectedHeader;
-    private JoseHeaders unionHeaders;
+    private JwsHeaders unionHeaders;
     private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
       
     public JwsJsonSignatureEntry(String encodedJwsPayload,
@@ -60,7 +60,7 @@ public class JwsJsonSignatureEntry {
         prepare();
     }
     private void prepare() {
-        unionHeaders = new JoseHeaders();
+        unionHeaders = new JwsHeaders();
         
         if (protectedHeader != null) {
             unionHeaders.asMap().putAll(protectedHeader.asMap());
@@ -92,7 +92,7 @@ public class JwsJsonSignatureEntry {
     public JoseHeaders getUnprotectedHeader() {
         return unprotectedHeader;
     }
-    public JoseHeaders getUnionHeader() {
+    public JwsHeaders getUnionHeader() {
         return unionHeaders;
     }
     public String getEncodedSignature() {

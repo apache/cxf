@@ -23,7 +23,6 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
@@ -42,7 +41,7 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
         super(key, spec, supportedAlgo);
     }
     @Override
-    public boolean verify(JoseHeaders headers, String unsignedText, byte[] signature) {
+    public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         final String algoName = super.getAlgorithm().getJwaName();
         if (SIGNATURE_LENGTH_MAP.get(algoName) != signature.length) {
             LOG.warning("Algorithm " + algoName + " signature length is " + SIGNATURE_LENGTH_MAP.get(algoName) 

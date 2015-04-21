@@ -36,7 +36,7 @@ public class JwsJwtCompactProducer extends JwsCompactProducer {
         this(new JwtToken(headers, claims), null);
     }
     protected JwsJwtCompactProducer(JwtToken token, JwtTokenReaderWriter w) {
-        super(token.getHeaders(), w, JwtUtils.claimsToJson(token.getClaims(), w));
+        super(new JwsHeaders(token.getHeaders()), w, JwtUtils.claimsToJson(token.getClaims(), w));
     }
     
     

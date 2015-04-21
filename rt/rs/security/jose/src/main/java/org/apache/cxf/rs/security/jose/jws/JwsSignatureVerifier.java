@@ -18,10 +18,9 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public interface JwsSignatureVerifier {
     SignatureAlgorithm getAlgorithm();
-    boolean verify(JoseHeaders headers, String unsignedText, byte[] signature);
+    boolean verify(JwsHeaders headers, String unsignedText, byte[] signature);
 }

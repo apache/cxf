@@ -22,7 +22,7 @@ import java.util.Arrays;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -52,7 +52,7 @@ public class AbstractJwtHandlerTest {
     @Mock
     private JwsSignatureVerifier signatureVerifier;
     @Mock
-    private JoseHeaders headers;
+    private JwsHeaders headers;
 
     @Before
     public void setUp() {

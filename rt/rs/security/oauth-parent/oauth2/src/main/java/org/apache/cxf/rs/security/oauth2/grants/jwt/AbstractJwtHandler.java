@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oauth2.grants.jwt;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
@@ -43,7 +43,7 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
         super(grants);
     }
     
-    protected void validateSignature(JoseHeaders headers, String unsignedText, byte[] signature) {
+    protected void validateSignature(JwsHeaders headers, String unsignedText, byte[] signature) {
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         if (!theSigVerifier.verify(headers, unsignedText, signature)) {    
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);

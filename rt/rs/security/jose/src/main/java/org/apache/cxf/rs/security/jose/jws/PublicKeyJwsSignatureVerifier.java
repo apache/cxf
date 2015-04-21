@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
@@ -44,7 +43,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
         this.supportedAlgo = supportedAlgo;
     }
     @Override
-    public boolean verify(JoseHeaders headers, String unsignedText, byte[] signature) {
+    public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         try {
             return CryptoUtils.verifySignature(StringUtils.toBytesUTF8(unsignedText), 
                                                signature, 

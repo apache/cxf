@@ -23,6 +23,7 @@ import java.util.Arrays;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -57,9 +58,9 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
         try {
             JwsJwtCompactConsumer jwsReader = getJwsReader(assertion);
             JwtToken jwtToken = jwsReader.getJwtToken();
-            validateSignature(jwtToken.getHeaders(),
-                                    jwsReader.getUnsignedEncodedSequence(), 
-                                    jwsReader.getDecodedSignature());
+            validateSignature(new JwsHeaders(jwtToken.getHeaders()),
+                                  jwsReader.getUnsignedEncodedSequence(), 
+                                  jwsReader.getDecodedSignature());
             
                    
             validateClaims(client, jwtToken.getClaims());
