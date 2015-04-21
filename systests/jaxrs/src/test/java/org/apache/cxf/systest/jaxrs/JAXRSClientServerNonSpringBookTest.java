@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -174,7 +175,9 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     
     @Test
     public void testGetBook123Application11PerRequest() throws Exception {
-        doTestPerRequest("http://localhost:" + PORT + "/application11/thebooks/bookstore2/bookheaders");
+        Response r = 
+            doTestPerRequest("http://localhost:" + PORT + "/application11/thebooks/bookstore2/bookheaders");
+        assertEquals("TheBook", r.getHeaderString("BookWriter"));
     }
     
     @Test
@@ -183,13 +186,15 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks2/bookstore2/bookheaders");
     }
     
-    private void doTestPerRequest(String address) throws Exception {
+    private Response doTestPerRequest(String address) throws Exception {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("application/xml");
-        Book book = wc.get(Book.class);
+        Response r = wc.get();
+        Book book = r.readEntity(Book.class);
         assertEquals("CXF in Action", book.getName());
         assertEquals(123L, book.getId());
+        return r;
     }
     
     @Test

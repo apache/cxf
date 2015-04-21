@@ -29,13 +29,17 @@ import java.util.Set;
 import javax.annotation.Priority;
 import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 
 @ApplicationPath("/thebooks")
+@GlobalNameBinding
 public class BookApplication extends Application {
 
     private String defaultName;
@@ -60,6 +64,7 @@ public class BookApplication extends Application {
         classes.add(org.apache.cxf.systest.jaxrs.RuntimeExceptionMapper.class);
         classes.add(BookRequestFilter.class);
         classes.add(BookRequestFilter2.class);
+        classes.add(BookWriter.class);
         return classes;
     }
 
@@ -92,6 +97,18 @@ public class BookApplication extends Application {
             sb.append(id);
         }
         defaultId = Long.valueOf(sb.toString());
+    }
+    
+    @GlobalNameBinding
+    public static class BookWriter implements WriterInterceptor {
+
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws IOException,
+            WebApplicationException {
+            context.getHeaders().putSingle("BookWriter", "TheBook");
+            context.proceed();
+        }
+        
     }
     
     @Priority(1)
