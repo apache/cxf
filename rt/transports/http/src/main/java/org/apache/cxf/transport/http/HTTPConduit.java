@@ -1821,14 +1821,23 @@ public abstract class HTTPConduit
         if (newURL != null && newURLCount != null) {
             // See if we are being redirected in a loop as best we can,
             // using string equality on URL.
-            boolean invalidLoopDetected = newURL.equals(lastURL); 
+            boolean invalidLoopDetected = newURL.equals(lastURL);
+            
+            Integer maxSameURICount = PropertyUtils.getInteger(message, AUTO_REDIRECT_MAX_SAME_URI_COUNT);
+            
             if (!invalidLoopDetected) {
-                // this URI was used sometime earlier
-                Integer maxSameURICount = PropertyUtils.getInteger(message, AUTO_REDIRECT_MAX_SAME_URI_COUNT);
+                // This new URI was already recorded earlier even though it is not equal to the last URI
+                // Example: a-b-a, where 'a' is the new URI. Check if a limited number of occurrences of this URI 
+                // is allowed, fail by default.
                 if (maxSameURICount == null || newURLCount > maxSameURICount) {
                     invalidLoopDetected = true;
                 }
-            }
+            } else if (maxSameURICount != null && newURLCount <= maxSameURICount) {
+                // This new URI was already recorded earlier and is the same as the last URI.
+                // Example: a-a. But we have a property supporting a limited number of occurrences of this URI.
+                // Continue the invocation. 
+                invalidLoopDetected = false;
+            } 
             if (invalidLoopDetected) {
                 // We are in a redirect loop; -- bail
                 String msg = "Redirect loop detected on Conduit '" 
