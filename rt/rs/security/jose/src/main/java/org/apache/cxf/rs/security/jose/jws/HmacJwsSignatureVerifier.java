@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.crypto.HmacUtils;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
@@ -52,12 +51,12 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     
     
     @Override
-    public boolean verify(JoseHeaders headers, String unsignedText, byte[] signature) {
+    public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         byte[] expected = computeMac(headers, unsignedText);
         return Arrays.equals(expected, signature);
     }
     
-    private byte[] computeMac(JoseHeaders headers, String text) {
+    private byte[] computeMac(JwsHeaders headers, String text) {
         return HmacUtils.computeHmac(key, 
                                      AlgorithmUtils.toJavaName(checkAlgorithm(headers.getAlgorithm())),
                                      hmacSpec,

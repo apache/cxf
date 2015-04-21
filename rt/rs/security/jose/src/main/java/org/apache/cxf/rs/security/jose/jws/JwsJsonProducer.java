@@ -119,7 +119,7 @@ public class JwsJsonProducer {
     public String signWith(JwsSignatureProvider signer,
                            JoseHeaders protectedHeader,
                            JoseHeaders unprotectedHeader) {
-        JoseHeaders unionHeaders = new JoseHeaders();
+        JwsHeaders unionHeaders = new JwsHeaders();
          
         if (protectedHeader != null) {
             unionHeaders.asMap().putAll(protectedHeader.asMap());

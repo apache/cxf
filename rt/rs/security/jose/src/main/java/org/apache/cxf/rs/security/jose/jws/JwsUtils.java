@@ -324,7 +324,7 @@ public final class JwsUtils {
         return jws;
     }
     public static String sign(JwsSignatureProvider jwsSig, String content, String ct) {
-        JoseHeaders headers = new JoseHeaders();
+        JwsHeaders headers = new JwsHeaders();
         if (ct != null) {
             headers.setContentType(ct);
         }

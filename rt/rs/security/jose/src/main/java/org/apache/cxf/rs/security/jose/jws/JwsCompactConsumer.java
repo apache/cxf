@@ -90,13 +90,13 @@ public class JwsCompactConsumer {
     public byte[] getDecodedSignature() {
         return encodedSignature.isEmpty() ? new byte[]{} : JoseUtils.decode(encodedSignature);
     }
-    public JoseHeaders getJoseHeaders() {
+    public JwsHeaders getJoseHeaders() {
         JoseHeaders joseHeaders = reader.fromJsonHeaders(headersJson);
         if (joseHeaders.getUpdateCount() != null) {
             LOG.warning("Duplicate headers have been detected");
             throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
         }
-        return joseHeaders;
+        return new JwsHeaders(joseHeaders);
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         try {

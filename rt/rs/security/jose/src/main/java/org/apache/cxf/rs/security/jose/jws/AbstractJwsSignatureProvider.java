@@ -33,9 +33,9 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         this.algorithm = algo;
     }
     
-    protected JoseHeaders prepareHeaders(JoseHeaders headers) {
+    protected JwsHeaders prepareHeaders(JwsHeaders headers) {
         if (headers == null) {
-            headers = new JoseHeaders();
+            headers = new JwsHeaders();
         }
         String algo = headers.getAlgorithm();
         if (algo != null) {
@@ -51,13 +51,13 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         return algorithm;    
     }
     @Override
-    public byte[] sign(JoseHeaders headers, byte[] content) {
+    public byte[] sign(JwsHeaders headers, byte[] content) {
         JwsSignature sig = createJwsSignature(headers);
         sig.update(content, 0, content.length);
         return sig.sign();
     }
     @Override
-    public JwsSignature createJwsSignature(JoseHeaders headers) {
+    public JwsSignature createJwsSignature(JwsHeaders headers) {
         return doCreateJwsSignature(prepareHeaders(headers));
     }
     

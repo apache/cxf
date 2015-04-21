@@ -128,8 +128,9 @@ public class JwsCompactHeaderTest extends Assert {
     public void verifyJwsWithTwoAlgHeaderFieldsBogusFieldFirst() throws Exception {
         JwsCompactConsumer jwsConsumer = new JwsCompactConsumer(TWO_ALG_HEADER_FIELDS_IN_JWS_BOGUS_FIRST);
 
-        assertFalse(jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
-                                                        SignatureAlgorithm.HS256)));
+        boolean result = jwsConsumer.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
+                                                                     SignatureAlgorithm.HS256));
+        assertFalse(result);
     }
 
     @Test

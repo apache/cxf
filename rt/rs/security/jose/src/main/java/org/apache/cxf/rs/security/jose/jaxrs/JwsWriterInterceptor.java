@@ -36,6 +36,7 @@ import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsOutputStream;
 import org.apache.cxf.rs.security.jose.jws.JwsSignature;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
@@ -51,7 +52,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             ctx.proceed();
             return;
         }
-        JoseHeaders headers = new JoseHeaders();
+        JwsHeaders headers = new JwsHeaders();
         JwsSignatureProvider sigProvider = getInitializedSigProvider(headers);
         setContentTypeIfNeeded(headers, ctx);
         OutputStream actualOs = ctx.getOutputStream();

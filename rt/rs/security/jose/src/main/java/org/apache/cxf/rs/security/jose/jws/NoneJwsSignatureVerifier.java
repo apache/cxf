@@ -18,13 +18,12 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class NoneJwsSignatureVerifier implements JwsSignatureVerifier {
 
     @Override
-    public boolean verify(JoseHeaders headers, String unsignedText, byte[] signature) {
+    public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         return headers.getAlgorithm().equals(getAlgorithm()) && signature.length == 0;
     }
 
