@@ -55,6 +55,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 public class AuthorizationCodeGrantService extends RedirectionBasedGrantService {
     private static final Integer RECOMMENDED_CODE_EXPIRY_TIME_MINS = 10;
     private boolean canSupportPublicClients;
+    private boolean canSupportEmptyRedirectForPrivateClients;
     private OOBResponseDeliverer oobDeliverer;
     private AuthorizationCodeRequestFilter codeRequestFilter;
     private AuthorizationCodeResponseFilter codeResponseFilter;
@@ -179,7 +180,10 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
 
     @Override
     protected boolean canRedirectUriBeEmpty(Client c) {
-        return canSupportPublicClient(c) && c.getRedirectUris().isEmpty();
+        // If a redirect URI is empty then the code will be returned out of band, 
+        // typically will be returned directly to a human user
+        return (c.isConfidential() && canSupportEmptyRedirectForPrivateClients || canSupportPublicClient(c)) 
+                && c.getRedirectUris().isEmpty();
     }
     
     public void setCanSupportPublicClients(boolean support) {
@@ -192,6 +196,9 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
 
     public void setCodeRequestFilter(AuthorizationCodeRequestFilter codeRequestFilter) {
         this.codeRequestFilter = codeRequestFilter;
+    }
+    public void setCanSupportEmptyRedirectForPrivateClients(boolean canSupportEmptyRedirectForPrivateClients) {
+        this.canSupportEmptyRedirectForPrivateClients = canSupportEmptyRedirectForPrivateClients;
     }
     
     
