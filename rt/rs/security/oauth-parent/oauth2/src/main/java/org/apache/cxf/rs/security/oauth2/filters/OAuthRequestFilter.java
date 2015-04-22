@@ -28,7 +28,6 @@ import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -40,6 +39,7 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -71,6 +71,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     private boolean checkFormData;
     private List<String> requiredScopes = Collections.emptyList();
     private boolean allPermissionsMatch;
+    private boolean blockPublicClients;
     
     public void filter(ContainerRequestContext context) {
         validateRequest(JAXRSUtils.getCurrentMessage());
@@ -111,7 +112,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             || !requiredScopes.isEmpty() && requiredScopes.size() != matchingPermissions.size()) {
             String message = "Client has no valid permissions";
             LOG.warning(message);
-            throw new WebApplicationException(403);
+            throw ExceptionUtils.toForbiddenException(null, null);
         }
       
         if (accessTokenV.getClientIpAddress() != null) {
@@ -119,8 +120,13 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             if (remoteAddress == null || accessTokenV.getClientIpAddress().matches(remoteAddress)) {
                 String message = "Client IP Address is invalid";
                 LOG.warning(message);
-                throw new WebApplicationException(403);
+                throw ExceptionUtils.toForbiddenException(null, null);
             }
+        }
+        if (blockPublicClients && !accessTokenV.isClientConfidential()) {
+            String message = "Only Confidential Clients are supported";
+            LOG.warning(message);
+            throw ExceptionUtils.toForbiddenException(null, null);
         }
         
         // Create the security context and make it available on the message
@@ -272,6 +278,10 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
 
     public void setAllPermissionsMatch(boolean allPermissionsMatch) {
         this.allPermissionsMatch = allPermissionsMatch;
+    }
+
+    public void setBlockPublicClients(boolean blockPublicClients) {
+        this.blockPublicClients = blockPublicClients;
     }
     
 }
