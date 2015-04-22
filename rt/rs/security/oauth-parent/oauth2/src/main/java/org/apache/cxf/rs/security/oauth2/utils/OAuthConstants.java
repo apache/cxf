@@ -48,6 +48,10 @@ public final class OAuthConstants {
     public static final String RESOURCE_OWNER_GRANT = "password";
     public static final String REFRESH_TOKEN_GRANT = "refresh_token";
     
+    // CXF-specific grant
+    // The token is returned directly to a human user who copies it into a confidential client
+    public static final String IMPLICIT_CONFIDENTIAL_GRANT = "urn:ietf:params:oauth:grant-type:implicit-confidential";
+    
     // Well-known token types
     public static final String BEARER_TOKEN_TYPE = "bearer";
     public static final String HAWK_TOKEN_TYPE = "hawk";

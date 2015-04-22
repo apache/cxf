@@ -404,7 +404,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return client;
         
     }
-
+    protected String getSupportedGrantType() {
+        return this.supportedGrantType;
+    }
     public void setResourceOwnerNameProvider(ResourceOwnerNameProvider resourceOwnerNameProvider) {
         this.resourceOwnerNameProvider = resourceOwnerNameProvider;
     }

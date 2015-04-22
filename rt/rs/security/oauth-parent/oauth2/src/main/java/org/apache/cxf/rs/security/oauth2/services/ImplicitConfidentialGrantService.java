@@ -20,24 +20,32 @@
 package org.apache.cxf.rs.security.oauth2.services;
 
 import javax.ws.rs.Path;
+
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 
 /**
- * Redirection-based Implicit Grant Service
- * 
- * This resource handles the End User authorising
- * or denying the Client embedded in the Web agent.
- * 
- * We can consider having a single authorization service dealing with either
- * authorization code or implicit grant.
+ * Redirection-based Implicit Grant Service which returns tokens for the confidential clients
+ * directly to a human user. 
  */
-@Path("/authorize-implicit")
-public class ImplicitGrantService extends AbstractImplicitGrantService {
+@Path("/implicit-confidential")
+public class ImplicitConfidentialGrantService extends AbstractImplicitGrantService {
 
-    public ImplicitGrantService() {
-        super(OAuthConstants.TOKEN_RESPONSE_TYPE, OAuthConstants.IMPLICIT_GRANT);
+    public ImplicitConfidentialGrantService() {
+        super(OAuthConstants.TOKEN_RESPONSE_TYPE, OAuthConstants.IMPLICIT_CONFIDENTIAL_GRANT);
     }
+    
+    @Override
+    protected void processRefreshToken(StringBuilder sb, String refreshToken) {
+        sb.append("&").append(OAuthConstants.REFRESH_TOKEN).append("=").append(refreshToken);
+    }
+    @Override
+    protected boolean canSupportPublicClient(Client c) {
+        return false;
+    }
+    
+    
 }
 
 
