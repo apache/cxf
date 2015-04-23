@@ -429,7 +429,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
     }
     protected Client getClient(MultivaluedMap<String, String> params) {
-        return this.getClient(params.getFirst(OAuthConstants.CLIENT_ID));
+        return getClient(params.getFirst(OAuthConstants.CLIENT_ID));
     }
     protected String getSupportedGrantType() {
         return this.supportedGrantType;

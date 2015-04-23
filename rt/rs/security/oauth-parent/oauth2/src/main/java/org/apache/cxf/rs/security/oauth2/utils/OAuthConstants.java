@@ -51,6 +51,7 @@ public final class OAuthConstants {
     // CXF-specific grant
     // The token is returned directly to a human user who copies it into a confidential client
     public static final String IMPLICIT_CONFIDENTIAL_GRANT = "urn:ietf:params:oauth:grant-type:implicit-confidential";
+    public static final String DIRECT_TOKEN_GRANT = "urn:ietf:params:oauth:grant-type:direct-token-grant";
     
     // Well-known token types
     public static final String BEARER_TOKEN_TYPE = "bearer";
