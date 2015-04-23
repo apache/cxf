@@ -61,6 +61,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -488,7 +489,7 @@ public class ClientProxyImpl extends AbstractClient implements
                             values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
                         }
                     } else {
-                        Field f = bean.getClass().getField(propertyName);
+                        Field f = bean.getClass().getField(StringUtils.uncapitalize(propertyName));
                         if (f == null) {
                             continue;
                         }
