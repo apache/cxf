@@ -61,6 +61,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -492,13 +493,14 @@ public class ClientProxyImpl extends AbstractClient implements
                             values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
                         }
                     } else {
-                        Field f = bean.getClass().getField(StringUtils.uncapitalize(propertyName));
+                        String fieldName = StringUtils.uncapitalize(propertyName);
+                        Field f = ReflectionUtil.getDeclaredField(bean.getClass(), fieldName);
                         if (f == null) {
                             continue;
                         }
                         annotation = f.getAnnotation(annClass);
                         if (annotation != null) {
-                            Object value = f.get(bean);
+                            Object value = ReflectionUtil.accessDeclaredField(f, bean, Object.class);
                             if (value != null) {
                                 String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
                                 values.put(annotationValue, new BeanPair(value, f.getAnnotations()));
