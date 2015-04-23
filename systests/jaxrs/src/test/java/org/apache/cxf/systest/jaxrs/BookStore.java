@@ -1664,6 +1664,7 @@ public class BookStore {
     
     public static class BookBean {
         private long id;
+        @QueryParam("id_2")
         private long id2;
         private long id3;
 
@@ -1680,7 +1681,6 @@ public class BookStore {
             return id2;
         }
 
-        @QueryParam("id_2")
         public void setId2(long id2) {
             this.id2 = id2;
         }
