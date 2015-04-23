@@ -689,9 +689,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         List<String> list = matrix.get(name);
         if (list == null) {
-            matrix.put(name, toStringList(values));
+            matrix.put(name, toStringList(true, values));
         } else {
-            list.addAll(toStringList(values));
+            list.addAll(toStringList(true, values));
         }
         return this;
     }
@@ -703,9 +703,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         List<String> list = query.get(name);
         if (list == null) {
-            query.put(name, toStringList(values));
+            query.put(name, toStringList(false, values));
         } else {
-            list.addAll(toStringList(values));
+            list.addAll(toStringList(false, values));
         }
         return this;
     }
@@ -723,7 +723,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             throw new IllegalArgumentException("name is null");
         }
         if (values != null && values.length >= 1 && values[0] != null) {
-            matrix.put(name, toStringList(values));
+            matrix.put(name, toStringList(true, values));
         } else {
             matrix.remove(name);
         }
@@ -779,7 +779,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             throw new IllegalArgumentException("name is null");
         }
         if (values != null && values.length >= 1 && values[0] != null) {
-            query.put(name, toStringList(values));
+            query.put(name, toStringList(false, values));
         } else {
             query.remove(name);
         }
@@ -805,7 +805,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      * @return list of strings
      * @throws IllegalArgumentException when one of values is null
      */
-    private List<String> toStringList(Object... values) throws IllegalArgumentException {
+    private List<String> toStringList(boolean encodeSlash, Object... values) throws IllegalArgumentException {
         List<String> list = new ArrayList<String>();
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
@@ -813,7 +813,11 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 if (value == null) {
                     throw new IllegalArgumentException("Null value on " + i + " position");
                 }
-                list.add(value.toString());
+                String strValue = value.toString();
+                if (encodeSlash) {
+                    strValue = strValue.replaceAll("/", "%2F");
+                }
+                list.add(strValue);
             }
         }
         if (list.isEmpty()) {
@@ -840,6 +844,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 boolean templateValue = val.startsWith("{") && val.endsWith("}");
                 if (!templateValue) { 
                     val = HttpUtils.encodePartiallyEncoded(val, isQuery);
+                    if (!isQuery) {
+                        val = val.replaceAll("/", "%2F");
+                    }
                 } else {
                     val = new URITemplate(val).encodeLiteralCharacters(isQuery);
                 }

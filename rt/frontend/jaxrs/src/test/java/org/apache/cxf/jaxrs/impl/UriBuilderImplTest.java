@@ -480,6 +480,13 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testMatrixWithSlash() throws Exception {
+        URI uri = new URI("http://bar/foo");
+        URI newUri = new UriBuilderImpl(uri).matrixParam("q", "1/2").build();   
+        assertEquals("URI is not built correctly", "http://bar/foo;q=1%2F2", newUri.toString());
+    }
+    
+    @Test
     public void replaceMatrixParamWithEmptyPathTest() throws Exception {
         String name = "name";
         String expected = "http://localhost:8080;name=x;name=y;name=y%20x;name=x%25y;name=%20";
