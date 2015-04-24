@@ -86,6 +86,41 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testOldConfiguration() throws Exception {
+        String address = "https://localhost:" + test.port + "/xmlsig";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        Map<String, Object> newProperties = new HashMap<>();
+        newProperties.put("ws-security.callback-handler", 
+            "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        newProperties.put("ws-security.signature.username", "alice");
+
+        String cryptoUrl = "org/apache/cxf/systest/jaxrs/security/alice.properties";
+        newProperties.put("ws-security.signature.properties", cryptoUrl);
+        bean.setProperties(newProperties);
+        
+        if (test.streaming) {
+            XmlSecOutInterceptor sigInterceptor = new XmlSecOutInterceptor();
+            sigInterceptor.setSignRequest(true);
+            bean.getOutInterceptors().add(sigInterceptor);
+        } else {
+            XmlSigOutInterceptor sigInterceptor = new XmlSigOutInterceptor();
+            bean.getOutInterceptors().add(sigInterceptor);
+        }
+        bean.setServiceClass(BookStore.class);
+        
+        BookStore store = bean.create(BookStore.class);
+        Book book = store.addBook(new Book("CXF", 126L));
+        assertEquals(126L, book.getId());
+    }
+    
+    @Test
     public void testPostBookWithEnvelopedSigAndProxy2() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlsig";
         doTestSignatureProxy(address, false, "", test.streaming);

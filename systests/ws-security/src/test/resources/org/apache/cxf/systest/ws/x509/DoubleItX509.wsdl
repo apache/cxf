@@ -641,6 +641,9 @@
         <wsdl:port name="DoubleItAsymmetricIssuerSerialPort" binding="tns:DoubleItAsymmetricIssuerSerialBinding">
             <soap:address location="http://localhost:9001/DoubleItX509Asymmetric"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricOldConfigPort" binding="tns:DoubleItAsymmetricIssuerSerialBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509AsymmetricOldConfig"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricNoInitiatorReferencePort" binding="tns:DoubleItAsymmetricNoInitiatorReferenceBinding">
             <soap:address location="http://localhost:9001/DoubleItX509AsymmetricNoInitiatorReference"/>
         </wsdl:port>
