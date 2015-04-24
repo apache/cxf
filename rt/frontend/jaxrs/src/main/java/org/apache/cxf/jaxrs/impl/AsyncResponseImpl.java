@@ -195,7 +195,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     
         Object[] allCallbacks = new Object[1 + callbacks.length];
         allCallbacks[0] = callback;
-        System.arraycopy(allCallbacks, 1, callbacks, 0, callbacks.length);
+        System.arraycopy(callbacks, 0, allCallbacks, 1, callbacks.length);
         
         for (int i = 0; i < allCallbacks.length; i++) {
             if (allCallbacks[i] == null) {
