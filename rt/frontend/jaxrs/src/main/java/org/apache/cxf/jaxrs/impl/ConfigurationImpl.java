@@ -141,7 +141,7 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public boolean isRegistered(Object obj) {
-        return providers.containsKey(obj);
+        return isRegistered(obj.getClass());
     }
 
     @Override

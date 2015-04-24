@@ -43,8 +43,10 @@ public class ConfigurationImplTest extends Assert {
         assertFalse(c.isRegistered(ContainerResponseFilter.class));
         assertFalse(c.register(filter, 
                               Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
+        assertFalse(c.register(ContainerResponseFilterImpl.class, 
+                               Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
     }
-    private static class ContainerResponseFilterImpl implements ContainerResponseFilter {
+    public static class ContainerResponseFilterImpl implements ContainerResponseFilter {
 
         @Override
         public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
