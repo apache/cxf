@@ -458,17 +458,18 @@ public class WadlGeneratorTest extends Assert {
         
         checkDocs(resource, "book store \"resource\"", "super resource", "en-us");
         
-        List<Element> resourceEls = getElements(resource, "resource", 9);
+        List<Element> resourceEls = getElements(resource, "resource", 10);
         
         assertEquals("/book2", resourceEls.get(0).getAttribute("path"));
         assertEquals("/books/{bookid}", resourceEls.get(1).getAttribute("path"));
         assertEquals("/chapter", resourceEls.get(2).getAttribute("path"));
         assertEquals("/chapter2", resourceEls.get(3).getAttribute("path"));
         assertEquals("/thebooks2", resourceEls.get(4).getAttribute("path"));
-        assertEquals("/books/\"{bookid}\"", resourceEls.get(5).getAttribute("path"));
-        assertEquals("/booksubresource", resourceEls.get(6).getAttribute("path"));
-        assertEquals("/form", resourceEls.get(7).getAttribute("path"));
-        assertEquals("/itself", resourceEls.get(8).getAttribute("path"));
+        assertEquals("/thestore", resourceEls.get(5).getAttribute("path"));
+        assertEquals("/books/\"{bookid}\"", resourceEls.get(6).getAttribute("path"));
+        assertEquals("/booksubresource", resourceEls.get(7).getAttribute("path"));
+        assertEquals("/form", resourceEls.get(8).getAttribute("path"));
+        assertEquals("/itself", resourceEls.get(9).getAttribute("path"));
         
         // verify root resource starting with "/"
         // must have a single template parameter
@@ -551,14 +552,16 @@ public class WadlGeneratorTest extends Assert {
         // verify resource starting with /chapter2
         verifyGetResourceMethod(resourceEls.get(3), chapterEl, null);
         
+        verifyGetResourceMethod(resourceEls.get(5), bookEl, null);
+        
         // verify resource starting from /booksubresource
         // should have 2 parameters
-        verifyParameters(resourceEls.get(6), 2, 
+        verifyParameters(resourceEls.get(7), 2, 
                          new Param("id", "template", "xs:int"),
                          new Param("mid", "matrix", "xs:int"));
-        checkDocs(resourceEls.get(6), "", "Book subresource", ""); 
+        checkDocs(resourceEls.get(7), "", "Book subresource", ""); 
         // should have 4 child resources
-        List<Element> subResourceEls = getElements(resourceEls.get(6), "resource", 6);
+        List<Element> subResourceEls = getElements(resourceEls.get(7), "resource", 6);
 
         assertEquals("/book", subResourceEls.get(0).getAttribute("path"));
         assertEquals("/form1", subResourceEls.get(1).getAttribute("path"));

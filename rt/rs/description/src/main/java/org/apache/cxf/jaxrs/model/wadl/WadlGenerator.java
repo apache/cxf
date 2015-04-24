@@ -985,6 +985,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             String docCategory;
             Annotation[] anns;
             int inParamIndex = -1;
+            Type genericType = null;
             if (inbound) {
                 inParamIndex = getRequestBodyParam(ori).getIndex();
                 anns = opMethod.getParameterAnnotations()[inParamIndex];
@@ -992,10 +993,12 @@ public class WadlGenerator implements ContainerRequestFilter {
                     anns = opMethod.getAnnotations();
                 }
                 docCategory = DocTarget.PARAM;
+                genericType = opMethod.getGenericParameterTypes()[inParamIndex];
             } else {
                 anns = opMethod.getAnnotations();
                 docCategory = DocTarget.RETURN;
                 allowDefault = false;
+                genericType = opMethod.getGenericReturnType();
             }
             if (isPrimitive) {
                 sb.append(">");
@@ -1007,10 +1010,14 @@ public class WadlGenerator implements ContainerRequestFilter {
                 boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
                 Class<?> theActualType = null;
                 if (isCollection) {
-                    theActualType = InjectionUtils.getActualType(!inbound ? opMethod.getGenericReturnType() : opMethod
-                        .getGenericParameterTypes()[getRequestBodyParam(ori).getIndex()]);
+                    theActualType = InjectionUtils.getActualType(genericType);
                 } else {
                     theActualType = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
+                }
+                if (theActualType == Object.class && !(genericType instanceof Class)) {
+                    Type theType = InjectionUtils.processGenericTypeIfNeeded(
+                        ori.getClassResourceInfo().getServiceClass(), Object.class, genericType);
+                    theActualType = InjectionUtils.getActualType(theType);
                 }
                 if (isJson) {
                     sb.append(" element=\"").append(theActualType.getSimpleName()).append("\"");
