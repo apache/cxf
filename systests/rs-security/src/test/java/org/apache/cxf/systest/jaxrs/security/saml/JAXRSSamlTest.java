@@ -60,7 +60,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     public void testGetBookSAMLTokenAsHeader() throws Exception {
         String address = "https://localhost:" + PORT + "/samlheader/bookstore/books/123";
         
-        WebClient wc = createWebClient(address, new SamlHeaderOutInterceptor(), null, true);
+        WebClient wc = createWebClient(address, new SamlHeaderOutInterceptor(), null);
         
         try {
             Book book = wc.get(Book.class);
@@ -100,8 +100,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + PORT + "/samlform/bookstore/books";
         FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
         formProvider.setExpectedEncoded(true);
-        WebClient wc = createWebClient(address, new SamlFormOutInterceptor(),
-                                       formProvider, true);
+        WebClient wc = createWebClient(address, new SamlFormOutInterceptor(), formProvider);
         
         wc.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_XML);
         try {
@@ -179,8 +178,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     
     public void doTestEnvelopedSAMLToken(boolean signed) throws Exception {
         String address = "https://localhost:" + PORT + "/samlxml/bookstore/books";
-        WebClient wc = createWebClient(address, new SamlEnvelopedOutInterceptor(!signed),
-                                       null, signed);
+        WebClient wc = createWebClient(address, new SamlEnvelopedOutInterceptor(!signed), null);
         XmlSigOutInterceptor xmlSig = new XmlSigOutInterceptor();
         if (signed) {
             xmlSig.setStyle(XmlSigOutInterceptor.DETACHED_SIG);
@@ -205,8 +203,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     
     private WebClient createWebClient(String address, 
                                       Interceptor<Message> outInterceptor,
-                                      Object provider,
-                                      boolean selfSign) {
+                                      Object provider) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -223,9 +220,6 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         properties.put("security.signature.username", "alice");
         properties.put("security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
-        if (selfSign) {
-            properties.put("ws-security.self-sign-saml-assertion", "true");
-        }
         bean.setProperties(properties);
         
         bean.getOutInterceptors().add(outInterceptor);
