@@ -589,7 +589,7 @@ public final class ResourceUtils {
             }
             Type type = method.getGenericReturnType();
             if (jaxbOnly) {
-                checkJaxbType(cls, realReturnType == Response.class ? cls : type, types, 
+                checkJaxbType(resource.getServiceClass(), cls, realReturnType == Response.class ? cls : type, types, 
                     method.getAnnotations(), jaxbWriter);
             } else {
                 types.getAllTypes().put(cls, type);
@@ -600,7 +600,7 @@ public final class ResourceUtils {
                     Class<?> inType = method.getParameterTypes()[pm.getIndex()];
                     Type paramType = method.getGenericParameterTypes()[pm.getIndex()];
                     if (jaxbOnly) {
-                        checkJaxbType(inType, paramType, types, 
+                        checkJaxbType(resource.getServiceClass(), inType, paramType, types, 
                                       method.getParameterAnnotations()[pm.getIndex()], jaxbWriter);
                     } else {
                         types.getAllTypes().put(inType, paramType);
@@ -628,7 +628,8 @@ public final class ResourceUtils {
         return isRecursiveSubResource(parent.getParent(), sub);
     }
     
-    private static void checkJaxbType(Class<?> type, 
+    private static void checkJaxbType(Class<?> serviceClass,
+                                      Class<?> type, 
                                       Type genericType, 
                                       ResourceTypes types,
                                       Annotation[] anns,
@@ -637,6 +638,12 @@ public final class ResourceUtils {
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             type = InjectionUtils.getActualType(genericType);
             isCollection = true;
+        }
+        if (type == Object.class && !(genericType instanceof Class)) {
+            Type theType = InjectionUtils.processGenericTypeIfNeeded(serviceClass, 
+                                                      Object.class,
+                                                      genericType);
+            type = InjectionUtils.getActualType(theType);
         }
         if (type == null
             || InjectionUtils.isPrimitive(type)

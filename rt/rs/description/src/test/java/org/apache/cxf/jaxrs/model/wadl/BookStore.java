@@ -52,7 +52,7 @@ import org.apache.cxf.jaxrs.model.wadl.jaxb.packageinfo.Book2;
 @Path("/bookstore/{id}")
 @Consumes({"application/xml", "application/json" })
 @Produces({"application/xml", "application/json" })
-public class BookStore implements BookDescription {
+public class BookStore extends AbstractStore<Book> implements BookDescription {
 
     @Descriptions({ 
         @Description(value = "Attachments, max < 10", target = DocTarget.PARAM)
