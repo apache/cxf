@@ -25,14 +25,17 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
 public class ConfigurationImpl implements Configuration {
+    private static final Logger LOG = LogUtils.getL7dLogger(ConfigurationImpl.class);
     private Map<String, Object> props = new HashMap<String, Object>();
     private RuntimeType runtimeType;
     private Map<Object, Map<Class<?>, Integer>> providers = 
@@ -144,7 +147,7 @@ public class ConfigurationImpl implements Configuration {
     @Override
     public boolean isRegistered(Class<?> cls) {
         for (Object o : getInstances()) {
-            if (cls.isAssignableFrom(o.getClass())) {
+            if (cls == o.getClass()) {
                 return true;
             }
         }
@@ -168,10 +171,15 @@ public class ConfigurationImpl implements Configuration {
         register(provider, initContractsMap(bindingPriority, contracts));
     }
     
-    public void register(Object provider, Map<Class<?>, Integer> contracts) {
+    public boolean register(Object provider, Map<Class<?>, Integer> contracts) {
         if (provider.getClass() == Class.class) {
             provider = createProvider((Class<?>)provider);
         }
+        if (isRegistered(provider)) {
+            LOG.warning("Provider " + provider.getClass().getName() + " has already been registered");
+            return false;
+        }
+        
         Map<Class<?>, Integer> metadata = providers.get(provider);
         if (metadata == null) {
             metadata = new HashMap<Class<?>, Integer>();
@@ -182,6 +190,7 @@ public class ConfigurationImpl implements Configuration {
                 metadata.put(contract, contracts.get(contract));
             }
         }
+        return true;
     }
     
     public static Map<Class<?>, Integer> initContractsMap(int bindingPriority, Class<?>... contracts) {
