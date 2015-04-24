@@ -19,17 +19,24 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -90,6 +97,9 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new FaultyRequestHandler());
         providers.add(new SearchContextProvider());
         providers.add(new QueryContextProvider());
+        providers.add(new BlockingRequestFilter());
+        providers.add(new FaultyResponseFilter());
+        providers.add(new BlockedExceptionMapper());
         sf.setProviders(providers);
         List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
         inInts.add(new CustomInFaultyInterceptor());
@@ -140,6 +150,41 @@ public class BookServer extends AbstractBusTestServerBase {
             return Response.serverError().type("text/plain;charset=utf-8").header("BusMapper", "the-mapper")
                 .entity("BusMapperException").build();
         }
+        
+    }
+    @PreMatching
+    private static class BlockingRequestFilter implements ContainerRequestFilter {
+
+        @Override
+        public void filter(ContainerRequestContext requestContext) throws IOException {
+            if (requestContext.getUriInfo().getPath().endsWith("/blockAndThrowException")) {
+                requestContext.setProperty("blocked", Boolean.TRUE);
+                requestContext.abortWith(Response.ok().build());
+            }
+        }
+        
+    }
+    private static class FaultyResponseFilter implements ContainerResponseFilter {
+        @Override
+        public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
+            throws IOException {
+            if (PropertyUtils.isTrue(requestContext.getProperty("blocked"))) {
+                throw new BlockedException();
+            }
+        }
+        
+    }
+    private static class BlockedExceptionMapper implements ExceptionMapper<BlockedException> {
+
+        @Override
+        public Response toResponse(BlockedException exception) {
+            return Response.ok().build();
+        }
+        
+        
+    }
+    @SuppressWarnings("serial")
+    public static class BlockedException extends RuntimeException {
         
     }
 }

@@ -149,6 +149,7 @@ public final class JAXRSUtils {
     public static final String ROOT_INSTANCE = "service.root.instance";
     public static final String ROOT_PROVIDER = "service.root.provider";
     public static final String EXCEPTION_FROM_MAPPER = "exception.from.mapper";
+    public static final String SECOND_JAXRS_EXCEPTION = "second.jaxrs.exception";
     public static final String PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK = 
         "media.subtype.partial.check"; 
     public static final String DOC_LOCATION = "wadl.location";

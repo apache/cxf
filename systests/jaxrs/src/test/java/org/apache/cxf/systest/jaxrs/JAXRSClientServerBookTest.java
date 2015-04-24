@@ -100,6 +100,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBlockAndTrowException() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/blockAndThrowException";
+        WebClient wc = WebClient.create(address);
+        Response r = wc.get();
+        assertEquals(500, r.getStatus());
+    }
+    @Test
     public void testGetBookRoot() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/;JSESSIONID=xxx";
         WebClient wc = WebClient.create(address);

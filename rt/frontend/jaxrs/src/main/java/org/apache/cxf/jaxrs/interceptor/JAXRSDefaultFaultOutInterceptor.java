@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.NSStack;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
@@ -52,6 +53,9 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
     }
 
     public void handleMessage(Message message) throws Fault {
+        if (PropertyUtils.isTrue(message.getExchange().get(JAXRSUtils.SECOND_JAXRS_EXCEPTION))) {
+            return;
+        }
         final Fault f = (Fault) message.getContent(Exception.class);
         
         Response r = JAXRSUtils.convertFaultToResponse(f.getCause(), message);

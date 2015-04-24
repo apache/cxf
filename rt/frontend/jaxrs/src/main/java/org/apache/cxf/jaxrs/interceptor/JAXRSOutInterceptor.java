@@ -363,6 +363,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         Response excResponse = null;
         if (firstTry) {
             excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
+        } else {
+            message.getExchange().put(JAXRSUtils.SECOND_JAXRS_EXCEPTION, Boolean.TRUE);
         }
         if (excResponse == null) {
             setResponseStatus(message, 500);
