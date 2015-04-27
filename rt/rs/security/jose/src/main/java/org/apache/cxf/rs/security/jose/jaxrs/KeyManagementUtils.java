@@ -167,6 +167,10 @@ public final class KeyManagementUtils {
             }
             String direction = m.getExchange().getOutMessage() == m ? ".out" : ".in";
             kid = (String)MessageUtils.getContextualProperty(m, preferredPropertyName, altPropertyName + direction);
+            // Check whether the direction is not set for the altPropertyName
+            if (kid == null && altPropertyName != null) {
+                kid = (String)m.getContextualProperty(altPropertyName);
+            }
         }
         
         if (kid == null) {
