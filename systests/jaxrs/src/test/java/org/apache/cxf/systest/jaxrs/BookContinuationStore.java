@@ -38,6 +38,7 @@ import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.ConnectionCallback;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -126,6 +127,14 @@ public class BookContinuationStore {
     public void handleContinuationRequestNotFoundUnmapped(@Suspended AsyncResponse response) {
         response.register(new CallbackImpl());
         resumeSuspendedNotFoundUnmapped(response);
+    }
+    
+    @GET
+    @Path("books/unmappedFromFilter")
+    @Produces("text/plain")
+    public void handleContinuationRequestUnmappedFromFilter(@Suspended AsyncResponse response) {
+        response.register(new CallbackImpl());
+        response.resume(Response.ok().build());
     }
     
     @GET
