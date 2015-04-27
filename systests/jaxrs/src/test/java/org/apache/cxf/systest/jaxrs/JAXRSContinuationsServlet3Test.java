@@ -19,6 +19,9 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.core.Response;
+
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.ServerLauncher;
 import org.junit.BeforeClass;
@@ -43,7 +46,15 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
     public void testTimeoutAndCancelAsyncExecutor() throws Exception {
         doTestTimeoutAndCancel("/asyncexecutor/bookstore");
     }
-    
+    @Test
+    public void testGetBookUnmappedFromFilter() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:" + getPort() + getBaseAddress()
+                             + "/books/unmappedFromFilter");
+        wc.accept("text/plain");
+        Response r = wc.get();
+        assertEquals(500, r.getStatus());
+    }
     @Test
     public void testClientDisconnect() throws Exception {
         ServerLauncher launcher = new ServerLauncher(BookContinuationClient.class.getName());

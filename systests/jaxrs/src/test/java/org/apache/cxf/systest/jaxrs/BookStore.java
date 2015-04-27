@@ -548,6 +548,16 @@ public class BookStore {
                             .build();
     }
     
+    @GET
+    @Path("/options/2")
+    public Response getOptions2() throws Exception {
+        return getOptions();
+    }
+    @Path("/options/{id}")
+    public int getOptions2Sub(@PathParam("id") int id) {
+        throw new RuntimeException();
+    }
+    
     @POST
     @Path("post401")
     public Response get401WithText() throws Exception {
