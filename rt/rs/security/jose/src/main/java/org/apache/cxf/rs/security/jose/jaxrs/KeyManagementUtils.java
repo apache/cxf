@@ -350,14 +350,6 @@ public final class KeyManagementUtils {
                 if (keyPassword != null) {
                     props.setProperty(RSSEC_KEY_PSWD, keyPassword);
                 }
-                String signatureProvider = (String)m.getContextualProperty(RSSEC_SIG_KEY_PSWD_PROVIDER);
-                if (signatureProvider != null) {
-                    props.setProperty(RSSEC_SIG_KEY_PSWD_PROVIDER, signatureProvider);
-                }
-                String keyProvider = (String)m.getContextualProperty(RSSEC_KEY_PSWD_PROVIDER);
-                if (keyProvider != null) {
-                    props.setProperty(RSSEC_KEY_PSWD_PROVIDER, keyProvider);
-                }
             }
         }
         if (props == null && required) { 
