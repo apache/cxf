@@ -43,13 +43,13 @@ public class ProvidersImpl implements Providers {
     public <T> MessageBodyReader<T> getMessageBodyReader(
          Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return ProviderFactory.getInstance(m).createMessageBodyReader(
-            type, genericType, annotations, mediaType, m);
+            type, getGenericType(type, genericType), annotations, mediaType, m);
     }
 
     public <T> MessageBodyWriter<T> getMessageBodyWriter(
         Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return ProviderFactory.getInstance(m).createMessageBodyWriter(
-                   type, genericType, annotations, mediaType, m);
+                   type, getGenericType(type, genericType), annotations, mediaType, m);
     }
 
     public <T> ContextResolver<T> getContextResolver(Class<T> contextType, MediaType mediaType) {
@@ -59,5 +59,7 @@ public class ProvidersImpl implements Providers {
     public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> type) {
         return ServerProviderFactory.getInstance(m).createExceptionMapper(type, m);
     }
-
+    private Type getGenericType(Class<?> type, Type genericType) {
+        return genericType == null ? type : genericType;
+    }
 }
