@@ -394,7 +394,6 @@ public final class JAXRSUtils {
         int methodMatched = 0;
         int consumeMatched = 0;
         
-        boolean resourceMethodsAdded = false;
         List<OperationResourceInfo> finalPathSubresources = null;
         for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> rEntry : matchedResources.entrySet()) {
             ClassResourceInfo resource = rEntry.getKey();
@@ -439,7 +438,6 @@ public final class JAXRSUtils {
                                     if (matchProduceTypes(acceptType, ori)) {
                                         candidateList.put(ori, map);
                                         added = true;
-                                        resourceMethodsAdded = true;
                                         break;
                                     }
                                 }
@@ -459,7 +457,7 @@ public final class JAXRSUtils {
                 }
             }
         }
-        if (finalPathSubresources != null && resourceMethodsAdded
+        if (finalPathSubresources != null && pathMatched > 0
             && !MessageUtils.getContextualBoolean(message, KEEP_SUBRESOURCE_CANDIDATES, false)) {
             for (OperationResourceInfo key : finalPathSubresources) {
                 candidateList.remove(key);

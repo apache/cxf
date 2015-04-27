@@ -1181,9 +1181,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testExplicitOptions() throws Exception {
-        WebClient wc = 
-            WebClient.create("http://localhost:" 
-                             + PORT + "/bookstore/options");
+        doTestExplicitOptions("http://localhost:" + PORT + "/bookstore/options");
+    }
+    @Test
+    public void testExplicitOptions2() throws Exception {
+        doTestExplicitOptions("http://localhost:" + PORT + "/bookstore/options/2");
+    }
+    private void doTestExplicitOptions(String address) throws Exception {
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         WebClient.getConfig(wc).getRequestContext().put("org.apache.cxf.http.header.split", true);
         Response response = wc.options();
         List<Object> values = response.getMetadata().get("Allow");
@@ -1309,7 +1315,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         bean.setAddress(address);
         bean.setResourceClass(BookStore.class);
         BookStore store = bean.create(BookStore.class);
-        WebClient.getConfig(store).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         double[] arr = store.getBookIndexAsDoubleArray();
         assertEquals(3, arr.length);
         assertEquals(1, arr[0], 0.0);

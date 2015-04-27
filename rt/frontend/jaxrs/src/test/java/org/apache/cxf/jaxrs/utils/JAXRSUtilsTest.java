@@ -469,7 +469,7 @@ public class JAXRSUtilsTest extends Assert {
         String contentTypes = "*/*";
         
         OperationResourceInfo ori = findTargetResourceClass(resources,
-               createMessage2(), "/bookstore/books/123", "GET", new MetadataMap<String, String>(), contentTypes,
+               createMessage2(), "/bookstore/books/sub/123", "GET", new MetadataMap<String, String>(), contentTypes,
                getTypes("*/*"));       
         assertNotNull(ori);
         assertEquals("getBook", ori.getMethodToInvoke().getName());

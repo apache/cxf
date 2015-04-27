@@ -33,6 +33,6 @@ public interface BookInterface {
     @Consumes("text/foo2")
     String getAuthor();
     
-    @Path("/books/{bookId}")
+    @Path("/books/sub/{bookId}")
     Book getBook(@PathParam("bookId") String id);
 }
