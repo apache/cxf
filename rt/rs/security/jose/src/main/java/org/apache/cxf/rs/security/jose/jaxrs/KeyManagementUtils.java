@@ -297,6 +297,9 @@ public final class KeyManagementUtils {
     }
     public static String getKeyAlgorithm(Message m, Properties props, String propName, String defaultAlg) {
         String algo = props.getProperty(propName);
+        if (algo == null) {
+            algo = (String)m.getContextualProperty(propName);
+        }
         if (algo == null && PropertyUtils.isTrue(m.getContextualProperty(RSSEC_DEFAULT_ALGORITHMS))) {
             algo = defaultAlg;
         }
@@ -325,12 +328,32 @@ public final class KeyManagementUtils {
             String keyFile = (String)m.getContextualProperty(RSSEC_KEY_STORE_FILE);
             if (keyFile != null) {
                 props = new Properties();
-                props.setProperty(KeyManagementUtils.RSSEC_KEY_STORE_FILE, keyFile);
+                props.setProperty(RSSEC_KEY_STORE_FILE, keyFile);
                 String type = (String)m.getContextualProperty(RSSEC_KEY_STORE_TYPE);
                 if (type == null) {
                     type = "jwk";
                 }
                 props.setProperty(RSSEC_KEY_STORE_TYPE, type);
+                String alias = (String)m.getContextualProperty(RSSEC_KEY_STORE_ALIAS);
+                if (alias != null) {
+                    props.setProperty(RSSEC_KEY_STORE_ALIAS, alias);
+                }
+                String keystorePassword = (String)m.getContextualProperty(RSSEC_KEY_STORE_PSWD);
+                if (keystorePassword != null) {
+                    props.setProperty(RSSEC_KEY_STORE_PSWD, keystorePassword);
+                }
+                String keyPassword = (String)m.getContextualProperty(RSSEC_KEY_PSWD);
+                if (keyPassword != null) {
+                    props.setProperty(RSSEC_KEY_PSWD, keyPassword);
+                }
+                String signatureProvider = (String)m.getContextualProperty(RSSEC_SIG_KEY_PSWD_PROVIDER);
+                if (signatureProvider != null) {
+                    props.setProperty(RSSEC_SIG_KEY_PSWD_PROVIDER, signatureProvider);
+                }
+                String keyProvider = (String)m.getContextualProperty(RSSEC_KEY_PSWD_PROVIDER);
+                if (keyProvider != null) {
+                    props.setProperty(RSSEC_KEY_PSWD_PROVIDER, keyProvider);
+                }
             }
         }
         if (props == null && required) { 
