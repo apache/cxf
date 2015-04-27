@@ -93,6 +93,16 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
     }
     
     @Test
+    public void testGetBookUnmappedFromFilter() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:" + getPort() + getBaseAddress() 
+                             + "/books/unmappedFromFilter");
+        wc.accept("text/plain");
+        Response r = wc.get();
+        assertEquals(500, r.getStatus());
+    }
+    
+    @Test
     public void testTimeoutAndCancel() throws Exception {
         doTestTimeoutAndCancel(getBaseAddress());
     }

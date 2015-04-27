@@ -177,7 +177,12 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             inMessage.getExchange().getInMessage()
                 .remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
             if (callback != null) {
-                callback.onComplete();
+                final Exception ex = inMessage.getExchange().get(Exception.class);
+                if (ex == null) {
+                    callback.onComplete();
+                } else {
+                    callback.onError(ex);
+                }
             }
         }
         public void onError(AsyncEvent event) throws IOException {
