@@ -52,7 +52,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
     private Map<String, String> claimMapping;
     private String userBaseDn;
     private List<String> userBaseDNs;
-    private String delimiter = ";";
+    private String delimiter;
     private boolean x500FilterEnabled = true;
     private String objectClass = "person";
     private String userNameAttribute = "cn";
@@ -240,7 +240,6 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                 c.setClaimType(claimType);
                 c.setPrincipal(principal);
 
-                StringBuilder claimValue = new StringBuilder();
                 try {
                     NamingEnumeration<?> list = (NamingEnumeration<?>)attr.getAll();
                     while (list.hasMore()) {
@@ -257,9 +256,16 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                                     //Ignore, not X500 compliant thus use the whole string as the value
                                 }
                             }
-                            claimValue.append(itemValue);
-                            if (list.hasMore()) {
-                                claimValue.append(this.getDelimiter());
+                            if (delimiter != null) {
+                                StringBuilder claimValue = new StringBuilder();
+                                claimValue.append(itemValue);
+                                if (list.hasMore()) {
+                                    claimValue.append(this.getDelimiter());
+                                } else if (claimValue.length() > 0) {
+                                    c.addValue(claimValue.toString());
+                                }
+                            } else {
+                                c.addValue(itemValue);
                             }
                         } else if (obj instanceof byte[]) {
                             // Just store byte[]
@@ -274,9 +280,6 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                     LOG.warning("Failed to read value of LDAP attribute '" + ldapAttribute + "'");
                 }
                 
-                if (claimValue.length() > 0) {
-                    c.addValue(claimValue.toString());
-                }
                 // c.setIssuer(issuer);
                 // c.setOriginalIssuer(originalIssuer);
                 // c.setNamespace(namespace);
