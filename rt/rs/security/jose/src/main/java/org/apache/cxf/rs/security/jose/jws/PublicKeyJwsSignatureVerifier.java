@@ -51,8 +51,8 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
                                                AlgorithmUtils.toJavaName(checkAlgorithm(headers.getAlgorithm())),
                                                signatureSpec);
         } catch (Exception ex) {
-            LOG.warning("Invalid signature");
-            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
+            LOG.warning("Invalid signature: " + ex.getMessage());
+            throw new JwsException(JwsException.Error.INVALID_SIGNATURE, ex);
         }
     }
     protected String checkAlgorithm(String algo) {
