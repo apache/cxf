@@ -49,6 +49,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
@@ -85,7 +86,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         try {
             processResponse(providerFactory, message);
         } catch (Exception ex) {
-            message.put("jaxrs.out.fault", Boolean.TRUE);    
+            message.put("jaxrs.out.fault", Boolean.TRUE);
+            throw new Fault(ex);
         } finally {
             Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
             Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);

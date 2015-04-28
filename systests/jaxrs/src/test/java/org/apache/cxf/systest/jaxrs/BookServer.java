@@ -78,6 +78,7 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new FormatResponseHandler());
         providers.add(new GenericHandlerWriter());
         providers.add(new FaultyRequestHandler());
+        providers.add(new FaultyResponseHandler());
         providers.add(new SearchContextProvider());
         providers.add(new QueryContextProvider());
         sf.setProviders(providers);

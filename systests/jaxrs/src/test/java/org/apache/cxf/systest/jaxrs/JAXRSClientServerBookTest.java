@@ -92,7 +92,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServer.class, true));
         createStaticBus();
     }
-    
+    @Test
+    public void testExceptionFromFaultyResponseHandler() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/faultyResponseHandler";
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setAutoRedirect(true);
+        Response r = wc.get();
+        assertEquals(500, r.getStatus());
+    }
     @Test
     public void testGetBookRoot() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/;JSESSIONID=xxx";

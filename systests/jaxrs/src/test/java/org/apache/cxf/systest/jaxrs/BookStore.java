@@ -144,6 +144,12 @@ public class BookStore {
     }
 
     @GET
+    @Path("faultyResponseHandler")
+    public Book testFaultyResponseHandler() {
+        return new Book("root", 124L);
+    }
+    
+    @GET
     @Path("/")
     public Book getBookRoot() {
         return new Book("root", 124L);
