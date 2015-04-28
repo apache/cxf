@@ -34,7 +34,6 @@ import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -195,11 +194,11 @@ public final class KeyManagementUtils {
         return cb;
     }
     
-    public static RSAPrivateKey loadPrivateKey(Message m, Properties props, String keyOper) {
+    public static PrivateKey loadPrivateKey(Message m, Properties props, String keyOper) {
         KeyStore keyStore = loadPersistKeyStore(m, props);
-        return (RSAPrivateKey)loadPrivateKey(keyStore, m, props, keyOper, null);
+        return loadPrivateKey(keyStore, m, props, keyOper, null);
     }
-    private static RSAPrivateKey loadPrivateKey(KeyStore keyStore, Message m, Properties props, String keyOper, 
+    private static PrivateKey loadPrivateKey(KeyStore keyStore, Message m, Properties props, String keyOper, 
                                                 String alias) {
         Bus bus = m.getExchange().getBus();
         PrivateKeyPasswordProvider cb = loadPasswordProvider(m, props, keyOper);
@@ -212,7 +211,7 @@ public final class KeyManagementUtils {
                 }
             }
         }
-        return (RSAPrivateKey)loadPrivateKey(keyStore, m, props, bus, cb, keyOper, alias);
+        return loadPrivateKey(keyStore, m, props, bus, cb, keyOper, alias);
     }
     public static KeyStore loadPersistKeyStore(Message m, Properties props) {
         if (!props.containsKey(RSSEC_KEY_STORE_FILE)) {
@@ -358,7 +357,7 @@ public final class KeyManagementUtils {
         }
         return props; 
     }
-    public static RSAPrivateKey loadPrivateKey(Message m, Properties props, 
+    public static PrivateKey loadPrivateKey(Message m, Properties props, 
                                                List<X509Certificate> inCerts, String keyOper) {
         KeyStore ks = loadPersistKeyStore(m, props);
         

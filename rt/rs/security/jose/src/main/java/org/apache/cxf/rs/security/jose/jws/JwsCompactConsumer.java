@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPublicKey;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -116,10 +116,10 @@ public class JwsCompactConsumer {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key, algo));
     }
     public boolean verifySignatureWith(X509Certificate cert, String algo) {
-        return verifySignatureWith(JwsUtils.getRSAKeySignatureVerifier(cert, algo));
+        return verifySignatureWith(JwsUtils.getPublicKeySignatureVerifier(cert, algo));
     }
-    public boolean verifySignatureWith(RSAPublicKey key, String algo) {
-        return verifySignatureWith(JwsUtils.getRSAKeySignatureVerifier(key, algo));
+    public boolean verifySignatureWith(PublicKey key, String algo) {
+        return verifySignatureWith(JwsUtils.getPublicKeySignatureVerifier(key, algo));
     }
     public boolean verifySignatureWith(byte[] key, String algo) {
         return verifySignatureWith(JwsUtils.getHmacSignatureVerifier(key, algo));
