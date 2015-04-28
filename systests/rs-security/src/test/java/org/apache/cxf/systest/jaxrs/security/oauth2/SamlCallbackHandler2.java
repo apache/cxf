@@ -47,7 +47,6 @@ import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.joda.time.DateTime;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
@@ -69,7 +68,6 @@ public class SamlCallbackHandler2 implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setSamlVersion(SAMLVersion.VERSION_20);
                 callback.setIssuer("alice");
                 
                 String subjectName = m != null ? (String)m.getContextualProperty("saml.subject.name") : null;
