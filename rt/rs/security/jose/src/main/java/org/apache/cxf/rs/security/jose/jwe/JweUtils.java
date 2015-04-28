@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.nio.ByteBuffer;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -324,10 +325,15 @@ public final class JweUtils {
             // Supporting loading a private key via a certificate for now
             List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
             KeyManagementUtils.validateCertificateChain(props, chain);
-            RSAPrivateKey privateKey = 
+            PrivateKey privateKey = 
                 KeyManagementUtils.loadPrivateKey(m, props, chain, JsonWebKey.KEY_OPER_DECRYPT);
+            if (!(privateKey instanceof RSAPrivateKey)) {
+                LOG.warning("Non-RSA private keys are not yet supported for encryption");
+                return null;
+            }
             contentEncryptionAlgo = inHeaders.getContentEncryptionAlgorithm();
-            keyDecryptionProvider = getRSAKeyDecryptionAlgorithm(privateKey, inHeaders.getKeyEncryptionAlgorithm());
+            keyDecryptionProvider = getRSAKeyDecryptionAlgorithm((RSAPrivateKey)privateKey, 
+                                                                 inHeaders.getKeyEncryptionAlgorithm());
         } else {
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_DECRYPT);

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
-import java.security.interfaces.RSAPrivateKey;
+import java.security.PrivateKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
@@ -77,8 +77,8 @@ public class JwsCompactProducer {
         return signWith(JwsUtils.getSignatureProvider(jwk, headers.getAlgorithm()));
     }
     
-    public String signWith(RSAPrivateKey key) {
-        return signWith(JwsUtils.getRSAKeySignatureProvider(key, headers.getAlgorithm()));
+    public String signWith(PrivateKey key) {
+        return signWith(JwsUtils.getPrivateKeySignatureProvider(key, headers.getAlgorithm()));
     }
     public String signWith(byte[] key) {
         return signWith(JwsUtils.getHmacSignatureProvider(key, headers.getAlgorithm()));

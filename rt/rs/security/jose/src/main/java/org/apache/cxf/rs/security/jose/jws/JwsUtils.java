@@ -18,7 +18,11 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
@@ -54,13 +58,13 @@ public final class JwsUtils {
     private JwsUtils() {
         
     }
-    public static String sign(RSAPrivateKey key, String algo, String content) {
+    public static String sign(PrivateKey key, String algo, String content) {
         return sign(key, algo, content, null);
     }
     
     
-    public static String sign(RSAPrivateKey key, String algo, String content, String ct) {
-        return sign(getRSAKeySignatureProvider(key, algo), content, ct);
+    public static String sign(PrivateKey key, String algo, String content, String ct) {
+        return sign(getPrivateKeySignatureProvider(key, algo), content, ct);
     }
     public static String sign(byte[] key, String algo, String content) {
         return sign(key, algo, content, null);
@@ -68,8 +72,8 @@ public final class JwsUtils {
     public static String sign(byte[] key, String algo, String content, String ct) {
         return sign(getHmacSignatureProvider(key, algo), content, ct);
     }
-    public static String verify(RSAPublicKey key, String algo, String content) {
-        JwsCompactConsumer jws = verify(getRSAKeySignatureVerifier(key, algo), content);
+    public static String verify(PublicKey key, String algo, String content) {
+        JwsCompactConsumer jws = verify(getPublicKeySignatureVerifier(key, algo), content);
         return jws.getDecodedJwsPayload();
     }
     public static String verify(byte[] key, String algo, String content) {
@@ -80,28 +84,34 @@ public final class JwsUtils {
         return getSignatureProvider(jwk, null);
     }
     public static JwsSignatureProvider getSignatureProvider(JsonWebKey jwk, String defaultAlgorithm) {
-        String rsaSignatureAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
+        String signatureAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         JwsSignatureProvider theSigProvider = null;
         if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-            theSigProvider = getRSAKeySignatureProvider(JwkUtils.toRSAPrivateKey(jwk),
-                                                        rsaSignatureAlgo);
+            theSigProvider = getPrivateKeySignatureProvider(JwkUtils.toRSAPrivateKey(jwk),
+                                                            signatureAlgo);
             
             
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) { 
             byte[] key = JoseUtils.decode((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-            theSigProvider = getHmacSignatureProvider(key, rsaSignatureAlgo);
+            theSigProvider = getHmacSignatureProvider(key, signatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
-            theSigProvider = new EcDsaJwsSignatureProvider(JwkUtils.toECPrivateKey(jwk),
-                                                           SignatureAlgorithm.getAlgorithm(rsaSignatureAlgo));
+            theSigProvider = getPrivateKeySignatureProvider(JwkUtils.toECPrivateKey(jwk),
+                                                            signatureAlgo);
         }
         return theSigProvider;
     }
-    public static JwsSignatureProvider getRSAKeySignatureProvider(RSAPrivateKey key, String algo) {
+    public static JwsSignatureProvider getPrivateKeySignatureProvider(PrivateKey key, String algo) {
         if (algo == null) {
             LOG.warning("No signature algorithm was defined");
             throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
         }
-        return new PrivateKeyJwsSignatureProvider(key, SignatureAlgorithm.getAlgorithm(algo));
+        if (key instanceof ECPrivateKey) {
+            return new EcDsaJwsSignatureProvider((ECPrivateKey)key, SignatureAlgorithm.getAlgorithm(algo));
+        } else if (key instanceof RSAPrivateKey) {
+            return new PrivateKeyJwsSignatureProvider(key, SignatureAlgorithm.getAlgorithm(algo));
+        }
+        
+        return null;
     }
     public static JwsSignatureProvider getHmacSignatureProvider(byte[] key, String algo) {
         if (algo == null) {
@@ -117,28 +127,34 @@ public final class JwsUtils {
         return getSignatureVerifier(jwk, null);
     }
     public static JwsSignatureVerifier getSignatureVerifier(JsonWebKey jwk, String defaultAlgorithm) {
-        String rsaSignatureAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
+        String signatureAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         JwsSignatureVerifier theVerifier = null;
         if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-            theVerifier = getRSAKeySignatureVerifier(JwkUtils.toRSAPublicKey(jwk, true), rsaSignatureAlgo);
+            theVerifier = getPublicKeySignatureVerifier(JwkUtils.toRSAPublicKey(jwk, true), signatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) { 
             byte[] key = JoseUtils.decode((String)jwk.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-            theVerifier = getHmacSignatureVerifier(key, rsaSignatureAlgo);
+            theVerifier = getHmacSignatureVerifier(key, signatureAlgo);
         } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(jwk.getKeyType())) {
-            theVerifier = new EcDsaJwsSignatureVerifier(JwkUtils.toECPublicKey(jwk), 
-                                                        SignatureAlgorithm.getAlgorithm(rsaSignatureAlgo));
+            theVerifier = getPublicKeySignatureVerifier(JwkUtils.toECPublicKey(jwk), signatureAlgo);
         }
         return theVerifier;
     }
-    public static JwsSignatureVerifier getRSAKeySignatureVerifier(X509Certificate cert, String algo) {
-        return getRSAKeySignatureVerifier((RSAPublicKey)cert.getPublicKey(), algo);
+    public static JwsSignatureVerifier getPublicKeySignatureVerifier(X509Certificate cert, String algo) {
+        return getPublicKeySignatureVerifier(cert.getPublicKey(), algo);
     }
-    public static JwsSignatureVerifier getRSAKeySignatureVerifier(RSAPublicKey key, String algo) {
+    public static JwsSignatureVerifier getPublicKeySignatureVerifier(PublicKey key, String algo) {
         if (algo == null) {
             LOG.warning("No signature algorithm was defined");
             throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
         }
-        return new PublicKeyJwsSignatureVerifier(key, SignatureAlgorithm.getAlgorithm(algo));
+        
+        if (key instanceof RSAPublicKey) {
+            return new PublicKeyJwsSignatureVerifier(key, SignatureAlgorithm.getAlgorithm(algo));
+        } else if (key instanceof ECPublicKey) {
+            return new EcDsaJwsSignatureVerifier(key, SignatureAlgorithm.getAlgorithm(algo));
+        }
+        
+        return null;
     }
     public static JwsSignatureVerifier getHmacSignatureVerifier(byte[] key, String algo) {
         if (algo == null) {
@@ -241,7 +257,6 @@ public final class JwsUtils {
                                                               JoseHeaders headers,
                                                               boolean ignoreNullProvider) {
         JwsSignatureProvider theSigProvider = null; 
-        String rsaSignatureAlgo = null;
         boolean reportPublicKey = 
             headers != null && MessageUtils.isTrue(
                 MessageUtils.getContextualProperty(m, JSON_WEB_SIGNATURE_REPORT_KEY_PROP,
@@ -249,17 +264,16 @@ public final class JwsUtils {
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_SIGN);
             if (jwk != null) {
-                rsaSignatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm(), getDefaultKeyAlgo(jwk));
-                theSigProvider = JwsUtils.getSignatureProvider(jwk, rsaSignatureAlgo);
+                String signatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm(), getDefaultKeyAlgo(jwk));
+                theSigProvider = JwsUtils.getSignatureProvider(jwk, signatureAlgo);
                 if (reportPublicKey) {
-                    JwkUtils.setPublicKeyInfo(jwk, headers, rsaSignatureAlgo);
+                    JwkUtils.setPublicKeyInfo(jwk, headers, signatureAlgo);
                 }
             }
         } else {
-            rsaSignatureAlgo = getSignatureAlgo(m, props, null, null);
-            RSAPrivateKey pk = (RSAPrivateKey)KeyManagementUtils.loadPrivateKey(m, props, 
-                JsonWebKey.KEY_OPER_SIGN);
-            theSigProvider = getRSAKeySignatureProvider(pk, rsaSignatureAlgo);
+            String signatureAlgo = getSignatureAlgo(m, props, null, null);
+            PrivateKey pk = KeyManagementUtils.loadPrivateKey(m, props, JsonWebKey.KEY_OPER_SIGN);
+            theSigProvider = getPrivateKeySignatureProvider(pk, signatureAlgo);
             if (reportPublicKey) {
                 headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
             }
@@ -284,22 +298,21 @@ public final class JwsUtils {
             } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_CHAIN) != null) {
                 List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
                 KeyManagementUtils.validateCertificateChain(props, chain);
-                return getRSAKeySignatureVerifier((RSAPublicKey)chain.get(0).getPublicKey(), inHeaders.getAlgorithm());
+                return getPublicKeySignatureVerifier(chain.get(0).getPublicKey(), inHeaders.getAlgorithm());
             }
         }
         
-        String rsaSignatureAlgo = null;
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, JsonWebKey.KEY_OPER_VERIFY);
             if (jwk != null) {
-                rsaSignatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm(), getDefaultKeyAlgo(jwk));
-                theVerifier = JwsUtils.getSignatureVerifier(jwk, rsaSignatureAlgo);
+                String signatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm(), getDefaultKeyAlgo(jwk));
+                theVerifier = JwsUtils.getSignatureVerifier(jwk, signatureAlgo);
             }
             
         } else {
-            rsaSignatureAlgo = getSignatureAlgo(m, props, null, null);
-            theVerifier = getRSAKeySignatureVerifier(
-                              (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props), rsaSignatureAlgo);
+            String signatureAlgo = getSignatureAlgo(m, props, null, null);
+            theVerifier = getPublicKeySignatureVerifier(
+                              KeyManagementUtils.loadPublicKey(m, props), signatureAlgo);
         }
         if (theVerifier == null && !ignoreNullVerifier) {
             LOG.warning("Verifier is not available");
