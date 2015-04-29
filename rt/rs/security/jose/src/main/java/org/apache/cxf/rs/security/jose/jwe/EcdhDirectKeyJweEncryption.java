@@ -77,7 +77,9 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
             this.ctAlgo = ctAlgo;
             this.peerPublicKey = peerPublicKey;
             this.ecurve = curve;
-            this.apuBytes = toBytes(apuString);
+            // JWA spec suggests the "apu" field MAY either be omitted or
+            // represent a random 512-bit value (...) and the "apv" field SHOULD NOT be present."
+            this.apuBytes = toApuBytes(apuString);
             this.apvBytes = toBytes(apvString);
         }
         public byte[] getDerivedKey(JweHeaders headers) {
@@ -92,6 +94,14 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
             
             return JweUtils.getECDHKey(privateKey, peerPublicKey, apuBytes, apvBytes, 
                                        jwtAlgo.getJwaName(), jwtAlgo.getKeySizeBits());
+            
+        }
+        private byte[] toApuBytes(String apuString) {
+            if (apuString != null) {
+                return toBytes(apuString);
+            } else {
+                return CryptoUtils.generateSecureRandomBytes(512 / 8);    
+            }
             
         }
         private byte[] toBytes(String str) {

@@ -40,6 +40,12 @@ public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider 
     
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              String curve,
+                                             KeyAlgorithm keyAlgo) {
+        
+        this(peerPublicKey, curve, null, null, keyAlgo);
+    }
+    public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
+                                             String curve,
                                              String apuString,
                                              String apvString,
                                              KeyAlgorithm keyAlgo) {
