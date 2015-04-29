@@ -114,6 +114,7 @@
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-ws-mex/${project.version}</bundle>
     </feature>
     <feature name="cxf-ws-security" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-rt-security</feature>
         <feature version="${project.version}">cxf-ws-policy</feature>
         <feature version="${cxf.wss4j.version}">wss4j</feature>
         <feature version="${project.version}">cxf-ws-addr</feature>
