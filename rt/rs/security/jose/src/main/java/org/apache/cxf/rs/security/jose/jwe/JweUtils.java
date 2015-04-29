@@ -228,14 +228,7 @@ public final class JweUtils {
         return ContentAlgorithm.getAlgorithm(algo);
     }
     public static JweEncryption getDirectKeyJweEncryption(JsonWebKey key) {
-        if (AlgorithmUtils.isAesCbcHmac(key.getAlgorithm())) {
-            return new AesCbcHmacJweEncryption(getContentAlgo(key.getAlgorithm()), 
-                                               JwkUtils.toSecretKey(key).getEncoded(), 
-                                               null, new DirectKeyEncryptionAlgorithm());
-        } else {
-            return new JweEncryption(new DirectKeyEncryptionAlgorithm(),
-                                 getContentEncryptionAlgorithm(key, key.getAlgorithm()));
-        }
+        return getDirectKeyJweEncryption(JwkUtils.toSecretKey(key), key.getAlgorithm());
     }
     public static JweEncryption getDirectKeyJweEncryption(SecretKey key, String algorithm) {
         if (AlgorithmUtils.isAesCbcHmac(algorithm)) {
@@ -246,22 +239,15 @@ public final class JweUtils {
                                  getContentEncryptionAlgorithm(key, algorithm));
         }
     }
+    public static JweDecryption getDirectKeyJweDecryption(JsonWebKey key) {
+        return getDirectKeyJweDecryption(JwkUtils.toSecretKey(key), key.getAlgorithm());
+    }
     public static JweDecryption getDirectKeyJweDecryption(SecretKey key, String algorithm) {
         if (AlgorithmUtils.isAesCbcHmac(algorithm)) { 
             return new AesCbcHmacJweDecryption(new DirectKeyDecryptionAlgorithm(key), getContentAlgo(algorithm));
         } else {
             return new JweDecryption(new DirectKeyDecryptionAlgorithm(key), 
                                  getContentDecryptionAlgorithm(algorithm));
-        }
-    }
-    public static JweDecryption getDirectKeyJweDecryption(JsonWebKey key) {
-        if (AlgorithmUtils.isAesCbcHmac(key.getAlgorithm())) { 
-            return new AesCbcHmacJweDecryption(
-                new DirectKeyDecryptionAlgorithm(JwkUtils.toSecretKey(key).getEncoded()), 
-                    getContentAlgo(key.getAlgorithm()));
-        } else {
-            return new JweDecryption(new DirectKeyDecryptionAlgorithm(JwkUtils.toSecretKey(key)), 
-                                 getContentDecryptionAlgorithm(key.getAlgorithm()));
         }
     }
     public static JweEncryptionProvider loadEncryptionProvider(boolean required) {
