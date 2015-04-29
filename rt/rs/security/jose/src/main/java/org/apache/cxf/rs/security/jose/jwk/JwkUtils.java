@@ -38,7 +38,6 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -62,6 +61,7 @@ import org.apache.cxf.rs.security.jose.jwe.KeyEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public final class JwkUtils {
     public static final String JWK_KEY_STORE_TYPE = "jwk";

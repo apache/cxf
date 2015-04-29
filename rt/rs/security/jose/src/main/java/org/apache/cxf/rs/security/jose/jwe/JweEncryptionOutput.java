@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import javax.crypto.Cipher;
 
-import org.apache.cxf.common.util.crypto.KeyProperties;
+import org.apache.cxf.rt.security.crypto.KeyProperties;
 
 public class JweEncryptionOutput {
     private Cipher cipher;

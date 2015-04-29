@@ -27,7 +27,6 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -37,6 +36,7 @@ import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 @Priority(Priorities.AUTHENTICATION)
 public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer 

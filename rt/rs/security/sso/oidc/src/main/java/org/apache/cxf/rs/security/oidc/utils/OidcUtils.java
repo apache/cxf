@@ -26,10 +26,10 @@ import java.util.Map;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
+import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class OidcUtils {
     public static final String ID_TOKEN = "id_token";

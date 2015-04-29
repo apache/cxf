@@ -31,8 +31,6 @@ import java.util.List;
 import javax.crypto.SecretKey;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
@@ -44,7 +42,8 @@ import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistrati
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
-
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.rt.security.crypto.KeyProperties;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

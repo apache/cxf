@@ -203,6 +203,7 @@
     </feature>
     <feature name="cxf-rs-security-jose" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-jaxrs</feature>
+        <feature version="${project.version}">cxf-rt-security</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-jose/${project.version}</bundle>
     </feature>
     <feature name="cxf-rs-security-oauth2" version="${project.version}" resolver="(obr)">

@@ -26,9 +26,9 @@ import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
 
-import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rt.security.crypto.HmacUtils;
 
 public class AesCbcHmacJweEncryption extends JweEncryption {
     private static final Map<String, String> AES_HMAC_MAP;

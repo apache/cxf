@@ -23,10 +23,10 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rt.security.crypto.HmacUtils;
 
 public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     protected static final Logger LOG = LogUtils.getL7dLogger(HmacJwsSignatureVerifier.class);

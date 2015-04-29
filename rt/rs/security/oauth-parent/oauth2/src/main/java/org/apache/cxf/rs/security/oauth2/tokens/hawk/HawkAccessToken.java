@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
-import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+import org.apache.cxf.rt.security.crypto.HmacUtils;
 
 //https://tools.ietf.org/html/draft-hammer-oauth-v2-mac-token-05
 //->

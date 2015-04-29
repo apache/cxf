@@ -20,8 +20,8 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 
 public abstract class AbstractContentEncryptionAlgorithm extends AbstractContentEncryptionCipherProperties
