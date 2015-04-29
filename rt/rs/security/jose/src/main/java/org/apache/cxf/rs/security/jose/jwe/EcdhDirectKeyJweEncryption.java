@@ -33,6 +33,11 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 public class EcdhDirectKeyJweEncryption extends JweEncryption {
     public EcdhDirectKeyJweEncryption(ECPublicKey peerPublicKey,
                                       String curve,
+                                      ContentAlgorithm ctAlgo) {
+        this(peerPublicKey, curve, null, null, ctAlgo);
+    }
+    public EcdhDirectKeyJweEncryption(ECPublicKey peerPublicKey,
+                                      String curve,
                                       String apuString,
                                       String apvString,
                                       ContentAlgorithm ctAlgo) {

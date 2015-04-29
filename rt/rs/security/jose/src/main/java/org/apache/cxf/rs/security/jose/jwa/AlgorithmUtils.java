@@ -124,7 +124,7 @@ public final class AlgorithmUtils {
     public static final Set<String> PBES_HS_SET = new HashSet<String>(Arrays.asList(PBES2_HS256_A128KW_ALGO,
                                           PBES2_HS384_A192KW_ALGO,
                                           PBES2_HS512_A256KW_ALGO));
-    public static final Set<String> ECDH_ES_SET = new HashSet<String>(Arrays.asList(ECDH_ES_A128KW_ALGO,
+    public static final Set<String> ECDH_ES_WRAP_SET = new HashSet<String>(Arrays.asList(ECDH_ES_A128KW_ALGO,
                       ECDH_ES_A192KW_ALGO,
                       ECDH_ES_A256KW_ALGO));
     
@@ -210,7 +210,10 @@ public final class AlgorithmUtils {
         return PBES_HS_SET.contains(algo); 
     }
     public static boolean isEcdhEsWrap(String algo) {
-        return ECDH_ES_SET.contains(algo); 
+        return ECDH_ES_WRAP_SET.contains(algo); 
+    }
+    public static boolean isEcdhEsDirect(String algo) {
+        return ECDH_ES_DIRECT_ALGO.equals(algo); 
     }
     public static boolean isAesGcm(String algo) {
         return AES_GCM_CEK_SET.contains(algo);
