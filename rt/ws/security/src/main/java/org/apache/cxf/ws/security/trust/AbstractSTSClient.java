@@ -1616,18 +1616,27 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                 && rst.hasAttributeNS(null, "ID")) {
                 id = rst.getAttributeNS(null, "ID");
             }
-            if (id == null) {
+            if (id == null || "".equals(id)) {
                 id = this.getIDFromSTR(rst);
             }
         }
-        if (id == null && rar != null) {
+        if ((id == null || "".equals(id)) && rar != null) {
             id = this.getIDFromSTR(rar);
         }
-        if (id == null && rur != null) {
+        if ((id == null || "".equals(id)) && rur != null) {
             id = this.getIDFromSTR(rur);
         }
-        if (id == null && rst != null) {
+        if ((id == null || "".equals(id)) && rst != null) {
             id = rst.getAttributeNS(WSConstants.WSU_NS, "Id");
+            if (id == null || "".equals(id)) {
+                QName elName = DOMUtils.getElementQName(rst);
+                if (elName.equals(new QName(WSConstants.SAML2_NS, "EncryptedAssertion"))) {
+                    Element child = DOMUtils.getFirstElement(rst);
+                    if (child != null) {
+                        id = child.getAttributeNS(WSConstants.WSU_NS, "Id");
+                    }
+                }
+            }
         }
         return id;
     }

@@ -636,11 +636,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     Document doc = token.getToken().getOwnerDocument();
                     boolean saml1 = WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
                         || WSConstants.SAML_NS.equals(tokenType);
-                    String id = null;
-                    if (saml1) {
-                        id = token.getToken().getAttributeNS(null, "AssertionID");
-                    } else {
-                        id = token.getToken().getAttributeNS(null, "ID");
+                    String id = token.getId();
+                    if (id == null || "".equals(id)) {
+                        if (saml1) {
+                            id = token.getToken().getAttributeNS(null, "AssertionID");
+                        } else {
+                            id = token.getToken().getAttributeNS(null, "ID");
+                        }
                     }
                     SecurityTokenReference secRef = 
                         createSTRForSamlAssertion(doc, id, saml1, false);
