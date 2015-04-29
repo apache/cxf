@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs;
 
 
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -95,8 +96,8 @@ public class BookStoreSpring {
     @GET
     @Path("/link")
     public Response getBookLink() {
-        Link link = Link.fromResource(BookStoreSpring.class)
-            .baseUri(ui.getBaseUri()).rel("self").build();
+        URI selfUri = ui.getBaseUriBuilder().path(BookStoreSpring.class).build();
+        Link link = Link.fromUri(selfUri).rel("self").build();
         return Response.ok().links(link).build();
     }
     

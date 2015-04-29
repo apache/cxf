@@ -79,7 +79,7 @@ public class LinkBuilderImplTest extends Assert {
         Link.Builder linkBuilder = Link.fromUri("relative");
         linkBuilder.baseUri("http://localhost:8080/base/path");
         Link link = linkBuilder.rel("next").build();
-        assertEquals("<http://localhost:8080/base/path/relative>;rel=\"next\"", link.toString());
+        assertEquals("<http://localhost:8080/base/relative>;rel=\"next\"", link.toString());
     }
     
     @Test
@@ -87,7 +87,7 @@ public class LinkBuilderImplTest extends Assert {
         Link.Builder linkBuilder = Link.fromUri("/relative");
         linkBuilder.baseUri("http://localhost:8080/base/path");
         Link link = linkBuilder.rel("next").build();
-        assertEquals("<http://localhost:8080/base/path/relative>;rel=\"next\"", link.toString());
+        assertEquals("<http://localhost:8080/relative>;rel=\"next\"", link.toString());
     }
     
     @Test
