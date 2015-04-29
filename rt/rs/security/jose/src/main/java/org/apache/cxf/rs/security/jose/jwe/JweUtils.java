@@ -96,8 +96,8 @@ public final class JweUtils {
         JweEncryptionProvider jwe = getDirectKeyJweEncryption(key);
         return jwe.encrypt(content, toJweHeaders(ct));
     }
-    public static byte[] decrypt(RSAPrivateKey key, String keyAlgo, String contentAlgo, String content) {
-        KeyDecryptionAlgorithm keyDecryptionProvider = getRSAKeyDecryptionAlgorithm(key, keyAlgo);
+    public static byte[] decrypt(PrivateKey key, String keyAlgo, String contentAlgo, String content) {
+        KeyDecryptionAlgorithm keyDecryptionProvider = getPrivateKeyDecryptionAlgorithm(key, keyAlgo);
         return decrypt(keyDecryptionProvider, contentAlgo, content);
     }
     public static byte[] decrypt(SecretKey key, String keyAlgo, String contentAlgo, String content) {
@@ -133,7 +133,9 @@ public final class JweUtils {
             keyEncryptionProvider = getSecretKeyEncryptionAlgorithm(JwkUtils.toSecretKey(jwk), 
                                                                     keyEncryptionAlgo);
         } else {
-            // TODO: support elliptic curve keys
+            keyEncryptionProvider = new EcdhAesWrapKeyEncryptionAlgorithm(JwkUtils.toECPublicKey(jwk),
+                                        jwk.getStringProperty(JsonWebKey.EC_CURVE),
+                                        KeyAlgorithm.getAlgorithm(keyEncryptionAlgo));
         }
         return keyEncryptionProvider;
     }
@@ -156,18 +158,23 @@ public final class JweUtils {
         String keyEncryptionAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         KeyDecryptionAlgorithm keyDecryptionProvider = null;
         if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
-            keyDecryptionProvider = getRSAKeyDecryptionAlgorithm(JwkUtils.toRSAPrivateKey(jwk), 
+            keyDecryptionProvider = getPrivateKeyDecryptionAlgorithm(JwkUtils.toRSAPrivateKey(jwk), 
                                                                  keyEncryptionAlgo);
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(jwk.getKeyType())) {
             keyDecryptionProvider = getSecretKeyDecryptionAlgorithm(JwkUtils.toSecretKey(jwk),
                                             keyEncryptionAlgo);
         } else {
-            // TODO: support elliptic curve keys
+            keyDecryptionProvider = getPrivateKeyDecryptionAlgorithm(JwkUtils.toECPrivateKey(jwk), 
+                                                                     keyEncryptionAlgo);
         }
         return keyDecryptionProvider;
     }
-    public static KeyDecryptionAlgorithm getRSAKeyDecryptionAlgorithm(RSAPrivateKey key, String algo) {
-        return new RSAKeyDecryptionAlgorithm(key, KeyAlgorithm.getAlgorithm(algo));
+    public static KeyDecryptionAlgorithm getPrivateKeyDecryptionAlgorithm(PrivateKey key, String algo) {
+        if (key instanceof RSAPrivateKey) {
+            return new RSAKeyDecryptionAlgorithm((RSAPrivateKey)key, KeyAlgorithm.getAlgorithm(algo));
+        } else {
+            return new EcdhAesWrapKeyDecryptionAlgorithm((ECPrivateKey)key, KeyAlgorithm.getAlgorithm(algo));
+        }
     }
     public static KeyDecryptionAlgorithm getSecretKeyDecryptionAlgorithm(SecretKey key, String algo) {
         if (AlgorithmUtils.isAesKeyWrap(algo)) {
@@ -327,12 +334,8 @@ public final class JweUtils {
             KeyManagementUtils.validateCertificateChain(props, chain);
             PrivateKey privateKey = 
                 KeyManagementUtils.loadPrivateKey(m, props, chain, JsonWebKey.KEY_OPER_DECRYPT);
-            if (!(privateKey instanceof RSAPrivateKey)) {
-                LOG.warning("Non-RSA private keys are not yet supported for encryption");
-                return null;
-            }
             contentEncryptionAlgo = inHeaders.getContentEncryptionAlgorithm();
-            keyDecryptionProvider = getRSAKeyDecryptionAlgorithm((RSAPrivateKey)privateKey, 
+            keyDecryptionProvider = getPrivateKeyDecryptionAlgorithm(privateKey, 
                                                                  inHeaders.getKeyEncryptionAlgorithm());
         } else {
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
@@ -346,9 +349,8 @@ public final class JweUtils {
                     keyDecryptionProvider = getKeyDecryptionAlgorithm(jwk, keyEncryptionAlgo);
                 }
             } else {
-                keyDecryptionProvider = getRSAKeyDecryptionAlgorithm(
-                    (RSAPrivateKey)KeyManagementUtils.loadPrivateKey(
-                        m, props, JsonWebKey.KEY_OPER_DECRYPT), keyEncryptionAlgo);
+                keyDecryptionProvider = getPrivateKeyDecryptionAlgorithm(
+                    KeyManagementUtils.loadPrivateKey(m, props, JsonWebKey.KEY_OPER_DECRYPT), keyEncryptionAlgo);
             }
         }
         return createJweDecryptionProvider(keyDecryptionProvider, ctDecryptionKey, contentEncryptionAlgo);
@@ -405,10 +407,10 @@ public final class JweUtils {
                                      getContentEncryptionAlgorithm(contentEncryptionAlgo));
         }
     }
-    public static JweDecryptionProvider createJweDecryptionProvider(RSAPrivateKey key,
+    public static JweDecryptionProvider createJweDecryptionProvider(PrivateKey key,
                                                                     String keyAlgo,
                                                                     String contentDecryptionAlgo) {
-        return createJweDecryptionProvider(getRSAKeyDecryptionAlgorithm(key, keyAlgo), contentDecryptionAlgo);
+        return createJweDecryptionProvider(getPrivateKeyDecryptionAlgorithm(key, keyAlgo), contentDecryptionAlgo);
     }
     public static JweDecryptionProvider createJweDecryptionProvider(SecretKey key,
                                                                     String keyAlgo,
