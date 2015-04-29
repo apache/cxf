@@ -25,8 +25,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
+import org.apache.cxf.ws.rm.RMCaptureInInterceptor;
 import org.apache.cxf.ws.rm.RMDeliveryInterceptor;
 import org.apache.cxf.ws.rm.RMInInterceptor;
+import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMOutInterceptor;
 import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
 
@@ -37,6 +39,7 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
     private RMInInterceptor rmIn = new RMInInterceptor();
     private RMOutInterceptor rmOut = new RMOutInterceptor();
     private RMSoapInterceptor rmSoap = new RMSoapInterceptor();
+    private RMCaptureInInterceptor rmCaptureIn = new RMCaptureInInterceptor();
     private RMDeliveryInterceptor rmDelivery = new RMDeliveryInterceptor();
 
     static {
@@ -55,6 +58,10 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
         getInInterceptors().add(rmIn);
         getInInterceptors().add(rmSoap);
         getInInterceptors().add(rmDelivery);
+        RMManager manager = bus.getExtension(RMManager.class);
+        if (null != manager && null != manager.getStore()) {
+            getInInterceptors().add(rmCaptureIn);
+        }
 
         getOutInterceptors().add(rmOut);
         getOutInterceptors().add(rmSoap);
