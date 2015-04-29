@@ -87,7 +87,7 @@ public final class JwtAccessTokenUtils {
                                                       Client client,
                                                       RSAPrivateKey key) {
         JwsSignatureProvider jws = 
-            JwsUtils.getRSAKeySignatureProvider(key, AlgorithmUtils.RS_SHA_256_ALGO);
+            JwsUtils.getPrivateKeySignatureProvider(key, AlgorithmUtils.RS_SHA_256_ALGO);
         return signToAccessToken(jwt, client, jws);
        
     }
@@ -98,7 +98,7 @@ public final class JwtAccessTokenUtils {
         return toAccessToken(jwt, client, jwtString);
     }
     public static JwtToken verifyAccessToken(String tokenId, RSAPublicKey key) {
-        JwsSignatureVerifier jws = JwsUtils.getRSAKeySignatureVerifier(key, AlgorithmUtils.RS_SHA_256_ALGO);
+        JwsSignatureVerifier jws = JwsUtils.getPublicKeySignatureVerifier(key, AlgorithmUtils.RS_SHA_256_ALGO);
         return verifyAccessToken(tokenId, jws);
     }
     public static JwtToken verifyAccessToken(String tokenId, JwsSignatureVerifier jws) {
