@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.Map;
 
@@ -120,8 +119,7 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
         } else if (verifyWithClientCertificates) {
             X509Certificate cert = 
                 (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
-            return JwsUtils.getRSAKeySignatureVerifier((RSAPublicKey)cert.getPublicKey(), 
-                                                       AlgorithmUtils.RS_SHA_256_ALGO);
+            return JwsUtils.getPublicKeySignatureVerifier(cert, AlgorithmUtils.RS_SHA_256_ALGO);
         } 
         return JwsUtils.loadSignatureVerifier(true);
     }
