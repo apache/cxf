@@ -26,9 +26,9 @@ import java.util.Set;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class AesGcmWrapKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgorithm {
     private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(

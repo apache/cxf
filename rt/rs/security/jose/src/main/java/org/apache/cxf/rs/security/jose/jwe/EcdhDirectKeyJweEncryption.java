@@ -24,10 +24,10 @@ import java.security.interfaces.ECPublicKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 
 public class EcdhDirectKeyJweEncryption extends JweEncryption {

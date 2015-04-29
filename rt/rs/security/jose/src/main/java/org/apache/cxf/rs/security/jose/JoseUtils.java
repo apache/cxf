@@ -25,8 +25,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public final class JoseUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JoseUtils.class);

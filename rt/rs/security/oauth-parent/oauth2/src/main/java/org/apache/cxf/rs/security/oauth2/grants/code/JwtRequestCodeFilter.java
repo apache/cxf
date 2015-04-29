@@ -25,7 +25,6 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
@@ -40,6 +39,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.AuthorizationCodeRequestFilter;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
     private static final String REQUEST_PARAM = "request";

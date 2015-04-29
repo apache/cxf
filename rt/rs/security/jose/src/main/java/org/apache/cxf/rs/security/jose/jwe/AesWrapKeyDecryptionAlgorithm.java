@@ -20,9 +20,9 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import javax.crypto.SecretKey;
 
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class AesWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public AesWrapKeyDecryptionAlgorithm(String encodedKey) {    

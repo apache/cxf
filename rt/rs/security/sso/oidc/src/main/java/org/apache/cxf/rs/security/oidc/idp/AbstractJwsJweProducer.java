@@ -23,13 +23,13 @@ import java.security.interfaces.RSAPublicKey;
 
 import javax.crypto.SecretKey;
 
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public abstract class AbstractJwsJweProducer {
     private JwsSignatureProvider sigProvider;

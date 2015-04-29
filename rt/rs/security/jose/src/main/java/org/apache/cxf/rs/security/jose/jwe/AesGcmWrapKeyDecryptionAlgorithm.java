@@ -25,10 +25,10 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     protected static final Logger LOG = LogUtils.getL7dLogger(AesGcmWrapKeyDecryptionAlgorithm.class);

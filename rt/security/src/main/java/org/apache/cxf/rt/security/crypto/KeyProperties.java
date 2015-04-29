@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.common.util.crypto;
+package org.apache.cxf.rt.security.crypto;
 
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;

@@ -23,10 +23,10 @@ import java.util.Map;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.client.HttpRequestProperties;
 import org.apache.cxf.rs.security.oauth2.common.AccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rt.security.crypto.HmacUtils;
 // https://tools.ietf.org/html/draft-hammer-oauth-v2-mac-token-05
 // ->
 // https://github.com/hueniverse/hawk/blob/master/README.md

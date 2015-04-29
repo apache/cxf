@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.common.util.crypto;
+package org.apache.cxf.rt.security.crypto;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

@@ -20,8 +20,8 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.crypto.MessageDigestUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 /**
  * ClientSecretVerifier which checks the passwords against hashes  

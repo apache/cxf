@@ -22,11 +22,11 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.cxf.common.util.crypto.MessageDigestUtils;
-
 public class MessageDigestInputStream extends java.security.DigestInputStream {
+    public static final String ALGO_SHA_256 = "SHA-256";
+    
     public MessageDigestInputStream(InputStream is) {
-        super(is, getDigestInstance(MessageDigestUtils.ALGO_SHA_256));
+        super(is, getDigestInstance(ALGO_SHA_256));
     }
     
     private static MessageDigest getDigestInstance(String algo)  {

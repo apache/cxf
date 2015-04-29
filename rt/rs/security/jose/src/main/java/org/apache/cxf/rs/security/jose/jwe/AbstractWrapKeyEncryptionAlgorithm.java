@@ -24,10 +24,10 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.rt.security.crypto.KeyProperties;
 
 public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractWrapKeyEncryptionAlgorithm.class);

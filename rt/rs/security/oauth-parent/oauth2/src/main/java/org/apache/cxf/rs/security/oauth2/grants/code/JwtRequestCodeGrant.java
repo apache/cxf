@@ -24,7 +24,6 @@ import javax.crypto.SecretKey;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
@@ -33,6 +32,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 
 

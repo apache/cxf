@@ -29,7 +29,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
-import org.apache.cxf.common.util.crypto.HmacUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.client.HttpRequestProperties;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
@@ -37,6 +36,7 @@ import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rt.security.crypto.HmacUtils;
 
 public abstract class AbstractHawkAccessTokenValidator implements AccessTokenValidator {
     protected static final String HTTP_VERB = "http.verb";

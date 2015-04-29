@@ -24,10 +24,10 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider {
     private PrivateKey key;

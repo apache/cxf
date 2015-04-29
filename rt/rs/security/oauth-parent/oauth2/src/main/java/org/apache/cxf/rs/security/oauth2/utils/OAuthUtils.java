@@ -29,7 +29,6 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -39,6 +38,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 

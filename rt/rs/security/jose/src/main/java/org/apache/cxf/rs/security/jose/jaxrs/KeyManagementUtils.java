@@ -44,13 +44,13 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.security.SecurityContext;
 
 

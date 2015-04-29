@@ -26,13 +26,13 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.crypto.CryptoUtils;
-import org.apache.cxf.common.util.crypto.KeyProperties;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.rt.security.crypto.KeyProperties;
 
 public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJweEncryption.class);
