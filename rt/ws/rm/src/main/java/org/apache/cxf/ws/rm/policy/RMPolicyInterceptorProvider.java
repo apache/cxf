@@ -27,9 +27,11 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
+import org.apache.cxf.ws.rm.RMCaptureInInterceptor;
 import org.apache.cxf.ws.rm.RMCaptureOutInterceptor;
 import org.apache.cxf.ws.rm.RMDeliveryInterceptor;
 import org.apache.cxf.ws.rm.RMInInterceptor;
+import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMOutInterceptor;
 import org.apache.cxf.ws.rm.soap.RMSoapInInterceptor;
 import org.apache.cxf.ws.rm.soap.RMSoapOutInterceptor;
@@ -40,6 +42,7 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
     private static final Collection<QName> ASSERTION_TYPES;
     private RMInInterceptor rmIn = new RMInInterceptor();
     private RMOutInterceptor rmOut = new RMOutInterceptor();
+    private RMCaptureInInterceptor rmCaptureIn = new RMCaptureInInterceptor();
     private RMCaptureOutInterceptor rmCaptureOut = new RMCaptureOutInterceptor();
     private RMSoapOutInterceptor rmOutSoap = new RMSoapOutInterceptor();
     private RMSoapInInterceptor rmInSoap = new RMSoapInInterceptor();
@@ -64,6 +67,10 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
         getInInterceptors().add(rmIn);
         getInInterceptors().add(rmInSoap);
         getInInterceptors().add(rmDelivery);
+        RMManager manager = bus.getExtension(RMManager.class);
+        if (null != manager && null != manager.getStore()) {
+            getInInterceptors().add(rmCaptureIn);
+        }
 
         getOutInterceptors().add(rmOut);
         getOutInterceptors().add(rmCaptureOut);
