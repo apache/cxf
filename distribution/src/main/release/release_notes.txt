@@ -1,4 +1,4 @@
-Apache CXF 2.7.15 Release Notes
+Apache CXF 2.7.16 Release Notes
 
 1. Overview
 
@@ -28,7 +28,7 @@ In particular, Apache CXF no longer supports Java5.   Users must upgrade to
 Java 6 in order to upgrade to Apache CXF 2.7.x.
 
 
-2.7.15 fixes over 25 JIRA issues reported by users and the community.
+2.7.16 fixes over 20 JIRA issues reported by users and the community.
 
 
 
@@ -72,51 +72,32 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
+
 ** Bug
-    * [CXF-6127] - Check thrown Exception's cause for SOAPFaultException
-    * [CXF-6136] - Change JMS Destination to not rollback on checked exception
-    * [CXF-6137] - WADL generation does not correctly support query parameters
-    * [CXF-6138] - JAXB unmarshaller Properties can't be configured
-    * [CXF-6143] - SSL/TLS hostname verification does not strictly follow HTTPS RFC2818
-    * [CXF-6147] - Part of demo wsdl_first_soap12 doesnt work
-    * [CXF-6151] - Apache-cxf wsdlvalidator returns error in mime:part
-    * [CXF-6152] - WSDLValidator may throw ClassCastException under verbose mode
-    * [CXF-6153] - OAuthRequestFilter throws NullPointerException when "Authorization" header is missing
-    * [CXF-6184] - HTTPConduit "transport.retransmit.url" property may have side-effects in case of non-redirect retransmits
-    * [CXF-6192] - Cxf Clustering Blueprint handler doesn't create the distribute feature rightly
-    * [CXF-6194] - [multipart] Server handle Collection argument as single element
-    * [CXF-6204] - JAX-RS Set-Cookie parser uses case-sensitive keys
-    * [CXF-6209] - Bug in processing Signed/Encrypted Elements policies with multiple XPaths
-    * [CXF-6210] - XPath evaluation failure on the client side causes all subsequent evaluations to fail
-    * [CXF-6217] - JmsPullPoint does not protect against external entities
-    * [CXF-6222] - Password can end up in log file
-    * [CXF-6228] - Using XSLTFeature with large messages creates unremovable temporary files
-    * [CXF-6229] - EndpointReferenceUtils.getSchema does NOT cache negative schema parsing
-    * [CXF-6234] - Invalid ?wsdl response with relative imports/includes when using jaxws-catalog.xml
-    * [CXF-6241] - WS-RM doesn't work with WS-Security configured with @EndpointProperties
-    * [CXF-6245] - Loading non-existent class org.apache.cxf.xmlbeans.XmlBeansWrapperHelper in WrapperClassOutInterceptor is causing performance issues
-    * [CXF-6246] - missing osgi import of javax.jws
+    * [CXF-6007] - WebClient does not resend request in Digest authentication for HTTP methods GET, HEAD, DELETE, OPTIONS (with no body).
+    * [CXF-6257] - Creating and Endpoint using JAX-WS API, getting the binding and then publishing causes a NullPointerException
+    * [CXF-6274] - NullPointerException in DestinationSequence because of RMCaptureInInterceptor not in interceptor chain
+    * [CXF-6276] - Some non-primitive properties lost during generating WADL
+    * [CXF-6284] - JAX-RS servlet run-time leaks additional strong references
+    * [CXF-6292] - Init parameters on OSGi service are not picked up
+    * [CXF-6299] - Providers registered in cxf bus are ignored.
+    * [CXF-6300] - cipherSuite configuration does not work with HTTPJ servers
+    * [CXF-6302] - JAXRS endpoints with URL encoded addresses can not be located
+    * [CXF-6309] - Client processing exception has its cause set to the original exception wrapped in Fault
+    * [CXF-6313] - SamlHeaderOutInterceptor does not set headers on the message if it had none
+    * [CXF-6317] - Authorization not possible with multiple service beans
+    * [CXF-6319] - Regression: failing namespace resolution after CXF-5891
+    * [CXF-6321] - Make sure global JAX-RS filters are applied once per request even if made to sub-resource
+    * [CXF-6332] - Wadl Genertion: @Description cannot be bound to field
+    * [CXF-6336] - Client ParamConverterProvider may be lost if Client runs in the server scope
+    * [CXF-6359] - NullPointerException when certAlias specified but no keyManagers are configured
+    * [CXF-6361] - HttpCondiut is not detecting the redirect loop properly
+    * [CXF-6376] - Unexpected exception thrown from ResponseHandler is swallowed and status code 200 is returned
+    * [CXF-6379] - Separate HTTP headers for multiple header values not possible - bug in CXF-3714 fix
+
 
 ** Improvement
-    * [CXF-5674] - CXF Support in "Audience Restriction" of SAML 2 (SOAP)
-    * [CXF-6079] - static-resource-list cache control
-    * [CXF-6154] - CXFServlet and JAX-RS RequestDispatcherProvider should be able to use RequestDispatch.include
-    * [CXF-6191] - Avoid Spring usage by configuration in ClassHelper
-    * [CXF-6223] - Support message property for encryption certificate
-
-** New Feature
-    * [CXF-6242] - Ability to configure the format of the marshalling / unmarshalling exceptions that are thrown by JAXB when schema validation is enabled.
-
-
-
-
-
-
-
-
-
-
-
-
-
+    * [CXF-6337] - Support the redirection directly via the injected JAX-RS ServletContext context
+    * [CXF-6344] - Support system file location for JexlClaimMapper scripts
+    * [CXF-6345] - Support Logging in JexlClaimMapper scripts
 
