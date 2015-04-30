@@ -1380,9 +1380,8 @@ public abstract class HTTPConduit
         protected void handleRetransmits() throws IOException {
             // If we have a cachedStream, we are caching the request.
             if (cachedStream != null
-                || KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(getMethod()) 
-                   && (getClient().isAutoRedirect()) 
-                       || authSupplier != null && authSupplier.requiresRequestCaching()) {
+                || getClient().isAutoRedirect() && KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(getMethod()) 
+                || authSupplier != null && authSupplier.requiresRequestCaching()) {
 
                 if (LOG.isLoggable(Level.FINE) && cachedStream != null) {
                     StringBuilder b = new StringBuilder(4096);
