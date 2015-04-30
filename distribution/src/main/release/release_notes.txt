@@ -1,4 +1,4 @@
-Apache CXF 3.0.4 Release Notes
+Apache CXF 3.0.5 Release Notes
 
 1. Overview
 
@@ -22,7 +22,7 @@ Users are encourage to review the migration guide at:
 http://cxf.apache.org/docs/30-migration-guide.html
 for further information and requirements for upgrading from 2.7.x.
 
-3.0.4 fixes over 70 JIRA issues reported by users and the community.
+3.0.5 fixes over 70 JIRA issues reported by users and the community.
 
 
 
@@ -66,91 +66,83 @@ for caveats when upgrading from CXF 2.7.x to 3.0.0
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Bug
-    * [CXF-5279] - STSClient may not be caching tokens long enough when renewal after expiry is allowed
-    * [CXF-6096] - http components transport is missing a dependency on commons-logging
-    * [CXF-6111] - JavascriptGetInterceptor.isRecognizedQuery is always false
-    * [CXF-6127] - Check thrown Exception's cause for SOAPFaultException
-    * [CXF-6137] - WADL generation does not correctly support query parameters
-    * [CXF-6138] - JAXB unmarshaller Properties can't be configured
-    * [CXF-6139] - WADLGenerator may produce a schema invalid resource id
-    * [CXF-6143] - SSL/TLS hostname verification does not strictly follow HTTPS RFC2818
-    * [CXF-6145] - WS-RM demo server throws exception
-    * [CXF-6146] - Demo wsdl_first_xmlbeans fails to build
-    * [CXF-6147] - Part of demo wsdl_first_soap12 doesnt work
-    * [CXF-6149] - ContainerRequestContextImpl hasEntity() always returns true for non-GET requests. Similar for ClientResponseContextImpl
-    * [CXF-6151] - Apache-cxf wsdlvalidator returns error in mime:part
-    * [CXF-6152] - WSDLValidator may throw ClassCastException under verbose mode
-    * [CXF-6153] - OAuthRequestFilter throws NullPointerException when "Authorization" header is missing
-    * [CXF-6155] - Exceptions thrown from ParamConverter generate 500 response
-    * [CXF-6160] - AsyncResponse infinite loops
-    * [CXF-6163] - WSDL Javascript generator for xsd:any elements is not correct when any is optional
-    * [CXF-6166] - Parsing Bug in org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter
-    * [CXF-6170] - Demo jax_rs/spring_security throws exception
-    * [CXF-6176] - org.apache.cxf.jaxrs.bus.providers property is not taken in account in cxf bus
-    * [CXF-6178] - Missing io.netty.util.Version
-    * [CXF-6184] - HTTPConduit "transport.retransmit.url" property may have side-effects in case of non-redirect retransmits
-    * [CXF-6187] - JMS sample fails  "connectionFactory may not be null"
-    * [CXF-6188] - Authorization loop using "CurrentWindowsCredentials" 
-    * [CXF-6189] - Improve memory usage of UrlUtils
-    * [CXF-6192] - Cxf Clustering Blueprint handler doesn't create the distribute feature rightly
-    * [CXF-6194] - [multipart] Server handle Collection argument as single element
-    * [CXF-6195] - JMS soap listeners are single-threaded in CXF 3.0.x
-    * [CXF-6204] - JAX-RS Set-Cookie parser uses case-sensitive keys
-    * [CXF-6207] - While Parsing wsdl url getting NAMESPACE_ERR
-    * [CXF-6209] - Bug in processing Signed/Encrypted Elements policies with multiple XPaths
-    * [CXF-6210] - XPath evaluation failure on the client side causes all subsequent evaluations to fail
-    * [CXF-6211] - JAX-RS client runtime ignores Content-Type set directly from MessageBodyWriter
-    * [CXF-6214] - [WebClient] wrong Accept received via proxy
-    * [CXF-6217] - JmsPullPoint does not protect against external entities
-    * [CXF-6222] - Password can end up in log file
-    * [CXF-6228] - Using XSLTFeature with large messages creates unremovable temporary files
-    * [CXF-6229] - EndpointReferenceUtils.getSchema does NOT cache negative schema parsing
-    * [CXF-6233] - STS client only sends AppliesTo on first RST call
-    * [CXF-6234] - Invalid ?wsdl response with relative imports/includes when using jaxws-catalog.xml
-    * [CXF-6235] - wsdl2java behaves differently from cxf-codegen-plugin
-    * [CXF-6241] - WS-RM doesn't work with WS-Security configured with @EndpointProperties
-    * [CXF-6245] - Loading non-existent class org.apache.cxf.xmlbeans.XmlBeansWrapperHelper in WrapperClassOutInterceptor is causing performance issues
-    * [CXF-6246] - missing osgi import of javax.jws
-    * [CXF-6248] - NPE at OAuthRequestFilter when no Authorization header found
-    * [CXF-6250] - WebSocket conduit fails to process String based responses and throws NPE
-    * [CXF-6252] - JAXRS Async Client hangs in case of Connection errors
 
+
+** Bug
+    * [CXF-6007] - WebClient does not resend request in Digest authentication for HTTP methods GET, HEAD, DELETE, OPTIONS (with no body).
+    * [CXF-6256] - Unexpected response code
+    * [CXF-6257] - Creating and Endpoint using JAX-WS API, getting the binding and then publishing causes a NullPointerException
+    * [CXF-6260] - JAXRS Async Client can not handle InvocationCallback TypeVariable
+    * [CXF-6272] - SCT Renew in Secure Conversation
+    * [CXF-6274] - NullPointerException in DestinationSequence because of RMCaptureInInterceptor not in interceptor chain
+    * [CXF-6276] - Some non-primitive properties lost during generating WADL
+    * [CXF-6284] - JAX-RS servlet run-time leaks additional strong references
+    * [CXF-6285] - NPE in SwaggerFeature.calculateDefaultResourcePackage
+    * [CXF-6295] - String cannot be cast to org.apache.ws.security.validate.Validator
+    * [CXF-6297] - JAX-RS BeanValidation feature fails with NPE in JAXRSBeanValidationOutInterceptor on sub-resource call
+    * [CXF-6300] - cipherSuite configuration does not work with HTTPJ servers
+    * [CXF-6302] - JAXRS endpoints with URL encoded addresses can not be located
+    * [CXF-6304] - AuthorizationCodeGrantHandler sets the approved scopes as the requested ones
+    * [CXF-6306] - AuthorizationCodeGrantService does not record a single pre-registered redirect uri in a session if current request has no redirect uri set
+    * [CXF-6309] - Client processing exception has its cause set to the original exception wrapped in Fault
+    * [CXF-6313] - SamlHeaderOutInterceptor does not set headers on the message if it had none
+    * [CXF-6314] - WebSocket transport should not require dependency to jetty
+    * [CXF-6315] - Optional WS-Addressing policy doesn't return required soap headers
+    * [CXF-6317] - Authorization not possible with multiple service beans
+    * [CXF-6319] - Regression: failing namespace resolution after CXF-5891
+    * [CXF-6320] - Zero-length entity should throw 400 on pre-packaged provider
+    * [CXF-6321] - Make sure global JAX-RS filters are applied once per request even if made to sub-resource
+    * [CXF-6322] - AbstractSearchConditionParser not working with UUID fields
+    * [CXF-6327] - Invalid Policy exception for EndorsingSupportingTokens with more than one token assertions
+    * [CXF-6331] - Wrap exceptions in JAXRSBeanValidationInvoker into Fault so that these exceptions are exposed to ExceptionMapper-s
+    * [CXF-6332] - Wadl Genertion: @Description cannot be bound to field
+    * [CXF-6336] - Client ParamConverterProvider may be lost if Client runs in the server scope
+    * [CXF-6338] - Reversed logic in AbstractJwtHandler#validateSignature
+    * [CXF-6340] - Return value of AsyncResponseImpl.cancel() not follow JAXRS 2.0 javadoc
+    * [CXF-6343] - EncryptedHeader not properly processed or generated
+    * [CXF-6352] - ContainerResponseContext.getLinks() loses links if they have no 'rel' parameter 
+    * [CXF-6356] - NPE when calling ServiceUnavailableException.getRetryTime()
+    * [CXF-6357] - request matching on method matching issue with compareSortedConsumesMediaTypes
+    * [CXF-6359] - NullPointerException when certAlias specified but no keyManagers are configured
+    * [CXF-6361] - HttpCondiut is not detecting the redirect loop properly
+    * [CXF-6366] - JAX-RS Client runtime does not encode forward slashes in Matrix parameters
+    * [CXF-6367] - JAX-RS Client runtime does not check BeanParam bean fields
+    * [CXF-6368] - Unexpected response code
+    * [CXF-6369] - org.apache.cxf.jaxrs.impl.ConfigurationImpl does not comply with SPEC
+    * [CXF-6370] - wrong usages for System.arraycopy in org.apache.cxf.jaxrs.impl.AsyncResponseImpl
+    * [CXF-6371] - WADL Generator does not always correctly deal with generic types 
+    * [CXF-6373] - CompletionCallback can not get the Throwable if error occurs in other interceptor (no serviceinvokerInterceptor)
+    * [CXF-6374] - If no OPTIONS defined , OPTIONS request will fail with 404
+    * [CXF-6375] - Providers.getMessageBodyReader throws NPE
+    * [CXF-6377] - Wrong media type of response
+    * [CXF-6378] - LinkBuilderImpl does not resolve relative links against baseUri
+    * [CXF-6379] - Separate HTTP headers for multiple header values not possible - bug in CXF-3714 fix
 
 ** Improvement
-    * [CXF-5674] - CXF Support in "Audience Restriction" of SAML 2 (SOAP)
-    * [CXF-5854] - Add property "refreshTemplates" to XSLTJaxbProvider
-    * [CXF-6046] - Enhance SwaggerFeature to support JAX-RS annotations
-    * [CXF-6079] - static-resource-list cache control
-    * [CXF-6126] - Search serviceBeans by given annotation
-    * [CXF-6142] - OAuth2 AccessTokenValidator needs to accept more parameters
-    * [CXF-6148] - Adding support for xsd:choice in Javascript generator
-    * [CXF-6150] - Override XSLTJaxbProvider xsl path at runtime
-    * [CXF-6154] - CXFServlet and JAX-RS RequestDispatcherProvider should be able to use RequestDispatch.include
-    * [CXF-6162] - Adding support for xsd:group ref in Javascript generator
-    * [CXF-6167] - Add an ability to specify SOAP error parser for Javascript client
-    * [CXF-6168] - Avoid ServletController synchronizing on the destination by default
-    * [CXF-6173] - Unable to configure CXF StAX properties on a per-endpoint/client basis if a JAX-WS handler is configured
-    * [CXF-6191] - Avoid Spring usage by configuration in ClassHelper
-    * [CXF-6199] - Allow scalability for slow services on jms
-    * [CXF-6200] - CXF JAX-RS Model extension should be usable without custom service classes 
-    * [CXF-6206] - JAASLoginInterceptor: Return proper unauthorized response when JAAS login with basic auth fails
-    * [CXF-6208] - Support registering JAX-RS providers as Classes in all cases
-    * [CXF-6223] - Support message property for encryption certificate
-    * [CXF-6227] - JAX-WS client performance improvements
-    * [CXF-6238] - Java2WADL : Generating response status attribute
-    * [CXF-6244] - ContentDisposition should support UTF-8 filenames
-    * [CXF-6251] - Allow org.apache.cxf.logging.enabled to have a value of "pretty" for pretty printing
+    * [CXF-6133] - Introduce Jwe and Jws exception classes to make it easier to provide dedicated JAX-RS exception mappers
+    * [CXF-6220] - JWA algorithm representation code needs to be cleaned up
+    * [CXF-6232] - Refactor CXF's Atmosphere based WebSocket transport for more flexible and extensible handling
+    * [CXF-6255] - WSS4JInInterceptor: "Security header, but it's a fault"
+    * [CXF-6268] - Make cxf-codegen-plugin toolchains aware during maven build
+    * [CXF-6277] - Enhance the X509TokenValidator to also validate X509Data DOM Elements
+    * [CXF-6283] - Support binary attributes in the LDAPClaimsHandler
+    * [CXF-6305] - Add an option to include or exclude specific response headers in WebSocket's transport
+    * [CXF-6308] - Make WebSocket transport's embedded jetty mode to use atmosphere if available
+    * [CXF-6329] - Allow multiple atmosphere interceptors to be configured for the websocket transport
+    * [CXF-6333] - Support Inclusive C14N via security policy
+    * [CXF-6335] - Explicitly set HTTPConduit on client inbound message
+    * [CXF-6337] - Support the redirection directly via the injected JAX-RS ServletContext context
+    * [CXF-6341] - Add atmosphere when installing feature cxf-transports-websocket-server
+    * [CXF-6342] - Undocumented feature to pass dates as Duration in JAX-RS-search 
+    * [CXF-6344] - Support system file location for JexlClaimMapper scripts
+    * [CXF-6345] - Support Logging in JexlClaimMapper scripts
+    * [CXF-6353] - provide a not typed way to configure cxf jaxrs clients
+    * [CXF-6363] - Introduce JwsHeaders
 
 ** New Feature
-    * [CXF-6132] - Provide JAX-RS ServletContainerInitializer 
-    * [CXF-6215] - Introduce JAX-RS DefaultMethod extension
-    * [CXF-6242] - Ability to configure the format of the marshalling / unmarshalling exceptions that are thrown by JAXB when schema validation is enabled.
-
+    * [CXF-6264] - Provide Swagger to CXF UserResource converter
 
 ** Task
-    * [CXF-6069] - upgrade jaxb version to 2.2.11
-
-** Test
-    * [CXF-6129] - CXF STS basic systests failure
-
+    * [CXF-6278] - Introduce MessageDigestInputStream utility class
+    * [CXF-6279] - Introduce X509 Certificate Path validation utility code 
+    * [CXF-6280] - Consider providing a DirectAccessToken JAXRS service
