@@ -174,8 +174,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             if (initialResponseContentType != null && !responseHeaders.containsKey(HttpHeaders.CONTENT_TYPE)) {
                 responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, initialResponseContentType);
             }
-        } else {
-            message.remove(Message.CONTENT_TYPE);
         }
         
         message.put(Message.PROTOCOL_HEADERS, responseHeaders);
@@ -196,8 +194,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (entity == null) {
             if (!headResponse) {
                 responseHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, "0");
-                responseHeaders.remove(HttpHeaders.CONTENT_TYPE);
-                message.remove(Message.CONTENT_TYPE);
+                if (MessageUtils.getContextualBoolean(message, "remove.content.type.for.empty.response", false)) {
+                    responseHeaders.remove(HttpHeaders.CONTENT_TYPE);
+                    message.remove(Message.CONTENT_TYPE);
+                }
             }
             HttpUtils.convertHeaderValuesToString(responseHeaders, true);
             return;
