@@ -22,13 +22,13 @@
     <artifactId>jaxws_async</artifactId>
     <name>JAX-WS Asynchronous Demo using Document/Literal Style</name>
     <description>JAX-WS Asynchronous Demo using Document/Literal Style</description>
-    <version>2.7.16</version>
+    <version>2.7.17-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.7.16</version>
+        <version>2.7.17-SNAPSHOT</version>
     </parent>
 
     <properties>
