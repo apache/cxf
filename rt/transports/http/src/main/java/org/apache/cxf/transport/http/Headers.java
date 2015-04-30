@@ -310,7 +310,7 @@ public class Headers {
             }
             if (addHeaders || HttpHeaderHelper.COOKIE.equalsIgnoreCase(header)) {
                 for (String s : headerList) {
-                    connection.addRequestProperty(HttpHeaderHelper.COOKIE, s);
+                    connection.addRequestProperty(header, s);
                 }
             } else {
                 StringBuilder b = new StringBuilder();
