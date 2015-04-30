@@ -39,7 +39,6 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.Constants;
-
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
@@ -94,8 +93,8 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return new Option[] {
             cxfBaseConfig(),
+            features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "http"),
             testUtils(),
-            features(cxfUrl, "cxf-core", "cxf-jaxrs", "http"),
             logLevel(LogLevel.INFO),
             provision(serviceBundle())
         };

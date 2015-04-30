@@ -165,7 +165,7 @@
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
         <cxf.karaf.version>3.0.2</cxf.karaf.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
-        <cxf.pax.exam.version>3.4.0</cxf.pax.exam.version>
+        <cxf.pax.exam.version>4.5.0</cxf.pax.exam.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
         <cxf.xmlbeans.bundle.version>2.6.0_2</cxf.xmlbeans.bundle.version>
