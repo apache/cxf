@@ -24,7 +24,9 @@ import java.util.Set;
 public class Consumers {
     
     private Set<Consumer> consumers = new HashSet<Consumer>();
-    
+    public Consumers() {
+        
+    }
     public Consumers(Consumers consumers) {
         this.consumers = consumers.getConsumers();
     }
