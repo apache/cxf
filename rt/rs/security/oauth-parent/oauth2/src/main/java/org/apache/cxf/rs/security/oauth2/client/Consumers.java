@@ -31,7 +31,7 @@ public class Consumers {
     public Consumers(Consumers consumers) {
         this(consumers.getConsumers());
     }
-    public Consumers(Set<Consumer> consumers) {
+    public Consumers(Set<OAuthClientUtils.Consumer> consumers) {
         this.consumers = consumers;
     }
 
