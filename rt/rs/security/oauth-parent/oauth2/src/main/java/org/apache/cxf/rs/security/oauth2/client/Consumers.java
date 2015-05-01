@@ -29,7 +29,10 @@ public class Consumers {
         
     }
     public Consumers(Consumers consumers) {
-        this.consumers = consumers.getConsumers();
+        this(consumers.getConsumers());
+    }
+    public Consumers(Set<Consumer> consumers) {
+        this.consumers = consumers;
     }
 
     public Set<OAuthClientUtils.Consumer> getConsumers() {
