@@ -25,6 +25,9 @@ public class Consumers {
     
     private Set<OAuthClientUtils.Consumer> consumers = new HashSet<OAuthClientUtils.Consumer>();
     
+    public Consumers() {
+        
+    }
     public Consumers(Consumers consumers) {
         this.consumers = consumers.getConsumers();
     }
