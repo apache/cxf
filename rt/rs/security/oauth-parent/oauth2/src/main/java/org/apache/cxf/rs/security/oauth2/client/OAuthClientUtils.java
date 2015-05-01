@@ -412,6 +412,7 @@ public final class OAuthClientUtils {
         
         private String key;
         private String secret;
+        private String description;
         
         public Consumer(String key, String secret) {
             this.key = key;
@@ -424,7 +425,20 @@ public final class OAuthClientUtils {
         public String getSecret() {
             return secret;
         }
-        
+        public String getDescription() {
+            return description;
+        }
+        public void setDescription(String description) {
+            this.description = description;
+        }
+        @Override
+        public int hashCode() {
+            return key.hashCode();
+        }
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof Consumer && key.equals(((Consumer)o).key);
+        }
         
     }
 }
