@@ -6,13 +6,13 @@ Initial Setup
 
 1) Install J2SE SDK, which can be downloaded from 
    http://www.oracle.com/technetwork/java/archive-139210.html#javase
-   CXF supports most versions newer than 1.6.0_04
+   CXF supports most versions newer than 1.7.0_25
 
 2) Make sure that your JAVA_HOME environment variable is set to the newly installed 
    JDK location, and that your PATH includes %JAVA_HOME%\bin (windows) or 
    $JAVA_HOME$/bin (unix).
 
-3) Install Maven 3.0 or newer, which can be downloaded from 
+3) Install Maven 3.1 or newer, which can be downloaded from 
    http://maven.apache.org/download.html. Make sure that your PATH includes 
    the MVN_HOME/bin directory. 
 
