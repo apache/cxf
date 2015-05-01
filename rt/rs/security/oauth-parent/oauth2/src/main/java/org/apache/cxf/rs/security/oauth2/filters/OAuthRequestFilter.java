@@ -46,6 +46,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
+import org.apache.cxf.rs.security.oauth2.common.AuthenticationMethod;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -72,7 +73,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     private List<String> requiredScopes = Collections.emptyList();
     private boolean allPermissionsMatch;
     private boolean blockPublicClients;
-    
+    private AuthenticationMethod am;
     public void filter(ContainerRequestContext context) {
         validateRequest(JAXRSUtils.getCurrentMessage());
     }    
@@ -127,6 +128,13 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             String message = "Only Confidential Clients are supported";
             LOG.warning(message);
             throw ExceptionUtils.toForbiddenException(null, null);
+        }
+        if (am != null && !am.equals(accessTokenV.getTokenSubject().getAuthenticationMethod())) {
+            String message = "The token has been authorized by the resource owner "
+                + "using an unsupported authentication method";
+            LOG.warning(message);
+            throw ExceptionUtils.toForbiddenException(null, null);
+            
         }
         
         // Create the security context and make it available on the message
@@ -282,6 +290,9 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
 
     public void setBlockPublicClients(boolean blockPublicClients) {
         this.blockPublicClients = blockPublicClients;
+    }
+    public void setTokenSubjectAuthenticationMethod(AuthenticationMethod method) {
+        this.am = method;
     }
     
 }

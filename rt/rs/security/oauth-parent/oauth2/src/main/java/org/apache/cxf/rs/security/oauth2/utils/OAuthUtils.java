@@ -32,6 +32,9 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.oauth2.common.AuthenticationMethod;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -85,8 +88,12 @@ public final class OAuthUtils {
                 roleNames.add(p.getName());
             }
         }
-        return 
-            new UserSubject(securityContext.getUserPrincipal().getName(), roleNames);
+        UserSubject subject = new UserSubject(securityContext.getUserPrincipal().getName(), roleNames);
+        Message m = JAXRSUtils.getCurrentMessage();
+        if (m != null && m.get(AuthenticationMethod.class) != null) {
+            subject.setAthenticationMethod(m.get(AuthenticationMethod.class));
+        }
+        return subject;
     }
     
     public static String convertPermissionsToScope(List<OAuthPermission> perms) {

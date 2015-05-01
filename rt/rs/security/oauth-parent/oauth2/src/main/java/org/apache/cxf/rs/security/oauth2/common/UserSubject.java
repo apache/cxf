@@ -39,7 +39,7 @@ public class UserSubject implements Serializable {
     private String id;
     private List<String> roles = new LinkedList<String>();
     private Map<String, String> properties = new HashMap<String, String>();
-    
+    private AuthenticationMethod am;
     public UserSubject() {
         
     }
@@ -128,6 +128,14 @@ public class UserSubject implements Serializable {
      */
     public void setId(String id) {
         this.id = id;
+    }
+
+    public AuthenticationMethod getAuthenticationMethod() {
+        return am;
+    }
+
+    public void setAthenticationMethod(AuthenticationMethod method) {
+        this.am = method;
     }
     
 }
