@@ -176,6 +176,8 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
                 extraCallbacks[i] = callbacks[i].newInstance();
             }
             return register(callback.newInstance(), extraCallbacks);    
+        } catch (NullPointerException e) {
+            throw e;
         } catch (Throwable t) {
             return Collections.emptyMap();
         }
