@@ -84,8 +84,7 @@ import org.junit.runner.RunWith;
 
 @CreateKdcServer(
     transports = {
-        // @CreateTransport(protocol = "TCP", address = "127.0.0.1", port=1024)
-        @CreateTransport(protocol = "UDP", address = "127.0.0.1")
+        @CreateTransport(protocol = "KRB", address = "127.0.0.1")
         },
     primaryRealm = "service.ws.apache.org",
     kdcPrincipal = "krbtgt/service.ws.apache.org@service.ws.apache.org"
