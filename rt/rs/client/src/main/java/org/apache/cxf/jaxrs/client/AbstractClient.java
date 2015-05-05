@@ -1067,12 +1067,22 @@ public abstract class AbstractClient implements Client {
         } 
 
         public void handleMessage(Message message) throws Fault {
-            Exception ex = message.getContent(Exception.class);
-            if (!message.getExchange().isSynchronous() && ex != null) {
-                //TODO: make sure it works with the failover feature
-                JaxrsClientCallback<?> cb = message.getExchange().get(JaxrsClientCallback.class);
-                cb.handleException(message, new ProcessingException(ex));
+            if (!message.getExchange().isSynchronous()) {
+                Throwable ex = message.getContent(Exception.class);
+                if (ex == null) {
+                    ex = message.getExchange().get(Exception.class);
+                }
+                if (ex != null) {
+                    JaxrsClientCallback<?> cb = message.getExchange().get(JaxrsClientCallback.class);
+                    if (ex instanceof Fault) {
+                        ex = ex.getCause();
+                    }
+                    ex = ex instanceof ProcessingException ? ex : new ProcessingException(ex);
+                    cb.handleException(message, ex);
+                }
             }
+            
+            
         }
     }
 }
