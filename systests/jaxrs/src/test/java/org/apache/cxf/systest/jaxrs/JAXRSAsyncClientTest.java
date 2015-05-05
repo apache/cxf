@@ -38,9 +38,11 @@ import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -150,7 +152,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
     }
     @Test
-    public void testNonExistentJaxrs20() throws Exception {
+    public void testNonExistentJaxrs20WithGet() throws Exception {
         String address = "http://localhostt/bookstore";
         Client c = ClientBuilder.newClient();
         c.register(new TestResponseFilter());
@@ -165,6 +167,26 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getCause().getCause() instanceof IOException);
         } finally {
             c.close();
+        }
+    }
+    
+    @Test
+    public void testNonExistentJaxrs20WithPost() throws Exception {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target("http://test.test/");
+        Invocation.Builder builder = target.request();
+        Entity<String> entity = Entity.entity("entity", MediaType.WILDCARD_TYPE);
+        Invocation invocation = builder.buildPost(entity);
+        Future<String> future = invocation.submit(
+            new GenericType<String>() {
+            }
+        );
+        
+        try {
+            future.get();
+        } catch (Exception ex) {
+            Throwable cause = ex.getCause();
+            assertTrue(cause instanceof ProcessingException);
         }
     }
     

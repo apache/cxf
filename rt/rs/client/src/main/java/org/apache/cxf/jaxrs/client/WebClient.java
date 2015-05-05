@@ -984,15 +984,7 @@ public class WebClient extends AbstractClient {
         
         doRunInterceptorChain(m);
         
-        Future<T> future = cb.createFuture();
-        if (m.getExchange().get(Exception.class) != null) {
-            Throwable ex = m.getExchange().get(Exception.class);
-            if (ex instanceof Fault) {
-                ex = ex.getCause();
-            }
-            cb.handleException(m, ex);
-        }
-        return future;
+        return cb.createFuture();
     }
 
     
