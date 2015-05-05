@@ -141,13 +141,11 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
             String basedir = System.getProperty("basedir");
             if (basedir == null) {
                 basedir = new File(".").getCanonicalPath();
-            } else {
-                basedir += "/..";
             }
 
             // System.setProperty("sun.security.krb5.debug", "true");
             System.setProperty("java.security.auth.login.config", 
-                               basedir + "/kerberos/src/test/resources/kerberos.jaas");
+                               basedir + "/src/test/resources/kerberos.jaas");
             
         }
         
