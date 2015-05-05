@@ -61,6 +61,7 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     private Map<String, Object> requestContext = new HashMap<String, Object>();
     private Map<String, Object> responseContext = new HashMap<String, Object>();
     private long synchronousTimeout = 60000;
+    private boolean shutdownBusOnClose;
     
     public long getSynchronousTimeout() {
         Conduit conduit = getConduit();
@@ -235,5 +236,13 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     
     public Endpoint getEndpoint() {
         return conduitSelector == null ? null : conduitSelector.getEndpoint();
+    }
+
+    public boolean isShutdownBusOnClose() {
+        return shutdownBusOnClose;
+    }
+
+    public void setShutdownBusOnClose(boolean shutdownBusOnClose) {
+        this.shutdownBusOnClose = shutdownBusOnClose;
     }
 }

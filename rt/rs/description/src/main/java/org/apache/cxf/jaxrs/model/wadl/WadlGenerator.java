@@ -282,9 +282,14 @@ public class WadlGenerator implements ContainerRequestFilter {
         Set<Class<?>> allTypes = resourceTypes.getAllTypes().keySet();
         
         
-        JAXBContext jaxbContext = useJaxbContextForQnames ? ResourceUtils
-            .createJaxbContext(new HashSet<Class<?>>(allTypes), null, null) : null;
-
+        JAXBContext jaxbContext = null;
+        if (useJaxbContextForQnames && !allTypes.isEmpty()) { 
+            jaxbContext = ResourceUtils.createJaxbContext(new HashSet<Class<?>>(allTypes), null, null);
+            if (jaxbContext == null) {
+                LOG.warning("JAXB Context is null: possibly due to one of input classes being not accepted");
+            }
+        } 
+            
         SchemaWriter schemaWriter = createSchemaWriter(resourceTypes, jaxbContext, ui);
         ElementQNameResolver qnameResolver = schemaWriter == null
             ? null : createElementQNameResolver(jaxbContext);

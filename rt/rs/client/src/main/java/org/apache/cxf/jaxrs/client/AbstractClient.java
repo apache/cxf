@@ -314,6 +314,9 @@ public abstract class AbstractClient implements Client {
                 cfg.getConduit().close();
             }
             state.reset();
+            if (cfg.isShutdownBusOnClose()) {
+                cfg.getBus().shutdown(false);
+            }
             state = null;
             cfg = null;
         }
