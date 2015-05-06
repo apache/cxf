@@ -55,6 +55,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -358,17 +360,31 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
-    public void testPostGetCollectionGenericEntityAndType() throws Exception {
+    public void testPostGetCollectionGenericEntityAndTypeXml() throws Exception {
         
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/collections"; 
         WebClient wc = WebClient.create(endpointAddress);
-        wc.accept("application/xml").type("application/xml");
+        doTestPostGetCollectionGenericEntityAndType(wc, "application/xml");
+    }
+    @Test
+    public void testPostGetCollectionGenericEntityAndTypeJson() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections"; 
+        WebClient wc = WebClient.create(endpointAddress,
+                                        Collections.singletonList(new JacksonJaxbJsonProvider()));
+        doTestPostGetCollectionGenericEntityAndType(wc, "application/json");
+    }
+    
+    private void doTestPostGetCollectionGenericEntityAndType(WebClient wc, String mt) throws Exception {
+        
+        wc.accept(mt).type(mt);
         GenericEntity<List<Book>> collectionEntity = createGenericEntity();
         final Holder<List<Book>> holder = new Holder<List<Book>>();
         InvocationCallback<List<Book>> callback = new CustomInvocationCallback(holder);
             
-        Future<List<Book>> future = wc.async().post(Entity.entity(collectionEntity, "application/xml"),
+        Future<List<Book>> future = wc.async().post(Entity.entity(collectionEntity, mt),
                                                     callback);    
             
         List<Book> books2 = future.get();

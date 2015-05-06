@@ -941,7 +941,6 @@ public class WebClient extends AbstractClient {
             ParameterizedType pt = (ParameterizedType)outType;
             if (pt.getRawType() instanceof Class) {
                 respClass = (Class<?>)pt.getRawType();
-                outType = InjectionUtils.getActualType(pt);
             }
         } 
         
