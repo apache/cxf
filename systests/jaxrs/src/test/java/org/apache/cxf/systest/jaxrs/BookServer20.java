@@ -59,6 +59,8 @@ import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
@@ -95,6 +97,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new FaultyContainerRequestFilter());
         providers.add(new PreMatchReplaceStreamOrAddress());
         providers.add(new GenericHandlerWriter());
+        providers.add(new JacksonJaxbJsonProvider());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
