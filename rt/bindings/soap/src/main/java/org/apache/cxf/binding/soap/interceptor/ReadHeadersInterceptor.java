@@ -22,7 +22,9 @@ package org.apache.cxf.binding.soap.interceptor;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -56,6 +58,7 @@ import org.apache.cxf.headers.HeaderProcessor;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -133,7 +136,8 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         message.setVersion(soapVersion);
         return soapVersion;
     }
-    
+
+    //CHECKSTYLE:OFF MethodLength
     public void handleMessage(SoapMessage message) {
         if (isGET(message)) {
             LOG.fine("ReadHeadersInterceptor skipped in HTTP GET method");
@@ -186,6 +190,14 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     doc = (Document)nd;
                     StaxUtils.readDocElements(doc, doc, filteredReader, false, false);
                 } else {
+                    final boolean addNC = 
+                        MessageUtils.getContextualBoolean(
+                            message, "org.apache.cxf.binding.soap.addNamespaceContext", false);
+                    Map<String, String> bodyNC = addNC ? new HashMap<String, String>() : null;
+                    if (addNC) {
+                        // add the Envelope-Level declarations
+                        addCurrentNamespaceDecls(xmlReader, bodyNC);
+                    }
                     HeadersProcessor processor = new HeadersProcessor(soapVersion);
                     doc = processor.process(filteredReader);
                     if (doc != null) {
@@ -193,6 +205,11 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     } else {
                         message.put(ENVELOPE_EVENTS, processor.getEnvAttributeAndNamespaceEvents());
                         message.put(BODY_EVENTS, processor.getBodyAttributeAndNamespaceEvents());
+                    }
+                    if (addNC) {
+                        // add the Body-level declarations
+                        addCurrentNamespaceDecls(xmlReader, bodyNC);
+                        message.put("soap.body.ns.context", bodyNC);
                     }
                 }
 
@@ -267,6 +284,17 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         } finally {
             if (closeNeeded) {
                 StaxUtils.close(xmlReader);
+            }
+        }
+    }
+
+    private void addCurrentNamespaceDecls(XMLStreamReader xmlReader, Map<String, String> bodyNsMap) {
+        for (int i = 0; i < xmlReader.getNamespaceCount(); i++) {
+            String nsuri = xmlReader.getNamespaceURI(i);
+            if (!Soap11.SOAP_NAMESPACE.equals(nsuri) && !Soap12.SOAP_NAMESPACE.equals(nsuri)) {
+                bodyNsMap.put(xmlReader.getNamespacePrefix(i), nsuri);
+            } else if ("".equals(nsuri)) {
+                bodyNsMap.remove("");
             }
         }
     }
