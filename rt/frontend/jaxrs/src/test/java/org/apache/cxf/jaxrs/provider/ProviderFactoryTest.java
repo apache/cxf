@@ -225,6 +225,21 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testMessageBodyReaderString() throws Exception {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        MessageBodyReader<String> mbr = pf.createMessageBodyReader(String.class, String.class, new Annotation[]{}, 
+                                   MediaType.APPLICATION_XML_TYPE, new MessageImpl());
+        assertTrue(mbr instanceof StringTextProvider);
+    }
+    @Test
+    public void testMessageBodyWriterString() throws Exception {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        MessageBodyWriter<String> mbr = pf.createMessageBodyWriter(String.class, String.class, new Annotation[]{}, 
+                                   MediaType.APPLICATION_XML_TYPE, new MessageImpl());
+        assertTrue(mbr instanceof StringTextProvider);
+    }
+    
+    @Test
     public void testMessageBodyHandlerHierarchy() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         List<Object> providers = new ArrayList<Object>();
@@ -291,7 +306,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testGetStringProvider() throws Exception {
-        verifyProvider(String.class, PrimitiveTextProvider.class, "text/plain");
+        verifyProvider(String.class, StringTextProvider.class, "text/plain");
     }
     
     @Test
@@ -353,7 +368,7 @@ public class ProviderFactoryTest extends Assert {
        
     @Test
     public void testGetStringProviderWildCard() throws Exception {
-        verifyProvider(String.class, PrimitiveTextProvider.class, "text/*");
+        verifyProvider(String.class, StringTextProvider.class, "text/*");
     }
     
     

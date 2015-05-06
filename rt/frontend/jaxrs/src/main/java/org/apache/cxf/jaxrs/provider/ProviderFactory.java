@@ -138,6 +138,7 @@ public abstract class ProviderFactory {
                                     new SourceProvider<Object>(),
                                     new DataSourceProvider<Object>(),
                                     new FormEncodingProvider<Object>(),
+                                    new StringTextProvider(),
                                     new PrimitiveTextProvider<Object>(),
                                     createProvider(JAXB_PROVIDER_NAME),
                                     createProvider(JSON_PROVIDER_NAME),
@@ -760,17 +761,16 @@ public abstract class ProviderFactory {
             MessageBodyReader<?> e1 = p1.getProvider();
             MessageBodyReader<?> e2 = p2.getProvider();
             
-            int result = compareClasses(e1, e2);
-            if (result != 0) {
-                return result;
-            }
-            
             List<MediaType> types1 = JAXRSUtils.getProviderConsumeTypes(e1);
             types1 = JAXRSUtils.sortMediaTypes(types1, null);
             List<MediaType> types2 = JAXRSUtils.getProviderConsumeTypes(e2);
             types2 = JAXRSUtils.sortMediaTypes(types2, null);
     
-            return JAXRSUtils.compareSortedMediaTypes(types1, types2, null);
+            int result = JAXRSUtils.compareSortedMediaTypes(types1, types2, null);
+            if (result != 0) {
+                return result;
+            }
+            return compareClasses(e1, e2);
         }
     }
     
