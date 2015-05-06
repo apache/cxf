@@ -23,6 +23,10 @@
 
     <xsd:import namespace="http://apache.org/hello_world/types"
         schemaLocation="hello_world_schema.xsd"/>
+    <xsd:import namespace="http://apache.org/hello_world/types4"
+                schemaLocation="d/hello_world_schema4.xsd"/>
+
+    <xsd:include schemaLocation="hello_world_schema3.xsd"/>
 
     <xsd:element name="sayHi2">
         <xsd:complexType/>
