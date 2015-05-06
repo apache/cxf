@@ -24,68 +24,55 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
-@Consumes("text/plain")
-@Produces("text/plain")
-public class PrimitiveTextProvider<T> extends AbstractConfigurableProvider
-    implements MessageBodyReader<T>, MessageBodyWriter<T> {
-    
-    private static boolean isSupported(Class<?> type, MediaType mt) { 
-        boolean isPrimitive = InjectionUtils.isPrimitiveOnly(type);
-        return isPrimitive && mt.isCompatible(MediaType.TEXT_PLAIN_TYPE);
-    }
-    
+public class StringTextProvider extends AbstractConfigurableProvider
+    implements MessageBodyReader<String>, MessageBodyWriter<String> {
+    private int bufferSize = IOUtils.DEFAULT_BUFFER_SIZE;
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return isSupported(type, mt);
+        return String.class == type;
     }
 
-    public T readFrom(Class<T> type, Type genType, Annotation[] anns, MediaType mt, 
+    public String readFrom(Class<String> type, Type genType, Annotation[] anns, MediaType mt, 
                       MultivaluedMap<String, String> headers, InputStream is) throws IOException {
-        String string = IOUtils.toString(is, HttpUtils.getEncoding(mt, "UTF-8"));
-        if (StringUtils.isEmpty(string)) {
-            reportEmptyContentLength();
-        }
-        if (type == Character.class) {
-            char character = string.charAt(0);
-            return type.cast(Character.valueOf(character));
-        }
-        return InjectionUtils.handleParameter(
-                    string, 
-                    false,
-                    type,
-                    genType,
-                    anns,
-                    ParameterType.REQUEST_BODY, null);
-        
+        return IOUtils.toString(is, HttpUtils.getEncoding(mt, "UTF-8"));
     }
 
-    public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(String t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return isSupported(type, mt);
+        return String.class == type;
     }
 
-    public void writeTo(T obj, Class<?> type, Type genType, Annotation[] anns, 
+    public void writeTo(String obj, Class<?> type, Type genType, Annotation[] anns, 
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
         String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
-        byte[] bytes = obj.toString().getBytes(encoding);
-        os.write(bytes);
-        
+        //REVISIT try to avoid instantiating the whole byte array
+        byte[] bytes = obj.getBytes(encoding);
+        if (bytes.length > bufferSize) {
+            int pos = 0;
+            while (pos < bytes.length) {
+                int bl = bytes.length - pos;
+                if (bl > bufferSize) {
+                    bl = bufferSize;
+                }
+                os.write(bytes, pos, bl);
+                pos += bl;
+            }
+        } else {
+            os.write(bytes);
+        }
     }
-    
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 }

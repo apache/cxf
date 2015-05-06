@@ -1252,13 +1252,15 @@ public final class InjectionUtils {
         }
         return false;
     }
-    
     public static boolean isPrimitive(Class<?> type) {
+        return String.class == type  
+            || isPrimitiveOnly(type);
+    }
+    public static boolean isPrimitiveOnly(Class<?> type) {
         return type.isPrimitive() 
             || Number.class.isAssignableFrom(type)
             || Boolean.class == type
-            || Character.class == type
-            || String.class == type;
+            || Character.class == type;
     }
     
     public static String decodeValue(String value, boolean decode, ParameterType param) {

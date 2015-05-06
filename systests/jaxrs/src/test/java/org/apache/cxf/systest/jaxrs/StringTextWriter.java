@@ -30,9 +30,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.cxf.jaxrs.provider.PrimitiveTextProvider;
+import org.apache.cxf.jaxrs.provider.StringTextProvider;
 
-public class StringTextWriter extends PrimitiveTextProvider<String> {
+public class StringTextWriter extends StringTextProvider {
     
     @Context
     private UriInfo ui;

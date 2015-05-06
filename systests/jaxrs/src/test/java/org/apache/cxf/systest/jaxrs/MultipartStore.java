@@ -459,8 +459,8 @@ public class MultipartStore {
     public Book testAddBookAndSimpleParts(
         @Multipart(value = "rootPart", type = "text/xml") Book b1,
         @Multipart(value = "simplePart1") String simplePart1,
-        @Multipart(value = "simplePart2") String simplePart2) throws Exception {
-        return new Book(b1.getName() + " - " + simplePart1 + simplePart2, b1.getId());   
+        @Multipart(value = "simplePart2") Integer simplePart2) throws Exception {
+        return new Book(b1.getName() + " - " + simplePart1 + simplePart2.toString(), b1.getId());   
     }
     
     @POST

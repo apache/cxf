@@ -76,7 +76,7 @@ public class PrimitiveTextProviderTest extends Assert {
     @Test
     public void testStringIsWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
-        assertTrue(p.isWriteable(String.class, null, null, MediaType.TEXT_PLAIN_TYPE)
+        assertFalse(p.isWriteable(String.class, null, null, MediaType.TEXT_PLAIN_TYPE)
                    && p.isWriteable(String.class, null, null, MediaType.valueOf("text/custom")));
     }
     
@@ -113,7 +113,7 @@ public class PrimitiveTextProviderTest extends Assert {
     @Test
     public void testStringIsReadable() {
         MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
-        assertTrue(p.isReadable(String.class, null, null, MediaType.TEXT_PLAIN_TYPE)
+        assertFalse(p.isReadable(String.class, null, null, MediaType.TEXT_PLAIN_TYPE)
                    && p.isReadable(String.class, null, null, MediaType.valueOf("text/custom")));
     }
     
