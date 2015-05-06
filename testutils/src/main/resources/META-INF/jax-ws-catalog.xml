@@ -18,7 +18,7 @@
     under the License.
 -->
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
-
+    <rewriteSystem systemIdStartString="http://apache.org/hello_world/types2/" rewritePrefix="/wsdl/others/"/>
     <rewriteSystem systemIdStartString="doesnotexist" rewritePrefix="../wsdl/catalog"/>
     <rewriteSystem systemIdStartString="nopath" rewritePrefix="../wsdl"/>
 

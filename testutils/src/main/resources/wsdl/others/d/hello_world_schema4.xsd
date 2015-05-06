@@ -18,17 +18,13 @@
     under the License.
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    targetNamespace="http://apache.org/hello_world/types2"
+    targetNamespace="http://apache.org/hello_world/types4"
             elementFormDefault="qualified">
 
-    <xsd:import namespace="http://apache.org/hello_world/types"
-        schemaLocation="hello_world_schema.xsd"/>
-    <xsd:import namespace="http://apache.org/hello_world/types4"
+    <xsd:import namespace="http://apache.org/hello_world/types5"
                 schemaLocation="d/hello_world_schema4.xsd"/>
 
-    <xsd:include schemaLocation="hello_world_schema3.xsd"/>
-
-    <xsd:element name="sayHi2">
+    <xsd:element name="sayHi4">
         <xsd:complexType/>
     </xsd:element>
 </xsd:schema>
