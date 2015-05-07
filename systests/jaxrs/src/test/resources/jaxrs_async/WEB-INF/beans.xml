@@ -34,6 +34,7 @@
     <jaxrs:server id="bookservice" address="/async">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
+            <bean class="org.apache.cxf.systest.jaxrs.AsyncResource"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="org.apache.cxf.systest.jaxrs.BookContinuationFilter"/>
