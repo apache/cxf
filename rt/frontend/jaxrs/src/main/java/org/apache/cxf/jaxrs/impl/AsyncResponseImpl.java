@@ -132,6 +132,9 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
 
     @Override
     public synchronized boolean isSuspended() {
+        if (cancelled || resumedByApplication) {
+            return false;
+        }
         return initialSuspend || cont.isPending();
     }
 
