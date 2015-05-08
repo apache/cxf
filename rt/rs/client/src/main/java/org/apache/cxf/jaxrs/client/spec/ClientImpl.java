@@ -304,7 +304,6 @@ public class ClientImpl implements Client {
                 JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
                 bean.setAddress(uri.toString());
                 targetClient = bean.createWebClient();
-                WebClient.getConfig(targetClient).getHttpConduit().getClient().setReceiveTimeout(1000000);
                 ClientImpl.this.baseClients.add(targetClient);
             } else if (!targetClient.getCurrentURI().equals(uri)) {
                 targetClient.to(uri.toString(), false);
