@@ -35,6 +35,7 @@
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
             <bean class="org.apache.cxf.systest.jaxrs.AsyncResource"/>
+            <bean class="org.apache.cxf.systest.jaxrs.AsyncResource2"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="org.apache.cxf.systest.jaxrs.BookContinuationFilter"/>

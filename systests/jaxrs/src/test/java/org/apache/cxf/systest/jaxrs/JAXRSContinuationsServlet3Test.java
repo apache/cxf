@@ -81,6 +81,26 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
         Future<Response> cancel = invokeRequest(base + "cancelvoid?stage=1"); 
         assertString(cancel, AsyncResource.FALSE); 
     }
+    @Test
+    public void testSuspendSetTimeoutt() throws Exception { 
+        final String base = "http://localhost:" + getPort() + "/async/resource2/";
+        Future<Response> suspend = invokeRequest(base + "suspend");
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                Future<Response> timeout = invokeRequest(base + "setTimeOut");
+                try {
+                    assertString(timeout, "true");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        t.start();
+        t.join();
+        
+        assertEquals(503, suspend.get().getStatus());
+         
+    }
 
     private static void assertString(Future<Response> future, String check) throws Exception { 
         Response response = future.get(); 

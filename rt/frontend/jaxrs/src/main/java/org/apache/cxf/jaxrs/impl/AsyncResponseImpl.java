@@ -54,6 +54,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     private volatile boolean done;
     private boolean resumedByApplication;
     private TimeoutHandler timeoutHandler;
+    private Long pendingTimeout;
     
     private List<CompletionCallback> completionCallbacks = new LinkedList<CompletionCallback>();
     private List<ConnectionCallback> connectionCallbacks = new LinkedList<ConnectionCallback>();
@@ -153,11 +154,20 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         if (isCancelledOrNotSuspended()) {
             return false;
         }
-        inMessage.getExchange().put(AsyncResponse.class, this);
+        setAsyncResponseOnExchange();
         long timeout = TimeUnit.MILLISECONDS.convert(time, unit);
         initialSuspend = false;
-        cont.suspend(timeout);
+        if (!cont.isPending()) {
+            cont.suspend(timeout);
+        } else {
+            pendingTimeout = timeout;
+            cont.resume();
+        }
         return true;
+    }
+
+    private void setAsyncResponseOnExchange() {
+        inMessage.getExchange().put(AsyncResponse.class, this);
     }
 
     @Override
@@ -273,7 +283,11 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     
     public synchronized void handleTimeout() {
         if (!resumedByApplication) {
-            if (timeoutHandler != null) {
+            if (pendingTimeout != null) {
+                setAsyncResponseOnExchange();
+                cont.suspend(pendingTimeout);
+                pendingTimeout = null;
+            } else if (timeoutHandler != null) {
                 timeoutHandler.handleTimeout(this);
             } else {
                 cont.setObject(new ServiceUnavailableException());
