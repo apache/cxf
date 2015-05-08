@@ -32,11 +32,6 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.Node;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -585,13 +580,6 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
 
         assertEquals("EncryptedData found without in header without being wrapped in an EncryptedHeader.",
                 0, strDataNodes.getLength());
-    }
-
-    private void dumpDocument(Document document) throws Exception { //NOPMD
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer t = tf.newTransformer();
-        t.setOutputProperty(OutputKeys.INDENT, "yes");
-        t.transform(new DOMSource(document), new StreamResult(System.out));
     }
 
     protected static final class MockEndpoint extends 
