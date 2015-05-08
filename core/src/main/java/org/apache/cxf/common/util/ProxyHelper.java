@@ -20,6 +20,7 @@
 package org.apache.cxf.common.util;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
@@ -72,6 +73,15 @@ public class ProxyHelper {
                 Class<?> ifClass = Class.forName(ifName, true, loader);
                 if (ifClass != currentInterface) {
                     return false;
+                }
+                //we need to check all the params/returns as well as the Proxy creation 
+                //will try to create methods for all of this even if they aren't used
+                //by the client and not available in the clients classloader
+                for (Method m : ifClass.getMethods()) {
+                    Class.forName(m.getReturnType().getName(), true, loader);
+                    for (Class<?> p : m.getParameterTypes()) {
+                        Class.forName(p.getName(), true, loader);
+                    }
                 }
             } catch (NoClassDefFoundError e) {
                 return false;
