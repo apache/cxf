@@ -26,6 +26,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
@@ -36,6 +37,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.NoneJwsSignatureProvider;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class JoseClientCodeStateManager implements ClientCodeStateManager {
     
@@ -45,9 +47,10 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
     private JwsSignatureVerifier signatureVerifier;
     private JsonMapObjectReaderWriter jsonp = new JsonMapObjectReaderWriter();
     @Override
-    public String toString(MessageContext mc, MultivaluedMap<String, String> state) {
+    public MultivaluedMap<String, String> toRedirectState(MessageContext mc, 
+                                                          MultivaluedMap<String, String> requestState) {
         
-        Map<String, Object> stateMap = CastUtils.cast((Map<?, ?>)state);
+        Map<String, Object> stateMap = CastUtils.cast((Map<?, ?>)requestState);
         String json = jsonp.toJson(stateMap);
         
         JwsCompactProducer producer = new JwsCompactProducer(json);
@@ -58,11 +61,16 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
         if (theEncryptionProvider != null) {
             stateParam = theEncryptionProvider.encrypt(StringUtils.toBytesUTF8(stateParam), null);
         }
-        return stateParam;
+        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        map.putSingle(OAuthConstants.STATE, stateParam);
+        return map;
     }
 
     @Override
-    public MultivaluedMap<String, String> toState(MessageContext mc, String stateParam) {
+    public MultivaluedMap<String, String> fromRedirectState(MessageContext mc, 
+                                                            MultivaluedMap<String, String> redirectState) {
+        
+        String stateParam = redirectState.getFirst(OAuthConstants.STATE);
         
         JweDecryptionProvider jwe = getInitializedDecryptionProvider();
         if (jwe != null) {

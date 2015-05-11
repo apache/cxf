@@ -23,8 +23,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
 public interface ClientCodeStateManager {
-    String toString(MessageContext mc,
-                    MultivaluedMap<String, String> state);
-    MultivaluedMap<String, String> toState(MessageContext mc,
-                                           String stateParam);
+    MultivaluedMap<String, String> toRedirectState(MessageContext mc, 
+                                                   MultivaluedMap<String, String> requestState);
+    MultivaluedMap<String, String> fromRedirectState(MessageContext mc, 
+                                                     MultivaluedMap<String, String> redirectState);
 }

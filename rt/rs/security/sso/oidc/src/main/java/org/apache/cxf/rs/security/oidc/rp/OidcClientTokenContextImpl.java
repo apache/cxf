@@ -18,11 +18,24 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
-import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
+import org.apache.cxf.rs.security.oauth2.client.ClientTokenContextImpl;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-public interface OidcClientTokenContext extends ClientTokenContext {
-    IdToken getIdToken();
-    UserInfo getUserInfo();
+public class OidcClientTokenContextImpl extends ClientTokenContextImpl implements OidcClientTokenContext {
+    private static final long serialVersionUID = 117239739331303618L;
+    private IdToken idToken;
+    private UserInfo userInfo;
+    public IdToken getIdToken() {
+        return idToken;
+    }
+    public void setIdToken(IdToken idToken) {
+        this.idToken = idToken;
+    }
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
 }

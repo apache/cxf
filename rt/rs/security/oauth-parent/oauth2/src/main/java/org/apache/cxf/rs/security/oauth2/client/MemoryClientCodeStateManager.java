@@ -23,21 +23,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 
 public class MemoryClientCodeStateManager implements ClientCodeStateManager {
     private ConcurrentHashMap<String, MultivaluedMap<String, String>> map = 
             new ConcurrentHashMap<String, MultivaluedMap<String, String>>();
     
     @Override
-    public String toString(MessageContext mc, MultivaluedMap<String, String> state) {
+    public MultivaluedMap<String, String> toRedirectState(MessageContext mc, 
+                                                          MultivaluedMap<String, String> requestState) {
         String name = mc.getSecurityContext().getUserPrincipal().getName();
         String hashCode = Integer.toString(name.hashCode());
-        map.put(hashCode, state);
-        return hashCode;
+        map.put(hashCode, requestState);
+        return new MetadataMap<String, String>();
     }
 
     @Override
-    public MultivaluedMap<String, String> toState(MessageContext mc, String stateParam) {
+    public MultivaluedMap<String, String> fromRedirectState(MessageContext mc, 
+                                                            MultivaluedMap<String, String> redirectState) {
         String name = mc.getSecurityContext().getUserPrincipal().getName();
         String hashCode = Integer.toString(name.hashCode());
         return map.remove(hashCode);

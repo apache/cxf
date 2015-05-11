@@ -84,11 +84,14 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
 
     private Response createCodeResponse(ContainerRequestContext rc, SecurityContext sc, UriInfo ui) {
+        MultivaluedMap<String, String> redirectState = createRedirectState(rc, sc, ui);
+        String redirectScope = redirectState.getFirst(OAuthConstants.SCOPE);
+        String theScope = redirectScope != null ? redirectScope : scopes;
         URI uri = OAuthClientUtils.getAuthorizationURI(authorizationServiceUri, 
                                              consumer.getKey(), 
                                              getAbsoluteRedirectUri(ui).toString(), 
-                                             createRequestState(rc, sc, ui), 
-                                             scopes);
+                                             redirectState.getFirst(OAuthConstants.STATE), 
+                                             theScope);
         return Response.seeOther(uri).build();
     }
 
@@ -96,45 +99,51 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         return ui.getBaseUriBuilder().path(relRedirectUri).build();
     }
     protected void processCodeResponse(ContainerRequestContext rc, SecurityContext sc, UriInfo ui) {
-        MultivaluedMap<String, String> params = ui.getQueryParameters();
+        MultivaluedMap<String, String> params = toRequestState(rc, ui);
         String codeParam = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
-        AccessTokenGrant grant = new AuthorizationCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
-        ClientAccessToken at = OAuthClientUtils.getAccessToken(accessTokenService, 
-                                                               consumer, 
-                                                               grant);
-        MultivaluedMap<String, String> state = null;
-        String stateParam = params.getFirst(OAuthConstants.STATE);
-        if (clientStateManager != null) {
-            state = clientStateManager.toState(mc, stateParam);
+        if (codeParam != null) {
+            AccessTokenGrant grant = new AuthorizationCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
+            ClientAccessToken at = OAuthClientUtils.getAccessToken(accessTokenService, 
+                                                                   consumer, 
+                                                                   grant);
+            ClientTokenContext request = createTokenContext(at);
+            MultivaluedMap<String, String> state = null;
+            if (clientStateManager != null) {
+                state = clientStateManager.fromRedirectState(mc, params);
+            }
+            ((ClientTokenContextImpl)request).setToken(at);
+            ((ClientTokenContextImpl)request).setState(state);
+            if (clientTokenContextManager != null) {
+                clientTokenContextManager.setClientTokenContext(mc, request);
+            }
+            setClientCodeRequest(request);
         }
-        ClientTokenContext request = createTokenContext(at);
-        request.setToken(at);
-        request.setState(state);
-        if (clientTokenContextManager != null) {
-            clientTokenContextManager.setClientTokenContext(mc, request);
-        }
-        setClientCodeRequest(request);
     }
     
     protected ClientTokenContext createTokenContext(ClientAccessToken at) {
-        return new ClientTokenContext();
+        return new ClientTokenContextImpl();
     }
     
     private void setClientCodeRequest(ClientTokenContext request) {
         JAXRSUtils.getCurrentMessage().setContent(ClientTokenContext.class, request);
     }
 
-    private String createRequestState(ContainerRequestContext rc, SecurityContext sc, UriInfo ui) {
+    private MultivaluedMap<String, String> createRedirectState(ContainerRequestContext rc, SecurityContext sc, 
+                                                               UriInfo ui) {
         if (clientStateManager == null) {
             return null;
         }
-        MultivaluedMap<String, String> state = new MetadataMap<String, String>();
-        state.putAll(ui.getQueryParameters(false));
+        return clientStateManager.toRedirectState(mc, toRequestState(rc, ui));
+    }
+
+    private MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc, UriInfo ui) {
+        MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
+        requestState.putAll(ui.getQueryParameters(false));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
             String body = FormUtils.readBody(rc.getEntityStream(), "UTF-8");
-            FormUtils.populateMapFromString(state, JAXRSUtils.getCurrentMessage(), body, "UTF-8", false);
+            FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, "UTF-8", false);
         }
-        return clientStateManager.toString(mc, state);
+        return requestState;
     }
 
     public void setScopeList(List<String> list) {
@@ -151,35 +160,34 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         this.scopes = scopesString;
     }
 
-    public void setStartUri(String startUri) {
-        this.startUri = startUri;
+    public void setRelativeStartUri(String relStartUri) {
+        this.startUri = relStartUri;
     }
 
     public void setAuthorizationServiceUri(String authorizationServiceUri) {
         this.authorizationServiceUri = authorizationServiceUri;
     }
 
-    public void setRelativeRedirectUri(String redirectUri) {
-        this.relRedirectUri = redirectUri;
+    public void setRelativeCompleteUri(String completeUri) {
+        this.relRedirectUri = completeUri;
     }
 
     public void setAccessTokenService(WebClient accessTokenService) {
         this.accessTokenService = accessTokenService;
     }
 
-    public void setClientStateManager(ClientCodeStateManager clientStateManager) {
-        this.clientStateManager = clientStateManager;
+    public void setClientCodeStateManager(ClientCodeStateManager manager) {
+        this.clientStateManager = manager;
     }
     public void setClientTokenContextManager(ClientTokenContextManager clientTokenContextManager) {
         this.clientTokenContextManager = clientTokenContextManager;
     }
 
-    public Consumer getConsumer() {
-        return consumer;
-    }
-
     public void setConsumer(Consumer consumer) {
         this.consumer = consumer;
+    }
+    public Consumer getConsumer() {
+        return consumer;
     }
 
 }
