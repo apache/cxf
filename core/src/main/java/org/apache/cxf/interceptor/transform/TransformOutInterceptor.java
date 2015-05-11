@@ -50,6 +50,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private Map<String, String> outElementsMap;
     private Map<String, String> outAppendMap;
     private List<String> outDropElements;
+    private Map<String, String> outAttributesMap;
     private boolean attributesToElements;
     private boolean skipOnFault;
     private String contextPropertyName;
@@ -112,6 +113,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
                                                       outElementsMap,
                                                       outDropElements,
                                                       outAppendMap,
+                                                      outAttributesMap,
                                                       attributesToElements,
                                                       defaultNamespace);
     }
@@ -126,6 +128,10 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void setOutDropElements(List<String> dropElementsSet) {
         this.outDropElements = dropElementsSet;
+    }
+
+    public void setOutTransformAttributes(Map<String, String> outAttributes) {
+        this.outAttributesMap = outAttributes;
     }
 
     public void setAttributesToElements(boolean value) {

@@ -59,7 +59,11 @@ public class StaxTransformFeature extends AbstractFeature {
     public void setOutTransformElements(Map<String, String> outElements) {
         out.setOutTransformElements(outElements);
     }
-    
+
+    public void setOutTransformAttributes(Map<String, String> outAttributes) {
+        out.setOutTransformAttributes(outAttributes);
+    }
+
     public void setAttributesToElements(boolean value) {
         out.setAttributesToElements(value);
     }
@@ -75,7 +79,7 @@ public class StaxTransformFeature extends AbstractFeature {
     public void setOutDropElements(List<String> dropElementsSet) {
         out.setOutDropElements(dropElementsSet);
     }
-    
+
     public void setInAppendElements(Map<String, String> inElements) {
         in.setInAppendElements(inElements);
     }
@@ -86,6 +90,10 @@ public class StaxTransformFeature extends AbstractFeature {
     
     public void setInTransformElements(Map<String, String> inElements) {
         in.setInTransformElements(inElements);
+    }
+    
+    public void setInTransformAttributes(Map<String, String> inAttributes) {
+        in.setInTransformAttributes(inAttributes);
     }
     
     public void setOutDefaultNamespace(String ns) {

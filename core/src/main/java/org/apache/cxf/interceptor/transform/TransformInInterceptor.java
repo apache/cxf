@@ -42,6 +42,7 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
     private List<String> inDropElements;
     private Map<String, String> inElementsMap;
     private Map<String, String> inAppendMap;
+    private Map<String, String> inAttributesMap;
     private boolean blockOriginalReader = true;
     private String contextPropertyName;
     
@@ -82,15 +83,16 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
          
     }
-    
+
     protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is) {
         return TransformUtils.createTransformReaderIfNeeded(reader, is,
                                                             inDropElements,
                                                             inElementsMap,
                                                             inAppendMap,
+                                                            inAttributesMap,
                                                             blockOriginalReader);
     }
-    
+
     public void setInAppendElements(Map<String, String> inElements) {
         this.inAppendMap = inElements;
     }
@@ -102,7 +104,11 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void setInTransformElements(Map<String, String> inElements) {
         this.inElementsMap = inElements;
     }
-   
+
+    public void setInTransformAttributes(Map<String, String> inAttributes) {
+        this.inAttributesMap = inAttributes;
+    }
+
     public void setBlockOriginalReader(boolean blockOriginalReader) {
         this.blockOriginalReader = blockOriginalReader;
     }
