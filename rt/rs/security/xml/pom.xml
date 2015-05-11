@@ -30,6 +30,11 @@
         <version>3.1.1-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.osgi.import>
+            org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
+        </cxf.osgi.import>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

@@ -32,7 +32,7 @@
     </parent>
     <properties>
         <cxf.osgi.import>
-            org.opensaml*,
+            org.opensaml*;resolution:=optional;version="${cxf.opensaml.osgi.version.range}",
         </cxf.osgi.import>
     </properties>
     <dependencies>
