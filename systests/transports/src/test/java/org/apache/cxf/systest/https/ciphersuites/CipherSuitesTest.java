@@ -527,6 +527,82 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // Both client + server include AES, client is TLSv1.1
+    @org.junit.Test
+    public void testAESIncludedTLSv11() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT);
+        
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit conduit = (HTTPConduit) client.getConduit();
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        X509TrustManager trustManager = new NoOpX509TrustManager();
+        TrustManager[] trustManagers = new TrustManager[1];
+        trustManagers[0] = trustManager;
+        tlsParams.setTrustManagers(trustManagers);
+        tlsParams.setDisableCNCheck(true);
+        
+        tlsParams.setSecureSocketProtocol("TLSv1.1");
+
+        conduit.setTlsClientParameters(tlsParams);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // Both client + server include AES, client is TLSv1.0
+    @org.junit.Test
+    public void testAESIncludedTLSv10() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT);
+        
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit conduit = (HTTPConduit) client.getConduit();
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        X509TrustManager trustManager = new NoOpX509TrustManager();
+        TrustManager[] trustManagers = new TrustManager[1];
+        trustManagers[0] = trustManager;
+        tlsParams.setTrustManagers(trustManagers);
+        tlsParams.setDisableCNCheck(true);
+        
+        tlsParams.setSecureSocketProtocol("TLSv1");
+
+        conduit.setTlsClientParameters(tlsParams);
+        
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
     private static class NoOpX509TrustManager implements X509TrustManager {
 
         public NoOpX509TrustManager() {
