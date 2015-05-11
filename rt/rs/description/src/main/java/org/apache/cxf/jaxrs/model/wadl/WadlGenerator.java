@@ -180,7 +180,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private String stylesheetReference;
     private boolean applyStylesheetLocally;
     private Bus bus;
-    private DocumentationProvider docProvider;
+    private List<DocumentationProvider> docProviders = new LinkedList<DocumentationProvider>();
     private ResourceIdGenerator idGenerator;     
     
     public WadlGenerator() {
@@ -941,7 +941,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                                         boolean isJson) {
     //CHECKSTYLE:ON    
         boolean docAnnAvailable = isDocAvailable(anns);
-        if (docAnnAvailable || (ori != null && docProvider != null)) {
+        if (docAnnAvailable || (ori != null && !docProviders.isEmpty())) {
             sb.append(">");
             if (docAnnAvailable) {
                 handleDocs(anns, sb, category, allowDefault, isJson);
@@ -1650,19 +1650,19 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     protected void handleClassJavaDocs(ClassResourceInfo cri, StringBuilder sb) {
-        if (docProvider != null) {
+        for (DocumentationProvider docProvider : docProviders) {
             addProvidedDocs(sb, docProvider.getClassDoc(cri));
         }
     }
     
     protected void handleOperJavaDocs(OperationResourceInfo ori, StringBuilder sb) {
-        if (docProvider != null) {
+        for (DocumentationProvider docProvider : docProviders) {
             addProvidedDocs(sb, docProvider.getMethodDoc(ori));
         }
     }
     
     protected void handleOperResponseJavaDocs(OperationResourceInfo ori, StringBuilder sb) {
-        if (docProvider != null) {
+        for (DocumentationProvider docProvider : docProviders) {
             addProvidedDocs(sb, docProvider.getMethodResponseDoc(ori));
         }
     }
@@ -1670,7 +1670,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     protected void handleOperParamJavaDocs(OperationResourceInfo ori,
                                            int paramIndex,
                                            StringBuilder sb) {
-        if (docProvider != null) {
+        for (DocumentationProvider docProvider : docProviders) {
             addProvidedDocs(sb, docProvider.getMethodParameterDoc(ori, paramIndex));
         }
     }
@@ -2128,13 +2128,15 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
     
     public void setJavaDocPath(String path) throws Exception {
-        docProvider = new JavaDocProvider(bus == null ? BusFactory.getDefaultBus() : bus, path);
+        setDocumentationProvider(new JavaDocProvider(bus == null ? BusFactory.getDefaultBus() : bus, path));
     }
     
     public void setDocumentationProvider(DocumentationProvider p) {
-        docProvider = p;
+        docProviders.add(p);
     }
-
+    public void setDocumentationProvider(List<DocumentationProvider> ps) {
+        docProviders.addAll(ps);
+    }
     public void setStylesheetReference(String stylesheetReference) {
         this.stylesheetReference = stylesheetReference;
     }
