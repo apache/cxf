@@ -18,14 +18,36 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
-import java.io.Serializable;
-
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 
-public interface ClientTokenContext extends Serializable {
-    ClientAccessToken getToken();
-    MultivaluedMap<String, String> getState();
-    <T> T getState(Class<T> stateClass);
+public class ClientTokenContextImpl implements ClientTokenContext {
+    private static final long serialVersionUID = -3501237730333195311L;
+    private ClientAccessToken token;
+    private MultivaluedMap<String, String> state;
+    
+    public ClientAccessToken getToken() {
+        return token;
+    }
+
+    public void setToken(ClientAccessToken token) {
+        this.token = token;
+    }
+
+    public MultivaluedMap<String, String> getState() {
+        return state;
+    }
+
+    public void setState(MultivaluedMap<String, String> state) {
+        this.state = state;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T> T getState(Class<T> cls) {
+        if (MultivaluedMap.class == cls) {
+            return (T)state;
+        }
+        return null;
+    }
 }
