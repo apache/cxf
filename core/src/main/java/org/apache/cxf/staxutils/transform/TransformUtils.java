@@ -57,11 +57,30 @@ public final class TransformUtils {
             || outAppendMap != null || attributesToElements) {
             writer = createNewWriterIfNeeded(writer, os);
             writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
-                                            outDropElements, attributesToElements, defaultNamespace);
+                                            outDropElements, null, attributesToElements, defaultNamespace);
         }
         return writer;
     }
-    
+
+    //CHECKSTYLE:OFF ParameterNumber
+    public static XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
+                                                                OutputStream os,
+                                                                Map<String, String> outElementsMap,
+                                                                List<String> outDropElements,
+                                                                Map<String, String> outAppendMap,
+                                                                Map<String, String> outAttributesMap,
+                                                                boolean attributesToElements,
+                                                                String defaultNamespace) {
+        if (outElementsMap != null || outDropElements != null 
+            || outAppendMap != null || attributesToElements) {
+            writer = createNewWriterIfNeeded(writer, os);
+            writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
+                                            outDropElements, outAttributesMap, attributesToElements, defaultNamespace);
+        }
+        return writer;
+    }
+    //CHECKSTYLE:ON
+
     public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, 
                                                                 InputStream is,
                                                                 List<String> inDropElements,
