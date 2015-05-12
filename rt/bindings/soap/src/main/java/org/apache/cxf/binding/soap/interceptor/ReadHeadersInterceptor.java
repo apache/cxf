@@ -292,10 +292,10 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
     private void addCurrentNamespaceDecls(XMLStreamReader xmlReader, Map<String, String> bodyNsMap) {
         for (int i = 0; i < xmlReader.getNamespaceCount(); i++) {
             String nsuri = xmlReader.getNamespaceURI(i);
-            if (!Soap11.SOAP_NAMESPACE.equals(nsuri) && !Soap12.SOAP_NAMESPACE.equals(nsuri)) {
-                bodyNsMap.put(xmlReader.getNamespacePrefix(i), nsuri);
-            } else if ("".equals(nsuri)) {
+            if ("".equals(nsuri)) {
                 bodyNsMap.remove("");
+            } else {
+                bodyNsMap.put(xmlReader.getNamespacePrefix(i), nsuri);
             }
         }
     }
