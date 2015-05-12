@@ -28,8 +28,10 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     @Override
     protected ClientTokenContext createTokenContext(ClientAccessToken at) {
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
-        ctx.setIdToken(userInfoClient.getIdToken(at, getConsumer().getKey()));
-        ctx.setUserInfo(userInfoClient.getUserInfo(at, ctx.getIdToken()));
+        if (at != null) {
+            ctx.setIdToken(userInfoClient.getIdToken(at, getConsumer().getKey()));
+            ctx.setUserInfo(userInfoClient.getUserInfo(at, ctx.getIdToken()));
+        }
         return ctx;
     }
     public void setUserInfoClient(UserInfoClient userInfoClient) {

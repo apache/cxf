@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+
 
 
 /**
@@ -57,4 +59,12 @@ public class ClientAccessToken extends AccessToken {
         return scope;
     }
 
+    @Override
+    public String toString() {
+        if (OAuthConstants.BEARER_AUTHORIZATION_SCHEME.equalsIgnoreCase(super.getTokenType())) {
+            return OAuthConstants.BEARER_AUTHORIZATION_SCHEME + " " + super.getTokenKey();
+        } else {
+            return super.toString();
+        }
+    }
 }
