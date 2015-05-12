@@ -43,6 +43,7 @@ import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.xml.security.transforms.Transforms;
 
 /**
  * Validate results corresponding to the processing of a Signature, EncryptedKey or
@@ -178,6 +179,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
                 if (!(algorithmPolicy.getC14n().getValue().equals(transformAlgorithm)
                     || WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithm)
                     || STRTransform.TRANSFORM_URI.equals(transformAlgorithm)
+                    || Transforms.TRANSFORM_ENVELOPED_SIGNATURE.equals(transformAlgorithm)
                     || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transformAlgorithm)
                     || WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transformAlgorithm))) {
                     ai.setNotAsserted("The transform algorithms do not match the requirement");
