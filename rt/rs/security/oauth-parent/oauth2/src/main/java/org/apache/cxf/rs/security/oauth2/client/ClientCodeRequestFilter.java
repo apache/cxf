@@ -59,6 +59,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private ClientCodeStateManager clientStateManager;
     private ClientTokenContextManager clientTokenContextManager;
     private WebClient accessTokenService;
+    private boolean decodeRequestParameters;
     
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
@@ -101,23 +102,21 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     protected void processCodeResponse(ContainerRequestContext rc, SecurityContext sc, UriInfo ui) {
         MultivaluedMap<String, String> params = toRequestState(rc, ui);
         String codeParam = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
+        ClientAccessToken at = null;
         if (codeParam != null) {
             AccessTokenGrant grant = new AuthorizationCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
-            ClientAccessToken at = OAuthClientUtils.getAccessToken(accessTokenService, 
-                                                                   consumer, 
-                                                                   grant);
-            ClientTokenContext request = createTokenContext(at);
-            MultivaluedMap<String, String> state = null;
-            if (clientStateManager != null) {
-                state = clientStateManager.fromRedirectState(mc, params);
-            }
-            ((ClientTokenContextImpl)request).setToken(at);
-            ((ClientTokenContextImpl)request).setState(state);
-            if (clientTokenContextManager != null) {
-                clientTokenContextManager.setClientTokenContext(mc, request);
-            }
-            setClientCodeRequest(request);
+            at = OAuthClientUtils.getAccessToken(accessTokenService, consumer, grant);
         }
+        ClientTokenContext request = createTokenContext(at);
+        ((ClientTokenContextImpl)request).setToken(at);
+        if (clientStateManager != null) {
+            MultivaluedMap<String, String> state = clientStateManager.fromRedirectState(mc, params);
+            ((ClientTokenContextImpl)request).setState(state);
+        }
+        if (at != null && clientTokenContextManager != null) {
+            clientTokenContextManager.setClientTokenContext(mc, request);
+        }
+        setClientCodeRequest(request);
     }
     
     protected ClientTokenContext createTokenContext(ClientAccessToken at) {
@@ -138,10 +137,11 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
 
     private MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
-        requestState.putAll(ui.getQueryParameters(false));
+        requestState.putAll(ui.getQueryParameters(decodeRequestParameters));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
             String body = FormUtils.readBody(rc.getEntityStream(), "UTF-8");
-            FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, "UTF-8", false);
+            FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, 
+                                            "UTF-8", decodeRequestParameters);
         }
         return requestState;
     }
@@ -188,6 +188,10 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
     public Consumer getConsumer() {
         return consumer;
+    }
+
+    public void setDecodeRequestParameters(boolean decodeRequestParameters) {
+        this.decodeRequestParameters = decodeRequestParameters;
     }
 
 }
