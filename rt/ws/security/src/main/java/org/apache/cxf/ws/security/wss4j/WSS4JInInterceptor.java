@@ -520,41 +520,54 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             useJAASSubject = Boolean.parseBoolean(useJAASSubjectStr);
         }
         
-        for (int i = wsResult.getResults().size() - 1; i >= 0; i--) {
-            WSSecurityEngineResult o = wsResult.getResults().get(i);
+        // Now go through the results in a certain order to set up a security context. Highest priority is first.
+        
+        List<Integer> resultPriorities = new ArrayList<>();
+        resultPriorities.add(WSConstants.ST_SIGNED);
+        resultPriorities.add(WSConstants.ST_UNSIGNED);
+        resultPriorities.add(WSConstants.UT);
+        resultPriorities.add(WSConstants.BST);
+        resultPriorities.add(WSConstants.SIGN);
+        resultPriorities.add(WSConstants.UT_NOPASSWORD);
+        
+        Map<Integer, List<WSSecurityEngineResult>> actionResults = wsResult.getActionResults();
+        for (Integer resultPriority : resultPriorities) {
+            if (resultPriority == WSConstants.ST_UNSIGNED && !allowUnsignedSamlPrincipals) {
+                continue;
+            }
             
-            Integer action = (Integer)o.get(WSSecurityEngineResult.TAG_ACTION);
-            final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-            final Subject subject = (Subject)o.get(WSSecurityEngineResult.TAG_SUBJECT);
-            final Object binarySecurity = o.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            
-            final boolean isValidSamlToken = action == WSConstants.ST_SIGNED 
-                    || (allowUnsignedSamlPrincipals && action == WSConstants.ST_UNSIGNED);
-            
-            // UsernameToken, Kerberos, SAML token or XML Signature
-            if (action == WSConstants.UT || action == WSConstants.UT_NOPASSWORD
-                || (action == WSConstants.BST && binarySecurity instanceof KerberosSecurity)
-                || isValidSamlToken || action == WSConstants.SIGN) {
-                
-                if (action == WSConstants.SIGN) {
-                    // Check we have a public key / certificate for the signing case
+            List<WSSecurityEngineResult> foundResults = actionResults.get(resultPriority);
+            if (foundResults != null && !foundResults.isEmpty()) {
+                for (WSSecurityEngineResult result : foundResults) {
+                    final Object binarySecurity = result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                     PublicKey publickey = 
-                        (PublicKey)o.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+                        (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
                     X509Certificate cert = 
-                        (X509Certificate)o.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                        (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
                     
-                    if (publickey == null && cert == null) {
+                    if ((resultPriority == WSConstants.BST && !(binarySecurity instanceof KerberosSecurity))
+                        || (resultPriority == WSConstants.SIGN && publickey == null && cert == null)) {
                         continue;
                     }
-                }
-                SecurityContext context = 
-                    createSecurityContext(msg, subject, p, useJAASSubject, o, utWithCallbacks);
-                if (context != null) {
-                    msg.put(SecurityContext.class, context);
-                    break;
+                    SecurityContext context = 
+                        createSecurityContext(msg, useJAASSubject, result, utWithCallbacks);
+                    if (context != null) {
+                        msg.put(SecurityContext.class, context);
+                        break;
+                    }
                 }
             }
         }
+    }
+    
+    private SecurityContext createSecurityContext(
+        SoapMessage msg, boolean useJAASSubject,
+        WSSecurityEngineResult wsResult, boolean utWithCallbacks
+    ) {
+        final Principal p = (Principal)wsResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        final Subject subject = (Subject)wsResult.get(WSSecurityEngineResult.TAG_SUBJECT);
+        
+        return createSecurityContext(msg, subject, p, useJAASSubject, wsResult, utWithCallbacks);
     }
     
     protected SecurityContext createSecurityContext(
