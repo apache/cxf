@@ -567,7 +567,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             
             for (WSSecurityEngineResult result : wsResult) {
                 Integer action = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-                if (action == resultPriority) {
+                if (action.intValue() == resultPriority.intValue()) {
                     final Object binarySecurity = result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                     PublicKey publickey = 
                         (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
