@@ -916,11 +916,36 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return id;
     }
     
-    public String getPassword(String userName, Assertion info, int usage) {
+    protected String getPassword(String userName, Assertion info, int usage) {
         //Then try to get the password from the given callback handler
+<<<<<<< HEAD
         CallbackHandler handler = getCallbackHandler();
         if (handler == null) {
             policyNotAsserted(info, "No callback handler and no password available");
+=======
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
+        CallbackHandler handler = null;
+        try {
+            handler = SecurityUtils.getCallbackHandler(o);
+            if (handler == null) {
+                // Don't unassert for signature as we might get the password from the crypto properties
+                if (usage == WSPasswordCallback.SIGNATURE) {
+                    LOG.info("No CallbackHandler available to retrieve a password. We will now try the crypto "
+                             + "properties file for a private password");
+                } else {
+                    unassertPolicy(info, "No callback handler and no password available");
+                }
+                return null;
+            }
+        } catch (Exception ex) {
+            // Don't unassert for signature as we might get the password from the crypto properties
+            if (usage == WSPasswordCallback.SIGNATURE) {
+                LOG.info("No CallbackHandler available to retrieve a password. We will now try the crypto "
+                         + "properties file for a private password");
+            } else {
+                unassertPolicy(info, "No callback handler and no password available");
+            }
+>>>>>>> a64265c... [CXF-6400] - Make ws-security.callback-handler optional for generating a WS-Security signature
             return null;
         }
         

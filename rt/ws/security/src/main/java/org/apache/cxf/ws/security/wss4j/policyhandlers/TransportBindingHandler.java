@@ -570,9 +570,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 uname = (String)message.getContextualProperty(userNameKey);
             }
             String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
-            if (password == null) {
-                password = "";
-            }
             sig.setUserInfo(uname, password);
             sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         } else {
