@@ -90,7 +90,7 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
 
         // Now go through the results in a certain order to set up a security context. Highest priority is first.
 
-        List<Event> desiredSecurityEvents = new ArrayList<>();
+        List<Event> desiredSecurityEvents = new ArrayList<Event>();
         desiredSecurityEvents.add(WSSecurityEventConstants.SamlToken);
         desiredSecurityEvents.add(WSSecurityEventConstants.UsernameToken);
         desiredSecurityEvents.add(WSSecurityEventConstants.KerberosToken);
@@ -129,15 +129,9 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
 
                     Object receivedAssertion = null;
                     
-<<<<<<< HEAD
-                    if (event.getSecurityEventType() == WSSecurityEventConstants.SamlToken) {
-                        String roleAttributeName = (String)msg.getContextualProperty(
-                                SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
-=======
                     if (desiredEvent == WSSecurityEventConstants.SamlToken) {
-                        String roleAttributeName = (String)SecurityUtils.getSecurityPropertyValue(
-                                SecurityConstants.SAML_ROLE_ATTRIBUTENAME, msg);
->>>>>>> 44bf65e... [CXF-6401] - Change the order that the set of security results are searched to create a security context
+                        String roleAttributeName = 
+                            (String)msg.getContextualProperty(SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
                         if (roleAttributeName == null || roleAttributeName.length() == 0) {
                             roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                         }

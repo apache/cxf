@@ -547,24 +547,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         Boolean allowUnsignedSamlPrincipals = 
                 MessageUtils.getContextualBoolean(msg, 
                         SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, false);
-        
-<<<<<<< HEAD
-        for (int i = wsResult.size() - 1; i >= 0; i--) {
-            WSSecurityEngineResult o = wsResult.get(i);
-            
-            Integer action = (Integer)o.get(WSSecurityEngineResult.TAG_ACTION);
-            final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-            final Subject subject = (Subject)o.get(WSSecurityEngineResult.TAG_SUBJECT);
-            final boolean useJAASSubject = MessageUtils
-                .getContextualBoolean(msg, SecurityConstants.SC_FROM_JAAS_SUBJECT, true);
-            final Object binarySecurity = o.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            
-            final boolean isValidSamlToken = action == WSConstants.ST_SIGNED 
-                    || (allowUnsignedSamlPrincipals && action == WSConstants.ST_UNSIGNED);
-=======
+        final boolean useJAASSubject = MessageUtils
+            .getContextualBoolean(msg, SecurityConstants.SC_FROM_JAAS_SUBJECT, true);
+
         // Now go through the results in a certain order to set up a security context. Highest priority is first.
         
-        List<Integer> resultPriorities = new ArrayList<>();
+        List<Integer> resultPriorities = new ArrayList<Integer>();
         resultPriorities.add(WSConstants.ST_SIGNED);
         resultPriorities.add(WSConstants.ST_UNSIGNED);
         resultPriorities.add(WSConstants.UT);
@@ -572,22 +560,20 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         resultPriorities.add(WSConstants.SIGN);
         resultPriorities.add(WSConstants.UT_NOPASSWORD);
         
-        Map<Integer, List<WSSecurityEngineResult>> actionResults = wsResult.getActionResults();
         for (Integer resultPriority : resultPriorities) {
             if (resultPriority == WSConstants.ST_UNSIGNED && !allowUnsignedSamlPrincipals) {
                 continue;
             }
->>>>>>> 44bf65e... [CXF-6401] - Change the order that the set of security results are searched to create a security context
             
-            List<WSSecurityEngineResult> foundResults = actionResults.get(resultPriority);
-            if (foundResults != null && !foundResults.isEmpty()) {
-                for (WSSecurityEngineResult result : foundResults) {
+            for (WSSecurityEngineResult result : wsResult) {
+                Integer action = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+                if (action == resultPriority) {
                     final Object binarySecurity = result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                     PublicKey publickey = 
                         (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
                     X509Certificate cert = 
                         (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                    
+    
                     if ((resultPriority == WSConstants.BST && !(binarySecurity instanceof KerberosSecurity))
                         || (resultPriority == WSConstants.SIGN && publickey == null && cert == null)) {
                         continue;
