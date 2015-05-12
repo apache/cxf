@@ -293,6 +293,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
             }
         }
     }
+    //CHECKSTYLE:ON
 
     private void addCurrentNamespaceDecls(XMLStreamReader xmlReader, Map<String, String> bodyNsMap) {
         for (int i = 0; i < xmlReader.getNamespaceCount(); i++) {
