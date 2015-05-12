@@ -921,18 +921,30 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return id;
     }
     
-    public String getPassword(String userName, Assertion info, int usage) {
+    protected String getPassword(String userName, Assertion info, int usage) {
         //Then try to get the password from the given callback handler
         Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
         CallbackHandler handler = null;
         try {
             handler = SecurityUtils.getCallbackHandler(o);
             if (handler == null) {
-                unassertPolicy(info, "No callback handler and no password available");
+                // Don't unassert for signature as we might get the password from the crypto properties
+                if (usage == WSPasswordCallback.SIGNATURE) {
+                    LOG.info("No CallbackHandler available to retrieve a password. We will now try the crypto "
+                             + "properties file for a private password");
+                } else {
+                    unassertPolicy(info, "No callback handler and no password available");
+                }
                 return null;
             }
         } catch (Exception ex) {
-            unassertPolicy(info, "No callback handler and no password available");
+            // Don't unassert for signature as we might get the password from the crypto properties
+            if (usage == WSPasswordCallback.SIGNATURE) {
+                LOG.info("No CallbackHandler available to retrieve a password. We will now try the crypto "
+                         + "properties file for a private password");
+            } else {
+                unassertPolicy(info, "No callback handler and no password available");
+            }
             return null;
         }
         
