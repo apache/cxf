@@ -81,6 +81,11 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
         }
         
         for (AssertionInfo ai : ais) {
+            if (ai.isAsserted()) {
+                // Secured Parts could already have been asserted by one of the other validators, if
+                // they are a child of a SupportingToken
+                continue;
+            }
             SignedParts p = (SignedParts)ai.getAssertion();
             ai.setAsserted(true);
             
