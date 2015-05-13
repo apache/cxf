@@ -75,8 +75,7 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
             
             ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put(Message.SCHEMA_VALIDATION_ENABLED,
-                           shouldValidate());
+            properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);
 
@@ -94,16 +93,6 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
                    launchServer(Server.class, true));
     }
             
-    public static Boolean shouldValidate() {
-        String ver = System.getProperty("java.version");
-        if (ver.startsWith("1.5.0_0")) {
-            //older versions of the JDK have a bug in the parser
-            //that prevent the validation from actually working
-            return Boolean.FALSE;
-        }
-        return Boolean.TRUE;
-    }
-    
     @Test
     public void testDecoupledOneway() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -122,7 +111,7 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
         ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, 
-                                                           shouldValidate());
+                                                           Boolean.TRUE);
         LOG.fine("Created greeter client.");
        
         ConnectionHelper.setKeepAliveConnection(greeter, true);
