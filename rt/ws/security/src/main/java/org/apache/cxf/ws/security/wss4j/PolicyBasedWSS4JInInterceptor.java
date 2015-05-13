@@ -63,9 +63,6 @@ import org.apache.wss4j.policy.model.Wss11;
  * 
  */
 public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
-    public static final PolicyBasedWSS4JInInterceptor INSTANCE 
-        = new PolicyBasedWSS4JInInterceptor();
-
     /**
      * 
      */

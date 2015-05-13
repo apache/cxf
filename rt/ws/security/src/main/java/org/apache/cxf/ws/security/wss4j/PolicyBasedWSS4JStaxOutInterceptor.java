@@ -43,8 +43,6 @@ import org.apache.xml.security.stax.ext.OutboundSecurityContext;
  * 
  */
 public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor {
-    public static final PolicyBasedWSS4JStaxOutInterceptor INSTANCE 
-        = new PolicyBasedWSS4JStaxOutInterceptor();
 
     public void handleMessage(SoapMessage msg) throws Fault {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);

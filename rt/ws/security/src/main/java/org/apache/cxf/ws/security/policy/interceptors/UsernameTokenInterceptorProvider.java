@@ -51,10 +51,12 @@ public class UsernameTokenInterceptorProvider extends AbstractPolicyInterceptorP
         this.getInInterceptors().add(inInterceptor == null ? new UsernameTokenInterceptor() : inInterceptor);
         //not needed on fault chains
         
-        this.getOutInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
-        this.getOutFaultInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
-        this.getInInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
-        this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
+        PolicyBasedWSS4JStaxOutInterceptor so = new PolicyBasedWSS4JStaxOutInterceptor();
+        PolicyBasedWSS4JStaxInInterceptor si = new PolicyBasedWSS4JStaxInInterceptor();
+        this.getOutInterceptors().add(so);
+        this.getOutFaultInterceptors().add(so);
+        this.getInInterceptors().add(si);
+        this.getInFaultInterceptors().add(si);
     }
     
 }

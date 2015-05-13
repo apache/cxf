@@ -89,10 +89,12 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         this.getOutInterceptors().add(new KerberosTokenInterceptor());
         this.getInInterceptors().add(new KerberosTokenInterceptor());
         
-        this.getOutInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
-        this.getOutFaultInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
-        this.getInInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
-        this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
+        PolicyBasedWSS4JStaxOutInterceptor so = new PolicyBasedWSS4JStaxOutInterceptor();
+        PolicyBasedWSS4JStaxInInterceptor si = new PolicyBasedWSS4JStaxInInterceptor();
+        this.getOutInterceptors().add(so);
+        this.getOutFaultInterceptors().add(so);
+        this.getInInterceptors().add(si);
+        this.getInFaultInterceptors().add(si);
     }
     
     static class KerberosTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
