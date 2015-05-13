@@ -67,8 +67,6 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
  * 
  */
 public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
-    public static final PolicyBasedWSS4JStaxInInterceptor INSTANCE 
-        = new PolicyBasedWSS4JStaxInInterceptor();
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JStaxInInterceptor.class);
 
     public void handleMessage(SoapMessage msg) throws Fault {
