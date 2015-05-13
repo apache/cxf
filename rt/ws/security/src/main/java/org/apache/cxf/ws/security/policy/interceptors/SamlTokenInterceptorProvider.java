@@ -40,10 +40,12 @@ public class SamlTokenInterceptorProvider extends AbstractPolicyInterceptorProvi
         this.getOutInterceptors().add(new SamlTokenInterceptor());
         this.getInInterceptors().add(new SamlTokenInterceptor());
         
-        this.getOutInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
-        this.getOutFaultInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
-        this.getInInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
-        this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
+        PolicyBasedWSS4JStaxOutInterceptor so = new PolicyBasedWSS4JStaxOutInterceptor();
+        PolicyBasedWSS4JStaxInInterceptor si = new PolicyBasedWSS4JStaxInInterceptor();
+        this.getOutInterceptors().add(so);
+        this.getOutFaultInterceptors().add(so);
+        this.getInInterceptors().add(si);
+        this.getInFaultInterceptors().add(si);
     }
     
 }

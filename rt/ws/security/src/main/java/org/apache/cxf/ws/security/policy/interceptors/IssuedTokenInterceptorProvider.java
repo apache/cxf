@@ -88,20 +88,23 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         
         //issued tokens can be attached as a supporting token without
         //any type of binding.  Make sure we can support that.
+        PolicyBasedWSS4JInInterceptor in = new PolicyBasedWSS4JInInterceptor();
         this.getOutInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
         this.getOutFaultInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
-        this.getInInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
-        this.getInFaultInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
+        this.getInInterceptors().add(in);
+        this.getInFaultInterceptors().add(in);
         
         this.getOutInterceptors().add(new IssuedTokenOutInterceptor());
         this.getOutFaultInterceptors().add(new IssuedTokenOutInterceptor());
         this.getInInterceptors().add(new IssuedTokenInInterceptor());
         this.getInFaultInterceptors().add(new IssuedTokenInInterceptor());
         
-        this.getOutInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
-        this.getOutFaultInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
-        this.getInInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
-        this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
+        PolicyBasedWSS4JStaxOutInterceptor so = new PolicyBasedWSS4JStaxOutInterceptor();
+        PolicyBasedWSS4JStaxInInterceptor si = new PolicyBasedWSS4JStaxInInterceptor();
+        this.getOutInterceptors().add(so);
+        this.getOutFaultInterceptors().add(so);
+        this.getInInterceptors().add(si);
+        this.getInFaultInterceptors().add(si);
     }
     
     protected static void assertIssuedToken(IssuedToken issuedToken, AssertionInfoMap aim) {
