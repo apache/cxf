@@ -766,11 +766,11 @@ public class WebClient extends AbstractClient {
      * @param value new values, null is equivalent to removing the header
      * @return updated WebClient
      */
-    public WebClient replaceHeader(String headerName, String value) {
+    public WebClient replaceHeader(String headerName, Object value) {
         MultivaluedMap<String, String> headers = getState().getRequestHeaders();
         headers.remove(headerName);
         if (value != null) {
-            headers.add(headerName, value);
+            super.header(headerName, value);
         }
         return this;
     }

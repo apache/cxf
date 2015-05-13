@@ -34,63 +34,63 @@ import javax.ws.rs.core.Response;
 public interface Client {
     
     /**
-     * sets HTTP Content-Type header
+     * Set HTTP Content-Type header
      * @param ct JAXRS MediaType representing Content-Type value  
      * @return the updated Client
      */
     Client type(MediaType ct);
     
     /**
-     * sets HTTP Content-Type header
+     * Set HTTP Content-Type header
      * @param type Content-Type value  
      * @return the updated Client
      */
     Client type(String type);
     
     /**
-     * sets HTTP Accept header
+     * Set HTTP Accept header
      * @param types list of JAXRS MediaTypes representing Accept header values  
      * @return the updated Client
      */
     Client accept(MediaType... types);
     
     /**
-     * sets HTTP Accept header
+     * Set HTTP Accept header
      * @param types list of Accept header values  
      * @return the updated Client
      */
     Client accept(String... types);
     
     /**
-     * sets HTTP Content-Language header 
+     * Set HTTP Content-Language header 
      * @param language Content-Language header value  
      * @return the updated Client
      */    
     Client language(String language);
     
     /**
-     * sets HTTP Accept-Language header 
+     * Set HTTP Accept-Language header 
      * @param languages list of Accept-Language header values  
      * @return the updated Client
      */
     Client acceptLanguage(String ...languages);
     
     /**
-     * sets HTTP Content-Encoding header 
+     * Set HTTP Content-Encoding header 
      * @param encoding Content-Encoding header value  
      * @return the updated Client
      */
     Client encoding(String encoding);
     
     /**
-     * sets HTTP Accept-Encoding header 
+     * Set HTTP Accept-Encoding header 
      * @param encodings list of Accept-Encoding header value  
      * @return the updated Client
      */
     Client acceptEncoding(String ...encodings);
     
     /**
-     * sets HTTP If-Match or If-None-Match header
+     * Set HTTP If-Match or If-None-Match header
      * @param tag ETag value
      * @param ifNot if true then If-None-Match is set, If-Match otherwise  
      * @return the updated Client
@@ -98,7 +98,7 @@ public interface Client {
     Client match(EntityTag tag, boolean ifNot);
     
     /**
-     * sets HTTP If-Modified-Since or If-Unmodified-Since header
+     * Set HTTP If-Modified-Since or If-Unmodified-Since header
      * @param date Date value, will be formated as "EEE, dd MMM yyyy HH:mm:ss zzz" 
      * @param ifNot if true then If-Unmodified-Since is set, If-Modified-Since otherwise  
      * @return the updated Client
@@ -106,14 +106,21 @@ public interface Client {
     Client modified(Date date, boolean ifNot);
     
     /**
-     * sets HTTP Cookie header 
+     * Set HTTP Cookie header 
      * @param cookie Cookie value  
      * @return the updated Client
      */
     Client cookie(Cookie cookie);
     
     /**
-     * Updates the current URI query parameters
+     * Set HTTP Authorization header 
+     * @param auth Authorization value  
+     * @return the updated Client
+     */
+    Client authorization(Object auth);
+    
+    /**
+     * Update the current URI query parameters
      * @param name query name
      * @param values query values
      * @return updated WebClient
@@ -121,7 +128,7 @@ public interface Client {
     Client query(String name, Object ...values);
     
     /**
-     * Sets arbitrary HTTP Header
+     * Set arbitrary HTTP Header
      * @param name header name
      * @param values list of header values
      * @return the updated Client
@@ -129,44 +136,44 @@ public interface Client {
     Client header(String name, Object... values);
     
     /**
-     * Sets HTTP Headers
+     * Set HTTP Headers
      * @param map headers
      * @return the updated Client
      */
     Client headers(MultivaluedMap<String, String> map);
 
     /**
-     * Resets the headers and response state if any
+     * Reset the headers and response state if any
      * @return  the updated Client
      */
     Client reset();
     
     /**
-     * Gets the copy of request headers
+     * Get the copy of request headers
      * @return request headers
      */
     MultivaluedMap<String, String> getHeaders();
     
     /**
-     * Gets the base URI this Client has been intialized with
+     * Get the base URI this Client has been intialized with
      * @return base URI
      */
     URI getBaseURI();
     
     /**
-     * Gets the current URI this Client is working with
+     * Get the current URI this Client is working with
      * @return current URI
      */
     URI getCurrentURI();
     
     /**
-     * Gets the response state if any
+     * Get the response state if any
      * @return JAXRS Response response
      */
     Response getResponse();
     
     /**
-     * Releases the internal state and configuration associated with this client 
+     * Release the internal state and configuration associated with this client 
      */
     void close();
 }

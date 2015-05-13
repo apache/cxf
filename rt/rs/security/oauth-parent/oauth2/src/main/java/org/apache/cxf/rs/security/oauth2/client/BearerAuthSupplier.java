@@ -69,9 +69,8 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
     }
     private void refreshAccessTokenIfExpired(AuthorizationPolicy authPolicy) {
         ClientAccessToken at = getClientAccessToken();
-        if (at.getExpiresIn() != -1 
-            && OAuthUtils.isExpired(at.getIssuedAt(), 
-                                    at.getExpiresIn())) {
+        if (OAuthUtils.isExpired(at.getIssuedAt(), 
+                                 at.getExpiresIn())) {
             refreshAccessToken(authPolicy);
         }
         
