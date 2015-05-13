@@ -44,6 +44,7 @@ import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 @PreMatching
 @Priority(Priorities.AUTHENTICATION + 1)
@@ -52,7 +53,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private MessageContext mc;
     
     private String scopes;
-    private String relRedirectUri;
+    private String completeUri;
     private String startUri;
     private String authorizationServiceUri;
     private Consumer consumer;
@@ -60,6 +61,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private ClientTokenContextManager clientTokenContextManager;
     private WebClient accessTokenService;
     private boolean decodeRequestParameters;
+    private long expiryThreshold;
     
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
@@ -68,18 +70,29 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         UriInfo ui = rc.getUriInfo();
-        if (ui.getPath().endsWith(startUri)) {
-            if (clientTokenContextManager != null) {
-                ClientTokenContext request = clientTokenContextManager.getClientTokenContext(mc);
-                if (request != null) {
-                    setClientCodeRequest(request);
-                    rc.setRequestUri(URI.create(relRedirectUri));
-                    return;
+        String absoluteRequestUri = ui.getAbsolutePath().toString();
+        
+        boolean sameUriRedirect = false;
+        if (completeUri == null) {
+            String referer = rc.getHeaderString("Referer");
+            if (referer != null && referer.startsWith(authorizationServiceUri)) {
+                completeUri = absoluteRequestUri;
+                sameUriRedirect = true;
+            }
+        }
+        
+        if (!sameUriRedirect && absoluteRequestUri.endsWith(startUri)) {
+            ClientTokenContext request = getClientTokenContext();
+            if (request != null) {
+                setClientCodeRequest(request);
+                if (completeUri != null) {
+                    rc.setRequestUri(URI.create(completeUri));
                 }
+                return;
             }
             Response codeResponse = createCodeResponse(rc, sc, ui);
             rc.abortWith(codeResponse);
-        } else if (ui.getPath().endsWith(relRedirectUri)) {
+        } else if (absoluteRequestUri.endsWith(completeUri)) {
             processCodeResponse(rc, sc, ui);
         }
     }
@@ -97,7 +110,12 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
 
     private URI getAbsoluteRedirectUri(UriInfo ui) {
-        return ui.getBaseUriBuilder().path(relRedirectUri).build();
+        if (completeUri != null) {
+            return completeUri.startsWith("http") ? URI.create(completeUri) 
+                : ui.getBaseUriBuilder().path(completeUri).build();
+        } else {
+            return ui.getAbsolutePath();
+        }
     }
     protected void processCodeResponse(ContainerRequestContext rc, SecurityContext sc, UriInfo ui) {
         MultivaluedMap<String, String> params = toRequestState(rc, ui);
@@ -107,18 +125,26 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             AccessTokenGrant grant = new AuthorizationCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
             at = OAuthClientUtils.getAccessToken(accessTokenService, consumer, grant);
         }
-        ClientTokenContext request = createTokenContext(at);
-        ((ClientTokenContextImpl)request).setToken(at);
-        if (clientStateManager != null) {
-            MultivaluedMap<String, String> state = clientStateManager.fromRedirectState(mc, params);
-            ((ClientTokenContextImpl)request).setState(state);
-        }
+        ClientTokenContext tokenContext = initializeClientTokenContext(at, params);
         if (at != null && clientTokenContextManager != null) {
-            clientTokenContextManager.setClientTokenContext(mc, request);
+            clientTokenContextManager.setClientTokenContext(mc, tokenContext);
         }
-        setClientCodeRequest(request);
+        setClientCodeRequest(tokenContext);
     }
     
+    private ClientTokenContext initializeClientTokenContext(ClientAccessToken at, 
+                                                            MultivaluedMap<String, String> params) {
+        ClientTokenContext tokenContext = createTokenContext(at);
+        ((ClientTokenContextImpl)tokenContext).setToken(at);
+        if (clientStateManager != null) {
+            MultivaluedMap<String, String> state = clientStateManager.fromRedirectState(mc, params);
+            ((ClientTokenContextImpl)tokenContext).setState(state);
+        }
+        
+        return tokenContext;
+        
+    }
+
     protected ClientTokenContext createTokenContext(ClientAccessToken at) {
         return new ClientTokenContextImpl();
     }
@@ -160,7 +186,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         this.scopes = scopesString;
     }
 
-    public void setRelativeStartUri(String relStartUri) {
+    public void setStartUri(String relStartUri) {
         this.startUri = relStartUri;
     }
 
@@ -168,8 +194,8 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         this.authorizationServiceUri = authorizationServiceUri;
     }
 
-    public void setRelativeCompleteUri(String completeUri) {
-        this.relRedirectUri = completeUri;
+    public void setCompleteUri(String completeUri) {
+        this.completeUri = completeUri;
     }
 
     public void setAccessTokenService(WebClient accessTokenService) {
@@ -194,4 +220,33 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         this.decodeRequestParameters = decodeRequestParameters;
     }
 
+    private ClientTokenContext getClientTokenContext() {
+        ClientTokenContext ctx = null;
+        if (clientTokenContextManager != null) {
+            ctx = clientTokenContextManager.getClientTokenContext(mc);
+            if (ctx != null) {
+                ClientAccessToken newAt = refreshAccessTokenIfExpired(ctx.getToken());
+                if (newAt != null) {
+                    clientTokenContextManager.removeClientTokenContext(mc, ctx);
+                    ClientTokenContext newCtx = initializeClientTokenContext(newAt, ctx.getState());            
+                    clientTokenContextManager.setClientTokenContext(mc, newCtx);
+                    ctx = newCtx;
+                }
+            }
+        }
+        return ctx;
+    }
+    
+    private ClientAccessToken refreshAccessTokenIfExpired(ClientAccessToken at) {
+        if (at.getRefreshToken() != null
+            && ((expiryThreshold > 0 && OAuthUtils.isExpired(at.getIssuedAt(), at.getExpiresIn() - expiryThreshold))
+            || OAuthUtils.isExpired(at.getIssuedAt(), at.getExpiresIn()))) {
+            return OAuthClientUtils.refreshAccessToken(accessTokenService, consumer, at);
+        }
+        return null;
+    }
+
+    public void setExpiryThreshold(long expiryThreshold) {
+        this.expiryThreshold = expiryThreshold;
+    }
 }

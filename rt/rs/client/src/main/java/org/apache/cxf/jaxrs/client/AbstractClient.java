@@ -197,6 +197,15 @@ public abstract class AbstractClient implements Client {
     /**
      * {@inheritDoc}
      */
+    public Client authorization(Object auth) {
+        String value = convertParamValue(auth, null);
+        state.getRequestHeaders().putSingle(HttpHeaders.AUTHORIZATION, value);
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public Client modified(Date date, boolean ifNot) {
         SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
         String hName = ifNot ? HttpHeaders.IF_UNMODIFIED_SINCE : HttpHeaders.IF_MODIFIED_SINCE;
