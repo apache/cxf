@@ -530,6 +530,13 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     // Both client + server include AES, client is TLSv1.1
     @org.junit.Test
     public void testAESIncludedTLSv11() throws Exception {
+        // TLS v1.1 not supported in JDK1.6
+        if (System.getProperty("java.version") != null
+            && System.getProperty("java.version").startsWith("1.6")) {
+            return;
+        }
+
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
 
