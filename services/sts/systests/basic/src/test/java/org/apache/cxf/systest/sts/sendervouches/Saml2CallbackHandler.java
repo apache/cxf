@@ -33,8 +33,8 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * Create a SAML2 Assertion via some authenticated information (Principal).
@@ -52,7 +52,7 @@ public class Saml2CallbackHandler implements CallbackHandler {
             if (callbacks[i] instanceof SAMLCallback) {
                 
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setSamlVersion(SAMLVersion.VERSION_20);
+                callback.setSamlVersion(Version.SAML_20);
                 
                 callback.setIssuer("intermediary");
                 String subjectName = "uid=" + principal.getName();

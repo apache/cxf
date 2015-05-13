@@ -31,8 +31,8 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * A Callback Handler implementation for a SAML 1.1 assertion. By default it creates an
@@ -61,7 +61,7 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setIssuer("www.example.com");
-                callback.setSamlVersion(SAMLVersion.VERSION_11);
+                callback.setSamlVersion(Version.SAML_11);
                 SubjectBean subjectBean = 
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod

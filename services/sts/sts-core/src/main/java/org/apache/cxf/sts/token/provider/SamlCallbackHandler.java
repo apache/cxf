@@ -34,8 +34,8 @@ import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.dom.WSConstants;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * This CallbackHandler implementation is populated with SAML Beans by the SAMLTokenProvider, and is tasked
@@ -115,9 +115,9 @@ public class SamlCallbackHandler implements CallbackHandler {
                 boolean saml1 = false;
                 if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
                     || WSConstants.SAML2_NS.equals(tokenType)) {
-                    callback.setSamlVersion(SAMLVersion.VERSION_20);
+                    callback.setSamlVersion(Version.SAML_20);
                 } else {
-                    callback.setSamlVersion(SAMLVersion.VERSION_11);
+                    callback.setSamlVersion(Version.SAML_11);
                     saml1 = true;
                     setSubjectOnBeans();
                 }

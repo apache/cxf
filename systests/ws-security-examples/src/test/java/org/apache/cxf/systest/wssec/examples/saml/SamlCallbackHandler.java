@@ -37,9 +37,9 @@ import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.opensaml.common.SAMLVersion;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
@@ -66,7 +66,7 @@ public class SamlCallbackHandler implements CallbackHandler {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 if (!saml2) {
-                    callback.setSamlVersion(SAMLVersion.VERSION_11);
+                    callback.setSamlVersion(Version.SAML_11);
                 }
                 callback.setIssuer("sts");
                 String subjectName = "uid=sts-client,o=mock-sts.com";
