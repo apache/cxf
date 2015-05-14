@@ -48,6 +48,7 @@
         <module>wsdl_maven</module>
         <module>cdi</module>
         <module>rs-http-sci</module>
+        <module>ws-transfer</module>
     </modules>
 
     <profiles>
