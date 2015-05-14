@@ -200,9 +200,9 @@ public class JAXBDataBinding extends AbstractDataBinding
 
     Class<?> cls;
 
-    private Map<String, Object> contextProperties = Collections.emptyMap();
-    private Map<String, Object> marshallerProperties = Collections.emptyMap();
-    private Map<String, Object> unmarshallerProperties = Collections.emptyMap();
+    private Map<String, Object> contextProperties = new HashMap<String, Object>();
+    private Map<String, Object> marshallerProperties = new HashMap<String, Object>();
+    private Map<String, Object> unmarshallerProperties = new HashMap<String, Object>();
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;
