@@ -28,6 +28,7 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
     private long accessTokenLifetime = 3600L;
@@ -107,7 +108,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
     }
     
     protected boolean isRefreshTokenSupported(List<String> theScopes) {
-        return true;
+        return theScopes.contains(OAuthConstants.REFRESH_TOKEN_SCOPE);
     }
 
     protected ServerAccessToken createNewAccessToken(Client client) {

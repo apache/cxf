@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.provider;
+package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
-import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
-import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
+import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthDataProvider;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider 
     implements AuthorizationCodeDataProvider {
@@ -32,11 +31,7 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
     @Override
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg) 
         throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(reg.getClient(), codeLifetime);
-        grant.setRedirectUri(reg.getRedirectUri());
-        grant.setSubject(reg.getSubject());
-        grant.setRequestedScopes(reg.getRequestedScope());
-        grant.setApprovedScopes(reg.getApprovedScope());
+        ServerAuthorizationCodeGrant grant = initCodeGrant(reg, codeLifetime);
         saveCodeGrant(grant);
         return grant;
     }
@@ -47,5 +42,15 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
     
     protected abstract void saveCodeGrant(ServerAuthorizationCodeGrant grant);
     
+    public static ServerAuthorizationCodeGrant initCodeGrant(AuthorizationCodeRegistration reg, long lifetime) {
+        ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(reg.getClient(), lifetime);
+        grant.setRedirectUri(reg.getRedirectUri());
+        grant.setSubject(reg.getSubject());
+        grant.setRequestedScopes(reg.getRequestedScope());
+        grant.setApprovedScopes(reg.getApprovedScope());
+        grant.setAudience(reg.getAudience());
+        grant.setClientCodeChallenge(reg.getClientCodeChallenge());
+        return grant;
+    }
     
 }

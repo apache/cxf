@@ -18,20 +18,17 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import java.util.List;
-
 import net.sf.ehcache.Ehcache;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.rs.security.oauth2.provider.DefaultEHCacheOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvider 
     implements AuthorizationCodeDataProvider {
-    public static final String CODE_GRANT_CACHE_KEY = "cxf.oauth2.client.cache";
+    public static final String CODE_GRANT_CACHE_KEY = "cxf.oauth2.codegrant.cache";
     
-    private long grantLifetime;
+    private long codeLifetime = 3600L;
     private Ehcache codeGrantCache;
     
     protected DefaultEHCacheCodeDataProvider() {
@@ -39,8 +36,8 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     }
     
     protected DefaultEHCacheCodeDataProvider(String configFileURL, Bus bus) {
-        this(configFileURL, bus, CODE_GRANT_CACHE_KEY,
-             CLIENT_CACHE_KEY, ACCESS_TOKEN_CACHE_KEY, REFRESH_TOKEN_CACHE_KEY);
+        this(configFileURL, bus, CLIENT_CACHE_KEY, CODE_GRANT_CACHE_KEY,
+             ACCESS_TOKEN_CACHE_KEY, REFRESH_TOKEN_CACHE_KEY);
     }
     
     protected DefaultEHCacheCodeDataProvider(String configFileURL, 
@@ -56,8 +53,8 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     @Override
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = doCreateCodeGrant(reg);
-        saveAuthorizationGrant(grant);
+        ServerAuthorizationCodeGrant grant = AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime);
+        saveCodeGrant(grant);
         return grant;
     }
 
@@ -71,40 +68,12 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
         }
         return grant;
     }
-    
-    protected ServerAuthorizationCodeGrant doCreateCodeGrant(AuthorizationCodeRegistration reg)
-        throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = 
-            new ServerAuthorizationCodeGrant(reg.getClient(), getCode(reg), getGrantLifetime(), getIssuedAt());
-        grant.setApprovedScopes(getApprovedScopes(reg));
-        grant.setAudience(reg.getAudience());
-        grant.setClientCodeChallenge(reg.getClientCodeChallenge());
-        grant.setSubject(reg.getSubject());
-        grant.setRedirectUri(reg.getRedirectUri());
-        return grant;
-    }
-
-    protected List<String> getApprovedScopes(AuthorizationCodeRegistration reg) {
-        return reg.getApprovedScope();
-    }
-    
-    protected String getCode(AuthorizationCodeRegistration reg) {
-        return OAuthUtils.generateRandomTokenKey();
-    }
-    
-    public long getGrantLifetime() {
-        return grantLifetime;
-    }
-
-    public void setGrantLifetime(long lifetime) {
-        this.grantLifetime = lifetime;
-    }
-
-    protected long getIssuedAt() {
-        return OAuthUtils.getIssuedAt();
-    }
-    
-    protected void saveAuthorizationGrant(ServerAuthorizationCodeGrant grant) { 
+        
+    protected void saveCodeGrant(ServerAuthorizationCodeGrant grant) { 
         putCacheValue(codeGrantCache, grant.getCode(), grant, grant.getExpiresIn());
+    }
+    
+    public void setCodeLifetime(long codeLifetime) {
+        this.codeLifetime = codeLifetime;
     }
 }

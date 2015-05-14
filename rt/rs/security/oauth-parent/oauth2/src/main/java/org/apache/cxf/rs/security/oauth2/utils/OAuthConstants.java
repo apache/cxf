@@ -126,6 +126,10 @@ public final class OAuthConstants {
     public static final String AUTHORIZATION_SCHEME_TYPE = "authScheme";
     public static final String AUTHORIZATION_SCHEME_DATA = "authSchemeData";
     
+    // Default refresh token scope value - checked by CXF utility code
+    public static final String REFRESH_TOKEN_SCOPE = "refreshToken";
+    
+    
     private OAuthConstants() {
     }
     
