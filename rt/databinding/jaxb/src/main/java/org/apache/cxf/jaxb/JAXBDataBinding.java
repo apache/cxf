@@ -195,10 +195,10 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
     Class<?> cls;
 
-    private Map<String, Object> contextProperties = Collections.emptyMap();
-    private List<XmlAdapter<?, ?>> adapters = Collections.emptyList();
-    private Map<String, Object> marshallerProperties = Collections.emptyMap();
-    private Map<String, Object> unmarshallerProperties = Collections.emptyMap();
+    private Map<String, Object> contextProperties = new HashMap<String, Object>();
+    private List<XmlAdapter<?, ?>> adapters = new ArrayList<XmlAdapter<?, ?>>();
+    private Map<String, Object> marshallerProperties = new HashMap<String, Object>();
+    private Map<String, Object> unmarshallerProperties = new HashMap<String, Object>();
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;
