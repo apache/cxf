@@ -316,6 +316,9 @@ public class JettyHTTPServerEngine implements ServerEngine {
         if (shouldCheckUrl(handler.getBus())) {
             checkRegistedContext(url);
         }
+        if (contexts == null) {
+            contexts = new ContextHandlerCollection();
+        }
         
         SecurityHandler securityHandler = null;
         if (server == null) {
@@ -394,7 +397,6 @@ public class JettyHTTPServerEngine implements ServerEngine {
                     }
                 }
             }
-            contexts = new ContextHandlerCollection();
             /*
              * handlerCollection may be null here if is only one handler to deal with.
              * Which in turn implies that there can't be a 'defaultHander' to deal with.
