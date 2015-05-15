@@ -19,22 +19,37 @@
 package org.apache.cxf.transport.http;
 
 import java.net.MalformedURLException;
+import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Iterator;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 
 /**
  * A convenient class for storing URI and URL representation of an address and avoid useless conversions.
+ * A proxy for the current address is also lazily resolved and stored; most of the times, that proxy can
+ * be used to prevent the HttpURLConnection from computing the proxy when the connection is opened.
+ * 
  * The class is thread-safe.
  */
 @NoJSR250Annotations
 public final class Address {  
 
+    private final String str;
     private final URI uri;
     private volatile URL url;
+    private volatile Proxy defaultProxy;
     
-    public Address(URI uri) {
+    public Address(String str) throws URISyntaxException {
+        this.str = str;
+        this.uri = new URI(str);
+    }
+    
+    public Address(String str, URI uri) {
+        this.str = str;
         this.uri = uri;
     }
     
@@ -51,5 +66,42 @@ public final class Address {
     
     public URI getURI() {
         return uri;
+    }
+    
+    public String getString() {
+        return str;
+    }
+    
+    public Proxy getDefaultProxy() {
+        if (defaultProxy == null) {
+            synchronized (this) {
+                if (defaultProxy == null) {
+                    defaultProxy = chooseProxy(uri);
+                }
+            }
+        }
+        return defaultProxy;
+    }
+
+    private static Proxy chooseProxy(URI uri) {
+        ProxySelector sel = java.security.AccessController
+            .doPrivileged(new java.security.PrivilegedAction<ProxySelector>() {
+                @Override
+                public ProxySelector run() {
+                    return ProxySelector.getDefault();
+                }
+            });
+        if (sel == null) {
+            return Proxy.NO_PROXY;
+        }
+        //detect usage of user-defined proxy and avoid optimizations in that case
+        if (!sel.getClass().getName().equals("sun.net.spi.DefaultProxySelector")) {
+            return null;
+        }
+        Iterator<Proxy> it = sel.select(uri).iterator();
+        if (it.hasNext()) {
+            return it.next();
+        }
+        return Proxy.NO_PROXY;
     }
 }

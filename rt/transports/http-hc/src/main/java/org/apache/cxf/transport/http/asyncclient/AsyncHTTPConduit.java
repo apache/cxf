@@ -141,7 +141,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         String uriString = uri.toString();
         if (uriString.startsWith("hc://")) {
             try {
-                uri = new URI(uriString.substring(5));
+                uriString = uriString.substring(5);
+                uri = new URI(uriString);
                 addressChanged = true;
             } catch (URISyntaxException ex) {
                 throw new MalformedURLException("unsupport uri: "  + uriString);
@@ -184,7 +185,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
         if (!MessageUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
-            super.setupConnection(message, addressChanged ? new Address(uri) : address, csPolicy);
+            super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy);
             return;
         }
         if (StringUtils.isEmpty(uri.getPath())) {
@@ -834,8 +835,13 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             inbuf = new SharedInputBuffer(bufSize, allocator);
             outbuf = new SharedOutputBuffer(bufSize, allocator);
             try {
-                this.url = new URI(newURL);
-                setupConnection(outMessage, new Address(this.url), csPolicy);
+                if (defaultAddress.getString().equals(newURL)) {
+                    setupConnection(outMessage, defaultAddress, csPolicy);
+                } else {
+                    Address address = new Address(newURL);
+                    this.url = address.getURI();
+                    setupConnection(outMessage, address, csPolicy);
+                }
                 entity = outMessage.get(CXFHttpRequest.class);
                 basicEntity = (BasicHttpEntity)entity.getEntity();
                 entity.setOutputStream(this);

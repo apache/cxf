@@ -313,7 +313,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         
         if (send) {
             //proxy = control.createMock(Proxy.class);
-            proxy = null;
+            proxy = Proxy.NO_PROXY;
             connection =
                 control.createMock(HttpURLConnection.class);
             connection.getURL();
