@@ -29,7 +29,7 @@
         Having cxf:bus has no effect: <cxf:bus/>
         Having cxf:bus with id causes NPE in BusDefinitionParser: <cxf:bus id="cxf"/>   
      -->        
-     <bean id="cxf" class="org.apache.cxf.bus.extension.ExtensionManagerBus"/>
+     <cxf:bus/>
      
      <jaxrs:server id="resourceServer" address="/">
         <jaxrs:serviceBeans>
