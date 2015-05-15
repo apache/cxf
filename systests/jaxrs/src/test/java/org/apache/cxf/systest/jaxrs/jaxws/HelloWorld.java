@@ -34,7 +34,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @WebService(targetNamespace = "http://hello.com")
 @Path("/")
 public interface HelloWorld {
-
+    @GET
+    @Path("/clear")
+    @Produces("text/plain")
+    int clearUsers();
+    
     @GET
     @Produces("text/plain")
     String sayHi(@QueryParam("text") String text);

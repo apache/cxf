@@ -25,6 +25,7 @@ import org.apache.aries.blueprint.parser.NamespaceHandlerSet;
 import org.apache.aries.blueprint.web.BlueprintContextListener;
 import org.apache.cxf.internal.CXFAPINamespaceHandler;
 import org.apache.cxf.jaxrs.blueprint.JAXRSBPNamespaceHandler;
+import org.apache.cxf.jaxws.blueprint.JAXWSBPNamespaceHandler;
 
 public class JAXRSBlueprintContextListener extends BlueprintContextListener {
     @Override
@@ -39,7 +40,7 @@ public class JAXRSBlueprintContextListener extends BlueprintContextListener {
                          new JAXRSBPNamespaceHandler());
         set.addNamespace(URI.create("http://cxf.apache.org/blueprint/jaxws"),
                          getClass().getResource("/schemas/blueprint/jaxws.xsd"),
-                         new JAXRSBPNamespaceHandler());
+                         new JAXWSBPNamespaceHandler());
         return set;
     }
 }

@@ -59,7 +59,6 @@ public class JAXRSSoapRestBlueprintTest extends AbstractClientServerTestBase {
     }
     
     @Test
-    @Ignore
     public void testHelloSoap() throws Exception {
         final QName serviceName = new QName("http://hello.com", "HelloWorld");
         final QName portName = new QName("http://hello.com", "HelloWorldPort");
@@ -83,6 +82,9 @@ public class JAXRSSoapRestBlueprintTest extends AbstractClientServerTestBase {
         users = service.echoUsers(users);
         assertEquals(1, users.size());
         assertEquals("Fred", users.entrySet().iterator().next().getValue().getName());
+        
+        assertEquals(1, service.clearUsers());
+        assertEquals(0, service.clearUsers());
     }
     
 }
