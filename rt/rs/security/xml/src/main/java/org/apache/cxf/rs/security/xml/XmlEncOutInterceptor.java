@@ -206,17 +206,8 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         byte[] encryptedEphemeralKey = null;
         try {
             encryptedEphemeralKey = cipher.doFinal(keyBytes);
-        } catch (IllegalStateException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
-            );
-        } catch (IllegalBlockSizeException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
-            );
-        } catch (BadPaddingException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
+        } catch (IllegalStateException | IllegalBlockSizeException | BadPaddingException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
         }
        
@@ -281,7 +272,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 data = remoteCert.getEncoded();
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
                 );
             }
             Text text = encryptedDataDoc.createTextNode(Base64.encode(data));

@@ -417,7 +417,7 @@ public class STSStaxTokenValidator
             ) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badEncoding",
-                        binarySecurityTokenType.getEncodingType());
+                        new Object[]{binarySecurityTokenType.getEncodingType()});
             }
 
             final byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
@@ -522,7 +522,7 @@ public class STSStaxTokenValidator
                 } else {
                     throw new WSSecurityException(
                             WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType",
-                            binarySecurityTokenType.getValueType());
+                            new Object[]{binarySecurityTokenType.getValueType()});
                 }
             } catch (XMLSecurityException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);

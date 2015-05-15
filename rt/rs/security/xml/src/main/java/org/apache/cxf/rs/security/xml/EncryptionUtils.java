@@ -62,13 +62,9 @@ public final class EncryptionUtils {
             } else {
                 cipher.init(mode, cert.getPublicKey(), oaepParameters);
             }
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
-            );
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
         }
         return cipher;
@@ -92,13 +88,9 @@ public final class EncryptionUtils {
             } else {
                 cipher.init(mode, key, oaepParameters);
             }
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
-            );
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
         }
         return cipher;
