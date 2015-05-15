@@ -582,7 +582,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                         createSecurityContext(msg, useJAASSubject, result, utWithCallbacks);
                     if (context != null) {
                         msg.put(SecurityContext.class, context);
-                        break;
+                        return;
                     }
                 }
             }
