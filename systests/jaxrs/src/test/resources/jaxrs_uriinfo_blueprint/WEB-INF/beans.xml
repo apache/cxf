@@ -24,11 +24,6 @@
              http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
              http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
              ">
-     <!-- 
-        NoOsi container does not find a 'cxf' component without ExtensionManagerBus instantiated in this context. 
-        Having cxf:bus has no effect: <cxf:bus/>
-        Having cxf:bus with id causes NPE in BusDefinitionParser: <cxf:bus id="cxf"/>   
-     -->        
      <cxf:bus/>
      
      <jaxrs:server id="resourceServer" address="/">
