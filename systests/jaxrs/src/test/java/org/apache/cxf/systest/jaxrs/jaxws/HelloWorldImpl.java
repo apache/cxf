@@ -29,6 +29,12 @@ import javax.jws.WebService;
 public class HelloWorldImpl implements HelloWorld {
     Map<Integer, User> users = new LinkedHashMap<Integer, User>();
 
+    public int clearUsers() {
+        int i = users.size();
+        users.clear();
+        return i;
+    }
+
 
     public String sayHi(String text) {
         return "Hello " + text;
