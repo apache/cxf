@@ -52,7 +52,6 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.osgi.framework.Bundle;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.CollectionMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
@@ -266,11 +265,7 @@ public abstract class AbstractBPBeanDefinitionParser {
     protected MutableBeanMetadata getBus(ParserContext context, String name) {
         ComponentDefinitionRegistry cdr = context.getComponentDefinitionRegistry();
         ComponentMetadata meta = cdr.getComponentDefinition("blueprintBundle");
-
-        Bundle blueprintBundle = null;
-        if (meta instanceof PassThroughMetadata) {
-            blueprintBundle = (Bundle) ((PassThroughMetadata) meta).getObject();
-        }
+        
         if (!cdr.containsComponentDefinition(InterceptorTypeConverter.class.getName())) {
             MutablePassThroughMetadata md = context.createMetadata(MutablePassThroughMetadata.class);
             md.setObject(new InterceptorTypeConverter());
@@ -278,13 +273,16 @@ public abstract class AbstractBPBeanDefinitionParser {
             md.setId(InterceptorTypeConverter.class.getName());
             context.getComponentDefinitionRegistry().registerTypeConverter(md);
         }
-        if (blueprintBundle != null && !cdr.containsComponentDefinition(name)) {
+        if (!cdr.containsComponentDefinition(name)) {
             //Create a bus
 
             MutableBeanMetadata bus = context.createMetadata(MutableBeanMetadata.class);
             bus.setId(name);
             bus.setRuntimeClass(BlueprintBus.class);
-            bus.addProperty("bundleContext", createRef(context, "blueprintBundleContext"));
+            if (meta != null) {
+                //blueprint-no-osgi does not provide a bundleContext
+                bus.addProperty("bundleContext", createRef(context, "blueprintBundleContext"));
+            }
             bus.addProperty("blueprintContainer", createRef(context, "blueprintContainer"));
             bus.setDestroyMethod("shutdown");
             bus.setInitMethod("initialize");

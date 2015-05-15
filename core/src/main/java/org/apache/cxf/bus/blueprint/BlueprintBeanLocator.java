@@ -123,7 +123,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
                 list.add(type.cast(container.getComponentInstance(s)));
             }
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && context != null) {
             try {
                 ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
                 if (refs != null) {
@@ -168,16 +168,18 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         }
         
         try {
-            ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
-            if (refs != null) {
-                for (ServiceReference r : refs) {
-                    Object o2 = context.getService(r);
-                    Class<? extends T> t = o2.getClass().asSubclass(type);
-                    if (listener.loadBean(t.getName(), t)) {
-                        if (listener.beanLoaded(t.getName(), type.cast(o2))) {
-                            return true;
+            if (context != null) {
+                ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
+                if (refs != null) {
+                    for (ServiceReference r : refs) {
+                        Object o2 = context.getService(r);
+                        Class<? extends T> t = o2.getClass().asSubclass(type);
+                        if (listener.loadBean(t.getName(), t)) {
+                            if (listener.beanLoaded(t.getName(), type.cast(o2))) {
+                                return true;
+                            }
+                            loaded = true;
                         }
-                        loaded = true;
                     }
                 }
             }
