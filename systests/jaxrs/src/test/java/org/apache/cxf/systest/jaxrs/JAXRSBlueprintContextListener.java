@@ -37,6 +37,9 @@ public class JAXRSBlueprintContextListener extends BlueprintContextListener {
         set.addNamespace(URI.create("http://cxf.apache.org/blueprint/jaxrs"),
                          getClass().getResource("/schemas/blueprint/jaxrs.xsd"),
                          new JAXRSBPNamespaceHandler());
+        set.addNamespace(URI.create("http://cxf.apache.org/blueprint/jaxws"),
+                         getClass().getResource("/schemas/blueprint/jaxws.xsd"),
+                         new JAXRSBPNamespaceHandler());
         return set;
     }
 }

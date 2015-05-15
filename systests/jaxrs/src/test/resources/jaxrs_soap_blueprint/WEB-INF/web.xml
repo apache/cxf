@@ -22,7 +22,7 @@
 <web-app>
     <context-param>
         <param-name>blueprintLocation</param-name>
-        <param-value>jaxrs_uriinfo_blueprint/WEB-INF/beans.xml</param-value>
+        <param-value>jaxrs_soap_blueprint/WEB-INF/beans.xml</param-value>
     </context-param>
     <listener>
         <listener-class>
@@ -39,7 +39,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>CXFServlet</servlet-name>
-        <url-pattern>/v1/*</url-pattern>
+        <url-pattern>/services/*</url-pattern>
     </servlet-mapping>
 </web-app>
 <!-- END SNIPPET: webxml -->
