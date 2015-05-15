@@ -75,9 +75,9 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
      */
     public void close() {
         super.close();
-        if (defaultEndpointURI != null) {
+        if (defaultAddress != null) {
             try {
-                URLConnection connect = defaultEndpointURI.toURL().openConnection();
+                URLConnection connect = defaultAddress.getURL().openConnection();
                 if (connect instanceof HttpURLConnection) {
                     ((HttpURLConnection)connect).disconnect();
                 }
@@ -99,7 +99,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         if (clientParameters == null) {
             clientParameters = tlsClientParameters;
         }
-        return connectionFactory.createConnection(clientParameters, proxy, url);
+        return connectionFactory.createConnection(clientParameters,
+                                                  proxy != null ? proxy : address.getDefaultProxy(), url);
     }
     protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
         HttpURLConnection connection = createConnection(message, address, csPolicy);
@@ -296,8 +297,11 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             HTTPClientPolicy cp = getClient(outMessage);
             Address address;
             try {
-                URI nurl = new URI(newURL);
-                address = new Address(nurl);
+                if (defaultAddress.getString().equals(newURL)) {
+                    address = defaultAddress;
+                } else {
+                    address = new Address(newURL);
+                }
             } catch (URISyntaxException e) {
                 throw new IOException(e);
             }

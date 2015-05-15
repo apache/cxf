@@ -101,7 +101,8 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         String uriString = uri.toString();
         if (uriString.startsWith("netty://")) {
             try {
-                uri = new URI(uriString.substring(8));
+                uriString = uriString.substring(8);
+                uri = new URI(uriString);
                 addressChanged = true;
             } catch (URISyntaxException ex) {
                 throw new MalformedURLException("unsupport uri: "  + uriString);
@@ -144,7 +145,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         }
         if (!MessageUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
-            super.setupConnection(message, addressChanged ? new Address(uri) : address, csPolicy);
+            super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy);
             return;
         }
         message.put(USE_ASYNC, Boolean.TRUE);
@@ -544,8 +545,14 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             }
 
             try {
-                this.url = new URI(newURL);
-                Address address = new Address(this.url);
+                Address address;
+                if (defaultAddress.getString().equals(newURL)) {
+                    address = defaultAddress;
+                    this.url = defaultAddress.getURI();
+                } else {
+                    this.url = new URI(newURL);
+                    address = new Address(newURL, this.url);
+                }
                 setupConnection(outMessage, address, csPolicy);
                 entity = outMessage.get(NettyHttpClientRequest.class);
                 //reset the buffers

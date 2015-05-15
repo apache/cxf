@@ -208,8 +208,8 @@ public abstract class HTTPConduit
      * This field holds the "default" URI for this particular conduit, which
      * is created on demand.
      */
-    protected URI defaultEndpointURI;
-    protected String defaultEndpointURIString;
+    protected Address defaultAddress;
+    
     protected boolean fromEndpointReferenceType;
     
     protected ProxyFactory proxyFactory;
@@ -298,6 +298,11 @@ public abstract class HTTPConduit
 
         if (t != null) {
             fromEndpointReferenceType = true;
+        }
+        try {
+            defaultAddress = createAddress();
+        } catch (URISyntaxException use) {
+            throw new IOException(use);
         }
         proxyFactory = new ProxyFactory();
         cookies = new Cookies();
@@ -676,12 +681,10 @@ public abstract class HTTPConduit
         String queryString = (String)message.get(Message.QUERY_STRING);
         if (result == null) {
             if (pathInfo == null && queryString == null) {
-                URI uri = getURI();
-                message.put(Message.ENDPOINT_ADDRESS, defaultEndpointURIString);
-                return new Address(uri);
+                message.put(Message.ENDPOINT_ADDRESS, defaultAddress.getString());
+                return defaultAddress;
             }
-            result = getURI().toString();
-            message.put(Message.ENDPOINT_ADDRESS, result);
+            message.put(Message.ENDPOINT_ADDRESS, defaultAddress.getString());
         }
         
         // REVISIT: is this really correct?
@@ -691,9 +694,8 @@ public abstract class HTTPConduit
         if (queryString != null) {
             result = result + "?" + queryString;
         }        
-        return new Address(new URI(result));
+        return result.equals(defaultAddress.getString()) ? defaultAddress : new Address(result);
     }
-
 
     /**
      * Close the conduit
@@ -708,8 +710,8 @@ public abstract class HTTPConduit
      * @return the default target address
      */
     public String getAddress() {
-        if (defaultEndpointURI != null) {
-            return defaultEndpointURIString;
+        if (defaultAddress != null) {
+            return defaultAddress.getString();
         } else if (fromEndpointReferenceType) {
             return getTarget().getAddress().getValue();
         }
@@ -720,31 +722,19 @@ public abstract class HTTPConduit
      * @return the default target URL
      */
     protected URI getURI() throws URISyntaxException {
-        return getURI(true);
+        return defaultAddress.getURI();
     }
 
-    /**
-     * @param createOnDemand create URL on-demand if null
-     * @return the default target URL
-     * @throws URISyntaxException 
-     */
-    protected synchronized URI getURI(boolean createOnDemand)
-        throws URISyntaxException {
-        if (defaultEndpointURI == null && createOnDemand) {
-            if (fromEndpointReferenceType && getTarget().getAddress().getValue() != null) {
-                defaultEndpointURI = new URI(this.getTarget().getAddress().getValue());
-                defaultEndpointURIString = defaultEndpointURI.toString();
-                return defaultEndpointURI;
-            }
-            if (endpointInfo.getAddress() == null) {
-                throw new URISyntaxException("<null>", 
-                                             "Invalid address. Endpoint address cannot be null.",
-                                             0);
-            }
-            defaultEndpointURI = new URI(endpointInfo.getAddress());
-            defaultEndpointURIString = defaultEndpointURI.toString();
+    private Address createAddress() throws URISyntaxException {
+        if (fromEndpointReferenceType && getTarget().getAddress().getValue() != null) {
+            return new Address(this.getTarget().getAddress().getValue());
         }
-        return defaultEndpointURI;
+        if (endpointInfo.getAddress() == null) {
+            throw new URISyntaxException("<null>", 
+                                         "Invalid address. Endpoint address cannot be null.",
+                                         0);
+        }
+        return new Address(endpointInfo.getAddress());
     }
 
     /**
