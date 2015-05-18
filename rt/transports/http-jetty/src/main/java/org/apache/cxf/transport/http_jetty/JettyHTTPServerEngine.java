@@ -387,6 +387,9 @@ public class JettyHTTPServerEngine implements ServerEngine {
         }
         if (contexts == null) {
             contexts = new ContextHandlerCollection();
+            if (server != null) {
+                server.setHandler(contexts);
+            }
         }
         
         SecurityHandler securityHandler = null;
