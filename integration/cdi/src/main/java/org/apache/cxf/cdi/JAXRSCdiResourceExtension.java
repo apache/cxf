@@ -58,7 +58,9 @@ public class JAXRSCdiResourceExtension implements Extension {
     private final List< Bean< ? > > applicationBeans = new ArrayList< Bean< ? > >();
     private final List< Bean< ? > > serviceBeans = new ArrayList< Bean< ? > >();
     private final List< Bean< ? > > providerBeans = new ArrayList< Bean< ? > >();
+    private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
         
+    @SuppressWarnings("unchecked")
     public <T> void collect(@Observes final ProcessBean< T > event) {
         if (event.getAnnotated().isAnnotationPresent(ApplicationPath.class)) {
             applicationBeans.add(event.getBean());
@@ -66,9 +68,11 @@ public class JAXRSCdiResourceExtension implements Extension {
             serviceBeans.add(event.getBean());
         } else if (event.getAnnotated().isAnnotationPresent(Provider.class)) {
             providerBeans.add(event.getBean());
+        } else if (event.getBean().getTypes().contains(Feature.class)) {
+            featureBeans.add((Bean< ? extends Feature >)event.getBean());
         } else if (CdiBusBean.CXF.equals(event.getBean().getName()) 
                 && Bus.class.isAssignableFrom(event.getBean().getBeanClass())) {
-            busBean = event.getBean();  
+            busBean = event.getBean();
         }
     }
     
@@ -88,9 +92,9 @@ public class JAXRSCdiResourceExtension implements Extension {
             
             // If there is an application without any singletons and classes defined, we will
             // create a server factory bean with all services and providers discovered. 
-            if (instance.getSingletons().isEmpty() && instance.getClasses().isEmpty()) {                            
-                final JAXRSServerFactoryBean factory = createFactoryInstance(instance,         
-                    loadServices(beanManager), loadProviders(beanManager));
+            if (instance.getSingletons().isEmpty() && instance.getClasses().isEmpty()) {
+                final JAXRSServerFactoryBean factory = createFactoryInstance(instance,
+                    loadServices(beanManager), loadProviders(beanManager), loadFeatures(beanManager));
                 factory.init();   
             } else {
                 // If there is an application with any singletons or classes defined, we will
@@ -122,12 +126,13 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @return JAXRSServerFactoryBean instance
      */
     private JAXRSServerFactoryBean createFactoryInstance(final Application application, final List< ? > services,
-            final List< ? > providers) {        
+            final List< ? > providers, final List< ? extends Feature > features) {
         
         final JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false);          
         instance.setServiceBeans(new ArrayList< Object >(services));
         instance.setProviders(providers);
         instance.setProviders(loadExternalProviders());
+        instance.setFeatures(features);
         instance.setBus(bus);                  
         
         return instance; 
@@ -231,6 +236,27 @@ public class JAXRSCdiResourceExtension implements Extension {
         for (final Bean< ? > bean: serviceBeans) {
             services.add(
                 beanManager.getReference(
+                    bean, 
+                    bean.getBeanClass(), 
+                    beanManager.createCreationalContext(bean) 
+                )
+            );    
+        }
+        
+        return services;
+    }
+    
+    /**
+     * Gets the references for all discovered CXF-specific features
+     * @param beanManager bean manager instance
+     * @return the references for all discovered CXF-specific features
+     */
+    private List< Feature > loadFeatures(final BeanManager beanManager) {
+        final List< Feature > services = new ArrayList<>();
+        
+        for (final Bean< ? extends Feature > bean: featureBeans) {
+            services.add(
+                (Feature)beanManager.getReference(
                     bean, 
                     bean.getBeanClass(), 
                     beanManager.createCreationalContext(bean) 
